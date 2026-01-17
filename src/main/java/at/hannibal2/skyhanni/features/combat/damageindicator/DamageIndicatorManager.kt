@@ -1008,7 +1008,7 @@ object DamageIndicatorManager {
             }
         } else {
             if (showNameAndHealth && config.hideVanillaNametag) {
-                val name = entity.name.formattedTextCompatLessResets()
+                val name = entity.name.string
                 if (name.contains("Plasmaflux")) return
                 if (name.contains("Overflux")) return
                 if (name.contains("Mana Flux")) return

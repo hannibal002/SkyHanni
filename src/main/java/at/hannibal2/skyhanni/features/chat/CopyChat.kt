@@ -78,7 +78,7 @@ object CopyChat {
             matchingLines.size == 1 -> matchingLines.first()
             else -> {
                 matchingLines.firstOrNull {
-                    it.content.formattedTextCompat().stripHypixelMessage().removeColor()
+                    it.content.string.removeColor()
                         .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
                 } ?: matchingLines.first()
             }

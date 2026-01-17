@@ -153,11 +153,11 @@ object CakeTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcaketracker") {
+        event.registerBrigadier("shresetcaketracker") {
             description = "Resets the New Year Cake Tracker"
             category = CommandCategory.USERS_RESET
-            callback {
-                val storage = storage ?: return@callback
+            simpleCallback {
+                val storage = storage ?: return@simpleCallback
                 storage.ownedCakes.clear()
                 recalculateMissingCakes()
                 ChatUtils.chat("New Year Cake tracker data reset")

@@ -47,12 +47,15 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.annotations.Expose
@@ -60,6 +63,7 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
@@ -150,10 +154,11 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun ItemStack.cleanName() = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+    fun ItemStack.cleanName() = hoverName.string.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
+    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
     fun ItemStack.getLore(): List<String> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
@@ -163,6 +168,11 @@ object ItemUtils {
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
+    }
+
+    fun ItemStack.getLoreComponent(): List<Component> {
+        val lore = this.get(DataComponents.LORE)?.lines
+        return lore ?: emptyList()
     }
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -197,8 +207,13 @@ object ItemUtils {
         return name
     }
 
-    fun ItemStack.setLore(lore: List<String>): ItemStack {
-        this.set(DataComponents.LORE, ItemLore(lore.map { Component.nullToEmpty(it) }))
+    fun ItemStack.setLoreString(lore: List<String>): ItemStack {
+        this.set(DataComponents.LORE, ItemLore(lore.map { Component.literal(it) }))
+        return this
+    }
+
+    fun ItemStack.setLore(lore: List<Component>): ItemStack {
+        this.set(DataComponents.LORE, ItemLore(lore))
         return this
     }
 
@@ -215,13 +230,15 @@ object ItemUtils {
         return this
     }
 
-    // TODO change else janni is sad
-    fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
-        it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    fun ItemStack.isAnySoulbound(): Boolean = isCoopSoulbound() || isSoulbound()
+
+    fun ItemStack.isCoopSoulbound(): Boolean = getLoreComponent().any {
+        it.string == "* Co-op Soulbound *"
     }
 
-    // TODO change else janni is sad
-    fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
+    fun ItemStack.isSoulbound(): Boolean = getLoreComponent().any {
+        it.string == "* Soulbound *"
+    }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
@@ -256,7 +273,7 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (hoverName.formattedTextCompatLeadingWhiteLessResets() == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
         // This is to prevent an error message whenever coins are traded.
@@ -321,7 +338,7 @@ object ItemUtils {
         //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
         //#endif
         stack.setCustomItemName(displayName)
-        stack.setLore(lore.toList())
+        stack.setLoreString(lore.toList())
         return stack
     }
 
@@ -337,7 +354,7 @@ object ItemUtils {
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): ItemStack {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
-        stack.setLore(lore)
+        stack.setLoreString(lore)
         var tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
@@ -441,7 +458,13 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+    fun ItemStack.editItemInfo(displayName: String, lore: List<String>): ItemStack {
+        this.setCustomItemName(displayName)
+        this.setLoreString(lore)
+        return this
+    }
+
+    fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
         this.setCustomItemName(displayName)
         this.setLore(lore)
         return this
@@ -773,7 +796,11 @@ object ItemUtils {
                 "§eClick to copy internal name to clipboard!",
             ),
         )
-        add(componentText)
+        val hoverComp = componentBuilder {
+            appendWithColor(" (tooltip)", ChatFormatting.DARK_GRAY)
+            stackHover = internalName.getItemStackOrNull()
+        }
+        add(componentText.append(hoverComp))
     }
 
     @HandleEvent

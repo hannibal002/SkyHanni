@@ -51,7 +51,7 @@ object BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
-        if (!stack.hoverName.formattedTextCompatLeadingWhiteLessResets().contains("Cancel Order")) return
+        if (!stack.hoverName.string.contains("Cancel Order")) return
 
         val lore = stack.getLore()
         lastAmountPattern.firstMatcher(lore) {

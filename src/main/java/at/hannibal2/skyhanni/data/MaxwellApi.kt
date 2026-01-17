@@ -245,7 +245,7 @@ object MaxwellApi {
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
             } ?: return
-        val displayName = selectedPowerStack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().trim()
+        val displayName = selectedPowerStack.hoverName.string.removeColor().trim()
 
         currentPower = getPowerByNameOrNull(displayName) ?: run {
             ErrorManager.logErrorWithData(

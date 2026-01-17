@@ -43,7 +43,7 @@ object FrozenTreasureHighlighter {
             if (armorStand.getInventoryItems().count { it.isNotEmpty() } != 1) continue
 
             val standHelmet = armorStand.getStandHelmet().orNull() ?: continue
-            if (standHelmet.isSkull() && standHelmet.hoverName.formattedTextCompatLeadingWhiteLessResets().endsWith("Head")) continue
+            if (standHelmet.isSkull() && standHelmet.hoverName.string.endsWith("Head")) continue
 
             val treasureLocation = armorStand.blockPosition().toLorenzVec().up(yOffset)
             blockHighlighter.addBlock(TimedHighlightBlock(treasureLocation))

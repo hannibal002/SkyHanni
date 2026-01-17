@@ -158,7 +158,7 @@ object BestiaryData {
 
     private fun inCategory() {
         for ((index, stack) in stackList) {
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == " ") continue
+            if (stack.hoverName.string == " ") continue
             if (!indexes.contains(index)) continue
             val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             var familiesFound: Long = 0

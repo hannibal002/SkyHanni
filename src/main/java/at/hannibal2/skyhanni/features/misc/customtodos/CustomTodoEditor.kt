@@ -33,6 +33,9 @@ class CustomTodoEditor(
     var showWhen: String = from.showWhen.toString()
 
     @field:Bind
+    var totalTriggers: String = from.totalTriggers.toString()
+
+    @field:Bind
     var trigger: String = from.trigger
 
     @field:Bind
@@ -47,11 +50,18 @@ class CustomTodoEditor(
     @field:Bind
     var ignoreColorCodes: Boolean = from.ignoreColorCodes
 
+    @field:Bind
+    var cronEnabled: Boolean = from.cronEnabled
+
+    @field:Bind
+    var cronExpression: String = from.cronExpression
+
     var target = from.triggerTarget
     var matchMode = from.triggerMatcher
 
     fun into(): CustomTodo {
         if (from.readyAtOnCurrentProfile == null) markAsReady()
+        if (from.totalTriggers != totalTriggers.toIntOrNull()) from.triggersLeft = mutableMapOf()
         return CustomTodo(
             label,
             timer.toIntOrNull() ?: 0,
@@ -65,6 +75,12 @@ class CustomTodoEditor(
             enabled,
             ignoreColorCodes,
             from.position,
+            totalTriggers.toIntOrNull() ?: 1,
+            from.triggersLeft,
+            cronEnabled,
+            cronExpression,
+            from.downloaded,
+            from.downloadedId,
         )
     }
 
@@ -165,11 +181,13 @@ class CustomTodoEditor(
 
     @Bind
     fun markAsReady() {
+        from.triggersLeftOnCurrentProfile = totalTriggers.toIntOrNull() ?: 1
         from.readyAtOnCurrentProfile = SimpleTimeMark.now()
     }
 
     @Bind
     fun markAsCompleted() {
+        from.triggersLeftOnCurrentProfile = 0
         from.setDoneNow()
     }
 
@@ -272,7 +290,7 @@ class CustomTodoEditor(
 
     @Bind
     fun getLabel(): StructuredText {
-        return label.replace("&&", "§").asStructuredText()
+        return (label.replace("&&", "§") + if (from.downloaded) " §a(Downloaded)" else "").asStructuredText()
     }
 
     @Bind
@@ -292,6 +310,8 @@ class CustomTodoEditor(
 
     @Bind
     fun edit() {
+        from.downloaded = false
+        from.downloadedId = ""
         XmlUtils.openXmlScreen(this, MyResourceLocation("skyhanni", "gui/customtodos/edit.xml"))
     }
 }

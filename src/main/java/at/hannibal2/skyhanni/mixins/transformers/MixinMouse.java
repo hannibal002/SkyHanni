@@ -35,7 +35,7 @@ public class MixinMouse {
     @Inject(method = "onScroll", at = @At("HEAD"))
     private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
         MouseCompat.INSTANCE.setScroll(vertical);
-        DelayedRun.INSTANCE.runNextTick(() -> {
+        DelayedRun.INSTANCE.runNextTickOld(() -> {
             MouseCompat.INSTANCE.setScroll(0);
             return null;
         });
@@ -54,7 +54,7 @@ public class MixinMouse {
             new KeyPressEvent(button).post();
         } else {
             new KeyPressEvent(button).post();
-            DelayedRun.INSTANCE.runNextTick(() -> {
+            DelayedRun.INSTANCE.runNextTickOld(() -> {
                 MouseCompat.INSTANCE.setLastEventButton(-1);
                 return null;
             });

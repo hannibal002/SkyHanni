@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import net.minecraft.network.chat.Component
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -165,11 +167,11 @@ object TimeUtils {
          */
         return ScoreboardData.tryToReplaceScoreboardLine(
             if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
-                "$datePart, $timePart"
+                Component.literal("$datePart, $timePart")
             } else {
-                "$datePart$timePart".trim()
+                Component.literal("$datePart$timePart".trim())
             },
-        )
+        ).formattedTextCompat()
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))

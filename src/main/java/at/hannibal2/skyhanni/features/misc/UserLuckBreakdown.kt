@@ -119,8 +119,8 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
-        if (inventoryName != "§dMiscellaneous Stats") return
+        val inventoryName = event.inventoryItems[4]?.hoverName?.string.orEmpty()
+        if (inventoryName != "Miscellaneous Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItemsWithNull)
         val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")
@@ -185,7 +185,7 @@ object UserLuckBreakdown {
         event.slot ?: return
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.containerSlot == 48) {
-            event.toolTip[1] = Component.nullToEmpty("§7To Your Stats Breakdown")
+            event.toolTip[1] = Component.literal("§7To Your Stats Breakdown")
         }
         if (event.slot.containerSlot != 4 || inCustomBreakdown) return
         val luckEvent = getOrPostLuckEvent()

@@ -4,11 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object PocketSackInASackDisplay {
@@ -30,7 +31,7 @@ object PocketSackInASackDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!config.replaceLore) return
         val itemStack = event.itemStack
         val applied = itemStack.getAppliedPocketSackInASack() ?: return
@@ -39,14 +40,14 @@ object PocketSackInASackDisplay {
         val iterator = event.toolTip.listIterator()
         var next = false
         for (line in iterator) {
-            if (line.contains("7This sack is")) {
+            if (line.string.contains("This sack is")) {
                 val color = if (applied == MAX_STITCHES) "§a" else "§b"
-                iterator.set("§7This sack is stitched $color$applied§7/$color$MAX_STITCHES")
+                iterator.set("§7This sack is stitched $color$applied§7/$color$MAX_STITCHES".asComponent())
                 next = true
                 continue
             }
             if (next) {
-                iterator.set("§7times with a §cPocket Sack-in-a-Sack§7.")
+                iterator.set("§7times with a §cPocket Sack-in-a-Sack§7.".asComponent())
                 return
             }
         }

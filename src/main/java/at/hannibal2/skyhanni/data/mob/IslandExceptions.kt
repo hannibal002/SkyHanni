@@ -132,13 +132,13 @@ object IslandExceptions {
             MobData.MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
 
         baseEntity is Pig && nextEntity is Pig -> MobData.MobResult.illegal // Matriarch Tongue
-        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "BarbarianGuard " ->
+        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.string == "BarbarianGuard " ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Barbarian Guard"))
 
-        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "MageGuard " ->
+        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.string == "MageGuard " ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Mage Guard"))
 
-        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "Mage Outlaw" ->
+        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.string == "Mage Outlaw" ->
             // fix for wierd name
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Mage Outlaw"))
 

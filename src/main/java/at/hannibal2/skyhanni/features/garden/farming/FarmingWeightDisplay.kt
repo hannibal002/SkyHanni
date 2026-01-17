@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.minecraft.client.Minecraft
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
@@ -192,21 +194,23 @@ object FarmingWeightDisplay {
         if (rankGoal == -1) rankGoal = getRankGoal()
         val leaderboard = getLeaderboardFormat()
 
-        val list = mutableListOf<Renderable>()
-        list.add(
-            Renderable.clickable(
-                "§6$lbName§7: $weight$leaderboard",
-                tips = listOf("§eClick to open your Farming Profile."),
-                onLeftClick = { openWebsite(PlayerUtils.getName()) },
-            ),
-        )
+        Minecraft.getInstance().execute {
+            val list = mutableListOf<Renderable>()
+            list.add(
+                Renderable.clickable(
+                    "§6$lbName§7: $weight$leaderboard",
+                    tips = listOf("§eClick to open your Farming Profile."),
+                    onLeftClick = { openWebsite(PlayerUtils.getName()) },
+                ),
+            )
 
-        if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
-            getETA()?.let {
-                list.add(it)
+            if (isEtaEnabled() && (weightPerSecond != -1.0 || config.overtakeETAAlways)) {
+                getETA()?.let {
+                    list.add(it)
+                }
             }
+            display = list
         }
-        display = list
     }
 
     private fun getLeaderboardFormat(): String {
@@ -433,6 +437,9 @@ object FarmingWeightDisplay {
     }
 
     private suspend fun loadLeaderboardPosition(): Int {
+        // Don't try to fetch leaderboard if we don't have a profile ID yet
+        if (profileId.isBlank()) return leaderboardPosition
+
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val upcomingPlayers = when {
             !isEnabled() -> 0
@@ -486,7 +493,10 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine("farming weight display load weight") {
+    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine(
+        "farming weight display load weight",
+        timeout = 30.seconds,
+    ) {
         val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
             apiError = true
             return@launchIOCoroutine
@@ -526,11 +536,6 @@ object FarmingWeightDisplay {
 
     private fun CropType.getFactor(): Double {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
-    }
-
-    private fun lookUpCommand(it: Array<String>) {
-        val name = if (it.size == 1) it[0] else PlayerUtils.getName()
-        openWebsite(name, ignoreCooldown = true)
     }
 
     private var lastName = ""
@@ -585,10 +590,15 @@ object FarmingWeightDisplay {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shfarmingprofile") {
+        event.registerBrigadier("shfarmingprofile") {
             description = "Look up the farming profile from yourself or another player on elitebot.dev"
             category = CommandCategory.USERS_ACTIVE
-            callback { lookUpCommand(it) }
+            argCallback("name", BrigadierArguments.string()) { name ->
+                openWebsite(name, ignoreCooldown = true)
+            }
+            simpleCallback {
+                openWebsite(PlayerUtils.getName(), ignoreCooldown = true)
+            }
         }
     }
 

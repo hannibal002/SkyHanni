@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -69,13 +68,9 @@ object PartyChatCommands {
             requiresPartyLead = false,
             executable = {
                 if (!CurrentPing.isEnabled()) {
-                    ChatUtils.clickableChat(
+                    ChatUtils.notifyOrDisable(
                         "Ping API is disabled, the ping command won't work!",
-                        prefixColor = "§c",
-                        onClick = {
-                            devConfig::pingApi.jumpToEditor()
-                        },
-                        hover = "§eClick to find setting in the config!",
+                        devConfig::pingApi,
                     )
                     return@PartyChatCommand
                 }

@@ -30,7 +30,7 @@ object BetterWikiFromMenus {
         if (chestName.isEmpty()) return
 
         val itemClickedStack = event.slot?.item ?: return
-        val itemClickedName = itemClickedStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemClickedName = itemClickedStack.hoverName.string
 
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")

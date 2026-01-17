@@ -8,10 +8,9 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatchesComponent
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import net.minecraft.world.item.ItemStack
 
@@ -33,15 +32,15 @@ object StereoHarmonyDiscReplacer {
         val internalName = item?.getInternalNameOrNull() ?: return
         val vinylType = VinylType.getByInternalNameOrNull(internalName) ?: return
         val cropType = PestType.getByVinylOrNull(vinylType)?.crop ?: return
-        val lore = item.getLore()
-        val isActiveVinyl = PestApi.stereoPlayingItemPattern.anyMatches(lore)
+        val lore = item.getLoreComponent()
+        val isActiveVinyl = PestApi.stereoPlayingItemPattern.anyMatchesComponent(lore)
         val iconId = "stereo_harmony_replacer:${vinylType.name}-$isActiveVinyl"
 
         val replacementStack = iconCache.getOrPut(iconId) {
             cropType.getItemStackCopy(iconId).apply {
                 if (isActiveVinyl) addEnchantGlint()
                 setLore(lore)
-                setCustomItemName(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
+                setCustomItemName(item.hoverName)
             }
         }
 

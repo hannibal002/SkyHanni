@@ -76,7 +76,7 @@ object FishingHookDisplay {
             return
         }
         if (!armorStand.hasCustomName()) return
-        val alertText = if (armorStand.name.formattedTextCompatLessResets() == "§c§l!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets()
+        val alertText = if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets()
 
         config.position.renderString(alertText, posLabel = "Fishing Hook Display")
     }
@@ -87,7 +87,7 @@ object FishingHookDisplay {
     }
 
     private fun ArmorStand.hasCorrectName(): Boolean {
-        if (name.formattedTextCompatLessResets() == "§c§l!!!") {
+        if (name.string == "!!!") {
             return true
         }
         return pattern.matcher(name.formattedTextCompatLessResets()).matches()

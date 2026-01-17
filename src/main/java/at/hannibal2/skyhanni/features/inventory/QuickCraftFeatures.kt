@@ -50,7 +50,7 @@ object QuickCraftFeatures {
         if (needsQuickCraftConfirmation(event.itemStack)) {
             for ((index, line) in event.toolTip.withIndex()) {
                 if (line.string.removeColor() == "Click to craft!") {
-                    event.toolTip.set(index, Component.nullToEmpty("§c${KeyboardManager.getModifierKeyName()} + Click to craft!"))
+                    event.toolTip.set(index, Component.literal("§c${KeyboardManager.getModifierKeyName()} + Click to craft!"))
                     break
                 }
             }
@@ -66,7 +66,7 @@ object QuickCraftFeatures {
 
         for ((slot, stack) in chest.getAllItems()) {
             if (inventoryType.ignoreSlot(slot.index)) continue
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cQuick Crafting Slot") continue
+            if (stack.hoverName.string == "Quick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 slot.highlight(LorenzColor.DARK_GRAY.addOpacity(180))
             }
@@ -85,7 +85,7 @@ object QuickCraftFeatures {
     }
 
     private fun needsQuickCraftConfirmation(item: ItemStack): Boolean {
-        return !quickCraftableItems.contains(item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor())
+        return !quickCraftableItems.contains(item.hoverName.string.removeColor())
     }
 
     private fun getInventoryType(): InventoryType? {

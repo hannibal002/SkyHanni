@@ -96,7 +96,7 @@ object FossilSolverDisplay {
     fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
-        val itemNames = slots.map { it.item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() }
+        val itemNames = slots.map { it.item.hoverName.string.removeColor() }
         if (itemNames != inventoryItemNames) {
             inventoryItemNames = itemNames
             if (inExcavatorMenu) return
@@ -113,7 +113,7 @@ object FossilSolverDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val stack = slot.item
             val slotIndex = slot.containerSlot
-            val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val stackName = stack.hoverName.string.removeColor()
             val isDirt = stackName == "Dirt"
             val isFossil = stackName == "Fossil"
             when {

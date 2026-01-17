@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component
 //$$ import net.minecraft.client.input.KeyEvent
 //#endif
 
-@Suppress("UnusedParameter")
+@Suppress("UnusedParameter", "TooManyFunctions")
 abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     val mc: Minecraft = Minecraft.getInstance()

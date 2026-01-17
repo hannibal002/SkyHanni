@@ -99,7 +99,7 @@ object NpcVisitorFix {
 
     private fun findNametags(visitorName: String): MutableList<ArmorStand> {
         return EntityUtils.getEntitiesInBoundingBox<ArmorStand>(GardenApi.barnArea) {
-            it.name.formattedTextCompatLessResets().removeColor() == visitorName
+            it.name.string.removeColor() == visitorName
         }.toMutableList()
     }
 }

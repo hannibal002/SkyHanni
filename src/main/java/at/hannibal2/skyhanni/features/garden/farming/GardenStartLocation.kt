@@ -106,10 +106,10 @@ object GardenStartLocation {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shcropstartlocation") {
+        event.registerBrigadier("shcropstartlocation") {
             description = "Manually sets the crop start location"
             category = CommandCategory.USERS_ACTIVE
-            callback { setLocationCommand() }
+            simpleCallback { setLocationCommand() }
         }
     }
 

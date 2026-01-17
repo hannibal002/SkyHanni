@@ -41,8 +41,8 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aSupercraft"
+        val correctItem = items[23]?.hoverName?.string == "Crafting Table"
+        val correctSuperCraftItem = items[32]?.hoverName?.string == "Supercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return

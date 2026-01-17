@@ -128,7 +128,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            if (event.slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§eReforge Item" || event.slot.item?.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§cError!") return
+            if (event.slot.item?.hoverName?.string == "Reforge Item" || event.slot.item?.hoverName?.string == "Error!") return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -427,8 +427,8 @@ object ReforgeHelper {
         if (slot != null) {
             slot.highlight(color)
         } else {
-            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
-            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON].takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON].takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
         }
     }
 

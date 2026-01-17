@@ -45,7 +45,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
@@ -61,6 +64,7 @@ object GardenApi {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
+    var lastBrokenCropType: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
     var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
@@ -139,14 +143,14 @@ object GardenApi {
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).post()
+        GardenToolChangeEvent(cropInHand, itemInHand, toolInHand).post()
     }
 
     private fun checkItemInHand() {
         val toolItem = InventoryUtils.getItemInHand()
         val crop = toolItem?.getCropType()
         val newTool = getToolInHand(toolItem, crop)
-        if (toolInHand != newTool || crop != cropInHand) {
+        if (itemInHand?.getItemUuid() != toolItem?.getItemUuid() || crop != cropInHand && !(toolInHand == null && newTool == null)) {
             toolInHand = newTool
             cropInHand = crop
             itemInHand = toolItem
@@ -172,6 +176,9 @@ object GardenApi {
         val crop = it.getCropType()
         getToolInHand(it, crop) != null
     } ?: false
+
+    fun isHoldingCropFever(): Boolean =
+        InventoryUtils.getItemInHand()?.getHypixelEnchantments()?.containsKeys("ultimate_crop_fever") == true
 
     fun ItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
@@ -204,8 +211,9 @@ object GardenApi {
     }
 
     fun getCurrentlyFarmedCrop(): CropType? {
-        val brokenCrop = if (toolInHand != null) GardenCropSpeed.lastBrokenCrop else null
-        return cropInHand ?: brokenCrop
+        if (toolInHand == null) return null
+        val brokenCrop = GardenCropSpeed.lastBrokenCrop
+        return lastBrokenCropType ?: cropInHand ?: brokenCrop
     }
 
     private var lastLocation: LorenzVec? = null

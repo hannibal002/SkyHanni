@@ -80,14 +80,6 @@ class EstimatedItemValueConfig {
     @ConfigEditorDropdown
     val priceSource: Property<ItemPriceSource> = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL)
 
-    enum class BazaarPriceSource(private val displayName: String) {
-        INSTANT_BUY("Instant Buy"),
-        BUY_ORDER("Buy Order"),
-        ;
-
-        override fun toString() = displayName
-    }
-
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig::class, field = "enabled")
     val position: Position = Position(140, 90)

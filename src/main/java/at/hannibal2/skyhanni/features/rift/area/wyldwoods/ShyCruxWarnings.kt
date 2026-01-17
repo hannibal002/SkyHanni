@@ -24,7 +24,7 @@ object ShyCruxWarnings {
     }
 
     private fun checkForShy() {
-        if (EntityUtils.getEntitiesNextToPlayer<Entity>(8.0).any { it.name.formattedTextCompatLessResets() in shyNames }) {
+        if (EntityUtils.getEntitiesNextToPlayer<Entity>(8.0).any { it.name.string in shyNames }) {
             TitleManager.sendTitle("§eLook away!", duration = 150.milliseconds)
         }
     }

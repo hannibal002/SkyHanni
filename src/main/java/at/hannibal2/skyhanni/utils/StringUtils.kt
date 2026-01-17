@@ -41,6 +41,7 @@ object StringUtils {
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
+    fun String.takeIfNotEmpty(): String? = if (this.isNotEmpty()) this else null
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")

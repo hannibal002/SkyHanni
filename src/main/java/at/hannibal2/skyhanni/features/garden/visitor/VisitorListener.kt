@@ -98,7 +98,7 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
+        if (offerItem.hoverName.string != "Accept Offer") return
 
         VisitorApi.inInventory = true
 
@@ -143,7 +143,7 @@ object VisitorListener {
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity.name.formattedTextCompatLessResets() == "§e§lCLICK") {
+        if (entity.name.string == "CLICK") {
             event.cancel()
         }
     }

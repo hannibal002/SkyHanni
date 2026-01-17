@@ -176,6 +176,8 @@ object HypixelData {
 
     var playerAmountOnIsland = 0
 
+    private val progressCategory = ChatProgressUpdates.category("Hypixel Data")
+
     // Data from locraw
     var locrawData: JsonObject? = null
     private val locraw: MutableMap<String, String> = listOf(
@@ -364,7 +366,7 @@ object HypixelData {
     fun onChat(event: SkyHanniChatEvent) {
         if (!SkyBlockUtils.onHypixel) return
 
-        val message = event.message.removeColor().lowercase()
+        val message = event.cleanMessage.lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
@@ -423,8 +425,7 @@ object HypixelData {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
-                    val progress = ChatProgressUpdates()
-                    progress.start("hypixel join repo update check")
+                    val progress = progressCategory.start("hypixel join repo update check")
                     SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
                     EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
                     progress.end("done with checking both repos")

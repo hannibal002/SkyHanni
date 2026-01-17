@@ -113,7 +113,7 @@ object TrophyFishManager {
         var updatedFishes = loadMissingTrophyFish()
         val savedFishes = fish ?: return
         for (stack in event.inventoryItems.values) {
-            val internalName = TrophyFishApi.getInternalName(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().replace("§k", ""))
+            val internalName = TrophyFishApi.getInternalName(stack.hoverName.string.replace("§k", ""))
 
             fun getRarity(rawRarity: String, line: String): TrophyRarity =
                 TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
