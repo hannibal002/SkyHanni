@@ -192,8 +192,8 @@ object ChatUtils {
         val text = componentBuilder {
             append(msgPrefix)
             append(message) {
-                if (prefixColor == null) withColor(ChatFormatting.YELLOW)
-                else withColor(prefixColor)
+                if (color == null) withColor(ChatFormatting.YELLOW)
+                else withColor(color)
             }
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
@@ -260,8 +260,8 @@ object ChatUtils {
             componentBuilder {
                 append(msgPrefix)
                 append(message) {
-                    if (prefixColor == null) withColor(ChatFormatting.YELLOW)
-                    else withColor(prefixColor)
+                    if (color == null) withColor(ChatFormatting.YELLOW)
+                    else withColor(color)
                 }
                 this.hover = TextHelper.multiline(hover)
                 if (command != null) {
@@ -299,8 +299,8 @@ object ChatUtils {
         val text = componentBuilder {
             append(msgPrefix)
             append(message) {
-                if (prefixColor == null) withColor(ChatFormatting.YELLOW)
-                else withColor(prefixColor)
+                if (color == null) withColor(ChatFormatting.YELLOW)
+                else withColor(color)
             }
             this.url = url
             this.hover = "$prefixColor$hover".asComponent()
