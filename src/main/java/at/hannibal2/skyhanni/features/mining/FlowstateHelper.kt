@@ -180,17 +180,37 @@ object FlowstateHelper {
         if (!config.colorfulTimer) return LorenzColor.AQUA.toColor().rgb
         return when (timeRemaining) {
             in 0.seconds..2.seconds -> {
-                ColorUtils.blendRGB(LorenzColor.RED.toColor(), Color(Integer.decode("#ec7b36")), timeRemaining.inPartialSeconds / 2.0).rgb
+                ColorUtils.blendRGB(
+                    LorenzColor.RED.toColor(),
+                    Color(Integer.decode("#ec7b36")),
+                    timeRemaining.inPartialSeconds / 2.0
+                ).rgb
             }
+
             in 2.seconds..4.seconds -> {
-                ColorUtils.blendRGB(Color(Integer.decode("#ec7b36")), LorenzColor.YELLOW.toColor(), (timeRemaining.inPartialSeconds - 2) / 2.0).rgb
+                ColorUtils.blendRGB(
+                    Color(Integer.decode("#ec7b36")),
+                    LorenzColor.YELLOW.toColor(),
+                    (timeRemaining.inPartialSeconds - 2) / 2.0
+                ).rgb
             }
+
             in 4.seconds..6.seconds -> {
-                ColorUtils.blendRGB(LorenzColor.YELLOW, LorenzColor.GREEN, (timeRemaining.inPartialSeconds - 4) / 2.0).rgb
+                ColorUtils.blendRGB(
+                    LorenzColor.YELLOW,
+                    LorenzColor.GREEN,
+                    (timeRemaining.inPartialSeconds - 4) / 2.0
+                ).rgb
             }
+
             in 6.seconds..8.seconds -> {
-                ColorUtils.blendRGB(LorenzColor.GREEN, LorenzColor.DARK_GREEN, (timeRemaining.inPartialSeconds - 6) / 2.0).rgb
+                ColorUtils.blendRGB(
+                    LorenzColor.GREEN,
+                    LorenzColor.DARK_GREEN,
+                    (timeRemaining.inPartialSeconds - 6) / 2.0
+                ).rgb
             }
+
             in 8.seconds..10.seconds -> {
                 LorenzColor.DARK_GREEN.toColor().rgb
             }
