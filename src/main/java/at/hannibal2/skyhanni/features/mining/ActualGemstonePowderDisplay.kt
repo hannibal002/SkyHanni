@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.Locale
@@ -193,7 +194,7 @@ object ActualGemstonePowderDisplay {
             if (upgradeDrill > 0) drillFactors.add(SimpleFactor("Goblin Egg", upgradeDrill / 100.0))
 
             if (drillFactors.isNotEmpty()) {
-                hotmFactors.add(AdditiveFactor(heldItem.displayName, factors = drillFactors))
+                hotmFactors.add(AdditiveFactor(heldItem.displayName.formattedTextCompat(), factors = drillFactors))
             }
         }
 
