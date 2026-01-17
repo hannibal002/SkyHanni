@@ -56,7 +56,7 @@ object FossilExcavatorApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!excavatorInventory.isInside()) return
         inExcavatorMenu = event.inventoryItems.values.any {
-            it.displayName.toString().removeColor() == "Start Excavator"
+            it.hoverName.string.removeColor() == "Start Excavator"
         }
     }
 

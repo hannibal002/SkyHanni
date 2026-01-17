@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -76,7 +77,7 @@ object ScrapGFS {
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!enabled || event.itemStack.getInternalNameOrNull() != FossilExcavatorApi.scrapItem) return
+        if (!enabled) return
         susScrapInInventory = getSusScrapCurrentlyInInventory()
         uiDirty = true
     }
@@ -153,7 +154,7 @@ object ScrapGFS {
                 color = lighterGray,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
             )
-            when (config.bzIfSacksEmpty) {
+            when (config.bzIfSacksEmpty && !HypixelData.noTrade) {
                 true -> Renderable.vertical {
                     add(baseNoScrapRenderable)
                     Renderable.link(

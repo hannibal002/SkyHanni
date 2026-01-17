@@ -23,9 +23,11 @@ class NeuItemStackProvider(
     companion object {
         private val providerCache = WeakHashMap<NeuItemStackProvider, ItemStack>()
 
-        @HandleEvent(NeuRepositoryReloadEvent::class, priority = HandleEvent.LOW)
-        fun onNeuRepoReload() = providerCache.forEach { (provider, _) ->
-            providerCache[provider] = provider.rebuildFromNeu()
+        @HandleEvent(priority = HandleEvent.LOW)
+        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+            providerCache.forEach { (provider, _) ->
+                providerCache[provider] = provider.rebuildFromNeu()
+            }
         }
     }
 }

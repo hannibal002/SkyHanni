@@ -15,7 +15,7 @@ class ExcavatorScrapGFSConfig {
     @ConfigOption(name = "Enabled", desc = "Show a UI while in the Fossil Excavator to fetch Suspicious Scrap from your sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    var enabled: Boolean = false
 
     @Expose
     @ConfigLink(owner = ExcavatorScrapGFSConfig::class, field = "enabled")
