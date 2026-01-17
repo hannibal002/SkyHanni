@@ -27,10 +27,8 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.minecraft.server.packs.resources.ResourceManager
-import java.awt.Color
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
-import kotlin.random.Random
 
 @SkyHanniModule
 object ClientEvents {
