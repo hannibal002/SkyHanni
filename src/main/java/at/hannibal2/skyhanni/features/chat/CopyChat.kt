@@ -32,7 +32,6 @@ object CopyChat {
     }
 
     private fun processCopyChat(mouseX: Int, mouseY: Int) {
-        // On 1.8 we use our own code to find the chat lines which uses our mouse methods, on 1.21 we use the vanilla methods
         val chatLine = getChatLine(mouseX, mouseY) ?: return
 
         val formatted = chatLine.fullComponent.formattedTextCompat()
@@ -46,9 +45,9 @@ object CopyChat {
                     .removeColor()
                 ) to "modified message"
 
-            KeyboardManager.isControlKeyDown() -> chatLine.chatMessage.removeColor() to "line"
+            KeyboardManager.isControlKeyDown() -> chatLine.content.string.removeColor() to "line"
 
-            else -> formatted.removeColor() to "message"
+            else -> chatLine.fullComponent.string.removeColor() to "message"
         }
 
         ClipboardUtils.copyToClipboard(clipboard)
