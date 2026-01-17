@@ -150,7 +150,7 @@ var Component.hover: Component?
         it.action() == HoverEvent.Action.SHOW_TEXT
     }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
-        value?.let { new -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
 var Component.command: String?
@@ -158,7 +158,7 @@ var Component.command: String?
         it.action() == ClickEvent.Action.RUN_COMMAND
     }?.let { (it as ClickEvent.RunCommand).command }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
     }
 
 var Component.suggest: String?
@@ -166,7 +166,7 @@ var Component.suggest: String?
         it.action() == ClickEvent.Action.SUGGEST_COMMAND
     }?.let { (it as ClickEvent.SuggestCommand).command }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
     }
 
 var Component.url: String?
@@ -174,7 +174,37 @@ var Component.url: String?
         it.action() == ClickEvent.Action.OPEN_URL
     }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+    }
+
+var MutableComponent.underlined: Boolean
+    get() = this.style.isUnderlined
+    set(value) {
+        this.withStyle { it.withUnderlined(value) }
+    }
+
+var MutableComponent.bold: Boolean
+    get() = this.style.isBold
+    set(value) {
+        this.withStyle { it.withBold(value) }
+    }
+
+var MutableComponent.strikethrough: Boolean
+    get() = this.style.isStrikethrough
+    set(value) {
+        this.withStyle { it.withStrikethrough(value) }
+    }
+
+var MutableComponent.italic: Boolean
+    get() = this.style.isItalic
+    set(value) {
+        this.withStyle { it.withItalic(value) }
+    }
+
+var MutableComponent.obfuscated: Boolean
+    get() = this.style.isObfuscated
+    set(value) {
+        this.withStyle { it.withObfuscated(value) }
     }
 
 var MutableComponent.underlined: Boolean
@@ -283,7 +313,7 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): H
 }
 
 fun Component.changeColor(color: LorenzColor): Component =
-    this.copy().withStyle(color.toChatFormatting())
+    this.copyIfNeeded().withStyle(color.toChatFormatting())
 
 fun Component.convertToJsonString(): String {
     //#if MC < 1.21.6
@@ -294,13 +324,13 @@ fun Component.convertToJsonString(): String {
 }
 
 fun Component.append(newText: Component): MutableComponent {
-    return (this as MutableComponent).append(newText)
+    return this.copyIfNeeded().append(newText)
 }
 
 val formattingPattern = Regex("§.(?:§.)?")
 
 fun Component.append(newText: String): MutableComponent {
-    val mutableText = this as MutableComponent
+    val mutableText = this.copyIfNeeded()
     if (mutableText.string.matches(formattingPattern)) {
         return Component.literal(mutableText.string + newText)
     }
@@ -312,7 +342,31 @@ fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Un
 }
 
 fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
-    return this.append((comp as MutableComponent).also(init))
+    return this.append(comp.copyIfNeeded().also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
 }
 
 fun List<Any>.mapToComponents(): List<Component> {
@@ -342,4 +396,9 @@ operator fun Component.plus(string: String): Component {
 
 fun componentBuilder(init: MutableComponent.() -> Unit): Component {
     return Component.empty().also(init)
+}
+
+fun Component.copyIfNeeded(): MutableComponent {
+    if (this is MutableComponent) return this
+    else return this.copy()
 }

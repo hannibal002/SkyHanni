@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
+@Suppress("TooManyFunctions")
 object ColorUtils {
 
     @JvmStatic
