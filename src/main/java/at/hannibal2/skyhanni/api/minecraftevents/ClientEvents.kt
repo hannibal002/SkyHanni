@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -7,7 +8,10 @@ import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
@@ -23,8 +27,10 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.minecraft.server.packs.resources.ResourceManager
+import java.awt.Color
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import kotlin.random.Random
 
 @SkyHanniModule
 object ClientEvents {
@@ -133,11 +139,33 @@ object ClientEvents {
             // we don't have to worry about cancelling the action bar
             // this is more compatible with other mods changing the action bar as well
             // ie to remove hp/mana
-            val result = ActionBarData.onChatReceive(message) ?: return message
-            return result
+            val result = ActionBarData.onChatReceive(message)
+            if (result == null) {
+                return if (rainbowConfig()) {
+                    TextHelper.createGradientText(
+                        ColorUtils.getRandomColor(),
+                        ColorUtils.getRandomColor(),
+                        message.string.removeColor()
+                    )
+                } else {
+                    message
+                }
+            } else {
+                return if (rainbowConfig()) {
+                    TextHelper.createGradientText(
+                        ColorUtils.getRandomColor(),
+                        ColorUtils.getRandomColor(),
+                        result.string.removeColor()
+                    )
+                } else {
+                    result
+                }
+            }
         }
 
         return message
     }
+
+    fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
 
 }
