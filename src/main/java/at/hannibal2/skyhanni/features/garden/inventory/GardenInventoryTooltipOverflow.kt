@@ -4,19 +4,20 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneNextTierAmount
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.milestoneProgressToNextTier
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 
 // TODO: Merge common code with skill overflow
@@ -26,14 +27,14 @@ object GardenInventoryTooltipOverflow {
     private val config get() = GardenApi.config.cropMilestones.overflow
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
 
         val inventoryName = InventoryUtils.openInventoryName()
         if (inventoryName != "Crop Milestones") return
 
         val stack = event.itemStack
-        if (!stack.getLore().any { it.contains("Max tier reached!") }) return
+        if (!stack.getLoreComponent().any { it.string.contains("Max tier reached!") }) return
 
         val split = stack.cleanName().split(" ")
         val crop = getCrop(split)
@@ -46,18 +47,18 @@ object GardenInventoryTooltipOverflow {
         val iterator = event.toolTip.listIterator()
         val percentage = have.toDouble() / need.toDouble()
         for (line in iterator) {
-            val maxTierReached = "§7§8Max tier reached!"
-            if (line.contains(maxTierReached)) {
-                iterator.set("§7Progress to tier $nextLevel: §e${percentage.formatPercentage()}")
+            val maxTierReached = "Max tier reached!"
+            if (line.string.contains(maxTierReached)) {
+                iterator.set("§7Progress to tier $nextLevel: §e${percentage.formatPercentage()}".asComponent())
                 event.itemStack.setCustomItemName("§a${crop.cropName} $level")
                 next = true
                 continue
             }
             if (next) {
                 val bar = "                    "
-                if (line.contains(bar)) {
+                if (line.string.contains(bar)) {
                     val progressBar = StringUtils.progressBar(percentage)
-                    iterator.set("$progressBar §e${have.addSeparators()}§6/§e${need.addSeparators()}")
+                    iterator.set("$progressBar §e${have.addSeparators()}§6/§e${need.addSeparators()}".asComponent())
                 }
             }
         }

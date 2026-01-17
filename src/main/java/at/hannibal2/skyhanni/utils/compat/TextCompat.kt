@@ -291,3 +291,7 @@ fun Component.replace(oldValue: String, newValue: String): Component {
     }
     return this
 }
+
+operator fun Component.plus(string: String): Component {
+    return this.append(string)
+}

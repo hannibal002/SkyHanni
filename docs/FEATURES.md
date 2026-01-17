@@ -821,6 +821,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
   + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
 + Added crop fever tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5059)
++ Added display for the Mantid reforge pest kill bonus. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5082)
++ Greenhouse Growth Cycle Display. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5078)
 
 ### Garden Pests
 

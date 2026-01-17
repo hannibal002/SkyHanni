@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack
 /**
  * Use [ToolTipTextEvent] Instead
  */
+@Deprecated("Use ToolTipTextEvent instead", ReplaceWith("ToolTipTextEvent"))
 class ToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) : CancellableSkyHanniEvent() {
 
     var toolTip: MutableList<String>

@@ -56,6 +56,11 @@ class PestsConfig {
     val pesthunterShop: PesthunterShopConfig = PesthunterShopConfig()
 
     @Expose
+    @ConfigOption(name = "Mantid Kill Display", desc = "")
+    @Accordion
+    val mantidDisplay: MantidDisplayConfig = MantidDisplayConfig()
+
+    @Expose
     @ConfigOption(
         name = "Mute Vacuum",
         desc = "Mute the pest vacuum when using its right click ability.",

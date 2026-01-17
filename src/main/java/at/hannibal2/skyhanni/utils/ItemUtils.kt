@@ -154,6 +154,7 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
+    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
     fun ItemStack.getLore(): List<String> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
@@ -225,13 +226,15 @@ object ItemUtils {
         return this
     }
 
-    // TODO change else janni is sad
-    fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
-        it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    fun ItemStack.isAnySoulbound(): Boolean = isCoopSoulbound() || isSoulbound()
+
+    fun ItemStack.isCoopSoulbound(): Boolean = getLoreComponent().any {
+        it.string == "* Co-op Soulbound *"
     }
 
-    // TODO change else janni is sad
-    fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
+    fun ItemStack.isSoulbound(): Boolean = getLoreComponent().any {
+        it.string == "* Soulbound *"
+    }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
