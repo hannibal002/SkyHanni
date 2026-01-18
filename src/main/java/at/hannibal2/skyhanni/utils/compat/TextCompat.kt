@@ -16,6 +16,7 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
 import java.net.URI
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
@@ -151,6 +152,14 @@ var Component.hover: Component?
     }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
         value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
+    }
+
+var Component.stackHover: ItemStack?
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_ITEM
+    }?.let { (it as HoverEvent.ShowItem).item }
+    set(value) {
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
     }
 
 var Component.command: String?

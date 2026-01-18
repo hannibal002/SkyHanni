@@ -61,6 +61,13 @@ object ChatSoundResponse {
             }
             array
         }
+        event.transform(117, "chat.soundResponse.soundResponses") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive("FROG"))
+                add(JsonPrimitive("HORSE"))
+                add(JsonPrimitive("GOAT"))
+            }
+        }
     }
 
 
@@ -82,6 +89,9 @@ enum class SoundResponseTypes(private val displayName: String, soundLocation: St
     COW("Cow", "mob.cow.say", listOf("moo+")),
     PIG("Pig", "mob.pig.say", listOf("o+i+n+k+")),
     CHICKEN("Chicken", "mob.chicken.say", listOf("cl+u+c+k+")),
+    FROG("Frog", "entity.frog.hurt", listOf("ribbit")),
+    HORSE("Horse", "entity.horse.angry", listOf("neigh")),
+    GOAT("Goat", "entity.goat.screaming.ambient", listOf("bleat")),
     ;
 
     val sound by lazy { SoundUtils.createSound(soundLocation, 1f) }

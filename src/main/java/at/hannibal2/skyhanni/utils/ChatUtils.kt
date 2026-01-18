@@ -9,16 +9,17 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
-import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -29,8 +30,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
@@ -90,16 +90,16 @@ object ChatUtils {
     fun chat(
         message: String,
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String? = null,
         replaceSameMessage: Boolean = false,
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ) {
-        if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
-        } else {
-            internalChat(message, replaceSameMessage, onlySendOnce, messageId = messageId)
+        var color: Int? = null
+        if (prefixColor != null) {
+            color = prefixColor.replace("§", "")[0].toLorenzColor()?.toColor()?.rgb
         }
+        chat(message.asComponent(), prefix, color, replaceSameMessage, onlySendOnce, messageId)
     }
 
     fun chat(
@@ -111,16 +111,7 @@ object ChatUtils {
         messageId: Int? = null,
     ) {
         if (prefix) {
-            val text = componentBuilder {
-                if (prefixColor != null) {
-                    append(CHAT_PREFIX)
-                    withColor(prefixColor)
-                } else {
-                    append(TextHelper.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, CHAT_PREFIX))
-                    withColor(ChatFormatting.YELLOW)
-                }
-                append(message)
-            }
+            val text = getFormattedChatPrefix(prefixColor).append(message)
             internalChatComponent(text, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
             internalChatComponent(message, replaceSameMessage, onlySendOnce, messageId = messageId)
@@ -188,19 +179,27 @@ object ChatUtils {
         hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String? = null,
         oneTimeClick: Boolean = false,
         replaceSameMessage: Boolean = false,
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        var color: Int? = null
+        if (prefixColor != null) {
+            color = prefixColor.replace("§", "")[0].toLorenzColor()?.toColor()?.rgb
+        }
+        val msgPrefix = if (prefix) getFormattedChatPrefix(color) else Component.empty()
 
-        val rawText = msgPrefix + message
-        val text = TextHelper.text(rawText) {
+        val text = componentBuilder {
+            append(msgPrefix)
+            append(message) {
+                if (color == null) withColor(ChatFormatting.YELLOW)
+                else withColor(color)
+            }
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
 
-        if (replaceSameMessage) text.send(rawText.getUniqueMessageIdForString())
+        if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
         else logAndSendMessage(text)
     }
 
@@ -249,12 +248,21 @@ object ChatUtils {
         hover: List<String>,
         command: String? = null,
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String? = null,
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        var color: Int? = null
+        if (prefixColor != null) {
+            color = prefixColor.replace("§", "")[0].toLorenzColor()?.toColor()?.rgb
+        }
+        val msgPrefix = if (prefix) getFormattedChatPrefix(color) else Component.empty()
 
         logAndSendMessage(
-            TextHelper.text(msgPrefix + message) {
+            componentBuilder {
+                append(msgPrefix)
+                append(message) {
+                    if (color == null) withColor(ChatFormatting.YELLOW)
+                    else withColor(color)
+                }
                 this.hover = TextHelper.multiline(hover)
                 if (command != null) {
                     this.command = command
@@ -280,11 +288,20 @@ object ChatUtils {
         hover: String = "§eOpen $url",
         autoOpen: Boolean = false,
         prefix: Boolean = true,
-        prefixColor: String = "§e",
+        prefixColor: String? = null,
         replaceSameMessage: Boolean = false,
     ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        val text = TextHelper.text(msgPrefix + message) {
+        var color: Int? = null
+        if (prefixColor != null) {
+            color = prefixColor.replace("§", "")[0].toLorenzColor()?.toColor()?.rgb
+        }
+        val msgPrefix = if (prefix) getFormattedChatPrefix(color) else Component.empty()
+        val text = componentBuilder {
+            append(msgPrefix)
+            append(message) {
+                if (color == null) withColor(ChatFormatting.YELLOW)
+                else withColor(color)
+            }
             this.url = url
             this.hover = "$prefixColor$hover".asComponent()
         }
@@ -293,23 +310,6 @@ object ChatUtils {
         else logAndSendMessage(text)
 
         if (autoOpen) OSUtils.openBrowser(url)
-    }
-
-    /**
-     * Sends a message to the user that combines many message components e.g. clickable, hoverable and regular text
-     * @param components The list of components to be joined together to form the final message
-     * @param prefix Whether to prefix the message with the chat prefix, default true
-     * @param prefixColor Color that the prefix should be, default yellow (§e)
-     *
-     * @see CHAT_PREFIX
-     */
-    fun multiComponentMessage(
-        components: List<Component>,
-        prefix: Boolean = true,
-        prefixColor: String = "§e",
-    ) {
-        val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        logAndSendMessage(TextHelper.join(components).prefix(msgPrefix))
     }
 
     private val chatGui get() = Minecraft.getInstance().gui.chat
@@ -484,5 +484,17 @@ object ChatUtils {
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
+    }
+
+    private fun getFormattedChatPrefix(prefixColor: Int?): Component {
+        return componentBuilder {
+            if (prefixColor != null) {
+                append(CHAT_PREFIX)
+                withColor(prefixColor)
+            } else {
+                append(TextHelper.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, CHAT_PREFIX))
+                withColor(ChatFormatting.YELLOW)
+            }
+        }
     }
 }

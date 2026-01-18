@@ -437,6 +437,9 @@ object FarmingWeightDisplay {
     }
 
     private suspend fun loadLeaderboardPosition(): Int {
+        // Don't try to fetch leaderboard if we don't have a profile ID yet
+        if (profileId.isBlank()) return leaderboardPosition
+
         // Fetch more upcoming players when the difference between ranks is expected to be tiny
         val upcomingPlayers = when {
             !isEnabled() -> 0
@@ -490,7 +493,10 @@ object FarmingWeightDisplay {
         return if (newData) apiData.rank else leaderboardPosition
     }
 
-    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine("farming weight display load weight") {
+    private fun loadWeight(localProfile: String) = SkyHanniMod.launchIOCoroutine(
+        "farming weight display load weight",
+        timeout = 30.seconds,
+    ) {
         val apiData = EliteDevApi.fetchWeightProfile(localProfile) ?: run {
             apiError = true
             return@launchIOCoroutine

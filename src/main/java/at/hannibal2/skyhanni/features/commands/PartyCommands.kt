@@ -115,6 +115,10 @@ object PartyCommands {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.reversePT.clickable) return
+
+        // The message was likely already modified by us, return to avoid infinite recursion
+        if (event.chatComponent.style.clickEvent != null) return
+
         if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
         if (partyLeader != PlayerUtils.getName()) return
 
