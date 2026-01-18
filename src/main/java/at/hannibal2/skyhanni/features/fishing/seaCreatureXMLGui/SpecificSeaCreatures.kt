@@ -58,7 +58,8 @@ class SpecificSeaCreatures(
         private fun resetConfig() {
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
-                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[name] == null) existingSettings.add(
+                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage.clear()
+                    existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
