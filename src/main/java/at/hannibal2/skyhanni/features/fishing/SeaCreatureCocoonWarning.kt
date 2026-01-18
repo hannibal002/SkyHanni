@@ -22,7 +22,7 @@ object SeaCreatureCocoonWarning {
         if (!mob.seaCreature.isOwn) return
         val name = mob.seaCreature.name
         if (scSpecificConfig[name]?.shouldWarnWhenCocooned == true) {
-            TitleManager.sendTitle("$name Has Been Cocooned at ${mob.coordinates.roundToBlock().toCleanString()}")
+            TitleManager.sendTitle("§c$name Has Been Cocooned")
             SoundUtils.repeatSound(
                 1,
                 repeat = 5,
