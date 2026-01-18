@@ -348,7 +348,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
             val component = message.asComponent()
             component.hover = lastHover
-            ChatUtils.chat(component)
+            ChatUtils.chat(component, prefix = false)
             rareDrops.forEach { drop ->
                 ChatUtils.chat("§f - $drop", prefix = false)
             }

@@ -47,12 +47,15 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.annotations.Expose
@@ -60,6 +63,7 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
@@ -792,7 +796,11 @@ object ItemUtils {
                 "§eClick to copy internal name to clipboard!",
             ),
         )
-        add(componentText)
+        val hoverComp = componentBuilder {
+            appendWithColor(" (tooltip)", ChatFormatting.DARK_GRAY)
+            stackHover = internalName.getItemStackOrNull()
+        }
+        add(componentText.append(hoverComp))
     }
 
     @HandleEvent

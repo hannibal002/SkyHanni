@@ -181,6 +181,7 @@ object EnoughUpdatesManager {
             return fromJson
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
+            println("Error converting nbt to json: ${e.message}\nMalformed NBT: $convertedNbt\nOriginal NBT: $nbtString")
         }
 
         return null
