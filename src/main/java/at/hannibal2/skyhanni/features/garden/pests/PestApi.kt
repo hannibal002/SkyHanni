@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -461,6 +464,18 @@ object PestApi {
                 add(" pests: ${it.pests}")
                 add(" ")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommand(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestpestkill") {
+            description = "Simulates a pest kill"
+            category = CommandCategory.DEVELOPER_TEST
+            argCallback("pestType", EnumArgumentType.custom<PestType>({ it.name }, isGreedy = true)) { pestType ->
+                PestKillEvent(pestType).post()
+            }
+            simpleCallback { PestKillEvent(PestType.UNKNOWN).post() }
         }
     }
 }

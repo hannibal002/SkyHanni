@@ -9,5 +9,6 @@ abstract class AbstractChatEvent(
     chatComponent: Component,
     blockedReason: String? = null,
 ) : SystemMessageEvent(messageComponent.getText(), chatComponent, blockedReason) {
+    @Deprecated("Use cleanMessage unless you really need color codes", replaceWith = ReplaceWith("this.cleanMessage"))
     override val message = messageComponent.getText().removePrefix("§r")
 }

@@ -112,7 +112,7 @@ data class CustomTodo(
             val maybeDecoded = TemplateUtil.maybeDecodeTemplate(TEMPLATE_PREFIX, data, CustomTodo::class.java)
                 ?: TemplateUtil.maybeDecodeTemplate(NEU_TEMPLATE_PREFIX, data, CustomTodo::class.java)
             if (maybeDecoded == null && printErrors) {
-                ChatUtils.chat("§cInvalid Todo")
+                ChatUtils.userError("Invalid Todo")
             }
             return maybeDecoded?.also {
                 it.readyAt.clear()

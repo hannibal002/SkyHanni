@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
@@ -150,7 +151,7 @@ object VisitorApi {
         var lore: List<String> = emptyList()
         var allRewards = listOf<NeuInternalName>()
         var lastLore = listOf<String>()
-        var blockedLore = listOf<String>()
+        var blockedLore = listOf<Component>()
         var blockReason: VisitorBlockReason? = null
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
