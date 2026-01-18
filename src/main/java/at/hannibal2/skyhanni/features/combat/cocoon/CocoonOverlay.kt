@@ -16,7 +16,7 @@ object CocoonOverlay {
 
     private val currentCocoons: TimeLimitedSet<CocoonAPI.CocoonMob> = TimeLimitedSet(8.seconds)
 
-    private val LIFETIME = 6.seconds
+    private val LIFETIME = 6.4.seconds
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
