@@ -11,13 +11,18 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MythologicalCreatureType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.features.event.diana.dianararemobstorage.RareDianaMobsXMLGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents.Chat
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.item.ItemStack
 
@@ -64,11 +69,13 @@ object DianaApi {
         "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
     )
 
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
-        if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
+        val name = entity.name.string.trim()
+        if (SkyHanniMod.rareDianaMobSettings.RareDianaMobSettingStorage[name]?.shouldShareOnDiscovery == true) {
             RareDianaMobFoundEvent(entity).post()
         }
     }
@@ -80,5 +87,6 @@ object DianaApi {
         mythologicalCreatures = dianaJson.mythologicalCreatures
         sphinxQuestions = dianaJson.sphinxQuestions
         spades = dianaJson.spadeTypes.toSet()
+        RareDianaMobsXMLGui.updateList()
     }
 }

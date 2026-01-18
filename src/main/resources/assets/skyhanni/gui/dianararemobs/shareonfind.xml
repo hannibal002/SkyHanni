@@ -1,0 +1,21 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Send Chat Message On Spawn/Cocoon"/>
+                </Scale>
+            </Center>
+            <Spacer height="5"/>
+            <ScrollPanel width="350" height="200">
+                <Array data="@rareMobs">
+                    <Row>
+                        <Text text="@getName" width="330"/>
+                        <Switch value="@shouldShareOnDiscovery"/>
+                    </Row>
+                </Array>
+            </ScrollPanel>
+        </Column>
+    </Gui>
+</Root>

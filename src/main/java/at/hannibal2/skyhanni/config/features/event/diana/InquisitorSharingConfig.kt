@@ -45,6 +45,12 @@ class InquisitorSharingConfig {
     var showDespawnTime: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Instant Share Cocoons", desc = "Cocooned mobs should be shared after spawning, this will just alert earlier.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shouldShareCocoon: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Read Global Chat",
         desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat."

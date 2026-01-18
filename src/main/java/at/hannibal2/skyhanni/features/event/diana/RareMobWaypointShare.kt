@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.diana.RareDianaMobFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -79,7 +80,7 @@ object RareMobWaypointShare {
     private var lastRareMob = -1
     private var lastShareTime = SimpleTimeMark.farPast()
 
-    private val rareMobsNearby = ConcurrentHashMap<Int, RemotePlayer>()
+    private val rareMobsNearby = ConcurrentHashMap<Int, LivingEntity>()
 
     private val _waypoints = ConcurrentHashMap<String, SharedRareMob>()
     val waypoints: Map<String, SharedRareMob>
@@ -120,6 +121,17 @@ object RareMobWaypointShare {
 
         lastRareMob = rareMob.id
         checkRareMobFound()
+    }
+
+    @HandleEvent
+    fun onCocoon(event: CocoonSpawnEvent) {
+        val mob = event.cocoonMob
+        if (SkyHanniMod.rareDianaMobSettings.RareDianaMobSettingStorage[mob.mob.baseEntity.name.string.trim()]?.shouldShareOnDiscovery == true) {
+            val coordinates = event.cocoonMob.coordinates.roundToBlock()
+            if (config.shouldShareCocoon) {
+                HypixelCommands.partyChat("x: ${coordinates.x}, y: ${coordinates.y}, z: ${coordinates.z} ${mob.mob.name}. Cocooned!")
+            }
+        }
     }
 
     // We do not know if the chat message or the entity spawn happens first.

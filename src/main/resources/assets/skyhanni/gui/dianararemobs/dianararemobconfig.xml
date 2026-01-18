@@ -1,0 +1,20 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Diana Rare Mob Settings"/>
+                </Scale>
+            </Center>
+            <Spacer height="5"/>
+            <Center>
+                <Row>
+                    <Button onClick="@openShareOnfind">
+                        <Text text="Should Share/Highlight config"/>
+                    </Button>
+                </Row>
+            </Center>
+        </Column>
+    </Gui>
+</Root>
