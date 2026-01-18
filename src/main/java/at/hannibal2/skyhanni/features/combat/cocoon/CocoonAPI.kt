@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
@@ -34,7 +33,6 @@ object CocoonAPI {
         val mob: Mob,
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
-        val spawnTimeServer: ServerTimeMark,
         val cocoonID: Int,
     )
 
@@ -46,7 +44,7 @@ object CocoonAPI {
             val position = entity.getLorenzVec()
             val mob = getCocoonMob(position) ?: return
             val id = entity.id
-            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), ServerTimeMark.now(), id)
+            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id)
             recentCocoonMobs.add(cocoon)
             ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID} Entered List")
             logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
@@ -57,8 +55,8 @@ object CocoonAPI {
     @HandleEvent
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
         val cocoon = recentCocoonMobs.firstOrNull { it.cocoonID == event.entity.id } ?: return
-        ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID}) Left World at ${cocoon.spawnTime.passedSince()} Simple and ${cocoon.spawnTimeServer.passedSince()} Server Time Mark")
-        logger.log("${cocoon.mob.name} (Type: ${cocoon.mob.mobType}) Cocoon (${cocoon.cocoonID}) Left World at ${cocoon.spawnTime.passedSince()} Simple and ${cocoon.spawnTimeServer.passedSince()} Server Time Mark")
+        ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID}) Left World After ${cocoon.spawnTime.passedSince()}")
+        logger.log("${cocoon.mob.name} (Type: ${cocoon.mob.mobType}) Cocoon (${cocoon.cocoonID}) Left World after ${cocoon.spawnTime.passedSince()}")
     }
 
     @HandleEvent
