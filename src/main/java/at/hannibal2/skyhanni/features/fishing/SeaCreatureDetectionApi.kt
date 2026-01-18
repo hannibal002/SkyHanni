@@ -36,14 +36,14 @@ object SeaCreatureDetectionApi {
 
     private const val MAX_WAIT_DEATH_DISTANCE = 25.0
 
-    private val entityIdToData = TimeLimitedCache<Int, SeaCreatureData>(DESPAWN_TIME) { id, data, cause ->
+    private val entityIdToData = TimeLimitedCache<Int, LivingSeaCreatureData>(DESPAWN_TIME) { id, data, cause ->
         if (cause == RemovalCause.EXPIRED && data != null && id != null) data.forceRemove()
     }
 
-    fun getSeaCreatures(): Collection<SeaCreatureData> = entityIdToData.values
-    private val seaCreatures = mutableMapOf<Mob, SeaCreatureData>()
+    fun getSeaCreatures(): Collection<LivingSeaCreatureData> = entityIdToData.values
+    private val seaCreatures = mutableMapOf<Mob, LivingSeaCreatureData>()
 
-    val Mob.seaCreature: SeaCreatureData? get() = seaCreatures[this]
+    val Mob.seaCreature: LivingSeaCreatureData? get() = seaCreatures[this]
 
     private var lastNameFished: String? = null
     private var mobsToFind = 0
@@ -130,7 +130,7 @@ object SeaCreatureDetectionApi {
         isBabySlug: Boolean = false,
     ) {
         val seaCreature = if (isBabySlug) BABY_MAGMA_SLUG else SeaCreatureManager.allFishingMobs[mob.name] ?: return
-        val data = SeaCreatureData(isOwn, seaCreature, mob.entityId, time, mob)
+        val data = LivingSeaCreatureData(isOwn, seaCreature, mob.entityId, time, mob)
         seaCreatures[mob] = data
         entityIdToData[mob.entityId] = data
         SeaCreatureEvent.Spawn(data).post()
@@ -217,7 +217,7 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    fun assumeDeathIfAreaLeft(data: SeaCreatureData, playerPos: LorenzVec): Boolean {
+    fun assumeDeathIfAreaLeft(data: LivingSeaCreatureData, playerPos: LorenzVec): Boolean {
         if (data.isLoaded()) return false
         val lastPos = data.actualLastPos
         if (lastPos.distance(playerPos) > MAX_WAIT_DEATH_DISTANCE) return false

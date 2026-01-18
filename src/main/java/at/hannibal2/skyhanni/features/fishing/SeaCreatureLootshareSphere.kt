@@ -17,7 +17,7 @@ object SeaCreatureLootshareSphere {
 
     private const val RANGE = 30.0f
 
-    private val seaCreatures = mutableSetOf<SeaCreatureData>()
+    private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
 
     fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
 
@@ -38,7 +38,7 @@ object SeaCreatureLootshareSphere {
         }
     }
 
-    private fun addMob(seaCreature: SeaCreatureData) {
+    private fun addMob(seaCreature: LivingSeaCreatureData) {
         if (scSpecificConfig[seaCreature.name]?.shouldRenderLootshare == true) seaCreatures.add(seaCreature)
     }
 

@@ -23,7 +23,7 @@ object MobHealthDisplay {
     private val config get() = SkyHanniMod.feature.fishing.healthDisplay
     private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
-    private val healthMap = mutableMapOf<SeaCreatureData, Int>()
+    private val healthMap = mutableMapOf<LivingSeaCreatureData, Int>()
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -76,7 +76,7 @@ object MobHealthDisplay {
         config.pos.renderRenderables(strings, posLabel = "Mob Health Display")
     }
 
-    private fun addMob(seaCreature: SeaCreatureData) {
+    private fun addMob(seaCreature: LivingSeaCreatureData) {
         if (scSpecificConfig[seaCreature.name]?.shouldShowHealthOverlay == true) {
             val value = if (seaCreature.canBeSeen()) seaCreature.health else null
             healthMap[seaCreature] = value ?: -1

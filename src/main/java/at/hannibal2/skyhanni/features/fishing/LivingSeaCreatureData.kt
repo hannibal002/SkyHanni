@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.AABB
 
-data class SeaCreatureData(
+data class LivingSeaCreatureData(
     val isOwn: Boolean,
     val seaCreature: SeaCreature,
     var entityId: Int,
