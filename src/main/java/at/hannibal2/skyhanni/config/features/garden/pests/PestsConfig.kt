@@ -74,7 +74,6 @@ class PestsConfig {
     @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")
     @ConfigEditorDropdown
-    @FeatureToggle
     var pestChanceDisplay: Property<DisplayFormat> = Property.of(DisplayFormat.DISABLED)
 
     @Expose
