@@ -59,7 +59,7 @@ class SpecificSeaCreatures(
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
                 SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage.clear()
-                    existingSettings.add(
+                existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
@@ -99,13 +99,14 @@ class SpecificSeaCreatures(
 
         fun save(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
             for (seaCreature in seaCreatures) {
-                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] = SpecificSeaCreatureSettings(
-                    seaCreature.name,
-                    seaCreature.shouldRenderLootshare,
-                    seaCreature.shouldShowHealthOverlay,
-                    seaCreature.shouldShareInChat,
-                    seaCreature.shouldShowKillTime,
-                )
+                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] =
+                    SpecificSeaCreatureSettings(
+                        seaCreature.name,
+                        seaCreature.shouldRenderLootshare,
+                        seaCreature.shouldShowHealthOverlay,
+                        seaCreature.shouldShareInChat,
+                        seaCreature.shouldShowKillTime,
+                    )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
         }
