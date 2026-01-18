@@ -302,7 +302,7 @@ object CropMoneyDisplay {
 
         val isSeeds = isSeeds(internalName)
         if (isSeeds) speed *= 1.5
-        val replenishReduction = if (crop.replenish) (crop.multiplier * GardenCropSpeed.getRecentBPS()) else 0.0
+        val replenishReduction = if (crop.replenish || isSeeds) (crop.multiplier * GardenCropSpeed.getRecentBPS()) else 0.0
         speed -= replenishReduction
 
         val speedPerHour = speed * 60 * 60
