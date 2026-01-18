@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
@@ -24,9 +26,11 @@ object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
     private val mobRecentDeaths = mutableMapOf<Mob, SimpleTimeMark>()
     private val recentCocoonMobs = mutableListOf<CocoonMob>()
+    private val recentSeaCreatures = mutableMapOf<Mob, LivingSeaCreatureData?>()
 
     data class CocoonMob(
         val mob: Mob,
+        val seaCreature: LivingSeaCreatureData?,
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
         val cocoonID: Int,
@@ -41,7 +45,7 @@ object CocoonAPI {
             val mob = getCocoonMobName(position) ?: return
             val id = entity.id
             ChatUtils.debug("Cocoon mob detected ${mob.name}, ${position.toCleanString()}")
-            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id)
+            val cocoon = CocoonMob(mob, recentSeaCreatures[mob], position, SimpleTimeMark.now(), id)
             recentCocoonMobs.add(cocoon)
             CocoonSpawnEvent(cocoon).post()
         }
@@ -50,6 +54,7 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSkyblockMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         mobRecentDeaths[event.mob] = SimpleTimeMark.now()
+        recentSeaCreatures[event.mob] = event.mob.seaCreature
     }
 
     @HandleEvent(onlyOnSkyblock = true)

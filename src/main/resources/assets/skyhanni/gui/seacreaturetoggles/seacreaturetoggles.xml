@@ -36,6 +36,20 @@
                     </Button>
                 </Row>
             </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showCocoonChatSettings">
+                        <Text text="Cocoon Party Chat Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showCocoonWarnSettings">
+                        <Text text="Cocoon Self Warn Settings"/>
+                    </Button>
+                </Row>
+            </Center>
         </Column>
     </Gui>
 </Root>

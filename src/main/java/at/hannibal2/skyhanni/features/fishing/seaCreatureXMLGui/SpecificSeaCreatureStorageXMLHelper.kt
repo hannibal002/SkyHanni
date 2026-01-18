@@ -23,6 +23,12 @@ class SpecificSeaCreatureStorageXMLHelper(
     @field:Bind
     var shouldShowKillTime: Boolean? = from.shouldShowKillTime
 
+    @field:Bind
+    var shouldShareCocoonInChat: Boolean? = from.shouldShareCocoonInChat
+
+    @field:Bind
+    var shouldWarnWhenCocooned: Boolean? = from.shouldWarnWhenCocooned
+
 
     @Bind
     fun getName(): StructuredText {

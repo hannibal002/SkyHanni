@@ -58,7 +58,8 @@ class SpecificSeaCreatures(
         private fun resetConfig() {
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
-                if (SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[name] == null) existingSettings.add(
+                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage.clear()
+                    existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
@@ -66,6 +67,8 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldShareCocoonInChat = seaCreature.rare,
+                            shouldWarnWhenCocooned = seaCreature.rare,
                         ),
                     ),
                 )
@@ -86,6 +89,8 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldShareCocoonInChat = seaCreature.rare,
+                            shouldWarnWhenCocooned = seaCreature.rare,
                         ),
                     ),
                 )
@@ -104,6 +109,8 @@ class SpecificSeaCreatures(
                     seaCreature.shouldShowHealthOverlay,
                     seaCreature.shouldShareInChat,
                     seaCreature.shouldShowKillTime,
+                    seaCreature.shouldShareCocoonInChat,
+                    seaCreature.shouldWarnWhenCocooned,
                 )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
@@ -147,6 +154,18 @@ class SpecificSeaCreatures(
     @Bind
     fun showKillTime() {
         val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/killtime.xml")
+        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+    }
+
+    @Bind
+    fun showCocoonChatSettings() {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/sharecocoontoparty.xml")
+        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+    }
+
+    @Bind
+    fun showCocoonWarnSettings() {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/warnwhencocooned.xml")
         XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
     }
 
