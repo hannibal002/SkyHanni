@@ -59,7 +59,7 @@ class SpecificSeaCreatures(
             val existingSettings = ObservableList<SpecificSeaCreatureStorageXMLHelper>(mutableListOf())
             SeaCreatureManager.allFishingMobs.forEach { (name, seaCreature) ->
                 SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage.clear()
-                    existingSettings.add(
+                existingSettings.add(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
