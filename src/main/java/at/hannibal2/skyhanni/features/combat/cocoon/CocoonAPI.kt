@@ -5,10 +5,14 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
@@ -26,10 +30,13 @@ object CocoonAPI {
     private val recentCocoonMobs: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     private val mobRecentDeaths: TimeLimitedCache<Mob, SimpleTimeMark> = TimeLimitedCache(1.seconds)
 
+    val logger: LorenzLogger = LorenzLogger("Slayer/Cocoon")
+
     data class CocoonMob(
         val mob: Mob,
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
+        val spawnTimeServer: ServerTimeMark,
         val cocoonID: Int,
     )
 
@@ -41,10 +48,16 @@ object CocoonAPI {
             val position = entity.getLorenzVec()
             val mob = getCocoonMob(position) ?: return
             val id = entity.id
-            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id)
+            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), ServerTimeMark.now(), id)
             recentCocoonMobs.add(cocoon)
             CocoonSpawnEvent(cocoon).post()
         }
+    }
+
+    @HandleEvent
+    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
+        val cocoon = recentCocoonMobs.firstOrNull { it.cocoonID == event.entity.id } ?: return
+        logger.log("${cocoon.mob.name} Cocoon Left World at ${cocoon.spawnTime.passedSince()} Simple and ${cocoon.spawnTimeServer.passedSince()} Server Time Mark")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
