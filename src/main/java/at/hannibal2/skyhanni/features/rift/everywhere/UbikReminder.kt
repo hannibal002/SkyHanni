@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
@@ -37,14 +38,6 @@ object UbikReminder {
     private val cube by AutoUpdatingItemStack("UBIKS_CUBE")
 
     /**
-     * REGEX-TEST: ROUND 7 (FINAL): You chose STEAL and gained 55,000 Motes!
-     */
-    private val ubikRoundPattern by patternGroup.pattern(
-        "reminder-nocolor",
-        "ROUND \\d+ \\(FINAL\\): You chose \\w+ and gained [\\d,]+ Motes!",
-    )
-
-    /**
      * REGEX-TEST: SPLIT! You need to wait 1h 23m 45s before you can play again.
      * REGEX-TEST: SPLIT! You need to wait 1h 23m before you can play again.
      * REGEX-TEST: SPLIT! You need to wait 12m 34s before you can play again.
@@ -62,16 +55,21 @@ object UbikReminder {
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
         val message = event.cleanMessage
 
-        if (ubikRoundPattern.matches(message)) {
-            storage.ubikRemindTime = 2.hours.fromNow()
-            return
-        }
-
         cooldownPattern.matchMatcher(message) {
             storage.ubikRemindTime = TimeUtils.getDuration(group("duration")).fromNow()
         }
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (!config.ubikReminder) return
+        val storage = ProfileStorageData.profileSpecific?.rift ?: return
+    
+        if (event.inventoryName == "Split or Steal") {
+            storage.ubikRemindTime = 2.hours.fromNow()
+        }
+    }
+    
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
