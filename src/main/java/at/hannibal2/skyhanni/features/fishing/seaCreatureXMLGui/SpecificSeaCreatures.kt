@@ -103,15 +103,16 @@ class SpecificSeaCreatures(
 
         fun save(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
             for (seaCreature in seaCreatures) {
-                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] = SpecificSeaCreatureSettings(
-                    seaCreature.name,
-                    seaCreature.shouldRenderLootshare,
-                    seaCreature.shouldShowHealthOverlay,
-                    seaCreature.shouldShareInChat,
-                    seaCreature.shouldShowKillTime,
-                    seaCreature.shouldShareCocoonInChat,
-                    seaCreature.shouldWarnWhenCocooned,
-                )
+                SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] =
+                    SpecificSeaCreatureSettings(
+                        seaCreature.name,
+                        seaCreature.shouldRenderLootshare,
+                        seaCreature.shouldShowHealthOverlay,
+                        seaCreature.shouldShareInChat,
+                        seaCreature.shouldShowKillTime,
+                        seaCreature.shouldShareCocoonInChat,
+                        seaCreature.shouldWarnWhenCocooned,
+                    )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
         }
