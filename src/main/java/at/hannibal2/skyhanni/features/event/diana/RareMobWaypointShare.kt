@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -284,6 +287,19 @@ object RareMobWaypointShare {
     fun playUserSound() {
         with(config.sound) {
             SoundUtils.createSound(name, pitch).playSound()
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetdianamobs") {
+            description = "Resets all saved rare Diana mob locations"
+            category = CommandCategory.USERS_RESET
+            callback {
+                _waypoints.clear()
+                rareMobsNearby.clear()
+                ChatUtils.chat("Manually reset all rare mob data.")
+            }
         }
     }
 }
