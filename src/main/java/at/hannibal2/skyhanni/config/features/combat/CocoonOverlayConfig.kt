@@ -8,13 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CocoonOverlayConfig {
 
     @Expose
-    @ConfigOption(name = "Show Timer", desc = "Shows Time Left till Cocoon Hatches")
+    @ConfigOption(name = "Show Timer", desc = "Shows Time Left till Cocoon Hatches, Can be inaccurate.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showCocoonTimerTillHatch: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show Mob Name", desc = "Shows Mob Contained Within Cocoon's Name")
+    @ConfigOption(name = "Show Mob Name", desc = "Shows Mob Contained Within Cocoon's Name.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showCocoonContainedMobName: Boolean = false
