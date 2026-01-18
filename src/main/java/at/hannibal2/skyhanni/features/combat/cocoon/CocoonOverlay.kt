@@ -22,8 +22,8 @@ object CocoonOverlay {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for (cocoon in currentCocoons) {
             val timeTillSpawn = (LIFETIME - cocoon.spawnTime.passedSince()).format(showMilliSeconds = true)
-            if (config.showCocoonContainedMobName) event.drawDynamicText(cocoon.coordinates, cocoon.mob.name, 2.0, yOff = 0f)
-            if (config.showCocoonTimerTillHatch) event.drawDynamicText(cocoon.coordinates, timeTillSpawn, 2.0, yOff = -20f)
+            if (config.showCocoonContainedMobName) event.drawDynamicText(cocoon.coordinates, cocoon.mob.name, 2.0, yOff = 0f, seeThroughBlocks = false)
+            if (config.showCocoonTimerTillHatch) event.drawDynamicText(cocoon.coordinates, timeTillSpawn, 2.0, yOff = -20f, seeThroughBlocks = false)
         }
     }
 
