@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.ServerTime
-import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 
@@ -23,58 +23,58 @@ enum class CropType(
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.WHEAT) }, "wheat", FarmingItemType.WHEAT,
+        { "WHEAT".toInternalName().getItemStack() }, "wheat", FarmingItemType.WHEAT,
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.CARROT) }, "carrot", FarmingItemType.CARROT, replenish = true,
+        { "CARROT_ITEM".toInternalName().getItemStack() }, "carrot", FarmingItemType.CARROT, replenish = true,
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.POTATO) }, "potato", FarmingItemType.POTATO, replenish = true,
+        { "POTATO_ITEM".toInternalName().getItemStack() }, "potato", FarmingItemType.POTATO, replenish = true,
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.NETHER_WART) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
+        { "NETHER_STALK".toInternalName().getItemStack() }, "wart", FarmingItemType.NETHER_WART, replenish = true,
         enchantName = "warts",
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Blocks.CARVED_PUMPKIN) }, "pumpkin", FarmingItemType.PUMPKIN,
+        { "PUMPKIN".toInternalName().getItemStack() }, "pumpkin", FarmingItemType.PUMPKIN,
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.MELON_SLICE) }, "melon", FarmingItemType.MELON,
+        { "MELON".toInternalName().getItemStack() }, "melon", FarmingItemType.MELON,
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
-        { DyeCompat.BROWN.createStack() }, "cocoa",
+        { "INK_SACK-3".toInternalName().getItemStack() }, "cocoa",
         FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco",
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.SUGAR_CANE) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane",
+        { "SUGAR_CANE".toInternalName().getItemStack() }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane",
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Blocks.CACTUS) }, "cactus", FarmingItemType.CACTUS,
+        { "CACTUS".toInternalName().getItemStack() }, "cactus", FarmingItemType.CACTUS,
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Blocks.RED_MUSHROOM_BLOCK) }, "mushroom", FarmingItemType.MUSHROOM,
+        { "HUGE_MUSHROOM_2".toInternalName().getItemStack() }, "mushroom", FarmingItemType.MUSHROOM,
         enchantName = "mushrooms",
     ),
     SUNFLOWER(
         "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.SUNFLOWER) }, "sunflower", FarmingItemType.SUNFLOWER,
+        { "DOUBLE_PLANT".toInternalName().getItemStack() }, "sunflower", FarmingItemType.SUNFLOWER,
     ),
     MOONFLOWER(
         "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.BLUE_ORCHID) }, "moonflower", FarmingItemType.MOONFLOWER,
+        { "MOONFLOWER".toInternalName().getItemStack() }, "moonflower", FarmingItemType.MOONFLOWER,
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.ROSE_BUSH) }, "rose", FarmingItemType.WILD_ROSE,
+        { "WILD_ROSE".toInternalName().getItemStack() }, "rose", FarmingItemType.WILD_ROSE,
     ),
     ;
 
