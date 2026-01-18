@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 @SkyHanniModule
 object SeaCreatureCocoonWarning {
 
+    private val config get() = SkyHanniMod.feature.fishing.cocoonSettings
     private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
     @HandleEvent
@@ -21,7 +22,7 @@ object SeaCreatureCocoonWarning {
         if (mob.seaCreature == null ) return
         if (!mob.seaCreature.isOwn) return
         val name = mob.seaCreature.name
-        if (scSpecificConfig[name]?.shouldWarnWhenCocooned == true) {
+        if (scSpecificConfig[name]?.shouldWarnWhenCocooned == true && config.shareInPartyChat) {
             TitleManager.sendTitle("§c$name Has Been Cocooned")
             SoundUtils.repeatSound(
                 1,
@@ -29,7 +30,7 @@ object SeaCreatureCocoonWarning {
                 sound = SoundUtils.plingSound,
             )
         }
-        if (scSpecificConfig[name]?.shouldShareCocoonInChat == true) {
+        if (scSpecificConfig[name]?.shouldShareCocoonInChat == true && config.warnWhenCocooned) {
             if (PartyApi.isInParty()) {
                 HypixelCommands.partyChat("I Cocooned ${StringUtils.optionalAn(name)} $name!")
             }
