@@ -19,7 +19,7 @@ object SeaCreatureCocoonWarning {
     @HandleEvent
     fun onCocoon(event: CocoonSpawnEvent) {
         val mob = event.cocoonMob
-        if (mob.seaCreature == null ) return
+        if (mob.seaCreature == null) return
         if (!mob.seaCreature.isOwn) return
         val name = mob.seaCreature.name
         if (scSpecificConfig[name]?.shouldWarnWhenCocooned == true && config.shareInPartyChat) {
