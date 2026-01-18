@@ -65,7 +65,7 @@ object BonusPestChanceDisplay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(118, "#profile.garden.pests.pestChanceDisplay") { entry ->
+        event.transform(118, "garden.pests.pestChanceDisplay") { entry ->
             ConfigUtils.migrateBooleanToEnum(entry, DisplayFormat.FULL, DisplayFormat.DISABLED)
         }
     }
