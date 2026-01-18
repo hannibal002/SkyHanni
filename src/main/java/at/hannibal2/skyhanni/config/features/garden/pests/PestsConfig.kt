@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.garden.pests
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.garden.pests.BonusPestChanceDisplay.DisplayFormat
 import com.google.gson.annotations.Expose
@@ -74,7 +73,7 @@ class PestsConfig {
     @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")
     @ConfigEditorDropdown
-    var pestChanceDisplay: Property<DisplayFormat> = Property.of(DisplayFormat.DISABLED)
+    val pestChanceDisplay: Property<DisplayFormat> = Property.of(DisplayFormat.DISABLED)
 
     @Expose
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")

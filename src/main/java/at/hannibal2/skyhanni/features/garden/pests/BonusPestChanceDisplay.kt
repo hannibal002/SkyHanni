@@ -72,9 +72,12 @@ object BonusPestChanceDisplay {
 
     private fun isEnabled() = GardenApi.inGarden() && config.pestChanceDisplay.get() != DisplayFormat.DISABLED && !GardenApi.hideExtraGuis()
 
-    enum class DisplayFormat {
-        DISABLED,
-        COMPACT,
-        FULL,
+    enum class DisplayFormat(private val displayName: String) {
+        DISABLED("Disabled"),
+        COMPACT("Compact"),
+        FULL("Full"),
+        ;
+
+        override fun toString() = displayName
     }
 }
