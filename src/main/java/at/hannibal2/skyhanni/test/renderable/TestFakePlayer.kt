@@ -75,15 +75,11 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
         val boots = createRandomArmorPiece(bootsList)
 
         val armor = listOf(helmet, chestplate, leggings, boots)
-        //#if MC < 1.21.5
-        //$$ fakePlayer.inventory.armor = armor.toTypedArray()
-        //#else
         for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal < 0 || armorOrdinal > 3) continue
             fakePlayer.inventory.equipment.set(equipment, armor.reversed()[armorOrdinal])
         }
-        //#endif
 
         return fakePlayer
     }

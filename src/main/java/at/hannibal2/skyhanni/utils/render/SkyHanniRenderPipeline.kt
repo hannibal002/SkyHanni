@@ -96,16 +96,16 @@ enum class SkyHanniRenderPipeline(
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline",
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         uniforms = getCommonRoundedUniforms(withSmoothness = false) + mapOf(
             "borderThickness" to UniformType.FLOAT,
             "borderBlur" to UniformType.FLOAT,
         ),
-        //#else
-        //$$ uniforms = getCommonRoundedUniforms() + mapOf(
-        //$$     "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
-        //$$ ),
-        //#endif
+        //?} else {
+        /*uniforms = getCommonRoundedUniforms() + mapOf(
+            "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
+        ),
+        *///?}
         depthWrite = false,
     ),
     CIRCLE(
@@ -113,23 +113,23 @@ enum class SkyHanniRenderPipeline(
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
             "angle1" to UniformType.FLOAT,
             "angle2" to UniformType.FLOAT,
         ),
-        //#else
-        //$$ uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-        //$$     "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
-        //$$ ),
-        //#endif
+        //?} else {
+         /*uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+             "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
+         ),
+        *///?}
     ),
     RADIAL_GRADIENT_CIRCLE(
         snippet = RenderPipelines.MATRICES_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle",
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
             "angle" to UniformType.FLOAT,
             "startColor" to UniformType.VEC4,
@@ -138,11 +138,11 @@ enum class SkyHanniRenderPipeline(
             "phaseOffset" to UniformType.FLOAT,
             "reverse" to UniformType.INT,
         )
-        //#else
-        //$$ uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-        //$$     "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
-        //$$ ),
-        //#endif
+        //?} else {
+        /*uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+            "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
+        ),
+        *///?}
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_SNIPPET,
@@ -185,7 +185,7 @@ private object SkyHanniRenderPipelineUtils {
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
     ): Map<String, UniformType> {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         return mapOf(
             "scaleFactor" to UniformType.FLOAT,
             "radius" to UniformType.FLOAT,
@@ -197,19 +197,19 @@ private object SkyHanniRenderPipelineUtils {
             (withSmoothness || it.key != "smoothness") &&
                 (withHalfSize || it.key != "halfSize")
         }
-        //#else
-        //$$ return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
-        //#endif
+        //?} else {
+        /*return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
+        *///?}
     }
 
     val commonChromaUniforms = mapOf(
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         "chromaSize" to UniformType.FLOAT,
         "timeOffset" to UniformType.FLOAT,
         "saturation" to UniformType.FLOAT,
         "forwardDirection" to UniformType.INT,
-        //#else
-        //$$ "SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
-        //#endif
+        //?} else {
+        /*"SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
+        *///?}
     )
 }
