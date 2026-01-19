@@ -5,6 +5,9 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.seconds
 
 object MythicRabbitPetWarning {
@@ -25,7 +28,13 @@ object MythicRabbitPetWarning {
     fun correctPet() = CurrentPetApi.isCurrentPet(MYTHIC_RABBIT)
 
     private fun warn() {
-        ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")
+        ChatUtils.chat(
+            componentBuilder {
+                append("Use a ")
+                appendWithColor("Mythic Rabbit Pet ", ChatFormatting.LIGHT_PURPLE)
+                append("for more chocolate!")
+            }
+        )
         TitleManager.sendTitle("§cNo Rabbit Pet!")
     }
 }

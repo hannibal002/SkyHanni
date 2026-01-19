@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
-import at.hannibal2.skyhanni.mixins.hooks.renderToolTip
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -37,8 +36,7 @@ object ToolTipData {
         val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
         val tooltipCopy = tooltip.toMutableList()
         getTooltip(stack, tooltip)
-        onHover(context, stack, tooltip)
-        renderToolTip(context, stack)
+        RenderItemTooltipEvent(context, stack).post()
         if (tooltip.isEmpty()) {
             return mutableListOf()
         }
@@ -78,11 +76,6 @@ object ToolTipData {
                 "lore" to itemStack.getLore(),
             )
         }
-    }
-
-    @JvmStatic
-    fun onHover(context: GuiGraphics, stack: ItemStack, toolTip: MutableList<String>) {
-        ItemHoverEvent(context, stack, toolTip).post()
     }
 
     var lastSlot: Slot? = null

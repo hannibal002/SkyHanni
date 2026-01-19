@@ -186,7 +186,7 @@ object CompactSweepDetails {
             HypixelCommands.treeGifts()
         })
 
-        ChatUtils.chat(chatComponent)
+        ChatUtils.chat(chatComponent, prefix = false)
         resetSweepDetailsVariables()
     }
 

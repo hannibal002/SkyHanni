@@ -19,7 +19,7 @@ public class MixinDebugHud {
     @Final
     private Minecraft minecraft;
 
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     @WrapOperation(method = "getGameInformation", slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;getBiome(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/core/Holder;")), at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 2))
     public <E> boolean addDay(List instance, E e, Operation<Boolean> original) {
         long time = this.minecraft.level.getDayTime();
@@ -27,5 +27,5 @@ public class MixinDebugHud {
         instance.add("Local Difficulty: ?? (Day " + time / 24000L + ")");
         return false;
     }
-    //#endif
+    //?}
 }

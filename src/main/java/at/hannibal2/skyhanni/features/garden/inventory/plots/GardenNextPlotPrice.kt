@@ -2,46 +2,48 @@ package at.hannibal2.skyhanni.features.garden.inventory.plots
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 @SkyHanniModule
 object GardenNextPlotPrice {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!GardenApi.config.plotPrice) return
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.hoverName.string.startsWith("Plot")) return
+        if (!event.itemStack.cleanName().startsWith("Plot")) return
 
         var next = false
         val list = event.toolTip
         var i = -1
-        for (line in event.toolTipRemovedPrefix()) {
+        for (line in event.toolTip) {
             i++
-            if (line.contains("Cost")) {
+            if (line.string.contains("Cost")) {
                 next = true
                 continue
             }
 
             if (next) {
-                val readItemAmount = ItemUtils.readItemAmount(line)
+                val readItemAmount = ItemUtils.readItemAmount(line.formattedTextCompat())
                 readItemAmount?.let {
                     val (itemName, amount) = it
                     val lowestBin = NeuInternalName.fromItemName(itemName).getPrice()
                     val price = lowestBin * amount
                     val format = price.shortFormat()
-                    list[i] = list[i] + " §7(§6$format§7)"
+                    list[i] = list[i].append(" §7(§6$format§7)")
                 } ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Garden Next Plot Price error",

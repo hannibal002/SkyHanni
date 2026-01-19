@@ -1,4 +1,4 @@
-#chagem SkyHanni - Change Log
+# SkyHanni - Change Log
 
 ## Version 7.0.0
 
@@ -19,11 +19,19 @@
 + Added Zorro's Cape Contest Protection. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5029)
   + Requires equipping Zorro's Cape to claim Jacob's Farming Contest rewards.
 + Added crop fever tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5059)
++ Added display for the Mantid reforge pest kill bonus. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5082)
++ Greenhouse Growth Cycle Display. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5078)
 
 #### Inventory
 
 + Added Anti Super Crafting Overpay. - Hype_the_Time (https://github.com/hannibal002/SkyHanni/pull/5022)
     + Blocks Super Crafts (bypassable) if you can save more than X coins by instantly selling the mats and instant buying the item directly.
+
+#### Mining
++ Added UI to get Suspicious Scrap from sacks while in Fossil Excavator. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4579)
++ Show actual Gemstone Powder gained in chat alongside the base amount. - tristendillon (https://github.com/hannibal002/SkyHanni/pull/4907)
+  + Displays format: `Gemstone Powder x1,944 (x3,888)` where the first number is base, and the second is the actual amount after multipliers.
+  + Hover over the message to see a detailed breakdown of all active multipliers.
 
 #### Misc
 
@@ -32,6 +40,7 @@
 + Added downloading community shtodos. - nopo & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5048)
     + Access via /shtodos or download directly from /shdownloadtodo.
     + If you want your own todos featured, post them in Discord.
++ Added Rainbow Action Bar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
 
 ### Improvements
 
@@ -60,6 +69,8 @@
 + Improved Sensitivity Reducer to allow Fishing Rods. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5061)
 + Mooshroom Cow Display now displays overflow and custom milestones. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
   + These values are the same as the main Crop Milestone display.
++ Added Option to Show/Hide Pest Profit Tracker while farming. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5070)
++ Crop milestone display now tracks drops from crop fever. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5072)
 
 #### Inventory
 
@@ -68,6 +79,8 @@
   + Added an 'Advanced' section to allow for custom colours for enchant tiers instead of the usual Minecraft presets.
 + You can now customise Ultimate enchant colour. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5021)
 + Show all instance chest profits in the instance chest profit display. - frostyy1905 (https://github.com/hannibal002/SkyHanni/pull/5054)
++ Added hide soulbound items from Chest Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
++ Made Not Clickable Items not prevent soulbound items in trades on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
 
 #### Rift
 
@@ -76,6 +89,10 @@
 #### Events
 
 + Increased speed and accuracy of griffin burrow detection. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5051)
+
+#### Dungeons
+
++ Improved Livid Solver to have higher Range of detection. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5006)
 
 #### Misc
 
@@ -91,6 +108,7 @@
 + Sunflower/Moonflower and animated pet skin variants are now correctly detected when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5044)
 + Added auto complete to /shnavigate. - nopo (https://github.com/hannibal002/SkyHanni/pull/5050)
 + Improved argument suggestions in misc commands. - nopo (https://github.com/hannibal002/SkyHanni/pull/5050)
++ Added horse, frog and goat to sound responses. - nopo (https://github.com/hannibal002/SkyHanni/pull/5102)
 
 ### Fixes
 
@@ -126,6 +144,13 @@
 + Fixed overflow Crop Milestone level ups occasionally not triggering. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
 + Fixed overflow Crop Milestone level ups occasionally triggering when they shouldn't. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
 + Fixed pest profit tracker occasionally double counting pest kills. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5063)
++ Fixed Armor Drop Tracker showing when not wearing farming armor. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5082)
++ Fixed clicking on items in Composter Overlay searching for the wrong name on the bazaar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5088)
++ Fixed field mice kill tracking. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5071)
++ Fixed pest drop hider not hiding some drops. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5071)
++ Fixed plots with pests not being properly detected in the desk. - Luna (https://github.com/hannibal002/SkyHanni/pull/5046)
++ Fixed frequent loading farming weight errors. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5101)
++ Fixed mantid kill display not being able to be moved. - nopo (https://github.com/hannibal002/SkyHanni/pull/5099)
 
 #### Mining
 
@@ -141,6 +166,7 @@
 #### Combat
 
 + Fixed Arachne Kill Timer. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/5035)
++ Fixed wrong you have no auto-slayer active warnings when slayer quest information is only available in tab list (e.g. Wolf Slayer in The Park). - Luna (https://github.com/hannibal002/SkyHanni/pull/5083)
 
 #### Event
 
@@ -149,14 +175,18 @@
 #### Chat
 
 + Fixed Copy Underbid Price feature spamming the chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5052)
-
-#### Garden
-
-+ Fixed plots with pests not being properly detected in the desk. - Luna (https://github.com/hannibal002/SkyHanni/pull/5046)
++ Fixed error when someone transfers the party to you with Reverse Party Transfer Clickable Message enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/5103)
++ Fixed Copy Chat not copying skyhanni messages correctly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5107)
++ Fixed some skyhanni messages being black. - nopo (https://github.com/hannibal002/SkyHanni/pull/5108)
 
 #### Rift
 
 + Fixed the Timite Evolution Timer feature resetting every time you moved your mouse. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4962)
+
+#### Inventory
+
++ Fixed Custom Wardrobe not having 3 pages. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5091)
++ Fixed some displays not working on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5092)
 
 #### Misc
 
@@ -177,6 +207,11 @@
 + Fixed Cron /shtodos not being able to be disabled. - nopo (https://github.com/hannibal002/SkyHanni/pull/5042)
 + Fixed Museum milestone not getting tracked correctly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5067)
 + Fixed Scrolling in trackers. - nopo (https://github.com/hannibal002/SkyHanni/pull/5066)
++ Fixed /shnavigate not working with no args. - nopo (https://github.com/hannibal002/SkyHanni/pull/5077)
++ Fixed compatibility with some other mods when modifying tooltips. - nopo (https://github.com/hannibal002/SkyHanni/pull/5087)
+  + This may cause issues, if you notice any tooltip issues please report them.
++ Fixed lag in menus such as wardrobe and visitors. - nopo (https://github.com/hannibal002/SkyHanni/pull/5080)
++ Fixed an error when opening a crafter. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5100)
 
 ### Technical Details
 
@@ -230,6 +265,19 @@
 + Reduced visitor debug spam when a visitor doesn't have an associated item in repo. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5065)
 + Renamed cropCounter to cropMilestoneCounter in ProfileSpecificStorage. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4590)
   + Planning to add different types of crop counters in the future.
++ Added /shtestpestkill. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5082)
+  + Sends a pest kill event.
++ Converted most TooltipEvents to be TooltipTextEvents. - nopo (https://github.com/hannibal002/SkyHanni/pull/5087)
++ Deprecate SkyhanniChatEvent.message and ItemUtils.getLore. - nopo (https://github.com/hannibal002/SkyHanni/pull/5081)
++ Removed duplicate pest kill logic from PestApi. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5079)
++ Added capability for Animated Item Stack Renderables to store-back their rotation to the calling class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4579)
++ Added componentBuilder. - nopo (https://github.com/hannibal002/SkyHanni/pull/5098)
++ Created MiningEventsApi. - tristendillon (https://github.com/hannibal002/SkyHanni/pull/4907)
+  + A centralized API for detecting and managing mining events (2x Powder, Goblin Raid, Raffle, etc.) via chat patterns, boss bars, and tab widgets.
+  + This API posts `MiningEventEvent.Started/Ended` events for consumption by other systems.
++ Improved sending components via ChatUtils.chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/5097)
++ Refactored `PowderTracker` to use the new `MiningEventsApi`, eliminating duplicate event detection logic. - tristendillon (https://github.com/hannibal002/SkyHanni/pull/4907)
++ Use Components in places for ChatUtils. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
 
 ### Removed Features
 

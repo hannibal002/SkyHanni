@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
@@ -356,7 +355,6 @@ object CropMilestonesApi {
         cropMilestoneTierCache.clear()
         amountToNextTierCache.clear()
         maxTier = null
-        GardenCropMilestoneDisplay.update()
     }
 
     private fun resetMilestones() {
