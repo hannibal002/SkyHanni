@@ -19,9 +19,13 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -94,7 +98,13 @@ object GrowthCycle {
         val formatted = if (nextCycle.isInPast()) {
             if (!beep) {
                 SoundUtils.playPlingSound()
-                ChatUtils.chat("§aGreenhouse Growth Stage is ready in the Garden")
+                ChatUtils.chat(
+                    componentBuilder {
+                        append("Greenhouse Growth Stage is ready in the Garden") {
+                            withColor(ChatFormatting.GREEN)
+                        }
+                    }
+                )
                 beep = true
             }
             "§cOVERDUE"

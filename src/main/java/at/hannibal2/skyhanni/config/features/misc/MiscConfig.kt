@@ -490,4 +490,12 @@ class MiscConfig {
     @FeatureToggle
     @SearchTag("Colour Spell Spawn Specific")
     var fixColorParticles: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Rainbow Action Bar",
+        desc = "Makes the Action bar rainbow. Why? For fun!"
+    )
+    @ConfigEditorBoolean
+    var rainbowActionBar: Boolean = false
 }

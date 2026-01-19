@@ -172,7 +172,7 @@ object CompactStarlynSisters {
                     "§b$previousRecord §6$woodType logs §ecollected during a contest! Keep it up!"
                 )
             val hoverableLockInWarning = formattedLockInWarning.asComponent()
-            ChatUtils.chat(hoverableLockInWarning)
+            ChatUtils.chat(hoverableLockInWarning, prefix = false)
             blockedReason = "STARLYN_COLLECTION"
             return
         }
@@ -214,7 +214,7 @@ object CompactStarlynSisters {
                 hoverablePersonalBest.onClick(onClick = {
                     HypixelCommands.starlynSisters()
                 })
-                ChatUtils.chat(hoverablePersonalBest)
+                ChatUtils.chat(hoverablePersonalBest, prefix = false)
                 isInPersonalBest = false
                 blockedReason = "STARLYN_COLLECTION"
                 resetPersonalBestVariables()
@@ -265,7 +265,7 @@ object CompactStarlynSisters {
                         HypixelCommands.starlynSisters()
                     },
                 )
-                ChatUtils.chat(hoverableResults)
+                ChatUtils.chat(hoverableResults, prefix = false)
                 isInResults = false
                 blockedReason = "STARLYN_RESULTS"
                 resetContestResultVariables()

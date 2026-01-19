@@ -47,12 +47,15 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.annotations.Expose
@@ -60,6 +63,7 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
@@ -78,10 +82,10 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21.8
-//$$ import com.google.common.collect.ImmutableMultimap
-//$$ import com.mojang.authlib.properties.PropertyMap
-//#endif
+//? > 1.21.8 {
+/*import com.google.common.collect.ImmutableMultimap
+import com.mojang.authlib.properties.PropertyMap
+*///?}
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -299,21 +303,21 @@ object ItemUtils {
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.PLAYER_HEAD) return null
-        //#if MC < 1.21.9
+        //? < 1.21.9 {
         return this.get(DataComponents.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
-        //#else
-        //$$ return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
-        //#endif
+        //?} else {
+        /*return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
+        *///?}
 
     }
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.PLAYER_HEAD) return null
-        //#if MC < 1.21.9
+        //? < 1.21.9 {
         return this.get(DataComponents.PROFILE)?.id?.get().toString()
-        //#else
-        //$$ return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
-        //#endif
+        //?} else {
+        /*return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
+        *///?}
     }
 
     @Suppress("SpreadOperator")
@@ -323,16 +327,16 @@ object ItemUtils {
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         val stack = ItemStack(Items.PLAYER_HEAD)
-        //#if MC < 1.21.9
+        //? < 1.21.9 {
         val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
         profile.properties.put("textures", Property("textures", value))
         stack.set(DataComponents.PROFILE, ResolvableProfile(profile))
-        //#else
-        //$$ val builder = ImmutableMultimap.builder<String, Property>()
-        //$$ builder.put("textures", Property("textures", value))
-        //$$ val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
-        //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
-        //#endif
+        //?} else {
+        /*val builder = ImmutableMultimap.builder<String, Property>()
+        builder.put("textures", Property("textures", value))
+        val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
+        stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
+        *///?}
         stack.setCustomItemName(displayName)
         stack.setLoreString(lore.toList())
         return stack
@@ -792,7 +796,11 @@ object ItemUtils {
                 "§eClick to copy internal name to clipboard!",
             ),
         )
-        add(componentText)
+        val hoverComp = componentBuilder {
+            appendWithColor(" (tooltip)", ChatFormatting.DARK_GRAY)
+            stackHover = internalName.getItemStackOrNull()
+        }
+        add(componentText.append(hoverComp))
     }
 
     @HandleEvent

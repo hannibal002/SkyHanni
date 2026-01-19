@@ -17,6 +17,7 @@ pluginManagement {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
+        maven("https://maven.kikugie.dev/snapshots") // stone cutter
     }
     resolutionStrategy.eachPlugin {
         requested.apply {
@@ -31,6 +32,7 @@ pluginManagement {
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
     id("at.skyhanni.shared-variables")
+    id("dev.kikugie.stonecutter") version "0.8.3"
 }
 
 MultiVersionStage.initFrom(file(".gradle/private.properties"))
@@ -40,10 +42,8 @@ include("detekt")
 rootProject.name = "SkyHanni"
 rootProject.buildFileName = "root.gradle.kts"
 
-ProjectTarget.activeVersions().forEach { target ->
-    include(target.projectPath)
-    val p = project(target.projectPath)
-    p.projectDir = file("versions/${target.projectName}")
-    p.buildFileName = "../../build.gradle.kts"
+stonecutter {
+    create(rootProject) {
+        versions("1.21.5", "1.21.8", "1.21.10")
+    }
 }
-

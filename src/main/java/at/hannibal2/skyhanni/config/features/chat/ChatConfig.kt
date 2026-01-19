@@ -189,6 +189,17 @@ class ChatConfig {
     var hideSkyMall: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Show Actual Powder Gained",
+        desc = "Shows both base and actual Gemstone Powder amounts in chat messages, " +
+            "accounting for 2x Powder events, Sky Mall perks, and other multipliers.\n" +
+            "§eFormat: §dGemstone Powder §r§8x1,944 §7(x3,888)"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showEffectivePowder: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
     @ConfigEditorBoolean
     @FeatureToggle

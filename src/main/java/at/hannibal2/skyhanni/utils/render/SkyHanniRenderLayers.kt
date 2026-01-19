@@ -105,11 +105,11 @@ object SkyHanniRenderLayers {
             false,
             SkyHanniRenderPipeline.CHROMA_TEXT(),
             CompositeState.builder()
-                //#if MC < 1.21.6
+                //? < 1.21.6 {
                 .setTextureState(RenderStateShard.TextureStateShard(texture, TriState.FALSE, false))
-                //#else
-                //$$ .setTextureState(RenderStateShard.TextureStateShard(texture, false))
-                //#endif
+                //?} else {
+                /*.setTextureState(RenderStateShard.TextureStateShard(texture, false))
+                *///?}
                 .createCompositeState(false),
         )
     }
@@ -154,12 +154,12 @@ object SkyHanniRenderLayers {
 
     fun getChromaTexturedWithIdentifier(identifier: ResourceLocation) = CHROMA_TEXTURED.apply(identifier)
 
-    //#if MC < 1.21.6
+    //? < 1.21.6 {
     fun getChromaStandard() = CHROMA_STANDARD
     fun getChromaTextured() = SkyHanniRenderLayers::getChromaTexturedWithIdentifier
-    //#else
-    //$$ fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
-    //$$ fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
-    //#endif
+    //?} else {
+    /*fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
+    fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
+    *///?}
 
 }
