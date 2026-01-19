@@ -13,7 +13,10 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+import com.google.gson.JsonParser
+import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 
 @SkyHanniModule
 object TestChatCommand {
@@ -55,7 +58,7 @@ object TestChatCommand {
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component = if (isComplex) try {
-            "complex doesnt work on 1.21".asComponent()
+            ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(text)).getOrThrow().first
         } catch (ex: Exception) {
             ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
             return
