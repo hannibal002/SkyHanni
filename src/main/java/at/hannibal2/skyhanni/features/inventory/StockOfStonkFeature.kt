@@ -4,16 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -32,30 +34,22 @@ object StockOfStonkFeature {
     )
 
     /**
-     * REGEX-TEST: §dStonks Auction
-     */
-    private val itemPattern by patternGroup.pattern(
-        "item",
-        "§dStonks Auction",
-    )
-
-    /**
-     * REGEX-TEST: §7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
-     * REGEX-TEST: §5§o§7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
-     * REGEX-TEST: §5§o§7§a▶ §a§lTOP 100§7 - §5Stock of Stonks §8x25
+     * REGEX-TEST: ▶ TOP 5,000 - Stock of Stonks x2
+     * REGEX-TEST: ▶ TOP 5,000 - Stock of Stonks x2
+     * REGEX-TEST: ▶ TOP 100 - Stock of Stonks x25
      */
     private val topPattern by patternGroup.pattern(
-        "top",
-        "(?:§5§o)?§7§.▶ §.§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
+        "top.new",
+        "▶ TOP (?<rank>[\\d,]+) - Stock of Stonks x(?<amount>\\d+)",
     )
 
     /**
-     * REGEX-TEST: §7   Minimum Bid: §62,400,002 Coins
-     * REGEX-TEST: §5§o§7   Minimum Bid: §62,400,002 Coins
+     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
+     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
      */
     private val bidPattern by patternGroup.pattern(
-        "bid",
-        "(?:§5§o)?§7 {3}Minimum Bid: §6(?<amount>[\\d,]+) Coins",
+        "bid.new",
+        " {3}Minimum Bid: (?<amount>[\\d,]+) Coins",
     )
 
     var inInventory = false
@@ -73,10 +67,10 @@ object StockOfStonkFeature {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (!itemPattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!inventoryPattern.matches(event.itemStack.cleanName())) return
         var stonksReward = 0
         var index = 0
         var bestValueIndex = 0
@@ -91,7 +85,8 @@ object StockOfStonkFeature {
             bidPattern.matchMatcher(line) {
                 val cost = group("amount").formatLong().coerceAtLeast(2000000) // minimum bid is 2,000,000
                 val ratio = cost / stonksReward.transformIf({ this == 0 }, { 1 })
-                event.toolTip[index - 1] = line + " §7(paying §6${ratio.addSeparators()} §7per)" // double §6 for the replacement at the end
+                // double §6 for the replacement at the end
+                event.toolTip[index - 1] = line.append(" §7(paying §6§6${ratio.addSeparators()} §7per)")
                 if (ratio < bestRatio) {
                     bestValueIndex = index - 1
                     bestRatio = ratio

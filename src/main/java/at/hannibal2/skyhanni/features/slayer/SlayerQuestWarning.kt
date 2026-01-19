@@ -13,10 +13,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.LivingEntity
 import kotlin.time.Duration.Companion.milliseconds
@@ -28,8 +27,7 @@ object SlayerQuestWarning {
     private val config get() = SlayerApi.config
 
     private var lastWeaponUse = SimpleTimeMark.farPast()
-    private val voidItem = "ASPECT_OF_THE_VOID".toInternalName()
-    private val endItem = "ASPECT_OF_THE_END".toInternalName()
+    private val teleportItems = setOf("ASPECT_OF_THE_END", "ASPECT_OF_THE_VOID").toInternalNames()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
@@ -40,7 +38,7 @@ object SlayerQuestWarning {
             needNewQuest("The old slayer quest has failed!")
         }
         if (event.state == SlayerApi.ActiveQuestState.SLAIN) {
-            DelayedRun.runDelayed(2.seconds) {
+            DelayedRun.runDelayed(5.seconds) {
                 if (SlayerApi.state == SlayerApi.ActiveQuestState.SLAIN) {
                     needNewQuest("You have no Auto-Slayer active!")
                 }
@@ -80,7 +78,6 @@ object SlayerQuestWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-
         val entity = event.entity
         if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
             tryWarn()
@@ -92,7 +89,7 @@ object SlayerQuestWarning {
 
         // workaround for rift mob that is unrelated to slayer
         if (entity.name.string == "Oubliette Guard") return false
-        // workaround for Bladesoul in  Crimson Isle
+        // workaround for Bladesoul in Crimson Isle
         if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name.string == "Skeleton") return false
 
         val isSlayer = slayerType.clazz.isInstance(entity)
@@ -118,7 +115,7 @@ object SlayerQuestWarning {
         val internalName = event.itemInHand?.getInternalNameOrNull()
 
         if (event.clickType == ClickType.RIGHT_CLICK) {
-            if (internalName == voidItem || internalName == endItem) {
+            if (internalName in teleportItems) {
                 // ignore harmless teleportation
                 return
             }

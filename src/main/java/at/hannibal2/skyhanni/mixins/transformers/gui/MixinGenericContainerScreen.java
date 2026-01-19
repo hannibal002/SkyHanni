@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-//#if MC > 1.21.6
-//$$ import at.hannibal2.skyhanni.data.GuiData;
-//$$ import net.minecraft.client.gui.GuiGraphics;
-//$$ import org.spongepowered.asm.mixin.injection.Inject;
-//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#endif
+//? > 1.21.6 {
+/*import at.hannibal2.skyhanni.data.GuiData;
+import net.minecraft.client.gui.GuiGraphics;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+*///?}
 
 @Mixin(ContainerScreen.class)
 abstract class MixinGenericContainerScreen {
@@ -23,11 +23,11 @@ abstract class MixinGenericContainerScreen {
         method = "renderBg",
         at = @At(
             value = "INVOKE",
-            //#if MC < 1.21.6
+            //? < 1.21.6 {
             target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
-            //#else
-            //$$ target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
-            //#endif
+            //?} else {
+            /*target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIFFIIII)V"
+            *///?}
         ),
         index = 1
     )
@@ -35,12 +35,12 @@ abstract class MixinGenericContainerScreen {
         return skyhanni$hook.getTexture(sprite);
     }
 
-    //#if MC > 1.21.6
-    //$$ @Inject(method = "renderBg", at = @At(value = "HEAD"), cancellable = true)
-    //$$ private void cancelWardrobeBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
-    //$$     if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
-    //$$         ci.cancel();
-    //$$     }
-    //$$ }
-    //#endif
+    //? > 1.21.6 {
+    /*@Inject(method = "renderBg", at = @At(value = "HEAD"), cancellable = true)
+    private void cancelWardrobeBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
+            ci.cancel();
+        }
+    }
+    *///?}
 }

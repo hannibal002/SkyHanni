@@ -22,9 +22,9 @@ object MinecraftCompat {
 
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugOverlay.showDebugScreen()
-    //#else
-    //$$ val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isF3Visible
-    //#endif
+    //?} else {
+    /*val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isF3Visible
+    *///?}
 }

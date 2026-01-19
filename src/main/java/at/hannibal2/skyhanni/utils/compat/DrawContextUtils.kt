@@ -50,62 +50,59 @@ object DrawContextUtils {
     }
 
     fun translate(x: Double, y: Double, z: Double) {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         drawContext.pose().translate(x, y, z)
-        //#else
-        //$$ drawContext.pose().translate(x.toFloat(), y.toFloat())
-        //#endif
+        //?} else {
+        /*drawContext.pose().translate(x.toFloat(), y.toFloat())
+        *///?}
     }
 
     fun translate(x: Float, y: Float, z: Float) {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         drawContext.pose().translate(x, y, z)
-        //#else
-        //$$ drawContext.pose().translate(x, y)
-        //#endif
+        //?} else {
+        /*drawContext.pose().translate(x, y)
+        *///?}
     }
 
     fun rotate(angle: Float, x: Number, y: Number, z: Number) {
         val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
-        //#if MC < 1.21.6
+        //? < 1.21.6
         drawContext.pose().mulPose(Quaternionf().rotationAxis(angle, xf, yf, zf))
-        //#endif
     }
 
     fun multMatrix(buffer: FloatBuffer) {
-        //#if MC < 1.21.6
+        //? < 1.21.6
         multMatrix(Matrix4f(buffer))
-        //#endif
     }
 
-    //#if MC < 1.21.6
+    //? < 1.21.6
     fun multMatrix(matrix: Matrix4f) = drawContext.pose().mulPose(matrix)
-    //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         drawContext.pose().scale(x, y, z)
-        //#else
-        //$$ drawContext.pose().scale(x, y)
-        //#endif
+        //?} else {
+        /*drawContext.pose().scale(x, y)
+        *///?}
     }
 
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         drawContext.pose().pushPose()
-        //#else
-        //$$ drawContext.pose().pushMatrix()
-        //#endif
+        //?} else {
+        /*drawContext.pose().pushMatrix()
+        *///?}
     }
 
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         drawContext.pose().popPose()
-        //#else
-        //$$ drawContext.pose().popMatrix()
-        //#endif
+        //?} else {
+        /*drawContext.pose().popMatrix()
+        *///?}
     }
 
     /**
@@ -139,10 +136,10 @@ object DrawContextUtils {
     }
 
     fun loadIdentity() {
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         drawContext.pose().setIdentity()
-        //#else
-        //$$ drawContext.pose().identity()
-        //#endif
+        //?} else {
+        /*drawContext.pose().identity()
+        *///?}
     }
 }
