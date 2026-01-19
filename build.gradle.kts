@@ -151,6 +151,7 @@ dependencies {
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:1.12.5")
 
     modImplementation(libs.hypixelmodapi)
