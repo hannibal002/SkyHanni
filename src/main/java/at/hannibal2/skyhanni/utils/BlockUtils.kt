@@ -28,11 +28,11 @@ object BlockUtils {
     }
 
     fun SkullBlockEntity.getSkullTexture(): String? {
-        //#if MC < 1.21.9
+        //? < 1.21.9 {
         return this.ownerProfile?.id?.get()?.toString()
-        //#else
-        //$$ return this.ownerProfile?.partialProfile()?.id.toString()
-        //#endif
+        //?} else {
+        /*return this.ownerProfile?.partialProfile()?.id.toString()
+        *///?}
     }
 
     fun BlockState.isBabyCrop(): Boolean {

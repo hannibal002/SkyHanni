@@ -60,11 +60,11 @@ object ComponentUtils {
         }
         if (nbtInfo.skullOwner != null) {
             val skullOwner = nbtInfo.skullOwner
-            //#if MC < 1.21.9
+            //? < 1.21.9 {
             stack.set(DataComponents.PROFILE, ResolvableProfile(skullOwner.toGameProfile()))
-            //#else
-            //$$ stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(skullOwner.toGameProfile()))
-            //#endif
+            //?} else {
+            /*stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(skullOwner.toGameProfile()))
+            *///?}
         }
 
     }
@@ -72,13 +72,13 @@ object ComponentUtils {
     fun convertToNeuNbtInfoJson(stack: ItemStack): JsonObject {
         val isUnbreakable = NbtBoolean(stack.has(DataComponents.UNBREAKABLE))
         val profile = stack.get(DataComponents.PROFILE)
-        //#if MC < 1.21.9
+        //? < 1.21.9 {
         val profileProperties = profile?.properties?.get("textures")?.firstOrNull()
         val uuid = profile?.id?.getOrNull() ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
-        //#else
-        //$$ val profileProperties = profile?.partialProfile()?.properties?.get("textures")?.firstOrNull()
-        //$$ val uuid = profile?.partialProfile()?.id ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
-        //#endif
+        //?} else {
+        /*val profileProperties = profile?.partialProfile()?.properties?.get("textures")?.firstOrNull()
+        val uuid = profile?.partialProfile()?.id ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
+        *///?}
         val value = profileProperties?.value
         val signature = profileProperties?.signature
         val propertiesInfo = PropertiesInfo(listOf(TextureInfo(value = value, signature = signature)))

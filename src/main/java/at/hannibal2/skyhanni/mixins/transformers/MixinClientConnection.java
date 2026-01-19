@@ -9,11 +9,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC < 1.21.6
+//? < 1.21.6 {
 import net.minecraft.network.PacketSendListener;
-//#else
-//$$ import io.netty.channel.ChannelFutureListener;
-//#endif
+//?} else {
+/*import io.netty.channel.ChannelFutureListener;
+*///?}
 
 @Mixin(Connection.class)
 public class MixinClientConnection {
@@ -25,13 +25,13 @@ public class MixinClientConnection {
         }
     }
 
-    //#if MC < 1.21.6
+    //? < 1.21.6 {
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void sendPacketNew(Packet<?> packet, PacketSendListener callbacks, boolean flush, CallbackInfo ci) {
-        //#else
-        //$$ @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
-        //$$ private void sendPacketNew(Packet<?> packet, ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
-        //#endif
+        //?} else {
+        /*@Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
+        private void sendPacketNew(Packet<?> packet, ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
+        *///?}
         if (new PacketSentEvent(packet).post()) {
             ci.cancel();
         }
