@@ -29,7 +29,7 @@ RepoRules:
 
 ImportRules:
     CustomImportOrdering:
-        active: true
+        active: false
     PreprocessingImportOrdering:
         active: true
 
