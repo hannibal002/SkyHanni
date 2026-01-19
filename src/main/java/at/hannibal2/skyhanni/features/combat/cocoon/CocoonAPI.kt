@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    private val recentCocoonMobs: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
+    private val existingCocoons: MutableList<CocoonMob> = mutableListOf()
     private val recentMobs: TimeLimitedSet<Mob> = TimeLimitedSet(1.seconds)
 
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
@@ -39,13 +39,13 @@ object CocoonAPI {
     @HandleEvent
     fun onCheckRenderEntityEvent(event: CheckRenderEntityEvent<ArmorStand>) {
         val entity = event.entity
-        if (recentCocoonMobs.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
+        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
         if (entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
             val position = entity.getLorenzVec()
             val mob = getCocoonMob(position) ?: return
             val id = entity.id
             val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id)
-            recentCocoonMobs.add(cocoon)
+            existingCocoons.add(cocoon)
             ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID} Entered List")
             logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
             CocoonSpawnEvent(cocoon).post()
@@ -54,9 +54,10 @@ object CocoonAPI {
 
     @HandleEvent
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
-        val cocoon = recentCocoonMobs.firstOrNull { it.cocoonID == event.entity.id } ?: return
+        val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID}) Left World After ${cocoon.spawnTime.passedSince()}")
         logger.log("${cocoon.mob.name} (Type: ${cocoon.mob.mobType}) Cocoon (${cocoon.cocoonID}) Left World after ${cocoon.spawnTime.passedSince()}")
+        existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 
     @HandleEvent
@@ -71,7 +72,7 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onWorldChange(event: WorldChangeEvent) {
         recentMobs.clear()
-        recentCocoonMobs.clear()
+        existingCocoons.clear()
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
