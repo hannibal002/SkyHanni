@@ -5,11 +5,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-//#if MC > 1.21.8
-//$$ import net.minecraft.client.input.MouseButtonEvent
-//$$ import net.minecraft.client.input.CharacterEvent
-//$$ import net.minecraft.client.input.KeyEvent
-//#endif
+//? > 1.21.8 {
+/*import net.minecraft.client.input.MouseButtonEvent
+import net.minecraft.client.input.CharacterEvent
+import net.minecraft.client.input.KeyEvent
+*///?}
 
 @Suppress("UnusedParameter", "TooManyFunctions")
 abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
@@ -41,19 +41,19 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     open fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     override fun mouseClicked(mouseX: Double, mouseY: Double, mouseButton: Int): Boolean {
         postMouseClicked(mouseX.toInt(), mouseY.toInt(), mouseButton)
         postHandleMouseInput()
         return super.mouseClicked(mouseX, mouseY, mouseButton)
     }
-    //#else
-    //$$ override fun mouseClicked(click: MouseButtonEvent, doubled: Boolean): Boolean {
-    //$$     postMouseClicked(click.x.toInt(), click.y.toInt(), click.button())
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseClicked(click, doubled)
-    //$$ }
-    //#endif
+    //?} else {
+    /*override fun mouseClicked(click: MouseButtonEvent, doubled: Boolean): Boolean {
+        postMouseClicked(click.x.toInt(), click.y.toInt(), click.button())
+        postHandleMouseInput()
+        return super.mouseClicked(click, doubled)
+    }
+    *///?}
 
     private fun postMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         try {
@@ -65,7 +65,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     open fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {}
 
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         postKeyTyped(null, keyCode)
         return super.keyPressed(keyCode, scanCode, modifiers)
@@ -75,17 +75,17 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
         postKeyTyped(chr, null)
         return super.charTyped(chr, modifiers)
     }
-    //#else
-    //$$ override fun keyPressed(input: KeyEvent): Boolean {
-    //$$     postKeyTyped(null, input.key)
-    //$$     return super.keyPressed(input)
-    //$$ }
-    //$$
-    //$$ override fun charTyped(input: CharacterEvent): Boolean {
-    //$$     postKeyTyped(input.codepoint.toChar(), null)
-    //$$     return super.charTyped(input)
-    //$$ }
-    //#endif
+    //?} else {
+    /*override fun keyPressed(input: KeyEvent): Boolean {
+        postKeyTyped(null, input.key)
+        return super.keyPressed(input)
+    }
+
+    override fun charTyped(input: CharacterEvent): Boolean {
+        postKeyTyped(input.codepoint.toChar(), null)
+        return super.charTyped(input)
+    }
+    *///?}
 
     private fun postKeyTyped(typedChar: Char?, keyCode: Int?) {
         try {
@@ -97,19 +97,19 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     open fun onKeyTyped(typedChar: Char?, keyCode: Int?) {}
 
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
         postMouseReleased(mouseX.toInt(), mouseY.toInt(), button)
         postHandleMouseInput()
         return super.mouseReleased(mouseX, mouseY, button)
     }
-    //#else
-    //$$ override fun mouseReleased(click: MouseButtonEvent): Boolean {
-    //$$     postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseReleased(click)
-    //$$ }
-    //#endif
+    //?} else {
+    /*override fun mouseReleased(click: MouseButtonEvent): Boolean {
+        postMouseReleased(click.x.toInt(), click.y.toInt(), click.button())
+        postHandleMouseInput()
+        return super.mouseReleased(click)
+    }
+    *///?}
 
     private fun postMouseReleased(originalMouseX: Int, originalMouseY: Int, state: Int) {
         try {
@@ -121,21 +121,21 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     open fun onMouseReleased(originalMouseX: Int, originalMouseY: Int, state: Int) {}
 
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
         // TODO there is no timeSince last click in modern
         postMouseClickMove(mouseX.toInt(), mouseY.toInt(), button, 0L)
         postHandleMouseInput()
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
     }
-    //#else
-    //$$ override fun mouseDragged(click: MouseButtonEvent, mouseX: Double, mouseY: Double): Boolean {
-    //$$     // TODO idk if mouseX is correct or if it should be click.x
-    //$$     postMouseClickMove(mouseX.toInt(), mouseY.toInt(), click.button(), 0L)
-    //$$     postHandleMouseInput()
-    //$$     return super.mouseDragged(click, mouseX, mouseY)
-    //$$ }
-    //#endif
+    //?} else {
+    /*override fun mouseDragged(click: MouseButtonEvent, mouseX: Double, mouseY: Double): Boolean {
+        // TODO idk if mouseX is correct or if it should be click.x
+        postMouseClickMove(mouseX.toInt(), mouseY.toInt(), click.button(), 0L)
+        postHandleMouseInput()
+        return super.mouseDragged(click, mouseX, mouseY)
+    }
+    *///?}
 
     private fun postMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
         try {

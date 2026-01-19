@@ -6,7 +6,7 @@ jbAnnotations = "24.1.0"
 hypixelmodapi = "1.0.1"
 hypixelmodapi_fabric = "1.0.1+build.1+mc1.21"
 
-fabricLanguageKotlin = "1.13.2+kotlin.2.1.20"
+fabricLanguageKotlin = "1.13.7+kotlin.2.2.21"
 
 roughlyenoughitems = "19.0.806"
 
