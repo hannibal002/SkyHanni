@@ -52,7 +52,7 @@ object WorldRenderUtils {
         matrices.pushPose()
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.renderBeaconBeam(
-            //#if MC < 1.21.9
+            //? < 1.21.9 {
             matrices,
             vertexConsumers,
             beaconBeam,
@@ -64,18 +64,18 @@ object WorldRenderUtils {
             rgb,
             0.2f,
             0.25f,
-            //#else
-            //$$ matrices,
-            //$$ Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
-            //$$ beaconBeam,
-            //$$ 1f,
-            //$$ Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
-            //$$ 0,
-            //$$ 319,
-            //$$ rgb,
-            //$$ 0.2f,
-            //$$ 0.25f,
-            //#endif
+            //?} else {
+             /*matrices,
+             Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
+             beaconBeam,
+             1f,
+             Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
+             0,
+             319,
+             rgb,
+             0.2f,
+             0.25f,
+            *///?}
         )
         matrices.popPose()
     }

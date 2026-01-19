@@ -2,12 +2,10 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
-import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.CleanupMappingFiles
@@ -17,9 +15,8 @@ import skyhannibuildsystem.PublishToModrinth
 plugins {
     idea
     java
-    id("com.gradleup.shadow") version "8.3.4"
-    id("fabric-loom")
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
+    id("com.gradleup.shadow") version "9.3.1"
+    id("net.fabricmc.fabric-loom-remap")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -153,6 +150,7 @@ dependencies {
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:1.12.5")
 
     modImplementation(libs.hypixelmodapi)
@@ -184,10 +182,11 @@ afterEvaluate {
     loom.runs.named("client") {
         programArgs("--quickPlayMultiplayer", "hypixel.net")
     }
-    tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
+
+    ksp {
+        arg("skyhanni.modver", version.toString())
+        arg("skyhanni.mcver", target.minecraftVersion.versionName)
+        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
     }
 }
 
@@ -264,9 +263,6 @@ if (target.parent == ProjectTarget.MODERN_12105) {
     tasks.named("processResources") {
         dependsOn(mainRes)
     }
-    tasks.named("preprocessCode") {
-        dependsOn(mainRes)
-    }
 }
 
 tasks.withType(JavaCompile::class) {
@@ -293,11 +289,6 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
-    doLast {
-        configurations.forEach {
-            println("Config: ${it.files}")
-        }
-    }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
@@ -329,12 +320,6 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<ProcessResources> {
         onlyIf { false }
     }
-}
-
-preprocess {
-    vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("JAVA", target.minecraftVersion.javaVersion)
-    vars.put("TODO", 0)
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -405,4 +390,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     val isMainBaseline = (this.name == "detektBaselineMain")
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
+}
+repositories {
+    mavenCentral()
 }

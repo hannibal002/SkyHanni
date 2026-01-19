@@ -16,13 +16,13 @@ import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderType.CompositeRenderType
 
-//#if MC > 1.21.6
-//$$ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
-//$$ import org.joml.Vector4f
-//#endif
-//#if MC > 1.21.8
-//$$ import org.joml.Vector3f
-//#endif
+//? > 1.21.6 {
+/*import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
+import org.joml.Vector4f
+*///?}
+//? > 1.21.8 {
+/*import org.joml.Vector3f
+ *///?}
 
 class ChromaRenderLayer(
     name: String, size: Int, hasCrumbling: Boolean, translucent: Boolean, pipeline: RenderPipeline, phases: CompositeState,
@@ -46,23 +46,23 @@ class ChromaRenderLayer(
             Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> 0
         }
 
-        //#if MC > 1.21.6
-        //$$ var dynamicTransforms = RenderSystem.getDynamicUniforms()
-        //$$     .writeTransform(
-        //$$         RenderSystem.getModelViewMatrix(),
-        //$$ 		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-        //#if MC < 1.21.9
-        //$$ 		 RenderSystem.getModelOffset(),
-        //#else
-        //$$         Vector3f(),
-        //#endif
-        //$$ 		 RenderSystem.getTextureMatrix(),
-        //$$ 		 RenderSystem.getShaderLineWidth()
-        //$$     )
-        //$$ if (GuiRendererHook.chromaBufferSlice == null) {
-        //$$     GuiRendererHook.computeChromaBufferSlice()
-        //$$ }
-        //#endif
+        //? > 1.21.6 {
+        /*var dynamicTransforms = RenderSystem.getDynamicUniforms()
+             .writeTransform(
+                 RenderSystem.getModelViewMatrix(),
+         		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+            //? < 1.21.9 {
+                     RenderSystem.getModelOffset(),
+            //?} else {
+                     /*Vector3f(),
+            *///?}
+         		 RenderSystem.getTextureMatrix(),
+         		 RenderSystem.getShaderLineWidth()
+             )
+         if (GuiRendererHook.chromaBufferSlice == null) {
+             GuiRendererHook.computeChromaBufferSlice()
+         }
+        *///?}
 
         try {
             val gpuBuffer = renderPipeline.vertexFormat.uploadImmediateVertexBuffer(buffer.vertexBuffer())
@@ -80,16 +80,16 @@ class ChromaRenderLayer(
             val framebuffer = state.outputState.renderTarget
 
             RenderSystem.getDevice().createRenderPass("SkyHanni Immediate Chroma Pipeline Draw", framebuffer).use { renderPass ->
-                //#if MC > 1.21.6
-                //$$ RenderSystem.bindDefaultUniforms(renderPass)
-                //$$ renderPass.setUniform("DynamicTransforms", dynamicTransforms)
-                //$$ renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
-                //#else
+                //? > 1.21.6 {
+                 /*RenderSystem.bindDefaultUniforms(renderPass)
+                 renderPass.setUniform("DynamicTransforms", dynamicTransforms)
+                 renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
+                *///?} else {
                 renderPass.setUniform("chromaSize", chromaSize)
                 renderPass.setUniform("timeOffset", timeOffset)
                 renderPass.setUniform("saturation", saturation)
                 renderPass.setUniform("forwardDirection", forwardDirection)
-                //#endif
+                //?}
 
                 renderPass.setPipeline(renderPipeline)
                 renderPass.setVertexBuffer(0, gpuBuffer)
