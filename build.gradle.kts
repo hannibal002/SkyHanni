@@ -15,7 +15,7 @@ import skyhannibuildsystem.PublishToModrinth
 plugins {
     idea
     java
-    id("com.gradleup.shadow") version "8.3.4"
+    id("com.gradleup.shadow") version "9.3.1"
     id("fabric-loom")
     //id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
