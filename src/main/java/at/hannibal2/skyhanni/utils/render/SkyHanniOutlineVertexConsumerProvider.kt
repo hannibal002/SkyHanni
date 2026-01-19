@@ -12,8 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.RenderType
 //? > 1.21.6 {
-/*
-import com.mojang.blaze3d.textures.GpuTextureView
+/*import com.mojang.blaze3d.textures.GpuTextureView
 *///?}
 
 // The idea and implementation for this class was inspired by SkyBlocker.

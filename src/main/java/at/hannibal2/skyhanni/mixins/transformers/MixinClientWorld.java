@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? > 1.21.8 {
-/*
-import at.hannibal2.skyhanni.features.misc.ParticleHider;
+/*import at.hannibal2.skyhanni.features.misc.ParticleHider;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,7 +23,7 @@ public class MixinClientWorld {
     }
 
     //? > 1.21.8 {
-    /* @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
+     /*@Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
      private void onAddBlockBreakParticles(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
          if (ParticleHider.shouldHideBlockParticles()) {
              ci.cancel();

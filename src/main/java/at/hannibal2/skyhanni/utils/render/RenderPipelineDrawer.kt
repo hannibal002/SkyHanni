@@ -12,7 +12,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.Tesselator
 import net.minecraft.client.Minecraft
 //? > 1.21.6
-/*import org.joml.Matrix3x2f*/
+//import org.joml.Matrix3x2f
 
 object RenderPipelineDrawer {
     //? < 1.21.6 {

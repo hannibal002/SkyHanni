@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? > 1.21.8 {
-/*
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
+/*import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -28,7 +27,10 @@ import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
 
+    //? < 1.21.10 {
     @Inject(method = "renderNameTag", at = @At("HEAD"), cancellable = true)
+    //?} else
+    //@Inject(method = "submitNameTag", at = @At("HEAD"), cancellable = true)
     //? < 1.21.9 {
     public void onRenderLabelHead(EntityRenderState state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
         //?} else {
@@ -41,7 +43,10 @@ public class MixinEntityRenderer {
         }
     }
 
+    //? < 1.21.10 {
     @Inject(method = "renderNameTag", at = @At("TAIL"))
+    //?} else
+    //@Inject(method = "submitNameTag", at = @At("TAIL"))
     //? < 1.21.9 {
     public void onRenderLabelTail(EntityRenderState state, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
         //?} else {

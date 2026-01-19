@@ -9,8 +9,7 @@ import net.minecraft.world.entity.player.PlayerModelPart
 import net.minecraft.world.scores.PlayerTeam
 
 //? > 1.21.8 {
-/*
-import net.minecraft.core.ClientAsset
+/*import net.minecraft.core.ClientAsset
 import net.minecraft.world.entity.player.PlayerModelType
 *///?}
 

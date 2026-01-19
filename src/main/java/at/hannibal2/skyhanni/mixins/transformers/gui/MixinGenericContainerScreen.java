@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 //? > 1.21.6 {
-/*
-import at.hannibal2.skyhanni.data.GuiData;
+/*import at.hannibal2.skyhanni.data.GuiData;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,8 +36,7 @@ abstract class MixinGenericContainerScreen {
     }
 
     //? > 1.21.6 {
-    /*
-    @Inject(method = "renderBg", at = @At(value = "HEAD"), cancellable = true)
+    /*@Inject(method = "renderBg", at = @At(value = "HEAD"), cancellable = true)
     private void cancelWardrobeBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
             ci.cancel();

@@ -7,8 +7,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import java.util.UUID
 //? > 1.21.8 {
-/*
-import com.google.common.collect.ImmutableMultimap
+/*import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
 *///?}
 
@@ -57,8 +56,7 @@ fun SkullOwnerInfo.toGameProfile(): GameProfile {
     return profile
 }
 //?} else {
-/*
- fun SkullOwnerInfo.toGameProfile(): GameProfile {
+ /*fun SkullOwnerInfo.toGameProfile(): GameProfile {
      val builder = ImmutableMultimap.builder<String, Property>()
      val textures = this.properties?.textures?.get(0)
      if (textures != null) {

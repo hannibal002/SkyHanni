@@ -65,7 +65,7 @@ object WorldRenderUtils {
             0.2f,
             0.25f,
             //?} else {
-            /* matrices,
+             /*matrices,
              Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
              beaconBeam,
              1f,

@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 //? < 1.21.6 {
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //?} else {
-/*
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+/*import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 *///?}
 
 @Mixin(SoundEngine.class)

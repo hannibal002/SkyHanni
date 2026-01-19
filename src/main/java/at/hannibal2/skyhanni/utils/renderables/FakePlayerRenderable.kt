@@ -8,8 +8,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.player.Player
 import java.awt.Color
 //? > 1.21.5 {
-/*
-import org.joml.Matrix3x2f
+/*import org.joml.Matrix3x2f
 import kotlin.math.atan
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.entity.LivingEntity
@@ -78,8 +77,7 @@ fun Renderable.Companion.fakePlayer(
 }
 
 //? > 1.21.5 {
-/*
-private fun drawEntityWithoutScissor(
+/*private fun drawEntityWithoutScissor(
     guiGraphics: GuiGraphics,
     x1: Int,
     y1: Int,

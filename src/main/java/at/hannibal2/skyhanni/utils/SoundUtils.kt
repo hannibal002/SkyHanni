@@ -54,9 +54,8 @@ object SoundUtils {
 
     private fun SoundInstance.setLevel(level: Float) =
     //? < 1.21.9 {
-    /*
     Minecraft.getInstance().soundManager.updateSourceVolume(this.source, level)
-    *///?} else {
+    //?} else {
     /*Minecraft.getInstance().soundManager.setVolume(this, level)
     *///?}
 

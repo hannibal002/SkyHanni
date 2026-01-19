@@ -119,7 +119,7 @@ enum class SkyHanniRenderPipeline(
             "angle2" to UniformType.FLOAT,
         ),
         //?} else {
-        /* uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+         /*uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
              "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
          ),
         *///?}

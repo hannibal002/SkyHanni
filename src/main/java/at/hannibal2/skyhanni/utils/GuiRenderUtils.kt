@@ -30,8 +30,7 @@ import kotlin.collections.component3
 import kotlin.math.min
 
 //? > 1.21.6 {
-/*
-import kotlin.math.sqrt
+/*import kotlin.math.sqrt
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.vertex.PoseStack
@@ -41,7 +40,7 @@ import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.item.ItemDisplayContext
-*/ //?}
+ *///?}
 
 // todo 1.21 impl needed
 /**
@@ -351,13 +350,13 @@ object GuiRenderUtils {
         val rotZ = ((rotationDegrees?.z ?: 0.0) % 360).toFloat()
 
         //? > 1.21.6 {
-        /*Minecraft.getInstance().itemModelResolver.updateForTopItem(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
-        *///? < 1.21.9 {
-        /*val baseItemScale = if (isItemSkull || itemRenderStateButCool.usesBlockLight()) SKULL_SCALE else 1f
+        /*/*Minecraft.getInstance().itemModelResolver.updateForTopItem(itemRenderStateButCool, item, ItemDisplayContext.FIXED, MinecraftCompat.localWorld, MinecraftCompat.localPlayer, 0)
+            *///? < 1.21.9 {
+            val baseItemScale = if (isItemSkull || itemRenderStateButCool.usesBlockLight()) SKULL_SCALE else 1f
+            //?} else {
+            /*val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
+            *///?}
         *///?} else {
-        /*val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
-        *///?}
-        //?} else {
         val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
         //?}
 
@@ -401,11 +400,7 @@ object GuiRenderUtils {
 
             RenderSystem.assertOnRenderThread()
 
-            //? < 1.21.6 {
             Lighting.setupFor3DItems()
-            //?} else {
-            /*MinecraftClient.getInstance().gameRenderer.diffuseLighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D)
-            *///?}
 
             DrawContextUtils.drawItem(item, 0, 0)
 
@@ -420,15 +415,15 @@ object GuiRenderUtils {
         val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
 
         if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.usesBlockLight())) {
-        *///? < 1.21.9 {
-        /*     val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.8f)
-             val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.8f)
+            //? < 1.21.9 {
+                 val adjX = matrices2D.m20 + (x * guiScaleX) - (totalItemScale * 1.8f)
+                 val adjY = matrices2D.m21 + (y * guiScaleY) - (totalItemScale * 1.8f)
 
-             item.customRenderOnScreen(adjX, adjY, totalItemScale, rotX, rotY, rotZ)
-        *///?} else {
-        /*     item.normalRenderOnScreen(translateX, translateY, finalItemScale)
-        *///?}
-         /*} else {
+                 item.customRenderOnScreen(adjX, adjY, totalItemScale, rotX, rotY, rotZ)
+            //?} else {
+                 /*item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+            *///?}
+         } else {
              item.normalRenderOnScreen(translateX, translateY, finalItemScale)
          }
         *///?}
@@ -436,7 +431,7 @@ object GuiRenderUtils {
 
     // TODO: On 1.21.10+ it is completely broken
     //? > 1.21.6 {
-    /* private fun ItemStack.customRenderOnScreen(
+    /*private fun ItemStack.customRenderOnScreen(
          x: Float, y: Float, finalItemScale: Float,
          rotX: Float, rotY: Float, rotZ: Float,
      ) {
@@ -487,17 +482,17 @@ object GuiRenderUtils {
 
          client.gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
 
-    *///? < 1.21.9 {
-    /*     val consumers = client.renderBuffers().bufferSource()
-         itemRenderStateButCool.render(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY)
-         consumers.endBatch()
-    *///?} else {
-    /*     val dispatcher = client.gameRenderer.featureRenderDispatcher
-         val consumers = dispatcher.submitNodeStorage
-         itemRenderStateButCool.submit(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-         dispatcher.endFrame()
-    *///?}
-    /*     matrices.popPose()
+            //? < 1.21.9 {
+                 val consumers = client.renderBuffers().bufferSource()
+                 itemRenderStateButCool.render(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY)
+                 consumers.endBatch()
+            //?} else {
+                 /*val dispatcher = client.gameRenderer.featureRenderDispatcher
+                 val consumers = dispatcher.submitNodeStorage
+                 itemRenderStateButCool.submit(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
+                 dispatcher.endFrame()
+            *///?}
+         matrices.popPose()
          RenderSystem.teardownOverlayColor()
          RenderSystem.getModelViewStack().popMatrix()
          RenderSystem.getTextureMatrix().set(textureMatrixBackup)

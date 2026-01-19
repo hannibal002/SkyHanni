@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //? > 1.21.8 {
-/*
-import net.minecraft.client.input.MouseButtonEvent;
+/*import net.minecraft.client.input.MouseButtonEvent;
 *///?}
 
 @Mixin(ChatScreen.class)

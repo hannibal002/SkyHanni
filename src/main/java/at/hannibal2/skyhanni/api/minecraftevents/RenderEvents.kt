@@ -12,8 +12,7 @@ import net.minecraft.resources.ResourceLocation
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
 //?} else {
-/*
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+/*import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 *///?}
 
@@ -64,8 +63,7 @@ object RenderEvents {
             )
         }
         //?} else {
-        /*
-        HudElementRegistry.attachElementBefore(
+        /*HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
             ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
             RenderEvents::postGui

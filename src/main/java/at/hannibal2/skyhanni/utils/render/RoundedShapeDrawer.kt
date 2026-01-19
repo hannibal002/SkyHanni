@@ -15,8 +15,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 //? > 1.21.6 {
-/*
-import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
+/*import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
@@ -27,14 +26,13 @@ import org.joml.Matrix4f
 import org.joml.Vector4f
 *///?}
 //? > 1.21.8 {
-/*import org.joml.Vector3f*/
-//?}
+/*import org.joml.Vector3f
+*///?}
 
 object RoundedShapeDrawer {
 
     //? > 1.21.6 {
-     /*
-     val projectionMatrix = CachedOrthoProjectionMatrixBuffer("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
+     /*val projectionMatrix = CachedOrthoProjectionMatrixBuffer("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
      var roundedUniform = SkyHanniRoundedUniform()
      var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
      var circleUniform = SkyHanniCircleUniform()
@@ -58,8 +56,8 @@ object RoundedShapeDrawer {
         if (withSmoothness) renderPass.setUniform("smoothness", this.smoothness)
         if (withHalfSize) renderPass.setUniform("halfSize", this.halfSize[0], this.halfSize[1])
         //?} else {
-        /*renderPass.setUniform("SkyHanniRoundedUniforms", roundedBufferSlice)*/
-        //?}
+        /*renderPass.setUniform("SkyHanniRoundedUniforms", roundedBufferSlice)
+        *///?}
     }
 
     private fun <T : RoundedShader<T>> T.performVQuadAndUniforms(
@@ -67,8 +65,8 @@ object RoundedShapeDrawer {
         x1: Int, y1: Int, x2: Int, y2: Int,
         postVertexOps: List<(BufferBuilder.() -> Unit)>,
         //? > 1.21.6 {
-        /*prePassOp: (()-> Unit) = {},*/
-        //?}
+        /*prePassOp: (()-> Unit) = {},
+        *///?}
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
         passOp: (RenderPass.() -> Unit) = { },
@@ -113,12 +111,12 @@ object RoundedShapeDrawer {
                  .writeTransform(
                      Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
              		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-            *///? < 1.21.9 {
-            /* 		 RenderSystem.getModelOffset(),
-            *///?} else {
-            /*         Vector3f(),
-            *///?}
-            /* 		 RenderSystem.getTextureMatrix(),
+                //? < 1.21.9 {
+                         RenderSystem.getModelOffset(),
+                //?} else {
+                         /*Vector3f(),
+                *///?}
+             		 RenderSystem.getTextureMatrix(),
              		 RenderSystem.getShaderLineWidth()
                  )
              roundedBufferSlice = roundedUniform.writeWith(scaleFactor, radius, smoothness, halfSize, centerPos, modelViewMatrix)
@@ -181,7 +179,7 @@ object RoundedShapeDrawer {
                 { setColor(topColor) },
             ),
             //? > 1.21.6 {
-            /* { roundedOutlineBufferSlice = roundedOutlineUniform.writeWith(
+             /*{ roundedOutlineBufferSlice = roundedOutlineUniform.writeWith(
                  RoundedRectangleOutlineShader.borderThickness, RoundedRectangleOutlineShader.borderBlur
              ) },
             *///?}
@@ -213,7 +211,7 @@ object RoundedShapeDrawer {
             x1 = left, y1 = top, x2 = right, y2 = bottom,
             postVertexOps = listOf { setColor(color) },
             //? > 1.21.6 {
-            /* { circleBufferSlice = circleUniform.writeWith(
+             /*{ circleBufferSlice = circleUniform.writeWith(
                  CircleShader.angle1, CircleShader.angle2
              ) },
             *///?}
@@ -235,7 +233,7 @@ object RoundedShapeDrawer {
                 { setColor(endColor.toColor().rgb) },
             ),
             //? > 1.21.6 {
-            /* { radialGradientCircleBufferSlice = radialGradientCircleUniform.writeWith(
+             /*{ radialGradientCircleBufferSlice = radialGradientCircleUniform.writeWith(
                  RadialGradientCircleShader.angle,
                  Vector4f(startColor.destructToFloatArray()),
                  Vector4f(endColor.destructToFloatArray()),
@@ -268,7 +266,7 @@ object RoundedShapeDrawer {
     }
 
     //? > 1.21.6 {
-    /* fun clearUniforms() {
+     /*fun clearUniforms() {
          roundedUniform.clear()
          roundedOutlineUniform.clear()
          circleUniform.clear()

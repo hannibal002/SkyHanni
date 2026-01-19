@@ -14,12 +14,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? > 1.21.8 {
-/*
-import net.minecraft.client.gui.font.TextRenderable;
+/*import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph;
 *///?}
 
+//? < 1.21.6 {
 @Mixin(Font.StringRenderOutput.class)
+//?} else
+//@Mixin(Font.StringRenderOutput.class)
 public class MixinTextRendererDrawer {
 
     //? < 1.21.9 {

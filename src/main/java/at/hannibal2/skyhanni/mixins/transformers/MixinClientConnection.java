@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? < 1.21.6 {
 import net.minecraft.network.PacketSendListener;
 //?} else {
-/*
-import io.netty.channel.ChannelFutureListener;
+/*import io.netty.channel.ChannelFutureListener;
 *///?}
 
 @Mixin(Connection.class)

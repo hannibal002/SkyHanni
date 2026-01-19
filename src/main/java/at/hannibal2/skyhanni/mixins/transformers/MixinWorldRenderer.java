@@ -17,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //? > 1.21.8 {
-/*
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
+/*import net.minecraft.client.renderer.entity.state.EntityRenderState;
 *///?}
 
 @Mixin(LevelRenderer.class)
@@ -47,7 +46,7 @@ public class MixinWorldRenderer {
         return true;
     }
     //?} else {
-    /* @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
+     /*@WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
      public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
          Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
          if (glowColor == null) {

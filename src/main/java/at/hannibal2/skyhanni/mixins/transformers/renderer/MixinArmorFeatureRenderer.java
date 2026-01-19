@@ -12,8 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.client.model.HumanoidModel;
 //? > 1.21.8 {
-/*
-import net.minecraft.client.renderer.SubmitNodeCollector;
+/*import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 *///?}
 

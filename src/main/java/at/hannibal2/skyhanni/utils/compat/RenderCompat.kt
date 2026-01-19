@@ -9,8 +9,7 @@ import java.util.OptionalInt
 //? < 1.21.6 {
 import net.minecraft.client.renderer.RenderType
 //?} else {
-/*
-import com.mojang.blaze3d.pipeline.RenderPipeline
+/*import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.renderer.RenderPipelines
 *///?}
 

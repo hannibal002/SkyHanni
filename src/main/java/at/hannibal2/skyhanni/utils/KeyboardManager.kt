@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 //? > 1.21.8
-/*import net.minecraft.client.input.KeyEvent*/
+//import net.minecraft.client.input.KeyEvent
 
 object KeyboardManager {
 

@@ -17,14 +17,12 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderType.CompositeRenderType
 
 //? > 1.21.6 {
-/*
-import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
+/*import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
 import org.joml.Vector4f
 *///?}
 //? > 1.21.8 {
-/*
-import org.joml.Vector3f
-*/ //?}
+/*import org.joml.Vector3f
+ *///?}
 
 class ChromaRenderLayer(
     name: String, size: Int, hasCrumbling: Boolean, translucent: Boolean, pipeline: RenderPipeline, phases: CompositeState,
@@ -49,16 +47,16 @@ class ChromaRenderLayer(
         }
 
         //? > 1.21.6 {
-        /* var dynamicTransforms = RenderSystem.getDynamicUniforms()
+        /*var dynamicTransforms = RenderSystem.getDynamicUniforms()
              .writeTransform(
                  RenderSystem.getModelViewMatrix(),
          		 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-        *///? < 1.21.9 {
-        /* 		 RenderSystem.getModelOffset(),
-        *///?} else {
-        /*         Vector3f(),
-        *///?}
-        /* 		 RenderSystem.getTextureMatrix(),
+            //? < 1.21.9 {
+                     RenderSystem.getModelOffset(),
+            //?} else {
+                     /*Vector3f(),
+            *///?}
+         		 RenderSystem.getTextureMatrix(),
          		 RenderSystem.getShaderLineWidth()
              )
          if (GuiRendererHook.chromaBufferSlice == null) {
@@ -83,7 +81,7 @@ class ChromaRenderLayer(
 
             RenderSystem.getDevice().createRenderPass("SkyHanni Immediate Chroma Pipeline Draw", framebuffer).use { renderPass ->
                 //? > 1.21.6 {
-                /* RenderSystem.bindDefaultUniforms(renderPass)
+                 /*RenderSystem.bindDefaultUniforms(renderPass)
                  renderPass.setUniform("DynamicTransforms", dynamicTransforms)
                  renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
                 *///?} else {
