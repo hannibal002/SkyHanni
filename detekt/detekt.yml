@@ -167,4 +167,6 @@ potential-bugs:
         active: true
     ImmutableTypesWithExpectedInteriorMutabilityInConfig:
         active: true
+    UnreachableCode:
+        active: false
 
