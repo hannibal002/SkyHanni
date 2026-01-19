@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    private val existingCocoons: MutableList<CocoonMob> = mutableListOf()
+    val existingCocoons: MutableList<CocoonMob> = mutableListOf()
     private val recentMobs: TimeLimitedSet<Mob> = TimeLimitedSet(1.seconds)
 
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
@@ -36,17 +37,22 @@ object CocoonAPI {
         val spawnTime: SimpleTimeMark,
         val spawnTimeServer: ServerTimeMark,
         val cocoonID: Int,
+        var hasBeenSeen: Boolean,
     )
 
     @HandleEvent
     fun onCheckRenderEntityEvent(event: CheckRenderEntityEvent<ArmorStand>) {
         val entity = event.entity
-        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
+        val id = entity.id
+        val knownCocoon = existingCocoons.firstOrNull { it.cocoonID == id }
+        if (event.entity.canBeSeen() && knownCocoon != null) {
+            existingCocoons[existingCocoons.indexOf(knownCocoon)].hasBeenSeen = true
+        }
+        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == id) }) return
         if (entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
             val position = entity.getLorenzVec()
             val mob = getCocoonMob(position) ?: return
-            val id = entity.id
-            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), ServerTimeMark.now(), id)
+            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), ServerTimeMark.now(), id, event.entity.canBeSeen())
             existingCocoons.add(cocoon)
             ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID} Entered List")
             logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
