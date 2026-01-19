@@ -17,7 +17,6 @@ plugins {
     java
     id("com.gradleup.shadow") version "9.3.1"
     id("net.fabricmc.fabric-loom-remap")
-    //id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -172,7 +171,6 @@ dependencies {
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
@@ -265,23 +263,7 @@ if (target.parent == ProjectTarget.MODERN_12105) {
     tasks.named("processResources") {
         dependsOn(mainRes)
     }
-    /* tasks.named("preprocessCode") {
-        dependsOn(mainRes)
-    } */
 }
-
-/*if (target == ProjectTarget.MODERN_12105) {
-    sourceSets.main.get().apply {
-        java {
-            srcDir("../../src/main")
-        }
-    }
-    sourceSets.test.get().apply {
-        java {
-            srcDir("../../src/test")
-        }
-    }
-}*/
 
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
@@ -307,11 +289,6 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
-    /*doLast {
-        configurations.forEach {
-            println("Config: ${it.files}")
-        }
-    }*/
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
@@ -344,12 +321,6 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
         onlyIf { false }
     }
 }
-
-/* preprocess {
-    vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("JAVA", target.minecraftVersion.javaVersion)
-    vars.put("TODO", 0)
-} */
 
 val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))

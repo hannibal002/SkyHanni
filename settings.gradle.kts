@@ -47,11 +47,3 @@ stonecutter {
         versions("1.21.5", "1.21.8", "1.21.10")
     }
 }
-
-/*ProjectTarget.activeVersions().forEach { target ->
-    include(target.projectPath)
-    val p = project(target.projectPath)
-    p.projectDir = file("versions/${target.projectName}")
-    p.buildFileName = "../../build.gradle.kts"
-}*/
-
