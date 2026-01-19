@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
@@ -49,54 +50,56 @@ object SkyMartCopperPrice {
         if (!isEnabled()) return
         if (!event.inventoryName.startsWith("SkyMart ")) return
 
-        inInventory = true
-        val table = mutableListOf<DisplayTableEntry>()
-        for ((slot, item) in event.inventoryItems) {
-            val lore = item.getLore()
-            val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
+        DelayedRun.runOrNextTick {
+            inInventory = true
+            val table = mutableListOf<DisplayTableEntry>()
+            for ((slot, item) in event.inventoryItems) {
+                val lore = item.getLore()
+                val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != -1.0 }
 
-            for (line in lore) {
-                val copper = copperPattern.matchMatcher(line) {
-                    group("amount").formatInt()
-                } ?: continue
+                for (line in lore) {
+                    val copper = copperPattern.matchMatcher(line) {
+                        group("amount").formatInt()
+                    } ?: continue
 
-                val internalName = item.getInternalName()
-                val itemPrice = internalName.getPriceOrNull(config.priceSource) ?: continue
-                val profit = itemPrice - (otherItemsPrice ?: 0.0)
+                    val internalName = item.getInternalName()
+                    val itemPrice = internalName.getPriceOrNull(config.priceSource) ?: continue
+                    val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
-                val factor = profit / copper
-                val perFormat = factor.shortFormat()
+                    val factor = profit / copper
+                    val perFormat = factor.shortFormat()
 
-                val itemName = item.repoItemName
-                val hover = buildList {
-                    add(itemName)
-                    add("")
-                    add("§7Item price: §6${itemPrice.shortFormat()} ")
-                    otherItemsPrice?.let {
-                        add("§7Additional cost: §6${it.shortFormat()} ")
+                    val itemName = item.repoItemName
+                    val hover = buildList {
+                        add(itemName)
+                        add("")
+                        add("§7Item price: §6${itemPrice.shortFormat()} ")
+                        otherItemsPrice?.let {
+                            add("§7Additional cost: §6${it.shortFormat()} ")
+                        }
+                        add("§7Profit per purchase: §6${profit.shortFormat()} ")
+                        add("")
+                        add("§7Copper amount: §c${copper.addSeparators()} ")
+                        add("§7Profit per copper: §6$perFormat ")
                     }
-                    add("§7Profit per purchase: §6${profit.shortFormat()} ")
-                    add("")
-                    add("§7Copper amount: §c${copper.addSeparators()} ")
-                    add("§7Profit per copper: §6$perFormat ")
+                    table.add(
+                        DisplayTableEntry(
+                            "$itemName§f:".asComponent(),
+                            "§6§l$perFormat".asComponent(),
+                            factor,
+                            internalName,
+                            hover.mapToComponents(),
+                            highlightsOnHoverSlots = listOf(slot),
+                        ),
+                    )
                 }
-                table.add(
-                    DisplayTableEntry(
-                        "$itemName§f:".asComponent(),
-                        "§6§l$perFormat".asComponent(),
-                        factor,
-                        internalName,
-                        hover.mapToComponents(),
-                        highlightsOnHoverSlots = listOf(slot),
-                    ),
-                )
             }
-        }
 
-        val newList = mutableListOf<Renderable>()
-        newList.addString("§eCoins per Copper§f:")
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
-        display = newList
+            val newList = mutableListOf<Renderable>()
+            newList.addString("§eCoins per Copper§f:")
+            newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+            display = newList
+        }
     }
 
     @HandleEvent

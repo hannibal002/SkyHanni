@@ -13,7 +13,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -69,7 +73,20 @@ object PreventEarlyCommands {
             val seconds = ceil(runIn.toDouble(DurationUnit.SECONDS)).toInt()
             val formattedTime = "$seconds ${StringUtils.pluralize(seconds, "second")}"
 
-            ChatUtils.chat("§cCannot execute §e/$lastCommand §cyet. §aRunning it in $formattedTime.")
+            ChatUtils.chat(
+                componentBuilder {
+                    withColor(ChatFormatting.RED)
+                    append("Cannot execute ")
+                    append("/$lastCommand ") {
+                        withColor(ChatFormatting.YELLOW)
+                    }
+                    append("yet. ")
+                    append("Running it in $formattedTime.") {
+                        withColor(ChatFormatting.GREEN)
+
+                    }
+                }
+            )
         }
     }
 }

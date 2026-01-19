@@ -15,9 +15,9 @@ import net.minecraft.resources.ResourceLocation
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
-//#if MC > 1.21.5
-//$$ import org.joml.Matrix3x2f
-//#endif
+//? > 1.21.5 {
+/*import org.joml.Matrix3x2f
+*///?}
 
 object ShaderRenderUtils {
 
@@ -52,15 +52,15 @@ object ShaderRenderUtils {
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        //#if MC < 1.21.6
+        //? < 1.21.6 {
         this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.pose().last().pose())
-        //#endif
-        //#if MC > 1.21.6
-        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
-        //$$ this.modelViewMatrix = Matrix4f()
-        //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
-        //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
-        //#endif
+        //?}
+        //? > 1.21.6 {
+        /*val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
+        this.modelViewMatrix = Matrix4f()
+            .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
+            .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
+        *///?}
     }.also { extraApplies?.invoke(this) }
 
     /**

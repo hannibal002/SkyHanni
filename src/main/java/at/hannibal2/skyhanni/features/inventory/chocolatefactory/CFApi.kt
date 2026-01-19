@@ -142,19 +142,21 @@ object CFApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
-            if (config.enabled) {
-                chocolateFactoryPaused = true
-                CFStats.updateDisplay()
+        DelayedRun.runNextTick {
+            if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
+                if (config.enabled) {
+                    chocolateFactoryPaused = true
+                    CFStats.updateDisplay()
+                }
+                return@runNextTick
             }
-            return
-        }
-        if (!mainInventory.isInside()) return
+            if (!mainInventory.isInside()) return@runNextTick
 
-        if (config.enabled) {
-            factoryUpgrades = emptyList()
-            DelayedRun.runNextTick {
-                CFDataLoader.updateInventoryItems(event.inventoryItems)
+            if (config.enabled) {
+                factoryUpgrades = emptyList()
+                DelayedRun.runNextTick {
+                    CFDataLoader.updateInventoryItems(event.inventoryItems)
+                }
             }
         }
     }

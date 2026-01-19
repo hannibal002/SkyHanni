@@ -55,11 +55,7 @@ object TestChatCommand {
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component = if (isComplex) try {
-            //#if TODO
-            //$$ IChatComponent.Serializer.jsonToComponent(text) ?: "".asComponent()
-            //#else
             "complex doesnt work on 1.21".asComponent()
-            //#endif
         } catch (ex: Exception) {
             ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
             return

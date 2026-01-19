@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
@@ -50,9 +52,10 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         if (errors > 3) {
             val hiddenErrors = errors - 3
             ChatUtils.chat(
-                TextHelper.text(
-                    "§c[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!",
-                ),
+                componentBuilder {
+                    append("[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!")
+                    withColor(ChatFormatting.RED)
+                }
             )
         }
         return event.isCancelled

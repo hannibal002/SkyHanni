@@ -16,6 +16,7 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
 import java.net.URI
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
@@ -153,6 +154,14 @@ var Component.hover: Component?
         value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
+var Component.stackHover: ItemStack?
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_ITEM
+    }?.let { (it as HoverEvent.ShowItem).item }
+    set(value) {
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
+    }
+
 var Component.command: String?
     get() = this.style.clickEvent?.takeIf {
         it.action() == ClickEvent.Action.RUN_COMMAND
@@ -286,11 +295,11 @@ fun Component.changeColor(color: LorenzColor): Component =
     this.copyIfNeeded().withStyle(color.toChatFormatting())
 
 fun Component.convertToJsonString(): String {
-    //#if MC < 1.21.6
+    //? < 1.21.6 {
     return Component.SerializerAdapter(net.minecraft.core.RegistryAccess.EMPTY).serialize(this, null, null).toString()
-    //#else
-    //$$ return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
-    //#endif
+    //?} else {
+    /*return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
+    *///?}
 }
 
 fun Component.append(newText: Component): MutableComponent {

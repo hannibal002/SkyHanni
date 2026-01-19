@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -7,7 +8,10 @@ import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
@@ -64,7 +68,7 @@ object ClientEvents {
 
                 override fun getFabricId(): ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
 
-                //#if MC < 1.21.9
+                //? < 1.21.9 {
                 @Suppress("ForbiddenVoid")
                 override fun reload(
                     synchronizer: PreparableReloadListener.PreparationBarrier,
@@ -78,19 +82,19 @@ object ClientEvents {
                         applyExecutor,
                     ).thenCompose(synchronizer::wait)
                 }
-                //#else
-                //$$ override fun reload(
-                //$$     store: PreparableReloadListener.SharedState,
-                //$$     prepareExecutor: Executor,
-                //$$     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
-                //$$     applyExecutor: Executor,
-                //$$ ): CompletableFuture<Void> {
-                //$$     return CompletableFuture.runAsync(
-                //$$         { ResourcePackReloadEvent(store.resourceManager()).post() },
-                //$$         applyExecutor,
-                //$$     ).thenCompose(reloadSynchronizer::wait)
-                //$$ }
-                //#endif
+                //?} else {
+                 /*override fun reload(
+                     store: PreparableReloadListener.SharedState,
+                     prepareExecutor: Executor,
+                     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
+                     applyExecutor: Executor,
+                 ): CompletableFuture<Void> {
+                     return CompletableFuture.runAsync(
+                         { ResourcePackReloadEvent(store.resourceManager()).post() },
+                         applyExecutor,
+                     ).thenCompose(reloadSynchronizer::wait)
+                 }
+                *///?}
             },
         )
 
@@ -133,11 +137,33 @@ object ClientEvents {
             // we don't have to worry about cancelling the action bar
             // this is more compatible with other mods changing the action bar as well
             // ie to remove hp/mana
-            val result = ActionBarData.onChatReceive(message) ?: return message
-            return result
+            val result = ActionBarData.onChatReceive(message)
+            if (result == null) {
+                return if (rainbowConfig()) {
+                    TextHelper.createGradientText(
+                        ColorUtils.getRandomColor(),
+                        ColorUtils.getRandomColor(),
+                        message.string.removeColor()
+                    )
+                } else {
+                    message
+                }
+            } else {
+                return if (rainbowConfig()) {
+                    TextHelper.createGradientText(
+                        ColorUtils.getRandomColor(),
+                        ColorUtils.getRandomColor(),
+                        result.string.removeColor()
+                    )
+                } else {
+                    result
+                }
+            }
         }
 
         return message
     }
+
+    fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
 
 }

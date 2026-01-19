@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
+//? < 1.21.6 {
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.textures.GpuTexture;
@@ -20,3 +21,4 @@ public class MixinFramebuffer {
     }
 
 }
+//?}
