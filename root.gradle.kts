@@ -1,13 +1,13 @@
 import at.skyhanni.sharedvariables.ProjectTarget
-import com.replaymod.gradle.preprocess.Node
+//import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.8"
+    //id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "1.0.8"
     // loom 1.14 requires gradle 9, gradle 9 causes errors
     id("fabric-loom") version "1.13-SNAPSHOT" apply false
-    kotlin("jvm") version "2.0.0" apply false
+    kotlin("jvm") version "2.2.21" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
-    id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
+    id("com.google.devtools.ksp") version "2.2.21-2.0.4" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.7" apply false
 }
 
@@ -125,7 +125,7 @@ allprojects {
     }
 }
 
-preprocess {
+/* preprocess {
     val nodes = mutableMapOf<ProjectTarget, Node>()
     ProjectTarget.activeVersions().forEach { target ->
         nodes[target] = createNode(target.projectName, target.minecraftVersion.versionNumber, target.mappingStyle.identifier)
@@ -152,4 +152,4 @@ preprocess {
 
         pNode.link(nodes[child]!!, mappingFile, patternMappingsFile)
     }
-}
+} */

@@ -12,10 +12,11 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-    implementation("com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8")
+    //implementation(kotlin("stdlib-jdk8"))
+    implementation("com.google.devtools.ksp:symbol-processing-api:2.3.4")
 }
 
+/*
 tasks.withType<JavaCompile> {
     if (JavaVersion.current().isJava9Compatible) {
         options.release.set(8)
@@ -27,3 +28,4 @@ tasks.withType<KotlinCompile> {
         jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }
+*/
