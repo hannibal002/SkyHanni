@@ -48,7 +48,7 @@ object RenderUtils {
      */
     val absoluteTranslation
         get() = run {
-            //#if MC < 1.21.6
+            //? < 1.21.6 {
             RenderSystem.assertOnRenderThread()
             val posMatrix = DrawContextUtils.drawContext.pose().last().pose()
             val tmp = org.joml.Vector3f()
@@ -56,11 +56,11 @@ object RenderUtils {
             val xTranslate = tmp.x.toInt()
             val yTranslate = tmp.y.toInt()
             val zTranslate = tmp.z.toInt()
-            //#else
-            //$$ val xTranslate = 0
-            //$$ val yTranslate = 0
-            //$$ val zTranslate = 0
-            //#endif
+            //?} else {
+            /*val xTranslate = 0
+            val yTranslate = 0
+            val zTranslate = 0
+            *///?}
             Triple(xTranslate, yTranslate, zTranslate)
         }
 

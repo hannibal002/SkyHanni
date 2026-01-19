@@ -16,7 +16,7 @@ plugins {
     idea
     java
     id("com.gradleup.shadow") version "9.3.1"
-    id("fabric-loom")
+    id("net.fabricmc.fabric-loom-remap")
     //id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
@@ -268,6 +268,19 @@ if (target.parent == ProjectTarget.MODERN_12105) {
         dependsOn(mainRes)
     } */
 }
+
+/*if (target == ProjectTarget.MODERN_12105) {
+    sourceSets.main.get().apply {
+        java {
+            srcDir("../../src/main")
+        }
+    }
+    sourceSets.test.get().apply {
+        java {
+            srcDir("../../src/test")
+        }
+    }
+}*/
 
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"

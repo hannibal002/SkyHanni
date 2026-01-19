@@ -12,21 +12,21 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21.8
-//$$ import net.minecraft.client.input.CharacterEvent;
-//$$ import net.minecraft.client.input.KeyEvent;
-//#endif
+//? > 1.21.8 {
+/*import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+*///?}
 
 @Mixin(KeyboardHandler.class)
 public class MixinKeyboard {
 
     @Inject(method = "keyPress", at = @At("HEAD"))
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
-        //#else
-        //$$ private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
-        //$$     int key = input.key();
-        //#endif
+        //?} else {
+        /*private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
+            int key = input.key();
+        *///?}
         if (Minecraft.getInstance().player == null) return;
         if (key == GLFW.GLFW_KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
@@ -60,15 +60,15 @@ public class MixinKeyboard {
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"))
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     private void onChar(long window, int codePoint, int modifiers, CallbackInfo ci) {
         if (Minecraft.getInstance().player == null) return;
         new CharEvent(codePoint).post();
     }
-    //#else
-    //$$ private void onChar(long window, CharacterEvent input, CallbackInfo ci) {
-    //$$     if (Minecraft.getInstance().player == null) return;
-    //$$     new CharEvent(input.codepoint()).post();
-    //$$ }
-    //#endif
+    //?} else {
+    /*private void onChar(long window, CharacterEvent input, CallbackInfo ci) {
+        if (Minecraft.getInstance().player == null) return;
+        new CharEvent(input.codepoint()).post();
+    }
+    *///?}
 }
