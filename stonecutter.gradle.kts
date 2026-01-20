@@ -138,4 +138,6 @@ stonecutter parameters {
             replace("net.minecraft.client.gui.font.glyphs.BakedGlyph", "net.minecraft.client.gui.font.glyphs.BakedSheetGlyph")
         }
     }
+
+    filters.include("**/*.fsh", "**/*.vsh")
 }

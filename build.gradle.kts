@@ -40,13 +40,15 @@ runDirectory.mkdirs()
 
 // Minecraft configuration:
 loom {
-    val accessWidenerFile = when (target) {
-        ProjectTarget.MODERN_12105 -> rootProject.file("src/main/resources/skyhanni.accesswidener")
-        else -> file("src/main/resources/skyhanni.accesswidener")
-    }
+    val accessWidenerFile = sc.process(rootProject.file("src/main/resources/skyhanni.accesswidener"), "build/accesswidener.access")
+
     if (accessWidenerFile.exists()) {
         accessWidenerPath = accessWidenerFile
+    } else {
+        println("No accesswidener file for ${target.minecraftVersion}")
     }
+    fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
+
     @Suppress("UnstableApiUsage")
     mixin {
         useLegacyMixinAp.set(true)
@@ -210,9 +212,17 @@ kotlin {
 tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
-    inputs.property("version", version)
+    val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val props = buildMap {
+        put("version", version)
+        put("minecraft", target.minecraftVersion.versionName)
+        put("fapi", fapiVersion)
+    }
+
+    props.forEach(inputs::property)
+
     filesMatching("fabric.mod.json") {
-        expand("version" to version)
+        expand(props)
     }
 }
 
@@ -258,13 +268,6 @@ tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
-if (target.parent == ProjectTarget.MODERN_12105) {
-    val mainRes = project(ProjectTarget.MODERN_12105.projectPath).tasks.getAt("processResources")
-    tasks.named("processResources") {
-        dependsOn(mainRes)
-    }
-}
-
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -273,9 +276,6 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
     archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
-    manifest.attributes.run {
-        this["Main-Class"] = "SkyHanniInstallerFrame"
-    }
 }
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {

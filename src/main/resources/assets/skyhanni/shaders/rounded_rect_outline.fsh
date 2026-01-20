@@ -1,7 +1,7 @@
 #version 150
 
 in vec4 vertexColor;
-
+//? < 1.21.6 {
 // Rect specific uniforms
 uniform float scaleFactor;
 uniform float radius;
@@ -12,7 +12,23 @@ uniform mat4 modelViewMatrix;
 // Outline specific uniforms
 uniform float borderThickness;
 uniform float borderBlur;
+//?} else {
+/*// Rect specific uniforms
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
 
+// Outline specific uniforms
+layout(std140) uniform SkyHanniRoundedOutlineUniforms {
+    float borderThickness;
+    float borderBlur;
+};
+*///?}
 out vec4 outColor;
 
 // From https://www.shadertoy.com/view/WtdSDs
