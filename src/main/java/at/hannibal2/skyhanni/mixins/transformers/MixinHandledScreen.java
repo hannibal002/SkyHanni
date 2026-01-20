@@ -29,10 +29,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//#if MC > 1.21.8
-//$$ import net.minecraft.client.input.MouseButtonEvent;
-//$$ import net.minecraft.client.input.KeyEvent;
-//#endif
+//? > 1.21.8 {
+/*import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.KeyEvent;
+*///?}
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,18 +60,21 @@ public abstract class MixinHandledScreen {
         if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
     }
 
-    //#if MC < 1.21.6
+    //? < 1.21.6 {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
-    //#else
-    //$$ @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
-    //#endif
+    //?} else {
+    /*@Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
+    *///?}
     private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (MinecraftCompat.INSTANCE.getLocalWorldExists() && MinecraftCompat.INSTANCE.getLocalPlayerExists()) {
             new DrawBackgroundEvent(context).post();
         }
     }
 
+    //? < 1.21.6 {
     @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/ResourceLocation;)V"), index = 1)
+    //?} else
+    //@ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/ResourceLocation;)V"), index = 1)
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphics drawContext) {
         if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
@@ -80,12 +83,12 @@ public abstract class MixinHandledScreen {
     }
 
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-        //#else
-        //$$ private void keyPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
-        //$$     int keyCode = input.input();
-        //#endif
+        //?} else {
+        /*private void keyPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
+            int keyCode = input.input();
+        *///?}
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
         if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
@@ -94,11 +97,11 @@ public abstract class MixinHandledScreen {
     }
 
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
-    //#if MC < 1.21.9
+    //? < 1.21.9 {
     private void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        //#else
-        //$$ private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-        //#endif
+        //?} else {
+        /*private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
+        *///?}
         if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post()) {
             cir.setReturnValue(false);
         }
@@ -107,11 +110,11 @@ public abstract class MixinHandledScreen {
         }
     }
 
-    //#if MC < 1.21.6
+    //? < 1.21.6 {
     @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
-    //#else
-    //$$ @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
-    //#endif
+    //?} else {
+    /*@ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
+    *///?}
     private int customForegroundTextColor(int colour) {
         return BetterContainers.getTextColor(colour);
     }

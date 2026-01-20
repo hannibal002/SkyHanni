@@ -66,15 +66,15 @@ enum class CropType(
     ),
     SUNFLOWER(
         "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.SUNFLOWER) }, "sunflower", FarmingItemType.SUNFLOWER,
+        { ItemStack(Blocks.SUNFLOWER) }, "sunflower", FarmingItemType.SUNFLOWER, replenish = true,
     ),
     MOONFLOWER(
         "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.BLUE_ORCHID) }, "moonflower", FarmingItemType.MOONFLOWER,
+        { ItemStack(Blocks.BLUE_ORCHID) }, "moonflower", FarmingItemType.MOONFLOWER, replenish = true,
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.ROSE_BUSH) }, "rose", FarmingItemType.WILD_ROSE,
+        { ItemStack(Blocks.ROSE_BUSH) }, "rose", FarmingItemType.WILD_ROSE, replenish = true,
     ),
     ;
 
