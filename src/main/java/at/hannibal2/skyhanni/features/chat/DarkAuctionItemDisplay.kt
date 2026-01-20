@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -41,7 +42,7 @@ object DarkAuctionItemDisplay {
         lastItem = null
     }
 
-    @HandleEvent(/*onlyOnIsland = IslandType.DARK_AUCTION*/)
+    @HandleEvent(onlyOnIsland = IslandType.DARK_AUCTION)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.darkAuctionItemDisplay) return
 
