@@ -19,9 +19,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
@@ -74,7 +77,11 @@ object UbikReminder {
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
         if (storage.ubikRemindTime.isInFuture()) return
         if (config.ubikReminder) {
-            ChatUtils.chat("§aUbik's Cube is ready in the Rift!")
+            ChatUtils.chat(
+                componentBuilder {
+                    appendWithColor("Ubik's Cube is ready in the Rift!", ChatFormatting.GREEN)
+                }
+            )
         }
         storage.ubikRemindTime = SimpleTimeMark.farFuture()
     }

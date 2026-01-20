@@ -36,8 +36,8 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
             )
             it to Renderable.animatedItemStack(
                 animationFrames,
-                rotation = rotationDef,
-                bounce = ItemStackBounceDefinition(
+                rotationDefinition = rotationDef,
+                bounceDefinition = ItemStackBounceDefinition(
                     upwardBounce = 25,
                     downwardBounce = 25,
                     bounceSpeed = 8.0,

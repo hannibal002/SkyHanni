@@ -106,6 +106,14 @@ class ChestValueConfig {
     var hideBelow: Int = 100000
 
     @Expose
+    @ConfigOption(
+        name = "Ignore Soulbound",
+        desc = "Exclude Soulbound items from being counted in total value."
+    )
+    @ConfigEditorBoolean
+    var ignoreSoulbound: Boolean = false
+
+    @Expose
     @ConfigLink(owner = ChestValueConfig::class, field = "enabled")
     val position: Position = Position(107, 141)
 }

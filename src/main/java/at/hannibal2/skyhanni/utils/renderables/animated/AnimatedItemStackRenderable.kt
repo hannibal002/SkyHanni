@@ -68,14 +68,16 @@ class ItemStackAnimationFrame(
 
 class AnimatedItemStackRenderable private constructor(
     frames: Collection<ItemStackAnimationFrame>,
-    private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
-    private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
+    private val rotationDefinition: ItemStackRotationDefinition = ItemStackRotationDefinition(),
+    initialRotation: Vec3 = Vec3(0.0, 0.0, 0.0),
+    private val bounceDefinition: ItemStackBounceDefinition = ItemStackBounceDefinition(),
     scale: Double = NeuItems.ITEM_FONT_SIZE,
     xSpacing: Int = 2,
     ySpacing: Int = 1,
     rescaleSkulls: Boolean = true,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+    private val rotationSync: ((Vec3) -> Unit)? = null,
 ) : ItemStackRenderable(
     {
         frames.firstOrNull()?.stack ?: ErrorManager.skyHanniError(
@@ -97,30 +99,30 @@ class AnimatedItemStackRenderable private constructor(
 
     private val startTime = SimpleTimeMark.now()
     private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
-    private val fullBounceHeight = if (bounce.isEnabled()) bounce.getTotalBounceHeight() else 0
+    private val fullBounceHeight = if (bounceDefinition.isEnabled()) bounceDefinition.getTotalBounceHeight() else 0
     private val bounceOffset = fullBounceHeight / 2.0
 
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
-    var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
+    private var currentRotation: Vec3 = initialRotation
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
-        currentRotation.x + when (rotation.axis) {
-            Axis.X -> rotation.rotationSpeed * deltaTime
+        currentRotation.x + when (rotationDefinition.axis) {
+            Axis.X -> rotationDefinition.rotationSpeed * deltaTime
             else -> 0.0
         },
-        currentRotation.y + when (rotation.axis) {
-            Axis.Y -> rotation.rotationSpeed * deltaTime
+        currentRotation.y + when (rotationDefinition.axis) {
+            Axis.Y -> rotationDefinition.rotationSpeed * deltaTime
             else -> 0.0
         },
-        currentRotation.z + when (rotation.axis) {
-            Axis.Z -> rotation.rotationSpeed * deltaTime
+        currentRotation.z + when (rotationDefinition.axis) {
+            Axis.Z -> rotationDefinition.rotationSpeed * deltaTime
             else -> 0.0
         },
-    )
+    ).also { rotationSync?.invoke(currentRotation) }
 
     private fun ItemStackBounceDefinition.calculateBounce(): Double {
-        if (!bounce.isEnabled()) return 0.0
+        if (!bounceDefinition.isEnabled()) return 0.0
 
         val t = startTime.passedSince().inPartialSeconds
         val period = fullBounceHeight * 2.0 / bounceSpeed
@@ -142,7 +144,7 @@ class AnimatedItemStackRenderable private constructor(
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
-        val currentOffsetY = bounce.calculateBounce()
+        val currentOffsetY = bounceDefinition.calculateBounce()
         tryMoveNextFrame(deltaTime.inPartialSeconds)
 
         stack.renderOnScreen(
@@ -154,19 +156,26 @@ class AnimatedItemStackRenderable private constructor(
         )
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
 
     companion object {
         fun Renderable.Companion.animatedItemStack(
             frames: Collection<ItemStackAnimationFrame>,
-            rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
-            bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
+            rotationDefinition: ItemStackRotationDefinition = ItemStackRotationDefinition(),
+            initialRotation: Vec3 = Vec3(0.0, 0.0, 0.0),
+            bounceDefinition: ItemStackBounceDefinition = ItemStackBounceDefinition(),
             scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-        ) = AnimatedItemStackRenderable(frames, rotation, bounce, scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign)
+            rotationSync: ((Vec3) -> Unit)? = null,
+        ) = AnimatedItemStackRenderable(
+            frames, rotationDefinition, initialRotation, bounceDefinition, scale, xSpacing, ySpacing,
+            rescaleSkulls, horizontalAlign, verticalAlign, rotationSync
+        )
     }
 }

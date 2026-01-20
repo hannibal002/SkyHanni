@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("UnnecessarySafeCall")
 @SkyHanniModule
 object CFBarnManager {
 

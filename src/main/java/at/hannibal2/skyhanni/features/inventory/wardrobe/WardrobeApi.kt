@@ -53,7 +53,7 @@ object WardrobeApi {
     private const val FIRST_LEGGINGS_SLOT = 18
     private const val FIRST_BOOTS_SLOT = 27
     const val MAX_SLOT_PER_PAGE = 9
-    const val MAX_PAGES = 2
+    const val MAX_PAGES = 3
 
     var slots = listOf<WardrobeSlot>()
     var inCustomWardrobe = false
