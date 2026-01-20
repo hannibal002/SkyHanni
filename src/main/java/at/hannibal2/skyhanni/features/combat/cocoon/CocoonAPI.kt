@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,16 +32,25 @@ object CocoonAPI {
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
         val cocoonID: Int,
+        var hasBeenSeen: Boolean,
+        val cocoonEntity: ArmorStand,
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
+        existingCocoons.forEach { cocoon ->
+            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen()
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEnterWorldEvent(event: EntityEnterWorldEvent<ArmorStand>) {
         val entity = event.entity
         val id = entity.id
         if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == id) }) return
         val position = entity.getLorenzVec()
         val mob = getCocoonMob(position) ?: return
-        val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id)
+        val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
         DelayedRun.runNextTick {
             if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return@runNextTick
             if (event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
@@ -53,7 +63,7 @@ object CocoonAPI {
     }
 
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID}) Left World After ${cocoon.spawnTime.passedSince()}")
