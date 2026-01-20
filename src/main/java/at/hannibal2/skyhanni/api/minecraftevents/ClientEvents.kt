@@ -115,11 +115,11 @@ object ClientEvents {
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
         }
-        lastMessage = message
         if (actionBar) {
             // we never cancel the action bar
             return true
         }
+        lastMessage = message
 
         val (result, cancel) = ChatManager.onChatReceive(message)
         lastResult = result
