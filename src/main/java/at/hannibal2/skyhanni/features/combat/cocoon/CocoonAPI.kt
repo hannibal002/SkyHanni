@@ -33,7 +33,6 @@ object CocoonAPI {
         val mob: Mob,
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
-        val spawnTimeServer: ServerTimeMark,
         val cocoonID: Int,
         var hasBeenSeen: Boolean,
         val cocoonEntity: ArmorStand,
