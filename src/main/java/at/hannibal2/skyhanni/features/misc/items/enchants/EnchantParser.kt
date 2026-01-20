@@ -479,7 +479,9 @@ object EnchantParser {
     }
 
     private fun editChatComponent(chatComponent: Component, loreList: MutableList<Component>) {
-        val newComponent = MutableComponent(chatComponent.contents, loreList, chatComponent.style)
+        val newComponent = Component.literal((chatComponent.contents as PlainTextContents.LiteralContents).text)
+            .setStyle(chatComponent.style)
+        loreList.forEach { newComponent.append(it) }
         GuiChatHook.replaceHoverEventComponent(newComponent)
     }
 
