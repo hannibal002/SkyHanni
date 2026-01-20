@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -52,14 +51,12 @@ object CocoonAPI {
         val position = entity.getLorenzVec()
         val mob = getCocoonMob(position) ?: return
         val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
-        DelayedRun.runNextTick {
-            if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return@runNextTick
-            if (event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
-                existingCocoons.add(cocoon)
-                ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-                logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-                CocoonSpawnEvent(cocoon).post()
-            }
+        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
+        if (event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
+            existingCocoons.add(cocoon)
+            ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+            logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+            CocoonSpawnEvent(cocoon).post()
         }
     }
 
