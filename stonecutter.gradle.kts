@@ -123,6 +123,12 @@ allprojects {
 
 stonecutter active "1.21.5"
 
+stonecutter handlers {
+    configure("fsh", "vsh") {
+        commenter = line("//")
+    }
+}
+
 stonecutter parameters {
     replacements {
         string(current.parsed >= "1.21.6") {

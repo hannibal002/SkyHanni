@@ -1,17 +1,14 @@
 #version 150
-//? < 1.21.6 {
+
 in vec3 Position;
 in vec2 UV0;
-
+//? < 1.21.6 {
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 //?} else {
-/*#moj_import <minecraft:dynamictransforms.glsl>
-#moj_import <minecraft:projection.glsl>
-
-in vec3 Position;
-in vec2 UV0;
-*///?}
+//#moj_import <minecraft:dynamictransforms.glsl>
+//#moj_import <minecraft:projection.glsl>
+//?}
 out vec2 texCoord;
 
 void main() {
