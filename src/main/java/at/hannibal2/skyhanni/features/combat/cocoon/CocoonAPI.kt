@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -24,7 +25,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    private val existingCocoons: MutableList<CocoonMob> = mutableListOf()
+    val existingCocoons: MutableList<CocoonMob> = mutableListOf()
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
 
     data class CocoonMob(
