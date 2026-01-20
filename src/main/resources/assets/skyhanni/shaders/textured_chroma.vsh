@@ -7,18 +7,9 @@ in vec4 Color;
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 //?} else {
-/*
-layout(std140) uniform DynamicTransforms {
-    mat4 ModelViewMat;
-    vec4 ColorModulator;
-    vec3 ModelOffset;
-    mat4 TextureMat;
-    float LineWidth;
-};
-layout(std140) uniform Projection {
-    mat4 ProjMat;
-};
-*///?}
+//#moj_import <minecraft:dynamictransforms.glsl>
+//#moj_import <minecraft:projection.glsl>
+//?}
 out vec4 vertexColor;
 out vec2 texCoord0;
 
