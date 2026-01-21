@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -89,15 +91,14 @@ object RareDropMessages {
         "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)",
     )
 
-
     /**
-     * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
-     * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
+     * REGEX-TEST §r§6§lRARE DROP! §r§fEnchanted Book (§r§d§lChimera I§r§f)§r
      * REGEX-TEST: §r§6§lRARE DROP! §r§fEnchanted Book (Corruption I§r§f) §r§b(+§r§b314 §r§b✯ Magic Find§r§b)§r
      */
+    @Suppress("MaxLineLength")
     private val bookReplacerPattern by repoGroup.pattern(
         "bookreplacerpattern",
-        "(?:§.)+RARE DROP! (?<replacePart>(?:§.)+Enchanted Book \\(.*(?:§.)+\\)*) §r§b\\(\\+(?:§.)*\\d*%? §r§b✯ Magic Find§r§b\\)?.*"
+        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)(?<removalPart>Enchanted Book(?: \\((?<bookName>(?:§.)*(?:\\w+ ?)+ [IV]+)(?:§.)*\\))?)(?<end> §r§b\\(\\+(?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\))?.*",
     )
 
     private val petPatterns = listOf(
@@ -118,6 +119,19 @@ object RareDropMessages {
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.petRarity) return
+
+        if (config.enchantedBook) {
+            bookReplacerPattern.matchMatcher(event.message) {
+                val bookItemName = group("removalPart")
+                val unfixedName = ItemResolutionQuery.resolveEnchantmentByName(group("bookName"))
+                val realBookName = unfixedName?.toInternalName()?.repoItemName ?: bookItemName
+                ChatUtils.editFirstMessage(
+                    component = { it.formattedTextCompat().replace(bookItemName, realBookName).asComponent() },
+                    "enchanted book",
+                    predicate = { bookReplacerPattern.matches(it.chatMessage) },
+                )
+            }
+        }
 
         petPatterns.matchMatchers(event.message) {
             var start = group("start")
@@ -141,27 +155,15 @@ object RareDropMessages {
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (SkyBlockUtils.inAnyIsland(ignoredBookIslands)) return
-        var bookItemName = ""
 
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
             val message = line.chatMessage
             if (bookReplacerPattern.matches(message)) {
-                bookReplacerPattern.matchMatcher(message) {
-                    bookItemName = group("replacePart")
-                }
                 anyRecentMessage = true
                 break
             }
-        }
-
-        if (anyRecentMessage && config.enchantedBook) {
-            ChatUtils.editFirstMessage(
-                component = { it.formattedTextCompat().replace(bookItemName, internalName.repoItemName).asComponent() },
-                "enchanted book",
-                predicate = { it.passedSinceSent() < 1.seconds && bookReplacerPattern.matches(it.chatMessage) },
-            )
         }
 
         // Hypixel send Slayer Book messages late, so we do a manual internalName Regex Match
