@@ -16,24 +16,24 @@ uniform float progress;
 uniform float phaseOffset;
 uniform int reverse;
 //?} else {
-/*layout(std140) uniform SkyHanniRoundedUniforms {
-    float scaleFactor;
-    float radius;
-    float smoothness;
-    vec2 halfSize;
-    vec2 centerPos;
-    mat4 modelViewMatrix;
-};
-
-layout(std140) uniform SkyHanniRadialGradientCircleUniforms {
-    float angle;
-    vec4 startColor;
-    vec4 endColor;
-    float progress;
-    float phaseOffset;
-    int reverse;
-};
-*///?}
+//layout(std140) uniform SkyHanniRoundedUniforms {
+//    float scaleFactor;
+//    float radius;
+//    float smoothness;
+//    vec2 halfSize;
+//    vec2 centerPos;
+//    mat4 modelViewMatrix;
+//};
+//
+//layout(std140) uniform SkyHanniRadialGradientCircleUniforms {
+//    float angle;
+//    vec4 startColor;
+//    vec4 endColor;
+//    float progress;
+//    float phaseOffset;
+//    int reverse;
+//};
+//?}
 out vec4 fragColor;
 
 void main() {

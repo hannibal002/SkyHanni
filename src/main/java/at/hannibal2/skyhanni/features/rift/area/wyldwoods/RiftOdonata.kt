@@ -47,7 +47,7 @@ object RiftOdonata {
     private fun tryAdd(stand: ArmorStand) {
         if (!stand.wearingSkullTexture(ODONATA_SKULL_TEXTURE)) return
         RenderLivingEntityHelper.setEntityColor(stand, config.highlightColor.toColor().addAlpha(1)) {
-            RiftLarva.isEnabled() && hasBottleInHand
+            isEnabled() && hasBottleInHand
         }
     }
 
@@ -60,5 +60,5 @@ object RiftOdonata {
         }
     }
 
-    fun isEnabled() = RiftApi.inRift() && config.highlight.get()
+    private fun isEnabled() = RiftApi.inRift() && config.highlight.get()
 }

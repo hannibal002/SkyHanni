@@ -182,7 +182,7 @@ object ChatManager {
         var modified = false
         loggerAllowed.log("[allowed] $message")
         loggerAll.log("[allowed] $message")
-        if (modifiedComponent.formattedTextCompat() != component.formattedTextCompat()) {
+        if (modifiedComponent != component) {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
@@ -202,7 +202,7 @@ object ChatManager {
             // even if we "meant" to replace the component.
             modified = false
         }
-        return Pair(component.takeIf { modified }, cancelled)
+        return Pair(modifiedComponent.takeIf { modified }, cancelled)
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched

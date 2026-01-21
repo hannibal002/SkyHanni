@@ -7,13 +7,13 @@ uniform float timeOffset;
 uniform float saturation;
 uniform bool forwardDirection;
 //?} else {
-/*layout(std140) uniform SkyHanniChromaUniforms {
-    float chromaSize;
-    float timeOffset;
-    float saturation;
-    int forwardDirection;
-};
-*///?}
+//layout(std140) uniform SkyHanniChromaUniforms {
+//    float chromaSize;
+//    float timeOffset;
+//    float saturation;
+//    int forwardDirection;
+//};
+//?}
 out vec4 fragColor;
 
 float rgb2b(vec3 rgb) {
