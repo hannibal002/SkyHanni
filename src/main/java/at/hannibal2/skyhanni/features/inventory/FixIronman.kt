@@ -30,14 +30,14 @@ object FixIronman {
 
         for ((index, line) in event.toolTip.withIndex()) {
             if (line.string.contains("Ironman")) {
-                event.toolTip[index] = line.replace("Ironman", "Ironperson")
+                event.toolTip[index] = line.replace("Ironman", "Ironperson") ?: line
             }
         }
 
         if (selectModeInventory.isInside()) {
             for ((index, line) in event.toolTip.withIndex()) {
                 if (line.string.contains("No Auction House!")) {
-                    event.toolTip[index] = line.replace("No Auction House!", "Ironperson-Only Auction House!")
+                    event.toolTip[index] = line.replace("No Auction House!", "Ironperson-Only Auction House!") ?: line
                 }
             }
         }

@@ -16,8 +16,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 @SkyHanniModule
 object LesserOrbHider {
 
-    private val config get() = SkyHanniMod.feature.misc
-    private val enabled = config.lesserOrbHider
+    private fun isEnabled() = SkyHanniMod.feature.misc.lesserOrbHider
     private val hiddenEntities = CollectionUtils.weakReferenceList<ArmorStand>()
 
     private val LESSER_TEXTURE by lazy { SkullTextureHolder.getTexture("LESSER_ORB") }
@@ -34,7 +33,7 @@ object LesserOrbHider {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (!enabled) return
+        if (!isEnabled()) return
 
         if (event.entity in hiddenEntities) {
             event.cancel()
@@ -43,7 +42,7 @@ object LesserOrbHider {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!enabled) return
+        if (!isEnabled()) return
         if (event.type != ParticleTypes.DUST) return
 
         for (armorStand in hiddenEntities) {

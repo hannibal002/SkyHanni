@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
+import kotlin.random.Random
 
 @Suppress("TooManyFunctions")
 object ColorUtils {
@@ -108,5 +109,12 @@ object ColorUtils {
             ErrorManager.skyHanniError("invalid color code", "color" to color)
         }
         return colorCodes["0123456789abcdef".indexOf(newColor)]
+    }
+
+    fun getRandomColor(): Color {
+        val hue = Random.nextFloat()
+        val saturation = 0.9f
+        val luminance = 1.0f
+        return Color.getHSBColor(hue, saturation, luminance)
     }
 }
