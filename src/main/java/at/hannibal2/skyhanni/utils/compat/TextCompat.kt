@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessageTag
@@ -19,6 +20,7 @@ import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import java.net.URI
+import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
@@ -363,13 +365,41 @@ fun List<Any>.mapToComponents(): List<Component> {
     return newList
 }
 
-fun Component.replace(oldValue: String, newValue: String): Component {
-    // this isnt perfect
-    for (index in this.siblings.indices) {
-        val sibling = this.siblings[index]
-        this.siblings[index] = Component.literal(sibling.string.replace(oldValue, newValue)).withStyle(sibling.style)
-    }
-    return this
+/**
+ * Replace a string within a Component with another string
+ * The strings have to exist within 1 sibling
+ * AKA they have to have the same Style
+ */
+fun Component.replace(oldValue: String, newValue: String): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    this.visit( { style: Style?, string: String? ->
+        val edit = string?.replace(oldValue, newValue)
+        if (edit != string) hasEdited = true
+
+        newComp.append(Component.literal(edit).withStyle(style))
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
+}
+
+fun Component.replace(oldValue: Regex, newValue: String): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    this.visit( { style: Style?, string: String? ->
+        val edit = string?.replace(oldValue, newValue)
+        if (edit != string) hasEdited = true
+
+        newComp.append(Component.literal(edit).withStyle(style))
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
 }
 
 operator fun Component.plus(string: String): Component {
