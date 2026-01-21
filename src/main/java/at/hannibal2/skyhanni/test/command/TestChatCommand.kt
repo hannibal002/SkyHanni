@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
@@ -29,7 +29,6 @@ object TestChatCommand {
                 "   §7[-complex]§e: §7Parse the message as a JSON chat component",
                 "   §7[-clipboard]§e: §7Read the message from the clipboard",
                 "   §7[-s]§e: §7Hide the testing message",
-                "   §7[-sa]§e: §7Hide everything but the final message", // Not really sure why you'd want this
             )
             ChatUtils.userError("Specify a chat message to test!\n${syntaxStrings.joinToString("\n")}")
             return
@@ -41,22 +40,21 @@ object TestChatCommand {
             val isComplex = mutArgs.remove("-complex")
             // cant use multi lines without clipboard
             val isClipboard = mutArgs.remove("-clipboard") || multiLines
-            val isSilentAll = mutArgs.remove("-sa")
-            val isSilent = mutArgs.remove("-s") || isSilentAll
+            val isSilent = mutArgs.remove("-s")
             val text = if (isClipboard) {
                 OSUtils.readFromClipboard() ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
             if (multiLines) {
                 for (line in text.split("\n")) {
-                    extracted(isComplex, line, isSilent, isSilentAll)
+                    extracted(isComplex, line, isSilent)
                 }
             } else {
-                extracted(isComplex, text, isSilent, isSilentAll)
+                extracted(isComplex, text, isSilent)
             }
         }
     }
 
-    private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
+    private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean) {
         val component = if (isComplex) try {
             ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(text)).getOrThrow().first
         } catch (ex: Exception) {
@@ -77,7 +75,7 @@ object TestChatCommand {
 
     private fun test(componentText: Component) {
         // the fabric event will pick up on the message so it goes through the normal chat event
-        componentText.send(bypassSelfMessages = true)
+        addChatMessageToChat(componentText, true)
     }
 
     @HandleEvent
