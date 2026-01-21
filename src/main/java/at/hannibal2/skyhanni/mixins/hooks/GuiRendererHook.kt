@@ -16,7 +16,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GlyphRenderState
 import net.minecraft.client.gui.render.state.GuiElementRenderState
 //? > 1.21.8
-//import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
+//import net.minecraft.client.gui.font.glyphs.BakedGlyph.GlyphInstance
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()
