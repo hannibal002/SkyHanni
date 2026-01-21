@@ -339,7 +339,6 @@ class MiscConfig {
     @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
-    @Expose
     // doesnt work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
@@ -348,6 +347,7 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle*/
+    @Expose
     var fixGhostEntities: Boolean = true
 
     @Expose
