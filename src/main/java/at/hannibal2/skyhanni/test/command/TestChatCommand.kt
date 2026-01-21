@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
@@ -72,23 +72,12 @@ object TestChatCommand {
         val rawText = component.formattedTextCompat().stripHypixelMessage().replace("§", "&").replace("\n", "\\n")
         if (!isSilent) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
 
-        test(component, isSilentAll)
+        test(component)
     }
 
-    private fun test(componentText: Component, isHidden: Boolean) {
-        val message = componentText.formattedTextCompat().stripHypixelMessage()
-        val event = SkyHanniChatEvent(message, componentText)
-        event.post()
-
-        if (event.blockedReason != null) {
-            if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
-            return
-        }
-        val finalMessage = event.chatComponent
-        if (!isHidden && finalMessage.formattedTextCompat().stripHypixelMessage() != message) {
-            ChatUtils.chat("§eChat modified!")
-        }
-        ChatUtils.chat(finalMessage, prefix = false)
+    private fun test(componentText: Component) {
+        // the fabric event will pick up on the message so it goes through the normal chat event
+        componentText.send(bypassSelfMessages = true)
     }
 
     @HandleEvent

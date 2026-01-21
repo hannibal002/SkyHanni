@@ -229,13 +229,13 @@ fun Style.setHoverShowText(text: Component): Style {
     return this.withHoverEvent(HoverEvent.ShowText(text))
 }
 
-fun addChatMessageToChat(message: Component) {
-    (message as ComponentCreatedStore).`skyhanni$setCreated`()
+fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
+    if (!bypassSelfMessages) (message as ComponentCreatedStore).`skyhanni$setCreated`()
     Minecraft.getInstance().player?.displayClientMessage(message, false)
 }
 
-fun addDeletableMessageToChat(component: Component, id: Int) {
-    (component as ComponentCreatedStore).`skyhanni$setCreated`()
+fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
+    if (!bypassSelfMessages) (component as ComponentCreatedStore).`skyhanni$setCreated`()
     Minecraft.getInstance().execute {
         Minecraft.getInstance().gui.chat.deleteMessage(idToMessageSignature(id))
         Minecraft.getInstance().gui.chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
