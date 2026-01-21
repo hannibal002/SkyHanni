@@ -31,7 +31,7 @@ object CocoonOverlay {
                 cocoon.coordinates,
                 timeTillSpawn,
                 2.0,
-                yOff = -20f,
+                yOff = -10f,
                 seeThroughBlocks = cocoon.hasBeenSeen
             )
         }
