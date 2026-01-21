@@ -6,20 +6,24 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
+import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.audio.ISound
+import net.minecraft.client.resources.sounds.SoundInstance
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,13 +52,21 @@ object PestTrapFeatures {
     private val virtualReminderInterval get() = max(10, reminderInterval.get()).seconds
     private var nextWarningMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private val soundString get(): String = config.warningConfig.warningSound.get()
-    private var warningSound: ISound? = refreshSound()
+    private var warningSound: SoundInstance? = refreshSound()
 
     private fun getNextWarningMark() = SimpleTimeMark.now() + virtualReminderInterval
     private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onKeybind(event: GuiKeyPressEvent) {
+        if (!PestTrapApi.inInventory) return
+        if (!config.releaseHotkey.isKeyHeld()) return
+        if (event.guiContainer !is AccessorHandledScreen) return
+        InventoryUtils.clickSlot(16)
+    }
+
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.warningConfig.warningSound) {
             warningSound = refreshSound()
         }

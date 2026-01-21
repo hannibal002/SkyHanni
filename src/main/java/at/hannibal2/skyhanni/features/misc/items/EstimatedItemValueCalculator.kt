@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getArmorKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraArmorTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
@@ -52,14 +52,16 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOverclockerCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodParts
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTunerCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getWetBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
@@ -75,8 +77,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import java.util.Locale
 
 // TODO split into smaller sub classes
@@ -110,7 +115,9 @@ object EstimatedItemValueCalculator {
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
+        ::addWetBook,
         ::addFarmingForDummies,
+        ::addOverclocker,
         ::addSilex,
         ::addTransmissionTuners,
         ::addManaDisintegrators,
@@ -134,6 +141,7 @@ object EstimatedItemValueCalculator {
     )
 
     private val FARMING_FOR_DUMMIES = "FARMING_FOR_DUMMIES".toInternalName()
+    private val OVERCLOCKER_3000 = "OVERCLOCKER_3000".toInternalName()
     private val ETHERWARP_CONDUIT = "ETHERWARP_CONDUIT".toInternalName()
     private val ETHERWARP_MERGER = "ETHERWARP_MERGER".toInternalName()
     private val FUMING_POTATO_BOOK = "FUMING_POTATO_BOOK".toInternalName()
@@ -148,6 +156,7 @@ object EstimatedItemValueCalculator {
     private val ART_OF_WAR = "THE_ART_OF_WAR".toInternalName()
     private val BOOK_OF_STATS = "BOOK_OF_STATS".toInternalName()
     private val ART_OF_PEACE = "THE_ART_OF_PEACE".toInternalName()
+    private val WET_BOOK = "WET_BOOK".toInternalName()
     private val POLARVOID_BOOK = "POLARVOID_BOOK".toInternalName()
     private val POCKET_SACK_IN_A_SACK = "POCKET_SACK_IN_A_SACK".toInternalName()
     private val BOOKWORM_BOOK = "BOOKWORM_BOOK".toInternalName()
@@ -175,10 +184,10 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
-        val rawReforgeName = stack.getReforgeName() ?: return 0.0
+        val rawReforgeName = stack.getReforgeModifier() ?: return 0.0
 
-        val reforge = ReforgeApi.onlyPowerStoneReforge.firstOrNull {
-            rawReforgeName == it.lowercaseName || rawReforgeName == it.reforgeStone?.asString()?.lowercase()
+        val reforge = ReforgeApi.reforgeStones.firstOrNull {
+            rawReforgeName == it.nbtModifier
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
@@ -206,11 +215,11 @@ object EstimatedItemValueCalculator {
                 val oneBelow = itemRarity.oneBelow(logError = false)
                 if (oneBelow == null) {
                     ErrorManager.logErrorStateWithData(
-                        "Wrong item rarity detected in estimated item value for item ${stack.displayName}",
+                        "Wrong item rarity detected in estimated item value for item ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                         "Recombobulated item is common",
                         "internal name" to stack.getInternalName(),
                         "itemRarity" to itemRarity,
-                        "item name" to stack.displayName,
+                        "item name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                         "item nbt" to stack.readNbtDump(),
                     )
                     return null
@@ -221,12 +230,12 @@ object EstimatedItemValueCalculator {
 
         return reforgeCosts[itemRarity]?.toInt() ?: run {
             ErrorManager.logErrorStateWithData(
-                "Could not calculate reforge cost for item ${stack.displayName}",
+                "Could not calculate reforge cost for item ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                 "Item not in NEU repo reforge cost",
                 "reforgeCosts" to reforgeCosts,
                 "itemRarity" to itemRarity,
                 "internal name" to stack.getInternalName(),
-                "item name" to stack.displayName,
+                "item name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                 "reforgeStone" to reforgeStone,
                 "item nbt" to stack.readNbtDump(),
             )
@@ -364,11 +373,27 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun addWetBook(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getWetBookCount() ?: return 0.0
+
+        val price = WET_BOOK.getPrice() * count
+        list.add(formatProgress("Wet Book", count, max = 5, price))
+        return price
+    }
+
     private fun addFarmingForDummies(stack: ItemStack, list: MutableList<String>): Double {
         val count = stack.getFarmingForDummiesCount() ?: return 0.0
 
         val price = FARMING_FOR_DUMMIES.getPrice() * count
         list.add(formatProgress("Farming for Dummies", count, max = 5, price))
+        return price
+    }
+
+    private fun addOverclocker(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getOverclockerCount() ?: return 0.0
+
+        val price = OVERCLOCKER_3000.getPrice() * count
+        list.add(formatProgress("Overclocker 3000", count, max = 10, price))
         return price
     }
 
@@ -430,14 +455,14 @@ object EstimatedItemValueCalculator {
     private fun addCrimsonPrestige(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalNameOrNull() ?: return 0.0
         if (!internalName.isKuudraArmor()) return 0.0
-        val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
-        val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
+        val tierIndex = internalName.getArmorKuudraTier()?.takeIf { it > 1 } ?: return 0.0
+        val armorTier = kuudraArmorTiers.getOrNull(tierIndex - 1) ?: return 0.0
 
         val allTiersCost = (1 until tierIndex).mapNotNull { index ->
-            kuudraTiers.getOrNull(index)?.let { tierName ->
+            kuudraArmorTiers.getOrNull(index)?.let { tierName ->
                 EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: run {
                     ErrorManager.logErrorStateWithData(
-                        "Could not find crimson prestige cost for ${stack.displayName}",
+                        "Could not find crimson prestige cost for ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                         "EstimatedItemValue has no crimsonPrestigeCosts for $tierName tier",
                         "internalName" to internalName,
                         "tierIndex" to tierIndex,
@@ -498,7 +523,7 @@ object EstimatedItemValueCalculator {
     ): Pair<EssenceUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
         val (price, maxStars) = if (internalName.isKuudraArmor()) {
-            val tier = (internalName.getKuudraTier() ?: 0) - 1
+            val tier = (internalName.getArmorKuudraTier() ?: 0) - 1
             totalStars += tier * 10
 
             var remainingStars = totalStars
@@ -511,7 +536,7 @@ object EstimatedItemValueCalculator {
 
             for ((id, _) in EssenceUtils.itemPrices) {
                 if (!id.contains(removed)) continue
-                tiers[id] = (id.getKuudraTier() ?: 0) - 1
+                tiers[id] = (id.getArmorKuudraTier() ?: 0) - 1
 
             }
             for ((id, _) in tiers.sorted()) {
@@ -682,6 +707,13 @@ object EstimatedItemValueCalculator {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
             if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
+
+            data.endcapEnchants?.get(rawName)?.let { endcapData ->
+                if (rawLevel > endcapData.requiredLevel) {
+                    level = endcapData.requiredLevel
+                    items[endcapData.endcapItem] = 1
+                }
+            }
 
             val enchantmentName = "$rawName;$level".toInternalName()
 
@@ -855,7 +887,7 @@ object EstimatedItemValueCalculator {
 
     private fun ItemStack.readUnlockedSlots(): String? {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
+        val unlockedSlots = getExtraAttributes()?.getCompoundOrDefault("gems")?.get("unlocked_slots")?.toString() ?: return null
 
         // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0
@@ -867,11 +899,11 @@ object EstimatedItemValueCalculator {
             // Do not error out on items if their data was changed.
             if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for ${this.displayName}",
+                "Could not find gemstone slot price for ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
-                "item name" to displayName,
+                "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                 "item nbt" to readNbtDump(),
             )
             return null
@@ -882,10 +914,10 @@ object EstimatedItemValueCalculator {
 
     private fun ItemStack.readBoosters(): List<NeuInternalName> {
         val list = NbtCompat.getStringTagList(extraAttributes, "boosters")
-        if (list.tagCount() == 0) return emptyList()
+        if (list.size == 0) return emptyList()
         val boosters = mutableListOf<NeuInternalName>()
-        for (i in 0..list.tagCount()) {
-            var internalName = list.getStringTagAt(i)
+        for (i in 0..list.size) {
+            var internalName = list.getStringOrDefault(i)
             if (internalName.isBlank()) continue
             internalName += "_BOOSTER"
             boosters.add(internalName.toInternalName())

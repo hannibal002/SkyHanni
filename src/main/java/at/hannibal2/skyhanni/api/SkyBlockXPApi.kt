@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -78,7 +79,7 @@ object SkyBlockXPApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) return
 
-        val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.displayName) } ?: return
+        val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
 
         var level: Int? = null
         var xp: Int? = null

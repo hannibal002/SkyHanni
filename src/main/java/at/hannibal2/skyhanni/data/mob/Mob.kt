@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -18,14 +19,16 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import java.util.UUID
 
@@ -66,24 +69,29 @@ import java.util.UUID
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
  * @property uniqueId Unique identifier for each Mob instance
+ *
+ * @property hypixelTypes The types hypixel has assigned for that mob as the icons
  */
 @Suppress("TooManyFunctions")
 class Mob(
-    var baseEntity: EntityLivingBase,
+    var baseEntity: LivingEntity,
     val mobType: Type,
-    var armorStand: EntityArmorStand? = null,
+    var armorStand: ArmorStand? = null,
     val name: String = "",
-    additionalEntities: List<EntityLivingBase>? = null,
+    additionalEntities: List<LivingEntity>? = null,
     ownerName: String? = null,
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
+    val hypixelTypes: String = "",
 ) {
 
     private val uniqueId: UUID = UUID.randomUUID()
-    val id = baseEntity.entityId
+    val id = baseEntity.id
 
     val owner: MobUtils.OwnerShip?
+
+    val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
 
     companion object {
 
@@ -98,9 +106,9 @@ class Mob(
     val hologram2 by hologram2Delegate
 
     private val extraEntitiesList = additionalEntities?.toMutableList() ?: mutableListOf()
-    private var relativeBoundingBox: AxisAlignedBB?
+    private var relativeBoundingBox: AABB?
 
-    val extraEntities: List<EntityLivingBase> = extraEntitiesList
+    val extraEntities: List<LivingEntity> = extraEntitiesList
 
     enum class Type {
         DISPLAY_NPC,
@@ -119,22 +127,22 @@ class Mob(
             else -> false
         }
     }
+
     /**
      * @property isCorrupted can change.
      */
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted()
+
     /**
      * @property isRunic does not change.
      */
-    val isRunic = !RiftApi.inRift() &&
-        armorStand?.name?.startsWith("§5") == true &&
-        mobType == Type.BASIC
+    val isRunic = !RiftApi.inRift() && armorStand?.name.formattedTextCompatLessResets().startsWith("§5") && mobType == Type.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
+    fun isInvisible() = baseEntity !is Zombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isEmpty()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }
@@ -191,11 +199,11 @@ class Mob(
         }
     }
 
-    val boundingBox: AxisAlignedBB
-        get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
-            ?: baseEntity.entityBoundingBox
+    val boundingBox: AABB
+        get() = relativeBoundingBox?.move(baseEntity.position().x, baseEntity.position().y, baseEntity.position().z)
+            ?: baseEntity.boundingBox
 
-    val health: Float get() = baseEntity.health
+    val health: Float get() = baseEntity.findHealthReal()
     val maxHealth: Int get() = baseEntity.baseMaxHealth
 
     init {
@@ -211,7 +219,7 @@ class Mob(
     }
 
     private fun removeExtraEntitiesFromChecking() =
-        extraEntities.count { MobData.retries[it.entityId] != null }.also {
+        extraEntities.count { MobData.retries[it.id] != null }.also {
             MobData.externRemoveOfRetryAmount += it
         }
 
@@ -220,11 +228,11 @@ class Mob(
     }
 
     private fun makeRelativeBoundingBox() = (
-        baseEntity.entityBoundingBox.union(
-            extraEntities.filter { it !is EntityArmorStand }
-                .mapNotNull { it.entityBoundingBox },
+        baseEntity.boundingBox.union(
+            extraEntities.filter { it !is ArmorStand }
+                .mapNotNull { it.boundingBox },
         )
-        )?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
@@ -234,9 +242,9 @@ class Mob(
     fun makeEntityToMobAssociation() =
         fullEntityList().associateWith { this }
 
-    internal fun internalAddEntity(entity: EntityLivingBase) {
+    internal fun internalAddEntity(entity: LivingEntity) {
         internalRemoveColor()
-        if (baseEntity.entityId > entity.entityId) {
+        if (baseEntity.id > entity.id) {
             extraEntitiesList.add(0, baseEntity)
             baseEntity = entity
         } else {
@@ -247,7 +255,7 @@ class Mob(
         MobData.entityToMob[entity] = this
     }
 
-    internal fun internalAddEntity(entities: Collection<EntityLivingBase>) {
+    internal fun internalAddEntity(entities: Collection<LivingEntity>) {
         val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
         internalRemoveColor()
         extraEntitiesList.addAll(0, list)
@@ -258,14 +266,14 @@ class Mob(
         MobData.entityToMob.putAll(entities.associateWith { this })
     }
 
-    internal fun internalUpdateOfEntity(entity: EntityLivingBase) {
+    internal fun internalUpdateOfEntity(entity: LivingEntity) {
         internalRemoveColor()
-        when (entity.entityId) {
-            baseEntity.entityId -> {
+        when (entity.id) {
+            baseEntity.id -> {
                 baseEntity = entity
             }
 
-            armorStand?.entityId ?: Int.MIN_VALUE -> armorStand = entity as EntityArmorStand
+            armorStand?.id ?: Int.MIN_VALUE -> armorStand = entity as ArmorStand
             else -> {
                 extraEntitiesList.remove(entity)
                 extraEntitiesList.add(entity)
@@ -279,7 +287,7 @@ class Mob(
 
     override fun hashCode() = uniqueId.hashCode()
 
-    override fun toString(): String = "$name - ${baseEntity.entityId}"
+    override fun toString(): String = "$name - ${baseEntity.id}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -294,5 +302,5 @@ class Mob(
 
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 
-    val isAlive: Boolean get() = baseEntity.isEntityAlive
+    val isAlive: Boolean get() = baseEntity.isAlive
 }

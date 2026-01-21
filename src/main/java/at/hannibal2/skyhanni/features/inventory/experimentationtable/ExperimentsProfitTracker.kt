@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -32,11 +31,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -53,22 +52,20 @@ object ExperimentsProfitTracker {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
-        { Data() },
+        ::Data,
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
     // Warn once per session about tracking XP bottle usage
     private var warnedAboutTracking = false
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            experimentsDone = 0L
-            xpGained = 0L
-            bitCost = 0L
-            startCost = 0L
-            timeWasted = enumMapOf()
-        }
-
+    data class Data(
+        @Expose var experimentsDone: Long = 0L,
+        @Expose var xpGained: Long = 0L,
+        @Expose var bitCost: Long = 0L,
+        @Expose var startCost: Long = 0L,
+        @Expose var timeWasted: MutableMap<ExperimentationTableApi.ExperimentationTaskType, Duration> = enumMapOf(),
+    ) : ItemTrackerData() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / experimentsDone
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -79,23 +76,7 @@ object ExperimentsProfitTracker {
         }
 
         override fun getCoinName(item: TrackedItem) = ""
-
         override fun getCoinDescription(item: TrackedItem) = listOf<String>()
-
-        @Expose
-        var experimentsDone = 0L
-
-        @Expose
-        var xpGained = 0L
-
-        @Expose
-        var bitCost = 0L
-
-        @Expose
-        var startCost = 0L
-
-        @Expose
-        var timeWasted: MutableMap<ExperimentationTableApi.ExperimentationTaskType, Duration> = enumMapOf()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -107,7 +88,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        experimentRenewPattern.matchMatcher(event.message.removeColor()) {
+        experimentRenewPattern.matchMatcher(event.cleanMessage) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
             tracker.modify {
                 it.bitCost += increments.getValue(group("current").toInt())
@@ -134,7 +115,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
-        val internalName = event.slot?.stack?.getInternalNameOrNull()?.takeIf {
+        val internalName = event.slot?.item?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
         } ?: return
 
@@ -193,7 +174,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
-        val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
+        val displayName = getItemStackOrNull()?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: "XP Bottle"
         val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
         appendLine("§aExperiments Tracker§7:")
         appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")
@@ -232,7 +213,8 @@ object ExperimentsProfitTracker {
                 ),
             ).toSearchable(),
         )
-        add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.experimentsDone, "experiment", duration, "Experiments"))
 
         val enchantingXpGained = data.xpGained
         add(
@@ -257,16 +239,16 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         tracker.firstUpdate()
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetexperimentsprofittracker") {
+        event.registerBrigadier("shresetexperimentsprofittracker") {
             description = "Resets the Experiments Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

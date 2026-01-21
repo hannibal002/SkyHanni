@@ -7,8 +7,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -71,7 +70,7 @@ object JyrreTimer {
         display = drawDisplay()
     }
 
-    private val displayIcon by lazy { "REFINED_BOTTLE_OF_JYRRE".toInternalName().getItemStack() }
+    private val displayIcon by AutoUpdatingItemStack("REFINED_BOTTLE_OF_JYRRE")
 
     fun drawDisplay(): Renderable {
         duration -= 1.seconds

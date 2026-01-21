@@ -20,10 +20,10 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import org.intellij.lang.annotations.Language
 
 private val patternGroup = RepoPattern.group("event.carnival.goals")
@@ -219,9 +219,9 @@ enum class CarnivalGoal(
             SkyBlockUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
 
         private enum class GoalType(val item: Item, display: String) {
-            FRUIT_DIGGING(Item.getItemFromBlock(Blocks.sand), "§6Fruit Digging"),
-            CATCH_A_FISH(Items.fish, "§3Catch a Fish"),
-            ZOMBIE_SHOOTOUT(Items.arrow, "§cZombie Shootout");
+            FRUIT_DIGGING(Item.byBlock(Blocks.SAND), "§6Fruit Digging"),
+            CATCH_A_FISH(Items.COD, "§3Catch a Fish"),
+            ZOMBIE_SHOOTOUT(Items.ARROW, "§cZombie Shootout");
 
             val singleDisplay by lazy {
                 Renderable.horizontal(

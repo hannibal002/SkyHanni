@@ -1,69 +1,182 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.player.ClickAction
-import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
+import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.minecraft.client.GuiMessage
+import net.minecraft.client.GuiMessageTag
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.PackType
+import net.minecraft.server.packs.resources.PreparableReloadListener
+import net.minecraft.server.packs.resources.ResourceManager
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executor
 
 @SkyHanniModule
 object ClientEvents {
 
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        ClientDisconnectEvent.post()
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        WorldChangeEvent().post()
-    }
-
     var totalTicks = 0
-        private set
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) return
-        if (!MinecraftCompat.localPlayerExists) return
-        if (!MinecraftCompat.localWorldExists) return
+    init {
 
-        DelayedRun.checkRuns()
-        totalTicks++
-        SkyHanniTickEvent(totalTicks).post()
+        // Tick event
+        ClientTickEvents.START_WORLD_TICK.register(
+            ClientTickEvents.StartWorldTick {
+                if (!MinecraftCompat.localPlayerExists) return@StartWorldTick
+                if (!MinecraftCompat.localWorldExists) return@StartWorldTick
+
+                DelayedRun.checkRuns()
+                totalTicks++
+                SkyHanniTickEvent(totalTicks).post()
+            },
+        )
+
+        // Disconnect event
+        ClientPlayConnectionEvents.DISCONNECT.register(
+            ClientPlayConnectionEvents.Disconnect { _, _ ->
+                ClientDisconnectEvent.post()
+            },
+        )
+
+        // World change event
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(
+            ClientWorldEvents.AfterClientWorldChange { client, world ->
+                WorldChangeEvent().post()
+            },
+        )
+
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
+            object : IdentifiableResourceReloadListener {
+
+                override fun getFabricId(): ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
+
+                //? < 1.21.9 {
+                @Suppress("ForbiddenVoid")
+                override fun reload(
+                    synchronizer: PreparableReloadListener.PreparationBarrier,
+                    manager: ResourceManager,
+                    prepareExecutor: Executor,
+                    applyExecutor: Executor,
+                ): CompletableFuture<Void> {
+
+                    return CompletableFuture.runAsync(
+                        { ResourcePackReloadEvent(manager).post() },
+                        applyExecutor,
+                    ).thenCompose(synchronizer::wait)
+                }
+                //?} else {
+                 /*override fun reload(
+                     store: PreparableReloadListener.SharedState,
+                     prepareExecutor: Executor,
+                     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
+                     applyExecutor: Executor,
+                 ): CompletableFuture<Void> {
+                     return CompletableFuture.runAsync(
+                         { ResourcePackReloadEvent(store.resourceManager()).post() },
+                         applyExecutor,
+                     ).thenCompose(reloadSynchronizer::wait)
+                 }
+                *///?}
+            },
+        )
+
+        ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow)
+        ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
+
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onChatReceive(event: ClientChatReceivedEvent) {
-        if (event.type.toInt() == 2) {
-            ActionBarData.onChatReceive(event.message)?.let { result ->
-                event.message = result
-            }
-        } else {
-            val (result, cancel) = ChatManager.onChatReceive(event.message)
+    private var lastMessage: Component? = null
+    private var lastResult: Component? = null
 
-            result?.let {
-                event.message = it
-            }
-            if (cancel) {
-                event.isCanceled = true
+    private fun onAllow(message: Component, actionBar: Boolean): Boolean {
+        // if we created the message we don't want to pipe it back into our events
+        try {
+            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return true
+        } catch (exception: Exception) {
+            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
+        }
+        if (actionBar) {
+            // we never cancel the action bar
+            return true
+        }
+        lastMessage = message
+
+        val (result, cancel) = ChatManager.onChatReceive(message)
+        lastResult = result
+
+        if (cancel) {
+            // the message doesn't get logged if we cancel it, so we do that ourselves
+            val inGameHud = Minecraft.getInstance().gui
+            val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageTag.system())
+            inGameHud.chat.logChatMessage(chatHudLine)
+        }
+
+        // if we cancel then we don't allow the message
+        return !cancel
+    }
+
+    private fun onModify(message: Component, actionBar: Boolean): Component {
+        try {
+            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return message
+        } catch (exception: Exception) {
+            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
+        }
+        // we check if the message is the same as the one from allow
+        // if someone else modifies the message it won't be the same but what can you do about that
+        if (lastMessage == message && !actionBar) {
+            // if last result is null then we didn't want to change the message
+            lastResult?.let { return it }
+        } else if (actionBar) {
+            // we don't have to worry about cancelling the action bar
+            // this is more compatible with other mods changing the action bar as well
+            // ie to remove hp/mana
+            val result = ActionBarData.onChatReceive(message)
+            if (result == null) {
+                return if (rainbowConfig()) {
+                    TextHelper.createGradientText(
+                        ColorUtils.getRandomColor(),
+                        ColorUtils.getRandomColor(),
+                        message.string.removeColor()
+                    )
+                } else {
+                    message
+                }
+            } else {
+                return if (rainbowConfig()) {
+                    TextHelper.createGradientText(
+                        ColorUtils.getRandomColor(),
+                        ColorUtils.getRandomColor(),
+                        result.string.removeColor()
+                    )
+                } else {
+                    result
+                }
             }
         }
+
+        return message
     }
 
-    @SubscribeEvent
-    fun onPlayerInteract(event: PlayerInteractEvent) {
-        PlayerInteractionEvent(ClickAction.fromForge(event.action), event.pos, event.face).post()
-    }
+    fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
+
 }

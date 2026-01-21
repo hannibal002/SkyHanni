@@ -1,15 +1,22 @@
-// Textured Chroma Vertex Shader
-// Credit: https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/resources/assets/skyblockaddons/shaders/program/chroma_screen_textured.vsh
+#version 150
 
-#version 120
-
-varying vec2 outTextureCoords;
-varying vec4 outColor;
+in vec3 Position;
+in vec2 UV0;
+in vec4 Color;
+//? < 1.21.6 {
+uniform mat4 ModelViewMat;
+uniform mat4 ProjMat;
+//?} else {
+//#moj_import <minecraft:dynamictransforms.glsl>
+//#moj_import <minecraft:projection.glsl>
+//?}
+out vec4 vertexColor;
+out vec2 texCoord0;
 
 void main() {
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 
     // Pass the color & texture coords to the fragment shader
-    outColor = gl_Color;
-    outTextureCoords = gl_MultiTexCoord0.st;
+    vertexColor = Color;
+    texCoord0 = UV0;
 }

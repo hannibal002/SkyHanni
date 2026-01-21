@@ -7,14 +7,24 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HideNotClickableConfig {
+
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Hide items that are not clickable in the current inventory: ah, bz, accessory bag, etc."
+        desc = "Gray out items that are not clickable in the current inventory: Auction House, Bazaar, Accessory Bag, etc.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var items: Boolean = false
+    var enabled: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Protect Rarely Sold Items",
+        desc = "Also gray out items that are not commonly sold to NPCs in NPC shop menus.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var protectRarelySoldItems: Boolean = false
 
     @Expose
     @ConfigOption(name = "Block Clicks", desc = "Block the clicks on these items.")
@@ -29,7 +39,7 @@ class HideNotClickableConfig {
     @Expose
     @ConfigOption(
         name = "Bypass With Key",
-        desc = "Add the ability to bypass not clickable items when holding the control/command key."
+        desc = "Add the ability to bypass not clickable items when holding the control/command key.",
     )
     @ConfigEditorBoolean
     var itemsBypass: Boolean = true

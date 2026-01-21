@@ -16,8 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -48,11 +47,9 @@ object BazaarBestSellMethod {
         display = updateDisplay(event.openedProduct)
 
         // on 1.21 NeuInternalName.getAmountInInventory() does not include the item currently clicked at
-        if (!PlatformUtils.IS_LEGACY) {
-            DelayedRun.runDelayed(300.milliseconds) {
-                if (display.isEmpty()) {
-                    display = updateDisplay(event.openedProduct)
-                }
+        DelayedRun.runDelayed(300.milliseconds) {
+            if (display.isEmpty()) {
+                display = updateDisplay(event.openedProduct)
             }
         }
     }
@@ -64,7 +61,7 @@ object BazaarBestSellMethod {
         var having = internalName.getAmountInInventory()
         lastClickedItem?.let {
             if (it.getInternalName() == internalName) {
-                having += it.stackSize
+                having += it.count
             }
         }
         if (having <= 0) return ""
@@ -87,7 +84,7 @@ object BazaarBestSellMethod {
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        lastClickedItem = event.slot?.stack
+        lastClickedItem = event.slot?.item
         nextCloseWillResetItem = false
     }
 

@@ -32,7 +32,7 @@ object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
-    private suspend fun runCommand(args: Array<String>): String {
+    private fun runCommand(args: Array<String>): String {
         if (args.isEmpty()) {
             return "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
         }
@@ -86,7 +86,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private suspend fun setCommand(args: Array<String>): String {
+    private fun setCommand(args: Array<String>): String {
         if (args.size < 3) return "§c/shconfig set <config name> <json element>"
         val term = args[1]
         var rawJson = args.drop(2).joinToString(" ")
@@ -132,7 +132,7 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private suspend fun toggleCommand(args: Array<String>): String {
+    private fun toggleCommand(args: Array<String>): String {
         if (args.size == 1 || args.size == 3) return "§c/shconfig toggle <config name> [value 1] [value 2]"
 
         val path = args[1]
@@ -382,7 +382,7 @@ object SkyHanniConfigSearchResetCommand {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
             legacyCallbackArgs {
-                SkyHanniMod.launchCoroutine {
+                SkyHanniMod.launchCoroutine("shconfig command") {
                     ChatUtils.chat(runCommand(it))
                 }
                 lastCommand = it

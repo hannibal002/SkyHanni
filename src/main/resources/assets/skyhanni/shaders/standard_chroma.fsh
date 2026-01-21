@@ -1,14 +1,20 @@
-// Chroma Fragment Shader
-// (Same as textured_chroma.fsh but isn't restricted to textured elements)
+#version 150
 
-#version 120
-
+in vec4 vertexColor;
+//? < 1.21.6 {
 uniform float chromaSize;
 uniform float timeOffset;
 uniform float saturation;
 uniform bool forwardDirection;
-
-varying vec4 originalColor;
+//?} else {
+//layout(std140) uniform SkyHanniChromaUniforms {
+//    float chromaSize;
+//    float timeOffset;
+//    float saturation;
+//    int forwardDirection;
+//};
+//?}
+out vec4 fragColor;
 
 float rgb2b(vec3 rgb) {
     return max(max(rgb.r, rgb.g), rgb.b);
@@ -23,7 +29,10 @@ vec3 hsb2rgb_smooth(vec3 c) {
 void main() {
     // Determine the direction chroma moves
     float fragCoord;
+    //? < 1.21.6 {
     if (forwardDirection) {
+    //?} else
+    //if (forwardDirection == 1) {
         fragCoord = gl_FragCoord.x - gl_FragCoord.y;
     } else {
         fragCoord = gl_FragCoord.x + gl_FragCoord.y;
@@ -33,5 +42,5 @@ void main() {
     float hue = mod(((fragCoord) / chromaSize) - timeOffset, 1.0);
 
     // Set the color to use the new hue & original saturation/value/alpha values
-    gl_FragColor = vec4(hsb2rgb_smooth(vec3(hue, saturation, rgb2b(originalColor.rgb))), originalColor.a);
+    fragColor = vec4(hsb2rgb_smooth(vec3(hue, saturation, rgb2b(vertexColor.rgb))), vertexColor.a);
 }

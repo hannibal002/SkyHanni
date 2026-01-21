@@ -51,8 +51,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
@@ -63,7 +63,7 @@ object BlockStrengthGuide {
 
     private enum class DisplayOres(private val iconDel: () -> ItemStack, val oreBlocks: Set<OreBlock>) {
         VANILLA_ORES(
-            { ItemStack(Blocks.redstone_block) },
+            { ItemStack(Blocks.REDSTONE_BLOCK) },
             setOf(
                 OreBlock.COAL_ORE,
                 OreBlock.IRON_ORE,
@@ -76,7 +76,7 @@ object BlockStrengthGuide {
             ),
         ),
         PURE_ORES(
-            { ItemStack(Blocks.gold_block) },
+            { ItemStack(Blocks.GOLD_BLOCK) },
             setOf(
                 OreBlock.PURE_COAL,
                 OreBlock.PURE_IRON,
@@ -97,7 +97,7 @@ object BlockStrengthGuide {
             setOf(OreBlock.LOW_TIER_MITHRIL),
         ),
         GREEN_MITHRIL(
-            { ItemStack(Blocks.prismarine) },
+            { ItemStack(Blocks.PRISMARINE) },
             setOf(OreBlock.MID_TIER_MITHRIL),
         ),
         BLUE_MITHRIL(
@@ -105,7 +105,7 @@ object BlockStrengthGuide {
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         TUNGSTEN_UMBER(
-            { ItemStack(Blocks.clay) },
+            { ItemStack(Blocks.CLAY) },
             setOf(
                 OreBlock.LOW_TIER_UMBER,
                 OreBlock.MID_TIER_UMBER,
@@ -116,11 +116,11 @@ object BlockStrengthGuide {
             ),
         ),
         GLACITE(
-            { ItemStack(Blocks.packed_ice) },
+            { ItemStack(Blocks.PACKED_ICE) },
             setOf(OreBlock.GLACITE),
         ),
         OBSIDIAN(
-            { ItemStack(Blocks.obsidian) },
+            { ItemStack(Blocks.OBSIDIAN) },
             setOf(OreBlock.OBSIDIAN),
         ),
         RUBY(
@@ -148,27 +148,27 @@ object BlockStrengthGuide {
             setOf(OreBlock.ONYX, OreBlock.PERIDOT, OreBlock.CITRINE, OreBlock.AQUAMARINE),
         ),
         HARD_STONE(
-            { ItemStack(Blocks.stone) },
+            { ItemStack(Blocks.STONE) },
             setOf(OreBlock.HARD_STONE_HOLLOWS, OreBlock.HARD_STONE_TUNNELS, OreBlock.HARD_STONE_MINESHAFT),
         ),
         COBBLE_STONE(
-            { ItemStack(Blocks.cobblestone) },
+            { ItemStack(Blocks.COBBLESTONE) },
             setOf(OreBlock.COBBLESTONE),
         ),
         STONE(
-            { ItemStack(Blocks.stone) },
+            { ItemStack(Blocks.STONE) },
             setOf(OreBlock.STONE),
         ),
         SULPHUR(
-            { ItemStack(Blocks.sponge) },
+            { ItemStack(Blocks.SPONGE) },
             setOf(OreBlock.SULPHUR),
         ),
         NETHERRACK(
-            { ItemStack(Blocks.netherrack) },
+            { ItemStack(Blocks.NETHERRACK) },
             setOf(OreBlock.NETHERRACK),
         ),
         END_STONE(
-            { ItemStack(Blocks.end_stone) },
+            { ItemStack(Blocks.END_STONE) },
             setOf(OreBlock.END_STONE),
         );
 
@@ -222,7 +222,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
 
                     addString("§3Block Strength: §f${ore.strength.addSeparators()}")
-                    addExtraInfo("This defines the \"thoughness\" of a block.")
+                    addExtraInfo("This defines the \"toughness\" of a block.")
                     addExtraInfo("A higher number means it takes longer")
                     addExtraInfo("to break $blockName.")
 
@@ -417,46 +417,64 @@ object BlockStrengthGuide {
             }
         }
 
-    private var sbMenuOpened = false
+    private var statsOpened = false
 
     private var lastSet = SimpleTimeMark.farPast()
     private var lastRunCommand = SimpleTimeMark.farPast()
 
+    private var waitingForStats = false // if trying to fetch the stats actively
+    private var statsMenuOpened = false // /stats GUI is visible on the user's screen
+
     fun onCommand() {
+        if (!SkyBlockUtils.inSkyBlock) {
+            ChatUtils.userError("Join SkyBlock to use the Block Strength Guide!")
+            return
+        }
         when {
-            RiftApi.inRift() -> "in the rift"
-            DungeonApi.inDungeon() -> "in dungeons"
-            KuudraApi.inKuudra -> "in kuudra"
+            RiftApi.inRift() -> "in the Rift"
+            DungeonApi.inDungeon() -> "in Dungeons"
+            KuudraApi.inKuudra -> "in Kuudra"
             else -> null
         }?.let {
-            ChatUtils.userError("The Block Strengh Guide does not work $it!")
+            ChatUtils.userError("The Block Strength Guide does not work $it!")
             return
 
         }
         lastRunCommand = SimpleTimeMark.now()
         shouldBlockSHMenu = true
-        sbMenuOpened = false
-        HypixelCommands.skyblockMenu()
+        statsOpened = false
+        waitingForStats = true
+        statsMenuOpened = false
+        HypixelCommands.stats()
     }
 
     @HandleEvent
     fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (!shouldBlockSHMenu) return
 
-        if (!sbMenuOpened) {
+        if (waitingForStats) {
+            if (statsMenuOpened) {
+                statsOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
+                if (statsOpened) {
+                    waitingForStats = false
+                }
+            }
             if (lastRunCommand.passedSince() < 2.seconds) {
-                sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-                Renderable.text(
-                    "Loading...",
-                    scale = 2.0,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
-                event.cancel()
+                if (waitingForStats) {
+                    Renderable.text(
+                        "Loading...",
+                        scale = 2.0,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+                    event.cancel()
+                }
             } else {
+                shouldBlockSHMenu = false
+                waitingForStats = false
                 ErrorManager.logErrorStateWithData(
-                    "could not load mining data for /shblockstrengh command",
-                    "opened /sbmenu and found no mining speed in the next 2s",
+                    "could not load mining data for /shblockstrength command",
+                    "opened /stats and found no mining speed in the next 2s",
                     "island" to SkyBlockUtils.currentIsland,
                     "graph area" to SkyBlockUtils.graphArea,
                     "scoreboard area" to SkyBlockUtils.scoreboardArea,
@@ -464,6 +482,11 @@ object BlockStrengthGuide {
                     betaOnly = true,
                 )
             }
+            if (waitingForStats) return
+        }
+
+        if (!statsOpened) {
+            shouldBlockSHMenu = false
             return
         }
         event.cancel()
@@ -479,9 +502,12 @@ object BlockStrengthGuide {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "SkyBlock Menu") return
+        if (event.inventoryName != "Your Equipment and Stats") return
+        if (waitingForStats && lastRunCommand.passedSince() < 3.seconds) {
+            statsMenuOpened = true
+        }
         DelayedRun.runDelayed(100.milliseconds) {
-            if (lastRunCommand.passedSince() < 3.seconds) {
+            if (lastRunCommand.passedSince() < 3.seconds && !waitingForStats) {
                 lastRunCommand = SimpleTimeMark.farPast()
             }
         }
@@ -498,7 +524,7 @@ object BlockStrengthGuide {
 
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
-        if (!sbMenuOpened) return
+        if (!statsOpened) return
         shouldBlockSHMenu = false
     }
 

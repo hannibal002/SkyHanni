@@ -1,57 +1,63 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import net.minecraft.entity.monster.EntityBlaze
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntitySpider
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.entity.passive.EntityWolf
+import net.minecraft.world.entity.animal.wolf.Wolf
+import net.minecraft.world.entity.monster.Blaze
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.Spider
+import net.minecraft.world.entity.monster.Zombie
 
 enum class SlayerType(
     val displayName: String,
     val rngName: String,
     val clazz: Class<*>,
     val miniBossType: SlayerMiniBossType? = null,
+    val otherNames: List<String> = listOf(),
 ) {
     REVENANT(
         "Revenant Horror",
         "revenant",
-        EntityZombie::class.java,
+        Zombie::class.java,
         SlayerMiniBossType.REVENANT,
+        listOf("Atoned Horror"),
     ),
     TARANTULA(
         "Tarantula Broodfather",
         "tarantula",
-        EntitySpider::class.java,
+        Spider::class.java,
         SlayerMiniBossType.TARANTULA,
+        listOf("Conjoined Brood"),
     ),
     SVEN(
         "Sven Packmaster",
         "sven",
-        EntityWolf::class.java,
+        Wolf::class.java,
         SlayerMiniBossType.SVEN,
     ),
     VOID(
         "Voidgloom Seraph",
         "voidgloom",
-        EntityEnderman::class.java,
+        EnderMan::class.java,
         SlayerMiniBossType.VOIDLING,
     ),
     INFERNO(
         "Inferno Demonlord",
         "inferno",
-        EntityBlaze::class.java,
+        Blaze::class.java,
         SlayerMiniBossType.INFERNAL,
     ),
     VAMPIRE(
         "Bloodfiend",
         "vampire",
-        EntityZombie::class.java,
+        Zombie::class.java,
     ) // previously called "Riftstalker Bloodfiend"
     ;
 
     companion object {
-        fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
-        fun getByClazzName(name: String): SlayerType? = entries.firstOrNull {
+        fun getByName(name: String): SlayerType? = entries.firstOrNull { slayer ->
+            name.contains(slayer.displayName) || slayer.otherNames.any { name.contains(it) }
+        }
+
+        fun getByClassName(name: String): SlayerType? = entries.firstOrNull {
             it.clazz.simpleName.removePrefix("Entity").equals(name, ignoreCase = true)
         }
     }

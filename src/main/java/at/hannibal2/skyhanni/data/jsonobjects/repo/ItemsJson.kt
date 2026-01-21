@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -18,17 +17,30 @@ data class ItemsJson(
     @Expose @SerializedName("compact_names") val compactNames: Map<String, String>,
     @Expose @SerializedName("renamed_enchantments") val renamedEnchantments: Map<String, String>,
     @Expose @SerializedName("shard_name_overrides") val shardNameOverrides: Map<String, String>,
+    @Expose @SerializedName("distance_enchant_data") val distanceEnchantData: Map<String, DistanceEnchantData>,
+    @Expose @SerializedName("hunting_blackholes") val huntingBlackholes: List<NeuInternalName>?,
+    @Expose @SerializedName("hunting_axes") val huntingAxes: List<NeuInternalName>?,
 )
 
 data class ItemValueCalculationDataJson(
     @Expose @SerializedName("always_active_enchants") val alwaysActiveEnchants: Map<String, AlwaysActiveEnchantJson>,
     @Expose @SerializedName("only_tier_one_prices") val onlyTierOnePrices: List<String>,
     @Expose @SerializedName("only_tier_five_prices") val onlyTierFivePrices: List<String>,
+    @Expose @SerializedName("endcap_enchants") val endcapEnchants: Map<String, EndCapData>? = mapOf(),
 )
 
 data class AlwaysActiveEnchantJson(
     @Expose val level: Int,
-    @Expose val items: List<String>,
-) {
-    val internalNames get() = items.map { it.toInternalName() }
-}
+    @Expose @SerializedName("items") val internalNames: List<NeuInternalName>,
+)
+
+data class EndCapData(
+    @Expose @SerializedName("required_level") val requiredLevel: Int,
+    @Expose @SerializedName("endcap_item") val endcapItem: NeuInternalName,
+)
+
+data class DistanceEnchantData(
+    @Expose val distance: Double,
+    @Expose @SerializedName("max_amount") val maxAmount: Int,
+    @Expose @SerializedName("per_stack_multiplier") val perStackMultiplier: Double,
+)

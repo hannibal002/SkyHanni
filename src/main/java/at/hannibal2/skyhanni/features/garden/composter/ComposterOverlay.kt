@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -15,10 +16,11 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi.getLevel
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -57,6 +59,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -67,6 +70,9 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Display while in the composter inventory
+ */
 @SkyHanniModule
 object ComposterOverlay {
 
@@ -135,10 +141,10 @@ object ComposterOverlay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.displayName
+            val name = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
@@ -367,7 +373,7 @@ object ComposterOverlay {
 
             addLine(
                 tips = listOf(
-                    "§7The variables below are calcualted with",
+                    "§7The variables below are calculated with",
                     "${organicMatterItem.repoItemName} §7and ${fuelItem.repoItemName}.",
                 ),
             ) {
@@ -387,7 +393,7 @@ object ComposterOverlay {
             addString(
                 " §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview",
                 tips = listOf(
-                    "§7The §aCompost Factor §7is calcualted by adding",
+                    "§7The §aCompost Factor §7is calculated by adding",
                     "§aMulti Drop §7and §aComposter Speed §7together.",
                 ),
             )
@@ -519,7 +525,7 @@ object ComposterOverlay {
                 onClick(internalName)
                 if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                     lastAttemptTime = SimpleTimeMark.now()
-                    retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                    retrieveMaterials(internalName, internalName.repoItemName.removeColor(), itemsNeeded)
                 }
             },
             tips = tips,
@@ -590,6 +596,13 @@ object ComposterOverlay {
 
     @HandleEvent(NeuRepositoryReloadEvent::class)
     fun onNeuRepoReload() {
+        updateOrganicMatterFactors()
+    }
+
+    // hopefully fix the display not working properly
+    @HandleEvent
+    fun onIslandSwap(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.GARDEN) return
         updateOrganicMatterFactors()
     }
 
@@ -719,13 +732,9 @@ object ComposterOverlay {
         event.registerBrigadier("shtestcomposter") {
             description = "Test the composter overlay"
             category = CommandCategory.DEVELOPER_DEBUG
-            legacyCallbackArgs {
-                if (it.size != 1) {
-                    ChatUtils.userError("Usage: /shtestcomposter <offset>")
-                } else {
-                    testOffset = it[0].toInt()
-                    ChatUtils.chat("Composter test offset set to $testOffset.")
-                }
+            argCallback("offset", BrigadierArguments.integer()) {
+                testOffset = it
+                ChatUtils.chat("Composter test offset set to $testOffset.")
             }
         }
     }

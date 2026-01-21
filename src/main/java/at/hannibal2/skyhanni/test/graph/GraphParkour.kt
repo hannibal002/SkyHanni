@@ -20,19 +20,19 @@ object GraphParkour {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shgraphloadparkour") {
+        event.registerBrigadier("shgraphloadparkour") {
             description = "Loads the current clipboard as parkour into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
-            callback {
-                SkyHanniMod.launchCoroutine {
+            simpleCallback {
+                SkyHanniMod.launchCoroutine("shgraphloadparkour command") {
                     loadParkour()
                 }
             }
         }
-        event.register("shgraphexportasparkour") {
+        event.registerBrigadier("shgraphexportasparkour") {
             description = "Saves the graph editor as parkour into the clipboard."
             category = CommandCategory.DEVELOPER_TEST
-            callback { saveParkour() }
+            simpleCallback { saveParkour() }
         }
     }
 
@@ -53,7 +53,7 @@ object GraphParkour {
     }
 
     private fun graphToList(graph: Graph): List<LorenzVec>? {
-        val starts = graph.nodes.filter { it.name == "start" }
+        val starts = graph.getNodesWithName("start")
         if (starts.isEmpty()) {
             ChatUtils.userError("No start node found!")
             return null
@@ -62,7 +62,7 @@ object GraphParkour {
             ChatUtils.userError("More than one start node found!")
             return null
         }
-        val ends = graph.nodes.filter { it.name == "end" }
+        val ends = graph.getNodesWithName("end")
         if (ends.isEmpty()) {
             ChatUtils.userError("No end node found!")
             return null
@@ -88,7 +88,7 @@ object GraphParkour {
 
         var current = startN.first().key
 
-        while (list.size != graph.nodes.size - 1) {
+        while (list.size != graph.size - 1) {
             val neighbours = current.neighbours.filter { it.key !in list }.keys
             if (neighbours.size > 1) {
                 ChatUtils.userError("One node has more than two neighbours!")
@@ -122,11 +122,11 @@ object GraphParkour {
         IslandGraphs.pathFind(
             vec, "Node error",
             LorenzColor.RED.toColor(),
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
     }
 
-    private suspend fun loadParkour() {
+    private fun loadParkour() {
         val locations = readListFromClipboard() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
@@ -134,12 +134,12 @@ object GraphParkour {
         IslandGraphs.pathFind(
             locations.first(),
             "Start of parkour",
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
         ChatUtils.chat("Graph Editor loaded a parkour from clipboard!")
     }
 
-    private suspend fun readListFromClipboard(): List<LorenzVec>? {
+    private fun readListFromClipboard(): List<LorenzVec>? {
         val clipboard = OSUtils.readFromClipboard() ?: return null
         return clipboard.split("\n").map { line ->
             val raw = line.replace("\"", "").replace(",", "")

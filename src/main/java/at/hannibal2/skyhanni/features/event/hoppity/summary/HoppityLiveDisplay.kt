@@ -49,10 +49,12 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import org.lwjgl.input.Keyboard
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import org.lwjgl.glfw.GLFW
+import java.time.LocalDateTime
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
@@ -128,14 +130,16 @@ object HoppityLiveDisplay {
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
-        if (config.toggleKeybind == Keyboard.KEY_NONE || config.toggleKeybind != event.keyCode) return
+        if (config.toggleKeybind == GLFW.GLFW_KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inChocolateFactory) return
+        if (Minecraft.getInstance().screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
         lastToggleMark = SimpleTimeMark.now()
     }
+
+    private var inventoryOpen = false
 
     @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
@@ -144,6 +148,11 @@ object HoppityLiveDisplay {
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
+        val invCurrentlyOpen = InventoryUtils.inAnyInventory()
+        if (inventoryOpen != invCurrentlyOpen) {
+            inventoryOpen = invCurrentlyOpen
+            lastKnownStatHash = 0
+        }
         if (statsHash != lastKnownStatHash) {
             lastKnownStatHash = statsHash
             displayCardRenderables = buildDisplayRenderables(stats, HoppityEventSummary.statYear)
@@ -173,7 +182,7 @@ object HoppityLiveDisplay {
 
     private fun inMatchingInventory(): Boolean {
         val setting = config.specificInventories
-        val currentScreen = Minecraft.getMinecraft().currentScreen
+        val currentScreen = Minecraft.getInstance().screen
             ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
         // Get the inventory name and check if it matches any of the specific inventories
@@ -184,7 +193,7 @@ object HoppityLiveDisplay {
             miscCfInventoryPatterns.matches(inventoryName)
 
         return when {
-            currentScreen is GuiInventory -> HoppityLiveDisplayInventoryType.OWN_INVENTORY
+            currentScreen is InventoryScreen -> HoppityLiveDisplayInventoryType.OWN_INVENTORY
             inChocolateFactory -> HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY
             inventoryName == "Hoppity" -> HoppityLiveDisplayInventoryType.HOPPITY
             mealEggInventoryPattern.matches(inventoryName) -> HoppityLiveDisplayInventoryType.MEAL_EGGS
@@ -193,7 +202,7 @@ object HoppityLiveDisplay {
     }
 
     private fun isInInventory(): Boolean =
-        Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
+        Minecraft.getInstance().screen is InventoryScreen || Minecraft.getInstance().screen is ContainerScreen
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
         val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCountsWithInfPossible(statYear).takeIfNotEmpty() ?: return@buildList
@@ -234,7 +243,7 @@ object HoppityLiveDisplay {
         return percentText to percentageColor
     }
 
-    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {
+    private fun buildTitle(statYear: Int) = Renderable.vertical(horizontalAlign = RenderUtils.HorizontalAlignment.LEFT) {
         addString(
             CFApi.partyModeReplace(
                 when (statYear) {
@@ -242,7 +251,7 @@ object HoppityLiveDisplay {
                     else -> "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats"
                 },
             ),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
         )
         if (statYear == Int.MAX_VALUE) {
             val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
@@ -276,15 +285,33 @@ object HoppityLiveDisplay {
             else -> if (timeMarkAbs) "Starts" else "Starts in"
         }
 
-        addCenteredString(
-            CFApi.partyModeReplace(
-                when {
-                    isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
-                    isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
-                    else -> "§7$grammarFormat §f$timeMarkFormat"
-                },
+        val text = when {
+            isCurrentEvent -> "§7$grammarFormat §b$timeMarkFormat"
+            isPastEvent -> "§7Ended §b$timeMarkFormat$grammarFormat"
+            else -> "§7$grammarFormat §b$timeMarkFormat"
+        }
+
+        val eventStart = eventEnd - 31.hours
+        add(
+            Renderable.hoverTips(
+                CFApi.partyModeReplace(text),
+                tips = listOf(
+                    "§7From: §b${eventStart.format()}",
+                    "§7Until: §b${eventEnd.format()}",
+                ),
             ),
         )
+    }
+
+    private fun SimpleTimeMark.format(): String {
+        val date = toLocalDate()
+        val now = LocalDateTime.now()
+        val pattern = if (date.year != now.year) {
+            "yyyy MMM d h:mm a"
+        } else {
+            "MMM d h:mm a"
+        }
+        return formattedDate(pattern)
     }
 
     private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
@@ -397,7 +424,7 @@ object HoppityLiveDisplay {
         val container = Renderable.horizontal(
             renderable,
             spacing = 5,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
         )
         add(container)
     }

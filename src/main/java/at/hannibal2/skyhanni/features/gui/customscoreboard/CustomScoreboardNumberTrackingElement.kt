@@ -27,8 +27,7 @@ interface CustomScoreboardNumberTrackingElement {
         } else {
             " §7($numberColor${formatNumber(changeAmount)}§7)$numberColor"
         }
-
-        currentJob = SkyHanniMod.launchCoroutine {
+        currentJob = SkyHanniMod.launchCoroutine("custom scoreboard number show temporary change") {
             delay(durationMillis)
             temporaryChangeDisplay = null
             currentJob = null

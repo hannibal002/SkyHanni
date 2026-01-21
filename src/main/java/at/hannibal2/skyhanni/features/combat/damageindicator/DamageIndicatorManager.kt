@@ -12,21 +12,24 @@ import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
@@ -44,30 +47,33 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.entity.monster.EntityMagmaCube
-import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.entity.passive.EntityWolf
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.animal.wolf.Wolf
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.EnderMan
+import net.minecraft.world.entity.monster.MagmaCube
+import net.minecraft.world.entity.monster.Zombie
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import at.hannibal2.skyhanni.data.mob.Mob as ShMob
 
 typealias EntityData = DamageIndicatorEntityData
 
@@ -82,16 +88,16 @@ object DamageIndicatorManager {
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
-    private var data = mapOf<UUID, EntityData>()
+    private val data = mutableMapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
     private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
 
-    fun isDamageSplash(entity: EntityArmorStand): Boolean {
-        if (entity.ticksExisted > 300) return false
+    fun isDamageSplash(entity: ArmorStand): Boolean {
+        if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
-        if (entity.isDead) return false
-        val name = entity.customNameTag.removeColor().replace(",", "")
+        if (entity.deceased) return false
+        val name = entity.customName.formattedTextCompatLessResets().removeColor().replace(",", "")
 
         return damagePattern.matcher(name).matches()
     }
@@ -102,25 +108,19 @@ object DamageIndicatorManager {
 
     fun getDistanceTo(vararg types: BossType): Double {
         val playerLocation = LocationUtils.playerLocation()
-        return data.values.filter { it.bossType in types }
-            .map { it.entity.getLorenzVec().distance(playerLocation) }
-            .let { list ->
-                if (list.isEmpty()) Double.MAX_VALUE else list.minOf { it }
-            }
+        return data.values.filter { it.bossType in types }.map { it.entity.getLorenzVec().distance(playerLocation) }.let { list ->
+            if (list.isEmpty()) Double.MAX_VALUE else list.minOf { it }
+        }
     }
 
-    fun getAllMobs(): Collection<EntityLivingBase> = data.values.map { it.entity }
+    fun getAllMobs(): Collection<LivingEntity> = data.values.map { it.entity }
 
     fun getNearestDistanceTo(location: LorenzVec): Double {
-        return data.values
-            .map { it.entity.getLorenzVec() }
-            .minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
+        return data.values.map { it.entity.getLorenzVec() }.minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
     }
 
     fun removeDamageIndicator(type: BossType) {
-        data = data.editCopy {
-            values.removeIf { it.bossType == type }
-        }
+        data.removeIf { it.value.bossType == type }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -133,7 +133,7 @@ object DamageIndicatorManager {
     @HandleEvent
     fun onWorldChange() {
         mobFinder = MobFinder()
-        data = emptyMap()
+        data.clear()
     }
 
     @HandleEvent
@@ -145,22 +145,10 @@ object DamageIndicatorManager {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        // only render when actually enabled
-        if (!config.enabled) return
-
-        GlStateManager.disableDepth()
-        GlStateManager.disableCull()
-
-        // TODO config to define between 100ms and 5 sec
-        val filter = data.filter {
-            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4.seconds else 100.milliseconds
-            (SimpleTimeMark.now() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
-        }
-        if (filter.isNotEmpty()) {
-            data = data.editCopy {
-                for (entry in filter) {
-                    remove(entry.key)
-                }
+        if (SkyBlockUtils.debug) {
+            list.removeIf { it.decayAt.isInPast() }
+            for (highlight in list) {
+                event.drawDynamicText(highlight.location, highlight.text, 1.5, seeThroughBlocks = false)
             }
         }
 
@@ -186,16 +174,15 @@ object DamageIndicatorManager {
         }
 
         for (data in data.values) {
-
             val vecYOffset = when (data.bossType) {
                 BossType.END_ENDSTONE_PROTECTOR -> 3.0
                 BossType.SLAYER_SPIDER_5_1 -> 2.0
 
-                else -> 0.0
+                else -> 1.0
             }
 
             if (!data.ignoreBlocks && !data.entity.canBeSeen(70.0, vecYOffset = vecYOffset)) continue
-            if (!data.isConfigEnabled()) continue
+            val showNameAndHealth = data.shouldShowNameAndHealth()
 
             val entity = data.entity
 
@@ -216,8 +203,9 @@ object DamageIndicatorManager {
                 loc
             }.add(-0.5, 0.0, -0.5)
 
-
-            event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
+            if (showNameAndHealth) {
+                event.drawDynamicText(location, healthText, sizeHealth, smallestDistanceVew = smallestDistanceVew)
+            }
 
             if (data.nameAbove.isNotEmpty()) {
                 event.drawDynamicText(
@@ -229,11 +217,13 @@ object DamageIndicatorManager {
                 )
             }
 
-            var bossName = when (config.bossName) {
-                NameVisibility.HIDDEN -> ""
-                NameVisibility.FULL_NAME -> data.bossType.fullName
-                NameVisibility.SHORT_NAME -> data.bossType.shortName
-            }
+            var bossName = if (showNameAndHealth) {
+                when (config.bossName) {
+                    NameVisibility.HIDDEN -> ""
+                    NameVisibility.FULL_NAME -> data.bossType.fullName
+                    NameVisibility.SHORT_NAME -> data.bossType.shortName
+                }
+            } else ""
 
             if (data.namePrefix.isNotEmpty()) {
                 bossName = data.namePrefix + bossName
@@ -241,7 +231,9 @@ object DamageIndicatorManager {
             if (data.nameSuffix.isNotEmpty()) {
                 bossName += data.nameSuffix
             }
-            event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
+            if (bossName.isNotEmpty()) {
+                event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
+            }
 
             val icons = iconCache.getOrPut(data) {
                 buildList {
@@ -273,7 +265,7 @@ object DamageIndicatorManager {
                 diff += 22f
             } else diff += 4f
 
-            if (config.showDamageOverTime) {
+            if (showNameAndHealth && config.showDamageOverTime) {
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
@@ -316,11 +308,9 @@ object DamageIndicatorManager {
                 }
             }
         }
-        GlStateManager.enableDepth()
-        GlStateManager.enableCull()
     }
 
-    private fun EntityData.isConfigEnabled() = bossType.bossTypeToggle in config.bossesToShow
+    private fun EntityData.shouldShowNameAndHealth() = config.enabled && bossType.bossTypeToggle in config.bossesToShow
 
     @Suppress("Indentation")
     private fun noDeathDisplay(bossType: BossType): Boolean = when (bossType) {
@@ -332,6 +322,8 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_2,
         BossType.SLAYER_BLAZE_QUAZII_3,
         BossType.SLAYER_BLAZE_QUAZII_4,
+
+        BossType.SLAYER_SPIDER_5_1,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
         -> true
@@ -369,24 +361,52 @@ object DamageIndicatorManager {
         return color.getChatColor() + format
     }
 
+    val list = mutableListOf<Highlight>()
+
+    class Highlight(val location: LorenzVec, val text: String, val decayAt: SimpleTimeMark)
+
     @HandleEvent
-    fun onTick() {
+    fun onMobSpawn(event: MobEvent.Spawn) {
+        val mob = event.mob
+
+        if (SkyBlockUtils.debug) {
+            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.mobType}", 5.seconds.fromNow()))
+        }
         if (!isEnabled()) return
-        data = data.editCopy {
-            EntityUtils.getEntities<EntityLivingBase>()
-                .mapNotNull(::checkEntity)
-                .forEach { this put it }
+        try {
+            val d = grabData(mob) ?: return
+            data[d.entity.uuid] = d
+            update(d)
+        } catch (e: Throwable) {
+            ErrorManager.logErrorWithData(
+                e, "Error checking damage indicator entity",
+                "mob" to mob,
+                "mobInfo" to CopyNearbyEntitiesCommand.getMobInfo(mob),
+            )
+            return
         }
     }
 
-    private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
-        try {
-            val entityData = grabData(entity) ?: return null
-            if (DungeonApi.inDungeon()) {
-                checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
-            }
+    @HandleEvent
+    fun onSkyHanniTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+        data.values.forEach(::update)
+        // TODO config to define between 100ms and 5 sec
+        // TODO fix bug that the time is always 100 ms, even when the config is enabled?
+        data.removeIf { (_, value) ->
+            val noDeathDisplay = noDeathDisplay(value.bossType)
+            val waitForRemoval = if (value.dead && !noDeathDisplay) 4.seconds else 100.milliseconds
+            (SimpleTimeMark.now() > value.timeLastTick + waitForRemoval) || (value.dead && noDeathDisplay)
+        }
+    }
 
-            val health = entity.health.toLong()
+    private fun update(entityData: EntityData) {
+        try {
+            val entity = entityData.entity
+            if (DungeonApi.inDungeon()) {
+                checkFinalBoss(entityData.finalDungeonBoss, entity.id)
+            }
+            val health = entity.findHealthReal().toLong()
             val maxHealth: Long
             val biggestHealth = getMaxHealthFor(entity)
             if (biggestHealth == 0L) {
@@ -407,10 +427,10 @@ object DamageIndicatorManager {
                 }
                 "§cDead"
             } else {
-                getCustomHealth(entityData, health, entity, maxHealth) ?: return null
+                getCustomHealth(entityData, health, entity, maxHealth) ?: return
             }
 
-            data[entity.uniqueID]?.let {
+            data[entity.uuid]?.let {
                 val lastHealth = it.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
@@ -426,13 +446,12 @@ object DamageIndicatorManager {
                 entityData.healthText = color.getChatColor() + health.shortFormat()
             }
             entityData.timeLastTick = SimpleTimeMark.now()
-            return entity.uniqueID to entityData
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error checking damage indicator entity",
-                "entity" to entity,
+                "data" to data,
             )
-            return null
+            return
         }
     }
 
@@ -440,7 +459,7 @@ object DamageIndicatorManager {
     private fun getCustomHealth(
         entityData: EntityData,
         health: Long,
-        entity: EntityLivingBase,
+        entity: LivingEntity,
         maxHealth: Long,
     ): String? {
 
@@ -464,12 +483,17 @@ object DamageIndicatorManager {
                 entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckTier5 && config.spiderSlayer.showInvincible) {
                     "§eKill hatchlings!"
                 } else ""
-                entityData.nameSuffix = " §e1/2"
+
+                if (SlayerApi.config.spider.phaseDisplay) {
+                    entityData.nameSuffix = " §e1/2"
+                }
                 return ""
             }
 
             BossType.SLAYER_SPIDER_5_2 -> {
-                entityData.nameSuffix = " §e2/2"
+                if (SlayerApi.config.spider.phaseDisplay) {
+                    entityData.nameSuffix = " §e2/2"
+                }
                 return ""
             }
 
@@ -477,13 +501,13 @@ object DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
             BossType.SLAYER_ENDERMAN_4,
-            -> return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkEnderSlayer(entity as EnderMan, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLOODFIEND_1,
             BossType.SLAYER_BLOODFIEND_2,
             BossType.SLAYER_BLOODFIEND_3,
             BossType.SLAYER_BLOODFIEND_4,
-            -> return checkVampireSlayer(entity as EntityOtherPlayerMP, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkVampireSlayer(entity as RemotePlayer, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
@@ -495,49 +519,46 @@ object DamageIndicatorManager {
             BossType.SLAYER_BLAZE_TYPHOEUS_2,
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
-            -> return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
+            -> return checkBlazeSlayer(entity as Mob, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.NETHER_MAGMA_BOSS -> return checkMagmaCube(
-                entity as EntityMagmaCube,
+                entity as MagmaCube,
                 entityData,
                 health.toInt(),
                 maxHealth.toInt(),
             )
 
             BossType.SLAYER_ZOMBIE_5 -> {
-                if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
+                if ((entity as Zombie).hasNameTagWith(3, "§fBoom!")) {
                     // TODO fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
 //                    val format = formatDelay(remainingTicks * 50)
 //                    entityData.nameSuffix = " §f§lBOOM - $format"
-                    entityData.nameSuffix = " §f§lBOOM!"
+                    if (SlayerApi.config.zombie.boomDisplay) {
+                        entityData.nameSuffix = " §f§lBOOM!"
+                    }
                 }
             }
 
             BossType.SLAYER_WOLF_3,
             BossType.SLAYER_WOLF_4,
             -> {
-                if ((entity as EntityWolf).hasNameTagWith(2, "§bCalling the pups!")) {
+                if ((entity as Wolf).hasNameTagWith(2, "§bCalling the pups!")) {
                     return "Pups!"
                 }
             }
 
-            BossType.NETHER_BARBARIAN_DUKE,
-            -> {
+            BossType.NETHER_BARBARIAN_DUKE -> {
                 val location = entity.getLorenzVec()
                 entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
-            BossType.BACTE,
-            -> {
-                return checkBacte(entityData)
-            }
+            BossType.BACTE -> return checkBacte(entityData)
 
-            BossType.END_ENDER_DRAGON,
-            -> {
-                return checkEnderDragon(entityData)
-            }
+
+            BossType.END_ENDER_DRAGON -> return checkEnderDragon(entityData)
+
 
             else -> return ""
         }
@@ -556,18 +577,21 @@ object DamageIndicatorManager {
     private fun checkBacte(entityData: EntityData): String {
         if (!config.showBactePhase) return ""
         if (currentPhase == BacteApi.Phase.NOT_ACTIVE) return ""
-        entityData.namePrefix = "§c${currentPhase.ordinal}/${BacteApi.Phase.PHASE_5.ordinal} "
+        if (RiftApi.config.area.colosseum.bactePhaseDisplay) {
+            entityData.namePrefix = "§c${currentPhase.ordinal}/${BacteApi.Phase.PHASE_5.ordinal} "
+        }
         return ""
     }
 
-    private fun checkBlazeSlayer(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
+    private fun checkBlazeSlayer(entity: Mob, entityData: EntityData, health: Int, maxHealth: Int): String {
         var found = false
         for (shield in HellionShield.entries) {
-            val armorStand = entity.getNameTagWith(3, shield.name)
-            if (armorStand != null) {
-                val number = armorStand.name.split(" ♨")[1].substring(0, 1)
+            entity.getNameTagWith(3, shield.name)?.let { armorStand ->
+                val number = armorStand.name.formattedTextCompatLessResets().split(" ♨")[1].substring(0, 1)
                 entity.setHellionShield(shield)
-                entityData.nameAbove = shield.formattedName + " $number"
+                if (SlayerApi.config.blazes.hellion.coloredMobs) {
+                    entityData.nameAbove = shield.formattedName + " $number"
+                }
                 found = true
                 break
             }
@@ -621,13 +645,14 @@ object DamageIndicatorManager {
     }
 
     private fun checkMagmaCube(
-        entity: EntityMagmaCube,
+        entity: MagmaCube,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
     ): String? {
-        val slimeSize = entity.slimeSize
-        entityData.namePrefix = when (slimeSize) {
+        val slimeSize = entity.size
+        val crimsonIsleConfig = SkyHanniMod.feature.crimsonIsle
+        val prefix = when (slimeSize) {
             24 -> "§c1/6"
             22 -> "§e2/6"
             20 -> "§e3/6"
@@ -635,10 +660,16 @@ object DamageIndicatorManager {
             16 -> "§e5/6"
             else -> {
                 val color = NumberUtil.percentageColor(health.toLong(), 10_000_000)
-                entityData.namePrefix = "§a6/6"
+                if (crimsonIsleConfig.magmaBossDisplay) {
+                    entityData.namePrefix = "§a6/6"
+                }
                 return color.getChatColor() + health.shortFormat()
             }
-        } + " §f"
+        }
+
+        if (crimsonIsleConfig.magmaBossDisplay) {
+            entityData.namePrefix = "$prefix §f"
+        }
 
         // hide while in the middle
 //        val position = entity.getLorenzVec()
@@ -684,7 +715,7 @@ object DamageIndicatorManager {
     }
 
     private fun checkEnderSlayer(
-        entity: EntityEnderman,
+        entity: EnderMan,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
@@ -756,19 +787,19 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_4 -> 100
                 else -> 100
             }
-            val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name) {
+            val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
                 group("hits").toInt()
-            } ?: error("No hits number found in ender slayer name '${armorStandHits.name}'")
+            } ?: error("No hits number found in ender slayer name '${armorStandHits.name.formattedTextCompatLessResets()}'")
 
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
-        val ridingEntity = entity.ridingEntity
+        val ridingEntity = entity.vehicle
         // Laser phase
         if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
-            val ticksAlive = ridingEntity.ticksExisted.ticks
+            val ticksAlive = ridingEntity.tickCount.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
@@ -785,7 +816,7 @@ object DamageIndicatorManager {
     }
 
     private fun checkVampireSlayer(
-        entity: EntityOtherPlayerMP,
+        entity: RemotePlayer,
         entityData: EntityData,
         health: Int,
         maxHealth: Int,
@@ -798,8 +829,8 @@ object DamageIndicatorManager {
         }
 
         if (config.maniaCircles) {
-            entity.ridingEntity?.let {
-                val existed = it.ticksExisted
+            entity.vehicle?.let {
+                val existed = it.tickCount
                 if (existed > 40) {
                     val end = (20 * 26) - existed
                     val time = end.toDouble() / 20
@@ -909,13 +940,14 @@ object DamageIndicatorManager {
         }
     }
 
-    private fun grabData(entity: EntityLivingBase): EntityData? {
-        if (data.contains(entity.uniqueID)) return data[entity.uniqueID]
+    private fun grabData(mob: ShMob): EntityData? {
+        val entity = mob.baseEntity
+        if (data.contains(entity.uuid)) return data[entity.uuid]
 
-        val entityResult = mobFinder?.tryAdd(entity) ?: return null
+        val entityResult = mobFinder?.tryAdd(mob) ?: return null
 
         val entityData = EntityData(
-            entity,
+            mob,
             entityResult.ignoreBlocks,
             entityResult.delayedStart,
             entityResult.finalDungeonBoss,
@@ -932,12 +964,12 @@ object DamageIndicatorManager {
         }
     }
 
-    private fun setMaxHealth(entity: EntityLivingBase, currentMaxHealth: Long) {
-        maxHealth[entity.uniqueID!!] = currentMaxHealth
+    private fun setMaxHealth(entity: LivingEntity, currentMaxHealth: Long) {
+        maxHealth[entity.uuid!!] = currentMaxHealth
     }
 
-    private fun getMaxHealthFor(entity: EntityLivingBase): Long {
-        return maxHealth.getOrDefault(entity.uniqueID!!, 0L)
+    private fun getMaxHealthFor(entity: LivingEntity): Long {
+        return maxHealth.getOrDefault(entity.uuid!!, 0L)
     }
 
     @HandleEvent
@@ -948,37 +980,40 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
         val entityData = data.values.find {
             val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
             distance < 4.5
-        }
+        } ?: return
 
+        val showNameAndHealth = entityData.shouldShowNameAndHealth()
         if (isDamageSplash(entity)) {
-            val name = entity.customNameTag.removeColor().replace(",", "")
+            val name = entity.customName.formattedTextCompatLessResets().removeColor().replace(",", "")
 
-            if (entityData != null) {
-                if (config.hideDamageSplash) {
-                    event.cancel()
-                }
-                if (entityData.bossType == BossType.DUMMY) {
-                    val uuid = entity.uniqueID
-                    if (dummyDamageCache.contains(uuid)) return
-                    dummyDamageCache.add(uuid)
-                    val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
-                    entityData.damageCounter.currentDamage += dmg
-                }
+            if (showNameAndHealth && config.hideDamageSplash) {
+                event.cancel()
+            }
+            if (SkyHanniMod.feature.slayer.damageSplashHider && entityData.bossType.isSlayer) {
+                event.cancel()
+            }
+            if (entityData.bossType == BossType.DUMMY) {
+                val uuid = entity.uuid
+                if (dummyDamageCache.contains(uuid)) return
+                dummyDamageCache.add(uuid)
+                val dmg = name.toCharArray().filter { Character.isDigit(it) }.joinToString("").toLong()
+                entityData.damageCounter.currentDamage += dmg
             }
         } else {
-            if (entityData != null && config.hideVanillaNametag && entityData.isConfigEnabled()) {
-                val name = entity.name
+            if (showNameAndHealth && config.hideVanillaNametag) {
+                val name = entity.name.string
                 if (name.contains("Plasmaflux")) return
                 if (name.contains("Overflux")) return
                 if (name.contains("Mana Flux")) return
                 if (name.contains("Radiant")) return
+                if (!entity.hasCustomName()) return
                 event.cancel()
             }
         }
@@ -986,7 +1021,7 @@ object DamageIndicatorManager {
 
     @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        val data = data[event.entity.uniqueID] ?: return
+        val data = data[event.entity.uuid] ?: return
         if (event.health <= 1) {
             if (!data.firstDeath) {
                 data.firstDeath = true

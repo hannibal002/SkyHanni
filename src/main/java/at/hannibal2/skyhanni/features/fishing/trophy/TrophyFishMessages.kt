@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -75,20 +74,16 @@ object TrophyFishMessages {
                 else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
             }
             "§6♔ §6§lTROPHY FISH! $designFormat".asComponent()
-        } else event.chatComponent
+        } else event.chatComponent.copy()
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
-            edited.appendComponent((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
+            edited.append((" §7(${total.addSeparators()}${total.ordinal()} total)"))
         }
 
         if (config.tooltip) {
             getTooltip(internalName)?.let {
-                //#if MC < 1.21
-                edited.chatStyle = it
-                //#else
-                //$$ edited.getWithStyle(it)
-                //#endif
+                edited.toFlatList(it)
             }
         }
 

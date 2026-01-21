@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.item.ItemStack
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.item.ItemStack
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,7 +68,7 @@ object AuctionHouseOpenPriceWebsite {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
-        if (event.inventory is InventoryPlayer) return
+        if (event.inventory is Inventory) return
 
         if (event.slot == 8) {
             displayItem?.let {

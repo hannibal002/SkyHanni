@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
@@ -108,10 +109,11 @@ object PetUtils {
     /**
      * REGEX-TEST: §7§eRight-click to add this pet to
      * REGEX-TEST: §7§eRight-click to add this pet to your
+     * REGEX-TEST: §eRight-click to add this pet to your
      */
     private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.lore",
-        "§7§eRight-click to add this pet to(?: your)?",
+        "(?:§7)?§eRight-click to add this pet to(?: your)?",
     )
     // </editor-fold>
 
@@ -296,11 +298,11 @@ object PetUtils {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesthashigher") {
+        event.registerBrigadier("shtesthashigher") {
             description = "Test has higher tier"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                ChatUtils.chat("${it[0].toInternalName().hasValidHigherTier()}")
+            argCallback("id", BrigadierArguments.greedyString()) {
+                ChatUtils.chat("${it.toInternalName().hasValidHigherTier()}")
             }
         }
     }
