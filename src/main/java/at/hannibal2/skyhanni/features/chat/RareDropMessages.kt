@@ -95,10 +95,9 @@ object RareDropMessages {
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
      * REGEX-TEST: §r§6§lRARE DROP! §r§fEnchanted Book (Corruption I§r§f) §r§b(+§r§b314 §r§b✯ Magic Find§r§b)§r
      */
-    @Suppress("MaxLineLength")
-    private val enchantedBookPattern by repoGroup.pattern(
-        "enchantedbook",
-        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book(?<bookname> \\(.*\\))?(?<end> §r§b\\(\\+(?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\))?.*",
+    private val bookReplacerPattern by repoGroup.pattern(
+        "bookreplacerpattern",
+        "(?:§.)+RARE DROP! (?<replacePart>(?:§.)+Enchanted Book \\(.*(?:§.)+\\)*) §r§b\\(\\+(?:§.)*\\d*%? §r§b✯ Magic Find§r§b\\)?.*"
     )
 
     private val petPatterns = listOf(
@@ -148,9 +147,9 @@ object RareDropMessages {
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
             val message = line.chatMessage
-            if (enchantedBookPattern.matches(message)) {
-                enchantedBookPattern.matchMatcher(message) {
-                    bookItemName = group("bookname")
+            if (bookReplacerPattern.matches(message)) {
+                bookReplacerPattern.matchMatcher(message) {
+                    bookItemName = group("replacePart")
                 }
                 anyRecentMessage = true
                 break
@@ -159,9 +158,9 @@ object RareDropMessages {
 
         if (anyRecentMessage && config.enchantedBook) {
             ChatUtils.editFirstMessage(
-                component = { it.formattedTextCompat().replace("Enchanted Book$bookItemName", internalName.repoItemName).asComponent() },
+                component = { it.formattedTextCompat().replace(bookItemName, internalName.repoItemName).asComponent() },
                 "enchanted book",
-                predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) },
+                predicate = { it.passedSinceSent() < 1.seconds && bookReplacerPattern.matches(it.chatMessage) },
             )
         }
 
