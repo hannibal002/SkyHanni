@@ -153,7 +153,7 @@ object ChatUtils {
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
-            consoleLog(formattedMessage.removeColor())
+            consoleLog(message.string.removeColor())
             return false
         }
 

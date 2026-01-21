@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? > 1.21.8 {
 /*import net.minecraft.client.gui.font.TextRenderable;
-import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph;
+import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 *///?}
 
 //? < 1.21.6 {

@@ -77,17 +77,17 @@ object TextHelper {
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
-    fun Component.send(id: Int = 0) =
-        addDeletableMessageToChat(this, id)
+    fun Component.send(id: Int = 0, bypassSelfMessages: Boolean = false) =
+        addDeletableMessageToChat(this, id, bypassSelfMessages)
 
-    fun List<Component>.send(id: Int = 0) {
+    fun List<Component>.send(id: Int = 0, bypassSelfMessages: Boolean = false) {
         val parent = "".asComponent()
         forEach {
             parent.siblings.add(it)
             parent.siblings.add("\n".asComponent())
         }
 
-        parent.send(id)
+        parent.send(id, bypassSelfMessages)
     }
 
     fun Component.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
