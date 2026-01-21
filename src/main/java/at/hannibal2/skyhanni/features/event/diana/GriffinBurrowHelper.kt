@@ -571,6 +571,15 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetburrows") {
+            description = "Resets all saved griffin burrow locations"
+            category = CommandCategory.USERS_RESET
+            callback {
+                resetAllData()
+                ChatUtils.chat("Manually reset all burrow data.")
+            }
+        }
+
         event.registerBrigadier("shtestburrow") {
             description = "Sets a test burrow waypoint at your location"
             category = CommandCategory.DEVELOPER_TEST

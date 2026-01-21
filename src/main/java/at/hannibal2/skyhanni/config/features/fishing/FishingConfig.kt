@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -123,4 +124,9 @@ class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var muteBanshee: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Flay/Whip Hider", desc = "Hides Flaming Flay/Soul Whip particles that are within this Distance of you")
+    @ConfigEditorSlider(minValue = 0.0f, maxValue = 15.0f, minStep = 1f)
+    var flayHideDistance: Float = 2.0f
 }

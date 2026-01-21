@@ -66,15 +66,15 @@ enum class CropType(
     ),
     SUNFLOWER(
         "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { "DOUBLE_PLANT".toInternalName().getItemStack() }, "sunflower", FarmingItemType.SUNFLOWER,
+        { "DOUBLE_PLANT".toInternalName().getItemStack() }, "sunflower", FarmingItemType.SUNFLOWER, replenish = true,
     ),
     MOONFLOWER(
         "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { "MOONFLOWER".toInternalName().getItemStack() }, "moonflower", FarmingItemType.MOONFLOWER,
+        { "MOONFLOWER".toInternalName().getItemStack() }, "moonflower", FarmingItemType.MOONFLOWER, replenish = true,
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { "WILD_ROSE".toInternalName().getItemStack() }, "rose", FarmingItemType.WILD_ROSE,
+        { "WILD_ROSE".toInternalName().getItemStack() }, "rose", FarmingItemType.WILD_ROSE, replenish = true,
     ),
     ;
 

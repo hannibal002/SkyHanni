@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.config.features.garden.pests
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.garden.pests.BonusPestChanceDisplay.DisplayFormat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestsConfig {
     @Expose
@@ -70,9 +72,8 @@ class PestsConfig {
 
     @Expose
     @ConfigOption(name = "Bonus Chance Display", desc = "Displays your bonus pest chance and if it is enabled or not.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var pestChanceDisplay: Boolean = false
+    @ConfigEditorDropdown
+    val pestChanceDisplay: Property<DisplayFormat> = Property.of(DisplayFormat.DISABLED)
 
     @Expose
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")

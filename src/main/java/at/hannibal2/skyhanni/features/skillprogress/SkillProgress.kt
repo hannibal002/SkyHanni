@@ -497,7 +497,7 @@ object SkillProgress {
 
         if (xpInfo.lastTotalXP > 0) {
             val delta = totalXP - xpInfo.lastTotalXP
-            if (delta > 0 && delta < 1000) {
+            if (delta > 0) {
 
                 xpInfo.timer = when (SkillApi.activeSkill) {
                     SkillType.FARMING -> etaConfig.farmingPauseTime
