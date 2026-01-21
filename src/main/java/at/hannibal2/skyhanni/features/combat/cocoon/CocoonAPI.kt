@@ -52,7 +52,6 @@ object CocoonAPI {
             if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == id) }) return
             val position = entity.getLorenzVec()
             val mob = getCocoonMob(position) ?: return
-            ChatUtils.debug("Possible Cocooned Mob: ${mob.name}")
             val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
             if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
             existingCocoons.add(cocoon)
