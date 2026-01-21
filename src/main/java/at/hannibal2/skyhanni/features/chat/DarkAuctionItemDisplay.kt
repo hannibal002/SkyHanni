@@ -58,7 +58,10 @@ object DarkAuctionItemDisplay {
             ChatUtils.debug("lastItem is $lastItem")
             val item = lastItem ?: return@matchMatcher
 
-            event.chatComponent = event.chatComponent.copy().appendWithColor(" ($item)", ChatFormatting.GRAY)
+            event.replaceComponent(
+                event.chatComponent.copy().appendWithColor(" ($item)", ChatFormatting.GRAY),
+                "dark_auction_item",
+            )
             lastItem = null
             return
         }
