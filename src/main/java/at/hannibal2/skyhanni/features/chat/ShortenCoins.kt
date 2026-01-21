@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.replace
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.RegexUtils.findAll
+import at.hannibal2.skyhanni.utils.compat.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -17,32 +17,38 @@ object ShortenCoins {
     private val patternGroup = RepoPattern.group("chat.coins")
 
     /**
-     * REGEX-TEST: §6[Auction] §aEuropaPlus §ebought §fAtmospheric Filter §efor §62,650,000 coins §lCLICK
-     * REGEX-TEST: §aYou sold §r§aCicada Symphony Vinyl§r§8 x1 §r§afor §r§650,000 Coins§r§a!
-     * REGEX-TEST: §6§lALLOWANCE! §r§eYou earned §r§650,000 coins§r§e!
-     * REGEX-TEST: §6[Bazaar] §r§7§r§eSell Offer Setup! §r§a5§r§7x §r§9Enchanted Melon Block §r§7for §r§6250,303 coins§r§7.
-     * REGEX-FAIL: §aYou have withdrawn §r§610.5k coins§r§a! You now have §r§6991.1M coins §r§ain your account!
-     * REGEX-FAIL: §6:typing:  §f-  §e✎§6...
+     * REGEX-TEST: [Auction] EuropaPlus bought Atmospheric Filter for 2,650,000 coins §lCLICK
+     * REGEX-TEST: You sold Cicada Symphony Vinyl x1 for 650,000 Coins!
+     * REGEX-TEST: ALLOWANCE! You earned 50,000 coins!
+     * REGEX-TEST: [Bazaar] Sell Offer Setup! 5x Enchanted Melon Block for 250,303 coins.
+     * REGEX-TEST: [NPC] Sirius: The highest bidder was LOMENJUICE with a bid of 8,620,000 Coins!
+     * REGEX-FAIL: You have withdrawn 10.5k coins§r§a! You now have 991.1M coins in your account!
+     * REGEX-FAIL: :typing:  -  ✎...
+     * REGEX-FAIL: Profile ID: 23a8da75-5655-49b2-89e7-31b9d2a7ab7b
      */
     private val coinsPattern by patternGroup.pattern(
-        "format",
-        "§6(?<amount>\\d[\\d,.]+)(?![\\d.,kMB])",
+        "format-no-color",
+        "(?<amount>\\d[\\d,.]+)(?![\\d.,kMB]) ",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.shortenCoinAmounts) return
-        val message = event.message
-        val modifiedMessage = coinsPattern.replace(message) {
-            "§6${group("amount").formatDouble().shortFormat()}"
-        }.takeIf { it != message } ?: return
-
-        val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
-
-        val newComponent = modifiedMessage.asComponent {
-            style = originalComponent.style
+        val message = event.cleanMessage
+        var newComp = event.chatComponent.copy()
+        var found = false
+        for (amount in coinsPattern.findAll(message)) {
+            val trimmed = amount.trim()
+            val formatted = trimmed.formatDoubleOrNull() ?: continue
+            val editedComp = newComp.replace(Regex("^$trimmed"), formatted.shortFormat())
+            if (editedComp != null) {
+                newComp = editedComp
+                found = true
+            }
         }
-        event.replaceComponent(newComponent, "shortened_coins")
+        if (!found) return
+
+        event.replaceComponent(newComp, "shortened_coins")
     }
 
     fun Number.formatChatCoins(): String {
