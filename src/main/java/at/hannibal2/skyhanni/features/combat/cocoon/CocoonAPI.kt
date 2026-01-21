@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -16,15 +15,16 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
+import kotlin.time.Duration.Companion.seconds
 
-@Suppress("MaxLineLength")
 @SkyHanniModule
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    val existingCocoons: MutableList<CocoonMob> = mutableListOf()
+    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(30.seconds)
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
 
     data class CocoonMob(
@@ -37,7 +37,7 @@ object CocoonAPI {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
+    fun onTick() {
         existingCocoons.forEach { cocoon ->
             if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen()
         }
@@ -54,8 +54,8 @@ object CocoonAPI {
         if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
         if (event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
             existingCocoons.add(cocoon)
-            ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-            logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+            ChatUtils.debug("name: (${mob.name}), Type: (${mob.mobType}), Cocoon ID: (${cocoon.cocoonID}) Entered List")
+            logger.log("${mob.name} Cocoon (${cocoon.cocoonID} Entered List")
             CocoonSpawnEvent(cocoon).post()
         }
     }
@@ -64,8 +64,10 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
-        ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID}) Left World After ${cocoon.spawnTime.passedSince()}")
-        logger.log("${cocoon.mob.name} (Type: ${cocoon.mob.mobType}) Cocoon (${cocoon.cocoonID}) Left World after ${cocoon.spawnTime.passedSince()}")
+        val cocoonMob = cocoon.mob
+        val timeSince = cocoon.spawnTime.passedSince()
+        ChatUtils.debug("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
+        logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 
