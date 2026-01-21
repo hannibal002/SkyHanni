@@ -382,7 +382,7 @@ private fun replace(component: Component, oldValue: Any, newValue: String): Muta
     val newComp = Component.empty()
     var hasEdited = false
 
-    component.visit( { style: Style?, string: String? ->
+    component.visit({ style: Style?, string: String? ->
         val edit: String?
         if (oldValue is String) {
             edit = string?.replace(oldValue, newValue)
@@ -405,23 +405,24 @@ fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: B
     val newComp = Component.empty()
     var hasEdited = false
 
-    this.visit( { currentStyle: Style?, string: String? ->
+    this.visit({ currentStyle: Style?, string: String? ->
         if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited)) {
             val split = string.split(oldValue)
-            newComp.append(componentBuilder {
-                for ((index, str) in split.withIndex()) {
-                    append(Component.literal(str).withStyle(currentStyle))
-                    if (index < split.size - 1) {
-                        if (!onlyReplaceFirst || !hasEdited) {
-                            append(newValue)
-                            hasEdited = true
-                        } else {
-                            append(oldValue) {
-                                style = currentStyle
+            newComp.append(
+                componentBuilder {
+                    for ((index, str) in split.withIndex()) {
+                        append(Component.literal(str).withStyle(currentStyle))
+                        if (index < split.size - 1) {
+                            if (!onlyReplaceFirst || !hasEdited) {
+                                append(newValue)
+                                hasEdited = true
+                            } else {
+                                append(oldValue) {
+                                    style = currentStyle
+                                }
                             }
                         }
                     }
-                }
             })
         } else {
             newComp.append(Component.literal(string).withStyle(currentStyle))
