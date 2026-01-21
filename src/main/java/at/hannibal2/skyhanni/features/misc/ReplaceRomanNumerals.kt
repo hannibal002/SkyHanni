@@ -30,70 +30,9 @@ object ReplaceRomanNumerals {
     private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
-    private val patternGroup = RepoPattern.group("replace.roman.numerals")
-
-    @Suppress("MaxLineLength")
-    private val allowedPatterns by patternGroup.list(
-        "allowed.patterns",
-        "§o§a(?:Combat|Farming|Fishing|Mining|Foraging|Enchanting|Alchemy|Carpentry|Runecrafting|Taming|Social|)( Level)? (?<roman>[IVXLCDM]+)§r",
-        "(?:§5§o)?§7Progress to (?:Collection|Level|Tier|Floor|Milestone|Chocolate Factory) (?<roman>[IVXLCDM]+): §.(?:.*)%",
-        "§5§o  §e(?:\\w+) (?<roman>[IVXLCDM]+)",
-        "(?:§.)*Abiphone (?<roman>[IVXLCDM]+) .*",
-        "§o§a§a(?:§c§lMM§c )?The Catacombs §8- §eFloor (?<roman>[IVXLCDM]+)§r",
-        ".*Extra Farming Fortune (?<roman>[IVXLCDM]+)",
-        ".*(?:Collection|Level|Tier|Floor|Milestone) (?<roman>[IVXLCDM]+)(?: ?§(?:7|r).*)?",
-        "(?:§5§o§a ✔|§5§o§c ✖) §.* (?<roman>[IVXLCDM]+)",
-        "§o§a✔ §.* (?<roman>[IVXLCDM]+)§r",
-        "§5§o§7Purchase §a.* (?<roman>[IVXLCDM]+) §7.*",
-        "§5§o(?:§7)§.(?<roman>[IVXLCDM]+).*",
-        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*",
-    )
-
-    /**
-     * REGEX-TEST: §eSelect an option: §r§a[§aOk, then what?§a]
-     */
-    private val isSelectOptionPattern by patternGroup.pattern(
-        "string.isselectoption",
-        "§eSelect an option: .*",
-    )
-
-    // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipEvent) {
-        if (!isEnabled()) return
-
-        event.toolTip.replaceAll { it.tryReplace() }
-    }
-
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onChatHover(event: ChatHoverEvent) {
-        if (event.getHoverEvent().action() != HoverEvent.Action.SHOW_TEXT) return
-        if (!isEnabled()) return
-
-        val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
-        lore.replaceAll { it.tryReplace() }
-
-        val chatComponentText = lore.joinToString("\n").asComponent()
-        val hoverEvent = HoverEvent.ShowText(chatComponentText)
-
-        GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
-    }
-
-    @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent) {
-        if (!isEnabled() || event.message.isSelectOption()) return
-        event.applyIfPossible { it.tryReplace() }
-    }
-
     @HandleEvent(priority = HandleEvent.LOW)
     fun onRepoReload(event: RepositoryReloadEvent) {
         cachedStrings.clear()
-    }
-
-    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
-
-    private fun String.tryReplace(): String = cachedStrings.getOrPut(this) {
-        if (allowedPatterns.matches(this)) replace() else this
     }
 
     fun replaceLine(line: String): String {
@@ -115,10 +54,6 @@ object ReplaceRomanNumerals {
     private fun String.coloredRomanToDecimal() = removeFormatting().let { replace(it, it.romanToDecimal().toString()) }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals.get()
-
-    init {
-        RecalculatingValue
-    }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
