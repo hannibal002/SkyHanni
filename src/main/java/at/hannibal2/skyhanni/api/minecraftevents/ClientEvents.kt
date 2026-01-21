@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -107,11 +109,17 @@ object ClientEvents {
     private var lastResult: Component? = null
 
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
-        lastMessage = message
+        // if we created the message we don't want to pipe it back into our events
+        try {
+            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return true
+        } catch (exception: Exception) {
+            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
+        }
         if (actionBar) {
             // we never cancel the action bar
             return true
         }
+        lastMessage = message
 
         val (result, cancel) = ChatManager.onChatReceive(message)
         lastResult = result
@@ -128,6 +136,11 @@ object ClientEvents {
     }
 
     private fun onModify(message: Component, actionBar: Boolean): Component {
+        try {
+            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return message
+        } catch (exception: Exception) {
+            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
+        }
         // we check if the message is the same as the one from allow
         // if someone else modifies the message it won't be the same but what can you do about that
         if (lastMessage == message && !actionBar) {
