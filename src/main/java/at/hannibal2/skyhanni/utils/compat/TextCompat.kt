@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessageTag
@@ -371,27 +371,26 @@ fun List<Any>.mapToComponents(): List<Component> {
  * AKA they have to have the same Style
  */
 fun Component.replace(oldValue: String, newValue: String): MutableComponent? {
-    val newComp = Component.empty()
-    var hasEdited = false
-
-    this.visit( { style: Style?, string: String? ->
-        val edit = string?.replace(oldValue, newValue)
-        if (edit != string) hasEdited = true
-
-        newComp.append(Component.literal(edit).withStyle(style))
-        Optional.empty<Component>()
-    }, Style.EMPTY)
-
-    if (!hasEdited) return null
-    return newComp
+    return replace(this, oldValue, newValue)
 }
 
 fun Component.replace(oldValue: Regex, newValue: String): MutableComponent? {
+    return replace(this, oldValue, newValue)
+}
+
+private fun replace(component: Component, oldValue: Any, newValue: String): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
-    this.visit( { style: Style?, string: String? ->
-        val edit = string?.replace(oldValue, newValue)
+    component.visit( { style: Style?, string: String? ->
+        val edit: String?
+        if (oldValue is String) {
+            edit = string?.replace(oldValue, newValue)
+        } else if (oldValue is Regex) {
+            edit = string?.replace(oldValue, newValue)
+        } else {
+            ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+        }
         if (edit != string) hasEdited = true
 
         newComp.append(Component.literal(edit).withStyle(style))
@@ -401,6 +400,39 @@ fun Component.replace(oldValue: Regex, newValue: String): MutableComponent? {
     if (!hasEdited) return null
     return newComp
 }
+
+fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: Boolean = false): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    this.visit( { currentStyle: Style?, string: String? ->
+        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited)) {
+            val split = string.split(oldValue)
+            newComp.append(componentBuilder {
+                for ((index, str) in split.withIndex()) {
+                    append(Component.literal(str).withStyle(currentStyle))
+                    if (index < split.size - 1) {
+                        if (!onlyReplaceFirst || !hasEdited) {
+                            append(newValue)
+                            hasEdited = true
+                        } else {
+                            append(oldValue) {
+                                style = currentStyle
+                            }
+                        }
+                    }
+                }
+            })
+        } else {
+            newComp.append(Component.literal(string).withStyle(currentStyle))
+        }
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
+}
+
 
 operator fun Component.plus(string: String): Component {
     return this.append(string)
