@@ -423,7 +423,8 @@ fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: B
                             }
                         }
                     }
-            })
+                }
+            )
         } else {
             newComp.append(Component.literal(string).withStyle(currentStyle))
         }
