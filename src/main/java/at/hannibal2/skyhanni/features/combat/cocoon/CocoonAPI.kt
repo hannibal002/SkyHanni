@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -47,17 +46,17 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEquipmentChangeEvent(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
-            val entity = event.entity
-            val id = entity.id
-            if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == id) }) return
-            val position = entity.getLorenzVec()
-            val mob = getCocoonMob(position) ?: return
-            val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
-            if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
-            existingCocoons.add(cocoon)
-            ChatUtils.debug("name: (${mob.name}), Type: (${mob.mobType}), Cocoon ID: (${cocoon.cocoonID}) Entered List")
-            logger.log("${mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-            CocoonSpawnEvent(cocoon).post()
+        val entity = event.entity
+        val id = entity.id
+        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == id) }) return
+        val position = entity.getLorenzVec()
+        val mob = getCocoonMob(position) ?: return
+        val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
+        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
+        existingCocoons.add(cocoon)
+        ChatUtils.debug("name: (${mob.name}), Type: (${mob.mobType}), Cocoon ID: (${cocoon.cocoonID}) Entered List")
+        logger.log("${mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+        CocoonSpawnEvent(cocoon).post()
     }
 
 
