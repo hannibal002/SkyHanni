@@ -433,7 +433,6 @@ fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: B
     return newComp
 }
 
-
 operator fun Component.plus(string: String): Component {
     return this.append(string)
 }
