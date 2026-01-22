@@ -120,7 +120,7 @@ object PigFeaturesApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isYearOfThePig()) return
         val message = event.message
 

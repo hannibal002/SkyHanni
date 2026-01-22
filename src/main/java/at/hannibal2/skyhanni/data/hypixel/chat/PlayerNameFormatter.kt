@@ -60,7 +60,7 @@ object PlayerNameFormatter {
     )
 
     @HandleEvent
-    fun onPlayerAllChat(event: PlayerAllChatEvent) {
+    fun onPlayerAllChat(event: PlayerAllChatEvent.Modify) {
         if (!isEnabled()) return
         val levelColor = event.levelColor
         val levelComponent = event.levelComponent
@@ -88,7 +88,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onCoopChat(event: CoopChatEvent) {
+    fun onCoopChat(event: CoopChatEvent.Modify) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -101,7 +101,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onGuildChat(event: GuildChatEvent) {
+    fun onGuildChat(event: GuildChatEvent.Modify) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -114,7 +114,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onPartyChat(event: PartyChatEvent) {
+    fun onPartyChat(event: PartyChatEvent.Modify) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -127,7 +127,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onPrivateChat(event: PrivateMessageChatEvent) {
+    fun onPrivateChat(event: PrivateMessageChatEvent.Modify) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
@@ -141,7 +141,7 @@ object PlayerNameFormatter {
     }
 
     @HandleEvent
-    fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
+    fun onPlayerShowItemChat(event: PlayerShowItemChatEvent.Modify) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,

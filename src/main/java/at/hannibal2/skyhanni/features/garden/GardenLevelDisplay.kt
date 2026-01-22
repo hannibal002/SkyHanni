@@ -99,7 +99,7 @@ object GardenLevelDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
 
         visitorRewardPattern.matchMatcher(event.message) {
             addExp(group("exp").toInt())

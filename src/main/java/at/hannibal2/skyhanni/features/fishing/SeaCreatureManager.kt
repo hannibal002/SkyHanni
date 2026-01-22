@@ -9,6 +9,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -39,10 +43,12 @@ object SeaCreatureManager {
         "§e> Your bottle of thunder has fully charged!",
     )
 
+    private val config get() = SkyHanniMod.feature.fishing
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (doubleHookPattern.matches(event.message)) {
-            if (SkyHanniMod.feature.fishing.compactDoubleHook) {
+            if (config.compactDoubleHook) {
                 event.blockedReason = "double_hook"
             }
             doubleHook = true
@@ -54,7 +60,44 @@ object SeaCreatureManager {
         ) return
 
         getSeaCreatureFromMessage(event.message)?.let {
-            SeaCreatureFishEvent(it, event, doubleHook).post()
+            SeaCreatureFishEvent(it, doubleHook).post()
+            if (config.seaCreatureTracker.hideChat) {
+                event.blockedReason = "sea_creature_tracker"
+            }
+            return
+        }
+
+        doubleHook = false
+    }
+
+    // if you can do it better make a pr
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        if (doubleHookPattern.matches(event.message)) {
+            doubleHook = true
+            return
+        }
+
+        if (thunderBottleChargedPattern.matches(event.message) ||
+            PetStorageApi.isAutopetMessage(event.message)
+        ) return
+
+        getSeaCreatureFromMessage(event.message)?.let {
+            val original = event.chatComponent.formattedTextCompat()
+            var edited = original
+
+            if (config.shortenFishingMessage) {
+                val name = it.displayName
+                val aOrAn = StringUtils.optionalAn(name.removeColor())
+                edited = "§9You caught $aOrAn $name§9!"
+            }
+
+            if (config.compactDoubleHook && doubleHook) {
+                edited = "§e§lDOUBLE HOOK! $edited"
+            }
+
+            if (original == edited) return
+            event.replaceComponent(edited.asComponent(), "sea_creature")
         }
 
         doubleHook = false

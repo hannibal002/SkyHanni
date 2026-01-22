@@ -108,7 +108,7 @@ object StashCompact {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         // TODO make a system for detecting message "groups" (multiple consecutive messages)

@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.replace
 import net.minecraft.network.chat.Component
 
@@ -44,12 +43,13 @@ object FixIronman {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Modify) {
         // We don't need to always fix this
         if (!TimeUtils.isAprilFoolsDay) return
 
         if (event.message.contains("Ironman")) {
-            event.chatComponent = event.message.replace("Ironman", "Ironperson").asComponent()
+            val newComponent = event.chatComponent.replace("Ironman", "Ironperson") ?: return
+            event.replaceComponent(newComponent, "fix_ironman")
         }
     }
 

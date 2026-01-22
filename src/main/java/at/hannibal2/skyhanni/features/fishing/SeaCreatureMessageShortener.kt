@@ -12,25 +12,11 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 @SkyHanniModule
 object SeaCreatureMessageShortener {
 
-    private val config get() = SkyHanniMod.feature.fishing
+
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
 
-        val original = event.chatEvent.chatComponent.formattedTextCompat()
-        var edited = original
 
-        if (config.shortenFishingMessage) {
-            val name = event.seaCreature.displayName
-            val aOrAn = StringUtils.optionalAn(name.removeColor())
-            edited = "§9You caught $aOrAn $name§9!"
-        }
-
-        if (config.compactDoubleHook && event.doubleHook) {
-            edited = "§e§lDOUBLE HOOK! $edited"
-        }
-
-        if (original == edited) return
-        event.chatEvent.chatComponent = edited.asComponent()
     }
 }

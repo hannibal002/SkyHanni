@@ -51,7 +51,7 @@ object BacteApi {
     private var bacte: Mob? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChatMessage(event: SkyHanniChatEvent) {
+    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
         nameChatPattern.matchMatcher(event.message) {
             currentPhase = Phase.fromNumber(group("name").length)
         }

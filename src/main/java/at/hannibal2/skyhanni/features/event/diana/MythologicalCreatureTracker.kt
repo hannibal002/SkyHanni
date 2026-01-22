@@ -61,7 +61,7 @@ object MythologicalCreatureTracker {
     ) : TrackerData()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
         if (config.shardWarn) {
@@ -84,15 +84,35 @@ object MythologicalCreatureTracker {
             val since = it.since
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 val trackerId = creatureEntry.trackerId
-                if (creatureEntry == type) {
-                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
-                    since[trackerId] = 0
-                } else {
+                if (creatureEntry != type) {
                     since.addOrPut(trackerId, 1)
                 }
             }
         }
         if (config.hideChat) event.blockedReason = "mythological_creature_dug"
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
+
+        val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
+            ErrorManager.skyHanniError(
+                "Unknown mythological creature $creatureMatch",
+                "message" to event.message,
+            )
+        }
+
+        tracker.modify {
+            val since = it.since
+            for (creatureEntry in DianaApi.mythologicalCreatures.values) {
+                val trackerId = creatureEntry.trackerId
+                if (creatureEntry == type) {
+                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
+                    since[trackerId] = 0
+                }
+            }
+        }
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {

@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -362,7 +361,7 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (claimMessagePattern.matches(event.message) && ExperimentationMessages.DONE.isSelected()) {
             event.blockedReason = "CLAIM_MESSAGE"
             return
@@ -373,7 +372,7 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun SkyHanniChatEvent.tryBlockChat(reward: String) {
+    private fun SkyHanniChatEvent.Allow.tryBlockChat(reward: String) {
         val rewardInternalName = NeuInternalName.fromItemNameOrNull(reward)
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"

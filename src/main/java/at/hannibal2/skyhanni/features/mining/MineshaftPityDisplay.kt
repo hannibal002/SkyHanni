@@ -123,7 +123,7 @@ object MineshaftPityDisplay {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!MiningApi.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
@@ -170,7 +170,7 @@ object MineshaftPityDisplay {
                 hover = TextHelper.multiline(hoverText)
             }
 
-            if (config.modifyChatMessage) event.chatComponent = newComponent
+            if (config.modifyChatMessage) event.replaceComponent(newComponent, "shaft_count")
         }
     }
 

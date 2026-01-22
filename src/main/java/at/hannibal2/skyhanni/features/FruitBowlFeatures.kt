@@ -186,7 +186,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSystemMessage(event: SystemMessageEvent) {
+    fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!inHand) return
 
         val message = event.cleanMessage

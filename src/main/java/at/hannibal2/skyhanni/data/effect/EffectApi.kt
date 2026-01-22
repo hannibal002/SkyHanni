@@ -128,7 +128,7 @@ object EffectApi {
     // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
     // TODO: Move these to repo
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
             val durationAdded = TimeUtils.getDuration(group("time"))
             EffectDurationChangeEvent(

@@ -56,7 +56,7 @@ object ArachneKillTimer {
     private var arachneKillTime = Duration.ZERO
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (arachneCallingSpawnedPattern.matches(event.message) || arachneCrystalSpawnedPattern.matches(event.message)) {
             arachneSpawnedTime = SimpleTimeMark.now()

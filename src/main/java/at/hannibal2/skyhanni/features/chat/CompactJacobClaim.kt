@@ -110,13 +110,13 @@ object CompactJacobClaim {
         CropType.MOONFLOWER to Pair(LorenzColor.AQUA, "Mf"),
     )
 
-    private fun SkyHanniChatEvent.block(reason: String) {
+    private fun SkyHanniChatEvent.Allow.block(reason: String) {
         messageSet.add(message)
         blockedReason = reason
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.compactJacobClaim) return
         val message = event.message
         var eventDelay = 300.milliseconds

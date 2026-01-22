@@ -250,7 +250,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
         if (IslandTypeTags.IS_COLD.inAny()) {
             if (coldResetPattern.matches(event.message)) {

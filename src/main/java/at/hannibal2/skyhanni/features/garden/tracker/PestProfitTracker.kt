@@ -166,9 +166,25 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         event.checkPestChats()
         event.checkSprayChats()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        val message = event.message
+        pestRareDropPattern.matchMatcher(message) {
+            val itemGroup = group("item")
+            val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
+            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            1.fixAmount(internalName, pest).also {
+                if (it == 1) return@also
+                // If the amount was fixed, edit the chat message to reflect the change
+                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
+                event.replaceComponent(fixedString.asComponent(), "pest_drops")
+            }
+        }
     }
 
     @HandleEvent
@@ -184,7 +200,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         ConditionalUtils.onToggle(config.coinsPerBit, config.includeBits) { update() }
     }
 
-    private fun SkyHanniChatEvent.checkPestChats() {
+    private fun SkyHanniChatEvent.Allow.checkPestChats() {
         PestApi.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
@@ -212,12 +228,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
-            val amount = 1.fixAmount(internalName, pest).also {
-                if (it == 1) return@also
-                // If the amount was fixed, edit the chat message to reflect the change
-                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
-                chatComponent = fixedString.asComponent()
-            }
+            val amount = 1.fixAmount(internalName, pest)
 
             // Happens here so that the amount is fixed independently of tracker being enabled
 
@@ -238,7 +249,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
     }
 
-    private fun SkyHanniChatEvent.checkSprayChats() {
+    private fun SkyHanniChatEvent.Allow.checkSprayChats() {
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }

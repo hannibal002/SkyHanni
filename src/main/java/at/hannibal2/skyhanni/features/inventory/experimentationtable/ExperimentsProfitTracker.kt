@@ -86,7 +86,7 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         experimentRenewPattern.matchMatcher(event.cleanMessage) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
