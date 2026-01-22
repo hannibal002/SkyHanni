@@ -76,7 +76,7 @@ object CFBarnManager {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Modify) {
-         HoppityEggsManager.duplicateRabbitFound.matchMatcher(event.message) {
+        HoppityEggsManager.duplicateRabbitFound.matchMatcher(event.message) {
             event.duplicateFoundMessage(group("amount"))
         }
     }

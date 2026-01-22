@@ -310,40 +310,34 @@ object PlayerChatManager {
     private fun sendSystemMessage(event: SkyHanniChatEvent.Allow) {
         with(SystemMessageEvent.Allow(event.message, event.chatComponent)) {
             post()
-            event.handleChat(blockedReason, chatComponent)
+            event.handleChat(blockedReason)
         }
     }
 
     private fun sendSystemMessage(event: SkyHanniChatEvent.Modify) {
         with(SystemMessageEvent.Modify(event.message, event.chatComponent)) {
             post()
-            event.handleChat(blockedReason, chatComponent)
+            event.handleChat(chatComponent)
         }
     }
 
     private fun AbstractSourcedChatEvent.Allow.postChat(event: SkyHanniChatEvent.Allow) {
         post()
-        event.handleChat(blockedReason, chatComponent)
+        event.handleChat(blockedReason)
     }
 
     private fun AbstractSourcedChatEvent.Modify.postChat(event: SkyHanniChatEvent.Modify) {
         post()
-        event.handleChat(blockedReason, chatComponent)
+        event.handleChat(chatComponent)
     }
 
-    private fun SkyHanniChatEvent.Allow.handleChat(
-        blockedReason: String?,
-        chatComponent: Component,
-    ) {
+    private fun SkyHanniChatEvent.Allow.handleChat(blockedReason: String?) {
         blockedReason?.let {
             this.blockedReason = it
         }
     }
 
-    private fun SkyHanniChatEvent.Modify.handleChat(
-        blockedReason: String?,
-        chatComponent: Component,
-    ) {
+    private fun SkyHanniChatEvent.Modify.handleChat(chatComponent: Component, ) {
         this.chatComponent = chatComponent
     }
 }

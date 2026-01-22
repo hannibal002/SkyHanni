@@ -37,7 +37,7 @@ object ShortenCoins {
         val message = event.cleanMessage
         var newComp = event.chatComponent.copy()
         var found = false
-            for (amount in coinsPattern.findAll(message)) {
+        for (amount in coinsPattern.findAll(message)) {
             val trimmed = amount.trim()
             val formatted = trimmed.formatDoubleOrNull() ?: continue
             val editedComp = newComp.replace(Regex("^$trimmed"), formatted.shortFormat())

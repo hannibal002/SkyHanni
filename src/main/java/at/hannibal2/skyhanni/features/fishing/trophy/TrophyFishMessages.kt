@@ -39,8 +39,7 @@ object TrophyFishMessages {
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val (displayName, displayRarity) = trophyFishPattern.matchMatcher(event.message) {
-            group("displayName").replace("§k", "") to
-                    group("displayRarity")
+            group("displayName").replace("§k", "") to group("displayRarity")
         } ?: return
 
         val internalName = TrophyFishApi.getInternalName(displayName)
