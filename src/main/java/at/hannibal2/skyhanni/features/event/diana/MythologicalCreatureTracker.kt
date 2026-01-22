@@ -59,6 +59,8 @@ object MythologicalCreatureTracker {
         @Expose var count: MutableMap<String, Int> = mutableMapOf(),
     ) : TrackerData()
 
+    var lastSinceAmount: Int? = null
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
@@ -85,6 +87,8 @@ object MythologicalCreatureTracker {
                 val trackerId = creatureEntry.trackerId
                 if (creatureEntry != type) {
                     since.addOrPut(trackerId, 1)
+                    lastSinceAmount = since[trackerId]
+                    since[trackerId] = 0
                 }
             }
         }
@@ -93,6 +97,7 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Modify) {
+        if (lastSinceAmount == null) return
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
         val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
@@ -103,16 +108,14 @@ object MythologicalCreatureTracker {
         }
 
         tracker.modify {
-            val since = it.since
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
-                val trackerId = creatureEntry.trackerId
                 if (creatureEntry == type) {
-                    val newComp = event.chatComponent.copy().append(" §e(${since[trackerId]})")
+                    val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
                     event.replaceComponent(newComp, "diana_mobs_since")
-                    since[trackerId] = 0
                 }
             }
         }
+        lastSinceAmount = null
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
