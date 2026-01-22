@@ -52,6 +52,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Works exactly the same as NEU's version, you can even import your NEU todos into skyhanni.
 + Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 + Added Rainbow Action Bar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
++ Added an option to show the item that was bid on in the winning bid message in the Dark Auction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5126)
 
 #### Chat Filter
 
@@ -470,6 +471,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Rare Sea Creature Party Announcer. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/3672)
     + Sends a message to party chat when a rare sea creature is caught.
 + Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
++ Flay/Soul Whip Close Particle Hider. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5094)
 
 </details>
 <details open><summary>
