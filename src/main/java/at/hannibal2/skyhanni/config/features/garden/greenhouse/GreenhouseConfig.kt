@@ -27,6 +27,15 @@ class GreenhouseConfig {
     var onlyShowWhenOverdue: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Highlight Harvestable Status",
+        desc = "Highlights the \"Growth Status\" beacon green if the crop is harvestable and red if it is not.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var highlightHarvestableStatus: Boolean = true
+
+    @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
     val position: Position = Position(180, 40)
 }
