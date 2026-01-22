@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -108,7 +107,8 @@ object MythologicalCreatureTracker {
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 val trackerId = creatureEntry.trackerId
                 if (creatureEntry == type) {
-                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
+                    val newComp = event.chatComponent.copy().append(" §e(${since[trackerId]})")
+                    event.replaceComponent(newComp, "diana_mobs_since")
                     since[trackerId] = 0
                 }
             }
