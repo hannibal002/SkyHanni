@@ -875,7 +875,7 @@ object EstimatedItemValueCalculator {
                 }
             }
         }
-        val level = if(stack.getPetInternalNameWithLevel() != stack.getInternalName()) " LVL ${stack.getPetLevel()}" else ""
+        val level = if (stack.getPetInternalNameWithLevel() != stack.getInternalName()) " LVL ${stack.getPetLevel()}" else ""
 
         val name = "${internalName.repoItemName}$level"
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {

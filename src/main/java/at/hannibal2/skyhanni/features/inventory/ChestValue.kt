@@ -124,7 +124,7 @@ object ChestValue {
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getInstance().font.width(textAmount)
-            val level = if(stack.getPetInternalNameWithLevel() != stack.getInternalName()) " ${stack.getPetLevel()}" else ""
+            val level = if (stack.getPetInternalNameWithLevel() != stack.getInternalName()) " ${stack.getPetLevel()}" else ""
             val displayName = "${stack.repoItemNameCompact}$level"
             val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
