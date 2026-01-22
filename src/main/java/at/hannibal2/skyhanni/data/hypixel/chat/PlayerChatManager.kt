@@ -337,7 +337,7 @@ object PlayerChatManager {
         }
     }
 
-    private fun SkyHanniChatEvent.Modify.handleChat(chatComponent: Component, ) {
+    private fun SkyHanniChatEvent.Modify.handleChat(chatComponent: Component) {
         this.chatComponent = chatComponent
     }
 }
