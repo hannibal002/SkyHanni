@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
@@ -284,6 +285,14 @@ object ItemUtils {
     fun ItemStack.getPetInternalNameWithLevelOrNull(): NeuInternalName? {
         var internalName = getInternalNameOrNull()
         if (internalName != null) {
+            internalName = when (getMaxPetLevel()) {
+                100 -> if (this.getPetLevel() == 100) "${internalName.asString()}+${this.getPetLevel()}".toInternalName() else internalName
+                200 -> if (this.getPetLevel() >= 100 && this.getPetLevel() != 200) "${internalName.asString()}+100".toInternalName()
+                else if (this.getPetLevel() == 200) "${internalName.asString()}+${this.getPetLevel()}".toInternalName()
+                else internalName
+
+                else -> internalName
+            }
             if (this.getPetLevel() == getMaxLevel(internalName)) {
                 internalName = "${internalName.asString()}+${this.getPetLevel()}".toInternalName()
             }
@@ -299,7 +308,7 @@ object ItemUtils {
         if (getLore().getOrNull(0) == "§7Lump-sum amount") {
             return NeuInternalName.SKYBLOCK_COIN
         }
-        var internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
+        val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
         return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
