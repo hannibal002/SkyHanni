@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.ItemStack
@@ -373,41 +372,6 @@ object UserLuckBreakdown {
             createItemLore("limbo", luck),
         )
         event.addItem(stack)
-    }
-
-    @HandleEvent
-    fun modernLuck(event: UserLuckCalculateEvent) {
-        if (PlatformUtils.MC_VERSION == "1.21.5") {
-            event.addLuck(-10f)
-            val stack = ItemUtils.createItemStack(
-                Items.OMINOUS_BOTTLE,
-                "§a✴ 1.21.5 Tax",
-                arrayOf(
-                    "§8Minecraft",
-                    "",
-                    "§7Value: §c-10§a✴",
-                    "",
-                    "§81.21.5 is an outdated version :(",
-                    "§8You should update to a newer version :)!",
-                ),
-            )
-            event.addItem(stack)
-        } else {
-            event.addLuck(5f)
-            val stack = ItemUtils.createItemStack(
-                Items.TRIDENT,
-                "§a✴ Modern Minecraft Bonus",
-                arrayOf(
-                    "§8Minecraft",
-                    "",
-                    "§7Value: §a+5✴",
-                    "",
-                    "§8We put a lot of effort into updating SkyHanni.",
-                    "§8This is a small bonus for using modern Minecraft.",
-                ),
-            )
-            event.addItem(stack)
-        }
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
