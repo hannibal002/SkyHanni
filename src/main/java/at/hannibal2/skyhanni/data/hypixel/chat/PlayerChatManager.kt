@@ -61,10 +61,12 @@ object PlayerChatManager {
      * REGEX-TEST: §2Guild > §b[MVP§d+§b] infave §e[Em]§f: CEMENT DRINKERS INCORPORATED
      * REGEX-TEST: §2Guild > §6⚔ §6[MVP§3++§6] RealBacklight§f: !warp
      * REGEX-TEST: §2Guild > §b[MVP§d+§b] lrg89 §e[Iron]§f: h
+     * REGEX-TEST: §2Guild > §b[MVP§c+§b] B2Square1 §3[IRON]§f: §r700 to go
+     * REGEX-TEST: §2Guild > §6[MVP§5++§6] Throwpo §3[IRON]§f: §rbat pet clueless
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
-        "§2Guild > (?<author>.+?) ?(?<guildRank>§e\\[\\w*])?§f: (?<message>.*)",
+        "§2Guild > (?<author>.+?) ?(?<guildRank>§.\\[\\w*])?§f: (?<message>.*)",
     )
 
     /**
