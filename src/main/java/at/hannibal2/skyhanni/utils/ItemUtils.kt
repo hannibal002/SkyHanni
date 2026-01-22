@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -82,6 +84,7 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+
 //? > 1.21.8 {
 /*import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
@@ -272,6 +275,22 @@ object ItemUtils {
         return internalName
     }
 
+    /*
+    This will cause errors if used with basically anything EXCEPT getPrice
+    since PENGUIN;4+100 or GOLDEN_DRAGON;4+200 aren't real internal names.
+     */
+    fun ItemStack.getPetInternalNameWithLevel(): NeuInternalName = getPetInternalNameWithLevelOrNull() ?: NeuInternalName.NONE
+
+    fun ItemStack.getPetInternalNameWithLevelOrNull(): NeuInternalName? {
+        var internalName = getInternalNameOrNull()
+        if (internalName != null) {
+            if (this.getPetLevel() == getMaxLevel(internalName)) {
+                internalName = "${internalName.asString()}+${this.getPetLevel()}".toInternalName()
+            }
+        }
+        return internalName
+    }
+
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
         if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
@@ -280,7 +299,7 @@ object ItemUtils {
         if (getLore().getOrNull(0) == "§7Lump-sum amount") {
             return NeuInternalName.SKYBLOCK_COIN
         }
-        val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
+        var internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
         return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
