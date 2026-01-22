@@ -287,7 +287,7 @@ object CustomWardrobe {
             if (armorOrdinal < 0 || armorOrdinal > 3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
             if (stack == null) stack = ItemStack.EMPTY
-            fakePlayer.inventory.equipment.set(equipment, stack)
+            fakePlayer.equipment.set(equipment, stack)
         }
 
         val playerColor = if (!slot.isInCurrentPage()) {
