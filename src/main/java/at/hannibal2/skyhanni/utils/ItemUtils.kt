@@ -75,6 +75,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.component.ResolvableProfile
+import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import java.util.LinkedList
 import java.util.UUID
@@ -213,7 +214,7 @@ object ItemUtils {
     }
 
     fun ItemStack.setLore(lore: List<Component>): ItemStack {
-        this.set(DataComponents.LORE, ItemLore(lore))
+        this.set(DataComponents.LORE, ItemLore(lore, lore))
         return this
     }
 
@@ -355,14 +356,26 @@ object ItemUtils {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLoreString(lore)
-        var tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
+        setDefaultHiddenComponents(stack)
+        return stack
+    }
+
+    fun createItemStack(item: Item, displayName: Component, lore: List<Component>, amount: Int = 1): ItemStack {
+        val stack = ItemStack(item, amount)
+        stack.setCustomItemName(displayName)
+        stack.setLore(lore)
+        setDefaultHiddenComponents(stack)
+        return stack
+    }
+
+    fun setDefaultHiddenComponents(stack: ItemStack) {
+        var tooltipDisplay = TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
-        if (displayName.isBlank() && lore.isEmpty()) {
-            tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay(true, tooltipDisplay.hiddenComponents)
+        if (stack.hoverName.string.isBlank() && stack.getLoreComponent().isEmpty()) {
+            tooltipDisplay = TooltipDisplay(true, tooltipDisplay.hiddenComponents)
         }
         stack.set(DataComponents.TOOLTIP_DISPLAY, tooltipDisplay)
-        return stack
     }
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
