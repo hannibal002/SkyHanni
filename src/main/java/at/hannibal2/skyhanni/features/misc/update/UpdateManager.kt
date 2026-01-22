@@ -295,7 +295,7 @@ object UpdateManager {
                 arrayOf(
                     "§8Minecraft",
                     "",
-                    "§7Value: §c${luck}§a✴",
+                    "§7Value: §c$luck§a✴",
                     "",
                     "§8${PlatformUtils.MC_VERSION} is an outdated version :(",
                     "§8You should update to a newer version :)!",
