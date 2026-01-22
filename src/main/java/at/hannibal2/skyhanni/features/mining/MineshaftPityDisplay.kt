@@ -34,7 +34,9 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.plus
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -135,7 +137,7 @@ object MineshaftPityDisplay {
             mineshaftTotalCount++
             sessionMineshafts++
 
-            val message = event.message + " §e($counterUntilPity)"
+            val message = event.chatComponent.copy() + " §e($counterUntilPity)"
 
             val hoverText = buildList {
                 add("§7Blocks mined: §e$totalBlocks")
@@ -166,7 +168,8 @@ object MineshaftPityDisplay {
 
             resetCounter()
 
-            val newComponent = TextHelper.text(message) {
+            val newComponent = componentBuilder {
+                append(message)
                 hover = TextHelper.multiline(hoverText)
             }
 
