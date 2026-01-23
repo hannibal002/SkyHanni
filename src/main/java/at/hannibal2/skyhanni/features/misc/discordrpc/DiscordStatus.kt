@@ -27,11 +27,13 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -126,18 +128,12 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     PURSE(
         {
             val coins = PurseApi.getPurse()
-            val motes = CustomScoreboardUtils.getMotes().toIntOrNull() ?: "Unknown number of"
+            val motes = CustomScoreboardUtils.getMotes().formatInt() // TODO put this in RiftApi instead of CustomScoreboardUtils
 
             if (RiftApi.inRift()) {
-                when (motes) {
-                    1 -> "1 Mote"
-                    else -> "$motes Motes"
-                }
+                "${motes.addSeparators()} ${StringUtils.pluralize(motes, "Mote")}"
             } else {
-                when (coins) {
-                    1.0 -> "1 Coin"
-                    else -> "$coins Coins"
-                }
+                "${coins.addSeparators()} ${StringUtils.pluralize(coins.toInt(), "Coin")}"
             }
         },
     ),
