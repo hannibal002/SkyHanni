@@ -71,7 +71,7 @@ object MiningEventsApi {
 
 
     @HandleEvent(onlyOnIslands = [IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES])
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val msg = event.message
 
         for (eventType in MiningEventType.entries) {

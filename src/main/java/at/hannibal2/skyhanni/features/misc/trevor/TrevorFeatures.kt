@@ -129,7 +129,7 @@ object TrevorFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val formattedMessage = event.cleanMessage
 
         mobDiedPattern.matchMatcher(event.message) {

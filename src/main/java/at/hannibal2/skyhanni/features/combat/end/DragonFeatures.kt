@@ -231,7 +231,7 @@ object DragonFeatures {
     private fun displayIsEnabled() = config.display && dragonSpawned
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
 
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return

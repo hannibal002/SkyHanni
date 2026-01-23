@@ -142,7 +142,7 @@ object CompactStarlynSisters {
     private var collectionPB = StarlynCollectionPersonalBests()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isInIsland()) return
         event.blockAndCompact()
     }
@@ -154,7 +154,7 @@ object CompactStarlynSisters {
         resetPersonalBestVariables()
     }
 
-    private fun SkyHanniChatEvent.blockAndCompact() {
+    private fun SkyHanniChatEvent.Allow.blockAndCompact() {
         val message = this.message
         if (config.compactPersonalBest)
             compactCollectionPB(message)
@@ -162,7 +162,7 @@ object CompactStarlynSisters {
             compactContestResults(message)
     }
 
-    private fun SkyHanniChatEvent.compactCollectionPB(message: String) {
+    private fun SkyHanniChatEvent.Allow.compactCollectionPB(message: String) {
         sisterCollPBDuringContestPattern.matchMatcher(message) {
             val foragingSister = group("foragingSister")
             val previousRecord = group("previousRecord")
@@ -222,7 +222,7 @@ object CompactStarlynSisters {
         }
     }
 
-    private fun SkyHanniChatEvent.compactContestResults(message: String) {
+    private fun SkyHanniChatEvent.Allow.compactContestResults(message: String) {
         if (!isInResults) {
             startContestResultsPattern.matchMatcher(message) {
                 isInResults = true

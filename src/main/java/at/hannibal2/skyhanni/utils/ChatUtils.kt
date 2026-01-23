@@ -153,7 +153,7 @@ object ChatUtils {
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
-            consoleLog(formattedMessage.removeColor())
+            consoleLog(message.string.removeColor())
             return false
         }
 
@@ -357,7 +357,7 @@ object ChatUtils {
     private var deleteNext: Pair<String, (String) -> Boolean>? = null
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val (reason, predicate) = deleteNext ?: return
         this.deleteNext = null
 

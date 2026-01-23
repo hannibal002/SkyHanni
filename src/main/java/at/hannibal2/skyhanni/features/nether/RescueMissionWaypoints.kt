@@ -193,7 +193,7 @@ object RescueMissionWaypoints {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.hostagePath) {
             agentDialoguePattern.matchMatcher(event.cleanMessage) {
                 tier?.let {

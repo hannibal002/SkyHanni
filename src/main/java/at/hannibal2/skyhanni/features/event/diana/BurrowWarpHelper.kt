@@ -69,7 +69,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message != "§cYou haven't unlocked this fast travel destination!") return
         if (lastWarpTime.passedSince() > 1.seconds) return
         lastWarp?.let {

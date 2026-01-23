@@ -142,3 +142,6 @@ jobs:
                             repo: context.repo.repo,
                             body: commentBody
                         })
+
+            -   name: Try to fail
+                run: exit 1

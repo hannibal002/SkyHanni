@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
@@ -18,12 +19,12 @@ import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.TreeSet
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.world.item.ItemStack
+import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
 
@@ -47,8 +48,9 @@ open class Enchant : Comparable<Enchant> {
     val config by lazy { SkyHanniMod.feature.inventory.enchantParsing }
     val advanced by lazy { config.advancedEnchantColors }
 
-    open fun getComponent(level: Int, itemStack: ItemStack?): Component {
-        return Component.literal(loreName).setStyle(getStyle(level, itemStack))
+    open fun getComponent(level: Int, itemStack: ItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
+        val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
+        return Component.literal(text).setStyle(getStyle(level, itemStack))
     }
 
     open fun getStyle(level: Int, itemStack: ItemStack? = null): Style {
@@ -181,8 +183,9 @@ open class Enchant : Comparable<Enchant> {
 
         // Ensures enchants not yet in repo stay as vanilla formatting
         // (instead of that stupid dark red lowercase formatting *cough* sba *cough*)
-        override fun getComponent(level: Int, itemStack: ItemStack?): Component {
-            return Component.literal(loreName).withColor(ChatFormatting.BLUE)
+        override fun getComponent(level: Int, itemStack: ItemStack?, isRoman: Boolean, appendNewline: Boolean): Component {
+            val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
+            return Component.literal(text).withColor(ChatFormatting.BLUE)
         }
     }
 }
