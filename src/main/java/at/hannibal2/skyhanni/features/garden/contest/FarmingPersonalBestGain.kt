@@ -68,7 +68,7 @@ object FarmingPersonalBestGain {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         newPattern.matchMatcher(event.message) {

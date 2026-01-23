@@ -77,7 +77,7 @@ object MiningCommissionsBlocksColor {
 
     // TODO Commission API
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!enabled) return
         commissionCompletePattern.matchMatcher(event.message) {
             val name = group("name")

@@ -137,7 +137,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         mobFinder?.handleChat(event.message)
     }
 

@@ -19,14 +19,8 @@ class ReceiveParticleEvent(
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
     override fun toString(): String {
-        return "ReceiveParticleEvent(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=${
-            offset.roundTo(
-                1,
-            )
-        }, longDistance=$longDistance, distanceToPlayer=${
-            distanceToPlayer.roundTo(
-                1,
-            )
+        return "ReceiveParticleEvent(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=$offset, longDistance=$longDistance, distanceToPlayer=${
+            distanceToPlayer.roundTo(1)
         })"
     }
 }

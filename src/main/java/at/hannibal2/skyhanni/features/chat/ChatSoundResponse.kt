@@ -23,7 +23,7 @@ object ChatSoundResponse {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         for (soundType in SoundResponseTypes.entries) {

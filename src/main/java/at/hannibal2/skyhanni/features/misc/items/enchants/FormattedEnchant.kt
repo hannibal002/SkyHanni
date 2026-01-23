@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
-import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
@@ -21,8 +20,8 @@ data class FormattedEnchant(
 
     override fun compareTo(other: FormattedEnchant) = this.enchant.compareTo(other.enchant)
 
-    fun getComponent(itemStack: ItemStack?): Component {
-        val component = enchant.getComponent(level, itemStack).append(if (isRoman) " ${level.toRoman()}" else " $level")
+    fun getComponent(itemStack: ItemStack?, appendNewline: Boolean = false): Component {
+        val component = enchant.getComponent(level, itemStack, isRoman, appendNewline)
         if (!stacking.contains("empty"))
             component.append(Component.literal(stacking).withColor(ChatFormatting.GRAY))
         return component

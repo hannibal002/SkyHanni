@@ -195,7 +195,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isGreatSpookActive) return
 
         if (primalFearSpawnPattern.matches(event.message)) {

@@ -50,10 +50,6 @@ object SeaCreatureTracker {
             val amount = if (event.doubleHook && config.countDouble) 2 else 1
             it.amount.addOrPut(event.seaCreature.name, amount)
         }
-
-        if (config.hideChat) {
-            event.chatEvent.blockedReason = "sea_creature_tracker"
-        }
     }
 
     private const val NAME_ALL: CategoryName = "All"

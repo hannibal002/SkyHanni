@@ -173,7 +173,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isInIsland()) return
         event.tryReadLoot()
         event.tryBlock()
@@ -219,7 +219,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         }
     }
 
-    private fun SkyHanniChatEvent.tryReadLoot() {
+    private fun SkyHanniChatEvent.Allow.tryReadLoot() {
         val dropsJson = dropsJson ?: return
 
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
@@ -299,7 +299,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         if (inCategoryList) rareDrops.add(item)
     }
 
-    private fun SkyHanniChatEvent.tryBlock() {
+    private fun SkyHanniChatEvent.Allow.tryBlock() {
         if (!config.compactGiftChats || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }

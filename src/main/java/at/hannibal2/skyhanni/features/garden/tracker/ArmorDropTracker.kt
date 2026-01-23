@@ -78,7 +78,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         for (dropType in ArmorDropType.entries) {
             if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)

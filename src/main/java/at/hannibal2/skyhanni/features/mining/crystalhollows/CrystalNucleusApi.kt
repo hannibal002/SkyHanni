@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -91,7 +90,7 @@ object CrystalNucleusApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
 
         if (startPattern.matches(message)) {
@@ -117,7 +116,7 @@ object CrystalNucleusApi {
         }
     }
 
-    private fun SkyHanniChatEvent.getLoot(): Pair<NeuInternalName, Int>? {
+    private fun SkyHanniChatEvent.Allow.getLoot(): Pair<NeuInternalName, Int>? {
         // All loot rewards start with 4 spaces.
         // To simplify regex statements, this check is done outside the main logic.
         // This also nerfs the "§r§a§lREWARDS" message.
