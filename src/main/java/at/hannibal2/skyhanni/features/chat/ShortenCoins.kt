@@ -39,7 +39,9 @@ object ShortenCoins {
         var found = false
         for (amount in coinsPattern.findAll(message, "amount")) {
             val formatted = amount.formatDoubleOrNull() ?: continue
-            val editedComp = newComp.replace(Regex("^$amount"), formatted.shortFormat())
+            val editedComp = newComp.replace(Regex("^$amount"), formatted.shortFormat()) {
+                it?.color?.name == "gold"
+            }
             if (editedComp != null) {
                 newComp = editedComp
                 found = true
