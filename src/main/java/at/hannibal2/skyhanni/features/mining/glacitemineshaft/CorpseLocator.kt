@@ -103,12 +103,12 @@ object CorpseLocator {
     }
 
     @HandleEvent
-    fun onPartyChat(event: PartyChatEvent) {
+    fun onPartyChat(event: PartyChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
     @HandleEvent
-    fun onAllChat(event: PlayerAllChatEvent) {
+    fun onAllChat(event: PlayerAllChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 

@@ -224,4 +224,14 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     var hideClickableHint: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Dark Auction Item Display",
+        desc = "Adds the item name to the highest bidder message at the Dark Auction.",
+    )
+    @ConfigEditorBoolean
+    @SearchTag("da sirius")
+    @FeatureToggle
+    var darkAuctionItemDisplay: Boolean = true
 }

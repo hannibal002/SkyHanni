@@ -37,7 +37,7 @@ object Year300RaffleEvent {
     private var overlay: Renderable? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message == "§6§lACTIVE PLAYER! §eYou gained §b+1 Raffle Ticket§e!") {
             lastTimerReceived = SimpleTimeMark.now()
         }

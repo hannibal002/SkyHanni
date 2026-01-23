@@ -173,7 +173,7 @@ object KingTalismanHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!MiningApi.inDwarvenMines) return
 

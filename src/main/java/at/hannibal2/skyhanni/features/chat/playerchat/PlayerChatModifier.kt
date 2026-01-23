@@ -24,7 +24,7 @@ object PlayerChatModifier {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Modify) {
         event.applyIfPossible("PLAYER_CHAT") { cutMessage(it) }
     }
 

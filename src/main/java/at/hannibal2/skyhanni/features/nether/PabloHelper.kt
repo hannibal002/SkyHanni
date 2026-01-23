@@ -35,7 +35,7 @@ object PabloHelper {
     private var lastSentMessage = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 5.minutes) return
         val itemName = patterns.matchMatchers(event.cleanMessage) {

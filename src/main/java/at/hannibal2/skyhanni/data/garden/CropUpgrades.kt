@@ -38,7 +38,7 @@ object CropUpgrades {
     private val cropUpgradesStorage: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
 
         chatUpgradePattern.matchMatcher(event.message) {
             val crop = CropType.getByNameOrNull(group("crop"))

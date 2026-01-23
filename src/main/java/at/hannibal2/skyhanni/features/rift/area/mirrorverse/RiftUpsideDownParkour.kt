@@ -44,7 +44,7 @@ object RiftUpsideDownParkour {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (event.message == "§c§lOH NO! THE LAVA OOFED YOU BACK TO THE START!") {

@@ -178,7 +178,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
 
         val message = event.cleanMessage

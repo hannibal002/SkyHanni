@@ -8,5 +8,5 @@ class EggFoundEvent(
     val type: HoppityEggType,
     val slotIndex: Int? = null,
     val note: String? = null,
-    val chatEvent: SkyHanniChatEvent? = null
+    val chatEvent: SkyHanniChatEvent.Allow? = null
 ) : SkyHanniEvent()

@@ -76,7 +76,7 @@ object CurrentPetApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         chatSummonPattern.matchMatcher(event.message) {
             val resolvedPet = PetStorageApi.resolvePetDataOrNull(
                 name = group("pet"),

@@ -86,7 +86,7 @@ object TrevorTracker {
     private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val storage = ProfileStorageData.profileSpecific?.trapperData ?: return
 
         selfKillMobPattern.matchMatcher(event.message) {

@@ -585,12 +585,18 @@ object ChatFilter {
     // </editor-fold>
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         var blockReason = block(event.message)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
         event.blockedReason = blockReason ?: return
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        if (config.powderMining.enabled) powderMiningBlock(event)
+        if (config.crystalNucleus.enabled) crystalNucleusBlock(event)
     }
 
     /**
@@ -643,12 +649,26 @@ object ChatFilter {
 
     /**
      * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
-     * Will modify un-filtered Mining rewards, or return a resultant blocking code
+     * Will return a resultant blocking code
      * @param event The event to check
      * @return Block reason if applicable
      * @see block
      */
-    private fun powderMiningBlock(event: SkyHanniChatEvent): String? {
+    private fun powderMiningBlock(event: SkyHanniChatEvent.Allow): String? {
+        val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
+        if (powderMiningMatchResult == "no_filter") {
+            return null
+        }
+        return powderMiningMatchResult
+    }
+
+    /**
+     * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
+     * Will modify un-filtered Mining reward
+     * @param event The event to check
+     * @see block
+     */
+    private fun powderMiningBlock(event: SkyHanniChatEvent.Modify) {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
@@ -656,25 +676,35 @@ object ChatFilter {
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
-                event.chatComponent = "$amountFormat $reward".asComponent()
+                event.replaceComponent("$amountFormat $reward".asComponent(), "powder_gain")
             }
-            return null
         }
-        return powderMiningMatchResult
     }
 
     /**
      * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
-     * Will conditionally modify/compact messages in some cases, or return a blocking code
+     * Will conditionally return a blocking code
      * @param event The event to check
      * @return Block reason if applicable
      * @see block
      */
-    private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
-        val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
-        newMessage?.let { event.chatComponent = it.asComponent() }
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent.Allow): String? {
+        val blockCode = CrystalNucleusChatFilter.block(event.message)?.getPair()?.first
         blockCode?.let { return it }
         return null
+    }
+
+    /**
+     * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
+     * Will conditionally modify/compact messages in some cases
+     * @param event The event to check
+     * @see block
+     */
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent.Modify) {
+        val newMessage = CrystalNucleusChatFilter.block(event.message)?.getPair()?.second
+        newMessage?.let {
+            event.replaceComponent(it.asComponent(), "nuc_run")
+        }
     }
 
     private var othersMsg: String? = null

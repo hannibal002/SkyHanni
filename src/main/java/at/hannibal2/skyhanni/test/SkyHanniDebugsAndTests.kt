@@ -421,7 +421,7 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent(SkyHanniChatEvent::class)
+    @HandleEvent(SkyHanniChatEvent.Allow::class)
     @Suppress("EmptyFunctionBlock")
     fun onChat() {
     }

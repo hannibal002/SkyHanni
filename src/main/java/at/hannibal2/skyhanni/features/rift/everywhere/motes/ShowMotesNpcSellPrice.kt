@@ -121,7 +121,7 @@ object ShowMotesNpcSellPrice {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
             ChatUtils.chat("Set your McGrubber's burger stacks to ${group("amount")}.")
