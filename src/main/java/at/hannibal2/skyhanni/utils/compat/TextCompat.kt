@@ -365,31 +365,35 @@ fun List<Any>.mapToComponents(): List<Component> {
     return newList
 }
 
+val ALWAYS get(): (Style?) -> Boolean = { true }
+
 /**
  * Replace a string within a Component with another string
  * The strings have to exist within 1 sibling
  * AKA they have to have the same Style
  */
-fun Component.replace(oldValue: String, newValue: String): MutableComponent? {
-    return replace(this, oldValue, newValue)
+fun Component.replace(oldValue: String, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
+    return replace(this, oldValue, newValue, predicate)
 }
 
-fun Component.replace(oldValue: Regex, newValue: String): MutableComponent? {
-    return replace(this, oldValue, newValue)
+fun Component.replace(oldValue: Regex, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
+    return replace(this, oldValue, newValue, predicate)
 }
 
-private fun replace(component: Component, oldValue: Any, newValue: String): MutableComponent? {
+private fun replace(component: Component, oldValue: Any, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
     component.visit({ style: Style?, string: String? ->
-        val edit: String?
-        if (oldValue is String) {
-            edit = string?.replace(oldValue, newValue)
-        } else if (oldValue is Regex) {
-            edit = string?.replace(oldValue, newValue)
-        } else {
-            ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+        var edit = string
+        if (predicate(style)) {
+            if (oldValue is String) {
+                edit = string?.replace(oldValue, newValue)
+            } else if (oldValue is Regex) {
+                edit = string?.replace(oldValue, newValue)
+            } else {
+                ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+            }
         }
         if (edit != string) hasEdited = true
 
@@ -401,12 +405,12 @@ private fun replace(component: Component, oldValue: Any, newValue: String): Muta
     return newComp
 }
 
-fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: Boolean = false): MutableComponent? {
+fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: Boolean = false, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
     this.visit({ currentStyle: Style?, string: String? ->
-        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited)) {
+        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
             val split = string.split(oldValue)
             newComp.append(
                 componentBuilder {
