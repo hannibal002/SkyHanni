@@ -85,10 +85,11 @@ object MythologicalCreatureTracker {
             val since = it.since
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 val trackerId = creatureEntry.trackerId
-                if (creatureEntry != type) {
-                    since.addOrPut(trackerId, 1)
+                if (creatureEntry == type) {
                     lastSinceAmount = since[trackerId]
                     since[trackerId] = 0
+                } else {
+                    since.addOrPut(trackerId, 1)
                 }
             }
         }
