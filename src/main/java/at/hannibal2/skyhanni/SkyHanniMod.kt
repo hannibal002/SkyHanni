@@ -14,23 +14,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
-import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.data.OtherInventoryData
-import at.hannibal2.skyhanni.data.PetDataStorage
-import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
-import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
-import at.hannibal2.skyhanni.utils.VersionConstants
+import at.hannibal2.skyhanni.data.GuiEditManager import at.hannibal2.skyhanni.data.OtherInventoryData import at.hannibal2.skyhanni.data.PetDataStorage import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager import at.hannibal2.skyhanni.events.utils.InitFinishedEvent import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent import at.hannibal2.skyhanni.skyhannimodule.LoadedModules import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule import at.hannibal2.skyhanni.test.command.ErrorManager import at.hannibal2.skyhanni.utils.ChatUtils import at.hannibal2.skyhanni.utils.InventoryUtils import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -42,10 +26,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
