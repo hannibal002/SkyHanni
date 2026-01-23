@@ -131,7 +131,7 @@ object GriffinBurrowParticleFinder {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!config.guess) return
         val message = event.message

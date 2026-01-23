@@ -134,7 +134,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 

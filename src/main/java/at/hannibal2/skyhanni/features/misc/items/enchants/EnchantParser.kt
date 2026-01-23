@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
@@ -478,8 +479,7 @@ object EnchantParser {
     }
 
     private fun editChatComponent(chatComponent: Component, loreList: MutableList<Component>) {
-        val newComponent = Component.literal((chatComponent.contents as PlainTextContents.LiteralContents).text)
-            .setStyle(chatComponent.style)
+        val newComponent = MutableComponent.create(chatComponent.contents).setStyle(chatComponent.style)
         loreList.forEach { newComponent.append(it) }
         GuiChatHook.replaceHoverEventComponent(newComponent)
     }

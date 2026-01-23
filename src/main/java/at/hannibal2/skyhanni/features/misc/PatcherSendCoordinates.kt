@@ -38,7 +38,7 @@ object PatcherSendCoordinates {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
 
         val message = event.cleanMessage

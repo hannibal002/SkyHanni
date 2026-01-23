@@ -202,7 +202,7 @@ object GetFromSackApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.bazaarGFS || SkyBlockUtils.noTradeMode) return
         val stack = lastItemStack ?: return
         val message = event.message

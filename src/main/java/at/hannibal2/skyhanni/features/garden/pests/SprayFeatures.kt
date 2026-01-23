@@ -44,7 +44,7 @@ object SprayFeatures {
 
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         display = changeMaterialPattern.matchMatcher(event.message) {

@@ -39,7 +39,7 @@ object DungeonCreationCooldown {
 
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         join.matchMatcher(event.message) {
             val player = group("player").cleanPlayerName()
             if (player == PlayerUtils.getName()) {

@@ -149,12 +149,10 @@ object ChatManager {
     }
 
     /**
-     * If the message is modified return the modified message otherwise return null.
      * If the message is cancelled return true.
      */
-    fun onChatReceive(original: Component): Pair<Component?, Boolean> {
-        var component = original
-        val message = component.formattedTextCompat().stripHypixelMessage()
+    fun onChatAllow(original: Component): Boolean {
+        val message = original.formattedTextCompat().stripHypixelMessage()
         var cancelled = false
 
         if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
@@ -162,10 +160,10 @@ object ChatManager {
             if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
                 cancelled = true
             }
-            return null to cancelled
+            return cancelled
         }
-        val key = IdentityCharacteristics(component)
-        val chatEvent = SkyHanniChatEvent(message, component)
+        val key = IdentityCharacteristics(original)
+        val chatEvent = SkyHanniChatEvent.Allow(message, original)
         chatEvent.post()
 
         val blockReason = chatEvent.blockedReason.orEmpty().uppercase()
@@ -174,14 +172,34 @@ object ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.BLOCKED, blockReason, null, null)
-            return null to true
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null, null)
+            return true
         }
+
+        loggerAllowed.log("[allowed] $message")
+        loggerAll.log("[allowed] $message")
+
+        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
+        if (chatEvent.chatLineId != 0) {
+            cancelled = true
+            original.send(chatEvent.chatLineId)
+        }
+        return cancelled
+    }
+
+    /**
+     * If the message is modified return the modified message otherwise return null.
+     */
+    fun onChatModify(original: Component): Component? {
+        var component = original
+        val message = component.formattedTextCompat().stripHypixelMessage()
+
+        val key = IdentityCharacteristics(component)
+        val chatEvent = SkyHanniChatEvent.Modify(message, component)
+        chatEvent.post()
 
         val modifiedComponent = chatEvent.chatComponent
         var modified = false
-        loggerAllowed.log("[allowed] $message")
-        loggerAll.log("[allowed] $message")
         if (modifiedComponent != component) {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
@@ -194,15 +212,7 @@ object ChatManager {
             messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null, null)
         }
 
-        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
-        if (chatEvent.chatLineId != 0) {
-            cancelled = true
-            component.send(chatEvent.chatLineId)
-            // Because we're separately sending the chat line, we don't want to modify the component again,
-            // even if we "meant" to replace the component.
-            modified = false
-        }
-        return Pair(modifiedComponent.takeIf { modified }, cancelled)
+        return modifiedComponent.takeIf { modified }
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched

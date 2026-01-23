@@ -321,7 +321,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {

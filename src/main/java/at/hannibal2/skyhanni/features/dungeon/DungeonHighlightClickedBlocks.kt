@@ -55,7 +55,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (leverPattern.matches(event.message)) {

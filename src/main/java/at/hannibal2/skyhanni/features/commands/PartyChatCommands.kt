@@ -31,7 +31,7 @@ object PartyChatCommands {
         val isEnabled: () -> Boolean,
         val requiresPartyLead: Boolean = true,
         val triggerableBySelf: Boolean = true,
-        val executable: (PartyChatEvent) -> Unit,
+        val executable: (PartyChatEvent.Allow) -> Unit,
     )
 
     private var lastWarp = SimpleTimeMark.farPast()
@@ -118,7 +118,7 @@ object PartyChatCommands {
     }
 
     @HandleEvent
-    fun onPartyCommand(event: PartyChatEvent) {
+    fun onPartyCommand(event: PartyChatEvent.Allow) {
         if (event.message.firstOrNull() !in commandPrefixes) return
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return

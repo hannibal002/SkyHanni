@@ -45,7 +45,7 @@ object RiftLavaMazeParkour {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
