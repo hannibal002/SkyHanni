@@ -289,7 +289,7 @@ object ItemUtils {
             if (this.getPetLevel() == maxLevel) {
                 internalName = "${internalName.asString()}+${this.getPetLevel()}".toInternalName()
             }
-            if (maxLevel == 200 && this.getPetLevel() >= 100) {
+            else if (maxLevel == 200 && this.getPetLevel() >= 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
             }
         }
