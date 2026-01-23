@@ -29,7 +29,7 @@ object CocoonAPI {
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
      */
-    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(30.seconds)
+    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
 
     data class CocoonMob(
