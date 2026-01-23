@@ -13,9 +13,9 @@ import net.minecraft.client.entity.ClientMannequin
 *///?}
 
 //? < 1.21.9 {
-class FakePlayer() : RemotePlayer(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
+class FakePlayer : RemotePlayer(MinecraftCompat.localWorld, MinecraftCompat.localPlayer.gameProfile) {
 //?} else {
-/*class FakePlayer: ClientMannequin(
+/*class FakePlayer : ClientMannequin(
     MinecraftCompat.localWorld,
     Minecraft.getInstance().playerSkinRenderCache(),
 ) {
