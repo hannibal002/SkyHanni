@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(30.seconds)
+    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
 
     data class CocoonMob(
