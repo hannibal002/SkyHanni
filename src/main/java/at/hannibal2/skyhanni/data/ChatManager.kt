@@ -191,7 +191,7 @@ object ChatManager {
      * If the message is modified return the modified message otherwise return null.
      */
     fun onChatModify(original: Component): Component? {
-        var component = original
+        val component = original
         val message = component.formattedTextCompat().stripHypixelMessage()
 
         val key = IdentityCharacteristics(component)
