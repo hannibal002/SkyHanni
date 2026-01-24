@@ -30,10 +30,10 @@ object SnakeGame {
     private val keys
         get() = with(Minecraft.getInstance().options) {
             mapOf(
-                keyLeft.key.value to 50,
-                keyUp.key.value to 51,
-                keyRight.key.value to 52,
-                keyDown.key.value to 53,
+                keyLeft.key.value to 24,
+                keyUp.key.value to 16,
+                keyRight.key.value to 26,
+                keyDown.key.value to 34,
             )
         }
 
