@@ -405,7 +405,12 @@ private fun replace(component: Component, oldValue: Any, newValue: String, predi
     return newComp
 }
 
-fun Component.replace(oldValue: String, newValue: Component, onlyReplaceFirst: Boolean = false, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
+fun Component.replace(
+    oldValue: String,
+    newValue: Component,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
