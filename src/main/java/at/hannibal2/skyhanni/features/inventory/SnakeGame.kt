@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object SnakeGame {
 
-    private val pattern by RepoPattern.pattern("abiphone.snake.name", "Snake")
+    private val pattern by RepoPattern.pattern("abiphone.snake.name", "Snake|Eat 8 apples to win!")
     private val config get() = SkyHanniMod.feature.inventory
     private var lastClick = SimpleTimeMark.farPast()
 
