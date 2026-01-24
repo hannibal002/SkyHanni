@@ -33,7 +33,7 @@ object ClientCheck {
                 append(clientName) { bold = true }
                 append(
                     ". This is a closed source client that may cause issues we are unable to fix. " +
-                    "We strongly recommend switching to a supported configuration, such as "
+                        "We strongly recommend switching to a supported configuration, such as "
                 )
                 append("Modrinth Launcher") {
                     url = "https://modrinth.com/app"
