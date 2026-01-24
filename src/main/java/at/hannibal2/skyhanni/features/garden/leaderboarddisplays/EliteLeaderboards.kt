@@ -148,7 +148,7 @@ enum class EliteLeaderboards(
 
             }
 
-            event.add(117, "garden.eliteFarmingWeights.text") {
+            event.add(120, "garden.eliteFarmingWeights.text") {
                 ConfigManager.gson.toJsonTree(displayList)
             }
 
@@ -159,40 +159,40 @@ enum class EliteLeaderboards(
 
             // While pest and crop leaderboards are new, we'll guess if players want them on or off based on their other preferences
             val leaderboardDisplayList: List<EliteLeaderboards> = buildList {
-                event.transform(117, "$oldConfig.display") { entry ->
+                event.transform(120, "$oldConfig.display") { entry ->
                     if (entry.asBoolean) add(WEIGHT)
                     entry
                 }
-                event.transform(117, "garden.cropMilestones.progress") { entry ->
+                event.transform(120, "garden.cropMilestones.progress") { entry ->
                     if (entry.asBoolean) add(CROP)
                     entry
                 }
-                event.transform(117, "garden.pests.pestProfitTracker.enabled") { entry ->
+                event.transform(120, "garden.pests.pestProfitTracker.enabled") { entry ->
                     if (entry.asBoolean) add(PEST)
                     entry
                 }
             }
-            event.add(117, "garden.eliteFarmersLeaderboards.display") {
+            event.add(120, "garden.eliteFarmersLeaderboards.display") {
                 ConfigManager.gson.toJsonTree(leaderboardDisplayList)
             }
-            event.move(117, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") { entry ->
+            event.move(120, "$oldConfig.pos", "garden.eliteFarmersLeaderboards.displayPositions") { entry ->
                 val positionList = PositionList(EliteLeaderboards.entries.size)
                 positionList[WEIGHT.ordinal] = ConfigManager.gson.fromJson<Position>(entry)
                 ConfigManager.gson.toJsonTree(positionList)
             }
 
-            event.move(117, "$oldConfig.showOutsideGarden", "$display.showOutsideGarden")
-            event.move(117, "$oldConfig.text", "$display.text")
-            event.move(117, "$oldConfig.leaderboard", "$display.leaderboard")
-            event.move(117, "$oldConfig.overtakeETA", "$display.overtakeETA")
-            event.move(117, "$oldConfig.overtakeETAAlways", "$display.overtakeETA.always")
-            event.move(117, "$oldConfig.showLbChange", "$newConfig.offlineLbChange")
-            event.move(117, "$oldConfig.etaGoalRank", "$rankGoal.rankGoal")
-            event.move(117, "$oldConfig.etaGoalRank", "$rankGoal.monthlyRankGoal")
-            event.move(117, "$oldConfig.etaGoalRank", "$rankGoal.useRankGoal") { entry ->
+            event.move(120, "$oldConfig.showOutsideGarden", "$display.showOutsideGarden")
+            event.move(120, "$oldConfig.text", "$display.text")
+            event.move(120, "$oldConfig.leaderboard", "$display.leaderboard")
+            event.move(120, "$oldConfig.overtakeETA", "$display.overtakeETA")
+            event.move(120, "$oldConfig.overtakeETAAlways", "$display.overtakeETAAlways")
+            event.move(120, "$oldConfig.showLbChange", "$newConfig.offlineLbChange")
+            event.move(120, "$oldConfig.etaGoalRank", "$rankGoal.rankGoal")
+            event.move(120, "$oldConfig.etaGoalRank", "$rankGoal.monthlyRankGoal")
+            event.move(120, "$oldConfig.etaGoalRank", "$rankGoal.useRankGoal") { entry ->
                 ConfigManager.gson.toJsonTree(entry.asString != "10000")
             }
-            event.move(117, "$oldConfig.ignoreLow", "$display.ignoreLow")
+            event.move(120, "$oldConfig.ignoreLow", "$display.ignoreLow")
         }
 
 

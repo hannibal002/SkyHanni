@@ -60,7 +60,7 @@ object FarmingWeightData {
     // We need profile id for leaderboard api
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (profileId == "") updateCollections()
+        if (profileId.isBlank()) updateCollections()
     }
 
     @HandleEvent
@@ -120,7 +120,7 @@ object FarmingWeightData {
 
     fun updateCollections() {
         if (lastFetchAttempt.passedSince() <= 5.seconds || lastPlayerWeightFetch.passedSince() <= 5.minutes) return
-        if (HypixelData.profileName == "") return
+        if (HypixelData.profileName.isEmpty()) return
         if (collectionMutex.isLocked) return
         lastFetchAttempt = SimpleTimeMark.now()
         fetchAttempts++
@@ -131,7 +131,7 @@ object FarmingWeightData {
         fetchCollections()
     }
 
-    private fun fetchCollections() = SkyHanniMod.launchIOCoroutine("fetch collections") {
+    private fun fetchCollections() = SkyHanniMod.launchIOCoroutine("fetch collections", timeout = 30.seconds) {
         collectionMutex.withLock {
             val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
                 if (weightMap.isEmpty()) {
