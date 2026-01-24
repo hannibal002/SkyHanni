@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils.getWornSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -31,7 +31,7 @@ object ThunderSparksHighlight {
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.getWornSkullTexture() == THUNDER_SPARK_TEXTURE) sparks.add(entity)
+        if (entity.holdingSkullTexture(THUNDER_SPARK_TEXTURE)) sparks.add(entity)
     }
 
     @HandleEvent

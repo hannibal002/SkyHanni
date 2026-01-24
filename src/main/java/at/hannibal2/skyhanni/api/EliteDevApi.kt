@@ -157,7 +157,6 @@ object EliteDevApi {
     private var weightUrl = ""
     private var weightProfileApiResponse: JsonApiResponse<JsonObject>? = null
     suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
-        require(localProfile.isNotBlank()) { "Local profile cannot be blank" }
         val profile = if (spoofProfile) playerProfile else localProfile
         val uuid = if (spoofProfile) playerUuid else PlayerUtils.getUuid()
         weightUrl = "$FARMING_WEIGHT_URL/$uuid?collections=true"
@@ -168,11 +167,16 @@ object EliteDevApi {
 
         val weightData = ConfigManager.gson.fromJson<ElitePlayerWeightJson>(apiData)
         val selectedProfileId = weightData.selectedProfileId
-        val selectedProfileEntry = weightData.profiles.firstOrNull {
-            val idMatch = it.profileId == selectedProfileId
-            val nameMatch = it.profileName.lowercase() == profile.lowercase()
-            // Prioritize matching by ID, but also allow matching by name
-            (idMatch && nameMatch) || nameMatch
+
+        // Try to find by name first if localProfile is provided
+        val selectedProfileEntry = if (localProfile.isNotBlank()) {
+            weightData.profiles.firstOrNull {
+                it.profileName.lowercase() == profile.lowercase()
+            }
+        } else {
+            null
+        } ?: weightData.profiles.firstOrNull {
+            it.profileId == selectedProfileId
         } ?: throw IllegalStateException(
             "No profile found matching the local profile: $profile",
         )

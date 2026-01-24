@@ -169,13 +169,13 @@ object PartyApi {
     }
 
     @HandleEvent
-    fun onPartyChat(event: PartyChatEvent) {
+    fun onPartyChat(event: PartyChatEvent.Allow) {
         val name = event.author.cleanPlayerName()
         addPlayer(name)
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message.trimWhiteSpace().removeResets()
 
         // new member joined

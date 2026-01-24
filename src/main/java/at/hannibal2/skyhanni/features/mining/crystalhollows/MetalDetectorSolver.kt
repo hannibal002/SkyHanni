@@ -29,11 +29,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -156,7 +160,7 @@ object MetalDetectorSolver {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!treasureFoundPattern.matches(event.message)) return
 
@@ -167,7 +171,12 @@ object MetalDetectorSolver {
         if (config.showTimeTaken && !lastTreasureFound.isFarPast()) {
             DelayedRun.runNextTick {
                 ChatUtils.chat(
-                    "§aYou found the treasure in §e${timeTaken.inWholeSeconds}§a seconds.",
+                    componentBuilder {
+                        withColor(ChatFormatting.GREEN)
+                        append("You found the treasure in ")
+                        appendWithColor("${timeTaken.inWholeSeconds}", ChatFormatting.YELLOW)
+                        append(" seconds.")
+                    }
                 )
             }
         }

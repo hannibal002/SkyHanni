@@ -97,7 +97,7 @@ object FriendApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         readFriendsList(event)
 
         removedFriendPattern.matchMatcher(event.message) {
@@ -136,7 +136,7 @@ object FriendApi {
         saveConfig()
     }
 
-    private fun readFriendsList(event: SkyHanniChatEvent) {
+    private fun readFriendsList(event: SkyHanniChatEvent.Allow) {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {

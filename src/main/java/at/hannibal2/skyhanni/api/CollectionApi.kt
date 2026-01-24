@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -20,9 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -39,40 +38,40 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e43,649§6/§e50k
-     * REGEX-TEST: §7Total collected: §e277,252
+     * REGEX-TEST:                           43,649/50k
+     * REGEX-TEST: Total collected: 277,252
      */
     private val counterPattern by patternGroup.pattern(
-        "counter",
-        ".* §e(?<amount>[\\d,]*)(?:§6/.*)?",
+        "counter.new",
+        ".* (?<amount>[\\d,]*)(?:/.*)?",
     )
 
     /**
-     * REGEX-TEST: §7Total collected: §e261,390
-     * REGEX-TEST: §7Total Collected: §e2,012,418
+     * REGEX-TEST: Total collected: 261,390
+     * REGEX-TEST: Total Collected: 2,012,418
      */
     private val singleCounterPattern by patternGroup.pattern(
-        "singlecounter",
-        "§7Total [c|C]ollected: §e(?<amount>.*)",
+        "singlecounter.new",
+        "Total [c|C]ollected: (?<amount>.*)",
     )
 
     /**
-     * REGEX-TEST: §b[MVP§f+§b] oxsss§7: §e1.9M
-     * REGEX-TEST: §a[VIP] oxsss§7: §e0
-     * REGEX-TEST: §7oxsss§7: §e0
+     * REGEX-TEST: [MVP+] oxsss: 1.9M
+     * REGEX-TEST: [VIP] oxsss: 0
+     * REGEX-TEST: oxsss: 0
      */
     val playerCounterPattern by patternGroup.pattern(
-        "playercounter",
-        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>[^§]{2,16})§7: §e(?<amount>.+)",
+        "playercounter.new",
+        "(?:\\[[^]]+(?:\\+)?] |)(?<name>[^§]{2,16}): (?<amount>.+)",
     )
 
     /**
-     * REGEX-TEST: §7Progress to Raw Chicken IX: §e25.7§6%
-     * REGEX-TEST: §7Total Collected: §e1,917,287
+     * REGEX-TEST: Progress to Raw Chicken IX: 25.7§6%
+     * REGEX-TEST: Total Collected: 1,917,287
      */
     val collectionNotMaxedPattern by patternGroup.pattern(
-        "collections.notmaxed",
-        "§7(?:Progress to .+|Total Collected: .+)",
+        "collections.notmaxed.new",
+        "Progress to .+|Total Collected: .+",
     )
 
     /**
@@ -103,9 +102,9 @@ object CollectionApi {
 
         if (inventoryName.endsWith("n")) {
             val stack = event.inventoryItems[4] ?: return
-            val lore = stack.getLore()
+            val lore = stack.getLoreComponent()
 
-            singleCounterPattern.firstMatcher(lore) {
+            singleCounterPattern.firstMatcher(lore.map { it.string }) {
                 val counter = group("amount").formatLong()
                 val internalName = stack.getInternalName().getCorrectedName()
                 collectionValue[internalName] = counter
@@ -116,29 +115,29 @@ object CollectionApi {
 
         if (inventoryName.endsWith("s") && inventoryName != "Boss Collections") {
             for ((_, stack) in event.inventoryItems) {
-                val name = stack.hoverName.string.removeColor()
+                val name = stack.cleanName()
                 if ("Collections" in name) continue
 
-                val lore = stack.getLore()
-                if (lore.none { it.contains("Click to view!") }) continue
+                val lore = stack.getLoreComponent()
+                if (lore.none { it.string.contains("Click to view!") }) continue
 
                 val internalName = stack.getInternalName().getCorrectedName()
 
-                val isCoop = playerCounterPattern.anyMatches(lore)
-                val isNotMaxed = collectionNotMaxedPattern.anyMatches(lore)
+                val isCoop = playerCounterPattern.anyMatches(lore.map { it.string })
+                val isNotMaxed = collectionNotMaxedPattern.anyMatches(lore.map { it.string })
 
                 if (!isCoop || isNotMaxed) {
-                    counterPattern.firstMatcher(lore) {
+                    counterPattern.firstMatcher(lore.map { it.string }) {
                         val counter = group("amount").formatLong()
                         collectionValue[internalName] = counter
                     }
                 } else {
-                    val coopIndex = lore.indexOf("§7Co-op Contributions:")
+                    val coopIndex = lore.indexOfFirst { it.string == "Co-op Contributions:" }
                     if (coopIndex == -1) continue
 
                     var totalCollected = 0L
                     lore.drop(coopIndex).forEach { line ->
-                        if (line.isBlank()) return@forEach
+                        if (line.string.isBlank()) return@forEach
 
                         playerCounterPattern.matchMatcher(line) {
                             totalCollected += group("amount").formatLong()

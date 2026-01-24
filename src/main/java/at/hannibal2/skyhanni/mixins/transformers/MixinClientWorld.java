@@ -7,12 +7,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21.8
-//$$ import at.hannibal2.skyhanni.features.misc.ParticleHider;
-//$$ import net.minecraft.world.level.block.state.BlockState;
-//$$ import net.minecraft.core.BlockPos;
-//$$ import net.minecraft.core.Direction;
-//#endif
+//? > 1.21.8 {
+/*import at.hannibal2.skyhanni.features.misc.ParticleHider;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+*///?}
 
 @Mixin(ClientLevel.class)
 public class MixinClientWorld {
@@ -22,20 +22,20 @@ public class MixinClientWorld {
         new EntityEnterWorldEvent(entity).post();
     }
 
-    //#if MC > 1.21.8
-    //$$ @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
-    //$$ private void onAddBlockBreakParticles(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
-    //$$     if (ParticleHider.shouldHideBlockParticles()) {
-    //$$         ci.cancel();
-    //$$     }
-    //$$ }
-    //$$
-    //$$ @Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
-    //$$ private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
-    //$$     if (ParticleHider.shouldHideBlockParticles()) {
-    //$$         ci.cancel();
-    //$$     }
-    //$$ }
-    //#endif
+    //? > 1.21.8 {
+     /*@Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
+     private void onAddBlockBreakParticles(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
+         if (ParticleHider.shouldHideBlockParticles()) {
+             ci.cancel();
+         }
+     }
+
+     @Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
+     private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
+         if (ParticleHider.shouldHideBlockParticles()) {
+             ci.cancel();
+         }
+     }
+    *///?}
 
 }

@@ -53,11 +53,11 @@ object SoundUtils {
     }
 
     private fun SoundInstance.setLevel(level: Float) =
-        //#if MC < 1.21.9
+        //? < 1.21.9 {
         Minecraft.getInstance().soundManager.updateSourceVolume(this.source, level)
-    //#else
-    //$$ Minecraft.getInstance().soundManager.setVolume(this, level)
-    //#endif
+    //?} else {
+    /*Minecraft.getInstance().soundManager.setVolume(this, level)
+    *///?}
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)

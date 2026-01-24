@@ -78,7 +78,7 @@ object CFCustomReminder {
     )
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
         if (!CFApi.inChocolateFactory) return
         if (configReminder.hideChat) {

@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class MixinTextRenderer {
 
     @ModifyVariable(
-        //#if MC < 1.21.7
+        //? < 1.21.7 {
         method = "drawInternal(Lnet/minecraft/util/FormattedCharSequence;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I",
-        //#else
-        //$$ method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;",
-        //#endif
+        //?} else {
+        /*method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;",
+        *///?}
         index = 1,
         at = @At("HEAD"),
         argsOnly = true
@@ -33,11 +33,11 @@ public class MixinTextRenderer {
     }
 
     @ModifyVariable(
-        //#if MC < 1.21.7
+        //? < 1.21.7 {
         method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I",
-        //#else
-        //$$ method = "prepareText(Ljava/lang/String;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;",
-        //#endif
+        //?} else {
+        /*method = "prepareText(Ljava/lang/String;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;",
+        *///?}
         index = 1,
         at = @At("HEAD"),
         argsOnly = true

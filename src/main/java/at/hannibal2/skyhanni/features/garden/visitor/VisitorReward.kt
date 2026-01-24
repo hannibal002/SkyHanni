@@ -24,6 +24,11 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     HYPERCHARGE_CHIP("HYPERCHARGE_GARDEN_CHIP", "§9Hypercharge Chip"),
     QUICKDRAW_CHIP("QUICKDRAW_GARDEN_CHIP", "§9Quickdraw Chip"),
     FARMING_EXP_BOOST_EPIC("PET_ITEM_FARMING_SKILL_BOOST_EPIC", "§5Farming Exp Boost"),
+    UNFULFILLED_JERRYSEED("UNFULFILLED_JERRYSEED", "§aUnfulfilled Jerryseed"),
+    VOTER_BADGE("VOTER_BADGE", "§fVoter's Badge"),
+    VOTER_BADGE_VIP("VOTER_BADGE_VIP", "§aVIP Voter's Badge"),
+    VOTER_BADGE_ELITE("VOTER_BADGE_ELITE", "§9Elite Voter's Badge"),
+    VOTER_BADGE_SUPREME("VOTER_BADGE_SUPREME", "§5Supreme Voter's Badge"),
     ;
 
     private val internalName = rawInternalName.toInternalName()

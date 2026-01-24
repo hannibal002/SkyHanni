@@ -399,11 +399,11 @@ enum class HotfData(
             // Hi I'm not empty
         }
 
-        override fun extraChatHandling(event: SkyHanniChatEvent) {
+        override fun extraChatHandling(event: SkyHanniChatEvent.Allow) {
             // Hi I'm not empty
         }
 
-        override fun tryBlock(event: SkyHanniChatEvent) {
+        override fun tryBlock(event: SkyHanniChatEvent.Allow) {
             if (!chatConfig.hideLottery || IslandTypeTags.FORAGING.inAny()) return
             event.blockedReason = "lottery"
         }
@@ -430,7 +430,7 @@ enum class HotfData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+        override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
 
         @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {

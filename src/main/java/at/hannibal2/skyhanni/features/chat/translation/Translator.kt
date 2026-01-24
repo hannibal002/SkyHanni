@@ -34,7 +34,7 @@ object Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message

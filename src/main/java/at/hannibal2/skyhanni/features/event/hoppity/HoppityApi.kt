@@ -204,7 +204,7 @@ object HoppityApi {
         item != null && item.item != null && (item.item == Items.PLAYER_HEAD || item.isStainedGlassPane()) &&
             item.hoverName.string.isNotEmpty() && item.getLore().isNotEmpty()
 
-    private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
+    private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent.Allow, note: String? = null) {
         EggFoundEvent(
             type,
             chatEvent = event,
@@ -329,7 +329,7 @@ object HoppityApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             val type = getEggType(event)
@@ -369,7 +369,7 @@ object HoppityApi {
         }
     }
 
-    fun attemptFireRabbitFound(event: SkyHanniChatEvent? = null, lastDuplicateAmount: Long? = null) {
+    fun attemptFireRabbitFound(event: SkyHanniChatEvent.Allow? = null, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
             hoppityDataSet.lastDuplicateAmount = it
             hoppityDataSet.duplicate = true

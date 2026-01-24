@@ -262,7 +262,7 @@ object SunGeckoHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (sunGeckoActiveModifiers.matches(event.message)) {
             scanningChat = true

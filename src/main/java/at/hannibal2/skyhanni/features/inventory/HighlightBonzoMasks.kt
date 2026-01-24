@@ -58,7 +58,7 @@ object HighlightBonzoMasks {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         // TODO move pattern into enum
         if (bonzoMaskPattern.matches(message)) {
