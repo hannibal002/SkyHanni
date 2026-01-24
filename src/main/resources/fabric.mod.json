@@ -53,7 +53,10 @@
         "minecraft": "${minecraft}"
     },
     "breaks": {
-        "exordium": "*"
+        "exordium": "*",
+        "ichor": "*",
+        "feather": "*",
+        "feather-loader": "*"
     },
     "contact": {
         "homepage": "https://modrinth.com/mod/skyhanni",
