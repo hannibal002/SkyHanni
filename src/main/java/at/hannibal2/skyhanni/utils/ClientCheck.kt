@@ -35,11 +35,14 @@ object ClientCheck {
                     ". This is a closed source client that may cause issues we are unable to fix. " +
                         "We strongly recommend switching to a supported configuration, such as "
                 )
-                append("Modrinth Launcher") {
-                    url = "https://modrinth.com/app"
-                    underlined = true
+                // TODO: remove conditional once Modrinth Launcher is fixed on Linux
+                if (!OSUtils.isLinux) {
+                    append("Modrinth Launcher") {
+                        url = "https://modrinth.com/app"
+                        underlined = true
+                    }
+                    append(" or ")
                 }
-                append(" or ")
                 append("Prism Launcher") {
                     url = "https://prismlauncher.org/"
                     underlined = true
