@@ -82,9 +82,11 @@ object PlatformUtils {
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
 
-    fun isModInstalled(modId: String): Boolean {
-        return FabricLoader.getInstance().isModLoaded(modId)
-    }
+    fun isModInstalled(modId: String): Boolean =
+        FabricLoader.getInstance().isModLoaded(modId)
+
+    fun isAnyModInstalled(vararg modIds: String): Boolean =
+        modIds.any(::isModInstalled)
 
     fun isMcAbove(version: String): Boolean {
         return MCVersion.fromString(version) > MCVersion.currentMcVersion
