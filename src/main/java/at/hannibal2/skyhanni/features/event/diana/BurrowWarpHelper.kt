@@ -201,6 +201,7 @@ object BurrowWarpHelper {
             if (oldWarps.getAsJsonPrimitive("stonks")?.asBoolean == true) {
                 newWarps.add("STONKS")
             }
+            newWarps.add("TAYLOR")
             element.asJsonObject.add("ignoredWarpsList", newWarps)
             element
         }
