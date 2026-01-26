@@ -39,11 +39,11 @@ object SackItemDisplay {
     }
 
     fun handleTabComplete(): List<String> {
-        return SackApi.sackListNames.map { it.replace(" ", "_") }
+        return SackApi.sackListNames.map { it }
     }
 
     fun command(args: String) {
-        val fixedarg = args.replace("_", " ")
+        val fixedarg = args
         val foundInternalName = NeuInternalName.fromItemNameOrNull(fixedarg)
         if (foundInternalName == null) {
             ChatUtils.chat("Item $fixedarg could not be found.")
