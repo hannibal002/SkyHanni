@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -30,16 +31,14 @@ object SackItemDisplay {
         event.registerBrigadier("shdisplaysackitem") {
             description = "Displays Sack Contained Amount of Item"
             category = CommandCategory.USERS_ACTIVE
-            arg("Item", BrigadierArguments.greedyString()) { args ->
+            arg("Item", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider({ handleTabComplete() })) { args ->
                 callback { command(getArg(args)) }
             }
 
         }
     }
 
-    fun handleTabComplete(command: String): List<String>? {
-        if (command != "shdisplaysackitem") return null
-
+    fun handleTabComplete(): List<String> {
         return SackApi.sackListNames.map { it.replace(" ", "_") }
     }
 

@@ -10,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SackItemDisplayConfig {
 
-    @Expose
     @ConfigOption(name = "Note", desc = "These Settings are for /shdisplaysackitem")
     @ConfigEditorInfoText
     val notice = ""
@@ -18,7 +17,7 @@ class SackItemDisplayConfig {
     @Expose
     @ConfigOption(name = "Price Source", desc = "")
     @ConfigEditorDropdown
-    val priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
+    var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
 
     @Expose
     @NoConfigLink
