@@ -242,7 +242,7 @@ object CroesusChestTracker {
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
         val run = croesusSlotMapToRun(event.slot.containerSlot) ?: return
-        if (!getKismetUsed(run)) return
+        if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getLore())) return
         event.offsetY = -1
         event.offsetX = -9
         event.stackTip = "§a✔"
