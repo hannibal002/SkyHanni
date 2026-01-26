@@ -39,7 +39,7 @@ object SackItemDisplay {
     }
 
     fun handleTabComplete(): List<String> {
-        return SackApi.sackListNames.map { it }
+        return SackApi.sackListNames.map { it.lowercase() }
     }
 
     fun command(args: String) {
