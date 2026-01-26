@@ -184,4 +184,9 @@ class GuiConfig {
     @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
     @Accordion
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
+
+    @Expose
+    @ConfigOption(name = "Sack Item Overlay", desc = "")
+    @Accordion
+    val sackItemDisplay: SackItemDisplayConfig = SackItemDisplayConfig()
 }
