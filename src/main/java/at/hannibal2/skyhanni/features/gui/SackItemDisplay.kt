@@ -43,10 +43,9 @@ object SackItemDisplay {
     }
 
     fun command(args: String) {
-        val fixedarg = args
-        val foundInternalName = NeuInternalName.fromItemNameOrNull(fixedarg)
+        val foundInternalName = NeuInternalName.fromItemNameOrNull(args)
         if (foundInternalName == null) {
-            ChatUtils.chat("Item $fixedarg could not be found.")
+            ChatUtils.chat("Item $args could not be found.")
             return
         }
         if (items.remove(foundInternalName)) {
