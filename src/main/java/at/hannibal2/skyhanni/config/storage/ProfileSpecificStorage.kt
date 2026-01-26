@@ -142,9 +142,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var openState: OpenedState? = null
-
-            @Expose
-            var kismetUsed: Boolean? = null
         }
     }
 
