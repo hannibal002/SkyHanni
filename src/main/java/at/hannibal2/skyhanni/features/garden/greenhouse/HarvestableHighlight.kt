@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.greenhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,7 +16,7 @@ object HarvestableHighlight {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.highlightHarvestableStatus) return
         if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
