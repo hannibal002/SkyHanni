@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -14,10 +15,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -53,7 +54,8 @@ object FarmingWeightData {
     private var shouldRecalculateWeight = false
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.GARDEN) return
         updateCollections()
     }
 
