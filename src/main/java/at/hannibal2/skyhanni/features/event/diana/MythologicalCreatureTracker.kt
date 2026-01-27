@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -60,6 +59,8 @@ object MythologicalCreatureTracker {
         @Expose var count: MutableMap<String, Int> = mutableMapOf(),
     ) : TrackerData()
 
+    var lastSinceAmount: Int? = null
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
@@ -84,7 +85,10 @@ object MythologicalCreatureTracker {
             val since = it.since
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 val trackerId = creatureEntry.trackerId
-                if (creatureEntry != type) {
+                if (creatureEntry == type) {
+                    lastSinceAmount = since[trackerId]
+                    since[trackerId] = 0
+                } else {
                     since.addOrPut(trackerId, 1)
                 }
             }
@@ -94,6 +98,7 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Modify) {
+        if (lastSinceAmount == null) return
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
         val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
@@ -104,15 +109,14 @@ object MythologicalCreatureTracker {
         }
 
         tracker.modify {
-            val since = it.since
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
-                val trackerId = creatureEntry.trackerId
                 if (creatureEntry == type) {
-                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
-                    since[trackerId] = 0
+                    val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
+                    event.replaceComponent(newComp, "diana_mobs_since")
                 }
             }
         }
+        lastSinceAmount = null
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {

@@ -75,6 +75,7 @@ object MinecraftData {
             }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
+            InventoryUtils.lastItemChangeTime = SimpleTimeMark.now()
             ItemInHandChangeEvent(newItem, oldItem).post()
         }
     }
