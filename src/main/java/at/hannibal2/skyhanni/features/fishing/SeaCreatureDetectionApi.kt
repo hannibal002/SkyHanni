@@ -127,9 +127,8 @@ object SeaCreatureDetectionApi {
         mob: Mob,
         time: SimpleTimeMark = SimpleTimeMark.now(),
         isOwn: Boolean = false,
-        isBabySlug: Boolean = false,
     ) {
-        val seaCreature = if (isBabySlug) BABY_MAGMA_SLUG else SeaCreatureManager.allFishingMobs[mob.name] ?: return
+        val seaCreature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         val data = LivingSeaCreatureData(isOwn, seaCreature, mob.entityId, time, mob)
         seaCreatures[mob] = data
         entityIdToData[mob.entityId] = data
@@ -176,7 +175,7 @@ object SeaCreatureDetectionApi {
         for ((entry, _) in slugs) {
             val mob = entry.key
             val time = mob.baseEntity.spawnTime
-            addMob(mob, time, isOwn = true, isBabySlug = true)
+            addMob(mob, time, isOwn = true)
             recentBabyMagmaSlugs.remove(mob)
         }
         if (babyMagmaSlugsToFind == 0) {
@@ -198,7 +197,7 @@ object SeaCreatureDetectionApi {
         }
         recentBabyMagmaSlugs.removeIf { (mob, time) ->
             if (time.passedSince() < 1.2.seconds) return@removeIf false
-            addMob(mob, time, isOwn = false, isBabySlug = true)
+            addMob(mob, time, isOwn = false)
             return@removeIf true
         }
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
@@ -228,14 +227,6 @@ object SeaCreatureDetectionApi {
 
     @HandleEvent
     fun onWorldChange() = reset()
-
-    val BABY_MAGMA_SLUG = SeaCreature(
-        "Baby Magma Slug",
-        fishingExperience = 730,
-        chatColor = "§c",
-        rare = false,
-        rarity = LorenzRarity.RARE,
-    )
 
     private fun reset() {
         entityIdToData.values.forEach { it.forceRemove() }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.fishing
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,8 +12,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class SeaCreatureHealthDisplayConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a GUI with the health of the sea creatures shown.")
+    @ConfigOption(name = "Enabled", desc = "Shows a GUI with the health of the Sea Creatures Selected.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var enabled = false
 
     @Expose
