@@ -35,9 +35,16 @@ enum class CropType(
         { ItemStack(Items.POTATO).overrideId("POTATO_ITEM") }, "potato", FarmingItemType.POTATO, replenish = true,
     ),
     NETHER_WART(
-        "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.NETHER_WART).overrideId("NETHER_STALK") }, "wart", FarmingItemType.NETHER_WART, replenish = true,
-        enchantName = "warts", eliteLbName = "netherwart"
+        "Nether Wart",
+        "THEORETICAL_HOE_WARTS",
+        "FERMENTO",
+        2.5,
+        { ItemStack(Items.NETHER_WART).overrideId("NETHER_STALK") },
+        "wart",
+        FarmingItemType.NETHER_WART,
+        replenish = true,
+        enchantName = "warts",
+        eliteLbName = "netherwart"
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
@@ -53,8 +60,15 @@ enum class CropType(
         FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco",
     ),
     SUGAR_CANE(
-        "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.SUGAR_CANE).overrideId("SUGAR_CANE") }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane", eliteLbName = "sugarcane"
+        "Sugar Cane",
+        "THEORETICAL_HOE_CANE",
+        "FERMENTO",
+        2.0,
+        { ItemStack(Items.SUGAR_CANE).overrideId("SUGAR_CANE") },
+        "cane",
+        FarmingItemType.SUGAR_CANE,
+        enchantName = "cane",
+        eliteLbName = "sugarcane"
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
@@ -66,12 +80,24 @@ enum class CropType(
         enchantName = "mushrooms",
     ),
     SUNFLOWER(
-        "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Items.SUNFLOWER).overrideId("DOUBLE_PLANT") }, "sunflower", FarmingItemType.SUNFLOWER, replenish = true,
+        "Sunflower",
+        "THEORETICAL_HOE_SUNFLOWER",
+        "HELIANTHUS",
+        2.0,
+        { ItemStack(Items.SUNFLOWER).overrideId("DOUBLE_PLANT") },
+        "sunflower",
+        FarmingItemType.SUNFLOWER,
+        replenish = true,
     ),
     MOONFLOWER(
-        "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Items.BLUE_ORCHID).overrideId("MOONFLOWER") }, "moonflower", FarmingItemType.MOONFLOWER, replenish = true,
+        "Moonflower",
+        "THEORETICAL_HOE_SUNFLOWER",
+        "HELIANTHUS",
+        2.0,
+        { ItemStack(Items.BLUE_ORCHID).overrideId("MOONFLOWER") },
+        "moonflower",
+        FarmingItemType.MOONFLOWER,
+        replenish = true,
     ),
     WILD_ROSE(
         "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
@@ -94,9 +120,10 @@ enum class CropType(
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
             if (itemName == "Seeds") return WHEAT
             return entries.firstOrNull {
-                it.cropName.equals(itemName, ignoreCase = true) ||
-                    it.simpleName.equals(itemName, ignoreCase = true) ||
-                    it.enchantName.equals(itemName, ignoreCase = true)
+                it.cropName.equals(itemName, ignoreCase = true) || it.simpleName.equals(
+                    itemName,
+                    ignoreCase = true
+                ) || it.enchantName.equals(itemName, ignoreCase = true)
             }
         }
 
