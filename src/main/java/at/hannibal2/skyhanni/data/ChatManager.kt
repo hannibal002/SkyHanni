@@ -191,7 +191,7 @@ object ChatManager {
      * If the message is modified return the modified message otherwise return null.
      */
     fun onChatModify(original: Component): Component? {
-        var component = original
+        val component = original
         val message = component.formattedTextCompat().stripHypixelMessage()
 
         val key = IdentityCharacteristics(component)
@@ -207,12 +207,41 @@ object ChatManager {
             loggerModified.log("[original] " + component.formattedTextCompat())
             loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat())
             messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent, reason)
-            component = modifiedComponent
         } else {
             messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null, null)
         }
 
         return modifiedComponent.takeIf { modified }
+    }
+
+    /**
+     * Adds canceled messages to /shchathistory if another mod canceled it
+     */
+    fun onChatCancel(original: Component) {
+        val key = IdentityCharacteristics(original)
+        if (messageHistory.contains(key)) return
+        val blockReason = "OTHER_MOD"
+        val message = original.formattedTextCompat().stripHypixelMessage()
+
+        loggerFiltered.log("[$blockReason] $message")
+        loggerAll.log("[$blockReason] $message")
+        loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
+            .log(message)
+        messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null, null)
+    }
+
+    /**
+     * Added edited messages to /shchathistory if they were edited by another mod
+     */
+    fun onChatModifyOtherMod(original: Component, modified: Component) {
+        val key = IdentityCharacteristics(original)
+        val key2 = IdentityCharacteristics(modified)
+        if (messageHistory[key2]?.actionKind == ActionKind.ALLOWED && messageHistory[key] == null) {
+            loggerModified.log(" ")
+            loggerModified.log("[original] " + original.formattedTextCompat())
+            loggerModified.log("[modified] " + modified.formattedTextCompat())
+            messageHistory[key2] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified, "OTHER_MOD")
+        }
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched

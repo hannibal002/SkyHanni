@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
@@ -127,7 +128,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            if (event.slot.item?.hoverName?.string == "Reforge Item" || event.slot.item?.hoverName?.string == "Error!") return
+            if (event.slot.item?.getLoreComponent()?.last()?.string != "Click to reforge!") return
             if (handleReforgeButtonClick(event)) return
         }
 

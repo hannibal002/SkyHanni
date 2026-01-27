@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
@@ -189,7 +190,7 @@ object BurrowWarpHelper {
 
         event.transform(119, "event.diana") { element ->
             val oldWarps = element.asJsonObject.getAsJsonObject("ignoredWarps")
-            val newWarps = element.asJsonObject.getAsJsonArray("ignoredWarpsList")
+            val newWarps = JsonArray()
 
             if (oldWarps.getAsJsonPrimitive("crypt")?.asBoolean == true) {
                 newWarps.add("CRYPT")
@@ -200,6 +201,8 @@ object BurrowWarpHelper {
             if (oldWarps.getAsJsonPrimitive("stonks")?.asBoolean == true) {
                 newWarps.add("STONKS")
             }
+            newWarps.add("TAYLOR")
+            element.asJsonObject.add("ignoredWarpsList", newWarps)
             element
         }
     }
