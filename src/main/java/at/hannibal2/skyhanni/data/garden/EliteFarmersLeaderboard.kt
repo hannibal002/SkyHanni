@@ -213,8 +213,7 @@ object EliteFarmersLeaderboard {
         val nextPlayer = lbData.nextPlayers.firstOrNull() ?: return null
         lbData.lastPlayer = nextPlayer
         // send messages every ~30s instead of every pass to avoid chat spam
-        val list = lbData.passedPlayers.toMutableList()
-        list.add(nextPlayer.name)
+        lbData.passedPlayers.add(nextPlayer.name)
         lbData.nextPlayers.removeFirstOrNull() ?: return null
 
         val currentRank = leaderboardPosMap?.get(leaderboardType) ?: return null
