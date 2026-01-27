@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object HarvestableHighlight {
@@ -20,16 +21,21 @@ object HarvestableHighlight {
         if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
         val slot = InventoryUtils.getSlotAtIndex(24) ?: return
         val beacon = slot.item ?: return
+        if (beacon.item != Items.BEACON) return
+        var color = LorenzColor.RED
         for (component in beacon.getLoreComponent()) {
-            if (component.string.contains("Status: ")) {
-                if (component.string == "Status: Harvestable") {
-                    slot.highlight(LorenzColor.GREEN)
-                    return
+            val line = component.string
+            if (line.contains("Status: ")) {
+                if (line == "Status: Harvestable") {
+                    color = LorenzColor.GREEN
+                    continue
                 }
-                slot.highlight(LorenzColor.RED)
-                return
+                if (line.startsWith("Drops: ") || line.startsWith("Rewards: ")) {
+                    color = LorenzColor.YELLOW
+                    continue
+                }
             }
         }
-
+        slot.highlight(color)
     }
 }
