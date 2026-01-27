@@ -4,6 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
@@ -22,7 +25,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
+import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
@@ -60,7 +66,8 @@ object FarmingWeightData {
     }
 
     // We need profile id for leaderboard api
-    @HandleEvent
+    // This should only fetch once
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (profileId.isBlank()) updateCollections()
     }
@@ -121,7 +128,7 @@ object FarmingWeightData {
     }
 
     fun updateCollections() {
-        if (lastFetchAttempt.passedSince() <= 5.seconds || lastPlayerWeightFetch.passedSince() <= 5.minutes) return
+        if (lastFetchAttempt.passedSince() <= 30.seconds || lastPlayerWeightFetch.passedSince() <= 15.minutes) return
         if (HypixelData.profileName.isEmpty()) return
         if (collectionMutex.isLocked) return
         lastFetchAttempt = SimpleTimeMark.now()
@@ -251,6 +258,32 @@ object FarmingWeightData {
             cropWeightValues[cropType] = crop.value
         }
         hasFetchedCropWeights = true
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shfarmingprofile") {
+            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            category = CommandCategory.USERS_ACTIVE
+            argCallback("name", BrigadierArguments.string()) { name ->
+                openWebsite(name, ignoreCooldown = true)
+            }
+            simpleCallback {
+                openWebsite(PlayerUtils.getName(), ignoreCooldown = true)
+            }
+        }
+    }
+
+    private var lastName = ""
+    private var lastOpenWebsite = SimpleTimeMark.farPast()
+
+    fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
+        if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
+        lastOpenWebsite = SimpleTimeMark.now()
+        lastName = name
+
+        OSUtils.openBrowser("https://elitebot.dev/@$name/")
+        ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 
     @HandleEvent

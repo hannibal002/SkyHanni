@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinA
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.openWebsite
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -250,17 +251,5 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
 
         position.renderRenderables(display, posLabel = name)
-    }
-
-    private var lastName = ""
-    private var lastOpenWebsite = SimpleTimeMark.farPast()
-
-    private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
-        if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
-        lastOpenWebsite = SimpleTimeMark.now()
-        lastName = name
-
-        OSUtils.openBrowser("https://elitebot.dev/@$name/")
-        ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 }
