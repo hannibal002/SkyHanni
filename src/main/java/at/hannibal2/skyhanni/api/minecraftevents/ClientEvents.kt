@@ -68,7 +68,8 @@ object ClientEvents {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             object : IdentifiableResourceReloadListener {
 
-                override fun getFabricId(): ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
+                override fun getFabricId(): ResourceLocation =
+                    ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
 
                 //? < 1.21.9 {
                 @Suppress("ForbiddenVoid")
@@ -85,28 +86,28 @@ object ClientEvents {
                     ).thenCompose(synchronizer::wait)
                 }
                 //?} else {
-                 /*override fun reload(
-                     store: PreparableReloadListener.SharedState,
-                     prepareExecutor: Executor,
-                     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
-                     applyExecutor: Executor,
-                 ): CompletableFuture<Void> {
-                     return CompletableFuture.runAsync(
-                         { ResourcePackReloadEvent(store.resourceManager()).post() },
-                         applyExecutor,
-                     ).thenCompose(reloadSynchronizer::wait)
-                 }
-                *///?}
+                /*override fun reload(
+                    store: PreparableReloadListener.SharedState,
+                    prepareExecutor: Executor,
+                    reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
+                    applyExecutor: Executor,
+                ): CompletableFuture<Void> {
+                    return CompletableFuture.runAsync(
+                        { ResourcePackReloadEvent(store.resourceManager()).post() },
+                        applyExecutor,
+                    ).thenCompose(reloadSynchronizer::wait)
+                }
+               *///?}
             },
         )
 
         ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow)
         ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
+        ClientReceiveMessageEvents.GAME_CANCELED.register(::onCanceled)
 
     }
 
-    private var lastMessage: Component? = null
-    private var lastResult: Component? = null
+    var currentMessage: Component? = null
 
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
         // if we created the message we don't want to pipe it back into our events
@@ -119,10 +120,10 @@ object ClientEvents {
             // we never cancel the action bar
             return true
         }
-        lastMessage = message
 
-        val (result, cancel) = ChatManager.onChatReceive(message)
-        lastResult = result
+        currentMessage = message
+
+        val cancel = ChatManager.onChatAllow(message)
 
         if (cancel) {
             // the message doesn't get logged if we cancel it, so we do that ourselves
@@ -141,12 +142,8 @@ object ClientEvents {
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
         }
-        // we check if the message is the same as the one from allow
-        // if someone else modifies the message it won't be the same but what can you do about that
-        if (lastMessage == message && !actionBar) {
-            // if last result is null then we didn't want to change the message
-            lastResult?.let { return it }
-        } else if (actionBar) {
+
+        if (actionBar) {
             // we don't have to worry about cancelling the action bar
             // this is more compatible with other mods changing the action bar as well
             // ie to remove hp/mana
@@ -174,7 +171,24 @@ object ClientEvents {
             }
         }
 
+        val new = ChatManager.onChatModify(message)
+        // if new is null then we didn't want to change the message
+        new?.let { return it }
+
+        currentMessage?.let {
+            if (it != message) ChatManager.onChatModifyOtherMod(it, message)
+        }
+        currentMessage = null
+
         return message
+    }
+
+    private fun onCanceled(message: Component, actionBar: Boolean) {
+        if (actionBar) return
+        if (currentMessage == message) {
+            ChatManager.onChatCancel(message)
+        }
+        currentMessage = null
     }
 
     fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar

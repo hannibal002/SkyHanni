@@ -20,7 +20,7 @@ object PlayerDeathManager {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         deathMessagePattern.matchMatcher(message) {
             val name = group("name")

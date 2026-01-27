@@ -145,7 +145,7 @@ object ItemAddManager {
     private val superCraftedItems = TimeLimitedSet<NeuInternalName>(30.seconds)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (diceRollChatPattern.matches(event.message)) {
             lastDiceRoll = SimpleTimeMark.now()
         }

@@ -93,7 +93,7 @@ object StockOfStonkFeature {
                 }
             }
         }
-        event.toolTip.transformAt(bestValueIndex) { replace("§6§6", "§a") }
+        event.toolTip.transformAt(bestValueIndex) { replace("§6§6", "§a") ?: this }
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.stonkOfStonkPrice

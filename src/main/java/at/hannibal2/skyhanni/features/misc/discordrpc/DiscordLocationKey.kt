@@ -86,6 +86,7 @@ object DiscordLocationKey {
         "Builder's House" to "village",
         "Election Room" to "village",
         "Hexatorum" to "village",
+        "Pet Care" to "village",
         "Thaumaturgist" to "village",
         "Weaponsmith" to "village",
 
@@ -143,7 +144,6 @@ object DiscordLocationKey {
         "The Mist" to "dwarven-mines",
         "Upper Mines" to "dwarven-mines",
 
-        "Dragon's Lair" to "mithril-deposits",
         "Fairy Grotto" to "crystal-nucleus",
         "Goblin Queen's Den" to "goblin-holdout",
         "Jungle Temple" to "jungle",
@@ -161,6 +161,46 @@ object DiscordLocationKey {
         "Fossil Research Center" to "glacite-tunnels",
         "Great Glacite Lake" to "glacite-tunnels",
         "Glacite Mineshafts" to "glacite-tunnels",
+
+        "Ancient Ruins" to "dark-thicket",
+        "Bubbleboost Column" to "dark-thicket",
+        "Dive-Ember Pass" to "dark-thicket",
+        "Driptoad Delve" to "fishermans-hut",
+        "Driptoad Pass" to "fishermans-hut",
+        "Drowned Reliquary" to "dark-thicket",
+        "Evergreen Plateau" to "dark-thicket",
+        "Forest Temple" to "dark-thicket",
+        "Fusion House" to "dark-thicket",
+        "Kelpwoven Tunnels" to "dark-thicket",
+        "Moonglade Marsh" to "dark-thicket",
+        "Moonglade's Edge" to "dark-thicket",
+        "Murkwater Depths" to "fishermans-hut",
+        "Murkwater Loch" to "fishermans-hut",
+        "Murkwater Outpost" to "fishermans-hut",
+        "Murkwater Shallows" to "fishermans-hut",
+        "North Reaches" to "dark-thicket",
+        "North Wetlands" to "fishermans-hut",
+        "Red House" to "village",
+        "Reefguard Pass" to "dark-thicket",
+        "Side-Ember Way" to "dark-thicket",
+        "South Reaches" to "dark-thicket",
+        "South Wetlands" to "dark-thicket",
+        "Squid Cave" to "fishermans-hut",
+        "Stride-Ember Fissure" to "fishermans-hut",
+        "SwampCut Inc." to "dark-thicket",
+        "Tangleburg" to "dark-thicket",
+        "Tangleburg Bank" to "bank",
+        "Tangleburg Library" to "library",
+        "Tangleburg's Path" to "dark-thicket",
+        "Tomb Floodway" to "fishermans-hut",
+        "Tranquil Pass" to "dark-thicket",
+        "Tranquility Sanctum" to "dark-thicket",
+        "Verdant Summit" to "dark-thicket",
+        "West Reaches" to "dark-thicket",
+        "Westbound Wetlands" to "dark-thicket",
+        "Wyrmgrove Tomb" to "dark-thicket",
+
+        "Backwater Bayou" to "fishermans-hut",
     ) // maps sublocations to their broader image
 
     private val specialNetherRPC = arrayOf(
@@ -250,11 +290,10 @@ object DiscordLocationKey {
         val island = SkyBlockUtils.currentIsland
 
         DungeonApi.dungeonFloor?.lowercase()?.let {
-            if (it.startsWith("m")) {
-                return "master-mode"
-            }
-            if (it.startsWith("f")) {
-                return "dungeon"
+            return if (it.startsWith("m")) {
+                "master-mode"
+            } else {
+                "dungeon"
             }
         }
 
@@ -287,6 +326,14 @@ object DiscordLocationKey {
                 when (island) {
                     IslandType.HUB -> "colosseum"
                     IslandType.THE_RIFT -> "around-colosseum"
+                    else -> "skyblock-logo"
+                }
+            }
+
+            "Dragon's Lair" -> {
+                when (island) {
+                    IslandType.CRYSTAL_HOLLOWS -> "mithril-deposits"
+                    IslandType.GALATEA -> "dark-thicket"
                     else -> "skyblock-logo"
                 }
             }

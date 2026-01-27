@@ -73,7 +73,7 @@ object CurrentChatDisplay {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         changedChatPattern.matchMatcher(message) {
             return updateChat(ChatType.fromName(group("chat")))
@@ -88,7 +88,7 @@ object CurrentChatDisplay {
     }
 
     @HandleEvent
-    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (currentChat == ChatType.PRIVATE && privateMessagePlayer == event.author.cleanPlayerName()) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
             update()

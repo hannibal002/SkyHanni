@@ -341,7 +341,7 @@ class InventoryConfig {
     var essenceShopHelper: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone/PlantBoy Advance snake game.")
     @ConfigEditorBoolean
     @FeatureToggle
     var snakeGameKeybinds: Boolean = true

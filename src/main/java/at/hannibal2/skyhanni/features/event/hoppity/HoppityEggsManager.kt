@@ -183,7 +183,7 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
-    private fun SkyHanniChatEvent.sendNextEggAvailable() {
+    private fun SkyHanniChatEvent.Allow.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
         val currentYear = SkyBlockTime.now().year
         val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
@@ -194,7 +194,7 @@ object HoppityEggsManager {
         blockedReason = "hoppity_egg"
     }
 
-    private fun SkyHanniChatEvent.sendNextHuntIn(
+    private fun SkyHanniChatEvent.Allow.sendNextHuntIn(
         reason: String = "Hoppity's Hunt is not active",
     ) {
         val currentYear = SkyBlockTime.now().year
@@ -204,7 +204,7 @@ object HoppityEggsManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         hoppityEventNotOn.matchMatcher(event.message) {
             if (!chatConfig.eggLocatorTimeInChat) return@matchMatcher
             return event.sendNextHuntIn()
