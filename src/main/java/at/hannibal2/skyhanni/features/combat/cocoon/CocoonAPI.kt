@@ -23,6 +23,11 @@ import kotlin.time.Duration.Companion.seconds
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
+    val expectedLifetime = 6.4.seconds
+    /*
+     roughly where cocoon times landed for me across a few hundred cocoons
+     Might require some sort of ping based tweaking?
+     */
     val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
 
