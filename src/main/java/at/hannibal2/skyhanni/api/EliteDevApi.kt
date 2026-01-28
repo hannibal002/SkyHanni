@@ -5,7 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsRequest
@@ -17,6 +21,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.WeightProfile
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboards
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -42,6 +47,10 @@ object EliteDevApi {
         override fun toString() = displayName
     }
 
+    private var spoofProfile = false
+    private var playerUuid = ""
+    private var playerProfile = ""
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfetcheliteresource") {
@@ -53,6 +62,41 @@ object EliteDevApi {
                 }
             }
         }
+        event.registerBrigadier("shspoofweightprofile") {
+            description = "Set yourself to another player for the elite dev api"
+            category = CommandCategory.DEVELOPER_DEBUG
+            argCallback("uuid", BrigadierArguments.string()) { uuid ->
+                arg("profile", BrigadierArguments.string()) { profile ->
+                    spoofProfile(uuid, getArg(profile))
+                }
+            }
+            simpleCallback { resetProfile() }
+        }
+    }
+
+    private fun resetProfile() {
+        ChatUtils.chat("Reset weight profile to default!")
+        resetLeaderboardData()
+    }
+
+    private fun spoofProfile(uuid: String, profile: String) {
+        if (uuid.length <= 20) {
+            ChatUtils.userError("Invalid uuid!")
+            return
+        }
+        ChatUtils.chat("Setting uuid: $uuid, profile: $profile")
+        spoofProfile = true
+        playerUuid = uuid
+        playerProfile = profile
+        resetLeaderboardData()
+    }
+
+    private fun resetLeaderboardData() {
+        updateCollections()
+        FarmingWeightData.reset()
+        EliteFarmersLeaderboard.reset()
+        EliteLeaderboards.resetDisplays()
+        EliteLeaderboards.updateDisplays()
     }
 
     private suspend fun fetchResourceCommand(resourceType: EliteResourceType) = runCatching {
@@ -86,20 +130,20 @@ object EliteDevApi {
         FARMING_WEIGHT_API_NAME,
     )
 
-    private const val WEIGHT_LEADERBOARD_API_NAME = "Elitebot Farming Weight Leaderboard"
-    private const val WEIGHT_LEADERBOARD_URL = "$ELITEBOT_API_URL/leaderboard/farmingweight"
+    private const val LEADERBOARD_URL = "$ELITEBOT_API_URL/leaderboard/"
+    private const val LEADERBOARD_API_NAME = "Elitebot Leaderboard"
 
     private const val RESOURCE_API_NAME = "Elitebot Resources"
     private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
 
     // <editor-fold desc="Upcoming Contests">
-    suspend fun fetchUpcomingContests(): List<EliteFarmingContest>? {
+    suspend fun fetchUpcomingContests(): List<EliteFarmingContest> {
         val apiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(contestStatic.toGet())
         val (_, apiData) = apiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Failed to fetch upcoming contests. Please report this error if it continues to occur",
             "apiResponse" to apiResponse,
         )
-        val contestResponse = ConfigManager.Companion.gson.fromJson<EliteContestsResponse>(apiData)
+        val contestResponse = ConfigManager.gson.fromJson<EliteContestsResponse>(apiData)
         return contestResponse.responseContests
     }
 
@@ -113,7 +157,10 @@ object EliteDevApi {
     private var weightUrl = ""
     private var weightProfileApiResponse: JsonApiResponse<JsonObject>? = null
     suspend fun fetchWeightProfile(localProfile: String): WeightProfile? = try {
-        weightUrl = "$FARMING_WEIGHT_URL/${PlayerUtils.getUuid()}"
+        val profile = if (spoofProfile) playerProfile else localProfile
+        val uuid = if (spoofProfile) playerUuid else PlayerUtils.getUuid()
+        weightUrl = "$FARMING_WEIGHT_URL/$uuid?collections=true"
+        ChatUtils.debug("Fetching weight profile from $weightUrl")
         weightProfileApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(weightUrl, apiName = FARMING_WEIGHT_API_NAME)
         val (_, apiData) = weightProfileApiResponse?.assertSuccessWithData()
             ?: throw IllegalStateException("Response was not successful, or data was null")
@@ -124,16 +171,15 @@ object EliteDevApi {
         // Try to find by name first if localProfile is provided
         val selectedProfileEntry = if (localProfile.isNotBlank()) {
             weightData.profiles.firstOrNull {
-                it.profileName.lowercase() == localProfile.lowercase()
+                it.profileName.lowercase() == profile.lowercase()
             }
         } else {
             null
         } ?: weightData.profiles.firstOrNull {
             it.profileId == selectedProfileId
         } ?: throw IllegalStateException(
-            "No profile found matching the local profile: $localProfile",
+            "No profile found matching the local profile: $profile",
         )
-
         selectedProfileEntry
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
@@ -149,7 +195,7 @@ object EliteDevApi {
         null
     }
 
-    suspend fun fetchApiWeights(): EliteWeightsJson? {
+    suspend fun fetchApiWeights(): EliteWeightsJson {
         val apiWeightsResponse = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet())
         val (_, apiData) = apiWeightsResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Error getting crop weights from elitebot.dev",
@@ -165,20 +211,22 @@ object EliteDevApi {
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
         atRank: Int? = null,
-    ): EliteLeaderboard? {
+    ): EliteLeaderboard {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
-        val uuid = PlayerUtils.getUuid()
+        val uuid = if (spoofProfile) playerUuid else PlayerUtils.getUuid()
 
         val upcomingPlayersParam = upcomingCount?.let { "upcoming=$it" }
         val atRankParam = atRank?.let { "atRank=$it" }
-        val params = listOfNotNull(upcomingPlayersParam, atRankParam)
+        val previousPlayersParam = "previous=1"
+        val params = listOfNotNull(upcomingPlayersParam, atRankParam, previousPlayersParam)
         val paramString = if (params.isEmpty()) "" else {
             "?" + params.joinToString("&")
         }
-        val lbSuffix = lbType.suffix
-        val lbUrl = "$WEIGHT_LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
+        val lbSuffix = lbType.lbName
+        val lbUrl = "$LEADERBOARD_URL$lbSuffix/$uuid/$profileId$paramString"
+        ChatUtils.debug("Fetching leaderboard information from $lbUrl")
 
-        val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = WEIGHT_LEADERBOARD_API_NAME)
+        val lbApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(lbUrl, apiName = LEADERBOARD_API_NAME)
         val (_, apiData) = lbApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
             "Error getting weight leaderboard position",
             "url" to lbUrl,

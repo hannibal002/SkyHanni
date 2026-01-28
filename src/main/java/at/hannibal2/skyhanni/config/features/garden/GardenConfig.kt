@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.contest.JacobContestConfig
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
 import at.hannibal2.skyhanni.config.features.garden.greenhouse.GreenhouseConfig
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteFarmersLeaderboardsConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesConfig
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
@@ -30,6 +31,10 @@ class GardenConfig {
     @Expose
     @Category(name = "Visitor", desc = "Visitor Settings")
     val visitors: VisitorConfig = VisitorConfig()
+
+    @Expose
+    @Category(name = "Elite Leaderboards", desc = "")
+    val eliteFarmersLeaderboards: EliteFarmersLeaderboardsConfig = EliteFarmersLeaderboardsConfig()
 
     @Expose
     @ConfigOption(name = "Numbers", desc = "")
@@ -63,11 +68,6 @@ class GardenConfig {
     @ConfigOption(name = "Garden Level", desc = "")
     @Accordion
     val gardenLevels: GardenLevelConfig = GardenLevelConfig()
-
-    @Expose
-    @ConfigOption(name = "Farming Weight", desc = "")
-    @Accordion
-    val eliteFarmingWeights: EliteFarmingWeightConfig = EliteFarmingWeightConfig()
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
