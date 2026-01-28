@@ -49,6 +49,7 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onSecondPassed() {
         cocoons.removeIf { it.deceased }
+        miniBosses.removeIf { it.baseEntity.deceased }
     }
 
     @HandleEvent
