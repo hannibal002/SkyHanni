@@ -688,7 +688,7 @@ object WorldRenderUtils {
 
         val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
         val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
-                (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
+            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
         val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
