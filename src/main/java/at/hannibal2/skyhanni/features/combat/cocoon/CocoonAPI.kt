@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -54,7 +53,6 @@ object CocoonAPI {
         val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
         if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
         existingCocoons.add(cocoon)
-        ChatUtils.debug("name: (${mob.name}), Type: (${mob.mobType}), Cocoon ID: (${cocoon.cocoonID}) Entered List")
         logger.log("${mob.name} Cocoon (${cocoon.cocoonID} Entered List")
         CocoonSpawnEvent(cocoon).post()
     }
@@ -65,7 +63,6 @@ object CocoonAPI {
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         val cocoonMob = cocoon.mob
         val timeSince = cocoon.spawnTime.passedSince()
-        ChatUtils.debug("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
