@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -31,6 +35,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
@@ -102,6 +109,9 @@ class ProfileSpecificStorage(
         var migratedTotalKills: Boolean = false
     }
 
+    @Expose
+    var instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
+
     // - commands
     @Expose
     var lastStorage: LastStorage = LastStorage()
@@ -142,9 +152,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var openState: OpenedState? = null
-
-            @Expose
-            var kismetUsed: Boolean? = null
         }
     }
 
@@ -433,6 +440,12 @@ class ProfileSpecificStorage(
         var lastGainedCrop: CropType? = null
 
         @Expose
+        var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
+
+        @Expose
+        var cropCollectionCounter: MutableMap<CropType, CropCollectionApi.CropCollection> = enumMapOf()
+
+        @Expose
         var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
 
         @Expose
@@ -599,7 +612,24 @@ class ProfileSpecificStorage(
 
         class FarmingWeightConfig {
             @Expose
-            var lastLeaderboard: Int = -1
+            var lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
+
+            @Expose
+            var leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
+            @Expose
+            var cropDisplayType: CropLeaderboardStorage = CropLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var pestDisplayType: PestLeaderboardStorage = PestLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var weightDisplayType: WeightLeaderboardStorage =
+                WeightLeaderboardStorage(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
         }
 
         @Expose
@@ -619,6 +649,13 @@ class ProfileSpecificStorage(
 
         @Expose
         var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
+
+        @Expose
+        var greenhouse: GreenHouseStorage = GreenHouseStorage()
+
+        class GreenHouseStorage(
+            @Expose var nextCycle: SimpleTimeMark = farPast(),
+        )
     }
 
     // - gui

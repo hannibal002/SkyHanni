@@ -36,7 +36,7 @@ object CompactBingoChat {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
         if (!SkyBlockUtils.isBingoProfile && !config.outsideBingo) return
 

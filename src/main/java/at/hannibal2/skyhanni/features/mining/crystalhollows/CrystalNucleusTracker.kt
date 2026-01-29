@@ -79,7 +79,7 @@ object CrystalNucleusTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
 

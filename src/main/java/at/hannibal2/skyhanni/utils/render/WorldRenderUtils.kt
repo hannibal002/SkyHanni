@@ -52,7 +52,7 @@ object WorldRenderUtils {
         matrices.pushPose()
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.renderBeaconBeam(
-            //#if MC < 1.21.9
+            //? < 1.21.9 {
             matrices,
             vertexConsumers,
             beaconBeam,
@@ -64,18 +64,18 @@ object WorldRenderUtils {
             rgb,
             0.2f,
             0.25f,
-            //#else
-            //$$ matrices,
-            //$$ Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
-            //$$ beaconBeam,
-            //$$ 1f,
-            //$$ Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
-            //$$ 0,
-            //$$ 319,
-            //$$ rgb,
-            //$$ 0.2f,
-            //$$ 0.25f,
-            //#endif
+            //?} else {
+             /*matrices,
+             Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
+             beaconBeam,
+             1f,
+             Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
+             0,
+             319,
+             rgb,
+             0.2f,
+             0.25f,
+            *///?}
         )
         matrices.popPose()
     }
@@ -646,6 +646,54 @@ object WorldRenderUtils {
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
         drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawDynamicText(
+        location: LorenzVec,
+        text: Component,
+        scaleMultiplier: Double,
+        yOff: Float = 0f,
+        hideTooCloseAt: Double = 4.5,
+        smallestDistanceVew: Double = 5.0,
+        seeThroughBlocks: Boolean = true,
+        ignoreY: Boolean = false,
+        maxDistance: Int? = null,
+    ) {
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+
+        val x = location.x
+        val y = location.y
+        val z = location.z
+
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val eyeHeight = player.getEyeHeight(player.pose)
+
+        val dX = (x - viewerX) * (x - viewerX)
+        val dY = (y - (viewerY + eyeHeight)) * (y - (viewerY + eyeHeight))
+        val dZ = (z - viewerZ) * (z - viewerZ)
+        val distToPlayerSq = dX + dY + dZ
+        var distToPlayer = sqrt(distToPlayerSq)
+        // TODO this is optional maybe?
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+
+        if (distToPlayer < hideTooCloseAt) return
+        maxDistance?.let {
+            if (!seeThroughBlocks && distToPlayer > it) return
+        }
+
+        val distRender = distToPlayer.coerceAtMost(50.0)
+
+        var scale = distRender / 12
+        scale *= scaleMultiplier
+
+        val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
+            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
+        val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
+
+        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+
+        drawString(renderLocation, text, seeThroughBlocks, null, scale, true, yOff, 0)
     }
 
     // TODO add chroma color support

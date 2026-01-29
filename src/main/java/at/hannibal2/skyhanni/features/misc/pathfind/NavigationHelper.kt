@@ -139,6 +139,9 @@ object NavigationHelper {
                     doCommandAsync(it.lowercase())
                 }
             }
+            simpleCallback {
+                doCommandAsync("")
+            }
         }
     }
 

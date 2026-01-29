@@ -23,7 +23,7 @@ class DevConfig {
     val repo: RepositoryConfig = RepositoryConfig()
 
     @Expose
-    @ConfigOption(name = "Neu Repository", desc = "")
+    @ConfigOption(name = "NEU Repository", desc = "")
     @Accordion
     val neuRepo: NeuRepositoryConfig = NeuRepositoryConfig()
 

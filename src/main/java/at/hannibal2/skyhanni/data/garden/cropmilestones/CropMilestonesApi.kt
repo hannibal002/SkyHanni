@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 
@@ -356,7 +356,6 @@ object CropMilestonesApi {
         cropMilestoneTierCache.clear()
         amountToNextTierCache.clear()
         maxTier = null
-        GardenCropMilestoneDisplay.update()
     }
 
     private fun resetMilestones() {
@@ -373,9 +372,11 @@ object CropMilestonesApi {
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneRepoData = event.getConstant<GardenJson>("Garden").cropMilestones
         missingMilestoneRepoData = false
-        CustomGoals.loadCustomGoals()
         clearMilestoneCache()
-        CropMilestoneUpdateEvent.post()
+        if (MinecraftCompat.localPlayerExists) {
+            CustomGoals.loadCustomGoals()
+            CropMilestoneUpdateEvent.post()
+        }
     }
 
     @HandleEvent

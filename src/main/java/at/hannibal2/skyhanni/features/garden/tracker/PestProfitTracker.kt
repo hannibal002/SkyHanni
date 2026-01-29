@@ -11,13 +11,10 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
-import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
@@ -25,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
@@ -40,13 +38,12 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -76,7 +73,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
+     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §6(§6+1,344☘)
+     * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
      * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
@@ -84,7 +82,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)",
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? §6\\(§6\\+[\\d,]+☘\\)",
     )
 
     /**
@@ -104,8 +102,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
-    private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
-    private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
     data class BucketData(
         @Expose private var totalPestsKills: Long = 0L,
@@ -135,9 +131,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         }
 
         override val selectedBucketItems
-            get() =
-                if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
-                    .toMutableMap()
+            get() = if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
+                .toMutableMap()
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
 
@@ -155,9 +150,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             return "Pest"
         }
 
-        fun getTotalPestCount(): Long =
-            if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
-            else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
+        fun getTotalPestCount(): Long = if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
+        else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
     }
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
@@ -170,7 +164,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         event.checkPestChats()
         event.checkSprayChats()
     }
@@ -184,11 +178,11 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.coinsPerBit, config.includeBits) { update() }
     }
 
-    private fun SkyHanniChatEvent.checkPestChats() {
+    private fun SkyHanniChatEvent.Allow.checkPestChats() {
         PestApi.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
@@ -196,13 +190,13 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 "full_message" to message,
             )
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-            val amount = group("amount").toInt().fixAmount(internalName, pest)
+            val amount = group("amount").toInt()
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
+            CropType.getByNameOrNull(rawName)
+                ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            cropType.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
             if (config.hideChat && config.enabled) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
@@ -216,22 +210,15 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
-            val amount = 1.fixAmount(internalName, pest).also {
-                if (it == 1) return@also
-                // If the amount was fixed, edit the chat message to reflect the change
-                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
-                chatComponent = fixedString.asComponent()
-            }
-
-            // Happens here so that the amount is fixed independently of tracker being enabled
+            val amount = groupOrNull("amount")?.toIntOrNull() ?: 1
 
             addItem(pest, internalName, amount, command = false)
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
 
-            cropType.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
+            CropType.getByNameOrNull(rawName)
+                ?.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
@@ -242,24 +229,17 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
     }
 
-    private fun SkyHanniChatEvent.checkSprayChats() {
+    private fun SkyHanniChatEvent.Allow.checkSprayChats() {
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }
     }
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        adjustmentMap = event.getConstant<GardenJson>("Garden").pestRareDrops
-    }
-
-    private fun Int.fixAmount(internalName: NeuInternalName, pestType: PestType) =
-        adjustmentMap.takeIf { it.isNotEmpty() }?.get(pestType)?.get(internalName) ?: this
-
     private fun addKill(type: PestType) {
         modify {
             it.pestKills.addOrPut(type, 1)
         }
+        PestKillEvent(type).post()
         lastPestKillTimes[type] = SimpleTimeMark.now()
     }
 
@@ -331,12 +311,20 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled || !GardenApi.inGarden()) return false
-        if (GardenApi.isCurrentlyFarming()) return false
+        if (GardenApi.isCurrentlyFarming() && config.hideWhileFarming) return false
+        if (config.onlyWhenHolding.isEmpty()) return true
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
         }
-        val notHoldingTool = !PestApi.hasVacuumInHand() && !PestApi.hasSprayonatorInHand()
-        return !(allInactive && notHoldingTool)
+        return config.onlyWhenHolding.any {
+            when (it) {
+                PestProfitTrackerConfig.HeldItem.FARMING_TOOL -> GardenApi.hasFarmingToolInHand()
+                PestProfitTrackerConfig.HeldItem.VACUUM -> PestApi.hasVacuumInHand()
+                PestProfitTrackerConfig.HeldItem.SPRAYONATOR -> PestApi.hasSprayonatorInHand()
+                PestProfitTrackerConfig.HeldItem.LASSO -> PestApi.hasLassoInHand()
+                PestProfitTrackerConfig.HeldItem.TIMEOUT -> !allInactive
+            }
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

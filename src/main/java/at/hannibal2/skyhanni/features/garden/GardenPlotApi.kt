@@ -328,7 +328,7 @@ object GardenPlotApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
 
         plotSprayedPattern.matchMatcher(event.message) {
             val sprayName = group("spray")

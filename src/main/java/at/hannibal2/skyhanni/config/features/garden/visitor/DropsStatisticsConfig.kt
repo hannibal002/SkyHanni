@@ -40,6 +40,11 @@ class DropsStatisticsConfig {
             DropsStatisticsTextEntry.HYPERCHARGE_CHIP,
             DropsStatisticsTextEntry.QUICKDRAW_CHIP,
             DropsStatisticsTextEntry.FARMING_EXP_BOOST_EPIC,
+            DropsStatisticsTextEntry.UNFULFILLED_JERRYSEED,
+            DropsStatisticsTextEntry.VOTER_BADGE,
+            DropsStatisticsTextEntry.VOTER_BADGE_VIP,
+            DropsStatisticsTextEntry.VOTER_BADGE_ELITE,
+            DropsStatisticsTextEntry.VOTER_BADGE_SUPREME,
         )
     )
 
@@ -81,6 +86,11 @@ class DropsStatisticsConfig {
         HYPERCHARGE_CHIP("§b3 §9Hypercharge Chip"),
         QUICKDRAW_CHIP("§b7 §9Quickdraw Chip"),
         FARMING_EXP_BOOST_EPIC("§b1 §5Farming Exp Boost"),
+        UNFULFILLED_JERRYSEED("§aUnfulfilled Jerryseed"),
+        VOTER_BADGE("§fVoter's Badge"),
+        VOTER_BADGE_VIP("§aVIP Voter's Badge"),
+        VOTER_BADGE_ELITE("§9Elite Voter's Badge"),
+        VOTER_BADGE_SUPREME("§5Supreme Voter's Badge"),
         ;
 
         override fun toString() = displayName

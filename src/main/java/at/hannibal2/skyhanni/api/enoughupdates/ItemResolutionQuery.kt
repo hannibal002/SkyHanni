@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
@@ -45,7 +47,25 @@ class ItemResolutionQuery {
     @SkyHanniModule
     companion object {
 
-        private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
+        private val patternGroup = RepoPattern.group("misc.itemresolution")
+
+        /**
+         * REGEX-TEST: §r§7[Lvl 100] §r§6Scatha
+         * REGEX-TEST: §r§7[Lvl 200] §r§6Golden Dragon§5 ✦
+         */
+        private val petPattern by patternGroup.pattern(
+            "pet",
+            "(?:§.)*\\[Lvl (?<level>\\d+)] (?:§.)*§(?<rarity>.)(?<name>[^§]+)(?:(§.)* ✦)?",
+        )
+
+        /**
+         * REGEX-TEST: §aCondor
+         * REGEX-TEST: §aCondor §d§lNEW SHARD
+         */
+        private val shardPattern by patternGroup.pattern(
+            "shard",
+            "(?<name>§.[^§]+)(?: §d§lNEW SHARD)?",
+        )
 
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
@@ -86,14 +106,10 @@ class ItemResolutionQuery {
             mayBeMangled: Boolean,
         ): String? {
             var itemName = displayName
-            val isPet = itemName.contains("[Lvl ")
             var petRarity: String? = null
-            if (isPet) {
-                val matcher: Matcher = petPattern.matcher(itemName)
-                if (matcher.matches()) {
-                    itemName = itemName.replace(matcher.group(1), "").replace("✦", "").trim()
-                    petRarity = matcher.group(2)
-                }
+            petPattern.matchMatcher(itemName) {
+                itemName = group("name")
+                petRarity = group("rarity")
             }
             val cleanDisplayName = itemName.removeColor()
             var bestMatch: String? = null
@@ -102,14 +118,11 @@ class ItemResolutionQuery {
                 val unCleanItemDisplayName: String = EnoughUpdatesManager.getDisplayName(internalName)
                 var cleanItemDisplayName = unCleanItemDisplayName.removeColor()
                 if (cleanItemDisplayName.isEmpty()) continue
-                if (isPet) {
+                if (petPattern.matches(itemName)) {
                     if (!cleanItemDisplayName.contains("[Lvl {LVL}] ")) continue
                     cleanItemDisplayName = cleanItemDisplayName.replace("[Lvl {LVL}] ", "")
-                    val matcher: Matcher = petPattern.matcher(unCleanItemDisplayName)
-                    if (matcher.matches()) {
-                        if (matcher.group(2) != petRarity) {
-                            continue
-                        }
+                    petPattern.matchMatcher(unCleanItemDisplayName) {
+                        if (group("rarity") != petRarity) continue
                     }
                 }
 
@@ -128,7 +141,7 @@ class ItemResolutionQuery {
         }
 
         private fun findInternalNameCandidatesForDisplayName(displayName: String): Set<String> {
-            val isPet = displayName.contains("[Lvl ")
+            val isPet = petPattern.matches(displayName)
             val cleanDisplayName = displayName.cleanString()
             val titleWordMap = EnoughUpdatesManager.titleWordMap
             val candidates = HashSet<String>()
@@ -341,7 +354,11 @@ class ItemResolutionQuery {
             return resolveItemInHuntingBoxMenu(displayName)
         }
         if (guiName == "Confirm Fusion") {
-            return resolveItemInHuntingBoxMenu(compound.getLore().firstOrNull() ?: return null)
+            compound.getLore().firstOrNull()?.let {
+                shardPattern.matchMatcher(it) {
+                    return resolveItemInHuntingBoxMenu(group("name"))
+                }
+            }
         }
         if (guiName == "Dye Compendium") {
             return findInternalNameByDisplayName(displayName, false)

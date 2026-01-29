@@ -469,7 +469,7 @@ object GardenNextJacobContest {
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
         SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
-            knownContests = EliteDevApi.fetchUpcomingContests().orEmpty()
+            knownContests = EliteDevApi.fetchUpcomingContests()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
         }

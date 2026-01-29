@@ -3,21 +3,24 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -31,15 +34,14 @@ object ArrowGuessBurrow {
     private const val EPSILON = 1e-6
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
-    private val recentArrowParticles = TimeLimitedSet<LorenzVec>(1.minutes)
+    private val recentFoundArrows = TimeLimitedSet<RaycastUtils.Ray>(18.seconds)
+    var lastArrowTime = SimpleTimeMark.farPast()
 
-    private var newArrow = true
     private var failures = 0
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!newArrow) return
 
         if (event.distanceToPlayer > 6) return
         if (event.type != ParticleTypes.DUST) return
@@ -49,19 +51,24 @@ object ArrowGuessBurrow {
         // offset is color for some reason
         val range = getArrowRange(event.offset) ?: return
 
-        if (!recentArrowParticles.add(event.location)) return
-        points.add(event.location)
-
-        val arrow = detectArrow(points) ?: return
-        GriffinBurrowHelper.removeGuess(arrow.origin)
-        newArrow = false
-        points.clear()
-        findClosestValidBlockToRayNew(arrow, range) ?: run {
-            failures++
-            if (config.warnOnFail) {
-                TitleManager.sendTitle("§eUse Spade", duration = 3.seconds)
+        DelayedRun.runOrNextTick {
+            points.add(event.location)
+            detectArrow(points)?.let {
+                val dugBlock = it.origin.roundToBlock()
+                GriffinBurrowHelper.addDebug("detected arrow origin above block [${dugBlock.x}, ${dugBlock.y}, ${dugBlock.z}]")
+                GriffinBurrowHelper.removeGuess(dugBlock, "origin of detected arrow")
+                DelayedRun.runDelayed(CurrentPing.averagePing + 200.milliseconds) {
+                    GriffinBurrowHelper.removeGuess(dugBlock, "origin of detected arrow (delayed)")
+                }
+                lastArrowTime = SimpleTimeMark.now()
+                addGuessFromRay(it, range) ?: run {
+                    GriffinBurrowHelper.addDebug("arrow guess returned null")
+                    failures++
+                    if (config.warnOnFail) {
+                        GriffinBurrowHelper.showUseSpadeTitle()
+                    }
+                }
             }
-            return
         }
     }
 
@@ -69,7 +76,6 @@ object ArrowGuessBurrow {
     fun onBurrowDug(event: BurrowDugEvent) {
         if (event.current != event.max) {
             points.clear()
-            newArrow = true
         }
     }
 
@@ -96,18 +102,31 @@ object ArrowGuessBurrow {
         }
     }
 
-    private fun findClosestValidBlockToRayNew(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
-        val bounds = IslandType.HUB.islandData?.boundingBox ?: return null
-        if (!bounds.isInside(ray.origin)) return null // guarantees exit point is first intersect
+    @Suppress("ReturnCount")
+    private fun addGuessFromRay(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
+        val bounds = IslandType.HUB.islandData?.boundingBox ?: run {
+            GriffinBurrowHelper.addDebug("couldnt get hub bounds")
+            return null
+        }
+        if (!bounds.isInside(ray.origin)) { // guarantees exit point is first intersect
+            GriffinBurrowHelper.addDebug("origin not in bounds")
+            return null
+        }
         // you technically don't need to find the endpoint for this, but it makes it simpler so why not
-        val endPoint = RaycastUtils.intersectAABBWithRay(bounds, ray)?.second ?: return null
+        val endPoint = RaycastUtils.intersectAABBWithRay(bounds, ray)?.second ?: run {
+            GriffinBurrowHelper.addDebug("couldnt find endpoint")
+            return null
+        }
 
         val diff = endPoint.minus(ray.origin).toDoubleArray()
         val axisIndex = diff.withIndex()
             .filter { (_, value) -> abs(value) > 0.9 } // only if the axis isn't the same block
             .minByOrNull { (_, value) -> abs(value) } // find the axis with the least change
             ?.index
-            ?: return null
+            ?: run {
+                GriffinBurrowHelper.addDebug("couldnt find axis index")
+                return null
+            }
 
         val candidates = mutableMapOf<LorenzVec, Pair<Double, Double>>() // position mapped to scaledDistToRay and distFromOrigin
         val endPointArray = endPoint.toDoubleArray()
@@ -131,13 +150,19 @@ object ArrowGuessBurrow {
             candidates[candidateBlock] = Pair(scaledDistance.roundTo(2), distanceFromOrigin)
         }
 
-        if (candidates.isEmpty()) return null
+        if (candidates.isEmpty()) {
+            GriffinBurrowHelper.addDebug("candidates is empty")
+            return null
+        }
         val minValue = candidates.values.minOf { it.first }
         val possibilities = candidates.filterValues { it.first == minValue }
         val withinRange = possibilities.filterValues { it.second.toInt() in range }.map { it.key }
-        if (withinRange.isEmpty()) return null
+        if (withinRange.isEmpty()) {
+            GriffinBurrowHelper.addDebug("no candidates within range")
+            return null
+        }
 
-        BurrowGuessEvent(GriffinBurrowHelper.GuessEntry(withinRange)).post()
+        BurrowGuessEvent(GuessEntry(withinRange), "arrow guess").post()
 
         return withinRange[0]
     }
@@ -171,9 +196,20 @@ object ArrowGuessBurrow {
         val adjustedBase = base.down(1.5) // this is always an exact multiple of 0.5
         val adjustedTip = tip.down(1.5)
 
-        BurrowApi.lastBurrowInteracted?.let { if (adjustedBase.distanceSq(it) > 5) return null } // not your arrow
+        val ray = RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
+        if (recentFoundArrows.add(ray)) return null
+        points.clear()
 
-        return RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
+        // not your arrow
+        if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 500.milliseconds) {
+            val playerLocation = MinecraftCompat.localPlayer.position()
+            val bStr = "[${adjustedBase.roundToBlock().x}, ${adjustedBase.roundToBlock().y}, ${adjustedBase.roundToBlock().z}]"
+            val pStr = "[${playerLocation.x}, ${playerLocation.y}, ${playerLocation.z}]"
+            GriffinBurrowHelper.addDebug("not your arrow detected at $bStr, player pos $pStr")
+            return null
+        }
+
+        return ray
     }
 
     private fun getPointsWithinDistance(

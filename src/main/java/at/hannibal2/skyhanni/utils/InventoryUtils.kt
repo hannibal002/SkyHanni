@@ -40,6 +40,8 @@ object InventoryUtils {
     val pastItemsInHand = mutableListOf<Pair<SimpleTimeMark, NeuInternalName>>()
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
+    var lastItemChangeTime = SimpleTimeMark.farPast()
+
     fun getItemInHandAtTime(time: SimpleTimeMark): NeuInternalName? {
         return pastItemsInHand.lastOrNull { it.first <= time }?.second
     }

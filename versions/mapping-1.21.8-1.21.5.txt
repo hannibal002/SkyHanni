@@ -1,5 +1,0 @@
-
-net.minecraft.WorldVersion name() getName()
-
-net.minecraft.client.renderer.RenderPipelines MATRICES_PROJECTION_SNIPPET MATRICES_SNIPPET
-
