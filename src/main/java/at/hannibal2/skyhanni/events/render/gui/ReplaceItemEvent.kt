@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.world.Container
 import net.minecraft.world.item.ItemStack
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class ReplaceItemEvent(val inventory: Container, val originalItem: ItemStack, val slot: Int) : SkyHanniEvent() {
     var replacement: ItemStack? = null
