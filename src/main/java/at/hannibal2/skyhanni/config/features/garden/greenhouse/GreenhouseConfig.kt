@@ -36,6 +36,15 @@ class GreenhouseConfig {
     var highlightHarvestableStatus: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Highlight Water Status",
+        desc = "Highlights the \"Water Status\" item green if the crop has enough water.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var highlightWaterStatus: Boolean = true
+
+    @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
     val position: Position = Position(180, 40)
 }
