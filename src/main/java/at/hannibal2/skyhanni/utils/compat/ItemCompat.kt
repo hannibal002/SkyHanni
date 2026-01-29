@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
@@ -35,12 +36,19 @@ fun String.getVanillaItem(): Item? {
 }
 
 fun ItemStack.setCustomItemName(name: String): ItemStack {
-    this.set(DataComponents.CUSTOM_NAME, Component.literal(name))
+    val comp = name.asComponent {
+        italic = false
+    }
+    this.set(DataComponents.CUSTOM_NAME, comp)
     return this
 }
 
 fun ItemStack.setCustomItemName(name: Component): ItemStack {
-    this.set(DataComponents.CUSTOM_NAME, name)
+    var comp = name
+    if (!comp.style.isItalic) {
+        comp = comp.copy().withStyle(comp.style.withItalic(false))
+    }
+    this.set(DataComponents.CUSTOM_NAME, comp)
     return this
 }
 

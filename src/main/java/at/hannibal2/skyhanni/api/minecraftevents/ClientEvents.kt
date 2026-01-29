@@ -103,8 +103,11 @@ object ClientEvents {
 
         ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow)
         ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
+        ClientReceiveMessageEvents.GAME_CANCELED.register(::onCanceled)
 
     }
+
+    var currentMessage: Component? = null
 
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
         // if we created the message we don't want to pipe it back into our events
@@ -117,6 +120,8 @@ object ClientEvents {
             // we never cancel the action bar
             return true
         }
+
+        currentMessage = message
 
         val cancel = ChatManager.onChatAllow(message)
 
@@ -170,8 +175,20 @@ object ClientEvents {
         // if new is null then we didn't want to change the message
         new?.let { return it }
 
+        currentMessage?.let {
+            if (it != message) ChatManager.onChatModifyOtherMod(it, message)
+        }
+        currentMessage = null
 
         return message
+    }
+
+    private fun onCanceled(message: Component, actionBar: Boolean) {
+        if (actionBar) return
+        if (currentMessage == message) {
+            ChatManager.onChatCancel(message)
+        }
+        currentMessage = null
     }
 
     fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar

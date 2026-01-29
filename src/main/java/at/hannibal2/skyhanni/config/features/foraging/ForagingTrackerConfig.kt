@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.foraging
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -81,4 +83,11 @@ class ForagingTrackerConfig {
     @OnlyModern
     var showWholeTrees: Boolean = true
 
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }

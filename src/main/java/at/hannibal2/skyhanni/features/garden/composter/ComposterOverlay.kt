@@ -162,7 +162,7 @@ object ComposterOverlay {
     }
 
     private fun update() {
-        if (!config.overlay) return
+        if (!isEnabled()) return
         val composterUpgrades = ComposterApi.composterUpgrades ?: return
         if (composterUpgrades.isEmpty()) {
             Renderable.text("§cOpen Composter Upgrades!").let {
@@ -669,9 +669,9 @@ object ComposterOverlay {
 
     @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
     fun onBackgroundDraw() {
+        if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (!inInventory || !config.overlay) return
         config.overlayOrganicMatterPos.renderRenderable(
             organicMatterDisplay,
             posLabel = "Composter Overlay Organic Matter",
@@ -738,4 +738,6 @@ object ComposterOverlay {
             }
         }
     }
+
+    fun isEnabled(): Boolean = config.overlay
 }

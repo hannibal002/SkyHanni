@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import net.minecraft.world.entity.player.Player
 import java.awt.Color
 //? > 1.21.5 {
 /*import org.joml.Matrix3x2f
@@ -17,7 +17,7 @@ import org.joml.Vector3f
 *///?}
 
 fun Renderable.Companion.fakePlayer(
-    player: Player,
+    player: FakePlayer,
     followMouse: Boolean = false,
     eyesX: Float = 0f,
     eyesY: Float = 0f,

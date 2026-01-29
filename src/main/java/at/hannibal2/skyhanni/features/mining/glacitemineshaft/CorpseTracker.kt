@@ -37,6 +37,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
     ::BucketData,
     { it.mining.mineshaft.corpseProfitTracker },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker.perTrackerConfig }
 ) {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 

@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
-class InquisitorSharingConfig {
+class RareMobSharingConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Share your Rare Diana Mobs and receiving other Rare Diana Mobs via Party Chat.")
     @ConfigEditorBoolean
@@ -19,7 +19,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(name = "Focus", desc = "Hide other waypoints when your Party finds a Rare Diana Mob.")
     @ConfigEditorBoolean
-    var focusInquisitor: Boolean = false
+    var focus: Boolean = false
 
     @Expose
     @ConfigOption(

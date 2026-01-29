@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
 import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
@@ -94,7 +95,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Tracker", desc = "Tracker Config")
     @Accordion
-    val tracker: TrackerConfig = TrackerConfig()
+    val tracker: UniversalTrackerConfig = UniversalTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Pet Candy Display", desc = "")
