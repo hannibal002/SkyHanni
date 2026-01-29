@@ -313,10 +313,6 @@ object InstanceChestProfit {
         count * getPrice(NeuInternalName.fromItemName(name))
     } ?: 0.0
 
-    private fun ItemStack.getPrice(item: ItemStack): Double {
-        return item.getInternalName().getPrice() * item.count
-    }
-
     private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
         /**
          * Kuudra chests say "Free Chest Chest" and "Paid Chest Chest" due to Hypixel issue
