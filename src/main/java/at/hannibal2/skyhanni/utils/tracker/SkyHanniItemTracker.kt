@@ -30,6 +30,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
@@ -39,6 +41,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import net.minecraft.ChatFormatting
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.time.Duration
@@ -353,7 +356,13 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
     fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+            ChatUtils.chat(
+                componentBuilder {
+                    appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                    appendWithColor(": ", ChatFormatting.GRAY)
+                    append("§r$itemName")
+                }
+            )
         }
         if (itemTrackerConfig.warnings.title && price >= itemTrackerConfig.warnings.minimumTitle) {
             TitleManager.sendTitle("§a+ $itemName", weight = price)
