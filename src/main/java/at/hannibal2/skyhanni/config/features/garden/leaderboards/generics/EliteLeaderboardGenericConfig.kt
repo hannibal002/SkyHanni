@@ -44,7 +44,7 @@ open class EliteLeaderboardGenericConfig<RankGoal : RankGoalGenericConfig, Displ
         desc = "Which game mode to show on the leaderboard.",
     )
     @ConfigEditorDropdown
-    var gamemode: Property<Gamemode> = Property.of(Gamemode.ALL)
+    val gamemode: Property<Gamemode> = Property.of(Gamemode.ALL)
 }
 
 enum class Gamemode(val apiMode: String?, val displayName: String, val renderableName: String) {
