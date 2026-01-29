@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden.leaderboards.generics
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class EliteLeaderboardGenericConfig<RankGoal : RankGoalGenericConfig, Display : EliteDisplayGenericConfig>(
     rankGoalConfig: () -> RankGoal,
@@ -35,4 +37,23 @@ open class EliteLeaderboardGenericConfig<RankGoal : RankGoalGenericConfig, Displ
     )
     @ConfigEditorBoolean
     var offlineLbChange: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Gamemode",
+        desc = "Which game mode to show on the leaderboard.",
+    )
+    @ConfigEditorDropdown
+    val gamemode: Property<Gamemode> = Property.of(Gamemode.ALL)
+}
+
+enum class Gamemode(val apiMode: String?, val displayName: String, val renderableName: String) {
+    ALL(null, "All", ""),
+    IRONMAN("ironman", "Ironman", " Ironman"),
+    STRANDED("island", "Stranded", " Stranded")
+    ;
+
+    override fun toString(): String {
+        return this.displayName
+    }
 }

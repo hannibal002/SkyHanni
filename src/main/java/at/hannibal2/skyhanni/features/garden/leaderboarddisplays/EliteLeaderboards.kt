@@ -32,7 +32,7 @@ enum class EliteLeaderboards(
     PEST("Pest Kills", PestDisplay(), EliteLeaderboardType.Pest::class)
     ;
 
-    val isEnabled get() = this in config.display.get()
+    val isEnabled get() = config.enabled && this in config.display.get()
     val position get() = config.displayPositions[ordinal]
     override fun toString() = displayName
 
@@ -56,6 +56,7 @@ enum class EliteLeaderboards(
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent) {
             if (config.displayPositions.isEmpty()) return
+            if (!config.enabled) return
             config.display.get().forEach { leaderboard ->
                 leaderboard.display.renderDisplay(leaderboard.position)
             }
@@ -72,17 +73,20 @@ enum class EliteLeaderboards(
             val weightConfigs = listOf(
                 weightConfig.rankGoals.useRankGoal,
                 weightConfig.rankGoals.monthlyRankGoal,
-                weightConfig.rankGoals.rankGoal
+                weightConfig.rankGoals.rankGoal,
+                weightConfig.gamemode,
             )
 
             val cropConfigs = listOf(
                 cropConfig.rankGoals.useRankGoal,
                 cropConfig.rankGoals.rankGoalTypes,
+                cropConfig.gamemode,
             )
 
             val pestConfigs = listOf(
                 pestConfig.rankGoals.useRankGoal,
                 pestConfig.rankGoals.rankGoalTypes,
+                pestConfig.gamemode
             )
 
             weightConfigs.forEach {

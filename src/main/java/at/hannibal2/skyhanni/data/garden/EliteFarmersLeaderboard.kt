@@ -286,6 +286,7 @@ object EliteFarmersLeaderboard {
             lbType = leaderboardType,
             upcomingCount = upcomingPlayers,
             atRank = atRank,
+            getLeaderboardConfig(leaderboardType).gamemode.get().apiMode
         )
         // elite only updates player profiles once an hour, so assume it's wrong if it's the same as last fetch
         val shouldUpdateData = shouldUpdateData(leaderboardType, apiData)

@@ -211,6 +211,7 @@ object EliteDevApi {
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
         atRank: Int? = null,
+        mode: String? = null
     ): EliteLeaderboard {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
         val uuid = if (spoofProfile) playerUuid else PlayerUtils.getUuid()
@@ -218,7 +219,8 @@ object EliteDevApi {
         val upcomingPlayersParam = upcomingCount?.let { "upcoming=$it" }
         val atRankParam = atRank?.let { "atRank=$it" }
         val previousPlayersParam = "previous=1"
-        val params = listOfNotNull(upcomingPlayersParam, atRankParam, previousPlayersParam)
+        val modeParam = mode?.let { "mode=$it" }
+        val params = listOfNotNull(upcomingPlayersParam, atRankParam, previousPlayersParam, modeParam)
         val paramString = if (params.isEmpty()) "" else {
             "?" + params.joinToString("&")
         }

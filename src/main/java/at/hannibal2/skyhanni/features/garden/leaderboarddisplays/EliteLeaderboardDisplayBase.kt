@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
@@ -123,8 +124,9 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
 
         val leaderboardPos = getLeaderboardFormat(leaderboardType)
+        val mode = EliteLeaderboardConfigApi.getLeaderboardConfig(leaderboardType).gamemode.get().renderableName
         return Renderable.clickable(
-            "§6$leaderboardType§7: §e$amountText$leaderboardPos",
+            "§6$leaderboardType$mode§7: §e$amountText$leaderboardPos",
             tips = listOf("§eClick to open your Farming Profile."),
             onLeftClick = { openWebsite(PlayerUtils.getName()) },
         )

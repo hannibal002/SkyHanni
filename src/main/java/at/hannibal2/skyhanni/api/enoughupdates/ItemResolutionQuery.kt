@@ -33,7 +33,6 @@ import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import java.util.regex.Matcher
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
@@ -55,7 +54,7 @@ class ItemResolutionQuery {
          */
         private val petPattern by patternGroup.pattern(
             "pet",
-            "(?:§.)*\\[Lvl (?<level>\\d+)] (?:§.)*§(?<rarity>.)(?<name>[^§]+)(?:(§.)* ✦)?",
+            "(?:§.)*\\[Lvl (?<level>\\d+)] (?:§.)*§(?<rarity>.)(?<name>[^§]+)(?:(?:§.)* ✦)?",
         )
 
         /**
