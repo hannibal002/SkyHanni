@@ -195,8 +195,8 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Enable Plot Borders",
-        desc = "Enable the use of F3 + G hotkey to show Garden plot borders. " +
-            "Similar to how later Minecraft version render chunk borders.",
+        desc = "Enable the use of F3 + J hotkey to show Garden plot borders " +
+            "(similar to how F3 + G shows chunk borders).",
     )
     @ConfigEditorBoolean
     @FeatureToggle

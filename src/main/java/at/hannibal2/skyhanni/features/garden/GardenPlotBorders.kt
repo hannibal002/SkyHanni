@@ -24,11 +24,11 @@ object GardenPlotBorders {
         if (!isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
-        if (event.keyCode == GLFW.GLFW_KEY_G && GLFW.GLFW_KEY_F3.isKeyHeld()) {
+        if (event.keyCode == GLFW.GLFW_KEY_J && GLFW.GLFW_KEY_F3.isKeyHeld()) {
             timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }
-        if (event.keyCode == GLFW.GLFW_KEY_F3 && GLFW.GLFW_KEY_G.isKeyHeld()) {
+        if (event.keyCode == GLFW.GLFW_KEY_F3 && GLFW.GLFW_KEY_J.isKeyHeld()) {
             timeLastSaved = SimpleTimeMark.now()
             showBorders = !showBorders
         }
