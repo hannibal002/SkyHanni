@@ -70,7 +70,6 @@ object RoundedShapeDrawer {
                 }
             }
 
-            //? > 1.21.6 {
             // Need to backup current projection matrix and set current to an orthographic
             // projection matrix, since orthographic gui elements in 1.21.7 are now deferred
             // so we just set the correct matrix here are restore the perspective one afterwards
@@ -79,20 +78,23 @@ object RoundedShapeDrawer {
             RenderSystem.setProjectionMatrix(
                 projectionMatrix.getBuffer(
                     window.width.toFloat() / window.guiScale.toFloat(),
-                    window.height.toFloat() / window.guiScale.toFloat()
-                ), ProjectionType.ORTHOGRAPHIC
+                    window.height.toFloat() / window.guiScale.toFloat(),
+                ),
+                ProjectionType.ORTHOGRAPHIC,
             )
-            var dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
-                    Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
-                    Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-                    Vector3f(),
-                    RenderSystem.getTextureMatrix(),
-                    RenderSystem.getShaderLineWidth()
-                )
+            val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
+                Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
+                Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+                Vector3f(),
+                //? if < 1.21.11 {
+                RenderSystem.getTextureMatrix(),
+                RenderSystem.getShaderLineWidth(),
+                //?} else
+                //Matrix4f(),
+            )
             roundedBufferSlice =
                 roundedUniform.writeWith(scaleFactor, radius, smoothness, halfSize, centerPos, modelViewMatrix)
             prePassOp.invoke()
-            //?}
 
             draw(pipeline, buffer.buildOrThrow()) { pass ->
                 RenderSystem.bindDefaultUniforms(pass)
@@ -143,7 +145,7 @@ object RoundedShapeDrawer {
             ),
             {
                 roundedOutlineBufferSlice = roundedOutlineUniform.writeWith(
-                    RoundedRectangleOutlineShader.borderThickness, RoundedRectangleOutlineShader.borderBlur
+                    RoundedRectangleOutlineShader.borderThickness, RoundedRectangleOutlineShader.borderBlur,
                 )
             },
             withSmoothness = false,
@@ -169,7 +171,7 @@ object RoundedShapeDrawer {
         postVertexOps = listOf { setColor(color) },
         {
             circleBufferSlice = circleUniform.writeWith(
-                CircleShader.angle1, CircleShader.angle2
+                CircleShader.angle1, CircleShader.angle2,
             )
         },
     ) {
@@ -177,7 +179,7 @@ object RoundedShapeDrawer {
     }
 
     fun drawGradientCircle(
-        left: Int, top: Int, right: Int, bottom: Int, startColor: ChromaColour, endColor: ChromaColour
+        left: Int, top: Int, right: Int, bottom: Int, startColor: ChromaColour, endColor: ChromaColour,
     ) = RadialGradientCircleShader.performVQuadAndUniforms(
         SkyHanniRenderPipeline.RADIAL_GRADIENT_CIRCLE(),
         x1 = left, y1 = top, x2 = right, y2 = bottom,
@@ -192,7 +194,7 @@ object RoundedShapeDrawer {
                 Vector4f(endColor.destructToFloatArray()),
                 RadialGradientCircleShader.progress,
                 RadialGradientCircleShader.phaseOffset,
-                RadialGradientCircleShader.reverse
+                RadialGradientCircleShader.reverse,
             )
         },
     ) {
