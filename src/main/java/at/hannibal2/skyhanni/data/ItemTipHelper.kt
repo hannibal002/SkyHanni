@@ -50,7 +50,6 @@ object ItemTipHelper {
         val fontRenderer = Minecraft.getInstance().font
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 300f)
         for (slot in gui.container.slots) {
             val stack = slot.item.orNull() ?: continue
 

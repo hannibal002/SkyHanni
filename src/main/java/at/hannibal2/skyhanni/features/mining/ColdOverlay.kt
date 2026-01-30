@@ -35,7 +35,7 @@ object ColdOverlay {
         DrawContextUtils.pushMatrix()
 
         GL11.glDepthMask(false)
-        DrawContextUtils.translate(0f, 0f, -500f)
+        DrawContextUtils.translate(0f, 0f)
         GuiRenderUtils.drawTexturedRect(0f, 0f, textureLocation, alpha)
 
         GL11.glDepthMask(true)

@@ -281,7 +281,6 @@ interface Renderable {
                             onHover.invoke()
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                             DrawContextUtils.pushMatrix()
-                            DrawContextUtils.translate(0F, 0F, 400F)
 
                             RenderableTooltips.setTooltipForRender(
                                 tips = tipsRender,
@@ -494,7 +493,7 @@ interface Renderable {
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
                     RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
-                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat())
                 }
                 if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
@@ -511,14 +510,14 @@ interface Renderable {
                     content.render(mouseOffsetX, mouseOffsetY)
                 } else if (!shouldRenderTopElseBottom) {
                     content.render(mouseOffsetX, mouseOffsetY)
-                    DrawContextUtils.translate(0f, (ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing).toFloat())
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
-                    DrawContextUtils.translate(0f, -(ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing).toFloat())
                 } else {
                     content.render(mouseOffsetX, mouseOffsetY + textBoxHeight + ySpacing)
-                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat())
                 }
             }
 
@@ -663,9 +662,9 @@ interface Renderable {
                     realColor = color
                 }
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 content.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -708,9 +707,9 @@ interface Renderable {
                         GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
                     }
                 }
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 content.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -753,9 +752,9 @@ interface Renderable {
                     val x = it.width + spacing
                     it.renderXYAligned(xOffset, mouseOffsetY, x, height)
                     xOffset += x
-                    DrawContextUtils.translate(x.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(x.toFloat(), 0f)
                 }
-                DrawContextUtils.translate(-(xOffset - mouseOffsetX).toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-(xOffset - mouseOffsetX).toFloat(), 0f)
             }
         }
 
@@ -909,7 +908,7 @@ interface Renderable {
             // there are more items above
             if (showScrollableTipsInList && !scroll.atMinimum()) {
                 scrollUpTip.renderXAligned(mouseOffsetX, mouseOffsetY, width)
-                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat())
                 renderY += scrollUpTip.height
                 negativeSpace1 -= scrollUpTip.height
             }
@@ -924,13 +923,13 @@ interface Renderable {
             for (renderable in list) {
                 if ((virtualY..virtualY + renderable.height) in window) {
                     renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
-                    DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, renderable.height.toFloat())
                     renderY += renderable.height
                     found = true
                 } else if (found) {
                     if (renderY + renderable.height <= height + negativeSpace2) {
                         renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
-                        DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
+                        DrawContextUtils.translate(0f, renderable.height.toFloat())
                         renderY += renderable.height
                     }
                     break
@@ -944,7 +943,7 @@ interface Renderable {
                 scrollDownTip.renderXAligned(mouseOffsetX, mouseOffsetY + height - scrollDownTip.height, width)
             }
 
-            DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
+            DrawContextUtils.translate(0f, -renderY.toFloat())
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
@@ -1018,9 +1017,9 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1037,9 +1036,9 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1060,9 +1059,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
 
                 ShaderRenderUtils.drawRoundRectOutline(
                     0,
@@ -1106,9 +1105,9 @@ interface Renderable {
                     alpha = alpha / 255f,
                 )
 
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1134,9 +1133,9 @@ interface Renderable {
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax, texture, alpha / 255f)
 
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1172,9 +1171,9 @@ interface Renderable {
                     blur,
                 )
 
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
     }

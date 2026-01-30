@@ -69,22 +69,22 @@ object RenderableTooltips {
         }
 
         val zLevel = 400f
-        DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
+        DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat())
 
         drawTooltipBackground(tooltipTextWidth, tooltipHeight, borderColorStart)
 
-        DrawContextUtils.translate(-1f, -1f, 0f)
+        DrawContextUtils.translate(-1f, -1f)
 
         var yTranslateSum = 0
         tips.forEachIndexed { index, line ->
             line.renderXAligned(tooltipX, tooltipY, tooltipTextWidth)
             var yShift = line.height
             if (index == 0 && isSpacedTitle) yShift += 2
-            DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+            DrawContextUtils.translate(0f, yShift.toFloat())
             yTranslateSum += yShift
         }
 
-        DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
+        DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat())
     }
 
     private fun drawTooltipBackground(tooltipTextWidth: Int, tooltipHeight: Int, borderColorStart: Int) {

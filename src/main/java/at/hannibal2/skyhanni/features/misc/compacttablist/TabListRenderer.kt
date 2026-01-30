@@ -29,7 +29,6 @@ object TabListRenderer {
     private const val LINE_HEIGHT = 8 + 1
     private const val TAB_PADDING = 3
     private const val COLUMN_SPACING = 6
-    private const val TAB_Z_OFFSET = 10f
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
@@ -71,8 +70,6 @@ object TabListRenderer {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
-
-        DrawContextUtils.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
         var totalWidth = 0 - COLUMN_SPACING
@@ -142,7 +139,6 @@ object TabListRenderer {
                 footerY += LINE_HEIGHT
             }
         }
-        DrawContextUtils.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
     private fun drawColumns(x: Int, headerY: Int, columns: List<RenderColumn>) {

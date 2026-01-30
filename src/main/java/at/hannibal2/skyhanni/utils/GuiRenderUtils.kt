@@ -68,8 +68,8 @@ object GuiRenderUtils {
         DrawContextUtils.pushMatrix()
         val strLength = fr.width(text)
         val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        DrawContextUtils.translate(x, y, 0f)
-        DrawContextUtils.scale(factor, factor, 1f)
+        DrawContextUtils.translate(x, y)
+        DrawContextUtils.scale(factor, factor)
         drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
         DrawContextUtils.popMatrix()
     }
