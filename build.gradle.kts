@@ -174,6 +174,8 @@ dependencies {
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+
+    if (target != ProjectTarget.MODERN_12110) implementation("org.apache.httpcomponents:httpclient:4.5.14")
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
