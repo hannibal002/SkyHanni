@@ -368,21 +368,37 @@ val ALWAYS get(): (Style?) -> Boolean = { true }
  * The strings have to exist within 1 sibling
  * AKA they have to have the same Style
  */
-fun Component.replace(oldValue: String, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
-    return replace(this, oldValue, newValue, predicate)
+fun Component.replace(
+    oldValue: String,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
 
-fun Component.replace(oldValue: Regex, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
-    return replace(this, oldValue, newValue, predicate)
+fun Component.replace(
+    oldValue: Regex,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
 
-private fun replace(component: Component, oldValue: Any, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
+private fun replace(
+    component: Component,
+    oldValue: Any,
+    newValue: String,
+    onlyReplaceFirst: Boolean,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
     component.visit({ style: Style?, string: String? ->
         var edit = string
-        if (predicate(style)) {
+        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
             if (oldValue is String) {
                 edit = string?.replace(oldValue, newValue)
             } else if (oldValue is Regex) {
