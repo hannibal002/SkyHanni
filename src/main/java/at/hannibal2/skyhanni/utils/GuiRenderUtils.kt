@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -25,11 +24,11 @@ import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.ARGB
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
-import org.lwjgl.opengl.GL11
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -193,12 +192,12 @@ object GuiRenderUtils {
     }
 
     fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
+        val drawContext = DrawContextUtils.drawContext
         drawTexturedRect(
             x,
             y,
-            GuiScreenUtils.scaledWindowWidth.toFloat(),
-            GuiScreenUtils.scaledWindowHeight.toFloat(),
-            filter = GL11.GL_NEAREST,
+            drawContext.guiWidth().toFloat(),
+            drawContext.guiHeight().toFloat(),
             texture = texture,
             alpha = alpha,
         )
@@ -210,12 +209,11 @@ object GuiRenderUtils {
         width: Int,
         height: Int,
         uMin: Float = 0f,
-        uMax: Float = 1f,
+        uMax: Float = width.toFloat(),
         vMin: Float = 0f,
-        vMax: Float = 1f,
+        vMax: Float = height.toFloat(),
         texture: ResourceLocation,
         alpha: Float = 1f,
-        filter: Int = GL11.GL_NEAREST,
     ) {
         drawTexturedRect(
             x.toFloat(),
@@ -228,7 +226,6 @@ object GuiRenderUtils {
             vMax,
             texture,
             alpha,
-            filter,
         )
     }
 
@@ -238,12 +235,11 @@ object GuiRenderUtils {
         width: Float,
         height: Float,
         uMin: Float = 0f,
-        uMax: Float = 1f,
+        uMax: Float = width,
         vMin: Float = 0f,
-        vMax: Float = 1f,
+        vMax: Float = height,
         texture: ResourceLocation,
         alpha: Float = 1f,
-        filter: Int = GL11.GL_NEAREST,
     ) {
         DrawContextUtils.drawContext.blit(
             RenderCompat.getMinecraftGuiTextured(),
@@ -255,7 +251,8 @@ object GuiRenderUtils {
             uMax.toInt(),
             vMax.toInt(),
             width.toInt(),
-            height.toInt()
+            height.toInt(),
+            ARGB.white(alpha)
         )
     }
 

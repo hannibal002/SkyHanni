@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -24,7 +22,7 @@ object ColdOverlay {
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
-    private val textureLocation = createResourceLocation("skyhanni", "cold_overlay.png")
+    private val textureLocation = createResourceLocation("minecraft", "textures/misc/powder_snow_outline.png");
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -32,15 +30,7 @@ object ColdOverlay {
         val alpha = getColdAlpha()
         if (alpha == 0f) return
 
-        DrawContextUtils.pushMatrix()
-
-        GL11.glDepthMask(false)
-        DrawContextUtils.translate(0f, 0f)
         GuiRenderUtils.drawTexturedRect(0f, 0f, textureLocation, alpha)
-
-        GL11.glDepthMask(true)
-
-        DrawContextUtils.popMatrix()
     }
 
     // TODO fix small bug with high cold and low threshold having the same opacity than high cold and a b it smaller threshold
