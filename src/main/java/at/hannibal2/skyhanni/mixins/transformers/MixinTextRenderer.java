@@ -12,89 +12,46 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(Font.class)
 public class MixinTextRenderer {
 
-    @ModifyVariable(
-        //? < 1.21.7 {
-        method = "drawInternal(Lnet/minecraft/util/FormattedCharSequence;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I",
-        //?} else {
-        /*method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;",
-        *///?}
-        index = 1,
-        at = @At("HEAD"),
-        argsOnly = true
-    )
+    @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedCharSequence modifyOrderedText(FormattedCharSequence value) {
 
-        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
-            value
-        );
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(value);
 
         if (replaced == null) return value;
         return replaced;
     }
 
-    @ModifyVariable(
-        //? < 1.21.7 {
-        method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;IIZ)I",
-        //?} else {
-        /*method = "prepareText(Ljava/lang/String;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;",
-        *///?}
-        index = 1,
-        at = @At("HEAD"),
-        argsOnly = true
-    )
+    @ModifyVariable(method = "prepareText(Ljava/lang/String;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)
     private String modifyString(String value) {
 
-        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
-            OrderedTextUtils.legacyTextToOrderedText(value)
-        );
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(OrderedTextUtils.legacyTextToOrderedText(value));
 
         if (replaced == null) return value;
         return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
-    @ModifyVariable(
-        method = "width(Lnet/minecraft/util/FormattedCharSequence;)I",
-        index = 1,
-        at = @At("HEAD"),
-        argsOnly = true
-    )
+    @ModifyVariable(method = "width(Lnet/minecraft/util/FormattedCharSequence;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedCharSequence modifyWidth(FormattedCharSequence value) {
 
-        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
-            value
-        );
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(value);
 
         if (replaced == null) return value;
         return replaced;
     }
 
-    @ModifyVariable(
-        method = "width(Ljava/lang/String;)I",
-        index = 1,
-        at = @At("HEAD"),
-        argsOnly = true
-    )
+    @ModifyVariable(method = "width(Ljava/lang/String;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private String modifyWidth(String value) {
 
-        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(
-            OrderedTextUtils.legacyTextToOrderedText(value)
-        );
+        FormattedCharSequence replaced = ModifyVisualWords.INSTANCE.transformText(OrderedTextUtils.legacyTextToOrderedText(value));
 
         if (replaced == null) return value;
         return OrderedTextUtils.orderedTextToLegacyString(replaced);
     }
 
-    @ModifyVariable(
-        method = "width(Lnet/minecraft/network/chat/FormattedText;)I",
-        index = 1,
-        at = @At("HEAD"),
-        argsOnly = true
-    )
+    @ModifyVariable(method = "width(Lnet/minecraft/network/chat/FormattedText;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedText modifyWidth(FormattedText value) {
 
-        FormattedText replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
-            value
-        );
+        FormattedText replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(value);
 
         if (replaced == null) return value;
         return replaced;

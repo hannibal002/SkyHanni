@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
-//? > 1.21.9 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+
+import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -36,4 +36,3 @@ public class MixinItemFeatureRenderer {
         }
     }
 }
-*///?}

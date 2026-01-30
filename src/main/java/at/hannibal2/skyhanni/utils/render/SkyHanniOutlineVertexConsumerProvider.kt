@@ -11,18 +11,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.RenderType
-//? > 1.21.6 {
-/*import com.mojang.blaze3d.textures.GpuTextureView
-*///?}
+import com.mojang.blaze3d.textures.GpuTextureView
 
 // The idea and implementation for this class was inspired by SkyBlocker.
 // This implementation has been modified from the original SkyBlocker code to work across multiple versions.
 
-//? < 1.21.9 {
-class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource(parent) {
-    //?} else {
-    /*class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource() {
-    *///?}
+
+class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource() {
 
     override fun endOutlineBatch() {
         beginRendering()
@@ -40,35 +35,27 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
     companion object {
 
         @JvmStatic
-        val vertexConsumers by lazy { SkyHanniOutlineVertexConsumerProvider(Minecraft.getInstance().renderBuffers().bufferSource()) }
+        val vertexConsumers by lazy {
+            SkyHanniOutlineVertexConsumerProvider(
+                Minecraft.getInstance().renderBuffers().bufferSource()
+            )
+        }
 
         private var customDepthAttachment: GpuTexture? = null
 
-        //? < 1.21.6 {
-        @JvmStatic
-        fun getOverrideDepthAttachment(): GpuTexture? {
-            if (!currentlyActive) return null
-            return customDepthAttachment
-        }
-        //?} else {
-        /*private var customDepthAttachmentView: GpuTextureView? = null
-        *///?}
+        private var customDepthAttachmentView: GpuTextureView? = null
 
         @JvmStatic
         var currentlyActive = false
 
         private fun beginRendering() {
             currentlyActive = true
-            //? > 1.21.6 {
-            /*RenderSystem.outputDepthTextureOverride = customDepthAttachmentView
-            *///?}
+            RenderSystem.outputDepthTextureOverride = customDepthAttachmentView
         }
 
         private fun finishRendering() {
             currentlyActive = false
-            //? > 1.21.6 {
-            /*RenderSystem.outputDepthTextureOverride = null
-            *///?}
+            RenderSystem.outputDepthTextureOverride = null
         }
 
         private var lastWidth = 0
@@ -97,30 +84,21 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
 
         private fun updateDepthAttachment() {
             try {
-                @Suppress("SimpleRedundantLet")
-                customDepthAttachment?.let {
+                @Suppress("SimpleRedundantLet") customDepthAttachment?.let {
                     it.close()
-                    //? > 1.21.6 {
-                    /*customDepthAttachmentView?.close()
-                    *///?}
+                    customDepthAttachmentView?.close()
                 }
                 val device = RenderSystem.getDevice()
                 val depthAttachment = device.createTexture(
                     "SkyHanni Custom Depth",
-                    //? < 1.21.6 {
-                    TextureFormat.DEPTH32, lastWidth, lastHeight, 1,
-                    //?} else {
-                    /*GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
+                    GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
                     TextureFormat.DEPTH32,
                     lastWidth, lastHeight, 1, 1,
-                    *///?}
                 )
                 depthAttachment.setTextureFilter(FilterMode.NEAREST, false)
                 depthAttachment.setAddressMode(AddressMode.CLAMP_TO_EDGE)
                 customDepthAttachment = depthAttachment
-                //? > 1.21.6 {
-                /*customDepthAttachmentView = device.createTextureView(depthAttachment)
-                *///?}
+                customDepthAttachmentView = device.createTextureView(depthAttachment)
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to update outline depth attachment")
             }

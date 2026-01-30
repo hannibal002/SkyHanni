@@ -49,60 +49,26 @@ object DrawContextUtils {
         }
     }
 
-    fun translate(x: Double, y: Double, z: Double) {
-        //? < 1.21.6 {
-        drawContext.pose().translate(x, y, z)
-        //?} else {
-        /*drawContext.pose().translate(x.toFloat(), y.toFloat())
-        *///?}
+    fun translate(x: Double, y: Double) {
+        drawContext.pose().translate(x.toFloat(), y.toFloat())
     }
 
-    fun translate(x: Float, y: Float, z: Float) {
-        //? < 1.21.6 {
-        drawContext.pose().translate(x, y, z)
-        //?} else {
-        /*drawContext.pose().translate(x, y)
-        *///?}
+    fun translate(x: Float, y: Float) {
+        drawContext.pose().translate(x, y)
     }
 
-    fun rotate(angle: Float, x: Number, y: Number, z: Number) {
-        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
-        //? < 1.21.6
-        drawContext.pose().mulPose(Quaternionf().rotationAxis(angle, xf, yf, zf))
-    }
-
-    fun multMatrix(buffer: FloatBuffer) {
-        //? < 1.21.6
-        multMatrix(Matrix4f(buffer))
-    }
-
-    //? < 1.21.6
-    fun multMatrix(matrix: Matrix4f) = drawContext.pose().mulPose(matrix)
-
-    fun scale(x: Float, y: Float, z: Float) {
-        //? < 1.21.6 {
-        drawContext.pose().scale(x, y, z)
-        //?} else {
-        /*drawContext.pose().scale(x, y)
-        *///?}
+    fun scale(x: Float, y: Float) {
+        drawContext.pose().scale(x, y)
     }
 
     @Deprecated("Use pushPop instead")
     fun pushMatrix() {
-        //? < 1.21.6 {
-        drawContext.pose().pushPose()
-        //?} else {
-        /*drawContext.pose().pushMatrix()
-        *///?}
+        drawContext.pose().pushMatrix()
     }
 
     @Deprecated("Use pushPop instead")
     fun popMatrix() {
-        //? < 1.21.6 {
-        drawContext.pose().popPose()
-        //?} else {
-        /*drawContext.pose().popMatrix()
-        *///?}
+        drawContext.pose().popMatrix()
     }
 
     /**
@@ -118,28 +84,24 @@ object DrawContextUtils {
     /**
      * Run operations inside a DrawContext translation
      */
-    inline fun translated(x: Number = 0, y: Number = 0, z: Number = 0, action: () -> Unit) {
+    inline fun translated(x: Number = 0, y: Number = 0, action: () -> Unit) {
         // TODO: when fully modern, use pushPop instead
-        translate(x.toFloat(), y.toFloat(), z.toFloat())
+        translate(x.toFloat(), y.toFloat())
         action()
-        translate(-x.toFloat(), -y.toFloat(), -z.toFloat())
+        translate(-x.toFloat(), -y.toFloat())
     }
 
     /**
      * Run operations inside a DrawContext scale
      */
-    inline fun scaled(x: Number = 1, y: Number = 1, z: Number = 1, action: () -> Unit) {
+    inline fun scaled(x: Number = 1, y: Number = 1, action: () -> Unit) {
         // TODO: when fully modern, use pushPop instead
-        scale(x.toFloat(), y.toFloat(), z.toFloat())
+        scale(x.toFloat(), y.toFloat())
         action()
-        scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
+        scale(1 / x.toFloat(), 1 / y.toFloat())
     }
 
     fun loadIdentity() {
-        //? < 1.21.6 {
-        drawContext.pose().setIdentity()
-        //?} else {
-        /*drawContext.pose().identity()
-        *///?}
+        drawContext.pose().identity()
     }
 }

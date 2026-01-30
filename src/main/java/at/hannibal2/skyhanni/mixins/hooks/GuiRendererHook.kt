@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.hooks
-//? > 1.21.5 {
-/*import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
@@ -15,8 +14,7 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GlyphRenderState
 import net.minecraft.client.gui.render.state.GuiElementRenderState
-//? > 1.21.8
-//import net.minecraft.client.gui.font.glyphs.BakedGlyph.GlyphInstance
+import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()
@@ -55,12 +53,8 @@ object GuiRendererHook {
         if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return original.call(state)
 
         if (state is GlyphRenderState) {
-            //? < 1.21.9 {
-            val glyphColor = state.instance().style().color
-            //?} else {
-            /*val drawnGlyph = state.renderable as? GlyphInstance ?: return original.call(state)
+            val drawnGlyph = state.renderable as? GlyphInstance ?: return original.call(state)
             val glyphColor = drawnGlyph.style.color
-            *///?}
             if (glyphColor != null && glyphColor.name == "chroma") {
                 return SkyHanniRenderPipeline.CHROMA_TEXT.invoke()
             }
@@ -70,4 +64,3 @@ object GuiRendererHook {
     }
 
 }
-*///?}

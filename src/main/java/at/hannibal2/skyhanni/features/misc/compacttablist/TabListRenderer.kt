@@ -178,10 +178,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
-                        val texture = playerInfo.skin.texture()
-                        //? > 1.21.8 {
-                        /*.id()
-                        *///?}
+                        val texture = playerInfo.skin.body().id()
                         PlayerFaceRenderer.draw(
                             DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )

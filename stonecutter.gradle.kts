@@ -121,7 +121,7 @@ allprojects {
     }
 }
 
-stonecutter active "1.21.5"
+stonecutter active "1.21.10"
 
 stonecutter handlers {
     configure("fsh", "vsh") {
@@ -131,18 +131,7 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed >= "1.21.6") {
-            replace("RenderPipelines.MATRICES_SNIPPET", "RenderPipelines.MATRICES_PROJECTION_SNIPPET")
-            replace("net.minecraft.SharedConstants.getCurrentVersion().name", "net.minecraft.SharedConstants.getCurrentVersion().name()")
-            replace("Font.StringRenderOutput", "Font.PreparedTextBuilder")
-        }
-        string(current.parsed >= "1.21.10") {
-            replace("Minecraft.getInstance().window.window", "Minecraft.getInstance().window.handle()")
-            replace(".skin.texture()", ".skin.body()")
-            replace("net.minecraft.client.resources.PlayerSkin", "net.minecraft.world.entity.player.PlayerSkin")
-            replace("BeaconRenderer.renderBeaconBeam", "BeaconRenderer.submitBeaconBeam")
-            replace("net.minecraft.client.gui.font.glyphs.BakedGlyph", "net.minecraft.client.gui.font.glyphs.BakedSheetGlyph")
-        }
+
     }
 
     filters.include("**/*.fsh", "**/*.vsh")

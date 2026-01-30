@@ -7,14 +7,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import java.awt.Color
-//? > 1.21.5 {
-/*import org.joml.Matrix3x2f
+import org.joml.Matrix3x2f
 import kotlin.math.atan
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.entity.LivingEntity
 import org.joml.Quaternionf
 import org.joml.Vector3f
-*///?}
 
 fun Renderable.Companion.fakePlayer(
     player: FakePlayer,
@@ -37,22 +35,7 @@ fun Renderable.Companion.fakePlayer(
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 100f)
-        //? < 1.21.7 {
-        InventoryScreen.renderEntityInInventoryFollowsMouse(
-            DrawContextUtils.drawContext,
-            padding,
-            padding,
-            padding + width,
-            padding + height,
-            entityScale,
-            0.0625f,
-            if (followMouse) mouse.first - mouseOffsetX.toFloat() else eyesX,
-            if (followMouse) mouse.second - mouseOffsetY.toFloat() else eyesY,
-            player,
-        )
-        //?} else {
-        /*val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
+        val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
         val translationX = peeked.m20().toInt()
         val translationY = peeked.m21().toInt()
         val averageScale = (peeked.m00() + peeked.m11()) / 2
@@ -71,13 +54,11 @@ fun Renderable.Companion.fakePlayer(
             if (followMouse) (mouse.second - mouseOffsetY.toFloat()) * averageScale + translationY else eyesY,
             player,
         )
-        *///?}
         DrawContextUtils.popMatrix()
     }
 }
 
-//? > 1.21.5 {
-/*private fun drawEntityWithoutScissor(
+private fun drawEntityWithoutScissor(
     guiGraphics: GuiGraphics,
     x1: Int,
     y1: Int,
@@ -127,4 +108,3 @@ fun Renderable.Companion.fakePlayer(
     entity.yHeadRotO = u
     entity.yHeadRot = v
 }
-*///?}

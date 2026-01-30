@@ -51,21 +51,8 @@ object WorldRenderUtils {
     ) {
         matrices.pushPose()
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
-        BeaconRenderer.renderBeaconBeam(
-            //? < 1.21.9 {
-            matrices,
-            vertexConsumers,
-            beaconBeam,
-            partialTicks,
-            1f,
-            MinecraftCompat.localWorld.gameTime,
-            0,
-            319,
-            rgb,
-            0.2f,
-            0.25f,
-            //?} else {
-             /*matrices,
+        BeaconRenderer.submitBeaconBeam(
+             matrices,
              Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
              beaconBeam,
              1f,
@@ -75,7 +62,6 @@ object WorldRenderUtils {
              rgb,
              0.2f,
              0.25f,
-            *///?}
         )
         matrices.popPose()
     }

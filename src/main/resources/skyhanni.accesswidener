@@ -39,18 +39,7 @@ accessible method net/minecraft/client/gui/components/ChatComponent screenToChat
 accessible field net/minecraft/client/ToggleKeyMapping needsToggle Ljava/util/function/BooleanSupplier;
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 mutable field net/minecraft/core/particles/ColorParticleOption color I
-
-#? < 1.21.6 {
-accessible class net/minecraft/client/gui/Font$StringRenderOutput
-#?} else {
-#accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
-#accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType renderPipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
-#accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphics;FII)V
-#?}
-
-#? < 1.21.10 {
-accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet/minecraft/client/renderer/culling/Frustum;
-accessible field net/minecraft/client/gui/font/glyphs/BakedGlyph renderTypes Lnet/minecraft/client/gui/font/GlyphRenderTypes;
-#?} else {
-#accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance
-#?}
+accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
+accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType renderPipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphics;FII)V
+accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance

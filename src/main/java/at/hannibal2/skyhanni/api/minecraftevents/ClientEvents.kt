@@ -71,22 +71,7 @@ object ClientEvents {
                 override fun getFabricId(): ResourceLocation =
                     ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
 
-                //? < 1.21.9 {
-                @Suppress("ForbiddenVoid")
                 override fun reload(
-                    synchronizer: PreparableReloadListener.PreparationBarrier,
-                    manager: ResourceManager,
-                    prepareExecutor: Executor,
-                    applyExecutor: Executor,
-                ): CompletableFuture<Void> {
-
-                    return CompletableFuture.runAsync(
-                        { ResourcePackReloadEvent(manager).post() },
-                        applyExecutor,
-                    ).thenCompose(synchronizer::wait)
-                }
-                //?} else {
-                /*override fun reload(
                     store: PreparableReloadListener.SharedState,
                     prepareExecutor: Executor,
                     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
@@ -97,7 +82,6 @@ object ClientEvents {
                         applyExecutor,
                     ).thenCompose(reloadSynchronizer::wait)
                 }
-               *///?}
             },
         )
 

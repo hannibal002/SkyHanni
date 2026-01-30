@@ -17,9 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-//? > 1.21.8 {
-/*import net.minecraft.client.input.KeyEvent;
-*///?}
+import net.minecraft.client.input.KeyEvent;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends Screen {
@@ -36,19 +34,11 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     private final GuiContainerHook skyHanni$hook = new GuiContainerHook(this);
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;onClose()V", shift = At.Shift.BEFORE), cancellable = true)
-    //? < 1.21.9 {
-    private void closeWindowPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
-        //?} else {
-        /*private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
-        *///?}
+    private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
         skyHanni$hook.closeWindowPressed(cir);
     }
 
-    //? < 1.21.6 {
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    //?} else {
-    /*@Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    *///?}
+    @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V"))
     private void backgroundDrawn(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyHanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
@@ -63,11 +53,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
         skyHanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
     }
 
-    //? < 1.21.6 {
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderLabels(Lnet/minecraft/client/gui/GuiGraphics;II)V", shift = At.Shift.AFTER))
-    //?} else {
-    /*@Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
-    *///?}
+    @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyHanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
@@ -87,11 +73,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
         skyHanni$hook.onMouseClick(slot, slotId, button, actionType.id(), cir);
     }
 
-    //? < 1.21.6 {
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
-    //?} else {
-    /*@Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
-    *///?}
+    @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ToolTipData.INSTANCE.setLastSlot(this.hoveredSlot);
     }

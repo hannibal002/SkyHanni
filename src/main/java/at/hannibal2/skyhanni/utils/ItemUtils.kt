@@ -83,10 +83,8 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-//? > 1.21.8 {
-/*import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
-*///?}
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -304,21 +302,13 @@ object ItemUtils {
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.PLAYER_HEAD) return null
-        //? < 1.21.9 {
-        return this.get(DataComponents.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
-        //?} else {
-        /*return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
-        *///?}
+        return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
 
     }
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.PLAYER_HEAD) return null
-        //? < 1.21.9 {
-        return this.get(DataComponents.PROFILE)?.id?.get().toString()
-        //?} else {
-        /*return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
-        *///?}
+        return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
     }
 
     @Suppress("SpreadOperator")
@@ -328,16 +318,10 @@ object ItemUtils {
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         val stack = ItemStack(Items.PLAYER_HEAD)
-        //? < 1.21.9 {
-        val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
-        profile.properties.put("textures", Property("textures", value))
-        stack.set(DataComponents.PROFILE, ResolvableProfile(profile))
-        //?} else {
-        /*val builder = ImmutableMultimap.builder<String, Property>()
+        val builder = ImmutableMultimap.builder<String, Property>()
         builder.put("textures", Property("textures", value))
         val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
         stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
-        *///?}
         stack.setCustomItemName(displayName)
         stack.setLoreString(lore.toList())
         return stack

@@ -1,5 +1,4 @@
 import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
 
 pluginManagement {
     includeBuild("sharedVariables")
@@ -44,6 +43,6 @@ rootProject.buildFileName = "root.gradle.kts"
 
 stonecutter {
     create(rootProject) {
-        versions("1.21.5", "1.21.8", "1.21.10")
+        versions("1.21.10")
     }
 }

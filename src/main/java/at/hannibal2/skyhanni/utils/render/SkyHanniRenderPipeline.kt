@@ -76,14 +76,14 @@ enum class SkyHanniRenderPipeline(
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     ROUNDED_RECT(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
     ),
     ROUNDED_TEXTURED_RECT(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_TEX,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_texture",
@@ -92,84 +92,64 @@ enum class SkyHanniRenderPipeline(
         depthWrite = false,
     ),
     ROUNDED_RECT_OUTLINE(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline",
-        //? < 1.21.6 {
-        uniforms = getCommonRoundedUniforms(withSmoothness = false) + mapOf(
-            "borderThickness" to UniformType.FLOAT,
-            "borderBlur" to UniformType.FLOAT,
-        ),
-        //?} else {
-        /*uniforms = getCommonRoundedUniforms() + mapOf(
+        uniforms = getCommonRoundedUniforms() + mapOf(
             "SkyHanniRoundedOutlineUniforms" to UniformType.UNIFORM_BUFFER
         ),
-        *///?}
         depthWrite = false,
     ),
     CIRCLE(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
-        //? < 1.21.6 {
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-            "angle1" to UniformType.FLOAT,
-            "angle2" to UniformType.FLOAT,
+            "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
-        //?} else {
-         /*uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-             "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
-         ),
-        *///?}
     ),
     RADIAL_GRADIENT_CIRCLE(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle",
-        //? < 1.21.6 {
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
-            "angle" to UniformType.FLOAT,
-            "startColor" to UniformType.VEC4,
-            "endColor" to UniformType.VEC4,
-            "progress" to UniformType.FLOAT,
-            "phaseOffset" to UniformType.FLOAT,
-            "reverse" to UniformType.INT,
-        )
-        //?} else {
-        /*uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
             "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
-        *///?}
+        //?}
     ),
     CHROMA_STANDARD(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "standard_chroma",
         uniforms = commonChromaUniforms,
     ),
     CHROMA_TEXT(
-        snippet = RenderPipelines.MATRICES_SNIPPET,
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_TEX_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "textured_chroma",
         sampler = "Sampler0",
         uniforms = commonChromaUniforms,
-    ),
-    ;
+    ), ;
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
-            .withVertexFormat(vFormat, vDrawMode)
-            .apply {
+            .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
                 blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
-                fragmentShaderPath?.let { withFragmentShader(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
+                fragmentShaderPath?.let {
+                    withFragmentShader(
+                        ResourceLocation.fromNamespaceAndPath(
+                            SkyHanniMod.MODID, it
+                        )
+                    )
+                }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
                 withDepthWrite(depthWrite)
@@ -185,31 +165,10 @@ private object SkyHanniRenderPipelineUtils {
         withSmoothness: Boolean = true,
         withHalfSize: Boolean = true,
     ): Map<String, UniformType> {
-        //? < 1.21.6 {
-        return mapOf(
-            "scaleFactor" to UniformType.FLOAT,
-            "radius" to UniformType.FLOAT,
-            "smoothness" to UniformType.FLOAT,
-            "halfSize" to UniformType.VEC2,
-            "centerPos" to UniformType.VEC2,
-            "modelViewMatrix" to UniformType.MATRIX4X4,
-        ).filter {
-            (withSmoothness || it.key != "smoothness") &&
-                (withHalfSize || it.key != "halfSize")
-        }
-        //?} else {
-        /*return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
-        *///?}
+        return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     }
 
     val commonChromaUniforms = mapOf(
-        //? < 1.21.6 {
-        "chromaSize" to UniformType.FLOAT,
-        "timeOffset" to UniformType.FLOAT,
-        "saturation" to UniformType.FLOAT,
-        "forwardDirection" to UniformType.INT,
-        //?} else {
-        /*"SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
-        *///?}
+        "SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
     )
 }

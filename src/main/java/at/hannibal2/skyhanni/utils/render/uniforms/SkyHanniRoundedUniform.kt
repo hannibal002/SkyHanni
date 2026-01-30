@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.uniforms
-//? > 1.21.5 {
-/*import com.mojang.blaze3d.buffers.GpuBufferSlice
+
+import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import java.nio.ByteBuffer
@@ -52,4 +52,3 @@ class SkyHanniRoundedUniform : AutoCloseable {
         }
     }
 }
-*///?}

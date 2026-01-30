@@ -8,67 +8,18 @@ import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.ResourceLocation
-//? if < 1.21.6 {
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
-//?} else {
-/*import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-*///?}
-
-//? if < 1.21.9 {
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.minecraft.client.renderer.MultiBufferSource
-import com.mojang.blaze3d.vertex.PoseStack
-//?}
 
 @SkyHanniModule
 object RenderEvents {
 
     init {
-
-        // SkyHanniRenderWorldEvent
-        //? < 1.21.9 {
-        WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
-            val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
-            val stack = event.matrixStack() ?: PoseStack()
-            SkyHanniRenderWorldEvent(
-                stack,
-                event.camera(),
-                immediateVertexConsumers,
-                event.tickCounter().getGameTimeDeltaPartialTick(true),
-            ).post()
-        }
-        //?}
-
-        // ScreenDrawnEvent
-
-        // GuiScreenOpenEvent
-
-        // GuiMouseInputEvent
-
-        // BlockOverlayRenderEvent
-
-        // GuiActionPerformedEvent
-
-        // InitializeGuiEvent
-
-        //? < 1.21.6 {
-        HudLayerRegistrationCallback.EVENT.register { context ->
-            context.attachLayerAfter(
-                IdentifiedLayer.SLEEP,
-                ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
-                RenderEvents::postGui,
-            )
-        }
-        //?} else {
-        /*HudElementRegistry.attachElementBefore(
+        HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
             ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
             RenderEvents::postGui
         )
-        *///?}
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {
