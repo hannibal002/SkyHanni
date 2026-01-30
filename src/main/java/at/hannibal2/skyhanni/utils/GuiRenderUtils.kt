@@ -378,7 +378,7 @@ object GuiRenderUtils {
         }
     }
 
-    // TODO: On 1.21.10+ it is completely broken
+    /*// TODO: On 1.21.10+ it is completely broken
     private fun ItemStack.customRenderOnScreen(
         x: Float, y: Float, finalItemScale: Float,
         rotX: Float, rotY: Float, rotZ: Float,
@@ -439,7 +439,7 @@ object GuiRenderUtils {
         RenderSystem.getModelViewStack().popMatrix()
         RenderSystem.getTextureMatrix().set(textureMatrixBackup)
         RenderSystem.restoreProjectionMatrix()
-    }
+    }*/
 
     private fun ItemStack.normalRenderOnScreen(translateX: Float, translateY: Float, scale: Float) {
         DrawContextUtils.pushPop {

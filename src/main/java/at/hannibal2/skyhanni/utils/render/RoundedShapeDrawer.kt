@@ -117,7 +117,8 @@ object RoundedShapeDrawer {
     fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) {
         val glTex = Minecraft.getInstance().textureManager.getTexture(texture).textureView
         RenderSystem.assertOnRenderThread()
-        RenderSystem.setShaderTexture(0, glTex)
+        // todo 1.21.11 fix
+        //RenderSystem.setShaderTexture(0, glTex)
         RoundedTextureShader.performVQuadAndUniforms(
             SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
@@ -128,7 +129,8 @@ object RoundedShapeDrawer {
                 { setUv(1f, 0f) },
             ),
         ) {
-            bindSampler("textureSampler", glTex)
+            // todo 1.21.11 fix
+            //bindSampler("textureSampler", glTex)
         }
     }
 

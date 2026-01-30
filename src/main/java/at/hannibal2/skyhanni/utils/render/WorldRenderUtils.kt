@@ -207,6 +207,10 @@ object WorldRenderUtils {
             color.rgb,
             1f
         )
+
+        // todo dont do this
+        vertexConsumers.endLastBatch()
+
         *///?}
         matrices.popPose()
     }

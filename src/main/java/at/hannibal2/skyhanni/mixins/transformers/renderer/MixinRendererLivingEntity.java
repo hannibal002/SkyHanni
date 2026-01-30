@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.mixins.transformers.renderer;
 import at.hannibal2.skyhanni.data.entity.EntityOpacityManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
-import at.hannibal2.skyhanni.utils.StringUtils;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -21,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//? if > 1.21.10
+//import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
@@ -63,7 +64,10 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
         if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return;
+            //? if < 1.21.11 {
             cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
+            //?} else
+            //cir.setReturnValue(RenderTypes.itemEntityTranslucentCull(this.getTextureLocation(state)));
         }
     }
 
