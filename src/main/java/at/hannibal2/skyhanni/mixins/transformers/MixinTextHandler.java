@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.List;
-//? if > 1.21.11
+//? if > 1.21.10
 //import java.util.function.BiConsumer;
 
 @Mixin(StringSplitter.class)
