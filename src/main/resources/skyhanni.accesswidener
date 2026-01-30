@@ -36,6 +36,7 @@ mutable field net/minecraft/core/particles/ColorParticleOption color I
 accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphics;FII)V
 accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance
+accessible method net/minecraft/client/gui/components/ChatComponent getLineHeight ()I
 
 #? < 1.21.11 {
 accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/rendertype/RenderType$CompositeState;

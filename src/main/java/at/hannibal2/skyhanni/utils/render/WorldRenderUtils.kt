@@ -33,6 +33,10 @@ import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+//? if > 1.21.10 {
+/*import net.minecraft.gizmos.Gizmos
+import net.minecraft.world.phys.shapes.Shapes
+*///?}
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
@@ -180,6 +184,7 @@ object WorldRenderUtils {
         val buf = vertexConsumers.getBuffer(layer)
         matrices.pushPose()
 
+        //? if < 1.21.11 {
         ShapeRenderer.addChainedFilledBoxVertices(
             matrices,
             buf,
@@ -190,6 +195,19 @@ object WorldRenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier,
         )
+        //?} else {
+        /*val color =
+            Color(c.red / 255f * 0.9f, c.green / 255f * 0.9f, c.blue / 255f * 0.9f, c.alpha / 255f * alphaMultiplier)
+
+        ShapeRenderer.renderShape(
+            matrices,
+            buf,
+            Shapes.block(),
+            effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
+            color.rgb,
+            1f
+        )
+        *///?}
         matrices.popPose()
     }
 
