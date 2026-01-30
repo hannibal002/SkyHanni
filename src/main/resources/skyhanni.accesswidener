@@ -50,4 +50,8 @@ accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRe
 #accessible method net/minecraft/client/gui/components/ChatComponent getScale ()D
 #accessible method net/minecraft/client/gui/components/ChatComponent getWidth ()I
 #accessible field net/minecraft/client/Camera position Lnet/minecraft/world/phys/Vec3;
+#accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)V
+#accessible field net/minecraft/client/renderer/rendertype/RenderType state Lnet/minecraft/client/renderer/rendertype/RenderSetup;
+#accessible field net/minecraft/client/renderer/rendertype/RenderSetup pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+#accessible field net/minecraft/client/renderer/rendertype/RenderSetup outputTarget Lnet/minecraft/client/renderer/rendertype/OutputTarget;
 #?}
