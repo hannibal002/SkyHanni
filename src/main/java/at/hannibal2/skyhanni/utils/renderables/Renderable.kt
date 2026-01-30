@@ -41,7 +41,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.PauseScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -1079,7 +1079,7 @@ interface Renderable {
 
         fun drawInsideImage(
             input: Renderable,
-            texture: ResourceLocation,
+            texture: Identifier,
             alpha: Int = 255,
             padding: Int = 2,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -1113,7 +1113,7 @@ interface Renderable {
 
         fun drawInsideFixedSizedImage(
             input: Renderable,
-            texture: ResourceLocation,
+            texture: Identifier,
             width: Int = input.width,
             height: Int = input.height,
             alpha: Int = 255,

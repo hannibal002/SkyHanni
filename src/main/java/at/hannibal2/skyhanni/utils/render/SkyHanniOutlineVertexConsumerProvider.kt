@@ -5,13 +5,13 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.AddressMode
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
+import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.textures.TextureFormat
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.OutlineBufferSource
-import net.minecraft.client.renderer.RenderType
-import com.mojang.blaze3d.textures.GpuTextureView
+import net.minecraft.client.renderer.rendertype.RenderType
 
 // The idea and implementation for this class was inspired by SkyBlocker.
 // This implementation has been modified from the original SkyBlocker code to work across multiple versions.

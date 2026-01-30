@@ -15,7 +15,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.MeshData
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.RenderType.CompositeRenderType
+import net.minecraft.client.renderer.rendertype.RenderType.CompositeRenderType
 import org.joml.Vector3f
 import org.joml.Vector4f
 

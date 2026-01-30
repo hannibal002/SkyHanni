@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.Util
+import net.minecraft.util.Util
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files

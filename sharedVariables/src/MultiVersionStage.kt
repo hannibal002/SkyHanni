@@ -9,7 +9,7 @@ enum class MultiVersionStage(val label: String) {
     ;
 
     fun shouldCompile(projectTarget: ProjectTarget): Boolean {
-        if (projectTarget == ProjectTarget.MODERN_12105) return true
+        if (projectTarget == ProjectTarget.MODERN_12110) return true
         return when (this) {
             OFF -> false
             FULL -> true
@@ -17,7 +17,7 @@ enum class MultiVersionStage(val label: String) {
     }
 
     fun shouldCreateProject(projectTarget: ProjectTarget): Boolean {
-        if (projectTarget == ProjectTarget.MODERN_12105) return true
+        if (projectTarget == ProjectTarget.MODERN_12110) return true
         return when (this) {
             OFF -> false
             FULL -> true

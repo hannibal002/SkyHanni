@@ -25,7 +25,7 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.minecraft.server.packs.resources.ResourceManager
@@ -68,8 +68,8 @@ object ClientEvents {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             object : IdentifiableResourceReloadListener {
 
-                override fun getFabricId(): ResourceLocation =
-                    ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
+                override fun getFabricId(): Identifier =
+                    Identifier.fromNamespaceAndPath("skyhanni", "resources")
 
                 override fun reload(
                     store: PreparableReloadListener.SharedState,

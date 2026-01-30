@@ -15,8 +15,8 @@ public class MixinSoundSystem {
     @Inject(method = "play", at = @At("HEAD"), cancellable = true)
     public void play(SoundInstance sound, CallbackInfoReturnable<SoundEngine.PlayResult> cir) {
         if (sound == null) return;
-        if (sound.getLocation() == null) return;
-        String soundId = sound.getLocation().toString();
+        if (sound.getIdentifier() == null) return;
+        String soundId = sound.getIdentifier().toString();
         if (IslandType.GALATEA.isCurrent() && SkyHanniMod.feature.getForaging().getMutePhantoms()) {
             // for whatever reason canceling our actual sound event doesn't stop phantom noises
             if (soundId.contains("entity.phantom.")) cir.setReturnValue(SoundEngine.PlayResult.NOT_STARTED);

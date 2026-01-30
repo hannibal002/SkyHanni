@@ -27,7 +27,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 import java.util.UUID

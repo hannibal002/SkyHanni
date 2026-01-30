@@ -11,7 +11,7 @@ import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 
 @SkyHanniModule
@@ -38,13 +38,13 @@ object SoundUtils {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",
-                    "soundLocation" to this.location,
+                    "soundLocation" to this.identifier,
                 )
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",
-                    "soundLocation" to this.location,
+                    "soundLocation" to this.identifier,
                 )
             } finally {
                 if (!config.maintainGameVolume) this.setLevel(oldLevel)
@@ -57,7 +57,7 @@ object SoundUtils {
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
-        val identifier = ResourceLocation.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
     }
 

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
-import net.minecraft.Util
+import net.minecraft.util.Util
 import net.minecraft.client.renderer.RenderStateShard
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.client.renderer.RenderType.CompositeRenderType
-import net.minecraft.client.renderer.RenderType.CompositeState
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.client.renderer.rendertype.RenderType.CompositeRenderType
+import net.minecraft.client.renderer.rendertype.RenderType.CompositeState
+import net.minecraft.resources.Identifier
 import net.minecraft.util.TriState
 import java.util.OptionalDouble
 import java.util.concurrent.ConcurrentHashMap
@@ -97,7 +97,7 @@ object SkyHanniRenderLayers {
         CompositeState.builder().createCompositeState(false),
     )
 
-    private val CHROMA_TEXTURED: java.util.function.Function<ResourceLocation, RenderType> = Util.memoize { texture ->
+    private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
         ChromaRenderLayer(
             "skyhanni_text_chroma",
             RenderType.SMALL_BUFFER_SIZE,
@@ -148,7 +148,7 @@ object SkyHanniRenderLayers {
         }
     }
 
-    fun getChromaTexturedWithIdentifier(identifier: ResourceLocation) = CHROMA_TEXTURED.apply(identifier)
+    fun getChromaTexturedWithIdentifier(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
 
     fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
     fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()

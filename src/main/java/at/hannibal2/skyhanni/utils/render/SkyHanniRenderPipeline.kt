@@ -10,7 +10,7 @@ import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -137,14 +137,14 @@ enum class SkyHanniRenderPipeline(
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
+            .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
                 blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
-                vertexShaderPath?.let { withVertexShader(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
+                vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
                     withFragmentShader(
-                        ResourceLocation.fromNamespaceAndPath(
+                        Identifier.fromNamespaceAndPath(
                             SkyHanniMod.MODID, it
                         )
                     )

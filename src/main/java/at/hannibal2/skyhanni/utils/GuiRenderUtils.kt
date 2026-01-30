@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
@@ -192,7 +192,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.fillGradient(left, top, right, bottom, startColor, endColor)
     }
 
-    fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
+    fun drawTexturedRect(x: Float, y: Float, texture: Identifier, alpha: Float = 1f) {
         drawTexturedRect(
             x,
             y,
@@ -213,7 +213,7 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
@@ -241,7 +241,7 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {

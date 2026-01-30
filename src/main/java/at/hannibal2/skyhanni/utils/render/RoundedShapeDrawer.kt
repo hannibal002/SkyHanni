@@ -13,7 +13,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
@@ -112,7 +112,7 @@ object RoundedShapeDrawer {
             postVertexOps = listOf { setColor(color) },
         )
 
-    fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: ResourceLocation) {
+    fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) {
         val glTex = Minecraft.getInstance().textureManager.getTexture(texture).textureView
         RenderSystem.assertOnRenderThread()
         RenderSystem.setShaderTexture(0, glTex)

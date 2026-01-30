@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import java.net.URI
 import java.util.Optional
@@ -139,13 +139,13 @@ fun MutableComponent.withColor(hex: String): MutableComponent {
     return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
 }
 
-fun createResourceLocation(domain: String, path: String): ResourceLocation {
-    val textureLocation = ResourceLocation.fromNamespaceAndPath(domain, path)
+fun createResourceLocation(domain: String, path: String): Identifier {
+    val textureLocation = Identifier.fromNamespaceAndPath(domain, path)
     return textureLocation
 }
 
-fun createResourceLocation(path: String): ResourceLocation {
-    val textureLocation = ResourceLocation.parse(path)
+fun createResourceLocation(path: String): Identifier {
+    val textureLocation = Identifier.parse(path)
     return textureLocation
 }
 

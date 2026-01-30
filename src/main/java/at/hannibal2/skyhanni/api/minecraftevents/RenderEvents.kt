@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 
@@ -17,7 +17,7 @@ object RenderEvents {
     init {
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
-            ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
+            Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
             RenderEvents::postGui
         )
     }
