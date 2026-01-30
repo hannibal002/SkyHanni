@@ -118,7 +118,6 @@ enum class SkyHanniRenderPipeline(
         uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
             "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
-        //?}
     ),
     CHROMA_STANDARD(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
