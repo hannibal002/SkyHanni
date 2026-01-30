@@ -64,7 +64,6 @@ enum class TabWidgetDisplay(
     EVENT("Event", TabWidget.EVENT),
     ESSENCE("Essence", TabWidget.ESSENCE),
     FORGE("Forge", TabWidget.FORGE),
-    DUNGEON_STATS("Dungeon Stats", TabWidget.DUNGEON_STATS),
     PARTY("Party", TabWidget.PARTY),
     TRAPPER("Trapper", TabWidget.TRAPPER),
     CRYSTAL("Crystals", TabWidget.CRYSTAL),
@@ -75,7 +74,6 @@ enum class TabWidgetDisplay(
     COPPER("Copper", TabWidget.COPPER),
     VISITORS("Visitors", TabWidget.VISITORS),
     SALTS("Salts", TabWidget.SALTS),
-    
     ;
 
     val position get() = config.displayPositions[ordinal]
