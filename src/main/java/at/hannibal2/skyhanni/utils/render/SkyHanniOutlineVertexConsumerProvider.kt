@@ -15,8 +15,6 @@ import net.minecraft.client.renderer.rendertype.RenderType
 
 // The idea and implementation for this class was inspired by SkyBlocker.
 // This implementation has been modified from the original SkyBlocker code to work across multiple versions.
-
-
 class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource() {
 
     override fun endOutlineBatch() {
@@ -84,7 +82,7 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
 
         private fun updateDepthAttachment() {
             try {
-                @Suppress("SimpleRedundantLet") customDepthAttachment?.let {
+                customDepthAttachment?.let {
                     it.close()
                     customDepthAttachmentView?.close()
                 }
@@ -95,8 +93,10 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
                     TextureFormat.DEPTH32,
                     lastWidth, lastHeight, 1, 1,
                 )
+                //? if < 1.21.11 {
                 depthAttachment.setTextureFilter(FilterMode.NEAREST, false)
                 depthAttachment.setAddressMode(AddressMode.CLAMP_TO_EDGE)
+                //?}
                 customDepthAttachment = depthAttachment
                 customDepthAttachmentView = device.createTextureView(depthAttachment)
             } catch (e: Exception) {
