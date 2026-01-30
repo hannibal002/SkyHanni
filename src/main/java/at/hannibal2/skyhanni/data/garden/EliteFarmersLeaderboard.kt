@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
@@ -230,7 +229,6 @@ object EliteFarmersLeaderboard {
 
     private fun loadLeaderboardIfAble(leaderboardType: EliteLeaderboardType): Int? {
         if (loadingLeaderboardMutex[leaderboardType::class]?.isLocked == true) return null
-        if (profileId == "") updateCollections()
 
         val category = leaderboardType::class
 
@@ -367,7 +365,10 @@ object EliteFarmersLeaderboard {
     ) {
         if (diff >= 0.5 || abs(diff) >= 100) {
             when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time weight in the farmingweight class
+                EliteLeaderboardMode.ALL_TIME -> {
+                    // we handle all-time weight in the farmingweight class
+                    // we only update collections on garden join
+                }
                 EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
             }
         }
@@ -382,7 +383,10 @@ object EliteFarmersLeaderboard {
         val diffWeight = diff / crop.getFactor()
         if (diffWeight >= 0.5 || abs(diffWeight) >= 100) {
             when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time collections in the farming weight class
+                EliteLeaderboardMode.ALL_TIME -> {
+                    // we handle all-time collections in the farming weight class
+                    // we only update collections on garden join
+                }
                 EliteLeaderboardMode.MONTHLY ->
                     leaderboardAmountMap?.set(leaderboardType, apiData.amount)
             }

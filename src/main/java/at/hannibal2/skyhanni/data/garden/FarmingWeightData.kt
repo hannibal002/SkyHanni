@@ -65,13 +65,6 @@ object FarmingWeightData {
         updateCollections()
     }
 
-    // We need profile id for leaderboard api
-    // This should only fetch once
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (profileId.isBlank()) updateCollections()
-    }
-
     @HandleEvent
     fun onCollectionUpdate(event: CropCollectionAddEvent) {
         if (event.cropCollectionType == CropCollectionType.MOOSHROOM_COW) {
@@ -101,7 +94,9 @@ object FarmingWeightData {
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
-                EliteLeaderboardMode.ALL_TIME -> updateCollections()
+                EliteLeaderboardMode.ALL_TIME -> {
+                    // we only update collections on garden join
+                }
                 EliteLeaderboardMode.MONTHLY ->
                     getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
             }
@@ -127,8 +122,8 @@ object FarmingWeightData {
         weightGain += amount
     }
 
-    fun updateCollections() {
-        if (lastFetchAttempt.passedSince() <= 30.seconds || lastPlayerWeightFetch.passedSince() <= 15.minutes) return
+    fun updateCollections(ignoreCooldown: Boolean = false) {
+        if (!ignoreCooldown && (lastFetchAttempt.passedSince() <= 30.seconds || lastPlayerWeightFetch.passedSince() <= 15.minutes)) return
         if (HypixelData.profileName.isEmpty()) return
         if (collectionMutex.isLocked) return
         lastFetchAttempt = SimpleTimeMark.now()
