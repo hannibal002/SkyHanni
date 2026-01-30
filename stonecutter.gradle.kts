@@ -133,7 +133,8 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed >= "1.21.11") {
-            //replace("ResourceLocation", "Identifier")
+            replace("`com.google.gson.internal.\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
+            replace("isF3Visible", "isOverlayVisible")
         }
     }
 
