@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.List;
+//? if > 1.21.11
+//import java.util.function.BiConsumer;
 
 @Mixin(StringSplitter.class)
 public class MixinTextHandler {
@@ -24,7 +26,7 @@ public class MixinTextHandler {
     //? if < 1.21.11 {
     private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, FormattedText wrappedLinePrefix, Operation<List<FormattedText>> original) {
     //?} else
-    /*private void dontWrapOtherLines(FormattedText text, int maxWidth, Style style, BiConsumer<FormattedText, Boolean> biConsumer, Operation<Void> original) {*/
+    //private void dontWrapOtherLines(FormattedText text, int maxWidth, Style style, BiConsumer<FormattedText, Boolean> biConsumer, Operation<Void> original) {
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
         //? if < 1.21.11 {
