@@ -100,8 +100,15 @@ enum class CropType(
         replenish = true,
     ),
     WILD_ROSE(
-        "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { ItemStack(Items.ROSE_BUSH).overrideId("WILD_ROSE") }, "rose", FarmingItemType.WILD_ROSE, replenish = true,
+        "Wild Rose",
+        "THEORETICAL_HOE_WILD_ROSE",
+        "HELIANTHUS",
+        2.0,
+        { ItemStack(Items.ROSE_BUSH).overrideId("WILD_ROSE") },
+        "rose",
+        FarmingItemType.WILD_ROSE,
+        replenish = true,
+        eliteLbName = "wildrose"
     ),
     ;
 
