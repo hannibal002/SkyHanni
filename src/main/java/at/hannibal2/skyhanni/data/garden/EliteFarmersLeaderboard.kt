@@ -61,7 +61,6 @@ object EliteFarmersLeaderboard {
     private var hasWarned = false
     private var fetchAttempts = 0
     private var lastFetchAttempt = SimpleTimeMark.farPast()
-    private var lastTimeoutMessage = SimpleTimeMark.farPast()
 
     fun clearEntries(leaderboardType: EliteLeaderboardType) {
         leaderboardPosMap?.remove(leaderboardType)
@@ -251,10 +250,6 @@ object EliteFarmersLeaderboard {
                 }
             } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
                 apiUnavailable = true
-                if (lastTimeoutMessage.passedSince() > 5.minutes) {
-                    lastTimeoutMessage = SimpleTimeMark.now()
-                    ChatUtils.userError("elitebot.dev is currently overloaded. Leaderboards won't update until it recovers, sorry!")
-                }
                 throw e
             }
         }
