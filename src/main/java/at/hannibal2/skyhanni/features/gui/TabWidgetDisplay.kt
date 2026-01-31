@@ -30,8 +30,7 @@ enum class TabWidgetDisplay(
     BESTIARY(null, TabWidget.BESTIARY),
     DRAGON("Dragon Fight Info", TabWidget.DRAGON),
     PROTECTOR("Protector State", TabWidget.PROTECTOR),
-    RIFT_SHEN("Shen's Auction inside the Rift", TabWidget.RIFT_SHEN),
-    RIFT_INFO("Rift Info", TabWidget.RIFT_INFO),
+    SHEN_RIFT("Shen's Auction inside the Rift", TabWidget.RIFT_SHEN),
     MINION("Minion Info", TabWidget.MINION),
     COLLECTION(null, TabWidget.COLLECTION),
     TIMERS(null, TabWidget.TIMERS),
@@ -53,11 +52,12 @@ enum class TabWidgetDisplay(
     SHARD_TRAPS("Shard Traps", TabWidget.SHARD_TRAPS),
     FOREST_WHISPERS("Forest Whispers", TabWidget.FOREST_WHISPERS),
     AGATHA_CONTEST("Agatha's Contest", TabWidget.AGATHA_CONTEST),
-    JACOB_CONTEST("Jacob's Contest", TabWidget.JACOB_CONTEST),
     COMMISSIONS("Mining Commissions", TabWidget.COMMISSIONS),
     SLAYER("Slayer", TabWidget.SLAYER),
     PITY("Pity", TabWidget.PITY),
     PICKAXE_COOLDOWN("Pickaxe Cooldown", TabWidget.PICKAXE_COOLDOWN),
+    RIFT_INFO("Rift Info", TabWidget.RIFT_INFO),
+    JACOB_CONTEST("Jacob's Contest", TabWidget.JACOB_CONTEST),
     POWDERS("Powders", TabWidget.POWDER),
     ELECTION("Election", TabWidget.ELECTION),
     NORTH_STARS("North Stars", TabWidget.NORTH_STARS),
@@ -92,7 +92,7 @@ enum class TabWidgetDisplay(
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
-            config.display.get().forEach { widget ->
+            config.display.get().filterNotNull().forEach { widget ->
                 widget.position.renderStrings(
                     widget.widgets.flatMap { subWidget ->
                         subWidget.lines
