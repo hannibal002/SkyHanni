@@ -27,6 +27,7 @@ object SeeThroughWindow {
     @HandleEvent
     fun onKeyPressed(event: KeyDownEvent) {
         if (event.keyCode != config.keybind) return
+        if (Minecraft.getInstance().screen != null) return
         isActive = !isActive
         setOpacity()
     }
