@@ -92,7 +92,7 @@ enum class TabWidgetDisplay(
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
-            config.display.get().filterNotNull().forEach { widget ->
+            config.display.get().forEach { widget ->
                 widget.position.renderStrings(
                     widget.widgets.flatMap { subWidget ->
                         subWidget.lines
