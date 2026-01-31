@@ -27,12 +27,12 @@ enum class SkyHanniRenderPipeline(
 ) {
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        vFormat = DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/,
         vDrawMode = VertexFormat.Mode.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        vFormat = DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/,
         vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
