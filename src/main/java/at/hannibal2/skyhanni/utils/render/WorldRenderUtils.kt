@@ -54,16 +54,16 @@ object WorldRenderUtils {
         matrices.pushPose()
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
-             matrices,
-             Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
-             beaconBeam,
-             1f,
-             Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
-             0,
-             319,
-             rgb,
-             0.2f,
-             0.25f,
+            matrices,
+            Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
+            beaconBeam,
+            1f,
+            Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
+            0,
+            319,
+            rgb,
+            0.2f,
+            0.25f,
         )
         matrices.popPose()
     }
@@ -182,9 +182,10 @@ object WorldRenderUtils {
         val buf = vertexConsumers.getBuffer(layer)
         matrices.pushPose()
 
-        //? < 1.21.11
-        ShapeRenderer.
-        addChainedFilledBoxVertices(
+        //? < 1.21.11 {
+        ShapeRenderer.addChainedFilledBoxVertices(
+            //?} else
+            //addChainedFilledBoxVertices(
             matrices,
             buf,
             effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,

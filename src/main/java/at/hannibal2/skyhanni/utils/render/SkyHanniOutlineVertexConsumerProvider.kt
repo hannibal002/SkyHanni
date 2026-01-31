@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.rendertype.RenderType
 
 // The idea and implementation for this class was inspired by SkyBlocker.
 // This implementation has been modified from the original SkyBlocker code to work across multiple versions.
-class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSource) : OutlineBufferSource() {
+class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
 
     override fun endOutlineBatch() {
         beginRendering()
@@ -34,9 +34,7 @@ class SkyHanniOutlineVertexConsumerProvider(parent: MultiBufferSource.BufferSour
 
         @JvmStatic
         val vertexConsumers by lazy {
-            SkyHanniOutlineVertexConsumerProvider(
-                Minecraft.getInstance().renderBuffers().bufferSource()
-            )
+            SkyHanniOutlineVertexConsumerProvider()
         }
 
         private var customDepthAttachment: GpuTexture? = null

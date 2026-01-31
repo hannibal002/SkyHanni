@@ -44,7 +44,7 @@ object SeeThroughWindow {
             GLFW.glfwSetWindowOpacity(handle, 1f)
             return
         }
-        val alpha = (config.seeThroughFarming.get()/100f).coerceAtLeast(0.05f).coerceAtMost(1f)
+        val alpha = (config.seeThroughFarming.get() / 100f).coerceAtLeast(0.05f).coerceAtMost(1f)
         GLFW.glfwSetWindowOpacity(handle, alpha)
     }
 }

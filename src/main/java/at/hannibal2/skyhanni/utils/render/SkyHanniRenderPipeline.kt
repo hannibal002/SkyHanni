@@ -106,7 +106,7 @@ enum class SkyHanniRenderPipeline(
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
-        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+        uniforms = getCommonRoundedUniforms() + mapOf(
             "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
     ),
@@ -115,7 +115,7 @@ enum class SkyHanniRenderPipeline(
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle",
-        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+        uniforms = getCommonRoundedUniforms() + mapOf(
             "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
     ),
@@ -160,10 +160,7 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    fun getCommonRoundedUniforms(
-        withSmoothness: Boolean = true,
-        withHalfSize: Boolean = true,
-    ): Map<String, UniformType> {
+    fun getCommonRoundedUniforms(): Map<String, UniformType> {
         return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     }
 

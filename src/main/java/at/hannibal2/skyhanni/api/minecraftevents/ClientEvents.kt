@@ -70,6 +70,7 @@ object ClientEvents {
                 override fun getFabricId(): Identifier =
                     Identifier.fromNamespaceAndPath("skyhanni", "resources")
 
+                @Suppress("ForbiddenVoid")
                 override fun reload(
                     store: PreparableReloadListener.SharedState,
                     prepareExecutor: Executor,

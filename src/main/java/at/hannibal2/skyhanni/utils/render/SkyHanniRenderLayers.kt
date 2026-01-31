@@ -159,12 +159,14 @@ object SkyHanniRenderLayers {
     //?} else {
     /*private val LINES: RenderType = RenderType.create(
         "skyhanni_lines",
-        RenderSetup.builder(SkyHanniRenderPipeline.LINES()).setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING).createRenderSetup(),
+        RenderSetup.builder(SkyHanniRenderPipeline.LINES())
+            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING).createRenderSetup(),
     )
 
     private val LINES_XRAY: RenderType = RenderType.create(
         "skyhanni_lines_xray",
-        RenderSetup.builder(SkyHanniRenderPipeline.LINES_XRAY()).setLayeringTransform(LayeringTransform.NO_LAYERING).createRenderSetup(),
+        RenderSetup.builder(SkyHanniRenderPipeline.LINES_XRAY()).setLayeringTransform(LayeringTransform.NO_LAYERING)
+            .createRenderSetup(),
     )
     *///?}
 

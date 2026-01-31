@@ -41,8 +41,6 @@ object RoundedShapeDrawer {
 
     private fun <T : RoundedShader<T>> T.performBaseUniforms(
         renderPass: RenderPass,
-        withSmoothness: Boolean = true,
-        withHalfSize: Boolean = true,
     ) {
         renderPass.setUniform("SkyHanniRoundedUniforms", roundedBufferSlice)
     }
@@ -52,8 +50,6 @@ object RoundedShapeDrawer {
         x1: Int, y1: Int, x2: Int, y2: Int,
         postVertexOps: List<(BufferBuilder.() -> Unit)>,
         prePassOp: (() -> Unit) = {},
-        withSmoothness: Boolean = true,
-        withHalfSize: Boolean = true,
         passOp: (RenderPass.() -> Unit) = { },
     ) {
         val floatPairs = listOf(
@@ -101,7 +97,7 @@ object RoundedShapeDrawer {
             draw(pipeline, buffer.buildOrThrow()) { pass ->
                 RenderSystem.bindDefaultUniforms(pass)
                 pass.setUniform("DynamicTransforms", dynamicTransforms)
-                this@performVQuadAndUniforms.performBaseUniforms(pass, withSmoothness, withHalfSize)
+                this@performVQuadAndUniforms.performBaseUniforms(pass)
                 passOp.invoke(pass)
             }
 
@@ -156,7 +152,6 @@ object RoundedShapeDrawer {
                     RoundedRectangleOutlineShader.borderThickness, RoundedRectangleOutlineShader.borderBlur,
                 )
             },
-            withSmoothness = false,
         ) {
             setUniform("SkyHanniRoundedOutlineUniforms", roundedOutlineBufferSlice)
         }

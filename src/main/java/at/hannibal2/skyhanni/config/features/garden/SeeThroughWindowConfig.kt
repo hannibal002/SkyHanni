@@ -15,7 +15,7 @@ class SeeThroughWindowConfig {
         desc = "Makes the window transparent with a keybind so you can watch YouTube behind the game\n" + "§eDoes not work in full screen"
     )
     @ConfigEditorSlider(minValue = 5f, maxValue = 100f, minStep = 1f)
-    var seeThroughFarming: Property<Float> = Property.of(100f)
+    val seeThroughFarming: Property<Float> = Property.of(100f)
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "Press this key to toggle See Through Farming")

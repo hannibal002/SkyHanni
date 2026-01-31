@@ -300,7 +300,10 @@ fun Component.changeColor(color: LorenzColor): Component =
     this.copyIfNeeded().withStyle(color.toChatFormatting())
 
 fun Component.convertToJsonString(): String {
-    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
+    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
+        com.mojang.serialization.JsonOps.INSTANCE,
+        this
+    ).orThrow.toString()
 }
 
 fun Component.append(newText: Component): MutableComponent {
