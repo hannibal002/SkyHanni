@@ -24,6 +24,8 @@ import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.joml.Vector3f
+//? > 1.21.10
+//import com.mojang.blaze3d.textures.FilterMode
 
 object RoundedShapeDrawer {
 
@@ -117,8 +119,8 @@ object RoundedShapeDrawer {
     fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) {
         val glTex = Minecraft.getInstance().textureManager.getTexture(texture).textureView
         RenderSystem.assertOnRenderThread()
-        // todo 1.21.11 fix
-        //RenderSystem.setShaderTexture(0, glTex)
+        //? if < 1.21.11
+        RenderSystem.setShaderTexture(0, glTex)
         RoundedTextureShader.performVQuadAndUniforms(
             SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
@@ -129,8 +131,12 @@ object RoundedShapeDrawer {
                 { setUv(1f, 0f) },
             ),
         ) {
-            // todo 1.21.11 fix
-            //bindSampler("textureSampler", glTex)
+            //? if < 1.21.11 {
+            bindSampler("textureSampler", glTex)
+            //?} else {
+            /*val sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)
+            bindTexture("textureSampler", glTex, sampler)
+            *///?}
         }
     }
 
