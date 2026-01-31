@@ -79,7 +79,8 @@ object FishingHookDisplay {
             reset()
             return
         }
-        if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible || !armorStand.canBeSeen(50)) return
+        if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible) return
+        if (!armorStand.canBeSeen(50, ignoreFrustum = true)) return
         val alertText = if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets()
 
         isRendering = true
