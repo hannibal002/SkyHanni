@@ -45,7 +45,8 @@ data class EliteLeaderboard(
     @Expose val initialAmount: Double,
     @Expose val upcomingRank: Int,
     @Expose val upcomingPlayers: List<EliteLeaderboardPlayer>,
-    @Expose val previous: List<EliteLeaderboardPlayer>?
+    @Expose val previous: List<EliteLeaderboardPlayer>?,
+    @Expose val disabled: Boolean = false,
 )
 
 data class EliteLeaderboardPlayer(

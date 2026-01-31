@@ -57,9 +57,11 @@ object EliteFarmersLeaderboard {
     private val eliteLeaderboardData: MutableMap<EliteLeaderboardType, EliteLeaderboardData> = mutableMapOf()
 
     var apiError = false
+    var apiUnavailable = false
     private var hasWarned = false
     private var fetchAttempts = 0
     private var lastFetchAttempt = SimpleTimeMark.farPast()
+    private var lastTimeoutMessage = SimpleTimeMark.farPast()
 
     fun clearEntries(leaderboardType: EliteLeaderboardType) {
         leaderboardPosMap?.remove(leaderboardType)
@@ -232,19 +234,28 @@ object EliteFarmersLeaderboard {
 
         val category = leaderboardType::class
 
-        SkyHanniMod.launchIOCoroutine("load elite lb") {
-            loadingLeaderboardMutex[leaderboardType::class]?.withLock {
-                val oldPos = leaderboardPosMap?.get(leaderboardType)
-                val lbPos = loadLeaderboardPosition(leaderboardType)
-                lbPos?.let {
-                    leaderboardPosMap?.set(leaderboardType, lbPos)
-                    // warn for the load of each mode in each enabled display
-                    if (category !in loadedLeaderboardCategories) {
-                        checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
-                        loadedLeaderboardCategories.add(category)
+        SkyHanniMod.launchIOCoroutine("load elite lb", timeout = 15.seconds) {
+            try {
+                loadingLeaderboardMutex[leaderboardType::class]?.withLock {
+                    val oldPos = leaderboardPosMap?.get(leaderboardType)
+                    val lbPos = loadLeaderboardPosition(leaderboardType)
+                    lbPos?.let {
+                        leaderboardPosMap?.set(leaderboardType, lbPos)
+                        // warn for the load of each mode in each enabled display
+                        if (category !in loadedLeaderboardCategories) {
+                            checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
+                            loadedLeaderboardCategories.add(category)
+                        }
+                        eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.lastUpdate = SimpleTimeMark.now()
                     }
-                    eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.lastUpdate = SimpleTimeMark.now()
                 }
+            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                apiUnavailable = true
+                if (lastTimeoutMessage.passedSince() > 5.minutes) {
+                    lastTimeoutMessage = SimpleTimeMark.now()
+                    ChatUtils.userError("elitebot.dev is currently overloaded. Leaderboards won't update until it recovers, sorry!")
+                }
+                throw e
             }
         }
         return leaderboardPosMap?.get(leaderboardType)
@@ -293,6 +304,14 @@ object EliteFarmersLeaderboard {
         lbData.lastUpdate = SimpleTimeMark.now()
         lbData.shouldRefresh = false
         apiError = false
+
+        if (apiData.disabled) {
+            apiUnavailable = true
+            return leaderboardPosMap?.get(leaderboardType)
+        }
+
+        apiUnavailable = false
+
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             lbData.isUnranked = true
             // correct wrong data
@@ -305,7 +324,7 @@ object EliteFarmersLeaderboard {
 
             return null
         }
-        lbData.isUnranked = true
+        lbData.isUnranked = false
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
         handleUpcomingPlayers(leaderboardType, apiData)
         // prefer our lb pos
@@ -449,6 +468,7 @@ object EliteFarmersLeaderboard {
         leaderboardAmountMap?.clear()
         eliteLeaderboardData.clear()
         apiError = false
+        apiUnavailable = false
         hasWarned = false
         fetchAttempts = 0
         lastFetchAttempt = SimpleTimeMark.farPast()

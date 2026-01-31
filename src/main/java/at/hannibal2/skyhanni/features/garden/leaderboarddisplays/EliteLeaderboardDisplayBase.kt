@@ -161,6 +161,15 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     }
 
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
+        if (EliteFarmersLeaderboard.apiUnavailable) {
+            return Renderable.hoverTips(
+                content = "§7Waiting for update...",
+                tips = listOf(
+                    "§celitebot.dev is currently overloaded or unavailable.",
+                    "§7Leaderboard data will update when the service recovers.",
+                ),
+            )
+        }
         return if (isUnranked(leaderboardType)) {
             val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0
             // the amount eligible to enter every other leaderboard is the all-time amount for that lb, except for the monthly weight lb
