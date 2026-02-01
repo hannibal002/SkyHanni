@@ -43,7 +43,6 @@ import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 

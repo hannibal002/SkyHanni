@@ -22,7 +22,7 @@ object ColdOverlay {
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
-    private val textureLocation = createResourceLocation("minecraft", "textures/misc/powder_snow_outline.png");
+    private val textureLocation = createResourceLocation("minecraft", "textures/misc/powder_snow_outline.png")
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

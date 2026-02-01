@@ -66,9 +66,8 @@ object FarmingWeightData {
         updateCollections()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onProfileJoin(event: ProfileJoinEvent) {
-        if (!GardenApi.inGarden()) return
         updateCollections()
     }
 
