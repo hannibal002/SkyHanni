@@ -46,14 +46,14 @@ data class DisplayInfo(
     @Expose val color: Int?,
 )
 
- fun SkullOwnerInfo.toGameProfile(): GameProfile {
-     val builder = ImmutableMultimap.builder<String, Property>()
-     val textures = this.properties?.textures?.get(0)
-     if (textures != null) {
-         builder.put("textures", Property("textures", textures.value.orEmpty(), textures.signature.orEmpty()))
-     }
-     return GameProfile(UUID.fromString(this.uuid), "hannibal2", PropertyMap(builder.build()))
- }
+fun SkullOwnerInfo.toGameProfile(): GameProfile {
+    val builder = ImmutableMultimap.builder<String, Property>()
+    val textures = this.properties?.textures?.get(0)
+    if (textures != null) {
+        builder.put("textures", Property("textures", textures.value.orEmpty(), textures.signature.orEmpty()))
+    }
+    return GameProfile(UUID.fromString(this.uuid), "hannibal2", PropertyMap(builder.build()))
+}
 
 data class NbtBoolean(val boolean: Boolean) {
     fun asString(): String {

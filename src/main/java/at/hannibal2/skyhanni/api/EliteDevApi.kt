@@ -92,7 +92,7 @@ object EliteDevApi {
     }
 
     private fun resetLeaderboardData() {
-        updateCollections()
+        updateCollections(ignoreCooldown = true)
         FarmingWeightData.reset()
         EliteFarmersLeaderboard.reset()
         EliteLeaderboards.resetDisplays()

@@ -11,24 +11,17 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.item.ItemStackRenderState
-import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.ARGB
+import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
-import org.joml.Matrix4f
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -191,7 +184,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.fillGradient(left, top, right, bottom, startColor, endColor)
     }
 
-    fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
+    fun drawTexturedRect(x: Float, y: Float, texture: Identifier, alpha: Float = 1f) {
         val drawContext = DrawContextUtils.drawContext
         drawTexturedRect(
             x,
@@ -212,7 +205,7 @@ object GuiRenderUtils {
         uMax: Float = width.toFloat(),
         vMin: Float = 0f,
         vMax: Float = height.toFloat(),
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
     ) {
         drawTexturedRect(
@@ -238,7 +231,7 @@ object GuiRenderUtils {
         uMax: Float = width,
         vMin: Float = 0f,
         vMax: Float = height,
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
     ) {
         DrawContextUtils.drawContext.blit(
@@ -323,15 +316,6 @@ object GuiRenderUtils {
         )
     }
 
-    // todo, does this actually have to be matching Mojang's projection matrix?
-    //  theirs is 1000 -> 11000 by default, but we only use ~20 layers of that,
-    //  see if we can adjust this to maybe 100f -> 200f.
-    //  if we do change this, the 1.21.6 zT below will need to be adjusted as well.
-    private val projectionMatrix by lazy {
-        CachedOrthoProjectionMatrixBuffer(
-            "SkyHanni Item Rendering", 1000f, 11000f, true
-        )
-    }
     private val itemRenderStateButCool by lazy { ItemStackRenderState() }
 
     private const val SKULL_SCALE = (5f / 4f)
@@ -375,7 +359,7 @@ object GuiRenderUtils {
         }
     }
 
-    // TODO: On 1.21.10+ it is completely broken
+    /*// TODO: On 1.21.10+ it is completely broken
     private fun ItemStack.customRenderOnScreen(
         x: Float, y: Float, finalItemScale: Float,
         rotX: Float, rotY: Float, rotZ: Float,
@@ -436,7 +420,7 @@ object GuiRenderUtils {
         RenderSystem.getModelViewStack().popMatrix()
         RenderSystem.getTextureMatrix().set(textureMatrixBackup)
         RenderSystem.restoreProjectionMatrix()
-    }
+    }*/
 
     private fun ItemStack.normalRenderOnScreen(translateX: Float, translateY: Float, scale: Float) {
         DrawContextUtils.pushPop {

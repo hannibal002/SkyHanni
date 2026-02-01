@@ -68,7 +68,6 @@ object RenderableTooltips {
             x // normal
         }
 
-        val zLevel = 400f
         DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat())
 
         drawTooltipBackground(tooltipTextWidth, tooltipHeight, borderColorStart)

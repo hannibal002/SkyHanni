@@ -59,12 +59,12 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     }
 
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    private void onDrawSlot(GuiGraphics context, Slot slot, CallbackInfo ci) {
+    private void onDrawSlot(GuiGraphics guiGraphics, Slot slot, /*? if > 1.21.10 {*/ /*int i, int j, *//*?}*/ CallbackInfo ci) {
         skyHanni$hook.onDrawSlot(slot, ci);
     }
 
     @Inject(method = "renderSlot", at = @At("RETURN"))
-    private void onDrawSlotReturn(GuiGraphics context, Slot slot, CallbackInfo ci) {
+    private void onDrawSlotReturn(GuiGraphics guiGraphics, Slot slot, /*? if > 1.21.10 {*/ /*int i, int j, *//*?}*/ CallbackInfo ci) {
         skyHanni$hook.onDrawSlotPost(slot);
     }
 

@@ -3,9 +3,6 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
-import org.joml.Matrix4f
-import org.joml.Quaternionf
-import java.nio.FloatBuffer
 
 /**
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager

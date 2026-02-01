@@ -1,11 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.layers
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
-import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
@@ -14,10 +9,17 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.MeshData
 import com.mojang.blaze3d.vertex.VertexFormat
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.RenderType.CompositeRenderType
 import org.joml.Vector3f
 import org.joml.Vector4f
+//? if < 1.21.11 {
+import net.minecraft.client.renderer.rendertype.RenderType.CompositeRenderType
+//?} else {
+/*import net.minecraft.resources.Identifier
+import org.joml.Matrix4f
+import net.minecraft.client.renderer.rendertype.RenderType
+import net.minecraft.client.renderer.rendertype.RenderSetup
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
+*///?}
 
 class ChromaRenderLayer(
     name: String,
@@ -25,35 +27,46 @@ class ChromaRenderLayer(
     hasCrumbling: Boolean,
     translucent: Boolean,
     pipeline: RenderPipeline,
+    //? if < 1.21.11 {
     phases: CompositeState,
 ) : CompositeRenderType(name, size, hasCrumbling, translucent, pipeline, phases) {
+    //?} else {
+    /*texture: Identifier? = null,
+) : RenderType(
+    name,
+    if (texture == null) {
+        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_STANDARD())
+    } else {
+        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("texture", texture)
+    }
+        .createRenderSetup(),
+) {
+    *///?}
 
     override fun draw(buffer: MeshData) {
+
+        //? if < 1.21.11 {
         val renderPipeline = this.renderPipeline
         this.setupRenderState()
-
-        // Custom chroma uniforms
-        val chromaSize: Float = ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
-        var ticks =
-            (ClientEvents.totalTicks) + (Minecraft.getInstance() as AccessorMinecraft).timer.getGameTimeDeltaPartialTick(
-                true
-            )
-        ticks = when (ChromaManager.config.chromaDirection) {
-            Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
-            Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
+        //?} else {
+        /*val renderPipeline = this.state.pipeline
+        val matrix4fStack = RenderSystem.getModelViewStack()
+        val consumer = this.state.layeringTransform.modifier
+        if (consumer != null) {
+            matrix4fStack.pushMatrix()
+            consumer.accept(matrix4fStack)
         }
-        val timeOffset: Float = ticks * (ChromaManager.config.chromaSpeed / 360f)
-        val saturation: Float = ChromaManager.config.chromaSaturation
-        val forwardDirection: Int = when (ChromaManager.config.chromaDirection) {
-            Direction.FORWARD_RIGHT, Direction.FORWARD_LEFT -> 1
-            Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> 0
-        }
+        *///?}
 
-        var dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
-                RenderSystem.getModelViewMatrix(), Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-
-                Vector3f(), RenderSystem.getTextureMatrix(), RenderSystem.getShaderLineWidth()
-            )
+        val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
+            RenderSystem.getModelViewMatrix(), Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
+            Vector3f(),
+            //? if < 1.21.11 {
+            RenderSystem.getTextureMatrix(),
+            RenderSystem.getShaderLineWidth(),
+            //?} else
+            //Matrix4f(),
+        )
         if (GuiRendererHook.chromaBufferSlice == null) {
             GuiRendererHook.computeChromaBufferSlice()
         }
@@ -71,7 +84,7 @@ class ChromaRenderLayer(
                 indexType = buffer.drawState().indexType()
             }
 
-            val framebuffer = state.outputState.renderTarget
+            val framebuffer = state./*? if < 1.21.11 {*/ outputState /*?} else {*/ /*outputTarget *//*?}*/.renderTarget
 
             RenderSystem.getDevice().createRenderPass("SkyHanni Immediate Chroma Pipeline Draw", framebuffer)
                 .use { renderPass ->
@@ -85,12 +98,18 @@ class ChromaRenderLayer(
 
                     renderPass.enableRenderPassScissorStateIfAble()
 
+                    //? if < 1.21.11 {
                     for (i in 0..11) {
                         val gpuTexture = RenderSystem.getShaderTexture(i)
                         if (gpuTexture != null) {
                             renderPass.bindSampler("Sampler$i", gpuTexture)
                         }
                     }
+                    //?} else {
+                    /*for (entry in this.state.textures) {
+                        renderPass.bindTexture(entry.key, entry.value.textureView, entry.value.sampler)
+                    }
+                    *///?}
 
                     renderPass.setIndexBuffer(gpuBuffer2, indexType)
                     renderPass.drawIndexed(buffer.drawState().indexCount())
@@ -106,7 +125,13 @@ class ChromaRenderLayer(
         }
 
         buffer.close()
+        //? if < 1.21.11 {
         this.clearRenderState()
+        //?} else {
+        /*if (consumer != null) {
+            matrix4fStack.popMatrix()
+        }
+        *///?}
     }
 
 }

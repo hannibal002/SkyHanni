@@ -19,11 +19,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
@@ -65,11 +66,10 @@ object FarmingWeightData {
         updateCollections()
     }
 
-    // We need profile id for leaderboard api
-    // This should only fetch once
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (profileId.isBlank()) updateCollections()
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        if (!GardenApi.inGarden()) return
+        updateCollections()
     }
 
     @HandleEvent
@@ -101,7 +101,9 @@ object FarmingWeightData {
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
-                EliteLeaderboardMode.ALL_TIME -> updateCollections()
+                EliteLeaderboardMode.ALL_TIME -> {
+                    // we only update collections on garden join
+                }
                 EliteLeaderboardMode.MONTHLY ->
                     getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
             }
@@ -127,8 +129,8 @@ object FarmingWeightData {
         weightGain += amount
     }
 
-    fun updateCollections() {
-        if (lastFetchAttempt.passedSince() <= 30.seconds || lastPlayerWeightFetch.passedSince() <= 15.minutes) return
+    fun updateCollections(ignoreCooldown: Boolean = false) {
+        if (!ignoreCooldown && (lastFetchAttempt.passedSince() <= 30.seconds || lastPlayerWeightFetch.passedSince() <= 15.minutes)) return
         if (HypixelData.profileName.isEmpty()) return
         if (collectionMutex.isLocked) return
         lastFetchAttempt = SimpleTimeMark.now()

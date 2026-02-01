@@ -10,7 +10,7 @@ data class LaunchersJson(
 data class LauncherEntry(
     @Expose val name: String,
     @Expose val firstStacks: List<String>,
-    @Expose val brand: String = "",
+    @Expose val brand: String? = null,
     @Expose val flagged: Boolean = false,
 ) {
     fun getIdPair() = name to flagged

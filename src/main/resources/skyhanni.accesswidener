@@ -20,10 +20,6 @@ accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$I
 accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
 accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
 accessible method net/minecraft/client/gui/components/ChatComponent refreshTrimmedMessages ()V
-accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/RenderType$CompositeState;
-accessible field net/minecraft/client/renderer/RenderType$CompositeState outputState Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
-accessible method net/minecraft/client/renderer/RenderType$CompositeRenderType <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/RenderType$CompositeState;)V
-extendable class net/minecraft/client/renderer/RenderType$CompositeRenderType
 accessible class net/minecraft/client/StringSplitter$FlatComponents
 accessible class net/minecraft/client/StringSplitter$LineComponent
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
@@ -34,12 +30,30 @@ accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
 accessible field net/minecraft/world/entity/Entity DATA_CUSTOM_NAME Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/LivingEntity DATA_HEALTH_ID Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/client/gui/components/ChatComponent chatScrollbarPos I
-accessible method net/minecraft/client/gui/components/ChatComponent screenToChatX (D)D
-accessible method net/minecraft/client/gui/components/ChatComponent screenToChatY (D)D
 accessible field net/minecraft/client/ToggleKeyMapping needsToggle Ljava/util/function/BooleanSupplier;
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 mutable field net/minecraft/core/particles/ColorParticleOption color I
 accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
-accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType renderPipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphics;FII)V
 accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance
+accessible method net/minecraft/client/gui/components/ChatComponent getLineHeight ()I
+
+#? < 1.21.11 {
+accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/rendertype/RenderType$CompositeState;
+accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeState outputState Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
+accessible method net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType <init> (Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/rendertype/RenderType$CompositeState;)V
+extendable class net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType
+accessible method net/minecraft/client/gui/components/ChatComponent screenToChatX (D)D
+accessible method net/minecraft/client/gui/components/ChatComponent screenToChatY (D)D
+accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType renderPipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+#?} else {
+#accessible method net/minecraft/client/gui/components/ChatComponent getScale ()D
+#accessible method net/minecraft/client/gui/components/ChatComponent getWidth ()I
+#accessible field net/minecraft/client/Camera position Lnet/minecraft/world/phys/Vec3;
+#accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)V
+#accessible field net/minecraft/client/renderer/rendertype/RenderType state Lnet/minecraft/client/renderer/rendertype/RenderSetup;
+#accessible field net/minecraft/client/renderer/rendertype/RenderSetup pipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+#accessible field net/minecraft/client/renderer/rendertype/RenderSetup outputTarget Lnet/minecraft/client/renderer/rendertype/OutputTarget;
+#accessible field net/minecraft/client/renderer/rendertype/RenderSetup layeringTransform Lnet/minecraft/client/renderer/rendertype/LayeringTransform;
+#accessible field net/minecraft/client/renderer/rendertype/RenderType name Ljava/lang/String;
+#?}

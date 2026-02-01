@@ -8,11 +8,11 @@ import org.joml.Vector4f
 import java.nio.ByteBuffer
 
 class SkyHanniRadialGradientCircleUniform : AutoCloseable {
-    private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putVec4().putVec4().putFloat().putFloat().putInt().get()
+    private val uniformSize = Std140SizeCalculator().putFloat().putVec4().putVec4().putFloat().putFloat().putInt().get()
 
     val storage = DynamicUniformStorage<UniformValue>(
         "Skyhanni Gradient Circle UBO",
-        UNIFORM_SIZE,
+        uniformSize,
         6,
     )
 

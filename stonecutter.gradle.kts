@@ -1,5 +1,5 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT" apply false
+    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" apply false
     kotlin("jvm") version "2.2.21" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.2.21-2.0.4" apply false
@@ -118,6 +118,7 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
+        maven("https://maven.gegy.dev/releases/") // mojbackward
     }
 }
 
@@ -131,7 +132,10 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-
+        string(current.parsed >= "1.21.11") {
+            replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
+            replace("isF3Visible", "isOverlayVisible")
+        }
     }
 
     filters.include("**/*.fsh", "**/*.vsh")

@@ -7,9 +7,9 @@ import java.nio.ByteBuffer
 import net.minecraft.client.renderer.DynamicUniformStorage
 
 class SkyHanniRoundedOutlineUniform : AutoCloseable {
-    private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().get()
+    private val uniformSize = Std140SizeCalculator().putFloat().putFloat().get()
 
-    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Rounded Outline Rect UBO", UNIFORM_SIZE, 2)
+    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Rounded Outline Rect UBO", uniformSize, 2)
 
     fun writeWith(borderThickness: Float, borderBlur: Float): GpuBufferSlice {
         return storage.writeUniform(UniformValue(borderThickness, borderBlur))
