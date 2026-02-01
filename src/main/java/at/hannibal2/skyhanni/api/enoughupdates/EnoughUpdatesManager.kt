@@ -9,15 +9,19 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ComponentUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.google.gson.JsonArray
@@ -26,30 +30,15 @@ import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.JsonToNBT
-import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.StringTag
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import java.io.File
 import java.util.TreeMap
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.floor
-//#if MC > 1.21
-//$$ import net.minecraft.registry.Registries
-//$$ import net.minecraft.util.Identifier
-//$$ import net.minecraft.nbt.NbtString
-//$$ import net.minecraft.text.Text
-//$$ import net.minecraft.component.DataComponentTypes
-//$$ import net.minecraft.component.type.LoreComponent
-//$$ import at.hannibal2.skyhanni.utils.ComponentUtils
-//$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-//#else
-import net.minecraft.nbt.NBTTagString
-
-//#endif
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -77,7 +66,7 @@ object EnoughUpdatesManager {
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
      */
     suspend fun reloadItemsFromRepo(progress: ChatProgressUpdates) = loadingMutex.withLock {
-        progress.update("call reloadItemsFromRepo")
+        progress.update("reloadItemsFromRepo")
         progress.update("clearing caches and maps")
         itemStackCache.clear()
         displayNameCache.clear()
@@ -88,7 +77,7 @@ object EnoughUpdatesManager {
         val tempItemMap = TreeMap<String, JsonObject>()
         loadItemMap(progress, tempItemMap)
 
-        progress.update("call synchronized itemMap")
+        progress.update("synchronized itemMap")
         synchronized(itemMap) {
             itemMap.clear()
             itemMap.putAll(tempItemMap)
@@ -99,11 +88,10 @@ object EnoughUpdatesManager {
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<String, JsonObject>) = coroutineScope {
-        progress.update("call loadItemMap")
+        progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
-        progress.innerProgress(0, list.size)
-        val done = AtomicInteger(0)
+        progress.innerProgressStart(list.size)
         val async = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
@@ -111,7 +99,7 @@ object EnoughUpdatesManager {
                     internalName = internalName,
                     json = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject,
                 )
-                progress.innerProgress(done.incrementAndGet(), list.size)
+                progress.innerProgressStep()
                 val parsed = item ?: return@mapNotNullAsync null
                 internalName to parsed
             } catch (e: Exception) {
@@ -167,19 +155,12 @@ object EnoughUpdatesManager {
     }
 
     fun stackToJson(stack: ItemStack): JsonObject {
-        val tag = stack.tagCompound ?: NBTTagCompound()
-
         val lore = stack.getLore()
 
         val json = JsonObject()
         json.addProperty("itemid", stack.item.getIdentifierString())
-        json.addProperty("displayname", stack.displayName)
-        //#if MC < 1.21
-        json.addProperty("nbttag", tag.toString())
-        json.addProperty("damage", stack.itemDamage)
-        //#else
-        //$$ json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
-        //#endif
+        json.addProperty("displayname", stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
 
         val jsonLore = JsonArray()
         for (line in lore) {
@@ -200,14 +181,14 @@ object EnoughUpdatesManager {
             return fromJson
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
+            println("Error converting nbt to json: ${e.message}\nMalformed NBT: $convertedNbt\nOriginal NBT: $nbtString")
         }
 
         return null
     }
 
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
-        //#if MC < 1.21
-        json ?: return ItemStack(Items.painting)
+        json ?: return ItemStack(Items.PAINTING)
         var usingCache = useCache && !useReplacements
         val internalName = json["internalname"].asString
         if (internalName == "_") usingCache = false
@@ -217,22 +198,26 @@ object EnoughUpdatesManager {
             if (cachedStack != null) return cachedStack.copy()
         }
 
-        // todo modern doesnt have the "meta" number
-        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
-        stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
+        val damage = json["damage"]?.asInt ?: 0
+        val item: Item = ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+            println(json["itemid"].asString + " " + damage + " is invalid item")
+            return ItemStack(Blocks.STONE.asItem())
+        }
+        val stack = ItemStack(item)
+        if (stack.item == Items.AIR) {
+            return ItemStack(Blocks.STONE.asItem())
+        }
 
-        json["count"]?.asInt?.let { stack.stackSize = it }
-        json["damage"]?.asInt?.let { stack.itemDamage = it }
-        try {
-            val nbtString = json["nbttag"]?.let { rawJsonNbt ->
-                if (rawJsonNbt.isJsonObject) rawJsonNbt.toString()
-                else rawJsonNbt.asString
+        json["count"]?.asInt?.let { stack.count = it }
+
+
+        if (json["nbttag"]?.isJsonObject == false) {
+            json["nbttag"]?.asString?.let { nbt ->
+                ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
             }
-            val tag = JsonToNBT.getTagFromJson(nbtString)
-            stack.tagCompound = tag
-        } catch (_: Exception) {
-            println("json was malformed: ${json["nbttag"]}")
-            println("whole json: $json")
+        } else {
+            val neuNbtInfoJson = ConfigManager.gson.fromJson(json["nbttag"], NeuNbtInfoJson::class.java)
+            ComponentUtils.convertToComponents(stack, neuNbtInfoJson)
         }
 
         var replacements = mapOf<String, String>()
@@ -248,82 +233,26 @@ object EnoughUpdatesManager {
         }
 
         json["lore"]?.asJsonArray?.let { lore ->
-            val displayTag = stack.tagCompound?.getCompoundTag("display") ?: NBTTagCompound()
-            displayTag.setTag("Lore", processLore(lore, replacements))
-            val tag = stack.tagCompound ?: NBTTagCompound()
-            tag.setTag("display", displayTag)
-            stack.tagCompound = tag
+            val loreList: MutableList<String> = mutableListOf()
+            for (nbtElement in processLore(lore, replacements)) {
+                loreList.add(nbtElement.asString().get())
+            }
+
+            stack.setLoreString(loreList)
         }
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
-        //#else
-        //$$ json ?: return ItemStack(Items.PAINTING)
-        //$$ var usingCache = useCache && !useReplacements
-        //$$ val internalName = json["internalname"].asString
-        //$$ if (internalName == "_") usingCache = false
-        //$$
-        //$$ if (usingCache) {
-        //$$     val cachedStack = itemStackCache[internalName]
-        //$$     if (cachedStack != null) return cachedStack.copy()
-        //$$ }
-        //$$
-        //$$ val damage = json["damage"]?.asInt ?: 0
-        //$$ val item: Item = ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
-        //$$     println(json["itemid"].asString + " " + damage + " is invalid item")
-        //$$     return ItemStack(Blocks.STONE.asItem())
-        //$$ }
-        //$$ val stack = ItemStack(item)
-        //$$ if (stack.item == Items.AIR) {
-        //$$     return ItemStack(Blocks.STONE.asItem())
-        //$$ }
-        //$$
-        //$$ json["count"]?.asInt?.let { stack.count = it }
-        //$$
-        //$$
-        //$$ if (json["nbttag"]?.isJsonObject == false) {
-        //$$     json["nbttag"]?.asString?.let { nbt ->
-        //$$         ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
-        //$$     }
-        //$$ } else {
-        //$$     val neuNbtInfoJson = ConfigManager.gson.fromJson(json["nbttag"], NeuNbtInfoJson::class.java)
-        //$$     ComponentUtils.convertToComponents(stack, neuNbtInfoJson)
-        //$$ }
-        //$$
-        //$$ var replacements = mapOf<String, String>()
-        //$$ if (useReplacements) {
-        //$$     replacements = getPetLoreReplacements(stack, -1)
-        //$$     json["displayname"]?.asString?.let {
-        //$$         var name = it
-        //$$         for ((key, value) in replacements) {
-        //$$             name = name.replace("{$key}", value)
-        //$$         }
-        //$$         stack.setCustomItemName(name)
-        //$$     }
-        //$$ }
-        //$$
-        //$$ json["lore"]?.asJsonArray?.let { lore ->
-        //$$     val loreList: MutableList<String> = mutableListOf()
-        //$$     for (nbtElement in processLore(lore, replacements)) {
-        //$$         loreList.add(nbtElement.asString().get())
-        //$$     }
-        //$$
-        //$$     stack.setLore(loreList)
-        //$$ }
-        //$$
-        //$$ if (usingCache) itemStackCache[internalName] = stack
-        //$$ return stack.copy()
-        //#endif
     }
 
     private fun getPetLoreReplacements(stack: ItemStack?, level: Int): Map<String, String> {
-        stack?.tagCompound ?: return emptyMap()
+        stack?.components ?: return emptyMap()
         var petName: String? = null
         var tier: String? = null
 
         val extraAttributes = stack.extraAttributes
-        if (extraAttributes.hasKey("petInfo")) {
-            val petInfoStr = extraAttributes.getString("petInfo")
+        if (extraAttributes.contains("petInfo")) {
+            val petInfoStr = extraAttributes.getStringOrDefault("petInfo")
             val petInfo = ConfigManager.gson.fromJson(petInfoStr, JsonObject::class.java)
             petName = petInfo["name"]?.asString
             tier = petInfo["tier"]?.asString
@@ -438,18 +367,14 @@ object EnoughUpdatesManager {
         return replacements
     }
 
-    private fun processLore(lore: JsonArray, replacements: Map<String, String>): NBTTagList {
-        val loreList = NBTTagList()
+    private fun processLore(lore: JsonArray, replacements: Map<String, String>): ListTag {
+        val loreList = ListTag()
         for (line in lore) {
             val loreLine = line.asString
             for ((key, value) in replacements) {
                 loreLine.replace("{$key}", value)
             }
-            //#if MC < 1.21
-            loreList.appendTag(NBTTagString(loreLine))
-            //#else
-            //$$ loreList.add(NbtString.of(loreLine))
-            //#endif
+            loreList.add(StringTag.valueOf(loreLine))
         }
         return loreList
     }

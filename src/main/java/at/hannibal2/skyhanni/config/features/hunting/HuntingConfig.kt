@@ -1,33 +1,29 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
-/**
- * Attention developers:
- * If your feature can only be used on the foraging islands please mark it with @[OnlyModern]
- */
 class HuntingConfig {
 
-    @ConfigOption(
-        name = "§cNotice",
-        desc = "To see all Hunting features, please launch the game on a modern version of Minecraft with SkyHanni installed.\n" +
-            "§eJoin the SkyHanni Discord for a guide on how to migrate the config.",
-    )
-    @OnlyLegacy
-    @ConfigEditorInfoText
-    var notice: String = ""
+    @Expose
+    @ConfigOption(name = "Shard Tracker", desc = "")
+    @Accordion
+    val shardTracker: ShardTrackerConfig = ShardTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Hunting Profit Tracker", desc = "")
+    @Accordion
+    val huntingProfitTracker: HuntingProfitTrackerConfig = HuntingProfitTrackerConfig()
 
     @Expose
     @OnlyModern
@@ -71,7 +67,18 @@ class HuntingConfig {
     @Expose
     @OnlyModern
     @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var nextHideonleafKeybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var nextHideonleafKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @OnlyModern
+    var fusionDisplay = true
+
+    @Expose
+    @ConfigLink(owner = HuntingConfig::class, field = "fusionDisplay")
+    val fusionDisplayPosition: Position = Position(30, 210)
 
 }

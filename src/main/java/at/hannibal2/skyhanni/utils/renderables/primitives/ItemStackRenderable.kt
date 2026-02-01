@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 open class ItemStackRenderable protected constructor(
     private val stackGetter: () -> ItemStack,

@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.renderer.GlStateManager
 import java.time.Instant
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
@@ -68,7 +67,7 @@ object HoppityCallWarning {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
@@ -104,7 +103,6 @@ object HoppityCallWarning {
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
             shiftedRandomAlpha or (config.flashColor.toColor().rgb and 0xFFFFFF),
         )
-        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -1,28 +1,35 @@
 package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import org.lwjgl.glfw.GLFW
 
 class DianaConfig {
     @Expose
     @ConfigOption(
-        name = "Highlight Inquisitors",
-        desc = "Highlight Inquisitors found from the Mythological Event perk.",
+        name = "Highlight Rare Diana Mobs",
+        desc = "Highlight Rare Diana Mobs (Sphinx+) found from the Mythological Event perk.",
     )
+    @SearchTag("inquisitor")
     @ConfigEditorBoolean
     @FeatureToggle
-    var highlightInquisitors: Boolean = true
+    var highlightRareMobs: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Inquisitor Highlight", desc = "Color in which Inquisitors will be highlighted.")
+    @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Rare Diana Mobs will be highlighted.")
+    @SearchTag("inquisitor")
     @ConfigEditorColour
     var color: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 255, 127)
 
@@ -35,18 +42,21 @@ class DianaConfig {
     @FeatureToggle
     var guess: Boolean = false
 
-    enum class GuessLogic(private val displayName: String) {
-        SOOPY_GUESS("Soopy"),
-        PRECISE_GUESS("Precise"),
-        ;
-
-        override fun toString(): String = displayName
-    }
+    @Expose
+    @ConfigOption(
+        name = "Beacon Distance",
+        desc = "Min distance to draw beacon, -1 is no beacons.",
+    )
+    @ConfigEditorSlider(minValue = -1.0F, maxValue = 400.0F, minStep = 1.0F)
+    var beaconDistance = 10.0F
 
     @Expose
-    @ConfigOption(name = "Guessing Logic", desc = "Change which guess strategy to use.")
-    @ConfigEditorDropdown
-    var guessLogic: GuessLogic = GuessLogic.PRECISE_GUESS
+    @ConfigOption(
+        name = "Text Scale",
+        desc = "Text scale.",
+    )
+    @ConfigEditorSlider(minValue = 0.1F, maxValue = 2.5F, minStep = 0.01F)
+    var textScale = 1.0F
 
     @Expose
     @ConfigOption(
@@ -76,6 +86,47 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Guess From Arrow",
+        desc = "Guess next burrow location in chain instantly from the particle arrow.\n" +
+            "It is recommended to use bobby for better results.",
+    )
+    @ConfigEditorBoolean
+    var guessFromArrow: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn On Failure",
+        desc = "Sends \"Use Spade\" title when arrow guess fails.",
+    )
+    @ConfigEditorBoolean
+    var warnOnFail: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn On Chain Complete",
+        desc = "Sends \"Use Spade\" title when you complete a chain and there is not a burrow within 90 blocks.",
+    )
+    @ConfigEditorBoolean
+    var warnOnChainComp: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Render SubGuesses",
+        desc = "If there are multiple possible blocks will render them all in a greyed out chain.",
+    )
+    @ConfigEditorBoolean
+    var renderSubGuesses: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Clear On World Change",
+        desc = "Clear all guess data on world change.",
+    )
+    @ConfigEditorBoolean
+    var clearOnWorldChange: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Nearest Warp",
         desc = "Warp to the nearest warp point on the hub, if closer to the next burrow.",
     )
@@ -84,18 +135,25 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keyBindWarp: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keyBindWarp: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "Ignored Warps", desc = "")
-    @Accordion
-    val ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
+    @ConfigOption(
+        name = "Warp Distance",
+        desc = "How much closer a warp needs to be than you to suggest it.",
+    )
+    @ConfigEditorSlider(minValue = 0.0f, maxValue = 200.0f, minStep = 1.0f)
+    var warpDistanceDifference: Int = 10
 
     @Expose
-    @ConfigOption(name = "Inquisitor Waypoint Sharing", desc = "")
-    @Accordion
-    val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
+    @ConfigLink(owner = DianaConfig::class, field = "burrowNearestWarp")
+    val warpGuiPosition: Position = Position(327, 125, scale = 2.6f)
+
+    @Expose
+    @ConfigOption(name = "Ignored Warps", desc = "Warps listed here will not be suggested.")
+    @ConfigEditorDraggableList
+    val ignoredWarpsList: MutableList<BurrowWarpHelper.WarpPoint> = mutableListOf(BurrowWarpHelper.WarpPoint.TAYLOR)
 
     @Expose
     @ConfigOption(
@@ -105,6 +163,12 @@ class DianaConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var petWarning: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Rare Diana Mob Waypoint Sharing", desc = "")
+    @SearchTag("inquisitor")
+    @Accordion
+    val rareMobsSharing: RareMobSharingConfig = RareMobSharingConfig()
 
     @Expose
     @ConfigOption(name = "Diana Profit Tracker", desc = "")

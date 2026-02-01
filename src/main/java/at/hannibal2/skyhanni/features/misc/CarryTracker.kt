@@ -89,7 +89,7 @@ object CarryTracker {
     private var lastTradedPlayer: String? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         tradeCompletedPattern.matchMatcher(event.message) {
             lastTradedPlayer = group("name").cleanPlayerName()
         }
@@ -118,9 +118,9 @@ object CarryTracker {
 
     @HandleEvent
     fun onCommandRegister(event: CommandRegistrationEvent) {
-        event.register("shcarry") {
+        event.registerBrigadier("shcarry") {
             description = "Keep track of carries you do."
-            callback { onCommand(it) }
+            legacyCallbackArgs { onCommand(it) }
         }
     }
 
@@ -199,6 +199,8 @@ object CarryTracker {
         update()
         ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
+
+    fun isCustomer(customerName: String): Boolean = getCustomerOrNull(customerName) != null
 
     private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
         it.name.equals(customerName, ignoreCase = true)

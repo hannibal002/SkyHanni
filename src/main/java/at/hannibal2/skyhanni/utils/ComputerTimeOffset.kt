@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.EnumUtils.previous
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -18,6 +17,7 @@ import java.net.InetAddress
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -49,11 +49,11 @@ object ComputerTimeOffset {
     enum class State(val duration: Duration) {
         NORMAL(1.seconds),
         SLOW(10.seconds),
-        TOTALLY_OFF(Duration.INFINITE),
+        TOTALLY_OFF(INFINITE),
     }
 
     init {
-        SkyHanniMod.launchIOCoroutine("computer time offset init", timeout = 5.minutes) {
+        SkyHanniMod.launchIOCoroutine("computer time offset init", timeout = INFINITE) {
             while (state != State.TOTALLY_OFF) {
                 delay(state.duration)
                 detectTimeChange()
@@ -93,11 +93,10 @@ object ComputerTimeOffset {
             if (timeoutWarned.passedSince() > 10.minutes) {
                 timeoutMap[ntpServer] = 0
                 timeoutWarned = SimpleTimeMark.now()
-                ChatUtils.clickableChat(
+                ChatUtils.notifyOrDisable(
                     "NTP server $ntpServer is not responding ($timeouts failures). Check your connection, " +
                         "try disconnecting from any VPNs/proxies, or click here to change NTP servers.",
-                    hover = "Click to open Dev Config",
-                    onClick = { devConfig::ntpServer.jumpToEditor() }
+                    devConfig::ntpServer,
                 )
             }
             return@runCatching null

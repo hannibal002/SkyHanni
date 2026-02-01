@@ -31,8 +31,9 @@ object ShinyOrbTracker {
     private val SHINY_ROD_ITEM = "SHINY_ROD".toInternalName()
     private val tracker = SkyHanniItemTracker(
         "Shiny Orb Tracker",
-        { ShinyOrbData() },
+        ::ShinyOrbData,
         { it.shinyOrbTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     private fun passesHoldingItem() = !config.holdingItems || InventoryUtils.getItemInHand()?.let {
@@ -110,6 +111,7 @@ object ShinyOrbTracker {
         // Skill XP gains
         addSkillXpInfo(data.skillXpGained)
 
-        add(tracker.addTotalProfit(profit, data.orbsCompleted, "orb used"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.orbsCompleted, "orb used", duration, "Orbs used"))
     }
 }

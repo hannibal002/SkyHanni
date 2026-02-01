@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.data.repo.AbstractRepoConfig
 import at.hannibal2.skyhanni.data.repo.AbstractRepoLocationConfig
+import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -14,7 +14,7 @@ class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>
     @Expose
     @ConfigOption(
         name = "Repo Auto Update",
-        desc = "Update the repository on every startup and tries to auto fix bugs.\n" +
+        desc = "Update the repository on every startup and try to auto fix bugs.\n" +
             "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean
@@ -22,7 +22,7 @@ class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>
 
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    override val updateRepo: Runnable = Runnable { EnoughUpdatesRepoManager.updateRepo("config button") }
+    override val updateRepo: Runnable = Runnable { SkyHanniRepoManager.updateRepo("config button") }
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")

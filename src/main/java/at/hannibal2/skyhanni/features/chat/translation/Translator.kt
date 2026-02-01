@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.minecraft.event.ClickEvent
+import net.minecraft.network.chat.ClickEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
@@ -34,7 +34,7 @@ object Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -42,10 +42,10 @@ object Translator {
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
-        if (editedComponent.chatStyle?.chatClickEvent?.action == ClickEvent.Action.OPEN_URL) return
+        if (editedComponent.style?.clickEvent?.action() == ClickEvent.Action.OPEN_URL) return
 
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
-        editedComponent.chatStyle.setClickRunCommand("/shtranslate $text").setHoverShowText("§bClick to translate!")
+        editedComponent.style.setClickRunCommand("/shtranslate $text").setHoverShowText("§bClick to translate!")
     }
 
     @HandleEvent
@@ -172,21 +172,21 @@ object Translator {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtranslateadvanced") {
+        event.registerBrigadier("shtranslateadvanced") {
             description = "Translates a message in an inputted language to another inputted language."
             category = CommandCategory.DEVELOPER_TEST
-            callback { translateAdvancedCommand(it) }
+            legacyCallbackArgs { translateAdvancedCommand(it) }
         }
-        event.register("shcopytranslation") {
+        event.registerBrigadier("shcopytranslation") {
             description = "Copy the translation of a message in another language to your clipboard.\n" +
                 "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
-            callback { fromNativeLanguage(it) }
+            legacyCallbackArgs { fromNativeLanguage(it) }
         }
-        event.register("shtranslate") {
+        event.registerBrigadier("shtranslate") {
             description = "Translate a message in another language your language."
             category = CommandCategory.USERS_ACTIVE
-            callback { toNativeLanguage(it) }
+            legacyCallbackArgs { toNativeLanguage(it) }
         }
     }
 

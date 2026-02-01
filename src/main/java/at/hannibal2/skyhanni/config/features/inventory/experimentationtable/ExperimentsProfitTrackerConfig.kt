@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -35,6 +37,14 @@ class ExperimentsProfitTrackerConfig {
     @ConfigOption(name = "Bottle Warnings", desc = "Display warnings once per session about bottles being auto-tracked.")
     @ConfigEditorBoolean
     var bottleWarnings: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig::class, field = "enabled")

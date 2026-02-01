@@ -16,13 +16,13 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object DebugEntitySkinCommand {
 
     private var skinToFind: String? = null
-    private var foundEntities = setOf<EntityArmorStand>()
+    private var foundEntities = setOf<ArmorStand>()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -54,7 +54,7 @@ object DebugEntitySkinCommand {
     }
 
     private fun updateSkinEntities(skin: String) {
-        foundEntities = EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(30.0)
+        foundEntities = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(30.0)
             .filter { it.holdingSkullTexture(skin) || it.wearingSkullTexture(skin) }
             .toSet()
     }

@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 
 enum class FarmingItemType(
     val itemCategory: ItemCategory,
@@ -25,6 +25,9 @@ enum class FarmingItemType(
     SUGAR_CANE(ItemCategory.HOE),
     CACTUS(ItemCategory.HOE),
     MUSHROOM(ItemCategory.HOE),
+    SUNFLOWER(ItemCategory.HOE),
+    MOONFLOWER(ItemCategory.HOE),
+    WILD_ROSE(ItemCategory.HOE),
     HELMET(ItemCategory.HELMET, FFStats::getArmorFFData),
     CHESTPLATE(ItemCategory.CHESTPLATE, FFStats::getArmorFFData),
     LEGGINGS(ItemCategory.LEGGINGS, FFStats::getArmorFFData),
@@ -39,6 +42,7 @@ enum class FarmingItemType(
     BEE(ItemCategory.PET, FFStats::getPetFFData),
     SLUG(ItemCategory.PET, FFStats::getPetFFData),
     HEDGEHOG(ItemCategory.PET, FFStats::getPetFFData),
+    NONE(ItemCategory.NONE),
     ;
 
     var selectedState = false
@@ -47,7 +51,7 @@ enum class FarmingItemType(
 
     private val fallbackItem: ItemStack by lazy {
         val name = "§cNo saved ${name.lowercase().replace("_", " ")}"
-        ItemStack(Blocks.barrier).setCustomItemName(name)
+        ItemStack(Blocks.BARRIER).setCustomItemName(name)
     }
 
     fun getItemOrNull() = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this)

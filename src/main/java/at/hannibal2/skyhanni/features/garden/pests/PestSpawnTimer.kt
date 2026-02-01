@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldIt
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -27,6 +29,8 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
@@ -51,11 +55,11 @@ object PestSpawnTimer {
     private val patternGroup = RepoPattern.group("garden.pests")
 
     /**
-     * REGEX-TEST:  Cooldown: §r§a§lREADY
-     * REGEX-TEST:  Cooldown: §r§e1m 58s
-     * REGEX-TEST:  Cooldown: §r§e1m
-     * REGEX-TEST:  Cooldown: §r§e58s
-     * REGEX-TEST:  Cooldown: §r§c§lMAX PESTS
+     * WRAPPED-REGEX-TEST: " Cooldown: §r§a§lREADY"
+     * WRAPPED-REGEX-TEST: " Cooldown: §r§e1m 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: §r§e1m"
+     * WRAPPED-REGEX-TEST: " Cooldown: §r§e58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: §r§c§lMAX PESTS"
      */
 
     private val pestCooldownPattern by patternGroup.pattern(
@@ -76,6 +80,9 @@ object PestSpawnTimer {
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    private val customCooldownTime get(): Duration =
+        (if (Perk.PEST_ERADICATOR.isActive) config.customCooldownTimeFinnegan else config.customCooldownTime).get().seconds
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
@@ -91,7 +98,9 @@ object PestSpawnTimer {
                 return
             }
             if (time == null) return
-            pestCooldownEndTime = time
+            pestCooldownEndTime = if (config.customCooldown.get()) {
+                lastPestSpawnTime + customCooldownTime
+            } else time
 
             if (pestSpawned) {
                 hasWarned = false
@@ -100,8 +109,8 @@ object PestSpawnTimer {
         }
     }
 
-    @HandleEvent
-    fun onPestSpawn(event: PestSpawnEvent) {
+    @HandleEvent(PestSpawnEvent::class)
+    fun onPestSpawn() {
         shouldRepeatWarning = false
         val spawnTime = lastPestSpawnTime.passedSince()
 
@@ -120,8 +129,8 @@ object PestSpawnTimer {
         lastPestSpawnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onRenderOverlay() {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
@@ -138,8 +147,8 @@ object PestSpawnTimer {
         lastCropBrokenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         update()
         if (shouldRepeatWarning) {
@@ -174,10 +183,24 @@ object PestSpawnTimer {
         shouldRender = shouldRender()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onIslandChange() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
+    }
+
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        config.customCooldown.onToggle {
+            setCustomCooldown()
+        }
+        config.customCooldownTime.afterChange {
+            setCustomCooldown()
+        }
+    }
+
+    private fun setCustomCooldown() {
+        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + customCooldownTime
     }
 
     private fun drawDisplay(): List<Renderable> {
@@ -214,9 +237,8 @@ object PestSpawnTimer {
         return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> {
-        return config.pestDisplay.mapNotNull { lineMap[it] }
-    }
+    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> =
+        config.pestDisplay.mapNotNull { lineMap[it] }
 
     private fun update() {
         display = drawDisplay()

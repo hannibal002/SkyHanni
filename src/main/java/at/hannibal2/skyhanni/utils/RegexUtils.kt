@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 object RegexUtils {
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
+
+    inline fun <T> Pattern.matchMatcher(text: Component, consumer: Matcher.() -> T) =
+        matcher(text.string).let { if (it.matches()) consumer(it) else null }
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
@@ -49,9 +53,12 @@ object RegexUtils {
     fun List<Pattern>.anyMatches(string: String): Boolean = any { it.matches(string) }
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
+    fun Pattern.matches(component: Component?): Boolean = component?.let { matcher(it.string).matches() } ?: false
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
+    fun Pattern.find(component: Component?) = component?.let { matcher(it.string).find() } ?: false
 
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { matches(it) } ?: false
+    fun Pattern.anyMatchesComponent(list: List<Component>?): Boolean = list?.any { matches(it.string) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }
@@ -96,6 +103,16 @@ object RegexUtils {
         return buildList {
             while (matcher.find()) {
                 add(matcher.group())
+            }
+        }
+    }
+
+    fun Pattern.findAll(input: String, group: String): List<String> {
+        val matcher = matcher(input)
+
+        return buildList {
+            while (matcher.find()) {
+                add(matcher.group(group))
             }
         }
     }

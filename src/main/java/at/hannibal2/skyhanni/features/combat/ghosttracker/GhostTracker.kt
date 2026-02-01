@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -73,11 +74,15 @@ object GhostTracker {
     private var inArea: Boolean = false
     private var foundGhostBestiary: Boolean = false
 
+    private val ghostShard = "ATTRIBUTE_SHARD_VEIL;1".toInternalName()
+
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
-        { Data() },
+        ::Data,
         { it.ghostStorage.ghostTracker },
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
     data class Data(
         @Expose var kills: Long = 0L,
@@ -158,7 +163,9 @@ object GhostTracker {
         config.ghostTrackerText.forEach { line ->
             addSearchString(line.line(data))
         }
-        add(tracker.addTotalProfit(profit, data.kills, "kill"))
+
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
     }
 
     @HandleEvent
@@ -209,6 +216,12 @@ object GhostTracker {
     }
 
     @HandleEvent
+    fun onShard(event: ShardGainEvent) {
+        if (event.shardInternalName != ghostShard) return
+        tracker.addItem(ghostShard, event.amount, false)
+    }
+
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
@@ -219,12 +232,12 @@ object GhostTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        if (event.coins !in 200.0..2_000.0) return
+        if (event.coins !in 200.0..15_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
@@ -364,10 +377,10 @@ object GhostTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetghosttracker") {
+        event.registerBrigadier("shresetghosttracker") {
             description = "Resets the Ghost Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -16,7 +17,15 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
-) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
+    trackerConfig: () -> IndividualItemTrackerConfig
+) : SkyHanniItemTracker<BucketedData>(
+    name,
+    createNewSession,
+    getStorage,
+    extraDisplayModes,
+    drawDisplay = drawDisplay,
+    trackerConfig = { trackerConfig() },
+) {
 
     final override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")

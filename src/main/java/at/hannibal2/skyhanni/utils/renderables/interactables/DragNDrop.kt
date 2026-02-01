@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object DragNDrop {
@@ -21,7 +21,7 @@ object DragNDrop {
 
     private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
-    private val invalidItem = Renderable.item(ItemStack(Blocks.barrier), 1.0)
+    private val invalidItem = Renderable.item(ItemStack(Blocks.BARRIER), 1.0)
 
     @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
@@ -35,13 +35,13 @@ object DragNDrop {
             currentDrag = null
             return
         }
-        DrawContextUtils.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(event.mouseX.toFloat(), event.mouseY.toFloat())
         if (isInvalidDrop) {
             invalidItem.render(event.mouseX, event.mouseY)
         } else {
             item.onRender(event.mouseX, event.mouseY)
         }
-        DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat())
     }
 
     fun Renderable.Companion.draggable(

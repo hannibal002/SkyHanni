@@ -43,7 +43,7 @@ object AcceptLastPartyInvite {
     private var lastInviter = ""
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.acceptLastInvite) return
         inviteReceivedPattern.findMatcher(event.message) {
             lastInviter = group("player")

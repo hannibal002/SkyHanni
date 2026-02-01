@@ -21,6 +21,7 @@ import kotlinx.coroutines.Job
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ChangelogViewer {
@@ -61,11 +62,11 @@ object ChangelogViewer {
 
     private fun setupFetchJob() {
         if (fetchJob?.isActive == true) return
-        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data") { getChangelog() }
+        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data", timeout = 1.minutes) { getChangelog() }
     }
 
     private fun openChangelog() {
-        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
+        if (Minecraft.getInstance().screen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
     private suspend fun getChangelog() {
@@ -135,9 +136,8 @@ object ChangelogViewer {
         event.registerComplex<CommandContext>("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
-            //#if TODO
-            context = { CommandContext() }
-            //#endif
+            // context = { CommandContext() }
+
             specifiers = listOf(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +

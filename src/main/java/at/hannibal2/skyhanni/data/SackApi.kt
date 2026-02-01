@@ -36,10 +36,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
@@ -200,7 +201,7 @@ object SackApi {
 
     private fun MutableMap.MutableEntry<Int, ItemStack>.processGemstoneItem(savingSacks: Boolean) {
         var gemTypeProp: GemstoneType? = null
-        gemstoneItemNamePattern.matchMatcher(value.displayName) {
+        gemstoneItemNamePattern.matchMatcher(value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val gemName = group("gem") ?: return@matchMatcher
             gemTypeProp = GemstoneType.getByNameOrNull(gemName) ?: return@matchMatcher
         }
@@ -243,7 +244,7 @@ object SackApi {
             priceUpdater(price)
             gem.price += price
             if (savingSacks) setSackItem(internalName, stored)
-            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.displayName] = gem
+            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.hoverName.formattedTextCompatLeadingWhiteLessResets()] = gem
         }
     }
 
@@ -261,7 +262,7 @@ object SackApi {
                 3 -> {
                     rune.slot = key
                     rune.lvl3 = stored
-                    runeItem[value.displayName] = rune
+                    runeItem[value.hoverName.formattedTextCompatLeadingWhiteLessResets()] = rune
                 }
             }
             if (savingSacks) setSackItem(value.getInternalName(), stored)
@@ -321,16 +322,16 @@ object SackApi {
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
-        if (!event.message.removeColor().startsWith("[Sacks]")) return
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.string?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
         }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.hover?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.string?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
         }.orEmpty()

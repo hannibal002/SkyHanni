@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -39,13 +40,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -57,8 +59,6 @@ import kotlin.time.Duration.Companion.seconds
 object SkyHanniMod {
 
     fun preInit() {
-        PlatformUtils.checkIfNeuIsLoaded()
-
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
@@ -69,40 +69,33 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesRepoManager.initRepo()
+        if (PlatformUtils.getRepoPatternDumpLocation() == null) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         try {
-            SkyHanniRepoManager.initRepo()
+            if (PlatformUtils.getRepoPatternDumpLocation() == null) SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
-            SkyHanniRepoManager.progress.end("Error reading repo data: ${e.message}")
         }
         InitFinishedEvent.post()
     }
 
     @HandleEvent
     fun onTick() {
-        screenToOpen?.let {
-            screenTicks++
-            if (screenTicks == 5) {
-                val title = InventoryUtils.openInventoryName()
-                if (shouldCloseScreen) {
-                    //#if MC < 1.21
-                    MinecraftCompat.localPlayer.closeScreen()
-                    //#else
-                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
-                    //#endif
-                    OtherInventoryData.close(title)
-                }
-                shouldCloseScreen = true
-                Minecraft.getMinecraft().displayGuiScreen(it)
-                screenTicks = 0
-                screenToOpen = null
-            }
+        val screenToOpen = screenToOpen ?: return
+        screenTicks++
+        if (screenTicks != 5) return
+        val title = InventoryUtils.openInventoryName()
+        if (shouldCloseScreen) {
+            MinecraftCompat.localPlayer.closeContainer()
+            OtherInventoryData.close(title)
         }
+        shouldCloseScreen = true
+        Minecraft.getInstance().setScreen(screenToOpen)
+        screenTicks = 0
+        this.screenToOpen = null
     }
 
     const val MODID: String = "skyhanni"
@@ -123,6 +116,7 @@ object SkyHanniMod {
     lateinit var visualWordsData: VisualWordsJson
     lateinit var petData: PetDataStorage
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
+    lateinit var customTodos: CustomTodosStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -203,41 +197,37 @@ object SkyHanniMod {
         name: String,
         timeout: Duration = 10.seconds,
         function: suspend CoroutineScope.() -> Unit,
-    ): Job = coroutineScope.launch {
-        val mainJob = launch {
-            try {
+    ): Job = coroutineScope.launch(CoroutineName("SkyHanni $name")) {
+        try {
+            if (timeout != Duration.INFINITE && timeout > Duration.ZERO) {
+                withTimeout(timeout) { function() }
+            } else {
                 function()
-            } catch (e: CancellationException) {
-                // Don't notify the user about cancellation exceptions - these are to be expected at times
-                val jobState = coroutineContext[Job]?.toString() ?: "unknown job"
-                val cancellationCause = coroutineContext[Job]?.getCancellationException()
-                logger.debug("Job $jobState/$name was cancelled with cause: $cancellationCause", e)
-            } catch (e: Throwable) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    e.message ?: "Asynchronous exception caught",
-                    "coroutine name" to name,
-                )
             }
-        }
-
-        if (timeout != Duration.INFINITE && timeout != Duration.ZERO) {
-            launch {
-                delay(timeout)
-                if (mainJob.isActive) {
-                    ErrorManager.logErrorStateWithData(
-                        "Coroutine timed out",
-                        "The coroutine '$name' took longer than the specified timeout of $timeout",
-                        "timeout" to timeout,
-                        "coroutine name" to name,
-                    )
-                    mainJob.cancel(CancellationException("Coroutine $name timed out after $timeout"))
-                }
-            }
+        } catch (e: TimeoutCancellationException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Coroutine $name timed out after $timeout",
+                "coroutine name" to name,
+                "timeout" to timeout,
+            )
+            throw e
+        } catch (e: CancellationException) {
+            // Don't notify the user about cancellation exceptions - these are to be expected at times
+            val jobState = coroutineContext[Job]?.toString() ?: "unknown job"
+            val cancellationCause = coroutineContext[Job]?.getCancellationException()
+            logger.debug("Job $jobState/$name was cancelled with cause: $cancellationCause", e)
+        } catch (e: Throwable) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Asynchronous exception caught in $name",
+                "coroutine name" to name,
+                "coroutine timeout" to timeout,
+            )
         }
     }
 
-    var screenToOpen: GuiScreen? = null
+    var screenToOpen: Screen? = null
     var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {

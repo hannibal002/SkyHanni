@@ -107,7 +107,8 @@ object SlayerProfitTracker {
         }
         // TODO spawn costs in repo
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            if (coins < -150000 || coins > 0) {
+            val coinsCap = -350_000
+            if (coins < coinsCap || coins > 0) {
                 ChatUtils.debug("Wrong Slayer Spawn Cost! Ignoring!")
                 return
             }
@@ -116,7 +117,7 @@ object SlayerProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         autoSlayerBankPattern.matchMatcher(event.message) {
             addSlayerCosts(-group("coins").formatDouble())
@@ -140,7 +141,12 @@ object SlayerProfitTracker {
                     category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$categoryName Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
+            SkyHanniItemTracker(
+                "$categoryName Profit Tracker",
+                ::Data,
+                getStorage,
+                trackerConfig = { config.perTrackerConfig }
+            ) { drawDisplay(it) }
         }
     }
 
@@ -156,7 +162,7 @@ object SlayerProfitTracker {
         // TODO remove is config enabled check for tracker
         if (!isEnabled()) return
         if (!SlayerApi.isInCorrectArea) return
-        if (!SlayerApi.hasActiveSlayerQuest()) return
+        if (!SlayerApi.hasActiveQuest()) return
 
         tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
     }
@@ -201,7 +207,8 @@ object SlayerProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss", duration, "Bosses"))
 
         tracker.addPriceFromButton(this)
     }
@@ -223,7 +230,7 @@ object SlayerProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 getTracker()?.renderDisplay(config.pos)
             },
@@ -275,10 +282,10 @@ object SlayerProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetslayerprofits") {
+        event.registerBrigadier("shresetslayerprofits") {
             description = "Resets the total slayer profit for the current slayer type"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

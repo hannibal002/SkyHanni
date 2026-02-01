@@ -20,7 +20,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.util.AxisAlignedBB
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.bold
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -40,14 +46,14 @@ object LimboTimeTracker {
     private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false
 
-    private val bedWarsLobbyLimbo = AxisAlignedBB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
+    private val bedWarsLobbyLimbo = AABB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
-            onFire = MinecraftCompat.localPlayer.isBurning
+            onFire = MinecraftCompat.localPlayer.isOnFire
         }
     }
 
@@ -65,8 +71,24 @@ object LimboTimeTracker {
         if (inLimbo && !shownPB && limboJoinTime.passedSince() >= personalBest.seconds && personalBest != 0) {
             shownPB = true
             oldPB = personalBest.seconds
-            ChatUtils.chat("§d§lPERSONAL BEST§f! You've surpassed your previous record of §e$oldPB§f!")
-            ChatUtils.chat("§fKeep it up!")
+            ChatUtils.chat(
+                componentBuilder {
+                    append("PERSONAL BEST") {
+                        bold = true
+                        withColor(ChatFormatting.LIGHT_PURPLE)
+                    }
+                    withColor(ChatFormatting.WHITE)
+                    append("! You've surpassed your previous record of ")
+                    appendWithColor("$oldPB", ChatFormatting.YELLOW)
+                    append("!")
+                }
+            )
+            ChatUtils.chat(
+                componentBuilder {
+                    append("Keep it up!")
+                    withColor(ChatFormatting.WHITE)
+                }
+            )
         }
         val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString
         if (lobbyName.toString().startsWith("bedwarslobby")) {

@@ -122,7 +122,7 @@ enum class HoppityEggType(
         fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
         fun allEggsUnclaimed(): Boolean = resettingEntries.all { !it.claimed }
 
-        internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
+        internal fun Matcher.getEggType(event: SkyHanniChatEvent.Allow): HoppityEggType =
             entries.find { it.mealName == group("meal") } ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",

@@ -28,7 +28,7 @@ object HoppityEggsShared {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         sharedEggPattern.matchMatcher(event.message.removeColor()) {
