@@ -145,9 +145,9 @@ enum class EliteLeaderboards(
         private fun sendConfigChangedMessage(config: MutableList<EliteLeaderboards>) {
             val displayConfig: EliteFarmersLeaderboardsConfig = GardenApi.config.eliteFarmersLeaderboards
             ChatUtils.clickableChat(
-                "Due to excessive requests, Elite Leaderboards have been disabled by default. " +
+                "Due to excessive requests, Elite Leaderboards have been disabled by default.\n" +
                 "Click here to restore your settings!",
-                hover = "Click here to restore your settings! Shift + click to open config.",
+                hover = "Click to restore your settings! Shift + click to open config.",
                 onClick = {
                     if (KeyboardManager.isShiftKeyDown()) {
                         run { displayConfig::display.jumpToEditor() }
