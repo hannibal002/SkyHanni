@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class RarityBackgroundConfig : Resettable() {
+class RarityBackgroundConfig : Resettable {
     @Expose
     @NoReset
     @ConfigOption(

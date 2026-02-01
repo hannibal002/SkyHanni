@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.decorators.CircularContainerRende
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.util.EnumFacing
+import net.minecraft.core.Direction
 import java.util.UUID
 
 private typealias TElement = TextPetDisplayConfig.TextElement
@@ -240,8 +240,8 @@ object CurrentPetDisplay {
                 firstFrameOnly = !skinAnimation
             ) ?: listOf(ItemStackAnimationFrame(itemStack)),
             scale = iconScale,
-            rotation = ItemStackRotationDefinition(
-                axis = EnumFacing.Axis.Y,
+            rotationDefinition = ItemStackRotationDefinition(
+                axis = Direction.Axis.Y,
                 rotationSpeed = degreesPerSecond.toDouble(),
             ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

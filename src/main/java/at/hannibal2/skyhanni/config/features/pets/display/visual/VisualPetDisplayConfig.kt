@@ -100,7 +100,7 @@ class VisualPetDisplayConfig {
     @Accordion
     val xpRingCustomization: XpRingConfig = XpRingConfig()
 
-    class XpRingConfig : Resettable() {
+    class XpRingConfig : Resettable {
         @Expose
         @NoReset
         @ConfigOption(

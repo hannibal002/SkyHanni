@@ -402,12 +402,18 @@ interface Renderable {
             override val verticalAlign = bottomLayer.verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                var topHovered = false
+                // This might still be needed, but given we don't have Z in translation(s) anymore
+                // I'm not re-figuring this out until I need to. - David
+                //  See this discussion:
+                //  https://discord.com/channels/997079228510117908/1094190239532208228/1379961028921524234
+                /*var topHovered = false
                 DrawContextUtils.translated(0f, 0f, topLayerTranslation) {
                     val (x, y) = topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
                     topHovered = topLayer.isHovered(mouseOffsetX + x, mouseOffsetY + y)
-                }
-                val (nMouseOffsetX, nMouseOffsetY) = if (topHovered && blockBottomHover) {
+                }*/
+                val (x, y) = topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+                val topLayerHovered = topLayer.isHovered(mouseOffsetX + x, mouseOffsetY + y)
+                val (nMouseOffsetX, nMouseOffsetY) = if (topLayerHovered && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     mouseOffsetX to mouseOffsetY
