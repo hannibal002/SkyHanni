@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent;
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent;
-import at.hannibal2.skyhanni.utils.ChatUtils;
+import at.hannibal2.skyhanni.mixins.hooks.ConnectionHook;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.BundlePacket;
@@ -23,8 +23,7 @@ public class MixinClientConnection {
                 if (new PacketReceivedEvent(subPacket).post()) {
                     // not sure what to do here
                     // dont want to cancel the whole bundle
-                    ChatUtils.INSTANCE.debug("Bundle Packet attempt cancel", false);
-                    System.out.println(subPacket);
+                    ConnectionHook.errorBundle(subPacket);
                 }
             }
         } else {
