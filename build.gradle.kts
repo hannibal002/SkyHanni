@@ -49,11 +49,6 @@ loom {
     }
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
 
-    @Suppress("UnstableApiUsage")
-    mixin {
-        useLegacyMixinAp.set(true)
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
-    }
     runs {
         named("client") {
             isIdeConfigGenerated = true
