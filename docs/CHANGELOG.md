@@ -58,6 +58,8 @@
     + Access via /shtodos or download directly from /shdownloadtodo.
     + If you want your own todos featured, post them in Discord.
 + Added Rainbow Action Bar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
++ Added support for 1.21.11. - nopo + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5178)
++ Added Transparent Minecraft Farming feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/5178)
 
 ### Improvements
 
@@ -97,6 +99,7 @@
 + Added support for the Plantboy Advanced for Snake WASD Keybinds. - nopo (https://github.com/hannibal002/SkyHanni/pull/5152)
 + Added gamemode selector to the Elite Leaderboard Features. - nopo (https://github.com/hannibal002/SkyHanni/pull/5169)
 + Pest Profit Tracker now reads the drop amount for rare pest drops from the chat message if present. - Luna (https://github.com/hannibal002/SkyHanni/pull/5164)
++ Improved error handling for elite leaderboards. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5181)
 
 #### Inventory
 
@@ -146,6 +149,8 @@
   + Default settings for each tracker are based on your Universal Tracker Config.
   + Has option to go back to only using Universal Tracker Config.
 + Improve performance on item replace features. - Empa (https://github.com/hannibal002/SkyHanni/pull/5171)
++ Bumped the minimum Fabric API version for 1.21.10. - nopo + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5178)
++ Improved Item Stat Icon compatibility with other mods. - nopo (https://github.com/hannibal002/SkyHanni/pull/5176)
 
 ### Fixes
 
@@ -206,12 +211,14 @@
 + Fixed structure chests sometimes being incorrectly highlighted as chests dug up from powder mining. - Luna (https://github.com/hannibal002/SkyHanni/pull/4989)
 + Fixed Powder Chest Timer sometimes not detecting chests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5013)
 + Fixed SkyMart price per copper feature not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5041)
++ Fixed Cold Overlay not rendering. - nopo (https://github.com/hannibal002/SkyHanni/pull/5177)
 
 #### Fishing
 
 + Fixed Pet Drop Rarity not working for fished pets. - Luna (https://github.com/hannibal002/SkyHanni/pull/4998)
 + Fixed some pet rules breaking double hook detection. - appable (https://github.com/hannibal002/SkyHanni/pull/5030)
 + Fixed Thunder Sparks Highlighters not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5125)
++ Fixed Fishing Hook Display showing even when the Hypixel fishing timer is not visible to the player. - Luna (https://github.com/hannibal002/SkyHanni/pull/5184)
 
 #### Combat
 
@@ -366,6 +373,7 @@
 + Added style predicate support to Component.replace. - nopo (https://github.com/hannibal002/SkyHanni/pull/5138)
 + Added support for other mods cancelling and modifying in /shchathistory. - nopo (https://github.com/hannibal002/SkyHanni/pull/5149)
 + Added a Cocoon API that posts MobDetection SkylockMob, position & Time of Detection. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5085)
++ Fixed errors in chat when using `/shdebug`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5179)
 
 ### Removed Features
 
@@ -381,6 +389,7 @@
   + The feature never worked on 1.21 but was still causing issues.
 + The drop amount for rare pest drops is no longer added to chat messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/5164)
   + Hypixel now does this themselves, so this is no longer necessary.
++ Removed support for Minecraft 1.21.5 and 1.21.8. - nopo (https://github.com/hannibal002/SkyHanni/pull/5175)
 
 ## Version 6.0.0
 
