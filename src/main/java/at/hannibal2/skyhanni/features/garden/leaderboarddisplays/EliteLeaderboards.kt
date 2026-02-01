@@ -32,7 +32,7 @@ import kotlin.reflect.KClass
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
-    val leaderboardType: KClass<out EliteLeaderboardType>
+    val leaderboardType: KClass<out EliteLeaderboardType>,
 ) {
     WEIGHT("Farming Weight", WeightDisplay(), EliteLeaderboardType.Weight::class),
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),
@@ -93,7 +93,7 @@ enum class EliteLeaderboards(
             val pestConfigs = listOf(
                 pestConfig.rankGoals.useRankGoal,
                 pestConfig.rankGoals.rankGoalTypes,
-                pestConfig.gamemode
+                pestConfig.gamemode,
             )
 
             weightConfigs.forEach {
@@ -146,7 +146,7 @@ enum class EliteLeaderboards(
             val displayConfig: EliteFarmersLeaderboardsConfig = GardenApi.config.eliteFarmersLeaderboards
             ChatUtils.clickableChat(
                 "Due to excessive requests, Elite Leaderboards have been disabled by default.\n" +
-                "Click here to restore your settings!",
+                    "Click here to restore your settings!",
                 hover = "Click to restore your settings! Shift + click to open config.",
                 onClick = {
                     if (KeyboardManager.isShiftKeyDown()) {
@@ -154,7 +154,7 @@ enum class EliteLeaderboards(
                     } else {
                         displayConfig.display.get().addAll(config)
                     }
-                }
+                },
             )
         }
 
