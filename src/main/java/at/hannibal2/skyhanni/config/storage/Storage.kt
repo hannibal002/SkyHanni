@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.EliteLeaderboards
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -34,4 +35,7 @@ class Storage {
 
     @Expose
     var testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
+
+    @Expose
+    var oldLeaderboardDisplaySettings: MutableList<EliteLeaderboards> = mutableListOf()
 }

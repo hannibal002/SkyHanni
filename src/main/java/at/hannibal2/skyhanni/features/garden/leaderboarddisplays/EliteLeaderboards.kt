@@ -1,23 +1,30 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteFarmersLeaderboardsConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.reflect.KClass
@@ -126,6 +133,31 @@ enum class EliteLeaderboards(
             }
         }
 
+        @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+        fun onGardenJoin(event: WorldChangeEvent) {
+            val oldLeaderboardSettings = SkyHanniMod.feature.storage.oldLeaderboardDisplaySettings
+            if (oldLeaderboardSettings.isNotEmpty()) {
+                sendConfigChangedMessage(oldLeaderboardSettings)
+                SkyHanniMod.feature.storage.oldLeaderboardDisplaySettings = mutableListOf()
+            }
+        }
+
+        private fun sendConfigChangedMessage(config: MutableList<EliteLeaderboards>) {
+            val displayConfig: EliteFarmersLeaderboardsConfig = GardenApi.config.eliteFarmersLeaderboards
+            ChatUtils.clickableChat(
+                "Due to excessive requests, Elite Leaderboards have been disabled by default. " +
+                "Click here to restore your settings!",
+                hover = "Click here to restore your settings! Shift + click to open config.",
+                onClick = {
+                    if (KeyboardManager.isShiftKeyDown()) {
+                        run { displayConfig::display.jumpToEditor() }
+                    } else {
+                        displayConfig.display.get().addAll(config)
+                    }
+                }
+            )
+        }
+
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
@@ -197,6 +229,13 @@ enum class EliteLeaderboards(
                 ConfigManager.gson.toJsonTree(entry.asString != "10000")
             }
             event.move(120, "$oldConfig.ignoreLow", "$display.ignoreLow")
+
+            var leaderboardList: MutableList<EliteLeaderboards>
+            event.transform(123, "garden.eliteFarmersLeaderboards.display") { entry ->
+                leaderboardList = ConfigManager.gson.fromJson<MutableList<EliteLeaderboards>>(entry)
+                SkyHanniMod.feature.storage.oldLeaderboardDisplaySettings = leaderboardList
+                ConfigManager.gson.toJsonTree(emptyList<EliteLeaderboards>())
+            }
         }
 
 
