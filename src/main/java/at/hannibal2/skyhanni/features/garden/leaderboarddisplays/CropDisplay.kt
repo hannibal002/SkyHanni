@@ -31,7 +31,7 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
 
     override fun getDefaultEnum(): CropType? {
         return if (!config.display.hideWhenNotFarming) {
-            CropCollectionApi.lastGainedCrop ?: getCurrentlyFarmedCrop()
+            getCurrentlyFarmedCrop() ?: CropCollectionApi.lastGainedCrop
         } else {
             getCurrentlyFarmedCrop()
         }
