@@ -2,38 +2,25 @@
 
 const float pi = 3.14159265f;
 const float tau = 6.2831853f;
-//? < 1.21.6 {
-uniform float scaleFactor;
-uniform float radius;
-uniform float smoothness;
-uniform vec2 centerPos;
-uniform mat4 modelViewMatrix;
 
-uniform float angle;
-uniform vec4 startColor;
-uniform vec4 endColor;
-uniform float progress;
-uniform float phaseOffset;
-uniform int reverse;
-//?} else {
-//layout(std140) uniform SkyHanniRoundedUniforms {
-//    float scaleFactor;
-//    float radius;
-//    float smoothness;
-//    vec2 halfSize;
-//    vec2 centerPos;
-//    mat4 modelViewMatrix;
-//};
-//
-//layout(std140) uniform SkyHanniRadialGradientCircleUniforms {
-//    float angle;
-//    vec4 startColor;
-//    vec4 endColor;
-//    float progress;
-//    float phaseOffset;
-//    int reverse;
-//};
-//?}
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
+
+layout(std140) uniform SkyHanniRadialGradientCircleUniforms {
+    float angle;
+    vec4 startColor;
+    vec4 endColor;
+    float progress;
+    float phaseOffset;
+    int reverse;
+};
+
 out vec4 fragColor;
 
 void main() {

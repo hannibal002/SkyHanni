@@ -7,11 +7,7 @@ import net.minecraft.world.phys.AABB
 @SkyHanniModule
 object FrustumUtils {
 
-    //? < 1.21.9 {
-    private val frustum get() = Minecraft.getInstance().levelRenderer.cullingFrustum
-    //?} else {
-    /*private val frustum get() = Minecraft.getInstance().levelRenderer.capturedFrustum
-    *///?}
+    private val frustum get() = Minecraft.getInstance().levelRenderer.capturedFrustum
 
     fun isVisible(box: AABB): Boolean = frustum?.isVisible(box) ?: true
 

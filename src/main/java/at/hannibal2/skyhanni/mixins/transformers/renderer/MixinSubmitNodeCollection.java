@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
-//? > 1.21.9 {
-/*import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -23,4 +23,3 @@ public class MixinSubmitNodeCollection<E> {
         return original.call(list, itemCommand);
     }
 }
-*///?}

@@ -142,7 +142,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
                 GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
-            DrawContextUtils.scale(scale, scale, 1f)
+            DrawContextUtils.scale(scale, scale)
 
             drawUnmodifiedStringCentered(
                 "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
@@ -213,7 +213,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
                     ColoredBlockCompat.RED.createStainedClay()
                 }
 
-                DrawContextUtils.scale(inverseScale, inverseScale, 1f)
+                DrawContextUtils.scale(inverseScale, inverseScale)
 
                 if (index != 0) {
                     GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
@@ -224,7 +224,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
 
                 GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
 
-                DrawContextUtils.scale(scale, scale, 1f)
+                DrawContextUtils.scale(scale, scale)
 
                 if (inBox) {
                     drawUnmodifiedString(
@@ -261,7 +261,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
                 saveChanges()
             }
 
-            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
+            DrawContextUtils.scale(inverseScale, inverseScale)
 
             scrollScreen()
         } else {

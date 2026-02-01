@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -22,6 +23,7 @@ object FishingHookDisplay {
     private var armorStand: ArmorStand? = null
     private val potentialArmorStands = mutableListOf<ArmorStand>()
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
+    private var isRendering = false
 
     @HandleEvent
     fun onWorldChange() {
@@ -60,6 +62,7 @@ object FishingHookDisplay {
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
+        if (!isRendering) return
 
         if (event.entity == armorStand) {
             event.cancel()
@@ -69,15 +72,18 @@ object FishingHookDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        isRendering = false
 
         val armorStand = armorStand ?: return
         if (armorStand.deceased) {
             reset()
             return
         }
-        if (!armorStand.hasCustomName()) return
+        if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible) return
+        if (!armorStand.canBeSeen(50, ignoreFrustum = true)) return
         val alertText = if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets()
 
+        isRendering = true
         config.position.renderString(alertText, posLabel = "Fishing Hook Display")
     }
 

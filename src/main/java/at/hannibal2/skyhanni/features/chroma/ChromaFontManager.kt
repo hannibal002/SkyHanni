@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.chroma
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import net.minecraft.client.gui.font.glyphs.BakedGlyph.GlyphInstance
+import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 

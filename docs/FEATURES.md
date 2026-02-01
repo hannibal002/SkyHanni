@@ -154,6 +154,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Floor 7 Spring Boots Helper. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2581)
 + Added a guess for the Secret Tracker 3000 while in dungeons. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4611)
 + Added Croesus Unopened Chest Count Overlay for Kuudra and Dungeons. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
++ Croesus Profit Overlay and Highlight most profitable chest. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4857)
 
 </details>
 <details open><summary>
@@ -580,6 +581,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Reduces transparency of other mobs while fighting a Slayer boss.
 + Added option to hide Damage Splashes near Slayer Bosses. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
 + Added option to hide Slayer Spawn particles. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
++ Cocoon Timer & Mob Name Overlay. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5113)
 
 </details>
 <details open><summary>
@@ -835,6 +837,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Swap between pests by clicking on the display switcher button while in an inventory.
   + Data sourced from the Elitebot.dev API.
 + Highlight Harvestability status in the Greenhouse. - nopo (https://github.com/hannibal002/SkyHanni/pull/5136)
++ Highlight Water Status green if the crop doesn't need more water. - nopo (https://github.com/hannibal002/SkyHanni/pull/5168)
 
 ### Garden Pests
 
@@ -1821,6 +1824,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added downloading community shtodos. - nopo & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5048)
     + Access via /shtodos or download directly from /shdownloadtodo.
     + If you want your own todos featured, post them in Discord.
++ Added support for 1.21.11. - nopo + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5178)
++ Added Transparent Minecraft Farming feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/5178)
 
 </details>
 <details open><summary>

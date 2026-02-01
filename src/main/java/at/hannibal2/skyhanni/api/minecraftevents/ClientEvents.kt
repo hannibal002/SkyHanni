@@ -25,10 +25,9 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.PreparableReloadListener
-import net.minecraft.server.packs.resources.ResourceManager
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
@@ -68,25 +67,11 @@ object ClientEvents {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             object : IdentifiableResourceReloadListener {
 
-                override fun getFabricId(): ResourceLocation =
-                    ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
+                override fun getFabricId(): Identifier =
+                    Identifier.fromNamespaceAndPath("skyhanni", "resources")
 
-                //? < 1.21.9 {
                 @Suppress("ForbiddenVoid")
                 override fun reload(
-                    synchronizer: PreparableReloadListener.PreparationBarrier,
-                    manager: ResourceManager,
-                    prepareExecutor: Executor,
-                    applyExecutor: Executor,
-                ): CompletableFuture<Void> {
-
-                    return CompletableFuture.runAsync(
-                        { ResourcePackReloadEvent(manager).post() },
-                        applyExecutor,
-                    ).thenCompose(synchronizer::wait)
-                }
-                //?} else {
-                /*override fun reload(
                     store: PreparableReloadListener.SharedState,
                     prepareExecutor: Executor,
                     reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
@@ -97,7 +82,6 @@ object ClientEvents {
                         applyExecutor,
                     ).thenCompose(reloadSynchronizer::wait)
                 }
-               *///?}
             },
         )
 

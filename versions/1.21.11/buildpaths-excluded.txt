@@ -23,6 +23,7 @@ at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket.java
 at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal.java
 at.hannibal2.skyhanni.mixins.transformers.MixinBlockLiquid.java
+at.hannibal2.skyhanni.mixins.transformers.MixinEffectRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityAgeable.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityHorse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinFontRenderer.java

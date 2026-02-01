@@ -70,7 +70,7 @@ object ComputerEnvDebug {
         val isGeneric = genericStacks.any { firstStack.contains(it) }
         val matchingLaunchers = launchers.filter { launcher ->
             val firstStackMatch = launcher.firstStacks.any { firstStack.contains(it) }
-            val brandMatch = launcher.brand.isEmpty() || launcher.brand.equals(launcherBrand, ignoreCase = true)
+            val brandMatch = launcher.brand.isNullOrBlank() || launcher.brand.equals(launcherBrand, ignoreCase = true)
             (isGeneric || firstStackMatch) && brandMatch
         }
         val fallbackPair = null to true
@@ -129,9 +129,9 @@ object ComputerEnvDebug {
         text.add("Minecraft Allocated: $allocatedPercentage% ${totalMemoryGB.formatGB()} GB")
 
         // Get total system memory using OS-specific APIs
-        val osBean = ManagementFactory.getOperatingSystemMXBean()
-        val totalPhysicalMemory = (osBean as com.sun.management.OperatingSystemMXBean).totalPhysicalMemorySize
-        val freePhysicalMemory = osBean.freePhysicalMemorySize
+        val osBean = ManagementFactory.getOperatingSystemMXBean() as com.sun.management.OperatingSystemMXBean
+        val totalPhysicalMemory = osBean.totalMemorySize
+        val freePhysicalMemory = osBean.freeMemorySize
         val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
 
         // Convert system memory to GB

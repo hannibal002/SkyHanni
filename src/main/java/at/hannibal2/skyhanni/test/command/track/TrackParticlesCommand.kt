@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ParticleUtils
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 @SkyHanniModule
-object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, ResourceLocation>(commonName = "particle") {
+object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(commonName = "particle") {
     override val config get() = SkyHanniMod.feature.dev.debug.trackParticle
 
     // todo add suggestion provider for particle types, maybe when we're fully in 1.21
@@ -28,7 +28,7 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, ResourceLocati
         }
     }
 
-    override fun ReceiveParticleEvent.getTypeIdentifier(): ResourceLocation = BuiltInRegistries.PARTICLE_TYPE.getKey(type)
+    override fun ReceiveParticleEvent.getTypeIdentifier(): Identifier = BuiltInRegistries.PARTICLE_TYPE.getKey(type)
         ?: throw IllegalStateException("Particle type $type is not registered in the registry")
 
     override fun ReceiveParticleEvent.formatForDisplay() = "§3${getTypeIdentifier()} §8c:$count §7s:$speed"
