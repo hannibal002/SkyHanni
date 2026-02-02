@@ -540,5 +540,5 @@ object TunnelsMaps {
 
     private fun isEnabled() =
         IslandType.DWARVEN_MINES.isCurrent() && config.enable &&
-                (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
+            (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
 }
