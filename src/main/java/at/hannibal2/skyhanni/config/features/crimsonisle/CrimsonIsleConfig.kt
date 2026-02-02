@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.crimsonisle
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig
+import at.hannibal2.skyhanni.features.nether.VanquisherWaypointShare
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -94,4 +95,10 @@ class CrimsonIsleConfig {
     @ConfigOption(name = "Magma Boss Phase", desc = "Show the current phase of the Magma Boss.")
     @ConfigEditorBoolean
     var magmaBossDisplay: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Vanquisher Waypoint", desc = "Vanquisher Waypoint Settings")
+    @Accordion
+    var vanquisherSharing = VanquisherWaypointShareConfig()
+
 }
