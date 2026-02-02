@@ -24,30 +24,6 @@ object MinecraftData {
     @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
-            is ClientboundSoundPacket -> {
-                if (PlaySoundEvent(
-                        packet.sound.value().location().toString().removePrefix("minecraft:"),
-                        LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
-                    ).post()
-                ) {
-                    event.cancel()
-                }
-            }
-
-            is ClientboundLevelParticlesPacket -> {
-                if (ReceiveParticleEvent(
-                        packet.particle.type,
-                        LorenzVec(packet.x, packet.y, packet.z),
-                        packet.count,
-                        packet.maxSpeed,
-                        LorenzVec(packet.xDist, packet.yDist, packet.zDist),
-                        packet.isOverrideLimiter,
-                    ).post()
-                ) {
-                    event.cancel()
-                }
-            }
-
             is ClientboundPingPacket -> {
                 if (lastPingParameter == packet.id) return
                 lastPingParameter = packet.id
