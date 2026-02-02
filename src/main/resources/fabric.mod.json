@@ -20,7 +20,7 @@
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
     "environment": "client",
-    "classTweaker": "skyhanni.classtweaker",
+    "accessWidener": "skyhanni.classtweaker",
     "mixins": [
         "mixins.skyhanni.json"
     ],
