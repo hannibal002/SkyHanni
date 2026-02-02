@@ -48,9 +48,17 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Galatea.")
     @ConfigEditorBoolean
     @FeatureToggle
     @OnlyModern
     var mutePhantoms = true
+
+    @Expose
+    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in Galatea.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("box firework")
+    var muteFusionMachine = true
+
 }
