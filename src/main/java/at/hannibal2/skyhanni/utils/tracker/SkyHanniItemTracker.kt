@@ -383,4 +383,12 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             )
         }
     }
+
+    override fun hideInEstimatedItemValue(): Boolean {
+        return config.itemTracker.hideInEstimatedItemValue
+    }
+
+    override fun hideOutsideInventory(): Boolean {
+        return config.itemTracker.hideOutsideInventory
+    }
 }
