@@ -29,7 +29,7 @@ object StereoHarmonyDiscReplacer {
         if (event.slot !in 11..15 && event.slot !in 20..24 && event.slot !in 30..32) return
 
         val item = event.originalItem
-        val internalName = item?.getInternalNameOrNull() ?: return
+        val internalName = item.getInternalNameOrNull() ?: return
         val vinylType = VinylType.getByInternalNameOrNull(internalName) ?: return
         val cropType = PestType.getByVinylOrNull(vinylType)?.crop ?: return
         val lore = item.getLoreComponent()

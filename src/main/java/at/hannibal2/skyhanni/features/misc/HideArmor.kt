@@ -15,9 +15,6 @@ import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.entity.player.Player
-//? < 1.21.9 {
-import at.hannibal2.skyhanni.utils.FakePlayer
-//?}
 
 @SkyHanniModule
 object HideArmor {
@@ -27,9 +24,6 @@ object HideArmor {
 
     fun shouldHideArmor(entity: Player): Boolean {
         if (!SkyBlockUtils.inSkyBlock) return false
-        //? < 1.21.9 {
-        if (entity is FakePlayer) return false
-        //?}
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
         if (entity.isNpc()) return false
 

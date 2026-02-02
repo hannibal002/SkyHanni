@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
-//? > 1.21.9 {
-/*import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
+
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,4 +36,3 @@ public class MixinEntityRenderState implements EntityRenderStateStore {
     }
 
 }
-*///?}

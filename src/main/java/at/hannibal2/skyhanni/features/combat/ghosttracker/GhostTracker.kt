@@ -80,7 +80,9 @@ object GhostTracker {
         "Ghost Tracker",
         ::Data,
         { it.ghostStorage.ghostTracker },
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
     data class Data(
         @Expose var kills: Long = 0L,

@@ -45,6 +45,7 @@ object MythologicalCreatureTracker {
                 )
             },
         ),
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     // TODO create a draggable list from repo one that can be done

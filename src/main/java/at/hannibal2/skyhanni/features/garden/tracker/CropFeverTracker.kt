@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -45,6 +46,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     ::BucketData,
     { it.garden.cropFeverTracker },
     drawDisplay = { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.garden.cropFeverTracker.perTrackerConfig }
 ) {
     data class BucketData(
         @Expose var blocksBrokenDuring: MutableMap<CropType, Long> = EnumMap(CropType::class.java),

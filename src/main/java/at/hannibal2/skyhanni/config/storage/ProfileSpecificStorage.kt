@@ -109,6 +109,9 @@ class ProfileSpecificStorage(
         var migratedTotalKills: Boolean = false
     }
 
+    @Expose
+    var instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
+
     // - commands
     @Expose
     var lastStorage: LastStorage = LastStorage()

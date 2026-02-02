@@ -162,6 +162,11 @@ class GardenConfig {
     val cropFeverTracker: CropFeverTrackerConfig = CropFeverTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "See Through Farming", desc = "")
+    @Accordion
+    val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
+
+    @Expose
     @ConfigOption(
         name = "Plot Price",
         desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",

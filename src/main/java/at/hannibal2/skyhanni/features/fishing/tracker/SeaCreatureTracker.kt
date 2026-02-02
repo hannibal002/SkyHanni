@@ -34,7 +34,12 @@ object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", ::Data, { it.fishing.seaCreatureTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Sea Creature Tracker",
+        ::Data,
+        { it.fishing.seaCreatureTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 

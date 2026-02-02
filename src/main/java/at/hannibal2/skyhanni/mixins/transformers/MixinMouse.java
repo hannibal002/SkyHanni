@@ -13,9 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//? > 1.21.8 {
-/*import net.minecraft.client.input.MouseButtonInfo;
-*///?}
+import net.minecraft.client.input.MouseButtonInfo;
 
 @Mixin(MouseHandler.class)
 public class MixinMouse {
@@ -41,16 +39,9 @@ public class MixinMouse {
         });
     }
 
-    //? < 1.21.10 {
-    @Inject(method = "onPress", at = @At("HEAD"))
-    //?} else
-    //@Inject(method = "onButton", at = @At("HEAD"))
-    //? < 1.21.9 {
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        //?} else {
-        /*private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
-            int button = input.button();
-        *///?}
+    @Inject(method = "onButton", at = @At("HEAD"))
+    private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
+        int button = input.button();
         if (action == 1) {
             MouseCompat.INSTANCE.setLastEventButton(button);
             new KeyDownEvent(button).post();

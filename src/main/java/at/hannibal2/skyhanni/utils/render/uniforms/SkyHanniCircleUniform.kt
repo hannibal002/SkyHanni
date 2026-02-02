@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.utils.render.uniforms
-//? > 1.21.5 {
-/*import com.mojang.blaze3d.buffers.GpuBufferSlice
+
+import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import net.minecraft.client.renderer.DynamicUniformStorage
 import java.nio.ByteBuffer
 
 class SkyHanniCircleUniform : AutoCloseable {
-    private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().get()
+    private val uniformSize = Std140SizeCalculator().putFloat().putFloat().get()
 
-    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Circle UBO", UNIFORM_SIZE, 2)
+    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Circle UBO", uniformSize, 2)
 
     fun writeWith(angle1: Float, angle2: Float): GpuBufferSlice {
         return storage.writeUniform(UniformValue(angle1, angle2))
@@ -34,4 +34,3 @@ class SkyHanniCircleUniform : AutoCloseable {
         }
     }
 }
-*///?}

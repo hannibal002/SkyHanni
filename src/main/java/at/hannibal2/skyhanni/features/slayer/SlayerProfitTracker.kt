@@ -141,7 +141,12 @@ object SlayerProfitTracker {
                     category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$categoryName Profit Tracker", ::Data, getStorage) { drawDisplay(it) }
+            SkyHanniItemTracker(
+                "$categoryName Profit Tracker",
+                ::Data,
+                getStorage,
+                trackerConfig = { config.perTrackerConfig }
+            ) { drawDisplay(it) }
         }
     }
 
