@@ -95,11 +95,8 @@ object ClientEvents {
 
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
         // if we created the message we don't want to pipe it back into our events
-        try {
-            if (message.skyhanniCreated) return true
-        } catch (exception: Exception) {
-            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
-        }
+        if (message.skyhanniCreated) return true
+
         if (actionBar) {
             // we never cancel the action bar
             return true
@@ -121,11 +118,7 @@ object ClientEvents {
     }
 
     private fun onModify(message: Component, actionBar: Boolean): Component {
-        try {
-            if (message.skyhanniCreated) return message
-        } catch (exception: Exception) {
-            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
-        }
+        if (message.skyhanniCreated) return message
 
         if (actionBar) {
             // we don't have to worry about cancelling the action bar
