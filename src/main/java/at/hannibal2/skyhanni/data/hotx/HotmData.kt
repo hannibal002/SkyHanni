@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -523,12 +525,12 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: §r§299,918
-         * REGEX-TEST:  Gemstone: §r§d37,670
+         * REGEX-TEST:  Mithril: 99,918
+         * REGEX-TEST:  Gemstone: 37,670
          */
         private val powderPattern by patternGroup.pattern(
-            "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
+            "widget.powder-nocolor",
+            "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
         // </editor-fold>
 
@@ -619,8 +621,8 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onWidgetUpdate(event: WidgetUpdateEvent) {
-            if (!event.isWidget(TabWidget.POWDER)) return
+        fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+            if (!event.isWidget(TabWidgetComponent.POWDER)) return
             event.lines.forEach { line ->
                 powderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return

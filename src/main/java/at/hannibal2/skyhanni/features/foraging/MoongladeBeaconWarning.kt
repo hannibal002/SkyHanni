@@ -4,13 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -18,12 +19,17 @@ object MoongladeBeaconWarning {
 
     private var lastAlert = SimpleTimeMark.farPast()
 
+    val beaconReadyPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.available",
+        " Cooldown: AVAILABLE",
+    )
+
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onWidget(event: WidgetUpdateEvent) {
+    fun onWidget(event: WidgetUpdateComponentEvent) {
         if (!isEnabled()) return
-        if (!event.isWidget(TabWidget.MOONGLADE_BEACON)) return
+        if (!event.isWidget(TabWidgetComponent.MOONGLADE_BEACON)) return
         if (lastAlert.passedSince() < 9.minutes) return
-        ModernPatterns.beaconReadyPattern.firstMatcher(event.lines) {
+        beaconReadyPattern.firstMatcher(event.lines.map { it.string }) {
             TitleManager.sendTitle("§aBeacon Ready")
             SoundUtils.playPlingSound()
             lastAlert = SimpleTimeMark.now()
