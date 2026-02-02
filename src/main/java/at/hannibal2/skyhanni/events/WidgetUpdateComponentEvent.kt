@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import net.minecraft.network.chat.Component
 
 /** The events get send on change of the widget and on island switch */
-@PrimaryFunction("onWidgetUpdate")
 class WidgetUpdateComponentEvent(
     val widget: TabWidgetComponent,
     val lines: List<Component>,
