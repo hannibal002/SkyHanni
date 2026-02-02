@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.compat.SoundCompat
-import net.minecraft.resources.Identifier
 
 class PlaySoundEvent(
     val rawSoundName: String,
