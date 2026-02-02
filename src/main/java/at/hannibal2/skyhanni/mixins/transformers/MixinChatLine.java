@@ -22,13 +22,13 @@ public class MixinChatLine implements ChatLineData {
     @Unique
     @NotNull
     @Override
-    public Component getSkyHanni_fullComponent() {
+    public Component skyhanni$getFullComponent() {
         return skyHanni$fullComponent;
     }
 
     @Unique
     @Override
-    public void setSkyHanni_fullComponent(@NotNull Component fullComponent) {
+    public void skyhanni$setFullComponent(@NotNull Component fullComponent) {
         skyHanni$fullComponent = fullComponent;
     }
 

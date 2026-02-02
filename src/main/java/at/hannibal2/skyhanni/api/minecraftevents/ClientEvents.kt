@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -96,7 +96,7 @@ object ClientEvents {
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
         // if we created the message we don't want to pipe it back into our events
         try {
-            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return true
+            if (message.skyhanniCreated) return true
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
         }
@@ -122,7 +122,7 @@ object ClientEvents {
 
     private fun onModify(message: Component, actionBar: Boolean): Component {
         try {
-            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return message
+            if (message.skyhanniCreated) return message
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
         }
