@@ -20,7 +20,7 @@ object MoongladeBeaconWarning {
     private var lastAlert = SimpleTimeMark.farPast()
 
     val beaconReadyPattern by RepoPattern.pattern(
-        "foraging.moonglade.beacon.available",
+        "foraging.moonglade.beacon.available-nocolor",
         " Cooldown: AVAILABLE",
     )
 
