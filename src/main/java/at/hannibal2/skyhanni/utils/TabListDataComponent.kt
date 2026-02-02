@@ -67,24 +67,15 @@ object TabListDataComponent {
         }*/
     }
 
-    private fun copyCommand(noColor: Boolean) {
-        /*if (debugCache != null) {
-            ChatUtils.clickableChat(
-                "Tab list debug is enabled!",
-                onClick = ::toggleDebug,
-                "§eClick to disable!",
-            )
-            return
-        }*/
-
+    private fun copyCommand() {
         val resultList = mutableListOf<String>()
         for (line in getTabList()) {
-            val tabListLine = line/*.transformIf({ noColor }) { removeColor() }*/
+            val tabListLine = line
             if (tabListLine.string != "") resultList.add("'$tabListLine'")
         }
 
-        val tabHeader = header?.string ?: ""
-        val tabFooter = footer?.string ?: ""
+        val tabHeader = header?.string.orEmpty()
+        val tabFooter = footer?.string.orEmpty()
 
         val widgets = TabWidget.entries.filter { it.isActive }
             .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
@@ -178,10 +169,7 @@ object TabListDataComponent {
         event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            arg("nocolor", BrigadierArguments.bool()) { noColor ->
-                callback { copyCommand(getArg(noColor)) }
-            }
-            simpleCallback { copyCommand(false) }
+            simpleCallback { copyCommand() }
         }
     }
 }
