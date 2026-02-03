@@ -28,14 +28,12 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.client.player.RemotePlayer
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import net.minecraft.world.entity.Entity
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import net.minecraft.world.entity.EntityType
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.world.entity.boss.wither.WitherBoss
-import net.minecraft.world.entity.decoration.ArmorStand
 
 
 @SkyHanniModule
@@ -79,6 +77,26 @@ object VanquisherWaypointShare {
     private fun foundVanquisher(entityId: Int) {
         lastShareTime = SimpleTimeMark.farPast()
         myVanquisherId = entityId
+
+        TitleManager.sendTitle(
+            "§5§lVanquisher Spawned!",
+            "§r§7You found one nearby!",
+            3.seconds,
+            null,
+            TitleManager.TitleLocation.GLOBAL,
+            TitleManager.TitleAddType.FORCE_FIRST
+        )
+
+        val entity = vanquisherNearby[entityId] ?: EntityUtils.getEntityByID(entityId)
+        if(entity != null) {
+            val playerName = Minecraft.getInstance().player?.name?.string ?: "You"
+            sharedWaypoints[playerName] = SharedVanquisher(
+                playerName,
+                playerName,
+                entity.getLorenzVec(),
+                SimpleTimeMark.now()
+            )
+        }
 
         if(config.instantShare){
             sendVanquisher()
@@ -140,10 +158,15 @@ object VanquisherWaypointShare {
         val name = playerName.cleanPlayerName()
         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
 
-        if(!waypoints.containsKey(name)){
-            ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
-            TitleManager.sendTitle("Vanquisher from $playerDisplayName")
-        }
+        ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+        TitleManager.sendTitle(
+            "Vanquisher from $playerDisplayName",
+            null,
+            3.seconds,
+            null,
+            TitleManager.TitleLocation.GLOBAL,
+            TitleManager.TitleAddType.FORCE_FIRST
+        )
         sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
         return true
     }
@@ -227,6 +250,30 @@ object VanquisherWaypointShare {
                 if(myVanquisherId != entity.id){
                     foundVanquisher(entity.id)
                 }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent){
+        if(!isEnabled()) return
+
+        with(WorldRenderUtils){
+            for(waypoint in waypoints.values) {
+                if(waypoint.spawnTime.passedSince() > 30.seconds) continue
+
+                val beaconColor = java.awt.Color(160, 37, 191)
+
+                event.drawWaypointFilled(
+                    location = waypoint.location,
+                    color = beaconColor,
+                    seeThroughBlocks = true,
+                    beacon = false
+                )
+                event.renderBeaconBeam(
+                    waypoint.location,
+                    beaconColor.rgb
+                )
             }
         }
     }
