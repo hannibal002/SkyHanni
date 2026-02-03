@@ -33,6 +33,9 @@ import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import net.minecraft.world.entity.decoration.ArmorStand
 
 
 @SkyHanniModule
@@ -44,16 +47,16 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "coords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: (?<x>[^ ]+): (?<y>[^ ]+): (?<z>[^ ]+): | Vanquisher"
+        "(?<party>Party > )?(?<playerName>.+): (?<x>[^ ]+): (?<y>[^ ]+): (?<z>[^ ]+): | Vanquisher"
     )
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rVanquisher dead!",
+        "(?<party>Party > )?(?<playerName>.*): Vanquisher dead!",
     )
     private val vanquisherSpawnedPattern by patternGroup.pattern(
         "spawned",
-        ".*§aA §r§cVanquisher §r§ais spawning nearby!"
+        ".*A Vanquisher is spawning nearby!"
     )
 
     private var myVanquisherId = -1
@@ -81,8 +84,8 @@ object VanquisherWaypointShare {
             sendVanquisher()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keybindSharing)
-            val message = "You found a Vanquisher! Click §l§chere §l§bor press §c$keyName to share!"
-            ChatUtils.clickableChat(message, onClick = ::sendVanquisher, hover = "§eClick to share!", oneTimeClick = true)
+            val message = "You found a Vanquisher! Click here or press $keyName to share!"
+            ChatUtils.clickableChat(message, onClick = ::sendVanquisher, hover = "Click to share!", oneTimeClick = true)
         }
     }
 
@@ -94,7 +97,7 @@ object VanquisherWaypointShare {
         if (myVanquisherId == -1) {
             val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
             if(closestId != null) {myVanquisherId = closestId.id}
-            ChatUtils.chat("§cNo Vanquisher found to share!")
+            ChatUtils.chat("No Vanquisher found to share!")
             return
         }
 
@@ -138,8 +141,8 @@ object VanquisherWaypointShare {
         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
 
         if(!waypoints.containsKey(name)){
-            ChatUtils.chat("$playerDisplayName §l§efound a Vanquisher at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
-            TitleManager.sendTitle("§dVanquisher §efrom §b$playerDisplayName")
+            ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+            TitleManager.sendTitle("Vanquisher from $playerDisplayName")
         }
         sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
         return true
@@ -185,7 +188,7 @@ object VanquisherWaypointShare {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true)
     fun readChat(event: SkyHanniChatEvent.Allow) {
         if(!isEnabled()) return
-        val message = event.message
+        val message = event.cleanMessage
 
         if(vanquisherSpawnedPattern.matches(message)){
             if(myVanquisherId == -1) {
@@ -210,11 +213,9 @@ object VanquisherWaypointShare {
     }
 
     @HandleEvent
-    fun onRawEntityJoin(event: EntityEnterWorldEvent<Entity>) {
+    fun onRawEntityJoin(event: EntityEnterWorldEvent<WitherBoss>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity !is LivingEntity) return
-        if (entity is RemotePlayer) return
 
         if (entity.name.string.equals("Wither", ignoreCase = true) ||
             entity.name.string.contains("Vanquisher", ignoreCase = true)) {
