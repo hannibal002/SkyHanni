@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -30,7 +29,10 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import java.util.*
+import net.minecraft.network.chat.MutableComponent
+import java.lang.UnsupportedOperationException
+import java.util.LinkedList
+import java.util.Queue
 import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
@@ -472,12 +474,18 @@ object ChatUtils {
         )
     }
 
-    @Suppress("CAST_NEVER_SUCCEEDS")
-    var GuiMessage.fullComponent: Component
-        get() = (this as ChatLineData).skyHanni_fullComponent
+    var Component.skyhanniCreated: Boolean
+        get() = (this as? MutableComponent)?.`skyhanni$didCreate`() ?: false
         set(value) {
-            (this as ChatLineData).skyHanni_fullComponent = value
+            if (this !is MutableComponent) {
+                throw UnsupportedOperationException("Attempted to set skyhanniCreated on non-MutableComponent instance")
+            }
+            `skyhanni$setCreated`(value)
         }
+
+    var GuiMessage.fullComponent: Component
+        get() = `skyhanni$getFullComponent`()
+        set(value) { `skyhanni$setFullComponent`(value) }
 
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks

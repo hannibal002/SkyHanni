@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -154,10 +153,11 @@ object TabListData {
             }
         }
 
-        val tabListOverlay = Minecraft.getInstance().gui.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedTextCompat().orEmpty()
+        val tabListOverlay = Minecraft.getInstance().gui.tabList
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedTextCompat().orEmpty()
+        header = tabListOverlay.header?.formattedTextCompat().orEmpty()
+
+        val tabFooter = tabListOverlay.footer?.formattedTextCompat().orEmpty()
         if (tabFooter != footer && tabFooter != "") {
             TablistFooterUpdateEvent(tabFooter).post()
         }

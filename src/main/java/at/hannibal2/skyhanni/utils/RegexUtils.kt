@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -62,6 +63,10 @@ object RegexUtils {
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }
+    fun Pattern.matchGroup(text: Component, groupName: String): Component? = matchMatcher(text) {
+        val group = groupOrNull(groupName) ?: return@matchMatcher null
+        return TextHelper.matcher(text, group)
+    }
     fun Pattern.firstMatchGroup(list: List<String>, groupName: String): String? = firstMatcher(list) {
         groupOrNull(groupName)
     }

@@ -22,9 +22,13 @@ import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import com.mojang.serialization.JsonOps
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
@@ -108,6 +112,17 @@ object SkyHanniTypeAdapters {
 
         override fun read(reader: JsonReader): LocalDate {
             return LocalDate.parse(reader.nextString())
+        }
+    }
+
+    val COMPONENT = object : TypeAdapter<Component>() {
+        override fun write(out: JsonWriter, value: Component) {
+            val encodeStart = ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, value).getOrThrow()
+            out.jsonValue(encodeStart.toString())
+        }
+
+        override fun read(reader: JsonReader): Component {
+            return ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow().first
         }
     }
 

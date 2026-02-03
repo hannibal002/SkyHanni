@@ -20,7 +20,7 @@
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
     "environment": "client",
-    "accessWidener": "skyhanni.accesswidener",
+    "accessWidener": "skyhanni.classtweaker",
     "mixins": [
         "mixins.skyhanni.json"
     ],
@@ -50,6 +50,7 @@
     "depends": {
         "fabric-api": ">=${fapi}",
         "fabric-language-kotlin": ">=1.13.7+kotlin.2.2.21",
+        "fabricloader": ">=0.18.0",
         "minecraft": "${minecraft}"
     },
     "breaks": {

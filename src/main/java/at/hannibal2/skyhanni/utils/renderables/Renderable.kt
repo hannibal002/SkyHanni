@@ -43,7 +43,6 @@ import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 
@@ -1098,7 +1097,6 @@ interface Renderable {
                     0,
                     width,
                     height,
-                    GL11.GL_NEAREST,
                     radius,
                     smoothness,
                     texture = texture,
@@ -1119,9 +1117,9 @@ interface Renderable {
             alpha: Int = 255,
             padding: Int = 2,
             uMin: Float = 0f,
-            uMax: Float = 1f,
+            uMax: Float = width.toFloat(),
             vMin: Float = 0f,
-            vMax: Float = 1f,
+            vMax: Float = height.toFloat(),
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {

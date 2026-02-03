@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.api.minecraftevents.RenderEvents;
+import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
 import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
+import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
@@ -18,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public class MixinGuiIngame {
+public class MixinGui {
 
     @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
     public void renderScoreboard(GuiGraphics drawContext, Objective objective, CallbackInfo ci) {
@@ -82,6 +86,22 @@ public class MixinGuiIngame {
     private boolean modifyRenderText(boolean bool) {
         if (ChatPeek.peek()) return true;
         return bool;
+    }
+
+    @WrapMethod(method = "setTitle")
+    private void handleTitle(Component component, Operation<Void> original) {
+        String formattedText = TextCompatKt.formattedTextCompat(component);
+        if (!new TitleReceivedEvent(formattedText, false).post()) {
+            original.call(component);
+        }
+    }
+
+    @WrapMethod(method = "setSubtitle")
+    private void handleSubtitle(Component component, Operation<Void> original) {
+        String formattedText = TextCompatKt.formattedTextCompat(component);
+        if (!new TitleReceivedEvent(formattedText, true).post()) {
+            original.call(component);
+        }
     }
 
 }
