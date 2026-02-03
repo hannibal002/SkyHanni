@@ -91,7 +91,7 @@ object BeaconPower {
             }
         }
 
-        items[STATS_SLOT]?.let stats@ { item ->
+        items[STATS_SLOT]?.let stats@{ item ->
             item.getLoreComponent().forEach {
                 boostedStatPattern.matchGroup(it, "stat")?.let { statComponent ->
                     stat = statComponent
