@@ -103,11 +103,11 @@ object HoppityEggsManager {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §6Hoppity§f: §r§fSimply exquisite! I don't think I'll ever get tired of chocolate.
+     * REGEX-TEST: [NPC] Hoppity: Simply exquisite! I don't think I'll ever get tired of chocolate.
      */
     val hoppityVisitorAccepted by CFApi.patternGroup.pattern(
         "hoppity.visitor.accepted",
-        "§e\\[NPC\\] §6Hoppity§f: (?:§.)+Simply exquisite.+"
+        "\\[NPC\\] Hoppity: Simply exquisite.+"
     )
 
     private val noEggsLeftPattern by CFApi.patternGroup.pattern(
