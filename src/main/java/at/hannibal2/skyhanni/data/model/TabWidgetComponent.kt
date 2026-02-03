@@ -220,7 +220,7 @@ enum class TabWidgetComponent(
     ),
     VOLCANO(
         // language=RegExp
-        "Volcano: (?<time>.*)",
+        "Volcano: (?<status>\\S+)",
     ),
     REPUTATION(
         // language=RegExp
