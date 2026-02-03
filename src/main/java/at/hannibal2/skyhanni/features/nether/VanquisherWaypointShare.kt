@@ -51,11 +51,11 @@ object VanquisherWaypointShare {
 
     private val vanquisherSharedPattern by patternGroup.list(
         "coords",
-        "(?<party>Party > )?(?<playerName>.+): x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+) \\| Vanquisher"
+        "(?<party>Party > )?(?<playerName>.+): x: (?<x>-?[\\d\\.]+), y: (?<y>-?[\\d\\.]+), z: (?<z>-?[\\d\\.]+) \\| Vanquisher"
     )
 
     /**
-     * REGEX-TEST: §9Party §8> User Name§f: Vanquisher Dead!
+     * REGEX-TEST: §9Party §8> User Name§f: Vanquisher dead!
      */
 
     private val vanquisherDiedPattern by patternGroup.pattern(
@@ -113,7 +113,7 @@ object VanquisherWaypointShare {
             )
         }
 
-        if (config.instantShare){
+        if (config.instantShare) {
             sendVanquisher()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keybindSharing)
@@ -129,7 +129,7 @@ object VanquisherWaypointShare {
 
         if (myVanquisherId == -1) {
             val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
-            if (closestId != null) {myVanquisherId = closestId.id}
+            if (closestId != null) { myVanquisherId = closestId.id }
             ChatUtils.chat("No Vanquisher found to share!")
             return
         }
@@ -168,7 +168,7 @@ object VanquisherWaypointShare {
         val x = group("x").trim().toDoubleOrNull() ?: return false
         val y = group("y").trim().toDoubleOrNull() ?: return false
         val z = group("z").trim().toDoubleOrNull() ?: return false
-        val location = LorenzVec(x,y,z)
+        val location = LorenzVec(x, y, z)
 
         val name = playerName.cleanPlayerName()
         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
@@ -194,19 +194,19 @@ object VanquisherWaypointShare {
     }
 
     @HandleEvent
-    fun keyPressEvent(event: KeyPressEvent){
+    fun keyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getInstance().screen != null) return
         if (event.keyCode == config.keybindSharing) sendVanquisher()
     }
 
     @HandleEvent
-    fun checkVanquisherHealth(event: EntityHealthUpdateEvent){
+    fun checkVanquisherHealth(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
         if (event.health > 0) return
 
         val entityId = event.entity.id
-        if (entityId == myVanquisherId){
+        if (entityId == myVanquisherId) {
             sendVanquisherDeath()
         }
         vanquisherNearby.remove(entityId)
@@ -216,10 +216,10 @@ object VanquisherWaypointShare {
     fun checkSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        sharedWaypoints.values.removeIf{it.spawnTime.passedSince() > 60.seconds}
+        sharedWaypoints.values.removeIf { it.spawnTime.passedSince() > 60.seconds }
 
         if (event.repeatSeconds(3)) {
-            vanquisherNearby.values.removeIf{it.deceased || !it.isAlive}
+            vanquisherNearby.values.removeIf { it.deceased || !it.isAlive }
         }
     }
 
@@ -228,21 +228,21 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
         val message = event.cleanMessage
 
-        if(vanquisherSpawnedPattern.matches(message)){
+        if (vanquisherSpawnedPattern.matches(message)) {
             if (myVanquisherId == -1) {
                 val closestId = vanquisherNearby.values.minByOrNull {
                     it.distanceToPlayer()
                 }
-                if (closestId != null) {foundVanquisher(closestId.id)}
+                if (closestId != null) { foundVanquisher(closestId.id) }
             }
         }
 
-        vanquisherSharedPattern.matchMatchers(message){
+        vanquisherSharedPattern.matchMatchers(message) {
             if (!detectFromChat()) return@matchMatchers
             event.blockedReason = "vanquisher_waypoint"
         }
 
-        vanquisherDiedPattern.matchMatcher(message){
+        vanquisherDiedPattern.matchMatcher(message) {
             if (block()) return
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
@@ -256,13 +256,15 @@ object VanquisherWaypointShare {
         val entity = event.entity
 
         if (entity.name.string.equals("Wither", ignoreCase = true) ||
-            entity.name.string.contains("Vanquisher", ignoreCase = true)) {
+            entity.name.string.contains("Vanquisher", ignoreCase = true)
+            )
+        {
 
             vanquisherNearby[entity.id] = entity
 
             val player = Minecraft.getInstance().player ?: return
-            if (entity.distanceTo(player) < 15.0){
-                if (myVanquisherId != entity.id){
+            if (entity.distanceTo(player) < 15.0) {
+                if (myVanquisherId != entity.id) {
                     foundVanquisher(entity.id)
                 }
             }
@@ -270,11 +272,11 @@ object VanquisherWaypointShare {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent){
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        with(WorldRenderUtils){
-            for(waypoint in waypoints.values) {
+        with(WorldRenderUtils) {
+            for (waypoint in waypoints.values) {
                 if (waypoint.spawnTime.passedSince() > 30.seconds) continue
 
                 val beaconColor = java.awt.Color(160, 37, 191)
