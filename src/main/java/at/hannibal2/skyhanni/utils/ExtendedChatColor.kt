@@ -100,6 +100,28 @@ class ExtendedChatColor(
                     )
                 }
             }
+            event.registerBrigadier("shtestcomponentmatcher") {
+                description = "Test component matcher"
+                category = CommandCategory.DEVELOPER_TEST
+                simpleCallback {
+                    val component = componentBuilder {
+                        append("hi guys ")
+                        appendWithColor("watch me count ", ChatFormatting.AQUA)
+                        append(
+                            TextHelper.createGradientText(
+                                Color(Integer.decode("#a839ce")),
+                                LorenzColor.GREEN.toColor(),
+                                "0123456789"
+                            )
+                        )
+                        appendWithColor(" i did it! ", ChatFormatting.RED)
+                        appendWithColor("watch me count 0123456789 but this one isnt matched :(", ChatFormatting.BLUE)
+                    }
+                    ChatUtils.chat(component)
+                    ChatUtils.chat("matching \"count 0123456789\"")
+                    ChatUtils.chat(TextHelper.matcher(component, "count 0123456789") ?: Component.literal("null"))
+                }
+            }
         }
     }
 }

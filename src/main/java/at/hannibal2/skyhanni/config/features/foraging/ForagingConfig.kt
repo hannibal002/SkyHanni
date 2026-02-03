@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -32,25 +31,29 @@ class ForagingConfig {
     @Expose
     @ConfigOption(name = "Foraging Tutorial Quest", desc = "")
     @Accordion
-    @OnlyModern
     val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
 
     @Expose
     @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.")
-    @OnlyModern
     @Accordion
     var moongladeBeacon = MoongladeBeaconConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
-    @OnlyModern
     @Accordion
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Galatea.")
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Galatea.")
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var mutePhantoms = true
+
+    @Expose
+    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in Galatea.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("box firework")
+    var muteFusionMachine = true
+
 }

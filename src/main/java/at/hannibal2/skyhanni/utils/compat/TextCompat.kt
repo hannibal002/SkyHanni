@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
@@ -233,12 +234,12 @@ fun Style.setHoverShowText(text: Component): Style {
 
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
-    Minecraft.getInstance().player?.displayClientMessage(message, false)
+    DelayedRun.runOrNextTick { Minecraft.getInstance().player?.displayClientMessage(message, false) }
 }
 
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
-    Minecraft.getInstance().execute {
+    DelayedRun.runOrNextTick { {
         Minecraft.getInstance().gui.chat.deleteMessage(idToMessageSignature(id))
         Minecraft.getInstance().gui.chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
     }

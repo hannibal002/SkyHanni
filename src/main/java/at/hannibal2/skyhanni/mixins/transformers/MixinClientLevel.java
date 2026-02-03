@@ -13,25 +13,25 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
 @Mixin(ClientLevel.class)
-public class MixinClientWorld {
+public class MixinClientLevel {
 
     @Inject(method = "addEntity", at = @At("HEAD"))
     private void onAddEntity(Entity entity, CallbackInfo ci) {
         new EntityEnterWorldEvent(entity).post();
     }
 
-     @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
-     private void onAddBlockBreakParticles(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
-         if (ParticleHider.shouldHideBlockParticles()) {
-             ci.cancel();
-         }
-     }
+    @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
+    private void onAddBlockBreakParticles(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
+        if (ParticleHider.shouldHideBlockParticles()) {
+            ci.cancel();
+        }
+    }
 
-     @Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
-     private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
-         if (ParticleHider.shouldHideBlockParticles()) {
-             ci.cancel();
-         }
-     }
+    @Inject(method = "addBreakingBlockEffect", at = @At("HEAD"), cancellable = true)
+    private void onAddBlockBreakingParticles(BlockPos blockPos, Direction direction, CallbackInfo ci) {
+        if (ParticleHider.shouldHideBlockParticles()) {
+            ci.cancel();
+        }
+    }
 
 }
