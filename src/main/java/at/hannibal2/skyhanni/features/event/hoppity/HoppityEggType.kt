@@ -32,7 +32,7 @@ enum class HoppityEggType(
     CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6§l", -1),
     CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6§l", -1),
     STRAY("Stray", "§a", -1),
-    VISITOR("Visitor (Random)", "§d", -1),
+    VISITOR("Visitor", "§d", -1),
     ;
 
     val isResetting get() = resettingEntries.contains(this)
