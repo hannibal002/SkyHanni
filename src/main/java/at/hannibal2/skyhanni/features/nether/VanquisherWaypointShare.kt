@@ -45,7 +45,7 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "coords",
-        "(?<party>Party > )?(?<playerName>.+): (?<x>[^ ]+): (?<y>[^ ]+): (?<z>[^ ]+): | Vanquisher"
+        "(?<party>Party > )?(?<playerName>.+): x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+) \\| Vanquisher"
     )
 
     private val vanquisherDiedPattern by patternGroup.pattern(
@@ -81,7 +81,7 @@ object VanquisherWaypointShare {
         TitleManager.sendTitle(
             "§5§lVanquisher Spawned!",
             "§r§7You found one nearby!",
-            3.seconds,
+            5.seconds,
             null,
             TitleManager.TitleLocation.GLOBAL,
             TitleManager.TitleAddType.FORCE_FIRST
@@ -162,7 +162,7 @@ object VanquisherWaypointShare {
         TitleManager.sendTitle(
             "Vanquisher from $playerDisplayName",
             null,
-            3.seconds,
+            5.seconds,
             null,
             TitleManager.TitleLocation.GLOBAL,
             TitleManager.TitleAddType.FORCE_FIRST
