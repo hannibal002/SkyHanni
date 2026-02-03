@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
@@ -182,7 +182,7 @@ object SlayerApi {
     }
 
     private fun getSlayerLines(): List<String> =
-        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidget.SLAYER.lines }.map { it.trim() }
+        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidgetComponent.SLAYER.lines.map { it.string } }.map { it.trim() }
 
     private fun updateSlayerState() {
         val lines = getSlayerLines()
@@ -212,8 +212,8 @@ object SlayerApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.SLAYER)) return
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.SLAYER)) return
         updateSlayerState()
     }
 

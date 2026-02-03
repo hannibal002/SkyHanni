@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -18,21 +18,22 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import com.google.common.cache.RemovalCause.EXPIRED
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestTrapApi {
     // Todo: Use these to yell at the user to enable the widget if it's disabled
-    private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
-    private val widgetErrors: MutableMap<TabWidget, Long> = enumMapOf()
+    private val widgetEnabledAndVisible: TimeLimitedCache<TabWidgetComponent, Boolean> = baseWidgetStatus()
+    private val widgetErrors: MutableMap<TabWidgetComponent, Long> = enumMapOf()
 
-    private val tabListPestTrapsPattern = TabWidget.PEST_TRAPS.pattern
-    private val tabListFullTrapsPattern = TabWidget.FULL_TRAPS.pattern
-    private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
+    private val tabListPestTrapsPattern = TabWidgetComponent.PEST_TRAPS.pattern
+    private val tabListFullTrapsPattern = TabWidgetComponent.FULL_TRAPS.pattern
+    private val tabListNoBaitPattern = TabWidgetComponent.NO_BAIT.pattern
 
-    private val delayEvent: MutableMap<TabWidget, Boolean> = enumMapOf()
-    private val lastHashes: TimeLimitedCache<TabWidget, Int> = TimeLimitedCache(10.seconds)
+    private val delayEvent: MutableMap<TabWidgetComponent, Boolean> = enumMapOf()
+    private val lastHashes: TimeLimitedCache<TabWidgetComponent, Int> = TimeLimitedCache(10.seconds)
     var trapsPlaced: Int? = null
         private set
     var fullTraps: Set<Int>? = null
@@ -46,8 +47,8 @@ object PestTrapApi {
     val inInventory get() = InventoryUtils.openInventoryName() in inventoryNames
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PEST_TRAPS, TabWidget.FULL_TRAPS, TabWidget.NO_BAIT)) return
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.PEST_TRAPS, TabWidgetComponent.FULL_TRAPS, TabWidgetComponent.NO_BAIT)) return
         if (event.lines.isEmpty()) return
         val timeEnteredGarden = timeEnteredGarden ?: run {
             timeEnteredGarden = SimpleTimeMark.now()
@@ -64,18 +65,18 @@ object PestTrapApi {
         delayEvent[event.widget] = false
 
         when (event.widget) {
-            TabWidget.PEST_TRAPS -> {
-                widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
+            TabWidgetComponent.PEST_TRAPS -> {
+                widgetEnabledAndVisible[TabWidgetComponent.PEST_TRAPS] = true
                 trapsPlaced = event.lines.firstNotNullOfOrNull { it.getTrapsPlacedOrNull() }
             }
 
-            TabWidget.FULL_TRAPS -> {
-                widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
+            TabWidgetComponent.FULL_TRAPS -> {
+                widgetEnabledAndVisible[TabWidgetComponent.FULL_TRAPS] = true
                 fullTraps = event.lines.firstNotNullOfOrNull { it.getFullTrapsOrNull() }
             }
 
-            TabWidget.NO_BAIT -> {
-                widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
+            TabWidgetComponent.NO_BAIT -> {
+                widgetEnabledAndVisible[TabWidgetComponent.NO_BAIT] = true
                 noBaitTraps = event.lines.firstNotNullOfOrNull { it.getNoBaitTrapsOrNull() }
             }
 
@@ -100,34 +101,34 @@ object PestTrapApi {
             it.toIntOrNull()
         }?.takeIfNotEmpty()?.toSet()
 
-    private fun TabWidget.getNewHashOrNull(line: String): Int? = line.hashCode().takeIf {
+    private fun TabWidgetComponent.getNewHashOrNull(line: Component): Int? = line.hashCode().takeIf {
         it != lastHashes[this]
     }
 
-    private fun String.getTrapsPlacedOrNull(): Int? = tabListPestTrapsPattern.matchMatcher(this) {
-        widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
+    private fun Component.getTrapsPlacedOrNull(): Int? = tabListPestTrapsPattern.matchMatcher(this) {
+        widgetEnabledAndVisible[TabWidgetComponent.PEST_TRAPS] = true
         MAX_TRAPS = groupOrNull("max")?.toIntOrNull() ?: MAX_TRAPS
-        lastHashes[TabWidget.PEST_TRAPS] = TabWidget.PEST_TRAPS.getNewHashOrNull(this@getTrapsPlacedOrNull)
+        lastHashes[TabWidgetComponent.PEST_TRAPS] = TabWidgetComponent.PEST_TRAPS.getNewHashOrNull(this@getTrapsPlacedOrNull)
             ?: return@matchMatcher trapsPlaced
         return groupOrNull("count")?.toIntOrNull()
     }
 
-    private fun String.getFullTrapsOrNull(): Set<Int>? = tabListFullTrapsPattern.matchMatcher(this) {
-        widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
-        lastHashes[TabWidget.FULL_TRAPS] = TabWidget.FULL_TRAPS.getNewHashOrNull(this@getFullTrapsOrNull)
+    private fun Component.getFullTrapsOrNull(): Set<Int>? = tabListFullTrapsPattern.matchMatcher(this) {
+        widgetEnabledAndVisible[TabWidgetComponent.FULL_TRAPS] = true
+        lastHashes[TabWidgetComponent.FULL_TRAPS] = TabWidgetComponent.FULL_TRAPS.getNewHashOrNull(this@getFullTrapsOrNull)
             ?: return@matchMatcher fullTraps
         return this.getTrapIndexSet()
     }
 
-    private fun String.getNoBaitTrapsOrNull(): Set<Int>? = tabListNoBaitPattern.matchMatcher(this) {
-        widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
-        lastHashes[TabWidget.NO_BAIT] = TabWidget.NO_BAIT.getNewHashOrNull(this@getNoBaitTrapsOrNull)
+    private fun Component.getNoBaitTrapsOrNull(): Set<Int>? = tabListNoBaitPattern.matchMatcher(this) {
+        widgetEnabledAndVisible[TabWidgetComponent.NO_BAIT] = true
+        lastHashes[TabWidgetComponent.NO_BAIT] = TabWidgetComponent.NO_BAIT.getNewHashOrNull(this@getNoBaitTrapsOrNull)
             ?: return@matchMatcher noBaitTraps
         return this.getTrapIndexSet()
     }
 
     @Suppress("UnstableApiUsage")
-    private fun baseWidgetStatus() = TimeLimitedCache<TabWidget, Boolean>(
+    private fun baseWidgetStatus() = TimeLimitedCache<TabWidgetComponent, Boolean>(
         expireAfterWrite = 30.seconds,
         removalListener = { key, _, removalCause ->
             if (removalCause != EXPIRED) return@TimeLimitedCache

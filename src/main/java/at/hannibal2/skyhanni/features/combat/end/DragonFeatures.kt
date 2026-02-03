@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -50,7 +50,7 @@ object DragonFeatures {
     private val repoGroup = RepoPattern.group("combat.boss.dragon.1")
     private val chatGroup = repoGroup.group("chat")
     private val scoreBoardGroup = repoGroup.group("scoreboard")
-    private val tabListGroup = repoGroup.group("tablist")
+    private val tabListGroup = repoGroup.group("tablist-nocolor")
 
     /**
      * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
@@ -138,14 +138,14 @@ object DragonFeatures {
     private val scoreDragonPattern by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     /**
-     * REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
-     * REGEX-TEST:  §r§a42069HzMonitor: §r§c3M❤
-     * REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
-     * REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
+     * REGEX-TEST:  JamBeastie: 7.4M❤
+     * REGEX-TEST:  42069HzMonitor: 3M❤
+     * REGEX-TEST:  ItsJxxxxx2001: 457k❤
+     * REGEX-TEST:  Thunderblade73: 12.3k❤
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        ".*§r§.(?<name>.+): §r§c(?<damage>[\\d.]+[kM]?)❤",
+        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)❤",
     )
 
     private var yourEyes = 0
@@ -397,8 +397,8 @@ object DragonFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onTabList(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.DRAGON)) return
+    fun onTabList(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.DRAGON)) return
         if (!displayIsEnabled()) return
         widgetActive = true
         for (i in 1 until event.lines.size) {

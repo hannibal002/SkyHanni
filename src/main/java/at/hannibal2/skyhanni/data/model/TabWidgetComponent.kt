@@ -34,7 +34,7 @@ enum class TabWidgetComponent(
 ) {
     PLAYER_LIST(
         // language=RegExp
-        "Players \\(\\d+\\)",
+        "Players \\((?<amount>\\d+)\\)",
     ),
 
     /** This line holds no information, only here because every widget must be present */
@@ -112,7 +112,7 @@ enum class TabWidgetComponent(
     ),
     GUESTS(
         // language=RegExp
-        "Guests .*",
+        "Guests \\((?<amount>\\d+)\\)",
     ),
     COOP(
         // language=RegExp
@@ -312,7 +312,7 @@ enum class TabWidgetComponent(
     ),
     DUNGEON_PARTY(
         // language=RegExp
-        "Party \\(\\d+\\)",
+        "Party \\((?<amount>\\d+)\\)",
     ),
     DUNGEON_PLAYER_STATS(
         // language=RegExp

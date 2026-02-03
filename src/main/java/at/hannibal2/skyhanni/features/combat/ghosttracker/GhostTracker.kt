@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
@@ -46,6 +47,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -139,20 +141,20 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 21§r§f: §r§b29,614/40,000
-     * REGEX-TEST:  Ghost 15§r§f: §r§b12,449/12,500
+     * REGEX-TEST:  Ghost 21: 29,614/40,000
+     * REGEX-TEST:  Ghost 15: 12,449/12,500
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
-        "tablist.bestiary",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
+        "tablist.bestiary-no-color",
+        "\\s*Ghost (?<level>\\d+|[XVI]+): (?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
     )
 
     /**
-     * REGEX-TEST:  Ghost 25§r§f: §r§b§lMAX
+     * REGEX-TEST:  Ghost 25: MAX
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
-        "tablist.bestiarymax",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX",
+        "tablist.bestiarymax-no-color",
+        "\\s*Ghost (?<level>\\d+|[XVI]+): MAX",
     )
 
     private val SORROW = "SORROW".toInternalName()
@@ -268,7 +270,7 @@ object GhostTracker {
         }
     }
 
-    private fun parseBestiaryWidget(lines: List<String>) {
+    private fun parseBestiaryWidget(lines: List<Component>) {
         foundGhostBestiary = false
         for (line in lines) {
             if (maxBestiaryTablistPattern.matches(line)) {
@@ -277,7 +279,7 @@ object GhostTracker {
                 return
             }
 
-            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.formatLong() ?: continue
+            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.string?.formatLong() ?: continue
             foundGhostBestiary = true
             if (kills <= currentBestiaryKills) return
             val difference = kills - currentBestiaryKills
@@ -297,8 +299,8 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.BESTIARY)) return
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.BESTIARY)) return
         if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
     }
@@ -317,7 +319,7 @@ object GhostTracker {
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isCurrent()
-        if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
+        if (inArea) parseBestiaryWidget(TabWidgetComponent.BESTIARY.lines)
     }
 
     @HandleEvent

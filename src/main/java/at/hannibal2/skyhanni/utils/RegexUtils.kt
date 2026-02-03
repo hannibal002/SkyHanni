@@ -40,6 +40,12 @@ object RegexUtils {
         }
     }
 
+    inline fun <T> Pattern.matchAllComponents(list: List<Component>, consumer: Matcher.() -> T) {
+        for (line in list) {
+            matcher(line.string).let { if (it.find()) consumer(it) }
+        }
+    }
+
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
         for (pattern in iterator()) {
             pattern.matchMatcher<T>(text) {
@@ -76,6 +82,7 @@ object RegexUtils {
 
     fun Pattern.firstMatches(list: List<String>): String? = list.firstOrNull { matches(it) }
     fun Pattern.allMatches(list: List<String>): List<String> = list.filter { matches(it) }
+    fun Pattern.allMatchesComponent(list: List<Component>): List<Component> = list.filter { matches(it) }
 
     /**
      * Get the group, otherwise, return null

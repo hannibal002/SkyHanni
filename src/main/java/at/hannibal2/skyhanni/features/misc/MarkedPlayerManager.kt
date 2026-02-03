@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -36,15 +36,15 @@ object MarkedPlayerManager {
     private val patternGroup = RepoPattern.group("misc.markedplayer")
 
     /**
-     * REGEX-TEST: §8[§r§6400§r§8] §r§6HiZe_ §r§6▒
-     * REGEX-TEST: §8[§r§9318§r§8] §r§bwings_wacr §r§b§lᛝ
-     * REGEX-TEST: §8[§r§d321§r§8] §r§bbotbob21 §r§b§lᛝ
-     * REGEX-TEST: §8[§r§f42§r§8] §r§aVoidW_
-     * REGEX-TEST: §8[§r§a151§r§8] §r§bPhoenix_325
+     * REGEX-TEST: [400] HiZe_ ▒
+     * REGEX-TEST: [318] wings_wacr ᛝ
+     * REGEX-TEST: [321] botbob21 ᛝ
+     * REGEX-TEST: [42] VoidW_
+     * REGEX-TEST: [151] Phoenix_325
      */
     private val tabPlayerName by patternGroup.pattern(
-        "tabplayername",
-        "§8\\[§r(?<level>.*)§r§8] §r§\\w(?<name>[A-z0-9_]+)(?<symbol>.*)?",
+        "tabplayername-no-color",
+        "\\[(?<level>.*)] (?<name>[A-z0-9_]+)(?<symbol>.*)?",
     )
 
     private val notifyList = mutableSetOf<String>()
@@ -140,14 +140,14 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onTablistUpdate(event: WidgetUpdateEvent) {
+    fun onTablistUpdate(event: WidgetUpdateComponentEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
-        if (!event.isWidget(TabWidget.PLAYER_LIST)) return
+        if (!event.isWidget(TabWidgetComponent.PLAYER_LIST)) return
 
         currentLobbyPlayers.clear()
 
-        tabPlayerName.matchAll(event.lines) {
+        tabPlayerName.matchAll(event.lines.map { it.string }) {
             val name = group("name")
             if (name != PlayerUtils.getName()) {
                 currentLobbyPlayers.add(name)

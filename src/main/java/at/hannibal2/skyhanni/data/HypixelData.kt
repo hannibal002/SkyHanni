@@ -6,13 +6,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
@@ -28,7 +29,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.allMatchesComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -79,35 +80,11 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:          §r§a§lPlayers §r§f(5)
-     */
-    private val playerAmountPattern by patternGroup.pattern(
-        "playeramount",
-        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST: §8[§r§a§r§8] §r§bBpoth §r§6§l℻
+     * REGEX-TEST: [441] Throwpo ♲
      */
     private val playerAmountOnIslandPattern by patternGroup.pattern(
-        "playeramount.onisland",
-        "^§.\\[[§\\w]{6,11}] §r.*",
-    )
-
-    /**
-     * REGEX-TEST:           §r§5§lGuests §r§f(0)
-     */
-    private val playerAmountGuestingPattern by patternGroup.pattern(
-        "playeramount.guesting",
-        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST:           §r§b§lParty §r§f(4)
-     */
-    private val dungeonPartyAmountPattern by patternGroup.pattern(
-        "playeramount.dungeonparty",
-        "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
+        "playeramount.onisland-nocolor",
+        "^\\[\\w+] .*",
     )
 
     /**
@@ -263,18 +240,18 @@ object HypixelData {
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
-        val playerPatternList = mutableListOf(
-            playerAmountPattern,
-            playerAmountGuestingPattern,
+        val playerWidgetList = mutableListOf(
+            TabWidgetComponent.PLAYER_LIST,
+            TabWidgetComponent.GUESTS,
         )
 
         if (DungeonApi.inDungeon()) {
-            playerPatternList.add(dungeonPartyAmountPattern)
+            playerWidgetList.add(TabWidgetComponent.DUNGEON_PARTY)
         }
 
-        out@ for (pattern in playerPatternList) {
-            for (line in TabListData.getTabList()) {
-                pattern.matchMatcher(line) {
+        out@ for (widget in playerWidgetList) {
+            for (component in widget.lines) {
+                widget.pattern.matchMatcher(component) {
                     amount += group("amount").toInt()
                     continue@out
                 }
@@ -477,12 +454,12 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
         when (event.widget) {
-            TabWidget.AREA -> checkIsland(event)
-            TabWidget.PROFILE -> checkProfile()
-            TabWidget.COOP -> countPlayersOnIsland(event)
-            TabWidget.ISLAND -> countPlayersOnIsland(event)
+            TabWidgetComponent.AREA -> checkIsland(event)
+            TabWidgetComponent.PROFILE -> checkProfile()
+            TabWidgetComponent.COOP -> countPlayersOnIsland(event)
+            TabWidgetComponent.ISLAND -> countPlayersOnIsland(event)
             else -> Unit
         }
     }
@@ -562,7 +539,7 @@ object HypixelData {
         noTrade = ironman || stranded || bingo
     }
 
-    private fun checkIsland(event: WidgetUpdateEvent) {
+    private fun checkIsland(event: WidgetUpdateComponentEvent) {
         val newIsland: IslandType
         val foundIsland: String
         if (event.isClear()) {
@@ -575,7 +552,7 @@ object HypixelData {
             TabListData.fullyLoaded = true
             // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
             val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
+            foundIsland = TabWidgetComponent.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
             newIsland = getIslandType(foundIsland, guesting)
         }
 
@@ -620,8 +597,8 @@ object HypixelData {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
+    private fun countPlayersOnIsland(event: WidgetUpdateComponentEvent) {
         if (event.isClear()) return
-        playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
+        playerAmountOnIsland = playerAmountOnIslandPattern.allMatchesComponent(event.lines).size
     }
 }

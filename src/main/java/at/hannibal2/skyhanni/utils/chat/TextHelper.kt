@@ -236,4 +236,33 @@ object TextHelper {
         if (newComponent.string.isEmpty()) return null
         return newComponent
     }
+
+    fun split(component: Component, delimiter: String): List<Component>? {
+        val newComponents = mutableListOf<MutableComponent>()
+        var currentComponent = Component.empty()
+
+        component.visit({ style: Style?, string: String? ->
+            if (string.isNullOrEmpty()) return@visit Optional.empty()
+            val split = string.split(delimiter)
+            if (split.isEmpty() || split.size == 1) {
+                currentComponent.append(Component.literal(string).withStyle(style))
+            } else {
+                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                currentComponent = Component.empty()
+                for ((index, str) in split.withIndex()) {
+                    if (index == 0) continue
+                    currentComponent.append(Component.literal(str).withStyle(style))
+                    if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                    currentComponent = Component.empty()
+                }
+            }
+
+            Optional.empty<Component>()
+        }, Style.EMPTY)
+
+        if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+        if (newComponents.isEmpty()) return null
+        return newComponents
+    }
 }

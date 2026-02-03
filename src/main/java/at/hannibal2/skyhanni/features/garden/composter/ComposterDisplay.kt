@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,10 +48,10 @@ object ComposterDisplay {
     private var tabListData by ComposterApi::tabListData
 
     enum class DataType(rawPattern: String, val icon: String) {
-        ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
-        FUEL(" Fuel: §r(.*)", "OIL_BARREL"),
-        TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
-        STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
+        ORGANIC_MATTER(" Organic Matter: (.*)", "WHEAT"),
+        FUEL(" Fuel: (.*)", "OIL_BARREL"),
+        TIME_LEFT(" Time Left: (.*)", "WATCH"),
+        STORED_COMPOST(" Stored Compost: (.*)", "COMPOST");
 
         val displayItem by AutoUpdatingItemStack(icon)
 
@@ -68,10 +68,23 @@ object ComposterDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.COMPOSTER)) return
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.COMPOSTER)) return
 
-        readData(event.lines)
+        val newData = mutableMapOf<DataType, String>()
+
+        for (line in event.lines) {
+            if (line.string != "Composter:") {
+                if (line.string == "") break
+                for (type in DataType.entries) {
+                    type.pattern.matchMatcher(line) {
+                        newData[type] = group(1)
+                    }
+                }
+            }
+        }
+
+        tabListData = newData
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterApi.estimateEmptyTimeFromTab()
@@ -104,28 +117,6 @@ object ComposterDisplay {
                 addString("§b$format")
             }
         } else Renderable.text("§cOpen Composter Upgrades!")
-    }
-
-    private fun readData(tabList: List<String>) {
-        var next = false
-        val newData = mutableMapOf<DataType, String>()
-
-        for (line in tabList) {
-            if (line == "§b§lComposter:") {
-                next = true
-                continue
-            }
-            if (next) {
-                if (line == "") break
-                for (type in DataType.entries) {
-                    type.pattern.matchMatcher(line) {
-                        newData[type] = group(1)
-                    }
-                }
-            }
-        }
-
-        tabListData = newData
     }
 
     private fun sendNotify() {

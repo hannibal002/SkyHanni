@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -64,7 +64,6 @@ object DailyQuestHelper {
     private val questBoardBarbarian = LorenzVec(-572, 100, -687)
 
     val quests = mutableListOf<Quest>()
-    var greatSpook = false
 
     val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
 
@@ -116,8 +115,8 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
         QuestLoader.loadFromTabList()
@@ -258,12 +257,6 @@ object DailyQuestHelper {
             (state == QuestState.ACCEPTED && (this is FetchQuest || this is RescueMissionQuest))
 
     fun MutableList<Renderable>.addQuests() {
-        if (greatSpook) {
-            addString("")
-            addString("§7Daily Quests (§cdisabled§7)")
-            addString(" §5§lThe Great Spook §7happened :O")
-            return
-        }
         val done = quests.count { it.state == QuestState.COLLECTED }
         addString("")
         addString("§7Daily Quests (§e$done§8/§e5 collected§7)")

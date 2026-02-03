@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
@@ -119,10 +119,10 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
+     * REGEX-TEST:  Plots: 4, 12, 13, 18, 20
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
-        "tablist.infected-plots",
+        "tablist.infected-plots-no-color",
         "\\sPlots: (?<plots>.*)",
     )
 
@@ -252,10 +252,10 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
+    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        if (!event.isWidget(TabWidgetComponent.PESTS)) return
 
-        infestedPlotsTabListPattern.firstMatcher(event.widget.lines) {
+        infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
             val apiPlots = getInfestedPlots().map { it.id }.toSet()
 
