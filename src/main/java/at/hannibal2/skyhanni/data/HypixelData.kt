@@ -467,7 +467,6 @@ object HypixelData {
 
         TabWidget.PROFILE.matchMatcherFirstLine {
             profileName = group("profile").lowercase()
-            ChatUtils.chat(profileName)
             ProfileJoinEvent(profileName).post()
         }
     }
