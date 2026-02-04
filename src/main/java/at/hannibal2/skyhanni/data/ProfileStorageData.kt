@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -125,7 +124,7 @@ object ProfileStorageData {
         }
 
         noTabListTime = SimpleTimeMark.now()
-        val foundSkyBlockTabList = TabWidget.AREA.isActive
+        val foundSkyBlockTabList = TabWidgetComponent.AREA.isActive
         if (foundSkyBlockTabList) {
             ChatUtils.clickableChat(
                 "§cCannot read profile name from tab list! Open /widget and make sure the Profile Widget " +

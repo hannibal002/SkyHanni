@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
@@ -91,10 +90,8 @@ object TabListData {
         val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
         val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
 
-        val widgets = TabWidget.entries.filter { it.isActive }
-            .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
         val string =
-            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\n"
 
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Tab list copied into the clipboard!")

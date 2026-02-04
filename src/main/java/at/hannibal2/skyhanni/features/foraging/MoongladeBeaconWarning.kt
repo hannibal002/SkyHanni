@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent

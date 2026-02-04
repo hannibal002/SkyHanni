@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
@@ -76,7 +76,7 @@ object TabListDataComponent {
         val tabHeader = header?.string.orEmpty()
         val tabFooter = footer?.string.orEmpty()
 
-        val widgets = TabWidget.entries.filter { it.isActive }
+        val widgets = TabWidgetComponent.entries.filter { it.isActive }
             .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
         val string =
             "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"

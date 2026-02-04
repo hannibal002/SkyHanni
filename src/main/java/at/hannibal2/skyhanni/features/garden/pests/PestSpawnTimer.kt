@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTi
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -216,7 +215,7 @@ object PestSpawnTimer {
 
         lineMap[PestTimerTextEntry.PEST_TIMER] = Renderable.text(lastPestSpawned)
 
-        val pestCooldown = if (!TabWidget.PESTS.isActive) {
+        val pestCooldown = if (!TabWidgetComponent.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
             val cooldownValue = when {

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -182,7 +181,7 @@ object GhostTracker {
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
         if (!isEnabled()) return
-        if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
+        if (!TabWidgetComponent.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
                 "§cYou do not have the Bestiary Tab Widget enabled! Ghost Tracker needs this information to work properly.",
@@ -191,7 +190,7 @@ object GhostTracker {
                 replaceSameMessage = true,
             )
         }
-        if (TabWidget.BESTIARY.isActive && !foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
+        if (TabWidgetComponent.BESTIARY.isActive && !foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoGhostBestiaryWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
                 "§cGhost Bestiary not found in Bestiary Tab Widget! Ghost Tracker needs this information to work properly.",

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +17,7 @@ object DungeonTrinityHelper {
     fun onDungeonStart(event: DungeonStartEvent) {
         if (!config.enabled) return
 
-        TabWidget.DUNGEON_PUZZLE.matchMatcherFirstLine {
+        TabWidgetComponent.DUNGEON_PUZZLE.matchMatcherFirstLine {
             // https://hypixel.net/threads/best-way-to-get-trinitys-number-instead-of-acquiring-actual-friends.5489159/
             group("amount")?.toIntOrNull()?.takeIf { it >= 5 } ?: return@matchMatcherFirstLine
 

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
@@ -437,7 +436,7 @@ object GardenPlotApi {
     @HandleEvent
     fun onPlotChange(event: PlotChangeEvent) {
         DelayedRun.runDelayed(3.seconds) {
-            TabWidget.forceUpdateWidget(TabWidget.PESTS)
+            TabWidgetComponent.forceUpdateWidget(TabWidgetComponent.PESTS)
         }
     }
 

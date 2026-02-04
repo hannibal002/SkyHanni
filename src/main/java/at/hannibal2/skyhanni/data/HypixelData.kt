@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.model.TabWidgetComponent
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
@@ -179,7 +178,7 @@ object HypixelData {
         if (SkyBlockUtils.lastWorldSwitch.passedSince() < 1.seconds) return
         if (!TabListData.fullyLoaded) return
 
-        TabWidget.SERVER.matchMatcherFirstLine {
+        TabWidgetComponent.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
             HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
@@ -360,7 +359,7 @@ object HypixelData {
     }
 
     private fun checkProfile() {
-        TabWidget.PROFILE.matchMatcherFirstLine {
+        TabWidgetComponent.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
@@ -570,7 +569,7 @@ object HypixelData {
                 loggerIslandChange.log(newIsland.name)
             }
             if (TabListData.fullyLoaded) {
-                TabWidget.reSendEvents()
+                TabWidgetComponent.reSendEvents()
             }
         }
     }

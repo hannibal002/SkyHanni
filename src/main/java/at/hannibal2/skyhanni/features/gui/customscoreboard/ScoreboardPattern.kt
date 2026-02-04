@@ -984,21 +984,21 @@ object ScoreboardPattern {
     )
 
     // Lines from the tablist
-    private val tablistGroup = group.group("tablist")
+    private val tablistGroup = group.group("tablist-no-color")
 
     /**
-     * REGEX-TEST:  Ends In: §r§e27h
+     * REGEX-TEST:  Ends In: 27h
      */
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
-        "\\s+Ends In: §r§e(?<time>.*)",
+        "\\s+Ends In: (?<time>.*)",
     )
 
     /**
-     * REGEX-TEST:  Starts In: §r§e7h
+     * REGEX-TEST:  Starts In: 7h
      */
     val eventTimeStartsPattern by tablistGroup.pattern(
         "eventtimestarts",
-        "\\s+Starts In: §r§e(?<time>.*)",
+        "\\s+Starts In: (?<time>.*)",
     )
 }
