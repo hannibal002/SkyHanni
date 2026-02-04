@@ -24,7 +24,8 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        WorldRenderEvents.END_MAIN.register { event ->
+        // makes the lines render weird idk
+        /*WorldRenderEvents.END_MAIN.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
             val stack = event.matrices()
             SkyHanniRenderWorldEvent(
@@ -33,7 +34,7 @@ object RenderEvents {
                 immediateVertexConsumers,
                 Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
             ).post()
-        }
+        }*/
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {
