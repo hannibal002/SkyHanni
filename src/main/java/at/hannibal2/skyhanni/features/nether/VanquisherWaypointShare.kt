@@ -42,13 +42,13 @@ object VanquisherWaypointShare {
     private val config get() = SkyHanniMod.feature.crimsonIsle.vanquisherSharing
     private val patternGroup = RepoPattern.group("vanquisher.waypoint")
 
-    @Suppress("MaxLineLength")
+
 
     /**
      * REGEX-TEST: §9Party §8> User Name§f: x: 2.3, y: 4.5, z: -6.7 | Vanquisher
      * REGEX-TEST: §9Party §8> §b[MVP§9+§b] itsseth3§f: x: 86, y: 73, z: -29 | Vanquisher
      */
-
+    @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "coords",
         "(?<party>Party > )?(?<playerName>.+): x: (?<x>-?[\\d\\.]+), y: (?<y>-?[\\d\\.]+), z: (?<z>-?[\\d\\.]+) \\| Vanquisher"
@@ -255,11 +255,7 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
         val entity = event.entity
 
-        if (entity.name.string.equals("Wither", ignoreCase = true) ||
-            entity.name.string.contains("Vanquisher", ignoreCase = true)
-            )
-        {
-
+        if (entity.name.string.equals("Wither", ignoreCase = true) || entity.name.string.contains("Vanquisher", ignoreCase = true)) {
             vanquisherNearby[entity.id] = entity
 
             val player = Minecraft.getInstance().player ?: return
