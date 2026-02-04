@@ -51,7 +51,7 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "coords",
-        "(?<party>Party > )?(?<playerName>.+): x: (?<x>-?[\\d\\.]+), y: (?<y>-?[\\d\\.]+), z: (?<z>-?[\\d\\.]+) \\| Vanquisher"
+        "(?<party>Party > )?(?<playerName>.+): (?<x>[^ ]+): (?<y>[^ ]+): (?<z>[^ ]+): | Vanquisher"
     )
 
     /**
@@ -146,7 +146,7 @@ object VanquisherWaypointShare {
         val y = location.y.toInt()
         val z = location.z.toInt()
 
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
+        HypixelCommands.partyChat("$x: $y: $z: | Vanquisher")
     }
 
     private fun sendVanquisherDeath() {
