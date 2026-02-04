@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -64,7 +64,7 @@ object SkyBlockXPApi {
     fun getLevelColor(level: Int): LorenzColor = levelColors.entries.firstOrNull { level in it.key }?.value ?: LorenzColor.BLACK
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SB_LEVEL)) return
 
         TabWidget.SB_LEVEL.matchMatcherFirstLine {

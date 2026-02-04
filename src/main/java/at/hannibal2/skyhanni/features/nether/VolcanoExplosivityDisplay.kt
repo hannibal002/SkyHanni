@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -21,7 +21,7 @@ object VolcanoExplosivityDisplay {
     private var display: Component = Component.empty()
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!event.isWidget(TabWidget.VOLCANO)) return
 

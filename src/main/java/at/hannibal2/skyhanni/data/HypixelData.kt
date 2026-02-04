@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
@@ -453,7 +452,7 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
             TabWidget.PROFILE -> checkProfile()
@@ -466,8 +465,9 @@ object HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
+        TabWidget.PROFILE.matchMatcherFirstLine {
             profileName = group("profile").lowercase()
+            ChatUtils.chat(profileName)
             ProfileJoinEvent(profileName).post()
         }
     }
@@ -538,7 +538,7 @@ object HypixelData {
         noTrade = ironman || stranded || bingo
     }
 
-    private fun checkIsland(event: WidgetUpdateComponentEvent) {
+    private fun checkIsland(event: WidgetUpdateEvent) {
         val newIsland: IslandType
         val foundIsland: String
         if (event.isClear()) {
@@ -596,7 +596,7 @@ object HypixelData {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    private fun countPlayersOnIsland(event: WidgetUpdateComponentEvent) {
+    private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
         if (event.isClear()) return
         playerAmountOnIsland = playerAmountOnIslandPattern.allMatchesComponent(event.lines).size
     }

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -176,7 +176,7 @@ object PetStorageApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
-    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
         for (component in event.lines) {
             petTabWidgetNamePattern.matchMatcher(component.string) {

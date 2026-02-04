@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.tabLis
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.totalPattern
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
@@ -66,7 +66,7 @@ object WrongDataFix {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateComponentEvent) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
         tabListPercentPattern.firstMatcher(event.lines.map { it.string }) {
             val tier = group("tier").toInt()

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
@@ -186,7 +186,7 @@ object MineshaftPityDisplay {
     private var everFoundPityWidget = false
 
     @HandleEvent
-    fun onPityWidget(event: WidgetUpdateComponentEvent) {
+    fun onPityWidget(event: WidgetUpdateEvent) {
         if (!isDisplayEnabled()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {

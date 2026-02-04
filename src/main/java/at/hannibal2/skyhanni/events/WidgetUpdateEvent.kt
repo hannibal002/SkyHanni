@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import net.minecraft.network.chat.Component
 
 /** The events get send on change of the widget and on island switch */
-class WidgetUpdateComponentEvent(
+@PrimaryFunction("onWidgetUpdate")
+class WidgetUpdateEvent(
     val widget: TabWidget,
     val lines: List<Component>,
 ) : SkyHanniEvent() {

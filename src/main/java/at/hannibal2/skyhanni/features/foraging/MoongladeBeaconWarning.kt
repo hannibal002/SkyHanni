@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -24,7 +24,7 @@ object MoongladeBeaconWarning {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onWidget(event: WidgetUpdateComponentEvent) {
+    fun onWidget(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!event.isWidget(TabWidget.MOONGLADE_BEACON)) return
         if (lastAlert.passedSince() < 9.minutes) return

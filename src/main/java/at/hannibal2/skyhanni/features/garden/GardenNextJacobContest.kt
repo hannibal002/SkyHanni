@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -189,7 +189,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
         simpleDisplay = Renderable.vertical {
             event.lines.forEach { add(Renderable.text(it)) }
@@ -202,7 +202,7 @@ object GardenNextJacobContest {
         event.tryUpdateBoostedCrop()
     }
 
-    private fun WidgetUpdateComponentEvent.tryUpdateBoostedCrop() {
+    private fun WidgetUpdateEvent.tryUpdateBoostedCrop() {
         nextContest ?: return
         val firstLine = lines.firstOrNull() ?: return
         if (timeLeftPattern.matches(firstLine)) return

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -60,7 +60,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "Profile: (?<profile>[\\w\\s]+[^ §]).*",
+        "Profile: (?<profile>[\\w\\s]+)(?:[ ♲Ⓑ]+)?",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -412,12 +412,12 @@ enum class TabWidget(
         if (lines == this.lines) return
         this.lines = lines
         isActive = true
-        WidgetUpdateComponentEvent(this, lines).post()
+        WidgetUpdateEvent(this, lines).post()
     }
 
     private fun postClearEvent() {
         lines = emptyList()
-        WidgetUpdateComponentEvent(this, lines).post()
+        WidgetUpdateEvent(this, lines).post()
     }
 
     /** Update the state of the widget, posts the clear if [isActive] == true && [gotChecked] == false */
@@ -479,7 +479,7 @@ enum class TabWidget(
                 TabWidget.reSendEvents()
                 for (widget in entries) {
                     if (widget.isActive && !widget.sendOnThisIsland) {
-                        WidgetUpdateComponentEvent(widget, widget.lines).post()
+                        WidgetUpdateEvent(widget, widget.lines).post()
                     }
                 }
             }

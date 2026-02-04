@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -84,7 +84,7 @@ object PestSpawnTimer {
         (if (Perk.PEST_ERADICATOR.isActive) config.customCooldownTimeFinnegan else config.customCooldownTime).get().seconds
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
         pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {

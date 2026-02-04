@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -619,7 +619,7 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
+        fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
                 powderPattern.matchMatcher(line) {

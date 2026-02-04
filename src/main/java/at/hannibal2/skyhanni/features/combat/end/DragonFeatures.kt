@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -397,7 +397,7 @@ object DragonFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onTabList(event: WidgetUpdateComponentEvent) {
+    fun onTabList(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
         if (!displayIsEnabled()) return
         widgetActive = true

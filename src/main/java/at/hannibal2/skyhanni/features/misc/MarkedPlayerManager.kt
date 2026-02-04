@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -140,7 +140,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onTablistUpdate(event: WidgetUpdateComponentEvent) {
+    fun onTablistUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
         if (!event.isWidget(TabWidget.PLAYER_LIST)) return
