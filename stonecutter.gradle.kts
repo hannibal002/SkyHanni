@@ -125,6 +125,8 @@ allprojects {
 stonecutter active "1.21.10"
 
 stonecutter handlers {
+    inherit("accesswidener", "classtweaker")
+
     configure("fsh", "vsh") {
         commenter = line("//")
     }
@@ -134,7 +136,6 @@ stonecutter parameters {
     replacements {
         string(current.parsed >= "1.21.11") {
             replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
-            replace("isF3Visible", "isOverlayVisible")
         }
     }
 
