@@ -25,6 +25,8 @@ import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
+//? > 1.21.11
+//import net.minecraft.world.item.ItemStackTemplate
 
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
@@ -161,9 +163,9 @@ var Component.hover: Component?
 var Component.stackHover: ItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
-    }?.let { (it as HoverEvent.ShowItem).item }
+    }?.let { (it as HoverEvent.ShowItem).item /*? if >= 26.1 {*/ /*.create() *//*?}*/ }
     set(value) {
-        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(/*? if < 26.1 {*/ new /*?} else {*/ /*ItemStackTemplate.fromNonEmptyStack(new) *//*?}*/)) } }
     }
 
 var Component.command: String?

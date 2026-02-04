@@ -30,6 +30,16 @@ enum class ProjectTarget(
         modMenuVersion = "17.0.0-beta.2",
         modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
     ),
+    MODERN_26100(
+        "26.1",
+        MinecraftVersion.MC26100,
+        "official",
+        MappingStyle.NONE,
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.143.2+26.1",
+        modMenuVersion = "17.0.0-beta.2",
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
+    ),
     ;
 
     val projectPath get() = ":$projectName"
