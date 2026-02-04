@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.rift.everywhere
+package at.hannibal2.skyhanni.features.rift.area.mountaintop
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
