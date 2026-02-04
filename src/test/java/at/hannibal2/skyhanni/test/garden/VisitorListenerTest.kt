@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
@@ -86,6 +86,6 @@ class VisitorListenerTest {
     }
 
     private fun fakeTabWidget(lines: List<String>): WidgetUpdateComponentEvent {
-        return WidgetUpdateComponentEvent(TabWidgetComponent.VISITORS, lines)
+        return WidgetUpdateComponentEvent(TabWidget.VISITORS, lines)
     }
 }

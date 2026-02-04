@@ -29,7 +29,7 @@ private val repoGroup by RepoPattern.exclusiveGroup("tab.widgetcomponent.enum")
  * The general info widget is broken up into multiple smaller ones.
  * The class facilitates access to the lines associated with each widget and triggers events when a widget undergoes changes or becomes invisible.
  */
-enum class TabWidgetComponent(
+enum class TabWidget(
     pattern0: String,
 ) {
     PLAYER_LIST(
@@ -433,7 +433,7 @@ enum class TabWidgetComponent(
     companion object {
 
         /** The index for the start of each Widget (inclusive) */
-        private val separatorIndexes = mutableListOf<Pair<Int, TabWidgetComponent?>>()
+        private val separatorIndexes = mutableListOf<Pair<Int, TabWidget?>>()
 
         /** Patterns that where loaded from a future version*/
         private var extraPatterns: List<Pattern> = emptyList()
@@ -476,7 +476,7 @@ enum class TabWidgetComponent(
             }
 
             DelayedRun.runDelayed(2.seconds) {
-                TabWidgetComponent.reSendEvents()
+                TabWidget.reSendEvents()
                 for (widget in entries) {
                     if (widget.isActive && !widget.sendOnThisIsland) {
                         WidgetUpdateComponentEvent(widget, widget.lines).post()
@@ -553,7 +553,7 @@ enum class TabWidgetComponent(
             }
         }
 
-        fun forceUpdateWidget(widget: TabWidgetComponent) {
+        fun forceUpdateWidget(widget: TabWidget) {
             if (widget.isActive) {
                 widget.postClearEvent()
             }

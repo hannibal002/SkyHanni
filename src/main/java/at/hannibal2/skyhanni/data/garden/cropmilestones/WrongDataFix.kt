@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.storag
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.tabListMaxPattern
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.tabListPercentPattern
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.totalPattern
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -67,7 +67,7 @@ object WrongDataFix {
 
     @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.CROP_MILESTONE)) return
+        if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
         tabListPercentPattern.firstMatcher(event.lines.map { it.string }) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()

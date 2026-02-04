@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -65,9 +65,9 @@ object SkyBlockXPApi {
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.SB_LEVEL)) return
+        if (!event.isWidget(TabWidget.SB_LEVEL)) return
 
-        TabWidgetComponent.SB_LEVEL.matchMatcherFirstLine {
+        TabWidget.SB_LEVEL.matchMatcherFirstLine {
             val level = group("level")?.toIntOrNull()
             val xp = group("xp")?.toIntOrNull()
 

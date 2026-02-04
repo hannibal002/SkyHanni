@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTi
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -85,7 +85,7 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.PESTS)) return
+        if (!event.isWidget(TabWidget.PESTS)) return
 
         pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
@@ -215,7 +215,7 @@ object PestSpawnTimer {
 
         lineMap[PestTimerTextEntry.PEST_TIMER] = Renderable.text(lastPestSpawned)
 
-        val pestCooldown = if (!TabWidgetComponent.PESTS.isActive) {
+        val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
             val cooldownValue = when {

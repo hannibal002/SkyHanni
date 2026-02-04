@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
@@ -620,7 +620,7 @@ enum class HotmData(
 
         @HandleEvent
         fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
-            if (!event.isWidget(TabWidgetComponent.POWDER)) return
+            if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
                 powderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return

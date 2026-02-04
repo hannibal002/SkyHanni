@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,14 +23,14 @@ object VolcanoExplosivityDisplay {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
         if (!isEnabled()) return
-        if (!event.isWidget(TabWidgetComponent.VOLCANO)) return
+        if (!event.isWidget(TabWidget.VOLCANO)) return
 
         if (event.isClear()) {
             display = Component.empty()
             return
         }
 
-        TabWidgetComponent.VOLCANO.pattern.matchGroup(event.lines.first(), "status")?.let {
+        TabWidget.VOLCANO.pattern.matchGroup(event.lines.first(), "status")?.let {
             display = componentBuilder {
                 append("§bVolcano Explosivity§7: ")
                 append(it)

@@ -256,8 +256,8 @@ enum class SkyblockStat(
 
         @HandleEvent
         fun onTabList(event: WidgetUpdateComponentEvent) {
-            if (!event.isWidget(TabWidgetComponent.STATS, TabWidgetComponent.DUNGEON_SKILLS_AND_STATS)) return
-            val type = if (event.isWidget(TabWidgetComponent.DUNGEON_SKILLS_AND_STATS)) StatSourceType.TABLIST_DUNGEON else StatSourceType.TABLIST
+            if (!event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS)) return
+            val type = if (event.isWidget(TabWidget.DUNGEON_SKILLS_AND_STATS)) StatSourceType.TABLIST_DUNGEON else StatSourceType.TABLIST
             assignEntry(event.lines.map { it.string }, type) { it.tablistPattern }
         }
 

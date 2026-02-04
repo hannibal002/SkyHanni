@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
@@ -176,7 +176,7 @@ object VisitorApi {
 
         val visitorsInTab = mutableListOf<String>()
         loop@ for (line in tabList) {
-            TabWidgetComponent.VISITORS.pattern.matchMatcher(line) {
+            TabWidget.VISITORS.pattern.matchMatcher(line) {
                 found = true
                 val countInfo = group("count")
                 if (countInfo.isInt()) {

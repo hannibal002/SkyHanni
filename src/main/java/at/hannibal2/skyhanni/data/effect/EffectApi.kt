@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.effect
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
@@ -220,7 +220,7 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun readEffects(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.ACTIVE_EFFECTS)) return
+        if (!event.isWidget(TabWidget.ACTIVE_EFFECTS)) return
         godPotTabPattern.firstMatcher(event.lines.map { it.string }) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
         }
@@ -241,7 +241,7 @@ object EffectApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun readPestRepellent(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.PESTS)) return
+        if (!event.isWidget(TabWidget.PESTS)) return
 
         repellentPattern.firstMatcher(event.lines.map { it.string }) {
             // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
@@ -259,7 +259,7 @@ object EffectApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun readSalts(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.SALTS)) return
+        if (!event.isWidget(TabWidget.SALTS)) return
         saltTabPattern.matchAll(event.lines.map { it.string }) {
             val effect = group("effect")
             val duration = TimeUtils.getDuration(group("time"))

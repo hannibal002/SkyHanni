@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
@@ -137,14 +137,14 @@ object FarmingFortuneDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
         val widget = event.widget
-        if (event.isWidget(TabWidgetComponent.STATS)) {
+        if (event.isWidget(TabWidget.STATS)) {
             checkStats(widget)
-        } else if (event.isWidget(TabWidgetComponent.PESTS)) {
+        } else if (event.isWidget(TabWidget.PESTS)) {
             checkPests(widget)
         }
     }
 
-    private fun checkPests(widget: TabWidgetComponent) {
+    private fun checkPests(widget: TabWidget) {
         pestFortuneBuffPattern.firstMatcher(widget.lines.map { it.string }) {
             val inactive = groupOrNull("inactive")
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestBonusExpireTime) }
@@ -166,7 +166,7 @@ object FarmingFortuneDisplay {
         }
     }
 
-    private fun checkStats(widget: TabWidgetComponent) {
+    private fun checkStats(widget: TabWidget) {
         universalTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val fortune = group("fortune").toDouble()
             foundTabUniversalFortune = true

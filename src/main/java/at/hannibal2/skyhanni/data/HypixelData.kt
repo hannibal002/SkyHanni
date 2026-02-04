@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -178,7 +178,7 @@ object HypixelData {
         if (SkyBlockUtils.lastWorldSwitch.passedSince() < 1.seconds) return
         if (!TabListData.fullyLoaded) return
 
-        TabWidgetComponent.SERVER.matchMatcherFirstLine {
+        TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
             HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
@@ -240,12 +240,12 @@ object HypixelData {
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
         val playerWidgetList = mutableListOf(
-            TabWidgetComponent.PLAYER_LIST,
-            TabWidgetComponent.GUESTS,
+            TabWidget.PLAYER_LIST,
+            TabWidget.GUESTS,
         )
 
         if (DungeonApi.inDungeon()) {
-            playerWidgetList.add(TabWidgetComponent.DUNGEON_PARTY)
+            playerWidgetList.add(TabWidget.DUNGEON_PARTY)
         }
 
         out@ for (widget in playerWidgetList) {
@@ -359,7 +359,7 @@ object HypixelData {
     }
 
     private fun checkProfile() {
-        TabWidgetComponent.PROFILE.matchMatcherFirstLine {
+        TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
@@ -455,10 +455,10 @@ object HypixelData {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
         when (event.widget) {
-            TabWidgetComponent.AREA -> checkIsland(event)
-            TabWidgetComponent.PROFILE -> checkProfile()
-            TabWidgetComponent.COOP -> countPlayersOnIsland(event)
-            TabWidgetComponent.ISLAND -> countPlayersOnIsland(event)
+            TabWidget.AREA -> checkIsland(event)
+            TabWidget.PROFILE -> checkProfile()
+            TabWidget.COOP -> countPlayersOnIsland(event)
+            TabWidget.ISLAND -> countPlayersOnIsland(event)
             else -> Unit
         }
     }
@@ -551,7 +551,7 @@ object HypixelData {
             TabListData.fullyLoaded = true
             // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
             val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-            foundIsland = TabWidgetComponent.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
             newIsland = getIslandType(foundIsland, guesting)
         }
 
@@ -569,7 +569,7 @@ object HypixelData {
                 loggerIslandChange.log(newIsland.name)
             }
             if (TabListData.fullyLoaded) {
-                TabWidgetComponent.reSendEvents()
+                TabWidget.reSendEvents()
             }
         }
     }

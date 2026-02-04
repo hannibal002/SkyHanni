@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -39,7 +39,7 @@ object BonusPestChanceDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.STATS)) return
+        if (!event.isWidget(TabWidget.STATS)) return
         val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
         event.widget.lines.forEach { line ->
             bonusPestChancePattern.matchMatcher(line) {

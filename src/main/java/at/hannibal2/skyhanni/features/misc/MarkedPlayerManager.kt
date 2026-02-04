@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
@@ -143,7 +143,7 @@ object MarkedPlayerManager {
     fun onTablistUpdate(event: WidgetUpdateComponentEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
-        if (!event.isWidget(TabWidgetComponent.PLAYER_LIST)) return
+        if (!event.isWidget(TabWidget.PLAYER_LIST)) return
 
         currentLobbyPlayers.clear()
 

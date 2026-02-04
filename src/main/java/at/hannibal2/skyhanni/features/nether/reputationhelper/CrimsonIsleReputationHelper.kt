@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -88,9 +88,9 @@ object CrimsonIsleReputationHelper {
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.REPUTATION)) return
+        if (!event.isWidget(TabWidget.REPUTATION)) return
 
-        TabWidgetComponent.REPUTATION.matchMatcherFirstLine {
+        TabWidget.REPUTATION.matchMatcherFirstLine {
             factionType = FactionType.fromName(group("faction"))
         }
     }

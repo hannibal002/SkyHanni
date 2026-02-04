@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -394,7 +394,7 @@ object GardenPlotApi {
 
     @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateComponentEvent) {
-        if (!event.isWidget(TabWidgetComponent.PESTS)) return
+        if (!event.isWidget(TabWidget.PESTS)) return
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
@@ -436,7 +436,7 @@ object GardenPlotApi {
     @HandleEvent
     fun onPlotChange(event: PlotChangeEvent) {
         DelayedRun.runDelayed(3.seconds) {
-            TabWidgetComponent.forceUpdateWidget(TabWidgetComponent.PESTS)
+            TabWidget.forceUpdateWidget(TabWidget.PESTS)
         }
     }
 

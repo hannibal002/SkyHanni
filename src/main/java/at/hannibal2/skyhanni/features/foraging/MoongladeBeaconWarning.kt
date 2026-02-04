@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +26,7 @@ object MoongladeBeaconWarning {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onWidget(event: WidgetUpdateComponentEvent) {
         if (!isEnabled()) return
-        if (!event.isWidget(TabWidgetComponent.MOONGLADE_BEACON)) return
+        if (!event.isWidget(TabWidget.MOONGLADE_BEACON)) return
         if (lastAlert.passedSince() < 9.minutes) return
         beaconReadyPattern.firstMatcher(event.lines.map { it.string }) {
             TitleManager.sendTitle("§aBeacon Ready")

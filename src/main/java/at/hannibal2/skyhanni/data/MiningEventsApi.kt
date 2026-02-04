@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.MiningEventEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -89,15 +89,15 @@ object MiningEventsApi {
     @HandleEvent(onlyOnIslands = [IslandType.CRYSTAL_HOLLOWS, IslandType.DWARVEN_MINES])
     fun onSecondPassed() {
 
-        if (TabWidgetComponent.EVENT.isActive) {
+        if (TabWidget.EVENT.isActive) {
             for (eventType in MiningEventType.entries) {
-                for ((index, line) in TabWidgetComponent.EVENT.lines.withIndex()) {
+                for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
                     MiningEventType.widgetEventNotAnnouncedPattern.matchMatcher(line) {
                         clearActiveMiningEvent()
                         return
                     }
                     eventType.widgetEventPattern.matchMatcher(line) {
-                        val durationLine = TabWidgetComponent.EVENT.lines.getOrNull(index + 1) ?: return
+                        val durationLine = TabWidget.EVENT.lines.getOrNull(index + 1) ?: return
 
                         MiningEventType.widgetDurationPattern.matchMatcher(durationLine) {
                             val durationString = group("duration")

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotmReward
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
@@ -188,7 +188,7 @@ object MineshaftPityDisplay {
     @HandleEvent
     fun onPityWidget(event: WidgetUpdateComponentEvent) {
         if (!isDisplayEnabled()) return
-        if (!event.isWidget(TabWidgetComponent.PITY)) return
+        if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {
                 everFoundPityWidget = true

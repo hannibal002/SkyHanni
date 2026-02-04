@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.WhenToShow
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -115,7 +115,7 @@ object PestFinder {
     }
 
     private fun remindInChat() {
-        if (!TabWidgetComponent.PESTS.isActive) {
+        if (!TabWidget.PESTS.isActive) {
             ChatUtils.userError(
                 "Pest detection requires the tab list widget to be enabled. Enable the 'Pests Widget' via /widget!",
                 replaceSameMessage = true,
