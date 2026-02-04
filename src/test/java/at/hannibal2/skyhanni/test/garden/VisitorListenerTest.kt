@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.data.model.TabWidgetComponent
+import at.hannibal2.skyhanni.events.WidgetUpdateComponentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
@@ -85,7 +85,7 @@ class VisitorListenerTest {
         verify(exactly = 0) { VisitorApi.removeVisitor("§fJacob") }
     }
 
-    private fun fakeTabWidget(lines: List<String>): WidgetUpdateEvent {
-        return WidgetUpdateEvent(TabWidget.VISITORS, lines)
+    private fun fakeTabWidget(lines: List<String>): WidgetUpdateComponentEvent {
+        return WidgetUpdateComponentEvent(TabWidgetComponent.VISITORS, lines)
     }
 }
