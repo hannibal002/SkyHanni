@@ -305,7 +305,10 @@ object ChatUtils {
                 else withColor(color)
             }
             this.url = url
-            this.hover = "$prefixColor$hover".asComponent()
+            this.hover = hover.asComponent {
+                if (color != null) withColor(color)
+                else withColor(ChatFormatting.YELLOW)
+            }
         }
 
         if (replaceSameMessage) text.send(message.getUniqueMessageIdForString())
