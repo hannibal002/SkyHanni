@@ -504,10 +504,6 @@ object StringUtils {
         return message
     }
 
-    fun String.applyFormattingFrom(original: ComponentSpan): Component {
-        return asComponent { style = original.sampleStyleAtStart() }
-    }
-
     fun String.applyFormattingFrom(original: Component): Component {
         return asComponent { style = original.style }
     }

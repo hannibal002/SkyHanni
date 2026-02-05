@@ -202,7 +202,8 @@ object TextHelper {
         return chromaStyle
     }
 
-    fun matcher(component: Component, match: String): Component? {
+    fun matcher(component: Component, match: String?): Component? {
+        match ?: return null
         var index = 0
         var newComponent: Component = Component.empty()
         var currentString = ""
@@ -264,5 +265,15 @@ object TextHelper {
         if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
         if (newComponents.isEmpty()) return null
         return newComponents
+    }
+
+    fun sampleStyleAtStart(component: Component?): Style? {
+        var firstStyle: Style? = null
+        component?.visit({ style: Style?, string: String? ->
+            if (style?.isEmpty == true || firstStyle != null) return@visit Optional.empty<Component>()
+            firstStyle = style
+            Optional.empty<Component>()
+        }, Style.EMPTY) ?: return null
+        return firstStyle
     }
 }

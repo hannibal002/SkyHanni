@@ -1,32 +1,32 @@
 package at.hannibal2.skyhanni.events.chat
 
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.utils.ComponentSpan
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.network.chat.Component
 
 object AbstractChatEvent {
 
     open class Allow(
-        val messageComponent: ComponentSpan,
+        val messageComponent: Component,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : SystemMessageEvent.Allow(messageComponent.getText(), chatComponent, blockedReason) {
+    ) : SystemMessageEvent.Allow(messageComponent.string, chatComponent, blockedReason) {
         @Deprecated(
             "Use cleanMessage unless you really need color codes",
             replaceWith = ReplaceWith("this.cleanMessage")
         )
-        override val message = messageComponent.getText().removePrefix("§r")
+        override val message = messageComponent.formattedTextCompat().removePrefix("§r")
     }
 
     open class Modify(
-        val messageComponent: ComponentSpan,
+        val messageComponent: Component,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : SystemMessageEvent.Modify(messageComponent.getText(), chatComponent, blockedReason) {
+    ) : SystemMessageEvent.Modify(messageComponent.string, chatComponent, blockedReason) {
         @Deprecated(
             "Use cleanMessage unless you really need color codes",
             replaceWith = ReplaceWith("this.cleanMessage")
         )
-        override val message = messageComponent.getText().removePrefix("§r")
+        override val message = messageComponent.formattedTextCompat().removePrefix("§r")
     }
 }

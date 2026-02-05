@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.events.chat
 
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.network.chat.Component
 
@@ -13,11 +12,11 @@ object SkyHanniChatEvent {
         chatComponent: Component,
         blockedReason: String? = null,
         var chatLineId: Int = 0,
-    ) : AbstractChatEvent.Allow(message.asComponent().intoSpan(), chatComponent, blockedReason)
+    ) : AbstractChatEvent.Allow(message.asComponent(), chatComponent, blockedReason)
 
     class Modify(
         message: String,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : AbstractChatEvent.Modify(message.asComponent().intoSpan(), chatComponent, blockedReason)
+    ) : AbstractChatEvent.Modify(message.asComponent(), chatComponent, blockedReason)
 }

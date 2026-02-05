@@ -31,7 +31,7 @@ object BingoBoopParty {
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (!isEnabled()) return
-        val message = event.messageComponent.textComponent.formattedTextCompat().removeResets()
+        val message = event.messageComponent.formattedTextCompat().removeResets()
         if (!boopPattern.matches(message)) return
 
         val username = event.author.cleanPlayerName(displayName = true)
