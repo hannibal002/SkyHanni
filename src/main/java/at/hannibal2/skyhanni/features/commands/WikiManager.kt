@@ -31,7 +31,8 @@ object WikiManager {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
-        // Apparently this got changed again at some point but never got a migration
+        // Apparently the above got changed again at some point but never got a migration
+        event.move(123, "commands.betterWiki.useFandom", "commands.betterWiki.useUnofficial")
     }
 
     @HandleEvent(onlyOnSkyblock = true)

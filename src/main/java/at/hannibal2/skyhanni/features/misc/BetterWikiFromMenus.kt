@@ -18,7 +18,7 @@ object BetterWikiFromMenus {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "fandomWiki", "commands.fandomWiki")
-        // Apparently this got changed again at some point but never got a migration
+        // Apparently the above got changed again at some point but never got a migration
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
