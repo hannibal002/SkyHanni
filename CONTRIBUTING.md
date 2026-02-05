@@ -380,7 +380,7 @@ Access wideners are a way to access private methods and fields in Minecraft clas
 field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
 To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and
 select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom
-of `src/main/resources/skyhanni.accesswidener`.
+of `src/main/resources/skyhanni.classtweaker`.
 Then you need to reload gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.
