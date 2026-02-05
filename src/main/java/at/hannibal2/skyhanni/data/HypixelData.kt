@@ -359,7 +359,7 @@ object HypixelData {
 
     private fun checkProfile() {
         TabWidget.PROFILE.matchMatcherFirstLine {
-            var newProfile = group("profile").lowercase()
+            var newProfile = group("profile").lowercase().trim()
             // Hypixel shows the profile name reversed while in the Rift
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
             if (profileName == newProfile) return
@@ -466,7 +466,7 @@ object HypixelData {
         if (profileName.isNotEmpty()) return
 
         TabWidget.PROFILE.matchMatcherFirstLine {
-            profileName = group("profile").lowercase()
+            profileName = group("profile").lowercase().trim()
             ProfileJoinEvent(profileName).post()
         }
     }
