@@ -30,7 +30,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 ### Setting up IntelliJ
 
-Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
+Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft and so on should be automatically
 downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
 
 <details>
@@ -40,7 +40,7 @@ downloaded. If not, you might need to link the Gradle project in the Gradle tab 
 
 </details>
 
-If importing fails, make sure the Gradle JVM (found in the settings wheel in the Gradle tab, or by searching <kbd>Ctrl + Shift + A</kbd>
+Make sure the Gradle JVM (found in the settings wheel in the Gradle tab, or by searching <kbd>Ctrl + Shift + A</kbd>
 for "Gradle JVM") is set to a Java 21 JDK.
 
 <details>
@@ -101,9 +101,6 @@ Select an appropriate Java 21 JDK (preferably [DCEVM](#hot-swap), but any Java 2
 
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
-SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, so if you want to look at another guide, check
-out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
-
 ## Pull Requests
 
 General infos about Pull Request can be found on
@@ -119,8 +116,6 @@ You can do this by following the instructions within the IntelliJ window in the 
 - Click the beta dropdown at the top of IntelliJ.
 - Click **New branch**.
 - Give the branch a name related to the changes you plan to make.
-
-_A more in-depth explanation of how to use IntelliJ and branches will follow someday._
 
 ### Guidelines for Pull Requests
 
@@ -206,13 +201,12 @@ Make sure such pull requests have a good explanation in the **What** section.
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
-    - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
-    - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error
-      in `SkyHanniMod.kt`.
+    - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
+      the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -220,16 +214,28 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
-    - To expand the event systems you can create a new event that is called from a Mixin
-    - Or you can subscribe to a Fabric event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
-    - If you make a new event there are a few different types of events that you can make, make sure your event extends one of these.
-        - SkyHanniEvent: This is just a normal event.
-        - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
-        - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
-        - RenderingSkyHanniEvent: This is an event that you are allowed to do GUI rendering in.
+    - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
+      When creating a new event, place it in the appropriate sub package.
+    - To expand the event system, you can create a new event that is called from a Mixin,
+      or you can subscribe to a Fabric event and then post a SkyHanni event from that.
+      See the `api/minecraftevents` package for examples.
+    - If you make a new event, make sure it extends one of these base types:
+        - SkyHanniEvent: The base class for all events. Use this directly for simple events
+          that don't need cancellation or rendering.
+        - CancellableSkyHanniEvent: An event that listeners can cancel via `cancel()`,
+          preventing further processing.
+        - `GenericSkyHanniEvent<T>`: An event with a type parameter, allowing listeners to
+          subscribe only for a specific type. For example, an event with type `Zombie`
+          would only be received by listeners registered for that type. Generic events
+          are also cancellable.
+        - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
+    - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
+      interfaces directly if needed.
+- Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
+  Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
+  the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
+  See the `api/minecraftevents` package for examples.
 - Please use existing utils methods.
-- We try to avoid calling the NEU code too often.
-    - (We plan to remove NEU as a dependency in the future.)
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
@@ -238,18 +244,22 @@ Make sure such pull requests have a good explanation in the **What** section.
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
-- Do not use `event.post()` directly for Fabric events, use the SkyHanni event system instead.
-- Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
-  -
+- Do not use `toRegex()` or `toPattern()`. Use `RepoPattern` instead.
+  RepoPattern allows regex patterns to be updated remotely via the repo without requiring a mod update.
+  Each pattern has a local fallback defined in code, but can be overridden by the repo at runtime.
   See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
-    - The pattern variables are named in the scheme `variableNamePattern`
+    - Define patterns using `RepoPattern.pattern(key, fallback)` with Kotlin delegation (`by`).
+    - When a file contains more than one pattern, use `RepoPattern.group(prefix)` to group them under a shared key prefix.
+    - Pattern variables should be named in the scheme `variableNamePattern`.
+    - All repo patterns must be accompanied by a regex test. Add lines starting with `REGEX-TEST: `
+      in a KDoc comment above the pattern variable to provide test examples.
+    - Look at existing patterns in the codebase for reference.
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and
   event.transform() when updating a
-  value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
+  value. [For Example](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
@@ -306,11 +316,10 @@ written in [Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.htm
 
 This start script will automatically download all required libraries.
 
-### NotEnoughUpdates
+### NotEnoughUpdates Repo
 
-Although NEU is not a modern version mod, we use NEU API's to get auction house price data for items and read 
-the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
-and recipes.
+SkyHanni reads the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
+and recipes. NEU is not a dependency of SkyHanni.
 
 ### Config
 
@@ -329,7 +338,7 @@ All data sent is anonymized and opt-in.
 ### Mixin
 
 A system to inject code into the original Minecraft code.
-This library is not part of SkyHanni or Fabric, but we bundle it.
+Mixin is bundled with the Fabric Loader and does not need to be included as a runtime dependency.
 
 It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
 
