@@ -53,6 +53,10 @@ object FarmingFortuneDisplay {
     private val config get() = GardenApi.config.farmingFortunes
 
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
+
+    /**
+     * REGEX-TEST:  Farming Fortune: ☘1234
+     */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
         " Farming Fortune: ☘(?<fortune>\\d+)",

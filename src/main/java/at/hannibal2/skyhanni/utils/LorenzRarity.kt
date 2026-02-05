@@ -64,7 +64,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun getByComponent(component: Component, stringMatch: String): LorenzRarity? {
             var rarity: LorenzRarity? = null
-            TextHelper.matcher(component, stringMatch)?.visit( { style: Style?, string: String? ->
+            TextHelper.matcher(component, stringMatch)?.visit({ style: Style?, string: String? ->
                 if (string == stringMatch) {
                     rarity = when {
                         (style?.color?.name == "dark_red") -> ULTIMATE
