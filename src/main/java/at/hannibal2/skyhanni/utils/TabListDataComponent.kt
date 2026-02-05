@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
@@ -139,11 +138,11 @@ object TabListDataComponent {
             }
         }
 
-        val tabListOverlay = Minecraft.getInstance().gui.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni
+        val tabListOverlay = Minecraft.getInstance().gui.tabList
+        header = tabListOverlay.header
 
-        val tabFooter = tabListOverlay.footer_skyhanni
-        if (tabFooter != footer && tabFooter.string != "") {
+        val tabFooter = tabListOverlay.footer
+        if (tabFooter != footer && tabFooter != null && tabFooter.string != "") {
             TablistFooterUpdateComponentEvent(tabFooter).post()
         }
         footer = tabFooter
