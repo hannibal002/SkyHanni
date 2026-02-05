@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -57,12 +59,12 @@ object ComposterDisplay {
 
         val pattern = rawPattern.toPattern()
 
-        fun label(label: String) = Renderable.horizontal {
+        fun label(label: Component) = Renderable.horizontal {
             addItemStack(displayItem)
-            addString(label)
+            add(Renderable.text(label))
         }
 
-        fun labeledWithData(map: Map<DataType, String>): Renderable? {
+        fun labeledWithData(map: Map<DataType, Component>): Renderable? {
             return map[this]?.let { label(it) }
         }
     }
@@ -71,14 +73,14 @@ object ComposterDisplay {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.COMPOSTER)) return
 
-        val newData = mutableMapOf<DataType, String>()
+        val newData = mutableMapOf<DataType, Component>()
 
         for (line in event.lines) {
             if (line.string != "Composter:") {
                 if (line.string == "") break
-                for (type in DataType.entries) {
+                loop@ for (type in DataType.entries) {
                     type.pattern.matchMatcher(line) {
-                        newData[type] = group(1)
+                        newData[type] = TextHelper.matcher(line, group(1)) ?: continue@loop
                     }
                 }
             }
