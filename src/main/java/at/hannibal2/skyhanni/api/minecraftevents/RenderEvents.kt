@@ -77,6 +77,26 @@ object RenderEvents {
     fun postExperienceNumberLayerEventPost(context: GuiGraphics) {
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
+
+    @JvmStatic
+    fun postHeldItemTooltipLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
+    }
+
+    @JvmStatic
+    fun postHeldItemTooltipLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
+    }
+
+    @JvmStatic
+    fun postActionBarLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.ACTION_BAR).post()
+    }
+
+    @JvmStatic
+    fun postActionBarLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.ACTION_BAR).post()
+    }
 }
 
 enum class RenderLayer {
@@ -97,6 +117,8 @@ enum class RenderLayer {
     CHAT,
     PLAYER_LIST,
     DEBUG,
+    HELD_ITEM_TOOLTIP,
+    ACTION_BAR,
 
     // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,
