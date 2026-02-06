@@ -257,6 +257,11 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
         renderWaypoints.clear()
         ChatUtils.chat("Loaded ordered waypoints!")
+
+        if (!config.enabled) {
+            config.enabled = true
+            ChatUtils.chat("§eOrdered Waypoints was disabled, auto-enabled it.")
+        }
     }
 
     private fun unload() {
