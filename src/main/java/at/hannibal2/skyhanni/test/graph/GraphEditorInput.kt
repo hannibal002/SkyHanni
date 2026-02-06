@@ -199,6 +199,7 @@ object GraphEditorInput {
     private fun handleTextMode(): Boolean {
         if (!state.inTextMode) return false
         textBox.handle()
+        state.activeNode?.name = textBox.finalText().ifEmpty { null }
         return true
     }
 
