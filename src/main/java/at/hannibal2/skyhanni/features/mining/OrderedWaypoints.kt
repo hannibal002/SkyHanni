@@ -240,23 +240,24 @@ object OrderedWaypoints {
     }
 
     private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
-        val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-        else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
+        val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+        else storage?.routes?.get(name)?.let { it to "saved" } ?: return@launchIOCoroutine ChatUtils.userError(
             "Route $name doesn't exist.\n" +
                 "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
                 "§cIf you would like to import a route from your clipboard, leave the route name blank.",
         )
 
-        if (loadedRoute == null) return@launchIOCoroutine ChatUtils.userError(
+        if (result == null) return@launchIOCoroutine ChatUtils.userError(
             "There was an error parsing waypoints. " +
                 "Please make sure they are properly formatted and in a supported format.\n" +
                 "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
         )
 
+        val (loadedRoute, formatName) = result
         orderedWaypointsList = loadedRoute.deepCopy()
         currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
         renderWaypoints.clear()
-        ChatUtils.chat("Loaded ordered waypoints!")
+        ChatUtils.chat("Loaded ${orderedWaypointsList.size} ordered waypoints! (§e$formatName§r)")
 
         if (!config.enabled) {
             config.enabled = true
@@ -446,11 +447,9 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyHanniWaypoint>? {
-        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
-            it.load(data)
-        }?.let {
-            Waypoints(it.toMutableList())
+    private fun loadWaypoints(data: String): Pair<Waypoints<SkyHanniWaypoint>, String>? {
+        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull { format ->
+            format.load(data)?.let { it to format.name }
         }
     }
 
