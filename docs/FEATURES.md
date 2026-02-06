@@ -1153,6 +1153,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added compact messages for Agatha/Starlyn Sister contests. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4258)
 + Added option to mute final Tree Breaking Sound. - Siv (https://github.com/hannibal002/SkyHanni/pull/4459)
 + Added some whisper cost and spent info to HOTF perk tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4754)
++ Added Mute Fusion Machine. - Luna (https://github.com/hannibal002/SkyHanni/pull/5196)
 
 </details>
 <details open><summary>

@@ -50,6 +50,10 @@
 
 + Cocoon Timer & Mob Name Overlay. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5113)
 
+#### Foraging
+
++ Added Mute Fusion Machine. - Luna (https://github.com/hannibal002/SkyHanni/pull/5196)
+
 #### Misc
 
 + Added Particle Colour Fixer. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4993)
@@ -100,6 +104,8 @@
 + Added gamemode selector to the Elite Leaderboard Features. - nopo (https://github.com/hannibal002/SkyHanni/pull/5169)
 + Pest Profit Tracker now reads the drop amount for rare pest drops from the chat message if present. - Luna (https://github.com/hannibal002/SkyHanni/pull/5164)
 + Improved error handling for elite leaderboards. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5181)
++ The Garden Plot Borders feature is now activated with a custom keybind instead of F3+G. - Luna (https://github.com/hannibal002/SkyHanni/pull/5173)
+  + If you previously had this option enabled, you will have to set a keybind in the config to continue using it.
 
 #### Inventory
 
@@ -114,11 +120,13 @@
 #### Rift
 
 + Ubik's Cube timer will now automatically update if you try to use it while on cooldown. - Luna (https://github.com/hannibal002/SkyHanni/pull/5045)
++ Added the ability to quickly close Ubik's Cube (Split or Steal) games by clicking anywhere after the last round. - Luna (https://github.com/hannibal002/SkyHanni/pull/5209)
 
 #### Events
 
 + Increased speed and accuracy of griffin burrow detection. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5051)
 + Added options for text scale, beacon distance, and ignoring any warp to diana config. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5084)
++ Added Hoppity Visitor rabbits as a display line for Event Summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5201)
 
 #### Dungeons
 
@@ -151,6 +159,7 @@
 + Improve performance on item replace features. - Empa (https://github.com/hannibal002/SkyHanni/pull/5171)
 + Bumped the minimum Fabric API version for 1.21.10. - nopo + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5178)
 + Improved Item Stat Icon compatibility with other mods. - nopo (https://github.com/hannibal002/SkyHanni/pull/5176)
++ Dark Auction Item Display now also adds the item name when no one bid on the item. - Luna (https://github.com/hannibal002/SkyHanni/pull/5199)
 
 ### Fixes
 
@@ -175,6 +184,7 @@
 + Fixed enchant regex for new Hypixel formatting. - Vixid (https://github.com/hannibal002/SkyHanni/pull/5055)
 + Fixed Abiphone Snake Keybindings not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5152)
 + Fixed reforging not stopping when the highlighted reforge appears. - krazun123 (https://github.com/hannibal002/SkyHanni/pull/5150)
++ Fixed Beacon Power Display sometimes displaying colour incorrectly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5200)
 
 #### Farming
 
@@ -205,6 +215,7 @@
 + Fixed Weight Display not updating until you relogged. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4665)
 + Fixed /shfarmingprofile not existing. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5163)
 + Fixed Highlight Harvestable Status not highlighting multi drop crops yellow. - nopo (https://github.com/hannibal002/SkyHanni/pull/5168)
++ Fixed error when quickly switching between crops while farming. - Luna (https://github.com/hannibal002/SkyHanni/pull/5202)
 
 #### Mining
 
@@ -212,6 +223,7 @@
 + Fixed Powder Chest Timer sometimes not detecting chests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5013)
 + Fixed SkyMart price per copper feature not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5041)
 + Fixed Cold Overlay not rendering. - nopo (https://github.com/hannibal002/SkyHanni/pull/5177)
++ Fixed Tunnel Maps not working sometimes. - nopo (https://github.com/hannibal002/SkyHanni/pull/5194)
 
 #### Fishing
 
@@ -231,6 +243,8 @@
 + Fixed burrow guesses being removed to early or not being removed in some cases. - SidOfThe7CS (https://github.com/hannibal002/SkyHanni/pull/5084)
 + Fixed diana mobs not tracking how many since. - nopo (https://github.com/hannibal002/SkyHanni/pull/5138)
 + Fixed warping to early causing inaccurate burrow waypoints. - SidOfThe7CS (https://github.com/hannibal002/SkyHanni/pull/5084)
++ Fixed Diana since tracker showing 3 times in chat message. - nopo (https://github.com/hannibal002/SkyHanni/pull/5204)
++ Fixed Hoppity Compact Chat + Event Summary not working with Hoppity's random rabbit reward on Garden. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5201)
 
 #### Chat
 
@@ -255,6 +269,8 @@
 + Fixed some displays not working on 1.21.10. - nopo (https://github.com/hannibal002/SkyHanni/pull/5092)
 + Fixed crash in the Enchant Parsing config. - nopo (https://github.com/hannibal002/SkyHanni/pull/5154)
 + Fixed Custom Wardrobe glitch with Skyblocker's class-based player glow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5143)
++ Fixed Hide outside Inventory tracker setting not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5191)
++ Fixed Hide with Item Value tracker setting not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5191)
 
 #### Skills
 
@@ -294,6 +310,11 @@
 + Fixed the About page in the config having a forehead on 1.21.5. - nopo (https://github.com/hannibal002/SkyHanni/pull/5160)
 + Fixed Discord Rich Presence Logging. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/5167)
 + Fixed fused shards not being detected when it is a NEW SHARD. - Luna (https://github.com/hannibal002/SkyHanni/pull/5005)
++ Fixed errors with features that mute sounds or hide particles/titles. - Luna (https://github.com/hannibal002/SkyHanni/pull/5192)
++ Fixed Hide Armor hiding the outer layer of some skulls occasionally when using 3d skin layers. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/5198)
++ Fixed Line Rendering (ie diana vacuum etc). - nopo (https://github.com/hannibal002/SkyHanni/pull/5205)
++ Fixed occasional errors when the mod tries to delete a chat message (hopefully). - Luna (https://github.com/hannibal002/SkyHanni/pull/5206)
++ Fixed some skyhanni hover events saying null. - nopo (https://github.com/hannibal002/SkyHanni/pull/5208)
 
 ### Technical Details
 
@@ -374,6 +395,18 @@
 + Added support for other mods cancelling and modifying in /shchathistory. - nopo (https://github.com/hannibal002/SkyHanni/pull/5149)
 + Added a Cocoon API that posts MobDetection SkylockMob, position & Time of Detection. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5085)
 + Fixed errors in chat when using `/shdebug`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5179)
++ `PacketReceivedEvent` is no longer cancellable. - Luna (https://github.com/hannibal002/SkyHanni/pull/5192)
+  + Due to issues posed by bundle packets and us being wary of modifying them, all relevant cancellation logic must now be done via mixins or other appropriate methods.
++ `SoundEvent` now also fires for client-side sounds. - Luna (https://github.com/hannibal002/SkyHanni/pull/5192)
++ Added a component matcher. - nopo (https://github.com/hannibal002/SkyHanni/pull/5200)
++ Added Component based versions of the tab list events. - nopo (https://github.com/hannibal002/SkyHanni/pull/5193)
++ Added interface injection to eliminate casts to interfaces. - Luna (https://github.com/hannibal002/SkyHanni/pull/5190)
++ Added the ability to save Components into the config. - nopo (https://github.com/hannibal002/SkyHanni/pull/5200)
++ Bumped minimum Fabric Loader version to 0.18.0. - Luna (https://github.com/hannibal002/SkyHanni/pull/5190)
++ Made `TextCompat.addChatMessageToChat` always run on the client thread to avoid rendersystem errors on 1.21.10 and above. - Luna (https://github.com/hannibal002/SkyHanni/pull/5141)
++ Removed now unnecessary `@OnlyModern` annotation. - Luna (https://github.com/hannibal002/SkyHanni/pull/5195)
++ Switched from accessWidener to classTweaker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5190)
++ Updated CONTRIBUTING.md to reflect current project architecture. - hannibal002 (https://github.com/hannibal002/SkyHanni/pull/5213)
 
 ### Removed Features
 
