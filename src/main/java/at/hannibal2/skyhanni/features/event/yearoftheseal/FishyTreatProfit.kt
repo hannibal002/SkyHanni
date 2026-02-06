@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
@@ -41,6 +41,9 @@ object FishyTreatProfit {
     private var display = emptyList<Renderable>()
     private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
+    // I don't know why this fetches price source based on tracker config,
+    // but it already did before I changed how tracker config worked
+    val priceSource get() = SkyHanniMod.feature.misc.tracker.priceSource
 
     private val patternGroup = RepoPattern.group("event.year-of-the-seal.fishy-treat")
 
@@ -104,7 +107,7 @@ object FishyTreatProfit {
             internalName = item.getInternalName()
         }
 
-        val itemPrice = SkyHanniTracker.getPricePer(internalName) * amount
+        val itemPrice = internalName.getPrice(priceSource) * amount
         if (itemPrice < 0) return
 
         val profitPerSell = itemPrice - additionalCost
@@ -144,7 +147,7 @@ object FishyTreatProfit {
 
     private fun MutableList<Any>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
-            add(internalName.getPriceName(amount, SkyHanniTracker.getPricePer(internalName)))
+            add(internalName.getPriceName(amount, internalName.getPrice(priceSource)))
         }
     }
 
@@ -171,7 +174,7 @@ object FishyTreatProfit {
     private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
-            otherItemsPrice += SkyHanniTracker.getPricePer(name) * amount
+            otherItemsPrice += name.getPrice(priceSource) * amount
         }
         return otherItemsPrice
     }

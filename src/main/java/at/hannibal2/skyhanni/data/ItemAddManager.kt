@@ -124,10 +124,10 @@ object ItemAddManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shdebugrecentitemadds") {
+        event.registerBrigadier("shdebugrecentitemadds") {
             description = "Shows recent item addions."
             category = CommandCategory.DEVELOPER_DEBUG
-            callback {
+            simpleCallback {
                 ChatUtils.clickToClipboard("Recent Item adds", formattedList())
             }
         }
@@ -145,7 +145,7 @@ object ItemAddManager {
     private val superCraftedItems = TimeLimitedSet<NeuInternalName>(30.seconds)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (diceRollChatPattern.matches(event.message)) {
             lastDiceRoll = SimpleTimeMark.now()
         }

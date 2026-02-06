@@ -29,7 +29,7 @@ object TerracottaPhase {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (terracottaStartPattern.matches(event.message)) {
             inTerracottaPhase = true
         } else if (terracottaEndPattern.matches(event.message)) {

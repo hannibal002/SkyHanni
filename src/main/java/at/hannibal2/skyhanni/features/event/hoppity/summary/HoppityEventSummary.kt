@@ -88,10 +88,19 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresethoppityeventstats") {
+        event.registerBrigadier("shresethoppityeventstats") {
             description = "Reset Hoppity Event stats for all years."
             category = CommandCategory.USERS_RESET
-            callback { handleResetRequest(it) }
+            literalCallback("confirm") {
+                resetStats()
+            }
+            simpleCallback {
+                ChatUtils.clickableChat(
+                    "§c§lWARNING! §r§7This will reset §call §7Hoppity Event stats for §call §7years. " +
+                        "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
+                    onClick = HoppityEventSummary::resetStats,
+                )
+            }
         }
     }
 
@@ -125,7 +134,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
@@ -163,18 +172,6 @@ object HoppityEventSummary {
     fun onProfileJoin() {
         lastSnapshotServer = null
         checkEnded()
-    }
-
-    private fun handleResetRequest(args: Array<String>) {
-        if (args.any { it.equals("confirm", ignoreCase = true) }) {
-            resetStats()
-            return
-        }
-        ChatUtils.clickableChat(
-            "§c§lWARNING! §r§7This will reset §call §7Hoppity Event stats for §call §7years. " +
-                "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
-            onClick = HoppityEventSummary::resetStats,
-        )
     }
 
     private fun resetStats() {
@@ -372,6 +369,12 @@ object HoppityEventSummary {
                 val boughtCount = stats.getBoughtCount().takeIf { it > 0 } ?: return@put
                 val rabbitFormat = StringUtils.pluralize(boughtCount, "Rabbit")
                 statList.addStr("§7You bought §b${boughtCount.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
+            }
+
+            put(HoppityStat.VISITOR_RABBITS) { statList, stats, _ ->
+                val visitorCount = stats.mealsFound[HoppityEggType.VISITOR]?.takeIf { it > 0 } ?: return@put
+                val rabbitFormat = StringUtils.pluralize(visitorCount, "Rabbit")
+                statList.addStr("§6Hoppity §7gave you §b$visitorCount §d$rabbitFormat §r§7on your §aGarden§7.")
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->

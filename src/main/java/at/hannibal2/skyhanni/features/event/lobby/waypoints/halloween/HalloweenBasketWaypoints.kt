@@ -83,7 +83,7 @@ object HalloweenBasketWaypoints {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled.get()) return
         if (!isActive) return
         if (!isEnabled()) return

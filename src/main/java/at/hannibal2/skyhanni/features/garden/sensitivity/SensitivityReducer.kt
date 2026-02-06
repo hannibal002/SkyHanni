@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,6 +19,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -49,6 +52,9 @@ object SensitivityReducer {
     fun onConfigLoad() {
         config.reducingFactor.afterChange {
             MouseSensitivityManager.destroyCache()
+        }
+        config.enabled.afterChange {
+            autoToggle()
         }
         config.onlyPlot.afterChange {
             autoToggle()
@@ -86,11 +92,15 @@ object SensitivityReducer {
     }
 
     private fun autoToggleIfNeeded() {
-        when (config.mode) {
-            SensitivityReducerConfig.Mode.OFF -> toggleIfCondition { false }
-            SensitivityReducerConfig.Mode.TOOL -> toggleIfCondition(::isHoldingTool)
-            SensitivityReducerConfig.Mode.KEYBIND -> toggleIfCondition(::isHoldingKey)
+        val shouldReduce = config.mode.any {
+            when (it) {
+                SensitivityReducerConfig.Mode.TOOL -> isHoldingTool()
+                SensitivityReducerConfig.Mode.FISHING_ROD -> isHoldingFishingRod()
+                SensitivityReducerConfig.Mode.KEYBIND -> isHoldingKey()
+            }
         }
+
+        toggleIfCondition { shouldReduce }
     }
 
     private fun toggleIfCondition(check: () -> Boolean) {
@@ -101,6 +111,10 @@ object SensitivityReducer {
     }
 
     private fun autoToggle() {
+        if (!config.enabled.get()) {
+            if (isActive) disable()
+            return
+        }
         if (config.onlyPlot.get() && inBarn) {
             if (isActive) disable()
             return
@@ -138,10 +152,10 @@ object SensitivityReducer {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsensreduce") {
+        event.registerBrigadier("shsensreduce") {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
             category = CommandCategory.USERS_ACTIVE
-            callback { manualToggle() }
+            simpleCallback { manualToggle() }
         }
     }
 
@@ -159,8 +173,20 @@ object SensitivityReducer {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(80, "garden.sensitivityReducerConfig", "garden.sensitivityReducer")
         event.move(81, "garden.sensitivityReducer.showGUI", "garden.sensitivityReducer.showGui")
+        event.transform(116, "garden.sensitivityReducer.mode") { element ->
+            event.add(116, "garden.sensitivityReducer.enabled") { JsonPrimitive("OFF" != element.asString) }
+            val newList = JsonArray()
+            when (element.asString) {
+                "OFF" -> {
+                    newList.add("TOOL")
+                }
+                else -> newList.add(element.asString)
+            }
+            newList
+        }
     }
 
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
+    private fun isHoldingFishingRod(): Boolean = FishingApi.holdingRod
     private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
 }

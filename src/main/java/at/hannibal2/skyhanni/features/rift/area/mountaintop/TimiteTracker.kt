@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -40,7 +41,7 @@ object TimiteTracker {
 
         override fun getCoinDescription(item: TrackedItem): List<String> = emptyList()
 
-        override fun getCustomPricePer(internalName: NeuInternalName): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
             return internalName.getItemStack().motesNpcPrice() ?: 0.0
         }
 
@@ -81,7 +82,12 @@ object TimiteTracker {
         addSearchString("§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes")
     }
 
-    private val tracker = SkyHanniItemTracker("Timite Tracker", ::Data, { it.rift.timiteTracker }) {
+    private val tracker = SkyHanniItemTracker(
+        "Timite Tracker",
+        ::Data,
+        { it.rift.timiteTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
@@ -108,10 +114,10 @@ object TimiteTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresettimitetracker") {
+        event.registerBrigadier("shresettimitetracker") {
             description = "Resets the Timite Tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

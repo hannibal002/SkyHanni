@@ -63,9 +63,7 @@ object AuctionHouseCopyUnderbidPrice {
             OSUtils.copyToClipboard("")
             return
         }
-        val newPrice = price * item.count - 1
-        OSUtils.copyToClipboard("$newPrice")
-        ChatUtils.chat("Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)")
+        copyPrice(price * item.count)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -75,10 +73,17 @@ object AuctionHouseCopyUnderbidPrice {
         val stack = stackUnderCursor() ?: return
 
         auctionPricePattern.firstMatcher(stack.getLore()) {
-            val underbid = group("coins").formatLong() - 1
-            OSUtils.copyToClipboard("$underbid")
-            ChatUtils.chat("Copied ${underbid.addSeparators()} to clipboard.")
+            copyPrice(group("coins").formatLong())
         }
+    }
+
+    private fun copyPrice(price: Long) {
+        val underbidPrice = price - 1
+        OSUtils.copyToClipboard("$underbidPrice")
+        ChatUtils.chat(
+            "Copied ${underbidPrice.addSeparators()} to clipboard. (Copy Underbid Price)",
+            replaceSameMessage = true,
+        )
     }
 
     @HandleEvent

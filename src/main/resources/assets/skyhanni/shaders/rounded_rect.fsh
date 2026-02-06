@@ -2,12 +2,14 @@
 
 in vec4 vertexColor;
 
-uniform float scaleFactor;
-uniform float radius;
-uniform float smoothness;
-uniform vec2 halfSize;
-uniform vec2 centerPos;
-uniform mat4 modelViewMatrix;
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
 
 out vec4 fragColor;
 

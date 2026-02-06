@@ -75,7 +75,7 @@ class OrbitSystemRenderable private constructor(
             } else mouseOffsetX to mouseOffsetY
 
             DrawContextUtils.pushPop {
-                DrawContextUtils.translate(drawX, drawY, 0f)
+                DrawContextUtils.translate(drawX, drawY)
                 subBody.render(fPosX, fPosY)
             }
         }

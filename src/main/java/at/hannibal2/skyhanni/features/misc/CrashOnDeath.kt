@@ -23,7 +23,7 @@ object CrashOnDeath {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (pattern.matches(event.message)) {

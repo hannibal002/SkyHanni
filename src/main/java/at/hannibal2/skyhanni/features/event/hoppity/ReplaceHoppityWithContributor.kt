@@ -3,16 +3,20 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CircularList
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object ReplaceHoppityWithContributor {
@@ -49,31 +53,29 @@ object ReplaceHoppityWithContributor {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!HoppityCollectionStats.inInventory) return
 
         val itemStack = event.itemStack
-        val lore = itemStack.getLore()
+        val lore = itemStack.getLoreComponent()
         val last = lore.lastOrNull() ?: return
-        if (!last.endsWith(" RABBIT")) return
+        if (!last.string.endsWith(" RABBIT")) return
 
         val realName = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 
-        val newName = event.toolTip[0].replace(cleanName, fakeName)
-        event.toolTip[0] = newName
+        event.toolTip[0] = event.toolTip[0].formattedTextCompat().replace(cleanName, fakeName).asComponent()
 
         event.toolTip.add(" ")
         event.toolTip.add("§8§oSome might say this rabbit is also known as $realName")
 
         // TODO find a way to handle non containing entries in a kotlin nullable way instead of checking for -1
-        val index = event.toolTip.indexOfFirst { it.contains(" a duplicate") }
+        val index = event.toolTip.indexOfFirst { it.string.contains(" a duplicate") }
         if (index == -1) return
         val oldLine = event.toolTip[index]
-        val newLine = oldLine.replace(cleanName, fakeName)
-        event.toolTip[index] = newLine
+        event.toolTip[index] = Component.literal(oldLine.formattedTextCompat().replace(cleanName, fakeName))
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.contributorRabbitName

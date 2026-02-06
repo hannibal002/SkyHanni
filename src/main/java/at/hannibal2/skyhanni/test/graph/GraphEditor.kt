@@ -84,20 +84,20 @@ object GraphEditor {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shgraph") {
+        event.registerBrigadier("shgraph") {
             description = "Enables the graph editor"
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleFeature() }
+            simpleCallback { toggleFeature() }
         }
-        event.register("shgraphfindall") {
+        event.registerBrigadier("shgraphfindall") {
             description = "Navigate over the whole graph network"
             category = CommandCategory.DEVELOPER_TEST
-            callback { GraphEditorNodeFinder.toggleFindAll() }
+            simpleCallback { GraphEditorNodeFinder.toggleFindAll() }
         }
-        event.register("shgraphloadthisisland") {
+        event.registerBrigadier("shgraphloadthisisland") {
             description = "Loads the current island data into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
-            callback { GraphEditorIO.loadThisIsland() }
+            simpleCallback { GraphEditorIO.loadThisIsland() }
         }
     }
 

@@ -91,13 +91,13 @@ object TpsCounter {
     private fun tpsCommand() {
         val timeUntil = minimumSecondsDisplayDelay - timeSinceWorldSwitch
         if (timeUntil.isPositive()) {
-            ChatUtils.chat("§eTPS: §fCalculating... §7(${timeUntil.inWholeSeconds}s)")
+            ChatUtils.chat("TPS: §fCalculating... §7(${timeUntil.inWholeSeconds}s)")
             DelayedRun.runDelayed(timeUntil) {
                 pendingTpsCommand = true
             }
         } else {
             val tpsMessage = tps?.let { "${format(fixTps(it))}$it" } ?: "§70 (Limbo?)"
-            ChatUtils.chat("§eTPS: $tpsMessage")
+            ChatUtils.chat("TPS: $tpsMessage")
         }
     }
 

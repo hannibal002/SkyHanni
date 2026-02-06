@@ -1,15 +1,17 @@
 package at.hannibal2.skyhanni.events.render.gui
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.world.Container
 import net.minecraft.world.item.ItemStack
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class ReplaceItemEvent(val inventory: Container, val originalItem: ItemStack?, val slot: Int) : SkyHanniEvent() {
+class ReplaceItemEvent(val inventory: Container, val originalItem: ItemStack, val slot: Int) : SkyHanniEvent() {
     var replacement: ItemStack? = null
         private set
     var shouldRemove = false
         private set
+
+    val hasItem: Boolean = originalItem.isNotEmpty()
 
     fun replace(replacement: ItemStack) {
         this.replacement = replacement
@@ -23,18 +25,13 @@ class ReplaceItemEvent(val inventory: Container, val originalItem: ItemStack?, v
         @JvmStatic
         fun postEvent(
             inventory: Container,
-            inventoryContents: Array<ItemStack?>,
+            originalItem: ItemStack,
             slot: Int,
-            cir: CallbackInfoReturnable<ItemStack>,
-        ) {
-            val originalItem = inventoryContents.getOrNull(slot)
+        ): ItemStack {
             val event = ReplaceItemEvent(inventory, originalItem, slot)
             event.post()
-            if (event.shouldRemove) {
-                cir.returnValue = ItemStack.EMPTY
-                return
-            }
-            event.replacement?.let { cir.returnValue = it }
+            return if (event.shouldRemove) ItemStack.EMPTY
+            else event.replacement ?: originalItem
         }
     }
 }

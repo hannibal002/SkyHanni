@@ -6,61 +6,31 @@ import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import java.util.OptionalDouble
 import java.util.OptionalInt
-//#if MC < 1.21.6
-import net.minecraft.client.renderer.RenderType
-//#else
-//$$ import com.mojang.blaze3d.pipeline.RenderPipeline
-//$$ import net.minecraft.client.renderer.RenderPipelines
-//#endif
+import com.mojang.blaze3d.pipeline.RenderPipeline
+import net.minecraft.client.renderer.RenderPipelines
 
 object RenderCompat {
 
-    //#if MC < 1.21.6
-    fun getMinecraftGuiTextured() = RenderType::guiTextured
-    //#else
-    //$$ fun getMinecraftGuiTextured(): RenderPipeline = RenderPipelines.GUI_TEXTURED
-    //#endif
+    fun getMinecraftGuiTextured(): RenderPipeline = RenderPipelines.GUI_TEXTURED
 
     fun RenderPass.enableRenderPassScissorStateIfAble() {
-        //#if MC < 1.21.6
-        if (RenderSystem.SCISSOR_STATE.isEnabled) {
-            this.enableScissor(RenderSystem.SCISSOR_STATE)
+        val scissorState = RenderSystem.getScissorStateForRenderTypeDraws()
+        if (scissorState.enabled()) {
+            this.enableScissor(scissorState.x(), scissorState.y(), scissorState.width(), scissorState.height())
         }
-        //#else
-        //$$ val scissorState = RenderSystem.getScissorStateForRenderTypeDraws()
-        //$$ if (scissorState.enabled()) {
-        //$$     this.enableScissor(scissorState.x(), scissorState.y(), scissorState.width(), scissorState.height())
-        //$$ }
-        //#endif
     }
 
     fun RenderPass.drawIndexed(indices: Int) {
-        //#if MC < 1.21.6
-        drawIndexed(0, indices)
-        //#else
-        //$$ drawIndexed(0, 0, indices, 1)
-        //#endif
+        drawIndexed(0, 0, indices, 1)
     }
 
-    private fun RenderTarget.findColorAttachment() =
-        //#if MC < 1.21.6
-        this.colorTexture
-    //#else
-    //$$ this.colorTextureView
-    //#endif
+    private fun RenderTarget.findColorAttachment() = this.colorTextureView
 
-    private fun RenderTarget.findDepthAttachment() =
-        //#if MC < 1.21.6
-        if (this.useDepth) this.depthTexture else null
-    //#else
-    //$$ if (this.useDepth) this.depthTextureView else null
-    //#endif
+    private fun RenderTarget.findDepthAttachment() = if (this.useDepth) this.depthTextureView else null
 
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {
         return this.createCommandEncoder().createRenderPass(
-            //#if MC > 1.21.6
-            //$$ { name },
-            //#endif
+            { name },
             framebuffer.findColorAttachment(),
             OptionalInt.empty(),
             framebuffer.findDepthAttachment(),

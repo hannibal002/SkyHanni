@@ -3,20 +3,19 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -41,15 +39,20 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
-open class SkyHanniTracker<Data : TrackerData>(
+open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTrackerConfig<*>>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
     private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val trackUptime: Boolean = true,
+    private val trackerConfig: () -> Config,
     private val customUptimeControl: Boolean = false,
     private val drawDisplay: (Data) -> List<Searchable>,
+
 ) {
+    val trackerSpecificConfig: Config get() = trackerConfig()
+    private val config: TrackerGenericConfig get() =
+        if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
@@ -62,10 +65,9 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     @SkyHanniModule
     companion object {
-
-        private val config get() = SkyHanniMod.feature.misc.tracker
+        private val universalTracker get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
-        private val unpausedTrackers: MutableSet<SkyHanniTracker<*>> = mutableSetOf()
+        private val unpausedTrackers: MutableSet<SkyHanniTracker<*, *>> = mutableSetOf()
 
         @HandleEvent
         fun onTick(event: SkyHanniTickEvent) {
@@ -77,9 +79,9 @@ open class SkyHanniTracker<Data : TrackerData>(
                 }
             }
         }
-
-        fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     }
+
+    fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
 
     fun isInventoryOpen() = inventoryOpen
 
@@ -114,11 +116,15 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
+    // used for Item tracker
+    open fun hideInEstimatedItemValue() = false
+    open fun hideOutsideInventory() = false
+
     fun renderDisplay(position: Position) {
-        if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
+        if (hideInEstimatedItemValue() && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getInstance().screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
-        if (!currentlyOpen && config.hideOutsideInventory && this is SkyHanniItemTracker) {
+        if (!currentlyOpen && hideOutsideInventory() && this is SkyHanniItemTracker) {
             return
         }
         if (RenderData.outsideInventory) {
@@ -181,7 +187,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     open fun getCurrentStopwatch(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.getActiveStopwatch() }
 
-    private fun startSessionUptime() {
+    fun startSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
@@ -189,7 +195,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun pauseSessionUptime() {
+    fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
@@ -197,7 +203,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    private fun swapActiveSession(session: SessionUptime) {
+    fun swapActiveSession(session: SessionUptime) {
         if (!this.customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.setActiveStopwatch(session) }
@@ -215,7 +221,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 tips = listOf(
                     "§eⓘ §7Uptime tracked only from",
                     "§7SkyHanni version 6.0.0 onwards",
-                )
+                ),
             )
         } else {
             Renderable.text("§eSession Uptime: §b${sessionUptime.format()}$pausedText")
@@ -326,31 +332,6 @@ open class SkyHanniTracker<Data : TrackerData>(
             "displayMode" to displayMode,
             "availableModes" to entries.keys,
         )
-    }
-
-    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
-        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat && message) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
-        }
-        if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            TitleManager.sendTitle("§a+ $itemName", weight = price)
-        }
-    }
-
-    fun addPriceFromButton(lists: MutableList<Searchable>) {
-        if (isInventoryOpen()) {
-            lists.addButton(
-                label = "Price Source",
-                current = config.priceSource,
-                getName = { it.sellName },
-                onChange = {
-                    config.priceSource = it
-                    update()
-                },
-                universe = ItemPriceSource.entries,
-            )
-        }
     }
 
     enum class DisplayMode(private val displayName: String, val shortenedName: String = displayName) {

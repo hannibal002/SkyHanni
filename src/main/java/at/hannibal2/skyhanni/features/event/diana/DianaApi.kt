@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.item.ItemStack
@@ -33,13 +32,13 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory()
+    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInHotbar()
 
     val ItemStack.isDianaSpade get() = getInternalName() in spades
 
     val NeuInternalName.isDianaSpade get() = this in spades
 
-    private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
+    private fun hasSpadeInHotbar() = InventoryUtils.getItemsInHotbar().any { it.isDianaSpade }
 
     var mythologicalCreatures = emptyMap<String, MythologicalCreatureType>()
         private set

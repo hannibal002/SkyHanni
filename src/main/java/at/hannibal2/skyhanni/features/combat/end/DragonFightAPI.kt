@@ -58,7 +58,7 @@ object DragonFightAPI {
     fun inNestArea() = IslandType.THE_END.isCurrent() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         chatSpawnPattern.matchMatcher(event.cleanMessage) {
             currentType = group("type")
         }

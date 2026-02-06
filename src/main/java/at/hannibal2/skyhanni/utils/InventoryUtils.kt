@@ -40,8 +40,25 @@ object InventoryUtils {
     val pastItemsInHand = mutableListOf<Pair<SimpleTimeMark, NeuInternalName>>()
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
+    var lastItemChangeTime = SimpleTimeMark.farPast()
+
     fun getItemInHandAtTime(time: SimpleTimeMark): NeuInternalName? {
         return pastItemsInHand.lastOrNull { it.first <= time }?.second
+    }
+
+    fun getItemInHandDuringTimeframe(start: SimpleTimeMark, end: SimpleTimeMark): NeuInternalName? {
+        val itemAtStart = getItemInHandAtTime(start)
+        val itemAtEnd = getItemInHandAtTime(end)
+
+        if (itemAtStart == null || itemAtEnd == null || itemAtStart != itemAtEnd) {
+            return null
+        }
+
+        val changesBetween = pastItemsInHand.any {
+            it.first > start && it.first <= end && it.second != itemAtStart
+        }
+
+        return if (changesBetween) null else itemAtStart
     }
 
     fun getItemsInOpenChest(): List<Slot> {

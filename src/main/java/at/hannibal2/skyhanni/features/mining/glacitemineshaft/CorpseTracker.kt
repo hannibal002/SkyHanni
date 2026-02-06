@@ -37,6 +37,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
     ::BucketData,
     { it.mining.mineshaft.corpseProfitTracker },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker.perTrackerConfig }
 ) {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
@@ -146,10 +147,10 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcorpsetracker") {
+        event.registerBrigadier("shresetcorpsetracker") {
             description = "Resets the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

@@ -93,7 +93,7 @@ object DungeonSecretTrackerLocator {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onChatMessage(event: SkyHanniChatEvent) {
+    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         secretTrackerMessagePattern.findMatcher(event.message) {
             val distance1 = group("distance").toInt()

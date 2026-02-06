@@ -47,7 +47,7 @@ object JyrreTimer {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled() || !drankBottlePattern.matches(event.message)) return
         duration = 60.minutes
     }

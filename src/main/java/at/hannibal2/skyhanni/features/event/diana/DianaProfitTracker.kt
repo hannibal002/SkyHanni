@@ -61,7 +61,9 @@ object DianaProfitTracker {
                 )
             },
         ),
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
     data class Data(
         @Expose var burrowsDug: Long = 0,
@@ -125,7 +127,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
@@ -150,7 +152,7 @@ object DianaProfitTracker {
         }
     }
 
-    private fun tryHide(event: SkyHanniChatEvent) {
+    private fun tryHide(event: SkyHanniChatEvent.Allow) {
         if (SkyHanniMod.feature.chat.filterType.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }
@@ -177,10 +179,10 @@ object DianaProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdianaprofittracker") {
+        event.registerBrigadier("shresetdianaprofittracker") {
             description = "Resets the Diana Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

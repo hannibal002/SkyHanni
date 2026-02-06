@@ -40,6 +40,7 @@ object HuntingProfitTracker {
         "Hunting Profit Tracker",
         { Data() },
         { it.hunting.huntingProfitTracker },
+        trackerConfig = { SkyHanniMod.feature.hunting.huntingProfitTracker.perTrackerConfig }
     ) { drawDisplay(it) }
 
     data class Data(
@@ -168,10 +169,10 @@ object HuntingProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresethuntingtracker") {
+        event.registerBrigadier("shresethuntingtracker") {
             description = "Resets the Hunting Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }
