@@ -34,7 +34,7 @@ class SkytilsWaypointFormat : WaypointFormat {
                 SkyHanniWaypoint(
                     LorenzVec(wp.x, wp.y, wp.z),
                     number,
-                    mutableMapOf("name" to number.toString()),
+                    mutableMapOf("name" to wp.name),
                 )
             }
             Waypoints(waypoints.toMutableList())
