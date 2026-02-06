@@ -125,4 +125,12 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "All Waypoint Color", desc = "Color used for waypoints when using show all mode.")
     @ConfigEditorColour
     var showAllWaypointColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 102)
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-Skip Forward",
+        desc = "Automatically skip forward when reaching a waypoint further down in the route.",
+    )
+    @ConfigEditorBoolean
+    var autoSkipForward: Boolean = false
 }
