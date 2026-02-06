@@ -41,7 +41,7 @@ object AbiphoneFeatures {
     )
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
     }
 
@@ -81,7 +81,7 @@ object AbiphoneFeatures {
         event.move(76, "event.hoppityEggs.hoppityCallWarning.acceptHotkey", "misc.abiphoneAcceptKey")
     }
 
-    private fun readPickupUuid(event: SkyHanniChatEvent) {
+    private fun readPickupUuid(event: SkyHanniChatEvent.Allow) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.style?.clickEvent ?: return
         if (clickEvent.action().name.lowercase() != "run_command" || !clickEvent.value().lowercase().startsWith("/cb")) return

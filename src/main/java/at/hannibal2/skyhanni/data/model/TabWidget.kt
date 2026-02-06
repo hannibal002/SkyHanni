@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,14 +13,15 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
-private val repoGroup by RepoPattern.exclusiveGroup("tab.widget.enum")
+private val repoGroup by RepoPattern.exclusiveGroup("tab.widgetcomponent.enum")
 
 /**
  * This class defines various widgets within the tab list, specifically focusing on the reading of the values.
@@ -33,57 +34,57 @@ enum class TabWidget(
 ) {
     PLAYER_LIST(
         // language=RegExp
-        "(?:§.)*Players (?:§.)*\\(\\d+\\)",
+        "Players \\((?<amount>\\d+)\\)",
     ),
 
     /** This line holds no information, only here because every widget must be present */
     INFO(
         // language=RegExp
-        "(?:§.)*Info",
+        "Info",
     ),
     AREA(
         // language=RegExp
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
+        "(Area|Dungeon): (?<island>.*)",
     ),
     SERVER(
         // language=RegExp
-        "Server: (?:§.)*(?<serverid>.*)",
+        "Server: (?<serverid>.*)",
     ),
     GEMS(
         // language=RegExp
-        "Gems: (?:§.)*(?<gems>.*)",
+        "Gems: (?<gems>.*)",
     ),
     FAIRY_SOULS(
         // language=RegExp
-        "Fairy Souls: (?:§.)*(?<got>\\d+)(?:§.)*\\/(?:§.)*(?<max>\\d+)",
+        "Fairy Souls: (?<got>\\d+)\\/(?<max>\\d+)",
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)+Profile: §r§.(?<profile>[\\w\\s]+[^ §]).*",
+        "Profile: (?<profile>[\\w\\s]+)(?:[ ♲Ⓑ]+)?",
     ),
     SB_LEVEL(
         // language=RegExp
-        "SB Level(?:§.)*: (?:§.)*\\[(?:§.)*(?<level>\\d+)(?:§.)*\\] (?:§.)*(?<xp>\\d+).*",
+        "SB Level: \\[(?<level>\\d+)\\] (?<xp>\\d+).*",
     ),
     BANK(
         // language=RegExp
-        "Bank: (?:§.)*(?<amount>[^§]+)(?:(?:§.)* \\/ (?:§.)*(?<personal>.*))?",
+        "Bank: (?<amount>[^§]+)(?: \\/ (?<personal>.*))?",
     ),
     INTEREST(
         // language=RegExp
-        "Interest: (?:§.)*(?<time>[^§]+)(?:§.)*( \\((?<amount>[^)]+)\\))?",
+        "Interest: (?<time>[^§]+)( \\((?<amount>[^)]+)\\))?",
     ),
     SOULFLOW(
         // language=RegExp
-        "Soulflow: (?:§.)*(?<amount>.*)",
+        "Soulflow: (?<amount>.*)",
     ),
     PET(
         // language=RegExp
-        "(?:§.)*Pet:",
+        "Pet:",
     ),
     PET_TRAINING(
         // language=RegExp
-        "(?:§.)*Pet Training:",
+        "Pet Training:",
     ),
     PET_SITTER(
         // language=RegExp
@@ -91,211 +92,211 @@ enum class TabWidget(
     ),
     FIRE_SALE(
         // language=RegExp
-        "(?:§.)*Fire Sales: .*",
+        "Fire Sales: .*",
     ),
     ELECTION(
         // language=RegExp
-        "(?:§.)*Election: (?:§.)*(?<time>.*)",
+        "Election: (?<time>.*)",
     ),
     EVENT(
         // language=RegExp
-        "(?:§.)*Event: (?<color>(?:§.)*)(?<event>.*)",
+        "Event: (?<event>.*)",
     ),
     SKILLS(
         // language=RegExp
-        "(?:§.)*Skills: ?(?:§.)*(?<avg>[\\d.]*)",
+        "Skills: ?(?<avg>[\\d.]*)",
     ),
     STATS(
         // language=RegExp
-        "(?:§.)*Stats:",
+        "Stats:",
     ),
     GUESTS(
         // language=RegExp
-        "(?:§.)*Guests (?:§.)*.*",
+        "Guests \\((?<amount>\\d+)\\)",
     ),
     COOP(
         // language=RegExp
-        "(?:§.)*Coop (?:§.)*.*",
+        "Coop .*",
     ),
     ISLAND(
         // language=RegExp
-        "(?:§.)*Island",
+        "Island",
     ),
     MINION(
         // language=RegExp
-        "(?:§.)*Minions: (?:§.)*(?<used>\\d+)(?:§.)*/(?:§.)*(?<max>\\d+)",
+        "Minions: (?<used>\\d+)/(?<max>\\d+)",
     ),
     JERRY_ISLAND_CLOSING(
         // language=RegExp
-        "Island closes in: (?:§.)*(?<time>.*)",
+        "Island closes in: (?<time>.*)",
     ),
     NORTH_STARS(
         // language=RegExp
-        "North Stars: (?:§.)*(?<amount>\\d+)",
+        "North Stars: (?<amount>\\d+)",
     ),
     COLLECTION(
         // language=RegExp
-        "(?:§.)*Collection:",
+        "Collection:",
     ),
     JACOB_CONTEST(
         // language=RegExp
-        "(?:§.)*Jacob's Contest:.*",
+        "Jacob's Contest:.*",
     ),
     SLAYER(
         // language=RegExp
-        "(?:§.)*Slayer:",
+        "Slayer:",
     ),
     DAILY_QUESTS(
         // language=RegExp
-        "(?:§.)*Daily Quests:",
+        "Daily Quests:",
     ),
     ACTIVE_EFFECTS(
         // language=RegExp
-        "(?:§.)*Active Effects: (?:§.)*\\((?<amount>\\d+)\\)",
+        "Active Effects: \\((?<amount>\\d+)\\)",
     ),
     BESTIARY(
         // language=RegExp
-        "(?:§.)*Bestiary:",
+        "Bestiary:",
     ),
     ESSENCE(
         // language=RegExp
-        "(?:§.)*Essence:.*",
+        "Essence:.*",
     ),
     FORGE(
         // language=RegExp
-        "(?:§.)*Forges:",
+        "Forges:",
     ),
     TIMERS(
         // language=RegExp
-        "(?:§.)*Timers:",
+        "Timers:",
     ),
     DUNGEON_STATS(
         // language=RegExp
-        "Opened Rooms: (?:§.)*(?<opend>\\d+)",
+        "Opened Rooms: (?<opend>\\d+)",
     ),
     PARTY(
         // language=RegExp
-        "(?:§.)*Party:.*",
+        "Party:.*",
     ),
     TRAPPER(
         // language=RegExp
-        "(?:§.)*Trapper:",
+        "Trapper:",
     ),
     COMMISSIONS(
         // language=RegExp
-        "(?:§.)*Commissions:",
+        "Commissions:",
     ),
     POWDER(
         // language=RegExp
-        "(?:§.)*Powders:",
+        "Powders:",
     ),
     CRYSTAL(
         // language=RegExp
-        "(?:§.)*Crystals:",
+        "Crystals:",
     ),
     UNCLAIMED_CHESTS(
         // language=RegExp
-        "Unclaimed chests: (?:§.)*(?<amount>\\d+)",
+        "Unclaimed chests: (?<amount>\\d+)",
     ),
     RAIN(
         // language=RegExp
-        "(?<type>Thunder|Rain): (?:§.)*(?<time>.*)",
+        "(?<type>Thunder|Rain): (?<time>.*)",
     ),
     BROODMOTHER(
         // language=RegExp
-        "Broodmother: (?:§.)*(?<stage>.*)",
+        "Broodmother: (?<stage>.*)",
     ),
     EYES_PLACED(
         // language=RegExp
-        "Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!",
+        "Eyes placed: (?<amount>\\d).*|Dragon spawned!|Egg respawning!",
     ),
     PROTECTOR(
         // language=RegExp
-        "Protector: (?:§.)*(?<time>.*)",
+        "Protector: (?<time>.*)",
     ),
     DRAGON(
         // language=RegExp
-        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)]*)\\)",
+        "Dragon: \\((?<type>[^)]*)\\)",
     ),
     VOLCANO(
         // language=RegExp
-        "Volcano: (?:§.)*(?<time>.*)",
+        "Volcano: (?<status>\\S+)",
     ),
     REPUTATION(
         // language=RegExp
-        "(?:§.)*(?<faction>Barbarian|Mage) Reputation:",
+        "(?<faction>Barbarian|Mage) Reputation:",
     ),
     FACTION_QUESTS(
         // language=RegExp
-        "(?:§.)*Faction Quests:",
+        "Faction Quests:",
     ),
     TROPHY_FISH(
         // language=RegExp
-        "(?:§.)*Trophy Fish:",
+        "Trophy Fish:",
     ),
     RIFT_INFO(
         // language=RegExp
-        "(?:§.)*Good to know:",
+        "Good to know:",
     ),
     RIFT_SHEN(
         // language=RegExp
-        "(?:§.)*Shen: (?:§.)*\\((?<time>[^)])\\)",
+        "Shen: \\((?<time>[^)])\\)",
     ),
     RIFT_BARRY(
         // language=RegExp
-        "(?:§.)*Advertisement:",
+        "Advertisement:",
     ),
     COMPOSTER(
         // language=RegExp
-        "(?:§.)*Composter:",
+        "Composter:",
     ),
     GARDEN_LEVEL(
         // language=RegExp
-        "Garden Level: (?:§.)*(?<level>.*)",
+        "Garden Level: (?<level>.*)",
     ),
     COPPER(
         // language=RegExp
-        "Copper: (?:§.)*(?<amount>\\d+)",
+        "Copper: (?<amount>\\d+)",
     ),
     PESTS(
         // language=RegExp
-        "(?:§.)*Pests:",
+        "Pests:",
     ),
     PEST_TRAPS(
         // language=RegExp
-        "(?:§.)*Pest Traps: (?:§.)*(?<count>\\d+)\\/(?<max>\\d+)",
+        "Pest Traps: (?<count>\\d+)\\/(?<max>\\d+)",
     ),
     FULL_TRAPS(
         /**
-         * REGEX-TEST: §r§fFull Traps: §r§a#1§r§7, §r§a#2§r§7, §r§a#3
-         * REGEX-TEST: §r§fFull Traps: §r§a#2§r§7, §r§a#3
-         * REGEX-TEST: §r§fFull Traps: §r§a#3
-         * REGEX-TEST: §r§fFull Traps: §r§7None
+         * REGEX-TEST: Full Traps: #1, #2, #3
+         * REGEX-TEST: Full Traps: #2, #3
+         * REGEX-TEST: Full Traps: #3
+         * REGEX-TEST: Full Traps: None
          */
         // language=RegExp
-        "(?:§.)*Full Traps: (?:§.)*(?:None|§r§a(?<traps>#\\d(?:§r§7, §r§a#\\d(?:§r§7, §r§a#\\d)?)?))",
+        "Full Traps: (?:None|(?<traps>#\\d(?:, #\\d(?:, #\\d)?)?))",
     ),
     NO_BAIT(
         /**
-         * REGEX-TEST: §r§fNo Bait: §r§c#1§r§7, §r§c#2§r§7, §r§c#3
-         * REGEX-TEST: §r§fNo Bait: §r§c#2§r§7, §r§c#3
-         * REGEX-TEST: §r§fNo Bait: §r§c#3
-         * REGEX-TEST: §r§fNo Bait: §r§7None
+         * REGEX-TEST: No Bait: #1, #2, #3
+         * REGEX-TEST: No Bait: #2, #3
+         * REGEX-TEST: No Bait: #3
+         * REGEX-TEST: No Bait: None
          */
         // language=RegExp
-        "(?:§.)*No Bait: (?:§.)*(?:None|§r§c(?<traps>#\\d(?:§r§7, §r§c#\\d(?:§r§7, §r§c#\\d)?)?))"
+        "No Bait: (?:None|(?<traps>#\\d(?:, #\\d(?:, #\\d)?)?))"
     ),
     VISITORS(
         // language=RegExp
-        "(?:§.)*Visitors: (?:§.)*\\((?<count>\\d+)\\)",
+        "Visitors: \\((?<count>\\d+)\\)",
     ),
     CROP_MILESTONE(
         // language=RegExp
-        "(?:§.)*Crop Milestones:",
+        "Crop Milestones:",
     ),
     PRIVATE_ISLAND_CRYSTALS(
         // language=RegExp
-        "Crystals: (?:§.)*(?<count>\\d+)",
+        "Crystals: (?<count>\\d+)",
     ),
     OLD_PET_SITTER(
         // language=RegExp
@@ -303,77 +304,77 @@ enum class TabWidget(
     ),
     DUNGEON_HUB_PROGRESS(
         // language=RegExp
-        "(?:§.)*Dungeons:",
+        "Dungeons:",
     ),
     DUNGEON_PUZZLE(
         // language=RegExp
-        "(?:§.)*Puzzles: (?:§.)*\\((?<amount>\\d+)\\)",
+        "Puzzles: \\((?<amount>\\d+)\\)",
     ),
     DUNGEON_PARTY(
         // language=RegExp
-        "(?:§.)*Party (?:§.)*\\(\\d+\\)",
+        "Party \\((?<amount>\\d+)\\)",
     ),
     DUNGEON_PLAYER_STATS(
         // language=RegExp
-        "(?:§.)*Player Stats",
+        "Player Stats",
     ),
     DUNGEON_SKILLS_AND_STATS(
         // language=RegExp
-        "(?:§.)*Skills: (?:§.)*\\w+ \\d+: (?:§.)*[\\d.]+%",
+        "Skills: \\w+ \\d+: [\\d.]+%",
     ),
 
     /** This line holds no information, only here because every widget must be present */
     DUNGEON_ACCOUNT_INFO_LINE(
         // language=RegExp
-        "(?:§.)*Account Info",
+        "Account Info",
     ),
     DUNGEON_STATS_LINE(
         // language=RegExp
-        "(?:§.)*Dungeon Stats",
+        "Dungeon Stats",
     ),
     FROZEN_CORPSES(
         // language=RegExp
-        "§b§lFrozen Corpses:",
+        "Frozen Corpses:",
     ),
     SCRAP(
         // language=RegExp
-        "Scrap: (?:§.)*(?<amount>\\d)(?:§.)*/(?:§.)*\\d",
+        "Scrap: (?<amount>\\d)/\\d",
     ),
     EVENT_TRACKERS(
         // language=RegExp
-        "§e§lEvent Trackers:",
+        "Event Trackers:",
     ),
     AGATHA_CONTEST(
         // language=RegExp
-        "(?:§.)*Agatha's Contest:.*",
+        "Agatha's Contest:.*",
     ),
     MOONGLADE_BEACON(
         // language=RegExp
-        "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
+        "Moonglade Beacon: (?<stacks>\\d+) Stacks?",
     ),
     SALTS(
         // language=RegExp
-        "(?:§.)*Salts:",
+        "Salts:",
     ),
     FOREST_WHISPERS(
         // language=RegExp
-        "(?:§.)*Forest Whispers: (?:§.)*(?<amount>.*)",
+        "Forest Whispers: (?<amount>.*)",
     ),
     SHARD_TRAPS(
         // language=RegExp
-        "(?:§.)*Shard Traps"
+        "Shard Traps"
     ),
     STARBORN_TEMPLE(
         // language=RegExp
-        "§9§lStarborn Temple:",
+        "Starborn Temple:",
     ),
     PITY(
         // language=RegExp
-        "§d§lPity:",
+        "Pity:",
     ),
     PICKAXE_COOLDOWN(
         // language=RegExp
-        "§9§lPickaxe Ability:",
+        "Pickaxe Ability:",
     ),
     ;
 
@@ -384,7 +385,7 @@ enum class TabWidget(
      *
      * When the widget isn't visible, it will be empty
      * */
-    var lines: List<String> = emptyList()
+    var lines: List<Component> = emptyList()
         private set
 
     /** Both are inclusive */
@@ -403,10 +404,10 @@ enum class TabWidget(
     /** A [matchMatcher] for the first line using the pattern from the widget*/
     inline fun <T> matchMatcherFirstLine(consumer: Matcher.() -> T) =
         if (isActive)
-            pattern.matchMatcher(lines.first(), consumer)
+            pattern.matchMatcher(lines.first().string, consumer)
         else null
 
-    private fun postNewEvent(lines: List<String>) {
+    private fun postNewEvent(lines: List<Component>) {
         // Prevent Post if lines are equal
         if (lines == this.lines) return
         this.lines = lines
@@ -451,12 +452,12 @@ enum class TabWidget(
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
-            update(TabListData.getTabList())
+            update(TabListDataComponent.getTabList())
             ChatUtils.debug("Forcefully Updated Widgets")
         }
 
         @HandleEvent(priority = HandleEvent.HIGH)
-        fun onTabListUpdate(event: TabListUpdateEvent) {
+        fun onTabListUpdate(event: TabListUpdateComponentEvent) {
             if (!SkyBlockUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
                     separatorIndexes.forEach { it.second?.updateIsActive() }
@@ -484,7 +485,7 @@ enum class TabWidget(
             }
         }
 
-        private fun update(newTablist: List<String>) {
+        private fun update(newTablist: List<Component>) {
             val tabList = filterTabList(newTablist)
 
             separatorIndexes.clear()
@@ -499,7 +500,7 @@ enum class TabWidget(
             separatorIndexes.zipWithNext { (firstIndex, widget), (secondIndex, _) ->
                 widget?.boundary = firstIndex to secondIndex - 1
                 widget?.gotChecked = true
-                widget?.postNewEvent(tabList.subList(firstIndex, secondIndex).filter { it.isNotEmpty() })
+                widget?.postNewEvent(tabList.subList(firstIndex, secondIndex).filter { it.string.isNotEmpty() })
             }
 
             entries.forEach { it.updateIsActive() }
@@ -519,7 +520,7 @@ enum class TabWidget(
             extraPatterns = repoGroup.getUnusedPatterns()
         }
 
-        private fun filterTabList(tabList: List<String>): List<String> {
+        private fun filterTabList(tabList: List<Component>): List<Component> {
             var playerListFound = false
             var infoFound = false
 

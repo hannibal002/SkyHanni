@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
 
@@ -126,7 +126,12 @@ object GiftProfitTracker {
     ).map { it.toPattern() }
     // </editor-fold>
 
-    private val tracker = SkyHanniItemTracker("Gift Tracker", ::Data, { it.giftProfitTracker }) {
+    private val tracker = SkyHanniItemTracker(
+        "Gift Tracker",
+        ::Data,
+        { it.giftProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
@@ -197,15 +202,11 @@ object GiftProfitTracker {
         "POTION_${skill.name.uppercase()}_XP_BOOST;$tier".toInternalName()
     }
 
-    private const val ADD_GIFT_USAGE = "§eUsage:\n§6/shaddusedgifts §e<§6giftType§7: white,red,green§e> <§6amount§e>\n" +
+    private const val ADD_GIFT_USAGE = "§eUsage:\n§6/shaddusedgifts §e<§6giftType§7: white,red,green,party§e> <§6amount§e>\n" +
         "§eExample: §6/shaddusedgifts white 10\n§eIf no amount is specified, 1 is assumed."
 
-    private fun tryAddUsedGift(args: Array<String>): String {
-        if (args.isEmpty()) return ADD_GIFT_USAGE
-        val giftName = args[0]
-        val gift = GiftType.byUserInput(giftName) ?: return ADD_GIFT_USAGE
-        val amountArg = args.getOrNull(1) ?: "1"
-        val amount = amountArg.toLongOrNull() ?: return "§cInvalid amount (§4${args[1]}§c) specified.\n$ADD_GIFT_USAGE"
+    private fun tryAddUsedGift(giftInput: String, amount: Long): String {
+        val gift = GiftType.byUserInput(giftInput) ?: return ADD_GIFT_USAGE
         tracker.modify {
             it.giftsUsed.addOrPut(gift, amount)
         }
@@ -215,17 +216,19 @@ object GiftProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shaddusedgifts") {
+        event.registerBrigadier("shaddusedgifts") {
             description = "Add used gifts to the gift profit tracker."
             category = CommandCategory.USERS_ACTIVE
-            callback {
-                ChatUtils.chat(tryAddUsedGift(it))
+            arg("gift", BrigadierArguments.string(), listOf("white", "red", "green", "party")) { gift ->
+                argCallback("amount", BrigadierArguments.long()) { amount ->
+                    ChatUtils.chat(tryAddUsedGift(getArg(gift), amount))
+                }
             }
         }
-        event.register("shresetgifttracker") {
+        event.registerBrigadier("shresetgifttracker") {
             description = "Reset the gift profit tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 
@@ -236,7 +239,7 @@ object GiftProfitTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         northStarsPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
             tracker.modify {
@@ -305,7 +308,7 @@ object GiftProfitTracker {
         var totalGiftCost = 0.0
         val giftCostStrings = applicableGifts.mapNotNull { (gift, count) ->
             val item = gift.toInternalName()
-            val totalPrice = SkyHanniTracker.getPricePer(item) * count
+            val totalPrice = tracker.getPricePer(item) * count
             if (totalPrice > 0) {
                 profit -= totalPrice
                 totalGiftCost += totalPrice

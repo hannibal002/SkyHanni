@@ -55,8 +55,8 @@ class DefaultConfigOptionGui(
         var y = originalMouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(width / 2F, (height - ySize) / 2F, 0F)
-        DrawContextUtils.scale(2f, 2f, 1f)
+        DrawContextUtils.translate(width / 2F, (height - ySize) / 2F)
+        DrawContextUtils.scale(2f, 2f)
         GuiRenderUtils.drawStringCenteredScaledMaxWidth(
             guiTitle,
             0F,
@@ -71,7 +71,6 @@ class DefaultConfigOptionGui(
         DrawContextUtils.translate(
             (width - xSize) / 2F + padding,
             (height + ySize) / 2F - mc.font.lineHeight * 2,
-            0F,
         )
         var i = 0
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
@@ -139,7 +138,6 @@ class DefaultConfigOptionGui(
         DrawContextUtils.translate(
             (width - xSize) / 2F + padding,
             (height - ySize) / 2F + barSize - currentScrollOffset,
-            0F,
         )
 
         for ((cat) in orderedOptions.entries) {
@@ -180,7 +178,7 @@ class DefaultConfigOptionGui(
             }
 
             y -= cardHeight
-            DrawContextUtils.translate(0F, cardHeight.toFloat(), 0F)
+            DrawContextUtils.translate(0F, cardHeight.toFloat())
         }
 
         DrawContextUtils.popMatrix()

@@ -2,24 +2,20 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
-import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
-import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
 
 plugins {
     idea
     java
-    id("com.gradleup.shadow") version "8.3.4"
-    id("fabric-loom")
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
+    id("com.gradleup.shadow") version "9.3.1"
+    id("net.fabricmc.fabric-loom-remap")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -43,18 +39,18 @@ runDirectory.mkdirs()
 
 // Minecraft configuration:
 loom {
-    val accessWidenerFile = when (target) {
-        ProjectTarget.MODERN_12105 -> rootProject.file("src/main/resources/skyhanni.accesswidener")
-        else -> file("src/main/resources/skyhanni.accesswidener")
+    val classTweakerFile = sc.process(
+        rootProject.file("src/main/resources/skyhanni.classtweaker"),
+        "build/skyhanni.classtweaker",
+    )
+    if (classTweakerFile.exists()) {
+        accessWidenerPath = classTweakerFile
+    } else {
+        println("No classTweaker file for ${target.minecraftVersion}")
     }
-    if (accessWidenerFile.exists()) {
-        accessWidenerPath = accessWidenerFile
-    }
-    @Suppress("UnstableApiUsage")
-    mixin {
-        useLegacyMixinAp.set(true)
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
-    }
+
+    fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
+
     runs {
         named("client") {
             isIdeConfigGenerated = true
@@ -96,10 +92,6 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
-val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
-    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
-}
-
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
@@ -120,7 +112,12 @@ dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
     if (target.mappingDependency == "official") {
-        mappings(loom.officialMojangMappings())
+        mappings(loom.layered {
+            officialMojangMappings()
+            if (versionName == "1.21.10") {
+                mappings("dev.lambdaurora:yalmm-mojbackward:1.21.10+build.3")
+            }
+        })
     } else {
         mappings(target.mappingDependency)
     }
@@ -153,6 +150,7 @@ dependencies {
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:1.12.5")
 
     modImplementation(libs.hypixelmodapi)
@@ -173,6 +171,8 @@ dependencies {
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+
+    if (target != ProjectTarget.MODERN_12110) shadowImpl("org.apache.httpcomponents:httpclient:4.5.14")
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
@@ -184,10 +184,11 @@ afterEvaluate {
     loom.runs.named("client") {
         programArgs("--quickPlayMultiplayer", "hypixel.net")
     }
-    tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths-excluded.txt").absolutePath}"))
+
+    ksp {
+        arg("skyhanni.modver", version.toString())
+        arg("skyhanni.mcver", target.minecraftVersion.versionName)
+        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
     }
 }
 
@@ -211,13 +212,21 @@ kotlin {
 tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
-    inputs.property("version", version)
+    val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val props = buildMap {
+        put("version", version)
+        put("minecraft", target.minecraftVersion.versionName)
+        put("fapi", fapiVersion)
+    }
+
+    props.forEach(inputs::property)
+
     filesMatching("fabric.mod.json") {
-        expand("version" to version)
+        expand(props)
     }
 }
 
-if (target == ProjectTarget.MODERN_12105) {
+if (target == ProjectTarget.MODERN_12110) {
     fabricApi {
         configureTests {
             modId = "skyhanni"
@@ -259,16 +268,6 @@ tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
-if (target.parent == ProjectTarget.MODERN_12105) {
-    val mainRes = project(ProjectTarget.MODERN_12105.projectPath).tasks.getAt("processResources")
-    tasks.named("processResources") {
-        dependsOn(mainRes)
-    }
-    tasks.named("preprocessCode") {
-        dependsOn(mainRes)
-    }
-}
-
 tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
@@ -277,9 +276,6 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
     archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
-    manifest.attributes.run {
-        this["Main-Class"] = "SkyHanniInstallerFrame"
-    }
 }
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
@@ -293,11 +289,6 @@ tasks.shadowJar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("all-dev")
     configurations = listOf(shadowImpl, shadowModImpl)
-    doLast {
-        configurations.forEach {
-            println("Config: ${it.files}")
-        }
-    }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
@@ -329,12 +320,6 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<ProcessResources> {
         onlyIf { false }
     }
-}
-
-preprocess {
-    vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("JAVA", target.minecraftVersion.javaVersion)
-    vars.put("TODO", 0)
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -372,7 +357,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MODERN_12105 && project.findProperty("skipDetekt") != "true"
+        target == ProjectTarget.MODERN_12110 && project.findProperty("skipDetekt") != "true"
     }
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
@@ -399,10 +384,13 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     outputs.cacheIf { false } // Custom rules won't work if cached
     onlyIf {
         // We only need one baseline for the main source set
-        target == ProjectTarget.MODERN_12105
+        target == ProjectTarget.MODERN_12110
     }
 
     val isMainBaseline = (this.name == "detektBaselineMain")
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
+}
+repositories {
+    mavenCentral()
 }

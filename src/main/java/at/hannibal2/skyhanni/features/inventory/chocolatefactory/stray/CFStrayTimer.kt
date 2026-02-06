@@ -43,8 +43,8 @@ object CFStrayTimer {
         timer = when (event.type) {
             // If a stray is found, the timer is no longer relevant
             HoppityEggType.STRAY -> Duration.ZERO
-            // Only reset the timer for meal entries and hitman eggs
-            in HoppityEggType.resettingEntries, HoppityEggType.HITMAN -> 30.seconds
+            // Only reset the timer for meal entries, and hitman/visitor rabbits
+            in HoppityEggType.resettingEntries, HoppityEggType.HITMAN, HoppityEggType.VISITOR -> 30.seconds
             else -> return
         }
         lastTimerSubtraction = null

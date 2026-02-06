@@ -173,7 +173,7 @@ object CenturyPartyInvitation {
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent) {
+    fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message

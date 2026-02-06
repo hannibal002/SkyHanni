@@ -68,7 +68,7 @@ object FusionDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (pureReptilePattern.find(event.message)) pureReptiles++
     }
 

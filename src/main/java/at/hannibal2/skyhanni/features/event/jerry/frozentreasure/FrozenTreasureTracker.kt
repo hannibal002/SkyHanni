@@ -37,7 +37,12 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", ::Data, { it.frozenTreasureTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Frozen Treasure Tracker",
+        ::Data,
+        { it.frozenTreasureTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         formatDisplay(drawDisplay(it))
     }
 
@@ -97,7 +102,7 @@ object FrozenTreasureTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!ProfileStorageData.loaded) return
 
         val message = event.cleanMessage.trim()
@@ -167,10 +172,10 @@ object FrozenTreasureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetfrozentreasuretracker") {
+        event.registerBrigadier("shresetfrozentreasuretracker") {
             description = "Resets the Frozen Treasure Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

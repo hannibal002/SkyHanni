@@ -11,9 +11,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import kotlin.time.Duration.Companion.seconds
 
@@ -53,7 +51,7 @@ object CarnivalQuickStart {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         // IDK what is wrong here, but it does not work with event.message
         if (!chatPattern.matches(event.chatComponent)) return

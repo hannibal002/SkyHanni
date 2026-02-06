@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.replace
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.compat.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -15,49 +17,51 @@ object ColorfulItemStats {
     private val group = RepoPattern.group("misc.itemstats")
 
     /**
-     * REGEX-TEST: §7Crit Chance: §c+30%
-     * REGEX-TEST: §7Magic Find: §a+54.52
-     * REGEX-TEST: §7Rift Time: §a+60s
-     * REGEX-TEST: §7Strength: §c+60 §e(+20) §9(+40) §8(+199.2)
-     * REGEX-FAIL: §7Health: §c+1000❤
+     * REGEX-TEST: Crit Chance: +30%
+     * REGEX-TEST: Magic Find: +54.52
+     * REGEX-TEST: Rift Time: +60s
+     * REGEX-TEST: Strength: +60 (+20) (+40) (+199.2)
+     * REGEX-FAIL: Health: +1000❤
      */
     private val genericStat by group.pattern(
-        "generic-stats",
-        "§7(?<stat>[a-zA-Z ]+): (?<oldColor>§[0-9a-f])(?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
+        "generic-stats-no-color",
+        "(?<stat>[a-zA-Z ]+): (?<bonus>[-+]?[\\d.,%s]+)(?:\\s|$)",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltipEvent(event: ToolTipEvent) {
-        if (!config.enabled) return
+    fun onTooltipEvent(event: ToolTipTextEvent) {
+        if (!config.statIcons) return
 
         for ((index, line) in event.toolTip.withIndex()) {
-            event.toolTip[index] = genericStat.replace(line) {
-
+            genericStat.findMatcher(line.string) {
                 val stat = group("stat")
-                val oldColor = group("oldColor")
-
                 val statId = stat.uppercase().replace(" ", "_")
-
-                val skyblockStatIcon = SkyblockStat.getIconOrNull(statId) ?: return@replace this.group()
+                val skyblockStatIcon = SkyblockStat.getIconOrNull(statId) ?: return@findMatcher
 
                 val bonusGroup = group("bonus")
-                val bonus = when {
-                    config.replacePercentages && config.statIcons && bonusGroup.endsWith("%") -> bonusGroup.removeSuffix("%")
-                    config.replaceRiftSeconds && config.statIcons && bonusGroup.endsWith("s") -> bonusGroup.removeSuffix("s")
+                var bonus = when {
+                    config.replacePercentages && bonusGroup.endsWith("%") -> bonusGroup.removeSuffix("%")
+                    config.replaceRiftSeconds && bonusGroup.endsWith("s") -> bonusGroup.removeSuffix("s")
                     else -> bonusGroup
                 }
+                bonus += skyblockStatIcon.drop(2)
 
-                buildString {
-                    append("§7$stat: ")
-                    append(skyblockStatIcon.take(2))
-                    append(bonus)
-                    if (config.statIcons) {
-                        append(skyblockStatIcon.drop(2))
-                    }
-                    append(oldColor)
-                    append(" ")
-                }
+                val newComp = line.replace(group("bonus"), bonus, true) ?: return@findMatcher
+                event.toolTip[index] = newComp
             }
         }
     }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(122, "misc.colorfulItemTooltips") { element ->
+            val oldEnabled = element.asJsonObject.get("enabled").asBoolean
+            if (!oldEnabled) {
+                element.asJsonObject.remove("statIcons")
+                element.asJsonObject.addProperty("statIcons", false)
+            }
+            element
+        }
+    }
+
 }

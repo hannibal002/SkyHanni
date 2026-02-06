@@ -73,7 +73,7 @@ object GardenVisitorCompactChat {
     private var rewardsList = mutableListOf<String>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (GardenApi.inGarden() && config.compactRewardChat && (
                 fullyAcceptedPattern.matcher(event.message.removeResets()).matches() ||
                     visitorRewardPattern.matcher(event.message.removeResets()).matches() ||
@@ -84,7 +84,7 @@ object GardenVisitorCompactChat {
         }
     }
 
-    private fun handleChat(event: SkyHanniChatEvent) {
+    private fun handleChat(event: SkyHanniChatEvent.Allow) {
         val transformedMessage = event.message.removeResets()
 
         fullyAcceptedPattern.matchMatcher(transformedMessage) {
@@ -129,7 +129,7 @@ object GardenVisitorCompactChat {
         compactChat(event)
     }
 
-    private fun compactChat(event: SkyHanniChatEvent) {
+    private fun compactChat(event: SkyHanniChatEvent.Allow) {
         event.blockedReason = "compact_visitor"
         visitorAcceptedChat.add(event.message)
         if (visitorAcceptedChat.size == 3) {

@@ -212,7 +212,7 @@ object ExperimentsAddonsHelper {
 
     private fun ReplaceItemEvent.replaceChronomatronItem() {
         val nextClickColor = hypixelChronomatronData.getOrNull(userChronomatronProgress.size) ?: return
-        originalItem?.getLorenzColorOrNull()?.takeIf { it == nextClickColor } ?: return
+        originalItem.getLorenzColorOrNull()?.takeIf { it == nextClickColor } ?: return
         val newItem = originalItem.copy()
         newItem.addEnchantGlint()
         replace(newItem)

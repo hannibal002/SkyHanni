@@ -117,7 +117,7 @@ object SlayerProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         autoSlayerBankPattern.matchMatcher(event.message) {
             addSlayerCosts(-group("coins").formatDouble())
@@ -141,7 +141,12 @@ object SlayerProfitTracker {
                     category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$categoryName Profit Tracker", ::Data, getStorage) { drawDisplay(it) }
+            SkyHanniItemTracker(
+                "$categoryName Profit Tracker",
+                ::Data,
+                getStorage,
+                trackerConfig = { config.perTrackerConfig }
+            ) { drawDisplay(it) }
         }
     }
 
@@ -277,10 +282,10 @@ object SlayerProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetslayerprofits") {
+        event.registerBrigadier("shresetslayerprofits") {
             description = "Resets the total slayer profit for the current slayer type"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

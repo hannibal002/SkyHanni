@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.res
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.VISITOR
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
@@ -204,7 +205,7 @@ object HoppityApi {
         item != null && item.item != null && (item.item == Items.PLAYER_HEAD || item.isStainedGlassPane()) &&
             item.hoverName.string.isNotEmpty() && item.getLore().isNotEmpty()
 
-    private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
+    private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent.Allow, note: String? = null) {
         EggFoundEvent(
             type,
             chatEvent = event,
@@ -321,7 +322,7 @@ object HoppityApi {
 
             // Each of these have their own from-Hypixel chats, so we don't need to add a message here
             // as it will be handled in the attemptFireRabbitFound method, from the chat event.
-            in resettingEntries, HITMAN, BOUGHT, BOUGHT_ABIPHONE -> null
+            in resettingEntries, HITMAN, BOUGHT, BOUGHT_ABIPHONE, VISITOR -> null
             else -> "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type: §c§l${event.type}"
         }?.let { hoppityDataSet.hoppityMessages.add(it) }
 
@@ -329,12 +330,17 @@ object HoppityApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             val type = getEggType(event)
             val note = groupOrNull("note")?.removeColor()
             postApiEggFoundEvent(type, event, note)
+        }
+
+        if (IslandType.GARDEN.isCurrent()) HoppityEggsManager.hoppityVisitorAccepted.matchMatcher(event.cleanMessage) {
+            hoppityDataSet.reset()
+            postApiEggFoundEvent(VISITOR, event)
         }
 
         HoppityEggsManager.hitmanEggFoundPattern.matchMatcher(event.message) {
@@ -369,7 +375,7 @@ object HoppityApi {
         }
     }
 
-    fun attemptFireRabbitFound(event: SkyHanniChatEvent? = null, lastDuplicateAmount: Long? = null) {
+    fun attemptFireRabbitFound(event: SkyHanniChatEvent.Allow? = null, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
             hoppityDataSet.lastDuplicateAmount = it
             hoppityDataSet.duplicate = true

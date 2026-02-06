@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -54,15 +53,19 @@ object FarmingFortuneDisplay {
     private val config get() = GardenApi.config.farmingFortunes
 
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
+
+    /**
+     * REGEX-TEST:  Farming Fortune: ☘1234
+     */
     private val universalTabFortunePattern by patternGroup.pattern(
-        "tablist.universal",
-        " Farming Fortune: §r§6☘(?<fortune>\\d+)",
+        "tablist.universal-no-color",
+        " Farming Fortune: ☘(?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
-        "tablist.cropspecific",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: §r§6☘(?<fortune>\\d+)",
+        "tablist.cropspecific-no-color",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ☘(?<fortune>\\d+)",
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
@@ -94,14 +97,14 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEST:  Bonus: §r§c§lINACTIVE
-     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b29m
-     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b5m 2s
-     * REGEX-TEST:  Bonus: §r§6+200☘ §r§b8s
+     * REGEX-TEST:  Bonus: INACTIVE
+     * REGEX-TEST:  Bonus: +200☘ 29m
+     * REGEX-TEST:  Bonus: +200☘ 5m 2s
+     * REGEX-TEST:  Bonus: +200☘ 8s
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
-        "pestfortunebuff",
-        " Bonus: §r§.(?<inactive>§lINACTIVE)?(?:\\+(?<fortune>\\d+)☘ §r§b(?<time>.*))?.*",
+        "pestfortunebuff-no-color",
+        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)☘ (?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -146,7 +149,7 @@ object FarmingFortuneDisplay {
     }
 
     private fun checkPests(widget: TabWidget) {
-        pestFortuneBuffPattern.firstMatcher(widget.lines) {
+        pestFortuneBuffPattern.firstMatcher(widget.lines.map { it.string }) {
             val inactive = groupOrNull("inactive")
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestBonusExpireTime) }
             val fortune = groupOrNull("fortune")?.toIntOrNull()
@@ -168,7 +171,7 @@ object FarmingFortuneDisplay {
     }
 
     private fun checkStats(widget: TabWidget) {
-        universalTabFortunePattern.firstMatcher(widget.lines) {
+        universalTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val fortune = group("fortune").toDouble()
             foundTabUniversalFortune = true
             if (fortune != tabFortuneUniversal) {
@@ -176,7 +179,7 @@ object FarmingFortuneDisplay {
                 update()
             }
         }
-        cropSpecificTabFortunePattern.firstMatcher(widget.lines) {
+        cropSpecificTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val crop = CropType.getByName(group("crop"))
             val cropFortune = group("fortune").toDouble()
 
@@ -409,9 +412,7 @@ object FarmingFortuneDisplay {
         if (cropType == null) return 0.0
         val dedicationLevel = tool?.getHypixelEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
-        val cropMilestone = GardenCropMilestones.getTierForCropCount(
-            cropType.getCounter(), cropType,
-        )
+        val cropMilestone = cropType.getCurrentMilestoneTier()?.toDouble() ?: 0.0
         return dedicationMultiplier * cropMilestone
     }
 

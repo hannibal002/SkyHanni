@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import com.google.common.cache.RemovalCause.EXPIRED
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
@@ -100,11 +101,11 @@ object PestTrapApi {
             it.toIntOrNull()
         }?.takeIfNotEmpty()?.toSet()
 
-    private fun TabWidget.getNewHashOrNull(line: String): Int? = line.hashCode().takeIf {
+    private fun TabWidget.getNewHashOrNull(line: Component): Int? = line.hashCode().takeIf {
         it != lastHashes[this]
     }
 
-    private fun String.getTrapsPlacedOrNull(): Int? = tabListPestTrapsPattern.matchMatcher(this) {
+    private fun Component.getTrapsPlacedOrNull(): Int? = tabListPestTrapsPattern.matchMatcher(this) {
         widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
         MAX_TRAPS = groupOrNull("max")?.toIntOrNull() ?: MAX_TRAPS
         lastHashes[TabWidget.PEST_TRAPS] = TabWidget.PEST_TRAPS.getNewHashOrNull(this@getTrapsPlacedOrNull)
@@ -112,14 +113,14 @@ object PestTrapApi {
         return groupOrNull("count")?.toIntOrNull()
     }
 
-    private fun String.getFullTrapsOrNull(): Set<Int>? = tabListFullTrapsPattern.matchMatcher(this) {
+    private fun Component.getFullTrapsOrNull(): Set<Int>? = tabListFullTrapsPattern.matchMatcher(this) {
         widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
         lastHashes[TabWidget.FULL_TRAPS] = TabWidget.FULL_TRAPS.getNewHashOrNull(this@getFullTrapsOrNull)
             ?: return@matchMatcher fullTraps
         return this.getTrapIndexSet()
     }
 
-    private fun String.getNoBaitTrapsOrNull(): Set<Int>? = tabListNoBaitPattern.matchMatcher(this) {
+    private fun Component.getNoBaitTrapsOrNull(): Set<Int>? = tabListNoBaitPattern.matchMatcher(this) {
         widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
         lastHashes[TabWidget.NO_BAIT] = TabWidget.NO_BAIT.getNewHashOrNull(this@getNoBaitTrapsOrNull)
             ?: return@matchMatcher noBaitTraps
