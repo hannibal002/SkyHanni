@@ -393,6 +393,7 @@ object OrderedWaypoints {
         if (closestInRange != null && closestInRange.number - 1 > currentOrderedWaypointIndex) {
             currentOrderedWaypointIndex = closestInRange.number - 1
             lastCloser = currentOrderedWaypointIndex
+            return
         }
 
         val beforeWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex - 1)
