@@ -138,11 +138,11 @@ object GraphEditorInput {
 
     private fun handleUndoRedo(): Boolean {
         if (Minecraft.getInstance().screen == null) {
-            if (GLFW.GLFW_KEY_Y.isKeyClicked() && KeyboardManager.isControlKeyDown()) {
+            if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Y.isKeyClicked()) {
                 GraphEditorHistory.undo()
                 return true
             }
-            if (GLFW.GLFW_KEY_Z.isKeyClicked() && KeyboardManager.isControlKeyDown()) {
+            if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Z.isKeyClicked()) {
                 GraphEditorHistory.redo()
                 return true
             }
