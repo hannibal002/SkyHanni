@@ -232,7 +232,7 @@ object GraphEditorInput {
         }
         config.enabled = false
         GraphEditor.chatAtDisable()
-        return false
+        return true
     }
 
     private fun testDijkstra() {
@@ -260,7 +260,7 @@ object GraphEditorInput {
             }.filterNotNull(),
         )
 
-        GraphEditorHistory.save("help when is this")
+        GraphEditorHistory.save("Test Dijkstra")
         GraphEditor.state = newState
     }
 

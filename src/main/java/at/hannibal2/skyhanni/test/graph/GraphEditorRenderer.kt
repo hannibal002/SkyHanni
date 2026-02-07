@@ -70,7 +70,7 @@ object GraphEditorRenderer {
             add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
             add("§eSelect (Look): §6${KeyboardManager.getKeyName(config.selectRaycastKey)}")
             add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
-            add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
+            add("§eTest Dijkstra: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
             add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
             add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
             add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")

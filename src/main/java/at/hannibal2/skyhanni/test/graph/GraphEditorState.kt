@@ -105,6 +105,9 @@ class GraphEditorState {
 
         this.highlightedNodes.mapNotNullTo(newState.highlightedNodes) { nodeMap[it] }
 
+        val edgeMap = this.edges.zip(newState.edges).toMap()
+        this.highlightedEdges.mapNotNullTo(newState.highlightedEdges) { edgeMap[it] }
+
         return newState
     }
 }

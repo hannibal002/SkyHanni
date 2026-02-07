@@ -24,6 +24,9 @@ object GraphEditor {
 
     var state = GraphEditorState()
         set(value) {
+            if (field.inTextMode) {
+                field.inTextMode = false
+            }
             field = value
             updateRender()
             GraphNodeEditor.updateNodeNames()
