@@ -198,6 +198,10 @@ object GraphEditorInput {
 
     private fun handleTextMode(): Boolean {
         if (!state.inTextMode) return false
+        if (!textBox.isActive) {
+            saveAndExitTextMode()
+            return true
+        }
         textBox.handle()
         return true
     }
@@ -205,22 +209,7 @@ object GraphEditorInput {
     private fun handleExit(): Boolean {
         if (!config.exitKey.isKeyClicked()) return false
         if (state.inTextMode) {
-            val newText = textBox.finalText().ifEmpty { null }
-            val activeNode = state.activeNode
-
-            if (activeNode != null && activeNode.name != newText) {
-                GraphEditorHistory.save("renamed node")
-                activeNode.name = newText
-            }
-
-            state.inTextMode = false
-            GraphEditor.feedBackInTutorial("Exited Text Mode.")
-            activeNode?.let {
-                GraphEditorNodeOperations.handleNameShortcut(it.name)?.let { (tag, name) ->
-                    it.tags.add(tag)
-                    it.name = name
-                }
-            }
+            saveAndExitTextMode()
             return true
         }
         if (state.inEditMode) {
@@ -231,6 +220,25 @@ object GraphEditorInput {
         config.enabled = false
         GraphEditor.chatAtDisable()
         return true
+    }
+
+    private fun saveAndExitTextMode() {
+        val newText = textBox.finalText().ifEmpty { null }
+        val activeNode = state.activeNode
+
+        if (activeNode != null && activeNode.name != newText) {
+            GraphEditorHistory.save("renamed node")
+            activeNode.name = newText
+        }
+
+        state.inTextMode = false
+        GraphEditor.feedBackInTutorial("Exited Text Mode.")
+        activeNode?.let {
+            GraphEditorNodeOperations.handleNameShortcut(it.name)?.let { (tag, name) ->
+                it.tags.add(tag)
+                it.name = name
+            }
+        }
     }
 
     private fun testDijkstra() {
