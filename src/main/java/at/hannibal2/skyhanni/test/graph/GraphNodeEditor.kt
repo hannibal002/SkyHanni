@@ -202,7 +202,11 @@ object GraphNodeEditor {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
             }
-            val name = node.name?.takeIf { it.isNotBlank() } ?: continue
+            val name = if (state.inTextMode && node == state.activeNode) {
+                state.textBox.finalText().takeIf { it.isNotBlank() }
+            } else {
+                node.name?.takeIf { it.isNotBlank() }
+            } ?: continue
             val color = if (node == state.activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
             val tagText = node.tags.let { tags ->

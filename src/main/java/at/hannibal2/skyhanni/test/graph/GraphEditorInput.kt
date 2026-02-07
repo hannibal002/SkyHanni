@@ -199,7 +199,6 @@ object GraphEditorInput {
     private fun handleTextMode(): Boolean {
         if (!state.inTextMode) return false
         textBox.handle()
-        state.activeNode?.name = textBox.finalText().ifEmpty { null }
         return true
     }
 
@@ -209,7 +208,6 @@ object GraphEditorInput {
             val newText = textBox.finalText().ifEmpty { null }
             val activeNode = state.activeNode
 
-            // Check if name got changed
             if (activeNode != null && activeNode.name != newText) {
                 GraphEditorHistory.save("renamed node")
                 activeNode.name = newText

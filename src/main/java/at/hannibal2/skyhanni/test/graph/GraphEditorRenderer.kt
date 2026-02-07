@@ -118,18 +118,25 @@ object GraphEditorRenderer {
             inverseAlphaScale = true,
         )
 
-        val nodeName = node.name ?: return
         val showTextAlways = seeThroughBlocks || node.distanceSqToPlayer() < 100
-        this.drawDynamicText(
-            node.position,
-            nodeName,
-            0.8,
-            seeThroughBlocks = showTextAlways,
-            smallestDistanceVew = 12.0,
-            ignoreY = true,
-            yOff = -15f,
-            maxDistance = 80,
-        )
+
+        val nodeName = if (inTextMode && node == activeNode) {
+            textBox.finalText().ifEmpty { null }
+        } else {
+            node.name
+        }
+        if (nodeName != null) {
+            this.drawDynamicText(
+                node.position,
+                nodeName,
+                0.8,
+                seeThroughBlocks = showTextAlways,
+                smallestDistanceVew = 12.0,
+                ignoreY = true,
+                yOff = -15f,
+                maxDistance = 80,
+            )
+        }
 
         val tags = node.tags
         if (tags.isEmpty()) return
