@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.uniforms
-//? > 1.21.5 {
-/*import com.mojang.blaze3d.buffers.GpuBufferSlice
+
+import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import java.nio.ByteBuffer
@@ -8,9 +8,9 @@ import net.minecraft.client.renderer.DynamicUniformStorage
 import org.joml.Matrix4fc
 
 class SkyHanniRoundedUniform : AutoCloseable {
-    private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().putFloat().putVec2().putVec2().putMat4f().get()
+    private val uniformSize = Std140SizeCalculator().putFloat().putFloat().putFloat().putVec2().putVec2().putMat4f().get()
 
-    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Rounded Rect UBO", UNIFORM_SIZE, 2)
+    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Rounded Rect UBO", uniformSize, 2)
 
     fun writeWith(
         scaleFactor: Float,
@@ -52,4 +52,3 @@ class SkyHanniRoundedUniform : AutoCloseable {
         }
     }
 }
-*///?}

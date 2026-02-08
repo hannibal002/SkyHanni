@@ -1,23 +1,21 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import net.minecraft.world.entity.player.Player
 import java.awt.Color
-//? > 1.21.5 {
-/*import org.joml.Matrix3x2f
+import org.joml.Matrix3x2f
 import kotlin.math.atan
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.entity.LivingEntity
 import org.joml.Quaternionf
 import org.joml.Vector3f
-*///?}
 
 fun Renderable.Companion.fakePlayer(
-    player: Player,
+    player: FakePlayer,
     followMouse: Boolean = false,
     eyesX: Float = 0f,
     eyesY: Float = 0f,
@@ -37,22 +35,7 @@ fun Renderable.Companion.fakePlayer(
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 100f)
-        //? < 1.21.7 {
-        InventoryScreen.renderEntityInInventoryFollowsMouse(
-            DrawContextUtils.drawContext,
-            padding,
-            padding,
-            padding + width,
-            padding + height,
-            entityScale,
-            0.0625f,
-            if (followMouse) mouse.first - mouseOffsetX.toFloat() else eyesX,
-            if (followMouse) mouse.second - mouseOffsetY.toFloat() else eyesY,
-            player,
-        )
-        //?} else {
-        /*val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
+        val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
         val translationX = peeked.m20().toInt()
         val translationY = peeked.m21().toInt()
         val averageScale = (peeked.m00() + peeked.m11()) / 2
@@ -71,13 +54,11 @@ fun Renderable.Companion.fakePlayer(
             if (followMouse) (mouse.second - mouseOffsetY.toFloat()) * averageScale + translationY else eyesY,
             player,
         )
-        *///?}
         DrawContextUtils.popMatrix()
     }
 }
 
-//? > 1.21.5 {
-/*private fun drawEntityWithoutScissor(
+private fun drawEntityWithoutScissor(
     guiGraphics: GuiGraphics,
     x1: Int,
     y1: Int,
@@ -89,6 +70,7 @@ fun Renderable.Companion.fakePlayer(
     mouseY: Float,
     entity: LivingEntity,
 ) {
+    //? if < 1.21.11 {
     val n: Float = (x1 + x2).toFloat() / 2.0f
     val o: Float = (y1 + y2).toFloat() / 2.0f
     val p = atan(((n - mouseX) / 40.0f).toDouble()).toFloat()
@@ -126,5 +108,6 @@ fun Renderable.Companion.fakePlayer(
     entity.setXRot(t)
     entity.yHeadRotO = u
     entity.yHeadRot = v
+    //?} else
+    //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
 }
-*///?}

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.compat.ReiCompat
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -54,10 +53,9 @@ object InventoryCompat {
         if (slot < 0) return
         val gui = Minecraft.getInstance().screen
         if (gui is AbstractContainerScreen<*>) {
-            val accessor = gui as AccessorHandledScreen
             val slotObj = gui.menu.getSlot(slot)
             val actionType = ClickType.entries[mode]
-            accessor.handleMouseClick_skyhanni(slotObj, slot, mouseButton, actionType)
+            gui.slotClicked(slotObj, slot, mouseButton, actionType)
         }
     }
 

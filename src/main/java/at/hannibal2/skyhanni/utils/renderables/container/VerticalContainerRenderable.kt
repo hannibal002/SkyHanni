@@ -21,9 +21,9 @@ open class VerticalContainerRenderable protected constructor(
         renderables.forEach {
             it.renderXAligned(mouseOffsetX, y, width)
             y += it.height + spacing
-            DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
+            DrawContextUtils.translate(0f, (it.height + spacing).toFloat())
         }
-        DrawContextUtils.translate(0f, (-height - spacing).toFloat(), 0f)
+        DrawContextUtils.translate(0f, (-height - spacing).toFloat())
     }
 
     companion object {

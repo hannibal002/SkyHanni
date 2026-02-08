@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -41,7 +40,7 @@ class EnchantParsingConfig {
         desc = "Chroma requires a separate setting.\n§eIf SkyHanni chroma is disabled Chroma will default to §6Gold.",
     )
     @ConfigEditorButton(buttonText = "Go")
-    val chromaRunnable = Runnable { SkyHanniMod.feature.gui.chroma::enabled.jumpToEditor() }
+    val chromaRunnable = Runnable { EnchantParser.openConfigLink() }
 
     @Expose
     @ConfigOption(name = "Ultimate Enchantment Color", desc = "The color the Ultimate enchantment will be. (Will always be bold)")

@@ -34,11 +34,6 @@ object ModernPatterns {
         "§7Current pitch: §a(?<pitch>.+)",
     )
 
-    val beaconReadyPattern by RepoPattern.pattern(
-        "foraging.moonglade.beacon.available",
-        " §r§fCooldown: §r§7§r§aAVAILABLE",
-    )
-
     /**
      * REGEX-TEST: §a§lFIG TREE §r§b§l88%
      * REGEX-TEST: §2§lMANGROVE TREE §r§b§l5%

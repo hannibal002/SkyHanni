@@ -64,6 +64,7 @@ object FishingProfitTracker {
         "Fishing Profit Tracker",
         ::Data,
         { it.fishing.fishingProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     data class Data(
@@ -88,10 +89,10 @@ object FishingProfitTracker {
             )
         }
 
-        override fun getCustomPricePer(internalName: NeuInternalName): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
             return if (internalName.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH) {
-                SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingApi.getFilletPerTrophy(internalName)
-            } else super.getCustomPricePer(internalName)
+                tracker.getPricePer(MAGMA_FISH) * FishingApi.getFilletPerTrophy(internalName)
+            } else super.getCustomPricePer(internalName, tracker)
         }
     }
 

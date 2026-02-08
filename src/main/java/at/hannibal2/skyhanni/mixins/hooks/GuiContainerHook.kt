@@ -54,10 +54,10 @@ class GuiContainerHook(guiAny: Any) {
 
     fun foregroundDrawn(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
         DrawContextUtils.setContext(context)
-        DrawContextUtils.translate(0.0, 0.0, 200.0)
+        DrawContextUtils.translate(0.0, 0.0)
 
         GuiContainerEvent.ForegroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
-        DrawContextUtils.translate(0.0, 0.0, -200.0)
+        DrawContextUtils.translate(0.0, 0.0)
         DrawContextUtils.clearContext()
     }
 

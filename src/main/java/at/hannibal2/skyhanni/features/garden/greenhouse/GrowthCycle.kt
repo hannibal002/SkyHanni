@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -37,14 +36,6 @@ object GrowthCycle {
     val patternGroup = RepoPattern.group("garden.greenhouse.growthcycle")
 
     /**
-     * REGEX-TEST: Crop Diagnostics
-     */
-    private val inventoryPattern by patternGroup.pattern(
-        "inventory",
-        "Crop Diagnostics",
-    )
-
-    /**
      * REGEX-TEST: Next Stage: 1h 40m 20s
      * REGEX-TEST: Next Stage: 40m 20s
      * REGEX-TEST: Next Stage: 20m 1s
@@ -55,14 +46,12 @@ object GrowthCycle {
         "Next Stage: (?<time>(?:\\d\\d?[hms] ?)+)",
     )
 
-    private val cropDiagnosticInventory = InventoryDetector(inventoryPattern)
-
     private var display: Renderable? = null
     private var beep = true
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!cropDiagnosticInventory.isInside()) return
+        if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
         val item = event.inventoryItemsWithNull[20] ?: return
         val lore = item.getLoreComponent()
 

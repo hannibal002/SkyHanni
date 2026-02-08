@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -48,21 +50,21 @@ object ComposterDisplay {
     private var tabListData by ComposterApi::tabListData
 
     enum class DataType(rawPattern: String, val icon: String) {
-        ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
-        FUEL(" Fuel: §r(.*)", "OIL_BARREL"),
-        TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
-        STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
+        ORGANIC_MATTER(" Organic Matter: (.*)", "WHEAT"),
+        FUEL(" Fuel: (.*)", "OIL_BARREL"),
+        TIME_LEFT(" Time Left: (.*)", "WATCH"),
+        STORED_COMPOST(" Stored Compost: (.*)", "COMPOST");
 
         val displayItem by AutoUpdatingItemStack(icon)
 
         val pattern = rawPattern.toPattern()
 
-        fun label(label: String) = Renderable.horizontal {
+        fun label(label: Component) = Renderable.horizontal {
             addItemStack(displayItem)
-            addString(label)
+            add(Renderable.text(label))
         }
 
-        fun labeledWithData(map: Map<DataType, String>): Renderable? {
+        fun labeledWithData(map: Map<DataType, Component>): Renderable? {
             return map[this]?.let { label(it) }
         }
     }
@@ -71,7 +73,20 @@ object ComposterDisplay {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.COMPOSTER)) return
 
-        readData(event.lines)
+        val newData = mutableMapOf<DataType, Component>()
+
+        for (line in event.lines) {
+            if (line.string != "Composter:") {
+                if (line.string == "") break
+                loop@ for (type in DataType.entries) {
+                    type.pattern.matchMatcher(line) {
+                        newData[type] = TextHelper.matcher(line, group(1)) ?: continue@loop
+                    }
+                }
+            }
+        }
+
+        tabListData = newData
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterApi.estimateEmptyTimeFromTab()
@@ -104,28 +119,6 @@ object ComposterDisplay {
                 addString("§b$format")
             }
         } else Renderable.text("§cOpen Composter Upgrades!")
-    }
-
-    private fun readData(tabList: List<String>) {
-        var next = false
-        val newData = mutableMapOf<DataType, String>()
-
-        for (line in tabList) {
-            if (line == "§b§lComposter:") {
-                next = true
-                continue
-            }
-            if (next) {
-                if (line == "") break
-                for (type in DataType.entries) {
-                    type.pattern.matchMatcher(line) {
-                        newData[type] = group(1)
-                    }
-                }
-            }
-        }
-
-        tabListData = newData
     }
 
     private fun sendNotify() {

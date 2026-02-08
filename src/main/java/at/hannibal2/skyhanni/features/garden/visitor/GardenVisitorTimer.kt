@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -84,7 +85,7 @@ object GardenVisitorTimer {
     @Suppress("CyclomaticComplexMethod")
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
+        var visitorsAmount = VisitorApi.visitorsInTabList(TabListDataComponent.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false

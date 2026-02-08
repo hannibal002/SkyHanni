@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -200,4 +203,11 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var dungeonSecretCompass: Boolean = true
+
+    @ConfigOption(
+        name = "Instance Chest Profit",
+        desc = "click the button to jump to Dungeon Chest Profit/Croesus Profit Settings.",
+    )
+    @ConfigEditorButton(buttonText = "Go")
+    val chestOverlayRunnable = Runnable { SkyHanniMod.feature.combat.instanceChestProfit::enabled.jumpToEditor() }
 }

@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.data.mob
 
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.Cod
-import net.minecraft.world.entity.animal.Panda
-import net.minecraft.world.entity.animal.Salmon
-import net.minecraft.world.entity.animal.TropicalFish
 import net.minecraft.world.entity.animal.axolotl.Axolotl
+import net.minecraft.world.entity.animal.fish.Cod
+import net.minecraft.world.entity.animal.fish.Salmon
+import net.minecraft.world.entity.animal.fish.TropicalFish
 import net.minecraft.world.entity.animal.frog.Frog
 import net.minecraft.world.entity.animal.frog.Tadpole
+import net.minecraft.world.entity.animal.panda.Panda
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Shulker
 import net.minecraft.world.item.DyeColor

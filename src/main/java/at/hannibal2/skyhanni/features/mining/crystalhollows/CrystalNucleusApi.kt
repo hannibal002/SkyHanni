@@ -130,7 +130,7 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            val bookType = ItemUtils.readBookType(itemName)
+            val bookType = ItemUtils.readBookTypeStrippedColor(itemName)
             return when (bookType) {
                 "Lapidary I" -> LAPIDARY_I_BOOK_ITEM to 1
                 "Fortune IV" -> FORTUNE_IV_BOOK_ITEM to 1

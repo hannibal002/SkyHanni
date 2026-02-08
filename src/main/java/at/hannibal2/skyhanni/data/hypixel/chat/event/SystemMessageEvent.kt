@@ -19,12 +19,14 @@ object SystemMessageEvent {
 
     open class Modify(
         open val message: String,
+        @set:Deprecated("Use replaceComponent() instead")
         open var chatComponent: Component,
         open val blockedReason: String? = null,
         open val cleanMessage: String = chatComponent.string.removeColor(),
     ) : SkyHanniEvent() {
         fun replaceComponent(newComponent: Component, reason: String) {
             ChatManager.addReplacementContext(chatComponent, reason)
+            @Suppress("DEPRECATION")
             chatComponent = newComponent
         }
     }

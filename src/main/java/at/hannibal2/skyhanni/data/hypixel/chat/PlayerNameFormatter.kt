@@ -84,13 +84,14 @@ object PlayerNameFormatter {
         all.append(": ")
         all.append(chatColor.asComponent())
         all.append(message.intoComponent())
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
+        val component = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
+        event.replaceComponent(component, "player_chat_formatting")
     }
 
     @HandleEvent
     fun onCoopChat(event: CoopChatEvent.Modify) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(
+        val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§bCo-op > ") {
                 append(nameFormat(event.authorComponent))
@@ -98,12 +99,13 @@ object PlayerNameFormatter {
                 append(event.messageComponent.intoComponent())
             },
         ) ?: return
+        event.replaceComponent(component, "coop_chat_formatting")
     }
 
     @HandleEvent
     fun onGuildChat(event: GuildChatEvent.Modify) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(
+        val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§2Guild > ") {
                 append(nameFormat(event.authorComponent, guildRank = event.guildRank))
@@ -111,12 +113,13 @@ object PlayerNameFormatter {
                 append(event.messageComponent.intoComponent())
             },
         ) ?: return
+        event.replaceComponent(component, "guild_chat_formatting")
     }
 
     @HandleEvent
     fun onPartyChat(event: PartyChatEvent.Modify) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(
+        val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§9Party §8> ") {
                 append(nameFormat(event.authorComponent))
@@ -124,12 +127,13 @@ object PlayerNameFormatter {
                 append(event.messageComponent.intoComponent())
             },
         ) ?: return
+        event.replaceComponent(component, "party_chat_formatting")
     }
 
     @HandleEvent
     fun onPrivateChat(event: PrivateMessageChatEvent.Modify) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(
+        val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§d${event.direction}") {
                 append(" ")
@@ -138,12 +142,13 @@ object PlayerNameFormatter {
                 append(event.messageComponent.intoComponent())
             },
         ) ?: return
+        event.replaceComponent(component, "private_chat_formatting")
     }
 
     @HandleEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent.Modify) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(
+        val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("") {
                 append(
@@ -161,6 +166,7 @@ object PlayerNameFormatter {
                 append(event.item.intoComponent())
             },
         ) ?: return
+        event.replaceComponent(component, "show_chat_formatting")
     }
 
     private fun nameFormat(

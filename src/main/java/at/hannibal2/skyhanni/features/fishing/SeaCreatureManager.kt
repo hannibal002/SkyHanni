@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -83,21 +83,21 @@ object SeaCreatureManager {
         ) return
 
         getSeaCreatureFromMessage(event.message)?.let {
-            val original = event.chatComponent.formattedTextCompat()
+            val original = event.chatComponent.copy()
             var edited = original
 
             if (config.shortenFishingMessage) {
                 val name = it.displayName
                 val aOrAn = StringUtils.optionalAn(name.removeColor())
-                edited = "§9You caught $aOrAn $name§9!"
+                edited = "§9You caught $aOrAn $name§9!".asComponent()
             }
 
             if (config.compactDoubleHook && doubleHook) {
-                edited = "§e§lDOUBLE HOOK! $edited"
+                edited = Component.literal("§e§lDOUBLE HOOK! ").append(edited)
             }
 
             if (original == edited) return
-            event.replaceComponent(edited.asComponent(), "sea_creature")
+            event.replaceComponent(edited, "sea_creature")
         }
 
         doubleHook = false

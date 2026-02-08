@@ -67,7 +67,6 @@ object DiscordRPCManager {
         try {
             progress.update("calling setup")
             setup(progress, fromCommand)
-            progress.end("setup done successfully")
         } catch (e: Throwable) {
             progress.end("error: ${e.message}")
             updateDebugStatus("Unexpected error: ${e.message}", error = true)

@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardTypeAdapter
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -20,9 +22,14 @@ import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import com.mojang.serialization.JsonOps
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
@@ -42,10 +49,19 @@ object SkyHanniTypeAdapters {
         { NbtBoolean.fromString(this) },
     )
 
-    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
-        { this.asString() },
-        { this.toInternalName() },
-    )
+    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = object : TypeAdapter<NeuInternalName>() {
+        override fun write(writer: JsonWriter, value: NeuInternalName?) {
+            if (value == null) writer.nullValue() else writer.value(value.asString())
+        }
+
+        override fun read(reader: JsonReader): NeuInternalName? {
+            if (reader.peek() == JsonToken.NULL) {
+                reader.nextNull()
+                return null
+            }
+            return reader.nextString().toInternalName()
+        }
+    }
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
         LorenzVec::asStoredString,
@@ -77,6 +93,8 @@ object SkyHanniTypeAdapters {
         }
     }
 
+    val ELITE_LEADERBOARD_TYPE: TypeAdapter<EliteLeaderboardType> = EliteLeaderboardTypeAdapter()
+
     val STOPWATCH: TypeAdapter<Stopwatch> = SimpleStringTypeAdapter(
         { this.getDuration().inWholeMilliseconds.toString() },
         { this.toLongOrNull()?.milliseconds?.let { Stopwatch(it) } ?: error("Could not parse Stopwatch duration from '$this'") },
@@ -104,6 +122,17 @@ object SkyHanniTypeAdapters {
 
         override fun read(reader: JsonReader): LocalDate {
             return LocalDate.parse(reader.nextString())
+        }
+    }
+
+    val COMPONENT = object : TypeAdapter<Component>() {
+        override fun write(out: JsonWriter, value: Component) {
+            val encodeStart = ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, value).getOrThrow()
+            out.jsonValue(encodeStart.toString())
+        }
+
+        override fun read(reader: JsonReader): Component {
+            return ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow().first
         }
     }
 

@@ -33,6 +33,7 @@ object ShinyOrbTracker {
         "Shiny Orb Tracker",
         ::ShinyOrbData,
         { it.shinyOrbTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     private fun passesHoldingItem() = !config.holdingItems || InventoryUtils.getItemInHand()?.let {

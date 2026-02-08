@@ -64,7 +64,6 @@ object DailyQuestHelper {
     private val questBoardBarbarian = LorenzVec(-572, 100, -687)
 
     val quests = mutableListOf<Quest>()
-    var greatSpook = false
 
     val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
 
@@ -258,12 +257,6 @@ object DailyQuestHelper {
             (state == QuestState.ACCEPTED && (this is FetchQuest || this is RescueMissionQuest))
 
     fun MutableList<Renderable>.addQuests() {
-        if (greatSpook) {
-            addString("")
-            addString("§7Daily Quests (§cdisabled§7)")
-            addString(" §5§lThe Great Spook §7happened :O")
-            return
-        }
         val done = quests.count { it.state == QuestState.COLLECTED }
         addString("")
         addString("§7Daily Quests (§e$done§8/§e5 collected§7)")
