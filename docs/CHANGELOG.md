@@ -262,6 +262,7 @@
 #### Rift
 
 + Fixed the Timite Evolution Timer feature resetting every time you moved your mouse. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/4962)
++ Fixed Ubik's Cube Timer showing as ready slightly too late (up to about 30 seconds). - Luna (https://github.com/hannibal002/SkyHanni/pull/5057)
 
 #### Inventory
 
@@ -271,10 +272,13 @@
 + Fixed Custom Wardrobe glitch with Skyblocker's class-based player glow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5143)
 + Fixed Hide outside Inventory tracker setting not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5191)
 + Fixed Hide with Item Value tracker setting not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5191)
++ Fixed item trackers sometimes showing the same item separately multiple times. - Empa (https://github.com/hannibal002/SkyHanni/pull/5212)
+  + This would also cause the trackers to lose information on the next restart.
 
 #### Skills
 
 + Fixed Skill ETA being wrong when gaining to much xp per second. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5119)
++ Fixed Skill Progress Display not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5217)
 
 #### Dungeons
 
@@ -315,6 +319,10 @@
 + Fixed Line Rendering (ie diana vacuum etc). - nopo (https://github.com/hannibal002/SkyHanni/pull/5205)
 + Fixed occasional errors when the mod tries to delete a chat message (hopefully). - Luna (https://github.com/hannibal002/SkyHanni/pull/5206)
 + Fixed some skyhanni hover events saying null. - nopo (https://github.com/hannibal002/SkyHanni/pull/5208)
++ Fixed issues with clicking in the config on macOS with Retina display. - Luna (https://github.com/hannibal002/SkyHanni/pull/5220)
++ Fixed Performance issue with the scoreboard. - nopo (https://github.com/hannibal002/SkyHanni/pull/5217)
++ Fixed Stranded profiles not getting recognised. - nopo (https://github.com/hannibal002/SkyHanni/pull/5221)
++ Fixed Widget display lines having too much spacing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5216)
 
 ### Technical Details
 
@@ -407,6 +415,7 @@
 + Removed now unnecessary `@OnlyModern` annotation. - Luna (https://github.com/hannibal002/SkyHanni/pull/5195)
 + Switched from accessWidener to classTweaker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5190)
 + Updated CONTRIBUTING.md to reflect current project architecture. - hannibal002 (https://github.com/hannibal002/SkyHanni/pull/5213)
++ Updated MoulConfig from 4.3.0-beta to 4.4.0-beta. - Luna (https://github.com/hannibal002/SkyHanni/pull/5220)
 
 ### Removed Features
 
