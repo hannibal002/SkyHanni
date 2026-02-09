@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.itemability
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.features.itemability.FireFreezeConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -19,7 +18,7 @@ class ItemAbilityConfig {
     @Expose
     @ConfigOption(
         name = "Ability Cooldown Background",
-        desc = "Show the cooldown color of item abilities in the background."
+        desc = "Show the cooldown color of item abilities in the background.",
     )
     @ConfigEditorBoolean
     var itemAbilityCooldownBackground: Boolean = false
@@ -52,7 +51,7 @@ class ItemAbilityConfig {
     @Expose
     @ConfigOption(
         name = "Depleted Bonzo's Masks",
-        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background."
+        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

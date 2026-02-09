@@ -62,12 +62,12 @@ object FireFreezeFeatures {
             if (frozen) return
             frozen = true
             for (mob in MobData.skyblockMobs) {
-                if (isInside(pos = mob.baseEntity.getLorenzVec(),extra = 0.0)) freezeMob(mob)
+                if (isInside(pos = mob.baseEntity.getLorenzVec(), extra = 0.0)) freezeMob(mob)
             }
         }
 
         fun isInside(pos: LorenzVec, extra: Double = 0.5): Boolean =
-            center.distanceIgnoreY(pos) < (RADIUS + extra) // add extra for good measure (Animation has bonus particles, some, could, count as outside)
+            center.distanceIgnoreY(pos) < (RADIUS + extra) // add extra for possibly loose particles
     }
 
     private fun freezeMob(mob: Mob) {
