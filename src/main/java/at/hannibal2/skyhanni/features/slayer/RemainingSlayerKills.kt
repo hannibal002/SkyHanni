@@ -52,7 +52,7 @@ object RemainingSlayerKills {
      */
     private val combatWisdomPattern by patternGroup.pattern(
         "combat-wisdom",
-        " ☯ Combat Wisdom (?<wisdom>.*)",
+        " ☯ Combat Wisdom (?<wisdom>\\d+)",
     )
 
     /**
@@ -60,7 +60,7 @@ object RemainingSlayerKills {
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
-        "\\((?<current>.*)\\/(?<max>.*)\\) .*",
+        "\\((?<current>[\\d,.]+[kmb]?)\\/(?<max>[\\d,.]+[kmb]?)\\) .*",
     )
 
     /**
@@ -76,7 +76,7 @@ object RemainingSlayerKills {
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
-        "\\+.* Kill Combo \\+(?<wisdom>.*)☯ Combat Wisdom",
+        "\\+.* Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
     )
 
     data class SlayerData(
