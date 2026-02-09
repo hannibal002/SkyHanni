@@ -48,19 +48,19 @@ object RemainingSlayerKills {
     private val patternGroup = RepoPattern.group("slayer.remaining-kills")
 
     /**
-     * REGEX-TEST:  §3☯ Combat Wisdom §f2
+     * REGEX-TEST:  ☯ Combat Wisdom 2
      */
     private val combatWisdomPattern by patternGroup.pattern(
         "combat-wisdom",
-        " §3☯ Combat Wisdom §f(?<wisdom>.*)",
+        " ☯ Combat Wisdom (?<wisdom>.*)",
     )
 
     /**
-     * REGEX-TEST: §7(§e120§7/§c500§7) Atomic Slayer
+     * REGEX-TEST: (120/500) Atomic Slayer
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
-        "§7\\(§e(?<current>.*)§7\\/§c(?<max>.*)§7\\) .*",
+        "\\((?<current>.*)\\/(?<max>.*)\\) .*",
     )
 
     /**
@@ -124,7 +124,7 @@ object RemainingSlayerKills {
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
 
-        val progress = event.newProgress
+        val progress = event.newProgress.removeColor()
         val newMissing = progressPattern.matchMatcher(progress) {
             val current = group("current").formatDouble()
             val max = group("max").formatDouble()
@@ -282,7 +282,7 @@ object RemainingSlayerKills {
         val stack = event.inventoryItems[34] ?: return
 
         for (line in stack.getLore()) {
-            combatWisdomPattern.matchMatcher(line) {
+            combatWisdomPattern.matchMatcher(line.removeColor()) {
                 baseCombatWisdom = group("wisdom").formatInt()
                 update()
                 return
