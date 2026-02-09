@@ -165,6 +165,7 @@ class FishingConfig {
             "when inside the lootshare range."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var lootshareRange = false
 
     @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under shSpecificSeaCreatureSettings!")
