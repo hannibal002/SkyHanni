@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
@@ -478,8 +480,7 @@ object EnchantParser {
     }
 
     private fun editChatComponent(chatComponent: Component, loreList: MutableList<Component>) {
-        val newComponent = Component.literal((chatComponent.contents as PlainTextContents.LiteralContents).text)
-            .setStyle(chatComponent.style)
+        val newComponent = MutableComponent.create(chatComponent.contents).setStyle(chatComponent.style)
         loreList.forEach { newComponent.append(it) }
         GuiChatHook.replaceHoverEventComponent(newComponent)
     }
@@ -495,5 +496,9 @@ object EnchantParser {
 
     private fun markCacheDirty() {
         loreCache.configChanged = true
+    }
+
+    fun openConfigLink() {
+        SkyHanniMod.feature.gui.chroma::enabled.jumpToEditor()
     }
 }

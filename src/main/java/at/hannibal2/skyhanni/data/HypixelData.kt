@@ -363,7 +363,7 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!SkyBlockUtils.onHypixel) return
 
         val message = event.cleanMessage.lowercase()

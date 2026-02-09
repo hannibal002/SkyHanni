@@ -107,6 +107,16 @@ object RegexUtils {
         }
     }
 
+    fun Pattern.findAll(input: String, group: String): List<String> {
+        val matcher = matcher(input)
+
+        return buildList {
+            while (matcher.find()) {
+                add(matcher.group(group))
+            }
+        }
+    }
+
     /** Replaces all occurrences of the pattern in the input string with the result of the [transform] function. */
     fun Pattern.replace(input: String, transform: Matcher.() -> String): String {
         val matcher = matcher(input)

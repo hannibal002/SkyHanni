@@ -67,7 +67,7 @@ object GemstoneMoneyPerHour {
     private var paused: Boolean = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         pristineMessagePattern.matchMatcher(event.message) {
             if (start.isFarPast()) start = SimpleTimeMark.now()

@@ -44,7 +44,7 @@ object KillZoneWarning {
     private var title: TitleContext? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChatMessage(event: SkyHanniChatEvent) {
+    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         killZonePattern.matchMatcher(event.message) {
             sound.playSound()

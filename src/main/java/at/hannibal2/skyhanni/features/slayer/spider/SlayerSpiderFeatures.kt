@@ -41,7 +41,7 @@ object SlayerSpiderFeatures {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         if (event.message != "§cYou need to kill the Broodfather's hatchlings before it can be damaged again!") return
 
         val mob = lastClickedTier5 ?: return

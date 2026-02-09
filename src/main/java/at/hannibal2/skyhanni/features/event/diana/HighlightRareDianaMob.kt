@@ -14,11 +14,11 @@ object HighlightRareDianaMob {
 
     @HandleEvent
     fun onRareDianaMobFound(event: RareDianaMobFoundEvent) {
-        if (!config.highlightInquisitors) return
+        if (!config.highlightRareMobs) return
 
         val rareMob = event.entity
 
         val color = config.color.toColor()
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(rareMob, color) { config.highlightInquisitors }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(rareMob, color) { config.highlightRareMobs }
     }
 }

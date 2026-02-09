@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
@@ -46,7 +47,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -102,7 +102,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
-    private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
     data class BucketData(
@@ -166,9 +165,25 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         event.checkPestChats()
         event.checkSprayChats()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        val message = event.message
+        pestRareDropPattern.matchMatcher(message) {
+            val itemGroup = group("item")
+            val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
+            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            1.fixAmount(internalName, pest).also {
+                if (it == 1) return@also
+                // If the amount was fixed, edit the chat message to reflect the change
+                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
+                event.replaceComponent(fixedString.asComponent(), "pest_drops")
+            }
+        }
     }
 
     @HandleEvent
@@ -184,7 +199,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         ConditionalUtils.onToggle(config.coinsPerBit, config.includeBits) { update() }
     }
 
-    private fun SkyHanniChatEvent.checkPestChats() {
+    private fun SkyHanniChatEvent.Allow.checkPestChats() {
         PestApi.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
@@ -212,12 +227,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
-            val amount = 1.fixAmount(internalName, pest).also {
-                if (it == 1) return@also
-                // If the amount was fixed, edit the chat message to reflect the change
-                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
-                chatComponent = fixedString.asComponent()
-            }
+            val amount = 1.fixAmount(internalName, pest)
 
             // Happens here so that the amount is fixed independently of tracker being enabled
 
@@ -238,7 +248,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         addItem(PestType.UNKNOWN, PEST_SHARD, event.amount, command = false)
     }
 
-    private fun SkyHanniChatEvent.checkSprayChats() {
+    private fun SkyHanniChatEvent.Allow.checkSprayChats() {
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }

@@ -132,7 +132,7 @@ object KloonHacking {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!wearingHelmet) return
         colorPattern.matchMatcher(event.cleanMessage) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return

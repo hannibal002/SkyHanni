@@ -44,7 +44,7 @@ object CorpseApi {
     private var corpseType: CorpseType? = null
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
 
         startPattern.matchMatcher(message) {

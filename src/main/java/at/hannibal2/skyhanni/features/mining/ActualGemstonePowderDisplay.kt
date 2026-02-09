@@ -219,7 +219,7 @@ object ActualGemstonePowderDisplay {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!isEnabled()) return
 
         PowderChestReward.GEMSTONE_POWDER.chatPattern.matchMatcher(event.message) {
@@ -243,12 +243,12 @@ object ActualGemstonePowderDisplay {
                     add("")
                     add("§7Actual Powder: §d${actualAmount.addSeparators()}")
                 }
-
-                event.chatComponent = TextHelper.text(
+                val newComponent = TextHelper.text(
                     text = "    §r§dGemstone Powder §r§8x${originalAmount.addSeparators()} §7(x${actualAmount.addSeparators()})"
                 ) {
                     this.hover = TextHelper.multiline(hoverText)
                 }
+                event.replaceComponent(newComponent, "actual_powder")
             }
         }
     }

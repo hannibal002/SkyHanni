@@ -57,7 +57,7 @@ object UbikReminder {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.ubikReminder) return
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
         val message = event.cleanMessage

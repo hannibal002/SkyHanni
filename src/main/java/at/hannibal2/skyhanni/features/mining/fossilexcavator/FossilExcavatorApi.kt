@@ -66,7 +66,7 @@ object FossilExcavatorApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         if (emptyPattern.matches(message)) FossilExcavationEvent(emptyList()).post()
 
