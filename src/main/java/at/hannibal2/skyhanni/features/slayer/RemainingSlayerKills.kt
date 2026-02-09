@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -63,19 +64,19 @@ object RemainingSlayerKills {
     )
 
     /**
-     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 3 Kill Combo!
+     * REGEX-TEST: Your Kill Combo has expired! You reached a 3 Kill Combo!
      */
     private val comboExpiredPattern by patternGroup.pattern(
         "combo.expired",
-        "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!",
+        "Your Kill Combo has expired! You reached a (.*) Kill Combo!",
     )
 
     /**
-     * REGEX-TEST: §5§l+20 Kill Combo §r§8§r§3+15☯ Combat Wisdom
+     * REGEX-TEST: +20 Kill Combo +15☯ Combat Wisdom
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
-        "combo.expired",
-        "§5§l\\+20 Kill Combo §r§8§r§3\\+15☯ Combat Wisdom",
+        "kill-combat-wisdom",
+        "\\+20 Kill Combo \\+15☯ Combat Wisdom",
     )
 
     data class SlayerData(
@@ -141,10 +142,11 @@ object RemainingSlayerKills {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent.Allow) {
-        if (comboExpiredPattern.matches(event.message)) {
+        val message = event.message.removeColor()
+        if (comboExpiredPattern.matches(message)) {
             killComboWisdom = 0
         }
-        if (killCombatWisdomPattern.matches(event.message)) {
+        if (killCombatWisdomPattern.matches(message)) {
             killComboWisdom = 15
         }
     }
