@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
-import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -14,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -22,19 +22,19 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.createHoverEvent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.systems.RenderSystem
-import java.util.TreeSet
-import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.world.item.ItemStack
+import java.util.TreeSet
 
 /**
  * Modified Enchant Parser from [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/features/enchants/EnchantManager.java)
@@ -47,32 +47,24 @@ object EnchantParser {
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
     /**
-     * REGEX-TEST: §9Champion VI §r§81.2M
-     * REGEX-TEST: §9Cultivating VII §r§83,271,717
-     * REGEX-TEST: §5§o§9Compact X
-     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
-     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
-     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * All previous regex tests are considered invalid due to new enchant formatting by Hypixel,
+     * re-populate the tests over time with new examples I guess. (The tests are what is returned
+     * from running `formattedTextCompat()` on a lore line, which is what is used against the regex)
+     *
+     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
     /**
-     * REGEX-TEST: §9Champion VI §r§81.2M
-     * REGEX-TEST: §9Cultivating VII §r§83,271,717
-     * REGEX-TEST: §5§o§9Compact X
-     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
-     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
-     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
-     * REGEX-TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
     private var currentItem: ItemStack? = null
@@ -123,7 +115,6 @@ object EnchantParser {
             config.advancedEnchantColors.advancedGoodColor,
             config.advancedEnchantColors.useAdvancedPoorColor,
             config.advancedEnchantColors.advancedPoorColor,
-            config.commaFormat,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
             ChromaManager.config.enabled,
@@ -155,20 +146,20 @@ object EnchantParser {
      */
     @HandleEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
-        return // TODO: Deal with this method once Hypixel fixes /show
-//         if (event.getHoverEvent().action() != HoverEvent.Action.SHOW_TEXT) return
-//         if (!isEnabled() || !this.enchants.hasEnchantData()) return
-//
-//         currentItem = null
-//
-//         val lore = event.getHoverEvent().value().formattedTextCompat().split("\n").toMutableList()
-//
-//         // Since we don't get given an item stack from /show, we pass an empty enchants map and
-//         // use all enchants from the Enchants class instead
-//         parseEnchants(lore, mapOf(), event.component)
+        if (event.get().action() != HoverEvent.Action.SHOW_TEXT) return
+        if (!isEnabled() || !this.enchants.hasEnchantData()) return
+
+        currentItem = null
+
+        val lore = event.get().value().siblings.toMutableList()
+
+        // Since we don't get given an item stack from /show, we pass an empty enchants map and
+        // use all enchants from the Enchants class instead
+        parseEnchants(lore, mapOf(), event.get().value())
     }
 
     private fun warnAaronMaxEnchant() {
+        if (!PlatformUtils.isModInstalled("aaron-mod")) return
         val aaron = OtherModsSettings.aaron()
 
         if (aaron.isEnabled("skyblock.enchantments.rainbowMaxEnchants")) {
@@ -235,7 +226,7 @@ object EnchantParser {
         maxEnchantsPerLine = 0
 
         // Order all enchants
-        orderEnchants(loreList)
+        orderEnchants(loreList, chatComponent != null)
 
         if (orderedEnchants.isEmpty()) {
             loreCache.updateAfter(loreList)
@@ -264,7 +255,7 @@ object EnchantParser {
 
         // Format enchants based on format config option
         try {
-            formatEnchants(insertEnchants)
+            formatEnchants(insertEnchants, chatComponent != null)
         } catch (e: ArithmeticException) {
             ErrorManager.logErrorWithData(
                 e,
@@ -331,20 +322,27 @@ object EnchantParser {
 
             if (startEnchant == -1) {
                 if (this.enchants.containsEnchantment(enchants, loreList[i].formattedTextCompat())) startEnchant = i
-            } else if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1
+            } else {
+                if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1 // Handles item tooltips end line
+                else if (strippedLine.contains("\n\n")) { // Handles chat component tooltips end line
+                    endEnchant = i
+                    break
+                }
+            }
         }
 
         this.startEnchant = startEnchant
         this.endEnchant = endEnchant
     }
 
-    private fun orderEnchants(loreList: MutableList<Component>) {
+    private fun orderEnchants(loreList: MutableList<Component>, fromChatComponent: Boolean) {
         var lastEnchant: FormattedEnchant? = null
+        var maxComponentEnchantsPerLine = 0
 
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
         for (i in startEnchant..endEnchant) {
-            val matcher = enchantmentPattern.matcher(loreList[i].formattedTextCompat())
+            val matcher = enchantmentPattern.matcher(loreList[i].formattedTextCompat().replace("\n", ""))
             var containsEnchant = false
             var enchantsOnThisLine = 0
 
@@ -383,36 +381,46 @@ object EnchantParser {
                 lastEnchant.addLore(loreList[i])
                 loreLines.add(loreList[i])
             }
+
+            if (fromChatComponent) {
+                if (!(loreList[i].contents as PlainTextContents.LiteralContents).text.contains("\n")) {
+                    maxComponentEnchantsPerLine++
+                } else {
+                    maxEnchantsPerLine =
+                        if (maxComponentEnchantsPerLine + 1 > maxEnchantsPerLine) maxComponentEnchantsPerLine + 1 else maxEnchantsPerLine
+                    maxComponentEnchantsPerLine = 0
+                }
+            }
         }
     }
 
-    private fun formatEnchants(insertEnchants: MutableList<Component>) {
+    private fun formatEnchants(insertEnchants: MutableList<Component>, fromChatComponent: Boolean) {
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
-            normalFormatting(insertEnchants)
+            normalFormatting(insertEnchants, fromChatComponent)
             // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
-            compressedFormatting(insertEnchants)
+            compressedFormatting(insertEnchants, fromChatComponent)
             // Stacked is always forcing 1 enchant per line
         } else {
-            stackedFormatting(insertEnchants)
+            stackedFormatting(insertEnchants, fromChatComponent)
         }
     }
 
-    private fun normalFormatting(insertEnchants: MutableList<Component>) {
-        val commaFormat = config.commaFormat.get()
+    private fun normalFormatting(insertEnchants: MutableList<Component>, fromChatComponent: Boolean) {
         var component = Component.empty()
 
         val lastElement = orderedEnchants.last
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-            component = component.append(orderedEnchant.getComponent(currentItem))
+            val notLastEnchantOnLine = (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement)
 
-            if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement) {
+            component = component.append(
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+            )
+
+            if (notLastEnchantOnLine) {
                 // Add comma
-                if (commaFormat == CommaFormat.COPY_ENCHANT)
-                    component.siblings.last().append(", ")
-                else
-                    component.append(Component.literal(", ").withColor(ChatFormatting.BLUE))
+                component.siblings.last().append(", ")
             } else {
                 insertEnchants.add(component)
 
@@ -424,27 +432,28 @@ object EnchantParser {
         }
 
         if (component != Component.empty()) insertEnchants.add(component)
+        if (fromChatComponent) insertEnchants.add(Component.literal("\n"))
     }
 
-    private fun compressedFormatting(insertEnchants: MutableList<Component>) {
-        val commaFormat = config.commaFormat.get()
+    private fun compressedFormatting(insertEnchants: MutableList<Component>, fromChatComponent: Boolean) {
         var component = Component.empty()
 
         val lastElement = orderedEnchants.last
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
-            component = component.append(orderedEnchant.getComponent(currentItem))
+            val notLastEnchantOnLine = (i % 3 != 2 && orderedEnchant != lastElement)
+
+            component = component.append(
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+            )
 
             if (itemIsBook() && maxEnchantsPerLine == 1) {
                 insertEnchants.add(component)
                 insertEnchants.addAll(orderedEnchant.getLore())
                 component = Component.empty()
             } else {
-                if (i % 3 != 2 && orderedEnchant != lastElement) {
+                if (notLastEnchantOnLine) {
                     // Add comma
-                    if (commaFormat == CommaFormat.COPY_ENCHANT)
-                        component.siblings.last().append(", ")
-                    else
-                        component.append(Component.literal(", ").withColor(ChatFormatting.BLUE))
+                    component.siblings.last().append(", ")
                 } else {
                     insertEnchants.add(component)
                     component = Component.empty()
@@ -453,29 +462,27 @@ object EnchantParser {
         }
 
         if (component != Component.empty()) insertEnchants.add(component)
+        if (fromChatComponent) insertEnchants.add(Component.literal("\n"))
     }
 
-    private fun stackedFormatting(insertEnchants: MutableList<Component>) {
+    private fun stackedFormatting(insertEnchants: MutableList<Component>, fromChatComponent: Boolean) {
         if (!config.hideEnchantDescriptions.get() || itemIsBook()) {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getComponent(currentItem))
+                insertEnchants.add(enchant.getComponent(currentItem, fromChatComponent))
                 insertEnchants.addAll(enchant.getLore())
             }
         } else {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getComponent(currentItem))
+                insertEnchants.add(enchant.getComponent(currentItem, fromChatComponent))
             }
+            if (fromChatComponent) insertEnchants.add(Component.literal("\n"))
         }
     }
 
     private fun editChatComponent(chatComponent: Component, loreList: MutableList<Component>) {
-        val text = loreList.joinToString("\n").dropLast(2)
-
-        // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
-        val chatComponentText = text.asComponent()
-        val hoverEvent = createHoverEvent(chatComponent.style.hoverEvent?.action(), chatComponentText) ?: return
-
-        GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
+        val newComponent = MutableComponent.create(chatComponent.contents).setStyle(chatComponent.style)
+        loreList.forEach { newComponent.append(it) }
+        GuiChatHook.replaceHoverEventComponent(newComponent)
     }
 
     private fun itemIsBook(): Boolean {
@@ -489,5 +496,9 @@ object EnchantParser {
 
     private fun markCacheDirty() {
         loreCache.configChanged = true
+    }
+
+    fun openConfigLink() {
+        SkyHanniMod.feature.gui.chroma::enabled.jumpToEditor()
     }
 }

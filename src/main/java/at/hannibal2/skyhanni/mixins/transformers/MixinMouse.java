@@ -13,9 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21.8
-//$$ import net.minecraft.client.input.MouseButtonInfo;
-//#endif
+import net.minecraft.client.input.MouseButtonInfo;
 
 @Mixin(MouseHandler.class)
 public class MixinMouse {
@@ -35,26 +33,22 @@ public class MixinMouse {
     @Inject(method = "onScroll", at = @At("HEAD"))
     private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
         MouseCompat.INSTANCE.setScroll(vertical);
-        DelayedRun.INSTANCE.runNextTick(() -> {
+        DelayedRun.INSTANCE.runNextTickOld(() -> {
             MouseCompat.INSTANCE.setScroll(0);
             return null;
         });
     }
 
-    @Inject(method = "onPress", at = @At("HEAD"))
-    //#if MC < 1.21.9
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        //#else
-        //$$ private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
-        //$$     int button = input.button();
-        //#endif
+    @Inject(method = "onButton", at = @At("HEAD"))
+    private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
+        int button = input.button();
         if (action == 1) {
             MouseCompat.INSTANCE.setLastEventButton(button);
             new KeyDownEvent(button).post();
             new KeyPressEvent(button).post();
         } else {
             new KeyPressEvent(button).post();
-            DelayedRun.INSTANCE.runNextTick(() -> {
+            DelayedRun.INSTANCE.runNextTickOld(() -> {
                 MouseCompat.INSTANCE.setLastEventButton(-1);
                 return null;
             });

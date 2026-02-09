@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.Gui;
@@ -49,13 +50,23 @@ public abstract class MixinChatHud {
     }
 
     @WrapMethod(
-        method = "render"
+            //? if < 1.21.11 {
+            method = "render"
+            //?} else
+            //method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V"
     )
+
+            //? if < 1.21.11 {
     private void wrapRender(GuiGraphics context, int currentTick, int mouseX, int mouseY, boolean focused, Operation<Void> original) {
+        //?} else
+        //private void wrapRender(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int i, int j, boolean bl, Operation<Void> original) {
         ChromaFontManagerKt.setRenderingChat(true);
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
+        //? if < 1.21.11 {
         original.call(context, currentTick, mouseX, mouseY, focused);
+        //?} else
+        //original.call(chatGraphicsAccess, i, j, bl);
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);

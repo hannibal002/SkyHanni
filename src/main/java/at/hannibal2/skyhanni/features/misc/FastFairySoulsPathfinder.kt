@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -292,7 +291,7 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent) {
+    fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
             data?.foundNearby()
         }
@@ -340,20 +339,20 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsoulsreset") {
+        event.registerBrigadier("shsoulsreset") {
             description = "Reset known Fairy Souls for the current island."
             category = CommandCategory.USERS_RESET
-            callback { onResetCommand() }
+            simpleCallback { onResetCommand() }
         }
-        event.register("shsoulsfoundall") {
+        event.registerBrigadier("shsoulsfoundall") {
             description = "Mark all Fairy Souls for the current island as found."
             category = CommandCategory.USERS_RESET
-            callback { onFoundAllCommand() }
+            simpleCallback { onFoundAllCommand() }
         }
-        event.register("shsoulsreloadpath") {
+        event.registerBrigadier("shsoulsreloadpath") {
             description = "Reload the Fairy Souls pathfinder."
             category = CommandCategory.DEVELOPER_TEST
-            callback { onReloadPathCommand() }
+            simpleCallback { onReloadPathCommand() }
         }
     }
 

@@ -3,28 +3,18 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
-import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.world.level.block.Blocks
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -32,12 +22,9 @@ object GriffinBurrowParticleFinder {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val recentlyDugParticleBurrows = TimeLimitedSet<LorenzVec>(1.minutes)
     private val burrows = mutableMapOf<LorenzVec, Burrow>()
-    private var lastDugParticleBurrow: LorenzVec? = null
 
-    // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
-    private var fakeBurrow: LorenzVec? = null
+    fun containsBurrow(location: LorenzVec): Boolean = burrows.containsKey(location)
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
@@ -46,7 +33,7 @@ object GriffinBurrowParticleFinder {
      */
     private val finishedChainPattern by patternGroup.pattern(
         "chain-finished",
-        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)"
+        "§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)",
     )
 
     @HandleEvent
@@ -91,31 +78,22 @@ object GriffinBurrowParticleFinder {
             ParticleType.TREASURE -> burrow.type = 2
         }
 
-        burrow.burrowTimeToLive += 1
-        if (burrow.burrowTimeToLive > 40) burrow.burrowTimeToLive = 40
+        burrow.lastSeen = SimpleTimeMark.now()
         if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
             if (!burrow.found || burrow.type != oldBurrowType) {
-                BurrowDetectEvent(burrow.location, burrow.getType()).post()
+                DelayedRun.runOrNextTick { BurrowDetectEvent(burrow.location, burrow.getType()).post() }
                 burrow.found = true
             }
         }
     }
 
-    // TODO this function needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
-    // and instead of ticks alive, should use found timestamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
-        val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-        if (isSpade) {
+        if (GriffinBurrowHelper.shouldBurrowParticlesBeVisible()) {
             for ((location, burrow) in burrows.toMutableMap()) {
-                if (location.distanceSqToPlayer() > 256) continue
-                burrow.burrowTimeToLive -= 1
-                if (burrow.burrowTimeToLive >= 0) continue
-                // TODO differentiate between user clicking the burrow and the burrow dissapears after a while,
-                //  important bc of wasCorrectPetAlready in GriffinPetWarning
-                BurrowDugEvent(location).post()
-                burrows.remove(location)
-                lastDugParticleBurrow = null
+                if (burrow.lastSeen.passedSince() > 0.5.seconds) {
+                    burrows.remove(location)
+                }
             }
         }
     }
@@ -147,11 +125,10 @@ object GriffinBurrowParticleFinder {
 
     fun reset() {
         burrows.clear()
-        recentlyDugParticleBurrows.clear()
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!config.guess) return
         val message = event.message
@@ -159,53 +136,15 @@ object GriffinBurrowParticleFinder {
             finishedChainPattern.matches(message)
         ) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-            val burrow = lastDugParticleBurrow
-            if (burrow != null) {
-                if (!tryDig(burrow)) {
-                    fakeBurrow = burrow
-                }
-            }
         }
         if (message == "§cDefeat all the burrow defenders in order to dig it!") {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
         }
     }
 
-    private fun tryDig(location: LorenzVec, ignoreFound: Boolean = false): Boolean {
-        val burrow = burrows[location] ?: return false
-        if (!burrow.found && !ignoreFound) return false
-        burrows.remove(location)
-        recentlyDugParticleBurrows.add(location)
-        lastDugParticleBurrow = null
-
-        BurrowDugEvent(burrow.location).post()
-        return true
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onBlockClick(event: BlockClickEvent) {
-        if (!isEnabled()) return
-        if (!config.guess) return
-
-        val location = event.position
-        if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.GRASS_BLOCK) return
-
-        if (location == fakeBurrow) {
-            fakeBurrow = null
-            // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
-            tryDig(location, ignoreFound = true)
-            return
-        }
-
-        if (burrows.containsKey(location)) {
-            lastDugParticleBurrow = location
-
-            DelayedRun.runDelayed(1.seconds) {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
-                    burrows.remove(location)
-                }
-            }
-        }
+    @HandleEvent
+    fun onBurrowDug(event: BurrowDugEvent) {
+        burrows.remove(event.burrowLocation)
     }
 
     class Burrow(
@@ -214,7 +153,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1,
+        var lastSeen: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
 
         fun getType(): BurrowType = when (this.type) {

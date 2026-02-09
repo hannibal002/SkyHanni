@@ -35,13 +35,13 @@ object DragNDrop {
             currentDrag = null
             return
         }
-        DrawContextUtils.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(event.mouseX.toFloat(), event.mouseY.toFloat())
         if (isInvalidDrop) {
             invalidItem.render(event.mouseX, event.mouseY)
         } else {
             item.onRender(event.mouseX, event.mouseY)
         }
-        DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
+        DrawContextUtils.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat())
     }
 
     fun Renderable.Companion.draggable(

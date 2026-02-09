@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -69,8 +68,7 @@ object VisitorListener {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.VISITORS)) return
 
-        val hasVisitorInfo = event.lines.any { VisitorApi.visitorCountPattern.matches(it) }
-        if (!hasVisitorInfo) return
+        if (event.isClear()) return
 
         val visitorsInTab = VisitorApi.visitorsInTabList(event.lines)
 

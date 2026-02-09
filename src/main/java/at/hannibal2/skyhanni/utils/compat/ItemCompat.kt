@@ -1,14 +1,20 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
+
+fun ItemStack.getTooltip(advanced: Boolean): MutableList<Component> {
+    val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
+    return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType)
+}
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
@@ -24,18 +30,25 @@ fun Item.getIdentifierString(): String {
  * On Modern it will return Items.AIR if it cant find it instead of null
  */
 fun String.getVanillaItem(): Item? {
-    val item = BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(this))
+    val item = BuiltInRegistries.ITEM.getValue(Identifier.parse(this))
     if (item == Items.AIR) return null
     return item
 }
 
 fun ItemStack.setCustomItemName(name: String): ItemStack {
-    this.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name))
+    val comp = name.asComponent {
+        italic = false
+    }
+    this.set(DataComponents.CUSTOM_NAME, comp)
     return this
 }
 
 fun ItemStack.setCustomItemName(name: Component): ItemStack {
-    this.set(DataComponents.CUSTOM_NAME, name)
+    var comp = name
+    if (!comp.style.isItalic) {
+        comp = comp.copy().withStyle(comp.style.withItalic(false))
+    }
+    this.set(DataComponents.CUSTOM_NAME, comp)
     return this
 }
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -7,6 +8,9 @@ import java.util.regex.Pattern
 object RegexUtils {
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.matches()) consumer(it) else null }
+
+    inline fun <T> Pattern.matchMatcher(text: Component, consumer: Matcher.() -> T) =
+        matcher(text.string).let { if (it.matches()) consumer(it) else null }
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
@@ -36,6 +40,12 @@ object RegexUtils {
         }
     }
 
+    inline fun <T> Pattern.matchAllComponents(list: List<Component>, consumer: Matcher.() -> T) {
+        for (line in list) {
+            matcher(line.string).let { if (it.find()) consumer(it) }
+        }
+    }
+
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
         for (pattern in iterator()) {
             pattern.matchMatcher<T>(text) {
@@ -59,6 +69,10 @@ object RegexUtils {
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }
+    fun Pattern.matchGroup(text: Component, groupName: String): Component? = matchMatcher(text) {
+        val group = groupOrNull(groupName) ?: return@matchMatcher null
+        return TextHelper.matcher(text, group)
+    }
     fun Pattern.firstMatchGroup(list: List<String>, groupName: String): String? = firstMatcher(list) {
         groupOrNull(groupName)
     }
@@ -68,6 +82,7 @@ object RegexUtils {
 
     fun Pattern.firstMatches(list: List<String>): String? = list.firstOrNull { matches(it) }
     fun Pattern.allMatches(list: List<String>): List<String> = list.filter { matches(it) }
+    fun Pattern.allMatchesComponent(list: List<Component>): List<Component> = list.filter { matches(it) }
 
     /**
      * Get the group, otherwise, return null
@@ -100,6 +115,16 @@ object RegexUtils {
         return buildList {
             while (matcher.find()) {
                 add(matcher.group())
+            }
+        }
+    }
+
+    fun Pattern.findAll(input: String, group: String): List<String> {
+        val matcher = matcher(input)
+
+        return buildList {
+            while (matcher.find()) {
+                add(matcher.group(group))
             }
         }
     }

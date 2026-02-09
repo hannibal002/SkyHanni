@@ -34,7 +34,12 @@ object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", ::Data, { it.fishing.seaCreatureTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Sea Creature Tracker",
+        ::Data,
+        { it.fishing.seaCreatureTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
@@ -49,10 +54,6 @@ object SeaCreatureTracker {
         tracker.modify {
             val amount = if (event.doubleHook && config.countDouble) 2 else 1
             it.amount.addOrPut(event.seaCreature.name, amount)
-        }
-
-        if (config.hideChat) {
-            event.chatEvent.blockedReason = "sea_creature_tracker"
         }
     }
 
@@ -211,10 +212,10 @@ object SeaCreatureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetseacreaturetracker") {
+        event.registerBrigadier("shresetseacreaturetracker") {
             description = "Resets the Sea Creature Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

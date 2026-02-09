@@ -29,17 +29,17 @@ object MotesSession {
     private val patternGroup = RepoPattern.group("rift.everywhere.motes")
 
     /**
-     * REGEX-TEST:  Lifetime Motes: §r§d593,922
+     * REGEX-TEST:  Lifetime Motes: 593,922
      */
     private val lifetimeMotesPattern by patternGroup.pattern(
-        "lifetime",
-        "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)",
+        "lifetime-nocolor",
+        "\\s+Lifetime Motes: (?<motes>[\\d,.]+)",
     )
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.RIFT_INFO)) return
-        lifetimeMotesPattern.firstMatcher(event.widget.lines) {
+        lifetimeMotesPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val amount = group("motes").formatLong()
             if (initialMotes == null) {
                 initialMotes = amount

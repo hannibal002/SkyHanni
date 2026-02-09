@@ -50,7 +50,7 @@ object DungeonCopilot {
     private var searchForKey = false
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         copilot(event.message)?.let {

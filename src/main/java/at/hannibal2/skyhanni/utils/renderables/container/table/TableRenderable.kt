@@ -27,7 +27,7 @@ class TableRenderable private constructor(
 
     override fun renderCell(mouseOffsetX: Int, mouseOffsetY: Int, rowIndex: Int, columnIndex: Int, renderable: Renderable) {
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(xOffsets[columnIndex].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+            DrawContextUtils.translate(xOffsets[columnIndex].toFloat(), yOffsets[rowIndex].toFloat())
             renderable.renderXYAligned(
                 mouseOffsetX + xOffsets[columnIndex],
                 mouseOffsetY + yOffsets[rowIndex],

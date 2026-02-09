@@ -164,6 +164,7 @@ object EstimatedItemValueCalculator {
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
     private val FREE_WILL = "FREE_WILL".toInternalName()
 
+    // TODO Extend this to actually take a price source instead of having price source be decided by Estimated Item Value config
     fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
         val (totalPrice, basePrice) = calculate(stack, mutableListOf())
         if (ignoreBasePrice && totalPrice == basePrice) {

@@ -14,7 +14,7 @@ class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>
     @Expose
     @ConfigOption(
         name = "Repo Auto Update",
-        desc = "Update the repository on every startup and tries to auto fix bugs.\n" +
+        desc = "Update the repository on every startup and try to auto fix bugs.\n" +
             "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean

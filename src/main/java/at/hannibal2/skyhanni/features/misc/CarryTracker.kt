@@ -89,7 +89,7 @@ object CarryTracker {
     private var lastTradedPlayer: String? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         tradeCompletedPattern.matchMatcher(event.message) {
             lastTradedPlayer = group("name").cleanPlayerName()
         }
@@ -118,9 +118,9 @@ object CarryTracker {
 
     @HandleEvent
     fun onCommandRegister(event: CommandRegistrationEvent) {
-        event.register("shcarry") {
+        event.registerBrigadier("shcarry") {
             description = "Keep track of carries you do."
-            callback { onCommand(it) }
+            legacyCallbackArgs { onCommand(it) }
         }
     }
 

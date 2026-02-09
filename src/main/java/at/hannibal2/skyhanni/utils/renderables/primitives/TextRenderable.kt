@@ -57,7 +57,7 @@ class TextRenderable internal constructor(
 ) : Renderable {
 
     companion object {
-        operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Component.nullToEmpty(string))
+        operator fun Renderable.invoke(string: String): TextRenderable = TextRenderable(Component.literal(string))
     }
 
     override val width by lazy { (Minecraft.getInstance().font.width(text) * scale).toInt() + 1 }

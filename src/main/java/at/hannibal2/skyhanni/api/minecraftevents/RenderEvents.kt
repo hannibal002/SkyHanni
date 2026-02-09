@@ -4,71 +4,34 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.resources.ResourceLocation
-//#if MC < 1.21.6
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
-//#else
-//$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
-//$$ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-//#endif
-//#if MC < 1.21.9
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.minecraft.client.renderer.MultiBufferSource
-import com.mojang.blaze3d.vertex.PoseStack
-
-//#endif
+import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object RenderEvents {
 
     init {
+        HudElementRegistry.attachElementBefore(
+            VanillaHudElements.SLEEP,
+            Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
+            RenderEvents::postGui
+        )
 
-        // SkyHanniRenderWorldEvent
-        //#if MC < 1.21.9
-        WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
+        // makes the lines render weird idk
+        /*WorldRenderEvents.END_MAIN.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
-            val stack = event.matrixStack() ?: PoseStack()
+            val stack = event.matrices()
             SkyHanniRenderWorldEvent(
                 stack,
-                event.camera(),
+                event.gameRenderer().mainCamera,
                 immediateVertexConsumers,
-                event.tickCounter().getGameTimeDeltaPartialTick(true),
+                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
             ).post()
-        }
-        //#endif
-
-        // ScreenDrawnEvent
-
-        // GuiScreenOpenEvent
-
-        // GuiMouseInputEvent
-
-        // BlockOverlayRenderEvent
-
-        // GuiActionPerformedEvent
-
-        // InitializeGuiEvent
-
-        //#if MC < 1.21.6
-        HudLayerRegistrationCallback.EVENT.register { context ->
-            context.attachLayerAfter(
-                IdentifiedLayer.SLEEP,
-                ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
-                RenderEvents::postGui,
-            )
-        }
-        //#else
-        //$$ HudElementRegistry.attachElementBefore(
-        //$$     VanillaHudElements.SLEEP,
-        //$$     ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
-        //$$     RenderEvents::postGui
-        //$$ )
-        //#endif
+        }*/
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {

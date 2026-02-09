@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import net.minecraft.client.Minecraft
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
@@ -61,6 +60,7 @@ object OtherInventoryData {
         MenuType.BREWING_STAND to 5,
         MenuType.CARTOGRAPHY_TABLE to 2,
         MenuType.CRAFTING to 9,
+        MenuType.CRAFTER_3x3 to 9,
         MenuType.ENCHANTMENT to 2,
         MenuType.FURNACE to 3,
         MenuType.GENERIC_3x3 to 9,
@@ -137,12 +137,10 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
-        Minecraft.getInstance().execute {
-            InventoryFullyOpenedEvent(inventory).post()
-            inventory.fullyOpenedOnce = true
-            InventoryUpdatedEvent(inventory).post()
-            acceptItems = false
-        }
+        InventoryFullyOpenedEvent(inventory).post()
+        inventory.fullyOpenedOnce = true
+        InventoryUpdatedEvent(inventory).post()
+        acceptItems = false
     }
 
     class Inventory(

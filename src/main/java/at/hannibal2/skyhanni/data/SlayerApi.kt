@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -139,7 +140,7 @@ object SlayerApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
             questStartTime = SimpleTimeMark.now()
         }
@@ -181,7 +182,8 @@ object SlayerApi {
     }
 
     private fun getSlayerLines(): List<String> =
-        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidget.SLAYER.lines }.map { it.trim() }
+        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }
+            .ifEmpty { TabWidget.SLAYER.lines.map { it.string } }.map { it.trim() }
 
     private fun updateSlayerState() {
         val lines = getSlayerLines()
@@ -259,7 +261,7 @@ object SlayerApi {
         -> Type.VOID
 
         "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isCurrent()) Type.VOID else null
-        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) Type.VOID else null
+        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) Type.VOID else null
 
         "Stronghold",
         "The Wasteland",

@@ -54,6 +54,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     { ForagingTrackerLegacy.BucketData() },
     { it.foraging.trackerData },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig },
 ) {
     private val config get() = SkyHanniMod.feature.foraging.tracker
 
@@ -173,7 +174,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isInIsland()) return
         event.tryReadLoot()
         event.tryBlock()
@@ -219,7 +220,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         }
     }
 
-    private fun SkyHanniChatEvent.tryReadLoot() {
+    private fun SkyHanniChatEvent.Allow.tryReadLoot() {
         val dropsJson = dropsJson ?: return
 
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
@@ -299,7 +300,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         if (inCategoryList) rareDrops.add(item)
     }
 
-    private fun SkyHanniChatEvent.tryBlock() {
+    private fun SkyHanniChatEvent.Allow.tryBlock() {
         if (!config.compactGiftChats || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }
@@ -348,7 +349,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
             val component = message.asComponent()
             component.hover = lastHover
-            ChatUtils.chat(component)
+            ChatUtils.chat(component, prefix = false)
             rareDrops.forEach { drop ->
                 ChatUtils.chat("§f - $drop", prefix = false)
             }

@@ -68,7 +68,7 @@ object NpcVisitorFix {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         barnSkinChangePattern.matchMatcher(event.message) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }

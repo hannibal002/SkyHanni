@@ -170,8 +170,8 @@ object GetFromSackApi {
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
         if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
-        // The last parameter could be "2*3". This does not support ending with ")", but it is good enough
-        val argsNull = !args.last().last().isDigit()
+        val preCalc = Calculator.calculateOrNull(args.last())
+        val argsNull = preCalc == null
         val arguments = if (argsNull) {
             args + config.defaultAmountGFS.toString()
         } else args
@@ -202,7 +202,7 @@ object GetFromSackApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.bazaarGFS || SkyBlockUtils.noTradeMode) return
         val stack = lastItemStack ?: return
         val message = event.message

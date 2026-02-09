@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.combat.end
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -18,6 +20,14 @@ class DraconicSacrificeTrackerConfig {
     @ConfigOption(name = "Only In Void Slate", desc = "Show the tracker only when inside the Void Slate area.")
     @ConfigEditorBoolean
     var onlyInVoidSlate: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = DraconicSacrificeTrackerConfig::class, field = "enabled")

@@ -139,7 +139,12 @@ object CFStrayTracker {
     )
     // </editor-fold>
 
-    private val tracker = SkyHanniTracker("Stray Tracker", ::Data, { it.chocolateFactory.strayTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Stray Tracker",
+        ::Data,
+        { it.chocolateFactory.strayTracker },
+        trackerConfig = { config.strayTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
@@ -347,10 +352,10 @@ object CFStrayTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetstrayrabbittracker") {
+        event.registerBrigadier("shresetstrayrabbittracker") {
             description = "Resets the Stray Rabbit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

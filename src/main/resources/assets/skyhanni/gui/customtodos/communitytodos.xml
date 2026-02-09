@@ -1,0 +1,43 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://notenoughupdates.org/moulconfig https://raw.githubusercontent.com/NotEnoughUpdates/MoulConfig/master/MoulConfig.xsd">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Community TODOs"/>
+                </Scale>
+            </Center>
+            <Center>
+                <Text text="Post your todos on the discord for them to be featured!"/>
+            </Center>
+            <Spacer height="10"/>
+            <Row>
+                <Text text="Search: "/>
+                <TextField value="@search"/>
+                <Text text="@poll"/>
+            </Row>
+            <Spacer height="15"/>
+            <ScrollPanel width="540" height="@getHeight">
+                <Array data="@searchResults">
+                    <Row>
+                        <Spacer width="20"/>
+                        <ItemStack value="@getItemStack"/>
+                        <Text text="@getLabel" width="200"/>
+                        <Text text="@getAuthor" width="125"/>
+                        <Button onClick="@viewOnDiscord">
+                            <Text text="View on Discord"/>
+                        </Button>
+                        <Spacer width="10"/>
+                        <Button onClick="@download">
+                            <Text text="@getDownloadText"/>
+                        </Button>
+                    </Row>
+                </Array>
+            </ScrollPanel>
+            <Button onClick="@openTodoMenu">
+                <Text text="Open TODOs menu" width="150"/>
+            </Button>
+        </Column>
+    </Gui>
+</Root>

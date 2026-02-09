@@ -27,7 +27,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.util.Locale
@@ -304,7 +304,7 @@ object SkyBlockItemModifierUtils {
 
     fun isVanillaItem(itemId: String): Boolean {
         if (!identifierPattern.matches(itemId)) return false
-        return BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId)) != Items.AIR
+        return BuiltInRegistries.ITEM.getValue(Identifier.parse(itemId)) != Items.AIR
     }
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
