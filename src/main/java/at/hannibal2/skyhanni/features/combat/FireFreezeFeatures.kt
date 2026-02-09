@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -74,8 +75,7 @@ object FireFreezeFeatures {
         }
     }
 
-    private const val ARMORSTAND_SKULL_TEXTURE =
-        "ewogICJ0aW1lc3RhbXAiIDogMTcxOTU4OTAwMzc4NiwKICAicHJvZmlsZUlkIiA6ICJjYzU2NjAzYmZiZjg0OGJmOTM3MzY1N2VjYzUyNGI4NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJpc2FhYWFhYV8iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTk0YTVlOGZlYWY5NTlhNzI3ZDZmMDdmODM4MmRjMzkyODBlNDY2YzRkODgzMGViMGFiYzM4YzQ2NGJmZDdiYyIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val ARMORSTAND_SKULL_TEXTURE = SkullTextureHolder.getTexture("FIRE_FREEZE_SKULLS")
 
     private val affectedMobs = ConcurrentHashMap<Mob, ServerTimeMark>()
     private val fireFreezes = ConcurrentHashMap<LorenzVec, FireFreezeArea>()
