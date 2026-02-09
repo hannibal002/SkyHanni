@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -67,6 +68,14 @@ object RemainingSlayerKills {
     private val comboExpiredPattern by patternGroup.pattern(
         "combo.expired",
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!",
+    )
+
+    /**
+     * REGEX-TEST: §5§l+20 Kill Combo §r§8§r§3+15☯ Combat Wisdom
+     */
+    private val killCombatWisdomPattern by patternGroup.pattern(
+        "combo.expired",
+        "§5§l\\+20 Kill Combo §r§8§r§3\\+15☯ Combat Wisdom",
     )
 
     data class SlayerData(
@@ -132,10 +141,10 @@ object RemainingSlayerKills {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent.Allow) {
-        comboExpiredPattern.matchMatcher(event.message) {
+        if (comboExpiredPattern.matches(event.message)) {
             killComboWisdom = 0
         }
-        if (event.message == "§5§l+20 Kill Combo §r§8§r§3+15☯ Combat Wisdom") {
+        if (killCombatWisdomPattern.matches(event.message)) {
             killComboWisdom = 15
         }
     }
