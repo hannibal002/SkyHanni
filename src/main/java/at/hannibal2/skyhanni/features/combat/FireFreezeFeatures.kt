@@ -10,23 +10,23 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.core.Rotations
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -169,7 +169,7 @@ object FireFreezeFeatures {
             drawDynamicText(
                 location = fireFreeze.center.up(1),
                 text = "§b❄ ${LorenzColor.AQUA.getChatColor()}${fireFreeze.startTime.timeUntil().formatTime()}",
-                scaleMultiplier = 1.0
+                scaleMultiplier = 1.0,
             )
         }
     }
@@ -179,20 +179,29 @@ object FireFreezeFeatures {
             val timeUntil = time.timeUntil()
             if (!mob.isAlive || timeUntil.isNegative()) continue
 
-            val color = if (timeUntil < chargeUpDuration) LorenzColor.RED else LorenzColor.YELLOW
+            val percent = 1 - ((timeUntil.inPartialSeconds - 5) / 5).coerceAtLeast(0.0).coerceAtMost(1.0)
+            val color = ColorUtils.blendRGB(
+                LorenzColor.YELLOW,
+                LorenzColor.RED,
+                percent,
+            )
             val exactLocation = mob.baseEntity.getLorenzVec().add(-0.5, 0.0, -0.5)
 
             if (config.mobTimer) {
                 val format = timeUntil.formatTime()
+                val text = componentBuilder {
+                    appendWithColor("❄ ", LorenzColor.AQUA.toColor().rgb)
+                    appendWithColor(format, color.rgb)
+                }
                 drawDynamicText(
                     location = exactLocation,
-                    text = "§b❄ ${color.getChatColor()}${format}".asComponent(),
+                    text = text,
                     scaleMultiplier = 1.0,
                 )
             }
             if (config.mobHighlight) {
                 val aabb = exactBoundingBox(mob.baseEntity).expand(0.1)
-                drawFilledBoundingBox(aabb, color.toColor(), 0.5f)
+                drawFilledBoundingBox(aabb, color, 0.5f)
             }
         }
     }
