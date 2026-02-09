@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import kotlin.math.ceil
@@ -41,6 +42,32 @@ import kotlin.time.Duration.Companion.minutes
 object RemainingSlayerKills {
 
     private val config get() = SlayerApi.config
+
+    private val patternGroup = RepoPattern.group("slayer.remaining-kills")
+
+    /**
+     * REGEX-TEST: §3☯ Combat Wisdom §f2
+     */
+    private val combatWisdomPattern by patternGroup.pattern(
+        "combat-wisdom",
+        " §3☯ Combat Wisdom §f(?<wisdom>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §7120§7\/§c500§7\) Atomic Slayer
+     */
+    private val progressPattern by patternGroup.pattern(
+        "progress",
+        "§7\\(§e(?<current>.*)§7\\/§c(?<max>.*)§7\\) .*",
+    )
+
+    /**
+     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 3 Kill Combo!
+     */
+    private val comboExpiredPattern by patternGroup.pattern(
+        "combo.expired",
+        "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!",
+    )
 
     data class SlayerData(
         @Expose @SerializedName("normal_mobs")
@@ -88,19 +115,10 @@ object RemainingSlayerKills {
         if (!isEnabled()) return
 
         val progress = event.newProgress
-        // TODO repo patterns
-        val pattern = "§7\\(§e(?<current>.*)§7\\/§c(?<max>.*)§7\\) .*".toPattern()
-        val newMissing = pattern.matchMatcher(progress) {
+        val newMissing = progressPattern.matchMatcher(progress) {
             val current = group("current").formatDouble()
             val max = group("max").formatDouble()
             max - current
-        }
-        // TODO remove debug
-        lastMissing?.let { last ->
-            if (newMissing != null) {
-                val diff = last - newMissing
-                println("diff: $diff")
-            }
         }
         lastMissing = newMissing
         update()
@@ -113,10 +131,8 @@ object RemainingSlayerKills {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
-        // TODO repo patterns
-        val pattern = "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern()
-        pattern.matchMatcher(event.message) {
+    fun onChat(event: SystemMessageEvent.Allow) {
+        comboExpiredPattern.matchMatcher(event.message) {
             killComboWisdom = 0
         }
         if (event.message == "§5§l+20 Kill Combo §r§8§r§3+15☯ Combat Wisdom") {
@@ -177,14 +193,12 @@ object RemainingSlayerKills {
         data?.let { data ->
             data.weapons[SlayerApi.activeType]?.get(InventoryUtils.itemInHandId)?.let { wisdom ->
                 combatWisdom += wisdom
-                println("weapon wisdom: $wisdom")
                 combatWisdom += countHabaneroOnArmor()
             }
 
             data.equipments[SlayerApi.activeType]?.let { equipments ->
                 for (internalName in EquipmentApi.getAll().map { it.getInternalNameOrNull() }) {
                     equipments[internalName]?.let { wisdom ->
-                        println("equipment wisdom: $wisdom")
                         combatWisdom += wisdom
                     }
                 }
@@ -192,14 +206,11 @@ object RemainingSlayerKills {
         }
 
         if (NonGodPotEffectDisplay.isActive(NonGodPotEffect.SMOLDERING) && SlayerApi.activeType == SlayerType.INFERNO) {
-            println("Smoldering Polarization: +10")
             combatWisdom += 10
         }
-//         val slayerWeapons = ""
 
         // TODO confirm if this is correct
         if (ElectionApi.isDerpy) {
-            println("derpy +10")
             combatWisdom += 30
         }
 
@@ -226,9 +237,7 @@ object RemainingSlayerKills {
                 }
             }
         }
-        val result = counter * 2.5
-        println("countHabaneroOnArmor: $result")
-        return result
+        return counter * 2.5
     }
 
     private fun Mob.names() = buildString {
@@ -261,9 +270,8 @@ object RemainingSlayerKills {
         if (event.inventoryName != "Your Equipment and Stats") return
         val stack = event.inventoryItems[34] ?: return
 
-        val pattern = " §3☯ Combat Wisdom §f(?<wisdom>.*)".toPattern()
         for (line in stack.getLore()) {
-            pattern.matchMatcher(line) {
+            combatWisdomPattern.matchMatcher(line) {
                 baseCombatWisdom = group("wisdom").formatInt()
                 update()
                 return
