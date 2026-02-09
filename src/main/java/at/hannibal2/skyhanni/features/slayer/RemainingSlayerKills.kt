@@ -68,7 +68,7 @@ object RemainingSlayerKills {
      */
     private val comboExpiredPattern by patternGroup.pattern(
         "combo.expired",
-        "Your Kill Combo has expired! You reached a (.*) Kill Combo!",
+        "Your Kill Combo has expired! You reached a .* Kill Combo!",
     )
 
     /**
@@ -76,7 +76,7 @@ object RemainingSlayerKills {
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
-        "\\+20 Kill Combo \\+15☯ Combat Wisdom",
+        "\\+.* Kill Combo \\+(?<wisdom>.*)☯ Combat Wisdom",
     )
 
     data class SlayerData(
@@ -146,8 +146,8 @@ object RemainingSlayerKills {
         if (comboExpiredPattern.matches(message)) {
             killComboWisdom = 0
         }
-        if (killCombatWisdomPattern.matches(message)) {
-            killComboWisdom = 15
+        killCombatWisdomPattern.matchMatcher(message) {
+            killComboWisdom = group("wisdom").formatInt()
         }
     }
 
