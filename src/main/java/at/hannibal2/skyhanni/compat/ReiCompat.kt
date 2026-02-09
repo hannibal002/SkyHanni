@@ -20,16 +20,7 @@ object ReiCompat {
         if (!isReiLoaded) return false
         if (Minecraft.getInstance().screen == null) return false
         return try {
-            val searchBar = REIRuntime.getInstance().searchTextField
-            try {
-                searchBar?.isFocused == true
-            } catch (e: NoSuchMethodError) {
-                try {
-                    searchBar?.javaClass?.getMethod("method_25370")?.invoke(searchBar) as Boolean? == true
-                } catch (e: Throwable) {
-                    false
-                }
-            }
+            (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
         } catch (e: Throwable) {
             false
         }
