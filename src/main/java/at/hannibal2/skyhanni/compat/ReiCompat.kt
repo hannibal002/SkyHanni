@@ -18,8 +18,18 @@ object ReiCompat {
     @JvmStatic
     fun searchHasFocus(): Boolean {
         if (!isReiLoaded) return false
+        if (Minecraft.getInstance().screen == null) return false
         return try {
-            REIRuntime.getInstance().searchTextField?.isFocused == true
+            val searchBar = REIRuntime.getInstance().searchTextField
+            try {
+                searchBar?.isFocused == true
+            } catch (e: NoSuchMethodError) {
+                try {
+                    searchBar?.javaClass?.getMethod("method_25370")?.invoke(searchBar) as Boolean? == true
+                } catch (e: Throwable) {
+                    false
+                }
+            }
         } catch (e: Throwable) {
             false
         }
