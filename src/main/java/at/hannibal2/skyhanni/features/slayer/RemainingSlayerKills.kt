@@ -76,7 +76,7 @@ object RemainingSlayerKills {
      */
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
-        "\\+.* Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
+        "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
     )
 
     data class SlayerData(
