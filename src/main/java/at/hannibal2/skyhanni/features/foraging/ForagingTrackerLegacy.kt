@@ -159,7 +159,17 @@ object ForagingTrackerLegacy {
      */
     val enchantedBookPattern by patternGroup.pattern(
         "bonus-gift.enchanted-book",
-        "(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+        " *(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+    )
+
+    /**
+     * REGEX-TEST: §r§7A §r§dPhanpyre §r§7fell from the Tree!
+     * REGEX-TEST: §r§7A §r§dPhanflare §r§7fell from the Tree!
+     * REGEX-TEST: §r§7A §r§dDreadwing §r§7fell from the Tree!
+     */
+    val phantomSpawnPattern by patternGroup.pattern(
+        "bonus-gift.phantoms",
+        " *(?:§.)+A (?:§.)+(?<phantom>.*) (?:§.)+fell from the Tree!"
     )
 
     /**

@@ -28,13 +28,14 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.plus
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -43,8 +44,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MineshaftPityDisplay {
@@ -123,7 +124,7 @@ object MineshaftPityDisplay {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!MiningApi.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
@@ -135,7 +136,7 @@ object MineshaftPityDisplay {
             mineshaftTotalCount++
             sessionMineshafts++
 
-            val message = event.message + " §e($counterUntilPity)"
+            val message = event.chatComponent.copy() + " §e($counterUntilPity)"
 
             val hoverText = buildList {
                 add("§7Blocks mined: §e$totalBlocks")
@@ -166,11 +167,12 @@ object MineshaftPityDisplay {
 
             resetCounter()
 
-            val newComponent = TextHelper.text(message) {
+            val newComponent = componentBuilder {
+                append(message)
                 hover = TextHelper.multiline(hoverText)
             }
 
-            if (config.modifyChatMessage) event.chatComponent = newComponent
+            if (config.modifyChatMessage) event.replaceComponent(newComponent, "shaft_count")
         }
     }
 
@@ -188,8 +190,7 @@ object MineshaftPityDisplay {
         if (!isDisplayEnabled()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
-            val cleanLine = line.removeColor()
-            tabPityPattern.matchMatcher(cleanLine) {
+            tabPityPattern.matchMatcher(line) {
                 everFoundPityWidget = true
                 tablistPity = MAX_COUNTER - group("pity").formatInt()
             }
@@ -325,7 +326,6 @@ object MineshaftPityDisplay {
         if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
             resetCounter()
         }
-        everFoundPityWidget = false
     }
 
     private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
@@ -379,19 +379,19 @@ object MineshaftPityDisplay {
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            ItemStack(Blocks.packed_ice),
+            ItemStack(Blocks.PACKED_ICE),
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            ItemStack(Blocks.clay),
+            ItemStack(Blocks.CLAY),
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            ItemStack(Blocks.red_sandstone),
+            ItemStack(Blocks.RED_SANDSTONE),
         ),
 
         TITANIUM(

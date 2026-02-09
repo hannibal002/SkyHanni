@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LividSolverJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
@@ -13,35 +15,37 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 // TODO replace all drawLineToEye with LineToMobHandler
 
@@ -52,15 +56,27 @@ object DungeonLividFinder {
 
     private val isBlind by RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 
-    var livid: EntityOtherPlayerMP? = null
+    var livid: RemotePlayer? = null
         private set
 
-    private var fakeLivids = mutableSetOf<EntityOtherPlayerMP>()
-    private val lividEntities
-        get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filter { it.isNpc() && lividNamePattern.matches(it.name) }.toList()
+    private var fakeLivids = mutableSetOf<RemotePlayer>()
+
+    // This only happens when in f5/m5 bossfight, so the performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
+    private val lividEntities: List<RemotePlayer>
+        get() = EntityUtils.getEntities<RemotePlayer>()
+            .filterTo(mutableListOf()) {
+                it.isNpc() &&
+                    (
+                        lividNamePattern.matches(it.name.formattedTextCompatLessResets()) ||
+                            lividTextureToColor.containsKey(it.getSkinTexture())
+                        )
+            }
 
     private var color: LorenzColor? = null
-    private val lividNameColor = mapOf(
+
+    private val lividTextureToColor = mutableMapOf<String, LorenzColor>()
+    private var lividNameToColor = mapOf(
         "Vendetta" to LorenzColor.WHITE,
         "Doctor" to LorenzColor.GRAY,
         "Crossed" to LorenzColor.LIGHT_PURPLE,
@@ -73,14 +89,6 @@ object DungeonLividFinder {
     )
 
     /**
-     * REGEX-TEST: Doctor Livid
-     */
-    private val lividNamePattern by RepoPattern.pattern(
-        "dungeon.f5.livid.name",
-        "^(?<type>\\w+) Livid$",
-    )
-
-    /**
      * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
      * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
      */
@@ -88,6 +96,30 @@ object DungeonLividFinder {
         "dungeon.f5.livid.armorstand",
         "^§(?<colorCode>.)﴾ §.§lLivid.*$",
     )
+
+    /**
+     * REGEX-TEST: Doctor Livid
+     */
+    private val lividNamePattern by RepoPattern.pattern(
+        "dungeon.f5.livid.name",
+        "^(?<name>\\w+) Livid$",
+    )
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        lividTextureToColor.clear()
+        val data = event.getConstant<LividSolverJson>("dungeons/LividSolver")
+        val names = mutableMapOf<String, LorenzColor>()
+        for ((color, lividInfo) in data.livids) {
+            val colorCode = color.getOrNull(1) ?: continue
+            val repoColor = LorenzColor.entries.firstOrNull { it.chatColorCode == colorCode } ?: continue
+            lividTextureToColor[lividInfo.skin] = repoColor
+            names[lividInfo.name] = repoColor
+        }
+        if (names.isNotEmpty()) {
+            lividNameToColor = names
+        }
+    }
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
@@ -97,12 +129,15 @@ object DungeonLividFinder {
 
         for (entity in lividEntities) {
             val lividColor = entity.getLividColor() ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Unknown Livid found",
-                    "No color matches for name",
-                    "Livid Name" to entity.name,
-                )
-                continue
+                lividNamePattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
+                    val name = group("name")
+                    val nameColor = lividNameToColor[name] ?: return@matchMatcher
+                    val texture = entity.getSkinTexture() ?: return@matchMatcher
+                    ChatUtils.debug("Unknown Livid Skin found $texture $nameColor $name")
+                    lividTextureToColor.add(texture to nameColor)
+                    return@run nameColor
+                }
+                return@run null
             }
             if (lividColor == color) {
                 livid = entity
@@ -169,9 +204,9 @@ object DungeonLividFinder {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!inLividBossRoom() || !config.hideWrong) return
         if (livid == null) return // in case livid detection fails, don't hide anything
-        if (event.entity is EntityOtherPlayerMP && event.entity in fakeLivids) event.cancel()
-        if (event.entity is EntityArmorStand) {
-            lividArmorStandNamePattern.matchMatcher(event.entity.name) {
+        if (event.entity is RemotePlayer && event.entity in fakeLivids) event.cancel()
+        if (event.entity is ArmorStand) {
+            lividArmorStandNamePattern.matchMatcher(event.entity.name.formattedTextCompatLessResets()) {
                 val colorChar = group("colorCode")[0]
 
                 if (colorChar.toLorenzColor() != color) event.cancel()
@@ -181,18 +216,14 @@ object DungeonLividFinder {
 
     private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
-    private fun EntityOtherPlayerMP.isLividColor(color: LorenzColor): Boolean {
+    private fun RemotePlayer.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
-        return name.startsWith("$chatColor﴾ $chatColor§lLivid")
+        return name.formattedTextCompatLessResets().startsWith("$chatColor﴾ $chatColor§lLivid")
     }
 
-    private fun EntityOtherPlayerMP.getLividColor(): LorenzColor? {
-        lividNamePattern.matchMatcher(this.name) {
-            val type = groupOrNull("type") ?: return null
-
-            return lividNameColor.getOrElse(type) { null }
-        }
-        return null
+    private fun RemotePlayer.getLividColor(): LorenzColor? {
+        val texture = this.getSkinTexture() ?: return null
+        return lividTextureToColor.getOrElse(texture) { return null }
     }
 
     @HandleEvent
@@ -204,7 +235,7 @@ object DungeonLividFinder {
         val lorenzColor =
             if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color ?: return
 
-        if (!entity.canBeSeen()) return
+        if (!entity.canBeSeen(ignoreFrustum = true)) return
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
 
@@ -217,7 +248,7 @@ object DungeonLividFinder {
 
     private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5
 
-    private fun EntityOtherPlayerMP.highlight(color: LorenzColor?) {
+    private fun RemotePlayer.highlight(color: LorenzColor?) {
         if (color == null) {
             RenderLivingEntityHelper.removeEntityColor(this)
             RenderLivingEntityHelper.removeNoHurtTime(this)
@@ -300,8 +331,10 @@ object DungeonLividFinder {
             add("inBoss: ${inLividBossRoom()}")
             add("isBlind: $isBlind")
             add("blockColor: ${blockLocation.getBlockStateAt()}")
-            add("livid: '${livid?.name}'")
-            add("color: ${color?.name}")
+            add("livid: '${livid?.name.formattedTextCompatLessResets()}'")
+            add("color: '${color?.name}'")
+            add("lividTextureToColor:")
+            for ((key, value) in lividTextureToColor) add("  $value: $key")
         }
     }
 }

@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -50,8 +51,8 @@ object PowerStoneGuideFeatures {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        event.container.inventorySlots
-            .filter { missing.containsKey(it.slotNumber) }
+        event.container.slots
+            .filter { missing.containsKey(it.index) }
             .forEach { it.highlight(LorenzColor.RED) }
     }
 
@@ -65,11 +66,12 @@ object PowerStoneGuideFeatures {
     }
 
     @HandleEvent
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
+        event.slot ?: return
         if (!inInventory) return
 
-        val internalName = missing[event.slot.slotNumber] ?: return
+        val internalName = missing[event.slot.index] ?: return
         val totalPrice = internalName.getPrice() * 9
         event.toolTip.add(5, "9x from Bazaar: §6${totalPrice.shortFormat()}")
     }

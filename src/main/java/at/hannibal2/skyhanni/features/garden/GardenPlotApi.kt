@@ -26,11 +26,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.AxisAlignedBB
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -57,6 +58,14 @@ object GardenPlotApi {
     private val barnNamePattern by patternGroup.pattern(
         "barnname",
         "§.(?<name>The Barn)",
+    )
+
+    /**
+     * REGEX-TEST: §7Greenhouse Plot
+     */
+    private val greenhousePlotPattern by patternGroup.pattern(
+        "greenhouse",
+        "§7Greenhouse Plot",
     )
 
     /**
@@ -92,24 +101,23 @@ object GardenPlotApi {
     )
 
     /**
-     * REGEX-TEST: §9§lSPLASH! §r§6Your §r§aGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!
-     * REGEX-TEST: §9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!
+     * REGEX-TEST: SPLASH! Your Garden was cleared of all active Sprayonator effects!
      */
     private val portableWasherPattern by patternGroup.pattern(
-        "spray.cleared.portablewasher",
-        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!",
+        "spray.cleared.portablewasher-nocolor",
+        "SPLASH! Your Garden was cleared of all active Sprayonator effects!",
     )
 
     /**
-     * REGEX-TEST: Spray: §r§7None
-     * REGEX-TEST: Spray: §r§aCompost §r§7(12m)
-     * REGEX-TEST: Spray: §r§aCompost §r§7(1m 3s)
-     * REGEX-TEST: Spray: §r§aCompost §r§7(53s)
-     * REGEX-TEST: Spray: §r§aHoney Jar §r§7(53s)
+     * REGEX-TEST: Spray: None
+     * REGEX-TEST: Spray: Compost (12m)
+     * REGEX-TEST: Spray: Compost (1m 3s)
+     * REGEX-TEST: Spray: Compost (53s)
+     * REGEX-TEST: Spray: Honey Jar (53s)
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
-        "tablist.spraytime",
-        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?<time>.*)\\))?",
+        "tablist.spraytime-nocolor",
+        "Spray: (?<spray>[\\w\\s]+)(?:\\((?<time>.*)\\))?",
     )
     var plots = listOf<Plot>()
 
@@ -117,7 +125,11 @@ object GardenPlotApi {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+    fun inGreenhouse(): Boolean {
+        return currentPlot?.greenhouse ?: false
+    }
+
+    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec)
 
     private var currentPlot: Plot? = null
 
@@ -162,6 +174,9 @@ object GardenPlotApi {
 
         @Expose
         var uncleared: Boolean,
+
+        @Expose
+        var greenhouse: Boolean,
     )
 
     data class SprayData(
@@ -181,6 +196,7 @@ object GardenPlotApi {
             isPestCountInaccurate = false,
             locked = true,
             uncleared = false,
+            greenhouse = false,
         )
     }
 
@@ -230,6 +246,12 @@ object GardenPlotApi {
         get() = this.getData()?.locked ?: false
         set(value) {
             this.getData()?.locked = value
+        }
+
+    var Plot.greenhouse: Boolean
+        get() = this.getData()?.greenhouse ?: false
+        set(value) {
+            this.getData()?.greenhouse = value
         }
 
     fun Plot.markExpiredSprayAsNotified() {
@@ -295,7 +317,7 @@ object GardenPlotApi {
                 val a = LorenzVec(minX, 0.0, minY)
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.middle(b).copy(y = 10.0)
-                val box = a.axisAlignedTo(b).expand(0.0001, 0.0, 0.0001)
+                val box = a.axisAlignedTo(b).inflate(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
                 slot++
             }
@@ -305,7 +327,7 @@ object GardenPlotApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
 
         plotSprayedPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
@@ -328,7 +350,7 @@ object GardenPlotApi {
             plot?.locked = false
         }
 
-        portableWasherPattern.matchMatcher(event.message) {
+        portableWasherPattern.matchMatcher(event.cleanMessage) {
             for (plot in plots) {
                 if (plot.currentSpray != null) {
                     plot.removeSpray()
@@ -346,21 +368,25 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.displayName) {
+            plotNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.displayName) {
+            barnNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 plot.name = group("name")
             }
             plot.locked = false
             plot.isBeingPasted = false
+            plot.greenhouse = false
             for (line in lore) {
                 if (line.contains("§7Cost:")) plot.locked = true
                 if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
                 plot.uncleared = false
                 uncleanedPlotPattern.matchMatcher(line) {
                     plot.uncleared = true
+                }
+                greenhousePlotPattern.matchMatcher(line) {
+                    plot.greenhouse = true
                 }
             }
         }
@@ -372,7 +398,7 @@ object GardenPlotApi {
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
-        plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
+        plotSprayedTablistPattern.firstMatcher(event.lines.map { it.string.trim() }) {
             val sprayName = group("spray").trim()
             val time = groupOrNull("time")?.let { getTablistEndTime(it, plot.getData()?.sprayExpiryTime) }
             if (time == null) {
@@ -415,7 +441,7 @@ object GardenPlotApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (event.isLocalPlayer) {
             DelayedRun.runDelayed(.5.seconds) {
                 checkCurrentPlot()

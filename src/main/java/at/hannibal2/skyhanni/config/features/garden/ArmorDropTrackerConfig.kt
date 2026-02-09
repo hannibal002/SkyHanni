@@ -2,14 +2,16 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ArmorDropTrackerConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Track all §9Cropie§7, §5Squash §7and §6Fermento §7dropped.")
+    @ConfigOption(name = "Enabled", desc = "Track all §aCropie§7, §9Squash§7, §5Fermento §7and §6Helianthus §7dropped.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
@@ -19,6 +21,14 @@ class ArmorDropTrackerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideChat: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ArmorDropTrackerConfig::class, field = "enabled")

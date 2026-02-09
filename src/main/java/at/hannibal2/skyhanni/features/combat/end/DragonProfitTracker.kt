@@ -31,9 +31,10 @@ import java.util.EnumMap
 @SkyHanniModule
 object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfitTracker.BucketData>(
     "Dragon Profit Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.dragonProfitTracker },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker.perTrackerConfig }
 ) {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
 
@@ -73,6 +74,8 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
         addSearchString("§b§lDragon Profit Tracker")
         addBucketSelector(this, bucketData, "Dragon Type")
 
+        val duration = bucketData.getTotalUptime()
+
         var profit = drawItems(bucketData, { true }, this)
 
         val eyePrice = getPricePer(SUMMONING_EYE)
@@ -87,7 +90,7 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
         val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
         addSearchString(dragonString)
 
-        add(addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon"))
+        addAll(addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon", duration, "Dragons"))
 
         addPriceFromButton(this)
     }
@@ -161,10 +164,10 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdragonprofittracker") {
+        event.registerBrigadier("shresetdragonprofittracker") {
             description = "Resets the Dragon Profit Tracker."
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

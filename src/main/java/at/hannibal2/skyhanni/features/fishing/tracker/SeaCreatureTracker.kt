@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ExcludedSeaCreatureAreasJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -34,13 +34,18 @@ object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Sea Creature Tracker",
+        ::Data,
+        { it.fishing.seaCreatureTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
     data class Data(
         @Expose var amount: MutableMap<String, Int> = mutableMapOf(),
-    ) : Resettable
+    ) : TrackerData()
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
@@ -49,10 +54,6 @@ object SeaCreatureTracker {
         tracker.modify {
             val amount = if (event.doubleHook && config.countDouble) 2 else 1
             it.amount.addOrPut(event.seaCreature.name, amount)
-        }
-
-        if (config.hideChat) {
-            event.chatEvent.blockedReason = "sea_creature_tracker"
         }
     }
 
@@ -211,10 +212,10 @@ object SeaCreatureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetseacreaturetracker") {
+        event.registerBrigadier("shresetseacreaturetracker") {
             description = "Resets the Sea Creature Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

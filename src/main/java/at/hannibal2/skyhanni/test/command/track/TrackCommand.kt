@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.command.track
 
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.config.features.dev.TrackCommandConfig
 import at.hannibal2.skyhanni.events.CancellableWorldEvent
@@ -98,15 +99,8 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         } else true
     }
 
-    private fun tryStartRecording(args: Array<String>) {
+    private fun tryStartRecording(durSec: Int? = null) {
         if (!skyBlockCheck() || !alreadyRecordingCheck()) return
-
-        val raw = args.firstOrNull()
-        val durSec = raw?.toIntOrNull()
-        if (raw != null && durSec == null) {
-            ChatUtils.userError("§cInvalid duration: \"§4$raw§c\" isn’t a number")
-            return
-        }
 
         isRecording = true
         tracked.clear()
@@ -169,7 +163,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         if (lastKeyToggle.passedSince() < 1.seconds) return
 
         if (isRecording) endRecording()
-        else tryStartRecording(emptyArray())
+        else tryStartRecording()
         lastKeyToggle = SimpleTimeMark.now()
     }
 
@@ -220,7 +214,12 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
                     ChatUtils.chat("§cSpecify a $commonName type to ignore", replaceSameMessage = true)
                 }
             }
-            legacyCallbackArgs(::tryStartRecording)
+            argCallback("seconds", BrigadierArguments.integer()) { seconds ->
+                tryStartRecording(seconds)
+            }
+            simpleCallback {
+                tryStartRecording()
+            }
         }
     }
     // </editor-fold>

@@ -1,389 +1,475 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
+import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import net.minecraft.ChatFormatting
+import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatStyle
-import net.minecraft.util.IChatComponent
-import net.minecraft.util.ResourceLocation
-//#if MC < 1.16
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import net.minecraft.util.ChatComponentText
-//#endif
-//#if MC > 1.16
-//$$ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-//$$ import net.minecraft.ChatFormatting
-//$$ import net.minecraft.network.chat.MutableComponent
-//$$ import net.minecraft.network.chat.TextColor
-//$$ import kotlin.time.Duration.Companion.minutes
-//#endif
-//#if MC > 1.21
-//$$ import net.minecraft.text.PlainTextContent
-//$$ import net.minecraft.client.gui.hud.MessageIndicator
-//$$ import net.minecraft.network.message.MessageSignatureData
-//$$ import java.net.URI
-//$$ import kotlin.jvm.optionals.getOrNull
-//$$ import kotlin.math.abs
-//$$ import net.minecraft.text.TranslatableTextContent
-//#endif
-//#if MC > 1.16
-//$$ private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
-//$$ private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
-//$$
-//$$ private enum class FormattedTextSettings(noExtraResets: Boolean, leadingWhite: Boolean) {
-//$$     DEFAULT(false, false),
-//$$     LESS_RESETS(true, false),
-//$$     LEADING_WHITE(false, true),
-//$$     LEADING_WHITE_LESS_RESETS(true, true),
-//$$     ;
-//$$     companion object {
-//$$         fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
-//$$             return when {
-//$$                 noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
-//$$                 noExtraResets -> LESS_RESETS
-//$$                 leadingWhite -> LEADING_WHITE
-//$$                 else -> DEFAULT
-//$$             }
-//$$         }
-//$$     }
-//$$ }
-//$$
-//$$ private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
-//#endif
+import net.minecraft.network.chat.ClickEvent
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MessageSignature
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.TextColor
+import net.minecraft.network.chat.contents.PlainTextContents
+import net.minecraft.network.chat.contents.TranslatableContents
+import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStack
+import java.net.URI
+import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
+import kotlin.math.abs
+import kotlin.time.Duration.Companion.minutes
 
-fun IChatComponent.unformattedTextForChatCompat(): String {
-//#if MC < 1.16
-    return this.unformattedTextForChat
-//#elseif MC < 1.21
-//$$ return this.contents
-//#else
-//$$     return unformattedTextCache.getOrPut(this) {
-//$$         computeUnformattedTextCompat()
-//$$     }
-//$$ }
-//$$
-//$$ private fun Text.computeUnformattedTextCompat(): String {
-//$$     if (this.content is TranslatableTextContent) {
-//$$         return this.string
-//$$     }
-//$$     return (this.content as? PlainTextContent)?.string().orEmpty()
-//#endif
+private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
+private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
+
+private enum class FormattedTextSettings {
+    DEFAULT,
+    LESS_RESETS,
+    LEADING_WHITE,
+    LEADING_WHITE_LESS_RESETS,
+    ;
+
+    companion object {
+        fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
+            return when {
+                noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
+                noExtraResets -> LESS_RESETS
+                leadingWhite -> LEADING_WHITE
+                else -> DEFAULT
+            }
+        }
+    }
 }
 
-fun IChatComponent.unformattedTextCompat(): String =
-//#if MC < 1.16
-    this.unformattedText
-//#else
-//$$ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
-//#endif
+private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
+
+fun Component.unformattedTextForChatCompat(): String {
+    return unformattedTextCache.getOrPut(this) {
+        computeUnformattedTextCompat()
+    }
+}
+
+private fun Component.computeUnformattedTextCompat(): String {
+    if (this.contents is TranslatableContents) {
+        return this.string
+    }
+    return (this.contents as? PlainTextContents)?.text().orEmpty()
+}
+
+fun Component.unformattedTextCompat(): String =
+    iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
 
 // has to be a separate function for pattern mappings
-fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-fun IChatComponent?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
-fun IChatComponent?.formattedTextCompatLeadingWhiteLessResets(): String =
+fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
     this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
 
 @JvmOverloads
 @Suppress("unused")
-fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
-//#if MC < 1.16
-    return this?.formattedText.orEmpty()
+fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
+    this ?: return ""
+    val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
+    return formattedTextCache.getOrPut(cacheKey) {
+        computeFormattedTextCompat(noExtraResets, leadingWhite)
+    }
 }
-//#else
-//$$     this ?: return ""
-//$$     val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
-//$$     return formattedTextCache.getOrPut(cacheKey) {
-//$$         computeFormattedTextCompat(noExtraResets, leadingWhite)
-//$$     }
-//$$ }
-//$$
-//$$ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
-//$$     this ?: return ""
-//$$     val sb = StringBuilder()
-//$$     for (component in iterator()) {
-//$$         val chatStyle = component.style.chatStyle()
-//$$         if (leadingWhite || (sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
-//$$             sb.append(chatStyle)
-//$$         }
-//$$         sb.append(component.unformattedTextForChatCompat())
-//$$         if (!noExtraResets) {
-//$$             sb.append("§r")
-//$$         } else {
-//$$             if (component == Component.empty()) sb.append("§r")
-//$$         }
-//$$     }
-//$$     return sb.toString().removeSuffix("§r").removePrefix("§r")
-//$$ }
-//$$
-//$$ private val textColorLUT = ChatFormatting.entries
-//$$     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
-//$$     .toMap()
-//$$
-//$$ fun Style.chatStyle() = buildString {
-//$$     color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
-//$$     if (isBold) append("§l")
-//$$     if (isItalic) append("§o")
-//$$     if (isUnderlined) append("§n")
-//$$     if (isStrikethrough) append("§m")
-//$$     if (isObfuscated) append("§k")
-//$$ }
-//$$
-//$$ fun TextColor.toChatFormatting(): ChatFormatting? {
-//$$     return textColorLUT[this.value]
-//$$ }
-//$$
-//$$ fun Component.iterator(): Sequence<Component> {
-//$$     return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
-//$$ }
-//#endif
 
-//#if MC > 1.21
-//$$ fun MutableText.withColor(formatting: Formatting): Text {
-//$$     return this.styled { it.withColor(formatting) }
-//$$ }
-//#endif
+private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
+    this ?: return ""
+    val sb = StringBuilder(50)
+    var wasFormatted = false
+    for (component in iterator()) {
+        val chatStyle = component.style.chatStyle()
+        if (chatStyle.isNotEmpty() && (leadingWhite || (wasFormatted && (sb.length != 2 || sb[0] != '§' || sb[1] != 'r')) || chatStyle != "§f")) {
+            sb.append(chatStyle)
+            wasFormatted = true
+        }
+        sb.append(component.unformattedTextForChatCompat())
+        if (!noExtraResets) {
+            sb.append("§r")
+            wasFormatted = true
+        } else if (component == Component.empty()) {
+            sb.append("§r")
+            wasFormatted = true
+        }
+    }
+    return sb.removeSuffix("§r").removePrefix("§r").toString()
+}
 
-fun createResourceLocation(domain: String, path: String): ResourceLocation {
-    //#if MC < 1.21
-    val textureLocation = ResourceLocation(domain, path)
-    //#else
-    //$$ val textureLocation = Identifier.of(domain, path)
-    //#endif
+private val textColorLUT = ChatFormatting.entries
+    .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
+    .toMap()
+
+fun Style.chatStyle() = buildString {
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
+    if (isBold) append("§l")
+    if (isItalic) append("§o")
+    if (isUnderlined) append("§n")
+    if (isStrikethrough) append("§m")
+    if (isObfuscated) append("§k")
+}
+
+fun TextColor.toChatFormatting(): ChatFormatting? {
+    return textColorLUT[this.value]
+}
+
+fun Component.iterator(): Sequence<Component> {
+    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
+}
+
+fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
+    return this.withStyle { it.withColor(formatting) }
+}
+
+fun MutableComponent.withColor(color: TextColor): MutableComponent {
+    return this.withStyle { it.withColor(color) }
+}
+
+/**
+ * This might have performance issues if you render it every frame idk
+ */
+fun MutableComponent.withColor(hex: String): MutableComponent {
+    return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
+}
+
+fun createResourceLocation(domain: String, path: String): Identifier {
+    val textureLocation = Identifier.fromNamespaceAndPath(domain, path)
     return textureLocation
 }
 
-fun createResourceLocation(path: String): ResourceLocation {
-    //#if MC < 1.21
-    val textureLocation = ResourceLocation(path)
-    //#else
-    //$$ val textureLocation = Identifier.of(path)
-    //#endif
+fun createResourceLocation(path: String): Identifier {
+    val textureLocation = Identifier.parse(path)
     return textureLocation
 }
 
-var IChatComponent.hover: IChatComponent?
-    //#if MC < 1.16
-    get() = this.chatStyle.chatHoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.value else null }
-    //#else
-    //$$ get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
-    //#endif
+var Component.hover: Component?
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_TEXT
+    }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
-        //#if MC < 1.16
-        this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
-        //#else
-        //$$ value?.let { value -> (this as MutableText).styled { it.withHoverEvent(HoverEvent.ShowText(value)) } }
-        //#endif
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
-var IChatComponent.command: String?
-    //#if MC < 1.21
-    get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
-    //#else
-    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
-    //#endif
+var Component.stackHover: ItemStack?
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_ITEM
+    }?.let { (it as HoverEvent.ShowItem).item }
     set(value) {
-        //#if MC < 1.16
-        this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
-        //#else
-        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
-        //#endif
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
     }
 
-var IChatComponent.suggest: String?
-    //#if MC < 1.21
-    get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
-    //#else
-    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
-    //#endif
+var Component.command: String?
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.RUN_COMMAND
+    }?.let { (it as ClickEvent.RunCommand).command }
     set(value) {
-        //#if MC < 1.16
-        this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
-        //#else
-        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
-        //#endif
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
     }
 
-var IChatComponent.url: String?
-    //#if MC < 1.21
-    get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
-    //#else
-    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
-    //#endif
+var Component.suggest: String?
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.SUGGEST_COMMAND
+    }?.let { (it as ClickEvent.SuggestCommand).command }
     set(value) {
-        //#if MC < 1.16
-        this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
-        //#else
-        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
-        //#endif
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
     }
 
-fun ChatStyle.setClickRunCommand(text: String): ChatStyle {
-    //#if MC < 1.21
-    return this.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, text))
-    //#else
-    //$$ return this.withClickEvent(ClickEvent.RunCommand(text))
-    //#endif
+var Component.url: String?
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.OPEN_URL
+    }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
+    set(value) {
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+    }
+
+var MutableComponent.underlined: Boolean
+    get() = this.style.isUnderlined
+    set(value) {
+        this.withStyle { it.withUnderlined(value) }
+    }
+
+var MutableComponent.bold: Boolean
+    get() = this.style.isBold
+    set(value) {
+        this.withStyle { it.withBold(value) }
+    }
+
+var MutableComponent.strikethrough: Boolean
+    get() = this.style.isStrikethrough
+    set(value) {
+        this.withStyle { it.withStrikethrough(value) }
+    }
+
+var MutableComponent.italic: Boolean
+    get() = this.style.isItalic
+    set(value) {
+        this.withStyle { it.withItalic(value) }
+    }
+
+var MutableComponent.obfuscated: Boolean
+    get() = this.style.isObfuscated
+    set(value) {
+        this.withStyle { it.withObfuscated(value) }
+    }
+
+fun Style.setClickRunCommand(text: String): Style {
+    return this.withClickEvent(ClickEvent.RunCommand(text))
 }
 
-fun ChatStyle.setHoverShowText(text: String): ChatStyle {
-    //#if MC < 1.21
-    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text.asComponent()))
-    //#else
-    //$$ return this.withHoverEvent(HoverEvent.ShowText(Text.of(text)))
-    //#endif
+fun Style.setHoverShowText(text: String): Style {
+    return this.withHoverEvent(HoverEvent.ShowText(Component.literal(text)))
 }
 
-fun ChatStyle.setHoverShowText(text: IChatComponent): ChatStyle {
-    //#if MC < 1.21
-    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text))
-    //#else
-    //$$ return this.withHoverEvent(HoverEvent.ShowText(text))
-    //#endif
+fun Style.setHoverShowText(text: Component): Style {
+    return this.withHoverEvent(HoverEvent.ShowText(text))
 }
 
-fun IChatComponent.appendString(text: String): IChatComponent =
-    //#if MC < 1.16
-    this.appendText(text)
-//#else
-//$$ (this as MutableComponent).append(text)
-//#endif
-
-fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
-    //#if MC < 1.16
-    this.appendSibling(component)
-//#else
-//$$ (this as MutableComponent).append(component)
-//#endif
-
-fun addChatMessageToChat(message: IChatComponent) {
-    //#if FORGE
-    Minecraft.getMinecraft().thePlayer.addChatMessage(message)
-    //#else
-    //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
-    //#endif
+fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
+    if (!bypassSelfMessages) message.skyhanniCreated = true
+    DelayedRun.runOrNextTick { Minecraft.getInstance().player?.displayClientMessage(message, false) }
 }
 
-fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
-    //#if MC < 1.16
-    Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
-    //#else
-    //$$ MinecraftClient.getInstance().execute {
-    //$$    MinecraftClient.getInstance().inGameHud.chatHud.removeMessage(idToMessageSignature(id))
-    //$$    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
-    //$$ }
-    //#endif
+fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
+    if (!bypassSelfMessages) component.skyhanniCreated = true
+    DelayedRun.runOrNextTick {
+        val chat = Minecraft.getInstance().gui.chat
+        chat.deleteMessage(idToMessageSignature(id))
+        chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
+    }
 }
 
-//#if MC > 1.21
-//$$ val map = mutableMapOf<Int, MessageSignatureData>()
-//$$
-//$$ fun idToMessageSignature(id: Int): MessageSignatureData {
-//$$     val newId = abs(id % (255*128))
-//$$     if (map.contains(newId)) return map[newId]!!
-//$$     val bytes = ByteArray(256)
-//$$     val div = newId / 128
-//$$     val mod = newId % 128
-//$$     for (i in 0 until div) {
-//$$         bytes[i] = 127
-//$$     }
-//$$     bytes[div] = mod.toByte()
-//$$     return MessageSignatureData(bytes)
-//$$ }
-//#endif
+val map = mutableMapOf<Int, MessageSignature>()
 
-val defaultStyleConstructor: ChatStyle get() =
-    //#if MC < 1.16
-    ChatStyle()
-//#else
-//$$ Style.EMPTY
-//#endif
+fun idToMessageSignature(id: Int): MessageSignature {
+    val newId = abs(id % (255 * 128))
+    map[newId]?.let { return it }
+    val bytes = ByteArray(256)
+    val div = newId / 128
+    val mod = newId % 128
+    for (i in 0 until div) {
+        bytes[i] = 127
+    }
+    bytes[div] = mod.toByte()
+    return MessageSignature(bytes)
+}
+
+val defaultStyleConstructor: Style
+    get() =
+        Style.EMPTY
 
 fun ClickEvent.value(): String {
-    //#if MC < 1.21
-    return this.value
-    //#else
-    //$$ return when (this.action) {
-    //$$     ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
-    //$$     ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
-    //$$     ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
-    //$$     // we don't use these bottom 3 but might as well have them here
-    //$$     ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
-    //$$     ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
-    //$$     ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
-    //$$     // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
-    //$$     else -> ""
-    //$$ }
-    //#endif
+    return when (this.action()) {
+        ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
+        ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
+        ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
+        // we don't use these bottom 3 but might as well have them here
+        ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
+        ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
+        ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
+        // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
+        else -> ""
+    }
 
 }
 
-fun HoverEvent.value(): IChatComponent {
-    //#if MC < 1.21
-    return this.value
-    //#else
-    //$$ return when (this.action) {
-    //$$     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-    //$$     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.name
-    //$$     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
-    //$$     else -> Text.empty()
-    //$$ }
-    //#endif
+fun HoverEvent.value(): Component {
+    return when (this.action()) {
+        HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+        HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
+        HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
+        else -> Component.empty()
+    }
 }
 
-//#if MC < 1.21
-fun createHoverEvent(action: HoverEvent.Action?, component: ChatComponentText): HoverEvent? {
+fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? {
     if (action == null) return null
-    return HoverEvent(action, component)
-}
-//#else
-//$$ fun createHoverEvent(action: HoverEvent.Action?, component: MutableText): HoverEvent? {
-//$$     if (action == null) return null
-//$$     when (action) {
-//$$         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
-//$$         // I really don't think anyone is using the other 2 lol
-//$$         else -> return null
-//$$     }
-//$$ }
-//#endif
-
-fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
-    //#if MC < 1.21
-    this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
-//#else
-//$$ this.copy().formatted(color.toChatFormatting())
-//#endif
-
-fun IChatComponent.convertToJsonString(): String {
-    //#if MC < 1.21
-    return IChatComponent.Serializer.componentToJson(this)
-    //#elseif MC < 1.21.6
-    //$$ return Text.Serializer(net.minecraft.registry.DynamicRegistryManager.EMPTY).serialize(this, null, null).toString()
-    //#else
-    //$$ return net.minecraft.text.TextCodecs.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
-    //#endif
+    when (action) {
+        HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
+        // I really don't think anyone is using the other 2 lol
+        else -> return null
+    }
 }
 
-//#if MC > 1.21
-//$$ fun Text.append(newText: Text): Text {
-//$$     return (this as MutableText).append(newText)
-//$$ }
-//$$
-//$$ val formattingPattern = Regex("§.(?:§.)?")
-//$$
-//$$ fun Text.append(newText: String): Text {
-//$$     val mutableText = this as MutableText
-//$$     if (mutableText.string.matches(formattingPattern)) {
-//$$         return Text.of(mutableText.string + newText)
-//$$     }
-//$$     return mutableText.append(newText)
-//$$ }
-//#else
-fun at.hannibal2.skyhanni.utils.compat.Text.append(string: String): at.hannibal2.skyhanni.utils.compat.Text {
-    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + string)
+fun Component.changeColor(color: LorenzColor): Component =
+    this.copyIfNeeded().withStyle(color.toChatFormatting())
+
+fun Component.convertToJsonString(): String {
+    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
+        com.mojang.serialization.JsonOps.INSTANCE,
+        this
+    ).orThrow.toString()
 }
 
-fun at.hannibal2.skyhanni.utils.compat.Text.append(newText: Text): at.hannibal2.skyhanni.utils.compat.Text {
-    return at.hannibal2.skyhanni.utils.compat.Text.of(this.text + newText.text)
+fun Component.append(newText: Component): MutableComponent {
+    return this.copyIfNeeded().append(newText)
 }
-//#endif
+
+val formattingPattern = Regex("§.(?:§.)?")
+
+fun Component.append(newText: String): MutableComponent {
+    val mutableText = this.copyIfNeeded()
+    if (mutableText.string.matches(formattingPattern)) {
+        return Component.literal(mutableText.string + newText)
+    }
+    return mutableText.append(newText)
+}
+
+fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Unit): MutableComponent {
+    return this.append(Component.literal(string).also(init))
+}
+
+fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
+    return this.append(comp.copyIfNeeded().also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun List<Any>.mapToComponents(): List<Component> {
+    val newList = mutableListOf<Component>()
+    for (entry in this) {
+        when (entry) {
+            is String -> newList.add(Component.literal(entry))
+            is Component -> newList.add(entry)
+            else -> throw IllegalArgumentException("$entry is not String or Component")
+        }
+    }
+    return newList
+}
+
+val ALWAYS get(): (Style?) -> Boolean = { true }
+
+/**
+ * Replace a string within a Component with another string
+ * The strings have to exist within 1 sibling
+ * AKA they have to have the same Style
+ */
+fun Component.replace(
+    oldValue: String,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
+}
+
+fun Component.replace(
+    oldValue: Regex,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
+}
+
+private fun replace(
+    component: Component,
+    oldValue: Any,
+    newValue: String,
+    onlyReplaceFirst: Boolean,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    component.visit({ style: Style?, string: String? ->
+        var edit = string
+        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+            if (oldValue is String) {
+                edit = string?.replace(oldValue, newValue)
+            } else if (oldValue is Regex) {
+                edit = string?.replace(oldValue, newValue)
+            } else {
+                ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+            }
+        }
+        if (edit != string) hasEdited = true
+
+        newComp.append(Component.literal(edit).withStyle(style))
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
+}
+
+fun Component.replace(
+    oldValue: String,
+    newValue: Component,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    this.visit({ currentStyle: Style?, string: String? ->
+        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+            val split = string.split(oldValue)
+            newComp.append(
+                componentBuilder {
+                    for ((index, str) in split.withIndex()) {
+                        append(Component.literal(str).withStyle(currentStyle))
+                        if (index < split.size - 1) {
+                            if (!onlyReplaceFirst || !hasEdited) {
+                                append(newValue)
+                                hasEdited = true
+                            } else {
+                                append(oldValue) {
+                                    style = currentStyle
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        } else {
+            newComp.append(Component.literal(string).withStyle(currentStyle))
+        }
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
+}
+
+operator fun Component.plus(string: String): Component {
+    return this.append(string)
+}
+
+fun componentBuilder(init: MutableComponent.() -> Unit): Component {
+    return Component.empty().also(init)
+}
+
+fun Component.copyIfNeeded(): MutableComponent {
+    if (this is MutableComponent) return this
+    else return this.copy()
+}

@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -17,8 +18,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraft.item.ItemStack
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MinisterInCalendar {
@@ -48,7 +49,9 @@ object MinisterInCalendar {
         val itemStack = "${minister.name}_MAYOR_MONSTER".toInternalName().getItemStack()
         val ministerColor = ElectionApi.mayorNameToColorCode(minister.mayorName)
 
-        ministerItemStack = changeItem(ministerColor, minister, itemStack)
+        DelayedRun.runOrNextTick {
+            ministerItemStack = changeItem(ministerColor, minister, itemStack)
+        }
     }
 
     @HandleEvent
@@ -61,7 +64,7 @@ object MinisterInCalendar {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
-        if (event.inventory !is ContainerLocalMenu || event.slot != MINISTER_SLOT) return
+        if (event.inventory !is SimpleContainer || event.slot != MINISTER_SLOT) return
         if (!ElectionApi.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         event.replace(ministerItemStack ?: return)
     }
@@ -81,7 +84,7 @@ object MinisterInCalendar {
             addAll(suffix)
         }
 
-        return item.setLore(ministerLore).setCustomItemName(ministerDisplayName)
+        return item.setLoreString(ministerLore).setCustomItemName(ministerDisplayName)
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.ministerInCalendar

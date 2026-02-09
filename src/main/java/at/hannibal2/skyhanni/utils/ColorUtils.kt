@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
+import kotlin.random.Random
 
+@Suppress("TooManyFunctions")
 object ColorUtils {
 
     @JvmStatic
@@ -36,6 +38,10 @@ object ColorUtils {
     operator fun Color.component3(): Float = if (!tooltipFixBool) this.green / 255f else this.blue / 255f
     operator fun Color.component4(): Float = if (!tooltipFixBool) this.blue / 255f else this.alpha / 255f
 
+    fun blendRGB(start: Color, end: Color, progress: Int, max: Int): Color {
+        val percent = (progress.toDouble() / max.toDouble()).coerceAtMost(1.0)
+        return blendRGB(start, end, percent)
+    }
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
@@ -43,9 +49,18 @@ object ColorUtils {
         (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
 
-    val ChromaColour.rgb get() = this.toColor().rgb
+    fun blendRGB(start: LorenzColor, end: LorenzColor, progress: Int, max: Int): Color {
+        val percent = (progress.toDouble() / max.toDouble()).coerceAtMost(1.0)
+        return blendRGB(start, end, percent)
+    }
 
-    fun Color.getExtendedColorCode(hasAlpha: Boolean = false): String = ExtendedChatColor(rgb, hasAlpha).toString()
+    fun blendRGB(start: LorenzColor, end: LorenzColor, percent: Double) = Color(
+        (start.toColor().red * (1 - percent) + end.toColor().red * percent).toInt(),
+        (start.toColor().green * (1 - percent) + end.toColor().green * percent).toInt(),
+        (start.toColor().blue * (1 - percent) + end.toColor().blue * percent).toInt(),
+    )
+
+    val ChromaColour.rgb get() = this.toColor().rgb
 
     /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
     fun Color.darker(factor: Double = 0.7) = Color(
@@ -94,5 +109,12 @@ object ColorUtils {
             ErrorManager.skyHanniError("invalid color code", "color" to color)
         }
         return colorCodes["0123456789abcdef".indexOf(newColor)]
+    }
+
+    fun getRandomColor(): Color {
+        val hue = Random.nextFloat()
+        val saturation = 0.9f
+        val luminance = 1.0f
+        return Color.getHSBColor(hue, saturation, luminance)
     }
 }

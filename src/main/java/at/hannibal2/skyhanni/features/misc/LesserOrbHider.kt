@@ -10,20 +10,19 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object LesserOrbHider {
 
-    private val config get() = SkyHanniMod.feature.misc
-    private val enabled = config.lesserOrbHider
-    private val hiddenEntities = CollectionUtils.weakReferenceList<EntityArmorStand>()
+    private fun isEnabled() = SkyHanniMod.feature.misc.lesserOrbHider
+    private val hiddenEntities = CollectionUtils.weakReferenceList<ArmorStand>()
 
     private val LESSER_TEXTURE by lazy { SkullTextureHolder.getTexture("LESSER_ORB") }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onArmorChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
+    fun onArmorChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         val entity = event.entity
         val itemStack = event.newItemStack ?: return
 
@@ -33,8 +32,8 @@ object LesserOrbHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!enabled) return
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+        if (!isEnabled()) return
 
         if (event.entity in hiddenEntities) {
             event.cancel()
@@ -43,8 +42,8 @@ object LesserOrbHider {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!enabled) return
-        if (event.type != EnumParticleTypes.REDSTONE) return
+        if (!isEnabled()) return
+        if (event.type != ParticleTypes.DUST) return
 
         for (armorStand in hiddenEntities) {
             val distance = armorStand.distanceTo(event.location)

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -125,7 +126,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" graph area: ${SkyBlockUtils.graphArea}")
-                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                with(MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(1)) {
                     add(" /shtestwaypoint $x $y $z pathfind")
                 }
             }
@@ -141,7 +142,7 @@ object SlayerApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
             questStartTime = SimpleTimeMark.now()
         }
@@ -188,7 +189,8 @@ object SlayerApi {
     }
 
     private fun getSlayerLines(): List<String> =
-        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidget.SLAYER.lines }.map { it.trim() }
+        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }
+            .ifEmpty { TabWidget.SLAYER.lines.map { it.string } }.map { it.trim() }
 
     private fun updateSlayerState() {
         val lines = getSlayerLines()
@@ -282,7 +284,7 @@ object SlayerApi {
         -> Type.VOID
 
         "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
-        "no_area" -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
+        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
 
         "Stronghold",
         "The Wasteland",// TODO check if we can remove this

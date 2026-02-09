@@ -210,7 +210,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.displayName.removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
             val have = stack.getLore().firstOrNull()?.let {
                 loreSoulPattern.matchMatcher(it) {
                     group("have").toIntOrNull()
@@ -291,7 +291,7 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent) {
+    fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
             data?.foundNearby()
         }
@@ -339,20 +339,20 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsoulsreset") {
+        event.registerBrigadier("shsoulsreset") {
             description = "Reset known Fairy Souls for the current island."
             category = CommandCategory.USERS_RESET
-            callback { onResetCommand() }
+            simpleCallback { onResetCommand() }
         }
-        event.register("shsoulsfoundall") {
+        event.registerBrigadier("shsoulsfoundall") {
             description = "Mark all Fairy Souls for the current island as found."
             category = CommandCategory.USERS_RESET
-            callback { onFoundAllCommand() }
+            simpleCallback { onFoundAllCommand() }
         }
-        event.register("shsoulsreloadpath") {
+        event.registerBrigadier("shsoulsreloadpath") {
             description = "Reload the Fairy Souls pathfinder."
             category = CommandCategory.DEVELOPER_TEST
-            callback { onReloadPathCommand() }
+            simpleCallback { onReloadPathCommand() }
         }
     }
 

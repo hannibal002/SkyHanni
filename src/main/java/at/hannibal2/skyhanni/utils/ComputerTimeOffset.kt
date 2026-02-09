@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.EnumUtils.previous
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -94,11 +93,10 @@ object ComputerTimeOffset {
             if (timeoutWarned.passedSince() > 10.minutes) {
                 timeoutMap[ntpServer] = 0
                 timeoutWarned = SimpleTimeMark.now()
-                ChatUtils.clickableChat(
+                ChatUtils.notifyOrDisable(
                     "NTP server $ntpServer is not responding ($timeouts failures). Check your connection, " +
                         "try disconnecting from any VPNs/proxies, or click here to change NTP servers.",
-                    hover = "Click to open Dev Config",
-                    onClick = { devConfig::ntpServer.jumpToEditor() }
+                    devConfig::ntpServer,
                 )
             }
             return@runCatching null

@@ -2,21 +2,33 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
+import org.lwjgl.glfw.GLFW
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,33 +41,72 @@ object BurrowWarpHelper {
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
 
-    @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
-        if (!DianaApi.isDoingDiana()) return
-        if (!config.burrowNearestWarp) return
+    private var cannotWarpUntil: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var warpQueued = false
 
-        if (event.keyCode != config.keyBindWarp) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
-
-        val warp = currentWarp ?: return
-        if (lastWarpTime.passedSince() < 1.seconds) return
-        lastWarpTime = SimpleTimeMark.now()
-        HypixelCommands.warp(warp.name)
-        lastWarp = currentWarp
-        GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-        TitleManager.conditionallyStopTitle { currentTitle ->
-            currentTitle.startsWith("§bWarp to ")
+    fun blockWarp(duration: Duration) {
+        val until = SimpleTimeMark.now().plus(duration)
+        if (until.minus(cannotWarpUntil) > 0.milliseconds) {
+            cannotWarpUntil = until
         }
     }
 
+    @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.HUB)
+    fun onRenderOverlay() {
+        if (!config.burrowNearestWarp) return
+        if (!DianaApi.isDoingDiana()) return
+        val warp = currentWarp ?: return
+        if (GriffinBurrowHelper.mobAlive) return
+
+        val text = "§bWarp to " + warp.displayName
+        val keybindSuffix = if (config.keyBindWarp != GLFW.GLFW_KEY_UNKNOWN) {
+            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
+            " §7(§ePress $keyName§7)"
+        } else ""
+
+        val warpText = Renderable.text(text + keybindSuffix, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+
+        config.warpGuiPosition.renderRenderable(warpText, posLabel = "Diana Nearest Warp")
+    }
+
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
+        if (event.keyCode != config.keyBindWarp) return
+        if (warpQueued) return
+
+        if (cannotWarpUntil.isInFuture()) {
+            GriffinBurrowHelper.addDebug("delaying warp for ${cannotWarpUntil.timeUntil()}")
+            warpQueued = true
+            DelayedRun.runDelayed(cannotWarpUntil.timeUntil(), { warp() })
+        } else warp()
+    }
+
+    private fun warp() {
+        warpQueued = false
+        if (!DianaApi.isDoingDiana()) return
+        if (!config.burrowNearestWarp) return
+        if (Minecraft.getInstance().screen != null) return
+        val warp = currentWarp ?: return
+        if (lastWarpTime.passedSince() < 1.seconds) return
+
+        GriffinBurrowHelper.addDebug("warping to $warp count of bezierFitter ${PreciseGuessBurrow.getBezierFitterCount()}")
+        lastWarpTime = SimpleTimeMark.now()
+        HypixelCommands.warp(warp.name)
+        lastWarp = currentWarp
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message != "§cYou haven't unlocked this fast travel destination!") return
         if (lastWarpTime.passedSince() > 1.seconds) return
         lastWarp?.let {
             it.unlocked = false
             ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
             ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+            ChatUtils.chatAndOpenConfig(
+                "Click Here to permanently ignore this warp.",
+                SkyHanniMod.feature.event.diana::ignoredWarpsList,
+            )
             lastWarp = null
             currentWarp = null
         }
@@ -106,7 +157,7 @@ object BurrowWarpHelper {
         debug?.add("warpDistance: ${warpDistance.roundTo(1)}")
         val difference = playerDistance - warpDistance
         debug?.add("difference: ${difference.roundTo(1)}")
-        val setWarpPoint = difference > 10
+        val setWarpPoint = difference > config.warpDistanceDifference
         debug?.add("setWarpPoint: $setWarpPoint")
         currentWarp = if (setWarpPoint) warpPoint else null
     }
@@ -117,13 +168,42 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetburrowwarps") {
+        event.registerBrigadier("shresetburrowwarps") {
             description = "Manually resetting disabled diana burrow warp points"
             category = CommandCategory.USERS_RESET
-            callback {
+            simpleCallback {
                 WarpPoint.entries.forEach { point -> point.unlocked = true }
                 ChatUtils.chat("Reset disabled burrow warps.")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(119, "event.diana.inquisitorSharing", "event.diana.rareMobsSharing") {
+            val sharing = it.asJsonObject
+            val focus = sharing.remove("focusInquisitor")
+            sharing.add("focus", focus)
+            it
+        }
+        event.move(119, "event.diana.highlightInquisitors", "event.diana.highlightRareMobs")
+
+        event.transform(119, "event.diana") { element ->
+            val oldWarps = element.asJsonObject.getAsJsonObject("ignoredWarps")
+            val newWarps = JsonArray()
+
+            if (oldWarps.getAsJsonPrimitive("crypt")?.asBoolean == true) {
+                newWarps.add("CRYPT")
+            }
+            if (oldWarps.getAsJsonPrimitive("wizard")?.asBoolean == true) {
+                newWarps.add("WIZARD")
+            }
+            if (oldWarps.getAsJsonPrimitive("stonks")?.asBoolean == true) {
+                newWarps.add("STONKS")
+            }
+            newWarps.add("TAYLOR")
+            element.asJsonObject.add("ignoredWarpsList", newWarps)
+            element
         }
     }
 
@@ -131,18 +211,20 @@ object BurrowWarpHelper {
         val displayName: String,
         val location: LorenzVec,
         private val extraBlocks: Int,
-        val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
+        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15),
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
-        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
+        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5),
+        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5),
+        TAYLOR("taylor", LorenzVec(22.0, 71.0, -42.5), 2),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
+
+        fun ignored(): Boolean = config.ignoredWarpsList.contains(this)
     }
 }
