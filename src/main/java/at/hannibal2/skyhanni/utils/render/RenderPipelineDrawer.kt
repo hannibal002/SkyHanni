@@ -8,18 +8,12 @@ import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
-import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.Tesselator
 import net.minecraft.client.Minecraft
-//? > 1.21.6
-//import org.joml.Matrix3x2f
+import org.joml.Matrix3x2f
 
 object RenderPipelineDrawer {
-    //? < 1.21.6 {
-    val matrices: PoseStack.Pose get() = DrawContextUtils.drawContext.pose().last()
-    //?} else {
-    /*val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.pose())
-    *///?}
+    val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.pose())
     fun getBuffer(
         pipeline: RenderPipeline,
     ): BufferBuilder = Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)

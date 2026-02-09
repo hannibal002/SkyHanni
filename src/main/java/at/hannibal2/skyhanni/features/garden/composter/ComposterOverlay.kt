@@ -722,7 +722,7 @@ object ComposterOverlay {
             add(" ")
             val tabListData = ComposterApi.tabListData
             for ((a, b) in tabListData) {
-                add("tabListData $a: $b")
+                add("tabListData $a: ${b.string}")
             }
         }
     }

@@ -94,7 +94,7 @@ object FossilExcavatorApi {
             ItemUtils.readItemAmount(group("item"))
         } ?: return
 
-        ItemUtils.readBookType(pair.first)?.let {
+        ItemUtils.readBookTypeStrippedColor(pair.first)?.let {
             pair = it to pair.second
         }
         loot.add(pair)

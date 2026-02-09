@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.api.minecraftevents.RenderEvents;
+import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
 import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
+import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Gui;
@@ -18,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public class MixinGuiIngame {
+public class MixinGui {
 
     @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
     public void renderScoreboard(GuiGraphics drawContext, Objective objective, CallbackInfo ci) {
@@ -46,37 +50,7 @@ public class MixinGuiIngame {
         }
     }
 
-    //? < 1.21.6 {
-    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
-    public void renderExperienceBar(GuiGraphics context, int x, CallbackInfo ci) {
-        if (RenderEvents.postExperienceBarLayerEventPre(context)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderExperienceBar", at = @At("TAIL"))
-    public void renderExperienceBarTail(GuiGraphics context, int x, CallbackInfo ci) {
-        RenderEvents.postExperienceBarLayerEventPost(context);
-    }
-
-    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
-    public void renderExperienceLevel(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderExperienceLevel", at = @At("TAIL"))
-    public void renderExperienceLevelTail(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        RenderEvents.postExperienceNumberLayerEventPost(context);
-    }
-
-    @Redirect(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/scores/Objective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"))
-    private int drawScoreboardString(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean shadow) {
-        return GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, shadow);
-    }
-    //?} else {
-     /*@Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
+     @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
      public void renderExperienceBar(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
          if (RenderEvents.postExperienceBarLayerEventPre(context)) {
              ci.cancel();
@@ -104,12 +78,30 @@ public class MixinGuiIngame {
      private void renderItemOverlayPost(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
          GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
      }
-    *///?}
 
+    //? if < 1.21.11 {
     @ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V"))
+    //?} else
+    //@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V"), index = 5)
     private boolean modifyRenderText(boolean bool) {
         if (ChatPeek.peek()) return true;
         return bool;
+    }
+
+    @WrapMethod(method = "setTitle")
+    private void handleTitle(Component component, Operation<Void> original) {
+        String formattedText = TextCompatKt.formattedTextCompat(component);
+        if (!new TitleReceivedEvent(formattedText, false).post()) {
+            original.call(component);
+        }
+    }
+
+    @WrapMethod(method = "setSubtitle")
+    private void handleSubtitle(Component component, Operation<Void> original) {
+        String formattedText = TextCompatKt.formattedTextCompat(component);
+        if (!new TitleReceivedEvent(formattedText, true).post()) {
+            original.call(component);
+        }
     }
 
 }

@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
 import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
@@ -94,7 +94,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Tracker", desc = "Tracker Config")
     @Accordion
-    val tracker: TrackerConfig = TrackerConfig()
+    val tracker: UniversalTrackerConfig = UniversalTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Pet Candy Display", desc = "")
@@ -435,7 +435,6 @@ class MiscConfig {
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var coralFishHelper: Boolean = true
 
     @Expose
@@ -473,7 +472,6 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var fixDoubleClicks: Boolean = true
 
 

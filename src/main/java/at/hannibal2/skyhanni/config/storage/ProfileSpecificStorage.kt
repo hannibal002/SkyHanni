@@ -73,6 +73,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
@@ -108,6 +109,9 @@ class ProfileSpecificStorage(
         @Expose
         var migratedTotalKills: Boolean = false
     }
+
+    @Expose
+    var instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
 
     // - commands
     @Expose
@@ -664,7 +668,7 @@ class ProfileSpecificStorage(
         var beaconPowerExpiryTime: SimpleTimeMark? = null
 
         @Expose
-        var boostedStat: String? = null
+        var boostedStat: Component? = null
     }
 
     // - inventory

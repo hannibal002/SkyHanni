@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
-//? > 1.21.9 {
-/*import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
+package at.hannibal2.skyhanni.mixins.transformers;
+
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -23,8 +23,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//? > 1.21.10
+//import com.mojang.blaze3d.textures.GpuSampler;
 
 // Adapted from 1.21.7 and 1.21.10 fabric api implementation
+// The fabric api event makes our lines render strange
 @Mixin(LevelRenderer.class)
 public class MixinReplacementLevelRenderer {
 
@@ -47,14 +50,21 @@ public class MixinReplacementLevelRenderer {
         currentTickCounter = tickCounter;
     }
 
-    // TODO(Ravel): @At.args is not supported
-// TODO(Ravel): @At.args is not supported
+    //? < 1.21.11 {
     @WrapOperation(method = "method_62214",
-        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;)V", ordinal = 0)
+            slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;)V", ordinal = 0)
     )
     private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, Operation<Void> original) {
         original.call(instance, group);
+        //?} else {
+    /*@WrapOperation(method = "method_62214",
+        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
+    )
+    private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
+        original.call(instance, group, gpuSampler);
+        *///?}
         if (contextMatrixStack == null) return;
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
@@ -74,4 +84,3 @@ public class MixinReplacementLevelRenderer {
         return matrixStack;
     }
 }
-*///?}

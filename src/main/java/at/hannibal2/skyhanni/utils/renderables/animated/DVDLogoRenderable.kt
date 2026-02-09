@@ -98,7 +98,7 @@ class DVDLogoRenderable private constructor(
 
         val (x, y) = position.x.roundToInt() to position.y.roundToInt()
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(x.toFloat(), y.toFloat(), 0f)
+            DrawContextUtils.translate(x.toFloat(), y.toFloat())
             renderable.render(mouseOffsetX + x, mouseOffsetY + y)
         }
     }

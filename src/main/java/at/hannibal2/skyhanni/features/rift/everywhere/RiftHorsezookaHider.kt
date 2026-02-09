@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.equine.Horse
 
 @SkyHanniModule
 object RiftHorsezookaHider {
