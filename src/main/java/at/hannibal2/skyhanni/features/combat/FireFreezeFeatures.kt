@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -39,14 +40,14 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FireFreezeFeatures {
 
-    private val config get() = SkyHanniMod.feature.combat.fireFreeze
+    private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
 
     private data class FireFreezeArea(
         val center: LorenzVec,
         val lastPitch: Float,
         var startTime: ServerTimeMark = timeFromPitch(lastPitch),
         var knownTime: Boolean = false,
-        var freezed: Boolean = false,
+        var frozen: Boolean = false,
     ) {
         fun update(pitch: Float) {
             if (knownTime || lastPitch == pitch) return
@@ -54,18 +55,19 @@ object FireFreezeFeatures {
             knownTime = true
         }
 
-        fun hasFinished(): Boolean = freezed || startTime.passedSince() > 0.5.seconds
+        fun hasFinished(): Boolean = frozen || startTime.passedSince() > 0.5.seconds
+        // 0.5s passed since is for times where the fire freeze misses and hypixel plays no noise.
 
         fun freezeMobs() {
-            if (freezed) return
-            freezed = true
+            if (frozen) return
+            frozen = true
             for (mob in MobData.skyblockMobs) {
-                if (isInside(mob.baseEntity.getLorenzVec(), 0.0)) freezeMob(mob)
+                if (isInside(pos = mob.baseEntity.getLorenzVec(),extra = 0.0)) freezeMob(mob)
             }
         }
 
         fun isInside(pos: LorenzVec, extra: Double = 0.5): Boolean =
-            center.distanceIgnoreY(pos) < (RADIUS + extra) // add 0.5 for good measure
+            center.distanceIgnoreY(pos) < (RADIUS + extra) // add extra for good measure (Animation has bonus particles, some, could, count as outside)
     }
 
     private fun freezeMob(mob: Mob) {
@@ -122,7 +124,7 @@ object FireFreezeFeatures {
     fun onParticle(event: ReceiveParticleEvent) {
         if (event.type != ParticleTypes.DUST) return
         if (event.count != 0 || event.speed != 1.0f || !event.isFreezeParticle()) return
-        if (!config.customCylinder) return
+        if (!config.customCircle) return
         if (event.location.isInAnyFireFreeze()) event.cancel()
     }
 
@@ -136,7 +138,7 @@ object FireFreezeFeatures {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
     fun onRenderLiving(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (!config.customCylinder) return
+        if (!config.customCircle) return
         if (event.entity.isFireFreeze()) event.cancel()
     }
 
@@ -151,20 +153,27 @@ object FireFreezeFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
-        fireFreezes.values.removeIf { it.freezed || it.startTime.passedSince() > 2.seconds }
+        fireFreezes.values.removeIf { it.frozen || it.startTime.passedSince() > 2.seconds }
         affectedMobs.removeIf { (mob, time) -> !mob.isAlive || time.isInPast() }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (config.customCylinder) event.renderCustomCylinder()
+        if (config.customCircle) event.renderCustomCylinder()
+        if (config.freezeTimer) event.renderCylinderTimer()
         if (config.mobHighlight || config.mobTimer) event.renderMobs()
     }
 
     private fun SkyHanniRenderWorldEvent.renderCustomCylinder() {
         for (fireFreeze in fireFreezes.values) {
             if (fireFreeze.hasFinished()) continue
-            drawCircleWireframe(fireFreeze.center.up(1), RADIUS, LorenzColor.BLACK.toColor())
+            drawCircleWireframe(fireFreeze.center.up(1), RADIUS, config.displayColor.toColor())
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderCylinderTimer() {
+        for (fireFreeze in fireFreezes.values) {
+            if (fireFreeze.hasFinished()) continue
             drawDynamicText(
                 location = fireFreeze.center.up(1),
                 text = "§b❄ ${LorenzColor.AQUA.getChatColor()}${fireFreeze.startTime.timeUntil().formatTime()}",

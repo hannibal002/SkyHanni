@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.itemability
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.features.itemability.FireFreezeConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -42,6 +43,11 @@ class ItemAbilityConfig {
     @Accordion
     @Expose
     val crownOfAvarice: CrownOfAvariceConfig = CrownOfAvariceConfig()
+
+    @Expose
+    @ConfigOption(name = "Fire Freeze", desc = "")
+    @Accordion
+    val fireFreeze: FireFreezeConfig = FireFreezeConfig()
 
     @Expose
     @ConfigOption(

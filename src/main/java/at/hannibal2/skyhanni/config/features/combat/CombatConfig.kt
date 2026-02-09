@@ -76,11 +76,6 @@ class CombatConfig {
     val cocoonOverlay: CocoonOverlayConfig = CocoonOverlayConfig()
 
     @Expose
-    @ConfigOption(name = "Fire Freeze", desc = "")
-    @Accordion
-    val fireFreeze: FireFreezeConfig = FireFreezeConfig()
-
-    @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle
