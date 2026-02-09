@@ -142,7 +142,7 @@ object RemainingSlayerKills {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent.Allow) {
-        val message = event.message.removeColor()
+        val message = event.cleanMessage
         if (comboExpiredPattern.matches(message)) {
             killComboWisdom = 0
         }
