@@ -31,22 +31,31 @@ object MobHighlight {
         val mob = event.mob
         val name = mob.name
 
-        val color = when {
-            name == "Boss Corleone" && config.corleoneHighlighter -> LorenzColor.DARK_PURPLE
+        val (color, isEnabled) = when {
+            name == "Boss Corleone" ->
+                LorenzColor.DARK_PURPLE to config.corleoneHighlighter
 
-            name == "Arachne's Keeper" && config.arachneKeeperHighlight -> LorenzColor.DARK_BLUE
-            name == "Arachne's Brood" && config.arachneBossHighlighter -> LorenzColor.GOLD
-            name == "Arachne" && config.arachneBossHighlighter -> {
+            name == "Arachne's Keeper" ->
+                LorenzColor.DARK_BLUE to config.arachneKeeperHighlight
+
+            name == "Arachne's Brood" ->
+                LorenzColor.GOLD to config.arachneBossHighlighter
+
+            name == "Arachne" -> {
                 arachne = mob
-                LorenzColor.RED
+                LorenzColor.RED to config.arachneBossHighlighter
             }
 
-            mob.isRunic && config.runicMobHighlight -> LorenzColor.LIGHT_PURPLE
+            mob.isRunic ->
+                LorenzColor.LIGHT_PURPLE to config.runicMobHighlight
 
             else -> return
-        }.toChromaColor()
+        }
 
-        mob.highlight(color)
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            mob.baseEntity,
+            color.toColor().addAlpha(127),
+        ) { isEnabled }
     }
 
     @HandleEvent
@@ -69,24 +78,29 @@ object MobHighlight {
 
     // Mob detection isn't used here to allow for highlighting Zealots from further away.
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onEntityJoinWorld(event: EntityMaxHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (event.entity !is EnderMan) return
 
         val entity = event.entity
 
         val heldBlock = entity.getBlockInHand()?.block
 
-        val color = when {
-            heldBlock == Blocks.END_PORTAL_FRAME && config.specialZealotHighlighter -> LorenzColor.DARK_RED
-            heldBlock == Blocks.ENDER_CHEST && config.chestZealotHighlighter -> LorenzColor.GREEN
-            entity.isZealotOrBruiser() && config.zealotBruiserHighlighter -> LorenzColor.DARK_AQUA
+        val (color, isEnabled) = when {
+            heldBlock == Blocks.END_PORTAL_FRAME ->
+                LorenzColor.DARK_RED to config.specialZealotHighlighter
+
+            heldBlock == Blocks.ENDER_CHEST ->
+                LorenzColor.GREEN to config.chestZealotHighlighter
+
+            entity.isZealotOrBruiser() ->
+                LorenzColor.DARK_AQUA to config.zealotBruiserHighlighter
             else -> return
         }
 
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             entity,
             color.toColor().addAlpha(127),
-        ) { true }
+        ) { isEnabled }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -105,5 +119,6 @@ object MobHighlight {
         )
     }
 
-    private fun LivingEntity.isZealotOrBruiser() = baseMaxHealth == 13_000 || baseMaxHealth == 65_000
+    private fun LivingEntity.isZealotOrBruiser() = baseMaxHealth == 13_000 || baseMaxHealth == 65_000 ||
+        baseMaxHealth == 13_000 * 4 || baseMaxHealth == 65_000 * 4 // runic
 }
