@@ -275,7 +275,6 @@ object RemainingSlayerKills {
         )
     }
 
-
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Your Equipment and Stats") return
