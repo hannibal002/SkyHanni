@@ -159,19 +159,19 @@ object FireFreezeFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (config.customCircle) event.renderCustomCylinder()
-        if (config.freezeTimer) event.renderCylinderTimer()
+        if (config.customCircle) event.renderCustomCircle()
+        if (config.freezeTimer) event.renderCircleTimer()
         if (config.mobHighlight || config.mobTimer) event.renderMobs()
     }
 
-    private fun SkyHanniRenderWorldEvent.renderCustomCylinder() {
+    private fun SkyHanniRenderWorldEvent.renderCustomCircle() {
         for (fireFreeze in fireFreezes.values) {
             if (fireFreeze.hasFinished()) continue
             drawCircleWireframe(fireFreeze.center.up(1), RADIUS, config.displayColor.toColor())
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderCylinderTimer() {
+    private fun SkyHanniRenderWorldEvent.renderCircleTimer() {
         for (fireFreeze in fireFreezes.values) {
             if (fireFreeze.hasFinished()) continue
             drawDynamicText(
