@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
@@ -56,7 +57,7 @@ object GardenVisitorChat {
 
     // TODO use event.chatComponent.string instead of event.message here
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         handleArrivalMessage(event)
         handleVisitorMessage(event)
         handlePartialAccepted(event)
@@ -65,7 +66,7 @@ object GardenVisitorChat {
     /**
      * Blocks the Hypixel arrival message if configured.
      */
-    private fun handleArrivalMessage(event: SkyHanniChatEvent) {
+    private fun handleArrivalMessage(event: SkyHanniChatEvent.Allow) {
         if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
@@ -74,7 +75,7 @@ object GardenVisitorChat {
     /**
      * Filters visitor chat messages to reduce spam.
      */
-    private fun handleVisitorMessage(event: SkyHanniChatEvent) {
+    private fun handleVisitorMessage(event: SkyHanniChatEvent.Allow) {
         // TODO use NpcChatEvent
         if (GardenApi.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
@@ -84,7 +85,7 @@ object GardenVisitorChat {
     /**
      * Reminds user to reopen visitor GUI after partial acceptance.
      */
-    private fun handlePartialAccepted(event: SkyHanniChatEvent) {
+    private fun handlePartialAccepted(event: SkyHanniChatEvent.Allow) {
         if (config.shoppingList.enabled) {
             partialAcceptedPattern.matchMatcher(event.message) {
                 ChatUtils.chat("Talk to the visitor again to update the number of items needed!")
@@ -145,7 +146,12 @@ object GardenVisitorChat {
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(visitor.visitorName)
-            ChatUtils.chat("$displayName §eis visiting your garden!")
+            ChatUtils.chat(
+                componentBuilder {
+                    append(displayName)
+                    append(" is visiting your garden!")
+                }
+            )
         }
     }
 }

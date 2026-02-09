@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
@@ -108,7 +110,7 @@ object GardenVisitorTooltip {
      * Modifies the tooltip to show calculated prices and times.
      */
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.hoverName.string != "Accept Offer") return
+        if (itemStack.cleanName() != "Accept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
@@ -165,7 +167,13 @@ object GardenVisitorTooltip {
             visitor.allRewards = foundRewards
             if (wasEmpty && config.rewardWarning.notifyInChat) {
                 visitor.getRewardWarningAwards().forEach { reward ->
-                    ChatUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
+                    ChatUtils.chat(
+                        componentBuilder {
+                            append("Found Visitor Reward ")
+                            append(reward.displayName)
+                            append("!")
+                        }
+                    )
                 }
             }
         }
