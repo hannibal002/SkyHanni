@@ -81,7 +81,6 @@ object FireFreezeFeatures {
     private val fireFreezes = ConcurrentHashMap<LorenzVec, FireFreezeArea>()
 
     private const val RADIUS = 5.0
-    private val chargeUpDuration = 5.seconds
     private val freezeDuration = 10.seconds
 
     @HandleEvent(onlyOnSkyblock = true)

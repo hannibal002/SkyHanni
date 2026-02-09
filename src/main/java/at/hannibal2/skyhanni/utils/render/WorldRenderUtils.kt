@@ -320,7 +320,9 @@ object WorldRenderUtils {
         )
     }
 
-    fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) = drawCircleWireframe(exactLocation(entity), rad, color)
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
+        drawCircleWireframe(exactLocation(entity), rad, color)
+    }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(location: LorenzVec, rad: Double, color: Color) {
         val x = location.x
