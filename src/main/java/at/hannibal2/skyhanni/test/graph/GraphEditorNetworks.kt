@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.OSUtils
 
 object GraphEditorNetworks {
 
@@ -38,6 +41,27 @@ object GraphEditorNetworks {
             val colorIndex = nodeToColorIndex[edge.node1] ?: 0
             edge.networkColor = networkColors[colorIndex]
         }
+    }
+
+    fun copyClosestNetwork() {
+        val state = GraphEditor.state
+        val closestNode = state.closestNode
+        if (closestNode == null) {
+            ChatUtils.userError("No nearby node found!")
+            return
+        }
+
+        val adjacency = buildAdjacency(state.nodes, state.edges)
+        val cluster = bfs(closestNode, adjacency)
+
+        val clusterNodes = state.nodes.filter { it in cluster }.toSet()
+        val graph = GraphEditorIO.compileGraph(nodeSubset = clusterNodes)
+        val json = graph.toJson()
+        OSUtils.copyToClipboard(json)
+
+        val nodeCount = clusterNodes.size.addSeparators()
+        val edgeCount = state.edges.count { it.node1 in cluster && it.node2 in cluster }.addSeparators()
+        ChatUtils.chat("Copied network with $nodeCount nodes and $edgeCount edges to clipboard.")
     }
 
     private fun findClusters(

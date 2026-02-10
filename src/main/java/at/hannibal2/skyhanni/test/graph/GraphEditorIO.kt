@@ -22,9 +22,16 @@ object GraphEditorIO {
     private val nodes get() = state.nodes
     private val edges get() = state.edges
 
-    fun compileGraph(): Graph {
-        val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val compiledNodes = nodes.mapIndexed { index, node ->
+    fun compileGraph(nodeSubset: Set<GraphingNode>? = null): Graph {
+        val filteredNodes = nodeSubset ?: nodes
+        val filteredEdges = if (nodeSubset != null) {
+            edges.filter { it.node1 in nodeSubset && it.node2 in nodeSubset }
+        } else {
+            edges
+        }
+
+        val indexedTable = filteredNodes.mapIndexed { index, node -> node.id to index }.toMap()
+        val compiledNodes = filteredNodes.mapIndexed { index, node ->
             GraphNode(
                 index,
                 node.position,
@@ -33,11 +40,11 @@ object GraphEditorIO {
             )
         }
 
-        val edgesByNode = nodes.associateWith { node ->
-            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }
+        val edgesByNode = filteredNodes.associateWith { node ->
+            filteredEdges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }
         }
 
-        val neighbours = nodes.map { node ->
+        val neighbours = filteredNodes.map { node ->
             val nodeEdges = edgesByNode[node].orEmpty()
 
             nodeEdges.map { edge ->

@@ -102,6 +102,11 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback { GraphEditorIO.loadThisIsland() }
         }
+        event.registerBrigadier("shgraphcopynetwork") {
+            description = "Copies the closest network to the clipboard."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { GraphEditorNetworks.copyClosestNetwork() }
+        }
     }
 
     var bypassTempRemoveTimer = SimpleTimeMark.farPast()
