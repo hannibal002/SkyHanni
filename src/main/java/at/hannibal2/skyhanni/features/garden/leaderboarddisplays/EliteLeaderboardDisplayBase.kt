@@ -82,13 +82,11 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     open val currentLeaderboardType: EliteLeaderboardType?
         get() {
             val enum = currentEnum ?: run {
-                // Apply debounce when auto-switching (currentEnum is null)
+                // Debounce leaderboard when auto switching
                 val now = SimpleTimeMark.now()
                 if (lastEnumSwitchTime.passedSince() < 5.seconds) {
-                    // Use cached value during debounce period
                     lastAutoSelectedEnum
                 } else {
-                    // Update cache after debounce period
                     val newDefault = getDefaultEnum()
                     if (newDefault != lastAutoSelectedEnum) {
                         lastEnumSwitchTime = now
@@ -163,19 +161,17 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         val (playerName, amountUntil, playerRank) = playerInfo ?: return nullNextPlayerRenderable(leaderboardType)
         var nextName = playerName
 
-        // Display rank if we have it and it provides useful non-sequential information
-        @Suppress("KotlinConstantConditions")
-        val shouldShowRank = when {
-            useRankGoal && rankGoal != null -> true
-            playerRank == null || leaderboardPos == null -> false
-            getLastPlayer -> playerRank != leaderboardPos + 1
-            else -> playerRank != leaderboardPos - 1
-        }
+        val currentRank = leaderboardPos
+        val shouldShowRank = playerRank != null && currentRank != null && (
+            useRankGoal || // Always show when using rank goal
+            (!getLastPlayer && playerRank != currentRank - 1) || // Show for next player if non-sequential
+            (getLastPlayer && playerRank != currentRank + 1) // Show for last player if non-sequential
+        )
 
         if (useRankGoal && rankGoal != null) {
             nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
-        } else if (shouldShowRank && playerRank != null) {
-            nextName += " §7[§b#${playerRank.addSeparators()}§7]"
+        } else if (shouldShowRank) {
+            nextName += " §7[#${playerRank?.addSeparators()}]"
         }
 
         val behindOrAhead = if (getLastPlayer) "ahead of" else "behind"
