@@ -48,6 +48,12 @@ object EliteFarmersLeaderboard {
         EliteLeaderboardType.Pest::class to Mutex()
     )
     private val storage get() = GardenApi.storage?.farmingWeight
+
+    data class LeaderboardPlayerInfo(
+        val name: String,
+        val amountDifference: Double,
+        val rank: Int?
+    )
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
@@ -155,7 +161,7 @@ object EliteFarmersLeaderboard {
         return pos
     }
 
-    fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+    fun getNextPlayer(leaderboardType: EliteLeaderboardType): LeaderboardPlayerInfo? {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val amount = getAmount(leaderboardType) ?: return null
         var nextPlayer = lbData.nextPlayers.firstOrNull() ?: return null
@@ -168,15 +174,15 @@ object EliteFarmersLeaderboard {
             lbData.shouldRefresh = true
             return null
         }
-        return Pair(nextPlayer.name, amountBehind)
+        return LeaderboardPlayerInfo(nextPlayer.name, amountBehind, nextPlayer.rank)
     }
 
-    fun getLastPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+    fun getLastPlayer(leaderboardType: EliteLeaderboardType): LeaderboardPlayerInfo? {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val amount = getAmount(leaderboardType) ?: return null
         val lastPlayer = lbData.lastPlayer ?: return null
         val amountAhead = amount - lastPlayer.amount
-        return if (amountAhead < 0) null else Pair(lastPlayer.name, amountAhead)
+        return if (amountAhead < 0) null else LeaderboardPlayerInfo(lastPlayer.name, amountAhead, lastPlayer.rank)
     }
 
     fun getAmount(leaderboardType: EliteLeaderboardType): Double? {
@@ -224,7 +230,15 @@ object EliteFarmersLeaderboard {
             return null
         }
         val rankGoal = getRankGoal(leaderboardType) // getRankGoal returns null if we're at or in front of it
-        leaderboardPosMap?.set(leaderboardType, rankGoal ?: (currentRank - 1)) // player we passed should be at rank goal if not null
+
+        // Use the rank from the player if available, otherwise decrement
+        val newRank = if (nextPlayer.rank != null && nextPlayer.rank > 0) {
+            nextPlayer.rank
+        } else {
+            rankGoal ?: (currentRank - 1)
+        }
+
+        leaderboardPosMap?.set(leaderboardType, newRank)
         return lbData.nextPlayers.firstOrNull()
     }
 

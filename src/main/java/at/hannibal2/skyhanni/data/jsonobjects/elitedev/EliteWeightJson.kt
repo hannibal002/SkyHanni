@@ -54,6 +54,7 @@ data class EliteLeaderboardPlayer(
     @Expose val profile: String,
     @Expose val uuid: UUID,
     @Expose val amount: Double,
+    @Expose val rank: Int? = null,
     @Expose val mode: String? = null,
     @Expose val meta: JsonObject? = null,
 )
