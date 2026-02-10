@@ -40,10 +40,11 @@ import kotlin.time.Duration.Companion.seconds
 abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
     private val typeClass: KClass<out T>,
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
-    private val name: String
+    private val name: String,
 ) {
     protected val configBase get() = GardenApi.config.eliteFarmersLeaderboards
     private val config get() = baseClass?.let { getConfigFromClass(it) }
+
     @Suppress("Unchecked_cast")
     private val baseClass: KClass<out EliteLeaderboardType>?
         get() = typeClass as? KClass<out EliteLeaderboardType>
@@ -164,9 +165,9 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         val currentRank = leaderboardPos
         val shouldShowRank = playerRank != null && currentRank != null && (
             useRankGoal || // Always show when using rank goal
-            (!getLastPlayer && playerRank != currentRank - 1) || // Show for next player if non-sequential
-            (getLastPlayer && playerRank != currentRank + 1) // Show for last player if non-sequential
-        )
+                (!getLastPlayer && playerRank != currentRank - 1) || // Show for next player if non-sequential
+                (getLastPlayer && playerRank != currentRank + 1) // Show for last player if non-sequential
+            )
 
         if (useRankGoal && rankGoal != null) {
             nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
