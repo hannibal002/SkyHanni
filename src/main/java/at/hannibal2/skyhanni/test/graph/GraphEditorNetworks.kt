@@ -16,7 +16,7 @@ object GraphEditorNetworks {
         LorenzColor.DARK_GREEN.addOpacity(150),
     )
 
-    fun recalculate() {
+    fun recalculate(): Int {
         val state = GraphEditor.state
         val clusters = findClusters(state.nodes, state.edges)
         val useNetworkColors = clusters.size > 1
@@ -25,7 +25,7 @@ object GraphEditorNetworks {
             for (edge in state.edges) {
                 edge.networkColor = null
             }
-            return
+            return clusters.size
         }
 
         val sortedClusters = clusters.sortedByDescending { it.size }
@@ -41,6 +41,8 @@ object GraphEditorNetworks {
             val colorIndex = nodeToColorIndex[edge.node1] ?: 0
             edge.networkColor = networkColors[colorIndex]
         }
+
+        return clusters.size
     }
 
     fun copyClosestNetwork() {

@@ -117,13 +117,14 @@ object GraphEditorIO {
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
-        GraphEditorNetworks.recalculate()
+        val networkCount = GraphEditorNetworks.recalculate()
         if (config.showsStats) {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
+            val networkLine = if (networkCount > 1) "\n§eNetworks: ${networkCount.addSeparators()}" else ""
             ChatUtils.chat(
                 "§lStats\n" + "§eNamed Nodes: ${
                     nodes.count { it.name != null }.addSeparators()
-                }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length",
+                }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length" + networkLine,
             )
         }
     }
