@@ -107,6 +107,17 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback { GraphEditorNetworks.copyClosestNetwork() }
         }
+        event.registerBrigadier("shgraphmerge") {
+            description = "Merges graph data from the clipboard into the current graph."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                if (!isEnabled()) {
+                    ChatUtils.userError("Graph Editor is not active!")
+                    return@simpleCallback
+                }
+                GraphEditorIO.mergeFromClipboard()
+            }
+        }
     }
 
     var bypassTempRemoveTimer = SimpleTimeMark.farPast()
