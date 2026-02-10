@@ -110,6 +110,7 @@ object GraphEditorIO {
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
+        GraphEditorNetworks.recalculate()
         if (config.showsStats) {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             ChatUtils.chat(
@@ -141,6 +142,7 @@ object GraphEditorIO {
         GraphEditor.enable()
         GraphEditorHistory.save("load island ${IslandGraphs.lastLoadedIslandType}")
         GraphEditor.state = createStateFrom(graph)
+        GraphEditorNetworks.recalculate()
         ChatUtils.chat("Graph Editor loaded this island!")
     }
 
