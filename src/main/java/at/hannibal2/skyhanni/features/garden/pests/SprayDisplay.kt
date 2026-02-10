@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.greenhouse
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
