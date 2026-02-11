@@ -145,7 +145,7 @@ open class Enchant : Comparable<Enchant> {
             return if (advanced.useAdvancedUltimateColor.get()) {
                 Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
             } else {
-                val color = if (isMaxed){
+                val color = if (isMaxed) {
                     config.maxUltimateEnchantColor.get()
                 } else {
                     config.ultimateEnchantColor.get()
