@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.render.SkyHanniItemRenderer
+import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
@@ -20,6 +22,8 @@ object RenderEvents {
             Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
             RenderEvents::postGui
         )
+
+        SpecialGuiElementRegistry.register { ctx -> SkyHanniItemRenderer(ctx.vertexConsumers()) }
 
         // makes the lines render weird idk
         /*WorldRenderEvents.END_MAIN.register { event ->
