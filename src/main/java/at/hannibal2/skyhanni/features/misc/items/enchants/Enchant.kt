@@ -151,7 +151,7 @@ open class Enchant : Comparable<Enchant> {
                     config.ultimateEnchantColor.get()
                 }
 
-                if (color == LorenzColor.CHROMA){
+                if (color == LorenzColor.CHROMA) {
                     Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
                 } else {
                     Style.EMPTY.withColor(color.toColor().rgb).withBold(true)
