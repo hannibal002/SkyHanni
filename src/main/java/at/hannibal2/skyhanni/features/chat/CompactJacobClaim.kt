@@ -82,7 +82,7 @@ object CompactJacobClaim {
     )
 
     /**
-     * REGEX-TEST:    Overclocker 3000
+     * REGEX-TEST:     Overclocker 3000
      */
     private val overclockerPattern by patternGroup.pattern(
         "overclocker",
@@ -247,6 +247,6 @@ object CompactJacobClaim {
     private fun ContestRewardsClaimedEvent.getOverclockersFormat() = buildString {
         if (rewards.overclockers == 0) return@buildString
         val verbiage = StringUtils.pluralize(rewards.overclockers, "Overclocker")
-        append("${rewards.overclockers} §6${verbiage}")
+        append("${rewards.overclockers} §6$verbiage")
     }
 }
