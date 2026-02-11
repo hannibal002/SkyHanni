@@ -152,7 +152,7 @@ object CompactJacobClaim {
             }
         }
 
-        overclockerPattern.matchMatcher(message) {
+        overclockerPattern.matchMatcher(event.cleanMessage) {
             rewardSet.overclockers++
         }
 
