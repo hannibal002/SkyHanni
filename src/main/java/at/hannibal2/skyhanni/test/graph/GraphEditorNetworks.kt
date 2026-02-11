@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.utils.OSUtils
 object GraphEditorNetworks {
 
     private val networkColors = listOf(
-        LorenzColor.GOLD.addOpacity(150),
-        LorenzColor.GREEN.addOpacity(150),
-        LorenzColor.AQUA.addOpacity(150),
-        LorenzColor.LIGHT_PURPLE.addOpacity(150),
-        LorenzColor.WHITE.addOpacity(150),
-        LorenzColor.DARK_GREEN.addOpacity(150),
+        LorenzColor.GOLD,
+        LorenzColor.GREEN,
+        LorenzColor.AQUA,
+        LorenzColor.LIGHT_PURPLE,
+        LorenzColor.WHITE,
+        LorenzColor.DARK_GREEN,
     )
 
     fun recalculate(): Int {
@@ -39,7 +39,7 @@ object GraphEditorNetworks {
 
         for (edge in state.edges) {
             val colorIndex = nodeToColorIndex[edge.node1] ?: 0
-            edge.networkColor = networkColors[colorIndex]
+            edge.networkColor = networkColors[colorIndex].addOpacity(150)
         }
 
         return clusters.size
