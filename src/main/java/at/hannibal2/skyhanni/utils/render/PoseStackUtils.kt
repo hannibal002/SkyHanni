@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
@@ -14,11 +15,10 @@ object PoseStackUtils {
 
     fun PoseStack.mulPose(rotationVector: Vec3) {
         val quaternionf = Quaternionf()
-        quaternionf.rotateXYZ(
-            Math.toRadians((rotationVector.x % 360)).toFloat(),
-            Math.toRadians((rotationVector.y % 360)).toFloat(),
-            Math.toRadians((rotationVector.z % 360)).toFloat(),
-        )
+        val xRad = Math.toRadians((rotationVector.x % 360)).toFloat()
+        val yRad = Math.toRadians((rotationVector.y % 360)).toFloat()
+        val zRad = Math.toRadians((rotationVector.z % 360)).toFloat()
+        quaternionf.rotateXYZ(xRad, yRad, zRad)
         mulPose(quaternionf)
     }
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
