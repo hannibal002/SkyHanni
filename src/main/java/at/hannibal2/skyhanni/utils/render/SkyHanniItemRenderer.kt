@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.gui.render.state.GuiRenderState
@@ -28,19 +28,16 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
 
     override fun renderToTexture(itemRenderState: SkyHanniGuiItemRenderState, poseStack: PoseStack) {
         poseStack.scale(1.0f, -1.0f, -1.0f)
-        poseStack.mulPose(Axis.XP.rotationDegrees(itemRenderState.rotX))
-        poseStack.mulPose(Axis.YP.rotationDegrees(itemRenderState.rotY))
-        poseStack.mulPose(Axis.ZP.rotationDegrees(itemRenderState.rotZ))
-        val guiItemRenderState = itemRenderState.guiItemRenderState()
-        val trackingItemStackRenderState = guiItemRenderState.itemStackRenderState()
-        val bl = !trackingItemStackRenderState.usesBlockLight()
-        if (bl) {
-            Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_FLAT)
-        } else {
-            Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-        }
+        poseStack.mulPose(itemRenderState.rotVec)
 
-        val featureRenderDispatcher = Minecraft.getInstance().gameRenderer.featureRenderDispatcher
+        val gameRenderer = Minecraft.getInstance().gameRenderer
+        val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
+        gameRenderer.lighting.setupFor(
+            if (trackingItemStackRenderState.usesBlockLight()) Lighting.Entry.ITEMS_3D
+            else Lighting.Entry.ITEMS_FLAT
+        )
+
+        val featureRenderDispatcher = gameRenderer.featureRenderDispatcher
         val submitNodeStorage = featureRenderDispatcher.submitNodeStorage
         trackingItemStackRenderState.submit(poseStack, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
         featureRenderDispatcher.renderAllFeatures()

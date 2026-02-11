@@ -321,8 +321,6 @@ object GuiRenderUtils {
         )
     }
 
-    private val itemRenderStateButCool by lazy { ItemStackRenderState() }
-
     private const val SKULL_SCALE = (5f / 4f)
 
     @Suppress("unused")
@@ -336,13 +334,7 @@ object GuiRenderUtils {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
 
-        val rotX = ((rotationDegrees?.x ?: 0.0) % 360).toFloat()
-        val rotY = ((rotationDegrees?.y ?: 0.0) % 360).toFloat()
-        val rotZ = ((rotationDegrees?.z ?: 0.0) % 360).toFloat()
-
         val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
-
-
         val finalItemScale = (baseItemScale * scaleMultiplier).toFloat()
 
         val (translateX, translateY) = if (isItemSkull) {
@@ -357,43 +349,33 @@ object GuiRenderUtils {
         val guiScaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
         val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
 
-        // (both were set to customRenderOnScreen just so i could test it works, idk which branch should be
-        // custom render and normal render)
-        if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.usesBlockLight())) {
-            item.customRenderOnScreen(translateX, translateY, finalItemScale, rotX, rotY, rotZ)
+        // Check if the model uses 3D lighting
+        val trackingState = TrackingItemStackRenderState()
+        Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
+
+        if (rotationDegrees != null || (totalItemScale > 1 && trackingState.usesBlockLight())) {
+            item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationDegrees)
         } else {
-            item.customRenderOnScreen(translateX, translateY, finalItemScale, rotX, rotY, rotZ)
+            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         }
     }
 
-    private fun ItemStack.customRenderOnScreen(x: Float, y: Float, scale: Float, rotX: Float, rotY: Float, rotZ: Float) {
+    private fun ItemStack.customRenderOnScreen(trackingState: TrackingItemStackRenderState, x: Float, y: Float, scale: Float, rotVec: Vec3?) {
         DrawContextUtils.pushPop {
             DrawContextUtils.drawContext.pose()
-
-            val trackingItemStackRenderState = TrackingItemStackRenderState()
-            Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingItemStackRenderState, this, ItemDisplayContext.GUI, null, null, 0)
 
             val guiItemRenderState = GuiItemRenderState(
                 this.item.name.toString(),
                 Matrix3x2f(DrawContextUtils.drawContext.pose()),
-                trackingItemStackRenderState,
+                trackingState,
                 0,
                 0,
                 DrawContextUtils.drawContext.scissorStack.peek()
             )
 
+            val finalRotationVector = rotVec ?: Vec3(0.0, 0.0, 0.0)
             Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(
-                SkyHanniGuiItemRenderState(
-                    guiItemRenderState,
-                    x.toInt(),
-                    y.toInt(),
-                    (x + (scale * 16)).toInt(),
-                    (y + (scale * 16)).toInt(),
-                    rotX,
-                    rotY,
-                    rotZ,
-                    scale
-                )
+                SkyHanniGuiItemRenderState(guiItemRenderState, x, y, finalRotationVector, scale)
             )
         }
     }
