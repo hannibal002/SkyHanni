@@ -24,7 +24,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.world.item.ItemStack
-import org.w3c.dom.Text
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
