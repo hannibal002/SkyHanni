@@ -185,7 +185,7 @@ object HoeLevelDisplay {
         event.registerBrigadier("shsethoelevel") {
             category = CommandCategory.USERS_BUG_FIX
             description = "Manually sets your overflow hoe level"
-            arg("level", BrigadierArguments.integer()) { newLevel ->
+            arg("level", BrigadierArguments.integer()) { newLevelArg ->
                 callback {
                     val item = InventoryUtils.getItemInHand() ?: return@callback errorNoTool()
                     val uuid = item.getItemUuid() ?: return@callback errorNoTool()
@@ -198,7 +198,7 @@ object HoeLevelDisplay {
 
                     val oldLevel = MAX_LEVEL + (getOverflowHoeLevel(item.getItemUuid()) ?: errorStorage(item))
 
-                    val newLevel = getArg(newLevel)
+                    val newLevel = getArg(newLevelArg)
                     if (newLevel < MAX_LEVEL) {
                         ChatUtils.userError("Overflow level cannot be below $MAX_LEVEL!")
                         return@callback
