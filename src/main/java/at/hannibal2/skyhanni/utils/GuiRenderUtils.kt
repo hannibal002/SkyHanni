@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
+import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -25,6 +26,10 @@ import net.minecraft.world.phys.Vec3
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
+import net.minecraft.client.gui.render.state.GuiItemRenderState
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState
+import net.minecraft.world.item.ItemDisplayContext
+import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -352,75 +357,46 @@ object GuiRenderUtils {
         val guiScaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
         val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
 
+        // (both were set to customRenderOnScreen just so i could test it works, idk which branch should be
+        // custom render and normal render)
         if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.usesBlockLight())) {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+            item.customRenderOnScreen(translateX, translateY, finalItemScale, rotX, rotY, rotZ)
         } else {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+            item.customRenderOnScreen(translateX, translateY, finalItemScale, rotX, rotY, rotZ)
         }
     }
 
-    /*// TODO: On 1.21.10+ it is completely broken
-    private fun ItemStack.customRenderOnScreen(
-        x: Float, y: Float, finalItemScale: Float,
-        rotX: Float, rotY: Float, rotZ: Float,
-    ) {
-        val client = Minecraft.getInstance()
-        val window = client.window
+    private fun ItemStack.customRenderOnScreen(x: Float, y: Float, scale: Float, rotX: Float, rotY: Float, rotZ: Float) {
+        DrawContextUtils.pushPop {
+            DrawContextUtils.drawContext.pose()
 
-        // Thank Vixid for this -  I would have never figured out how to do this.
-        RenderSystem.backupProjectionMatrix()
-        val guiWidth = window.width.toFloat() / window.guiScale.toFloat()
-        val guiHeight = window.height.toFloat() / window.guiScale.toFloat()
-        val slice = projectionMatrix.getBuffer(guiWidth, guiHeight)
-        RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
-        RenderSystem.getModelViewStack().pushMatrix()
-        RenderSystem.getModelViewStack().identity()
-        val textureMatrixBackup = Matrix4f(RenderSystem.getTextureMatrix())
-        RenderSystem.resetTextureMatrix()
+            val trackingItemStackRenderState = TrackingItemStackRenderState()
+            Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingItemStackRenderState, this, ItemDisplayContext.GUI, null, null, 0)
 
-        // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
-        val matrices = PoseStack()
-        matrices.pushPose()
-        // TODO -1100f comes from projectionMatrix above, needs changing
-        matrices.translate(x, y, -1100f)
+            val guiItemRenderState = GuiItemRenderState(
+                this.item.name.toString(),
+                Matrix3x2f(DrawContextUtils.drawContext.pose()),
+                trackingItemStackRenderState,
+                0,
+                0,
+                DrawContextUtils.drawContext.scissorStack.peek()
+            )
 
-        // Because by default the item is rendered flipped in all directions (what the fuck, Mojang?),
-        // we need to translate all three ways before rendering the item, so we can flip it, and still
-        // have it 'end' in the right position.
-        val itemSize = 16f * finalItemScale
-        matrices.translate(itemSize, itemSize, 0f)
-        // These scales being negative is what does the "flipping back to normal viewing"
-        matrices.scale(-finalItemScale, -finalItemScale, -1f)
-
-        // Since we want to rotate the item around its center point, we translate half in, in each direction
-        // Matrices are pre-scaled, so we use the raw 8f values
-        matrices.translate(8f, 8f, 8f)
-
-        // 'planned' rotations are done now.
-        if (rotX != 0f) matrices.mulPose(Axis.XP.rotationDegrees(rotX))
-        if (rotY != 0f) matrices.mulPose(Axis.YP.rotationDegrees(rotY))
-        if (rotZ != 0f) matrices.mulPose(Axis.ZP.rotationDegrees(rotZ))
-
-        // With the ItemRenderer call, all blocks and skulls are rendered from a true side view, rather than
-        // the old "angled down" view. This rotation set re-creates the old view.
-        matrices.mulPose(Axis.XN.rotationDegrees(30f))
-        matrices.mulPose(Axis.YP.rotationDegrees(45f))
-
-        // We need to scale up before rendering - for some reason the default is 1 x 1 x 1
-        matrices.scale(16f, 16f, 16f)
-
-        client.gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-
-        val dispatcher = client.gameRenderer.featureRenderDispatcher
-        val consumers = dispatcher.submitNodeStorage
-        itemRenderStateButCool.submit(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-        dispatcher.endFrame()
-        matrices.popPose()
-        RenderSystem.teardownOverlayColor()
-        RenderSystem.getModelViewStack().popMatrix()
-        RenderSystem.getTextureMatrix().set(textureMatrixBackup)
-        RenderSystem.restoreProjectionMatrix()
-    }*/
+            Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(
+                SkyHanniGuiItemRenderState(
+                    guiItemRenderState,
+                    x.toInt(),
+                    y.toInt(),
+                    (x + (scale * 16)).toInt(),
+                    (y + (scale * 16)).toInt(),
+                    rotX,
+                    rotY,
+                    rotZ,
+                    scale
+                )
+            )
+        }
+    }
 
     private fun ItemStack.normalRenderOnScreen(translateX: Float, translateY: Float, scale: Float) {
         DrawContextUtils.pushPop {

@@ -20,6 +20,7 @@ import com.google.gson.GsonBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
@@ -53,6 +54,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(Stopwatch::class.java, SkyHanniTypeAdapters.STOPWATCH.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
         .registerTypeAdapter(SessionUptime::class.java, SkyHanniTypeAdapters.SESSION_UPTIME.nullSafe())
+        .registerTypeAdapter(Component::class.java, SkyHanniTypeAdapters.COMPONENT.nullSafe())
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder {
