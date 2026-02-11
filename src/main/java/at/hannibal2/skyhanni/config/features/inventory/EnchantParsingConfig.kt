@@ -48,6 +48,11 @@ class EnchantParsingConfig {
     val ultimateEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.LIGHT_PURPLE)
 
     @Expose
+    @ConfigOption(name = "Max Ultimate Enchantment Color", desc = "The color the Ultimate enchantment will be if max level. (Will always be bold)")
+    @ConfigEditorDropdown
+    val maxUltimateEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)
+
+    @Expose
     @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
     @ConfigEditorDropdown
     val perfectEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)

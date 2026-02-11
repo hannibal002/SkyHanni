@@ -24,6 +24,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.world.item.ItemStack
+import org.w3c.dom.Text
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
@@ -39,7 +40,7 @@ open class Enchant : Comparable<Enchant> {
     private val goodLevel = 0
 
     @Expose
-    private val maxLevel = 0
+    val maxLevel = 0
 
     private fun isNormal() = this is Normal
     private fun isUltimate() = this is Ultimate
@@ -139,13 +140,22 @@ open class Enchant : Comparable<Enchant> {
 
     class Ultimate : Enchant() {
         override fun getStyle(level: Int, itemStack: ItemStack?): Style {
+            val isMaxed = level >= maxLevel
+
             return if (advanced.useAdvancedUltimateColor.get()) {
                 Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
             } else {
-                if (config.ultimateEnchantColor.get() == LorenzColor.CHROMA)
+                val color = if (isMaxed){
+                    config.maxUltimateEnchantColor.get()
+                } else {
+                    config.ultimateEnchantColor.get()
+                }
+
+                if (color == LorenzColor.CHROMA){
                     Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
-                else
-                    Style.EMPTY.withColor(config.ultimateEnchantColor.get().toColor().rgb).withBold(true)
+                } else {
+                    Style.EMPTY.withColor(color.toColor().rgb).withBold(true)
+                }
             }
         }
     }
