@@ -24,6 +24,19 @@ class AdvancedEnchantmentColors {
 
     @Expose
     @ConfigOption(
+        name = "Use Advanced Maxed Ultimate Color?",
+        desc = "Enable this to override the color selected for Maxed Ultimate enchantments from above."
+    )
+    @ConfigEditorBoolean
+    val useAdvancedMaxUltimateColor: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(name = "Advanced Maxed Ultimate Color", desc = "Select a custom color to use for maxed Ultimate enchantments.")
+    @ConfigEditorColour
+    val advancedMaxUltimateColor: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 255, 85, 1))
+
+    @Expose
+    @ConfigOption(
         name = "Use Advanced Perfect Color?",
         desc = "Enable this to override the color selected for perfect level enchantments from above."
     )

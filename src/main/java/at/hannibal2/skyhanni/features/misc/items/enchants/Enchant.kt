@@ -40,7 +40,6 @@ open class Enchant : Comparable<Enchant> {
 
     @Expose
     val maxLevel = 0
-        private set
 
     private fun isNormal() = this is Normal
     private fun isUltimate() = this is Ultimate
@@ -142,21 +141,21 @@ open class Enchant : Comparable<Enchant> {
         override fun getStyle(level: Int, itemStack: ItemStack?): Style {
             val isMaxed = level >= maxLevel
 
-            return if (advanced.useAdvancedUltimateColor.get()) {
-                Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
-            } else {
-                val color = if (isMaxed) {
-                    config.maxUltimateEnchantColor.get()
-                } else {
-                    config.ultimateEnchantColor.get()
-                }
+            val useAdvanced = if (isMaxed) advanced.useAdvancedMaxUltimateColor else advanced.useAdvancedUltimateColor
+            val advColor = if (isMaxed) advanced.advancedMaxUltimateColor else advanced.advancedUltimateColor
+            val stdColor = if (isMaxed) config.maxUltimateEnchantColor else config.ultimateEnchantColor
 
+            val rgb = if (useAdvanced.get()) {
+                advColor.get().getEffectiveColourRGB()
+            } else {
+                val color = stdColor.get()
                 if (color == LorenzColor.CHROMA) {
-                    Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
-                } else {
-                    Style.EMPTY.withColor(color.toColor().rgb).withBold(true)
+                    return Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma")).withBold(true)
                 }
+                color.toColor().rgb
             }
+
+            return Style.EMPTY.withColor(rgb).withBold(true)
         }
     }
 
