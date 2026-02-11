@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGameRenderer
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
@@ -7,21 +8,43 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
+import at.hannibal2.skyhanni.utils.render.PoseStackUtils.defaultAngleDown
+import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
+import at.hannibal2.skyhanni.utils.render.PoseStackUtils.pushPopPose
+import at.hannibal2.skyhanni.utils.render.item.OversizedRotatableItemRenderState
+import at.hannibal2.skyhanni.utils.render.item.OversizedRotatableItemRenderer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.PoseStack
+import jdk.internal.org.jline.utils.Colors.h
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.render.pip.OversizedItemRenderer
+import net.minecraft.client.gui.render.state.BlitRenderState
+import net.minecraft.client.gui.render.state.GuiItemRenderState
+import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.SubmitNodeStorage
+import net.minecraft.client.renderer.entity.ItemEntityRenderer
 import net.minecraft.client.renderer.item.ItemStackRenderState
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState
+import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
+import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
+import org.joml.Matrix3x2f
+import org.joml.Matrix4f
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -330,14 +353,7 @@ object GuiRenderUtils {
     ) {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
-
-        val rotX = ((rotationDegrees?.x ?: 0.0) % 360).toFloat()
-        val rotY = ((rotationDegrees?.y ?: 0.0) % 360).toFloat()
-        val rotZ = ((rotationDegrees?.z ?: 0.0) % 360).toFloat()
-
         val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
-
-
         val finalItemScale = (baseItemScale * scaleMultiplier).toFloat()
 
         val (translateX, translateY) = if (isItemSkull) {
@@ -353,10 +369,35 @@ object GuiRenderUtils {
         val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
 
         if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.usesBlockLight())) {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+            //item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+            item.modernCustomRender(translateX, translateY, finalItemScale, rotationDegrees!!)
         } else {
             item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         }
+    }
+
+    private fun ItemStack.modernCustomRender(x: Float, y: Float, scale: Float, rotationDegrees: Vec3) {
+        val client = Minecraft.getInstance()
+        val trackingStackState = TrackingItemStackRenderState()
+        client.itemModelResolver.updateForTopItem(trackingStackState, this, ItemDisplayContext.HEAD, null, null, 0)
+
+        val gameRenderer = client.gameRenderer
+        val accRenderer = (gameRenderer as AccessorGameRenderer)
+        val guiRenderState = accRenderer.guiRenderState
+        val guiItemRenderState = GuiItemRenderState(
+            item.name.toString(),
+            Matrix3x2f(DrawContextUtils.drawContext.pose()),
+            trackingStackState,
+            x.toInt(),
+            y.toInt(),
+            GuiGraphics(client, guiRenderState).scissorStack.peek()
+        )
+
+        val dispatcher = gameRenderer.featureRenderDispatcher
+        val consumers = dispatcher.submitNodeStorage
+        val oversizedRotatableState = OversizedRotatableItemRenderState(guiItemRenderState, rotationDegrees)
+        OversizedRotatableItemRenderer()
+
     }
 
     /*// TODO: On 1.21.10+ it is completely broken

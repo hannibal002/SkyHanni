@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
@@ -79,6 +80,14 @@ object CompactJacobClaim {
         "bits",
         " {4}§r§8\\+§r§b(?<amount>[\\d,]+) Bits",
     )
+
+    /**
+     * REGEX-TEST:    Overclocker 3000
+     */
+    private val overclockerPattern by patternGroup.pattern(
+        "overclocker",
+        " {4}Overclocker 3000",
+    )
     // </editor-fold>
 
     private val rewardSet = ContestRewardSet()
@@ -143,6 +152,10 @@ object CompactJacobClaim {
             }
         }
 
+        overclockerPattern.matchMatcher(message) {
+            rewardSet.overclockers++
+        }
+
         bookPattern.matchMatcher(message) {
             val crop = CropType.getByNameOrNull(group("crop")) ?: when (group("crop").lowercase()) {
                 "cacti" -> CropType.CACTUS
@@ -192,6 +205,7 @@ object CompactJacobClaim {
             getBooksFormat(),
             getMedalsFormat(),
             getBitsFormat(),
+            getOverclockersFormat(),
         ).filterNot {
             it.isEmpty()
         }.joinToString(separator = " §8§l| §r"),
@@ -228,5 +242,11 @@ object CompactJacobClaim {
     private fun ContestRewardsClaimedEvent.getBitsFormat() = buildString {
         if (rewards.bits == 0) return@buildString
         append("Bits: §b${rewards.bits}")
+    }
+
+    private fun ContestRewardsClaimedEvent.getOverclockersFormat() = buildString {
+        if (rewards.overclockers == 0) return@buildString
+        val verbiage = StringUtils.pluralize(rewards.overclockers, "Overclocker")
+        append("${rewards.overclockers} §6${verbiage}")
     }
 }
