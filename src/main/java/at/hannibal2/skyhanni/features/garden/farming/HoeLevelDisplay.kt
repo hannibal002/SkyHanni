@@ -97,17 +97,17 @@ object HoeLevelDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Modify) {
-        levelUpPattern.matchMatcher(event.cleanMessage) {
-            val heldItem = InventoryUtils.getItemInHand() ?: return
-            val leveledUpTool = group("tool")
-            val heldItemName = heldItem.hoverName.string.removeColor()
-            if (!heldItemName.contains(leveledUpTool)) return
-            val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
-            if (isEnabled() && config.overflow && overflowLevel != null) {
-                val currentLevel = heldItem.getHoeLevel() ?: return
-                val newComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
-                event.replaceComponent(newComponent, "hoe_level")
-            }
+        val heldItem = InventoryUtils.getItemInHand() ?: return
+        val leveledUpTool = levelUpPattern.matchMatcher(event.cleanMessage) {
+            group("tool")
+        } ?: return
+        val heldItemName = heldItem.hoverName.string.removeColor()
+        if (!heldItemName.contains(leveledUpTool)) return
+        val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
+        if (isEnabled() && config.overflow && overflowLevel != null) {
+            val currentLevel = heldItem.getHoeLevel() ?: return
+            val newComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+            event.replaceComponent(newComponent, "hoe_level")
         }
     }
 
@@ -154,8 +154,8 @@ object HoeLevelDisplay {
                     appendWithColor("$luck✴", ChatFormatting.GREEN)
                 },
                 Component.empty(),
-                Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY)
-            )
+                Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY),
+            ),
         )
         event.addItem(stack)
     }
@@ -214,7 +214,7 @@ object HoeLevelDisplay {
                             append(" to ")
                             appendWithColor(newLevel.toString(), ChatFormatting.AQUA)
                             append(".")
-                        }
+                        },
                     )
                 }
             }
