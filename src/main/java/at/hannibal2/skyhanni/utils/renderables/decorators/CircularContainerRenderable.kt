@@ -29,7 +29,7 @@ class CircularContainerRenderable(
     private val takenSpace = 2 * (radius - padding)
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         super.render(mouseOffsetX, mouseOffsetY)
-        DrawContextUtils.translated(padding.toFloat(), padding.toFloat(), 0f) {
+        DrawContextUtils.translated(padding.toFloat(), padding.toFloat()) {
             root.renderXYAligned(mouseOffsetX + padding, mouseOffsetY + padding, takenSpace, takenSpace)
         }
     }

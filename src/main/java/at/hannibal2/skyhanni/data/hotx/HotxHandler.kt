@@ -196,9 +196,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
     abstract val resetChatPattern: Pattern
 
-    abstract fun extraChatHandling(event: SkyHanniChatEvent)
+    abstract fun extraChatHandling(event: SkyHanniChatEvent.Allow)
 
-    open fun onChat(event: SkyHanniChatEvent) {
+    open fun onChat(event: SkyHanniChatEvent.Allow) {
         if (resetChatPattern.matches(event.message)) {
             resetTree()
             return
@@ -206,9 +206,9 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         extraChatHandling(event)
     }
 
-    abstract fun tryBlock(event: SkyHanniChatEvent)
+    abstract fun tryBlock(event: SkyHanniChatEvent.Allow)
 
-    fun tryReadRotatingPerkChat(event: SkyHanniChatEvent): Boolean? {
+    fun tryReadRotatingPerkChat(event: SkyHanniChatEvent.Allow): Boolean? {
         rotatingPerkPattern.matchMatcher(event.message) {
             val perkString = group("perk")
             val foundPerk = rotatingPerks.firstNotNullOfOrNull { perk ->

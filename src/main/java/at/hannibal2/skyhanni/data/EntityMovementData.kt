@@ -107,7 +107,7 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!warpingPattern.matches(event.message)) return
         DelayedRun.runNextTick {
             SkyHanniWarpEvent.post()

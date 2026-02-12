@@ -82,8 +82,10 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             readAllNeuItems()
+            multiplierCache.clear()
+            itemIdCache.clear()
         }
     }
 
@@ -102,10 +104,9 @@ object NeuItems {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
-            val cleanName =
-                stack.hoverName.formattedTextCompatLeadingWhiteLessResets()?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
-                    it.isNotEmpty()
-                } ?: return@forEach
+            val cleanName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().lowercase().removePrefix(neuPetLevelRegex).takeIf {
+                it.isNotEmpty()
+            } ?: return@forEach
 
             if (cleanName.contains("[lvl 1➡100]")) {
                 if (PlatformUtils.isDevEnvironment) error("wrong name: '$cleanName'")
@@ -118,8 +119,7 @@ object NeuItems {
             tempNoColor[newCleanName.removeColor()] = internalName
             allInternalNames[rawInternalName] = internalName
         }
-        @Suppress("UNCHECKED_CAST")
-        itemNamesWithoutColor = tempNoColor as NavigableMap<String, NeuInternalName>
+        itemNamesWithoutColor = tempNoColor
         allItemsCache = tempAllItemCache
         stackResolutionCache.clear()
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")

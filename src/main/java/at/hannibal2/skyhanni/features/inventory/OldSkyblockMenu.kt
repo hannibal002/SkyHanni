@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -51,7 +51,7 @@ object OldSkyblockMenu {
         if (!isEnabled()) return
 
         val sbButton = slotMap[event.slot]?.takeIf { !it.disabled } ?: return
-        val isAlreadySbButton = event.originalItem?.hoverName.formattedTextCompatLeadingWhiteLessResets()?.endsWith(sbButton.displayName) == true
+        val isAlreadySbButton = event.originalItem.hoverName.formattedTextCompatLeadingWhiteLessResets().endsWith(sbButton.displayName)
         if (isAlreadySbButton) return
 
         event.replace(sbButton.item)
@@ -117,7 +117,7 @@ object OldSkyblockMenu {
                 lore.add(4, "")
                 val format = magicalPower.addSeparators()
                 lore.add(5, "§7Magical Power: §6$format")
-                item.copy().setLore(lore)
+                item.copy().setLoreString(lore)
             }
         ),
         POTION(

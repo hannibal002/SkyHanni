@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldIt
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -54,16 +55,16 @@ object PestSpawnTimer {
     private val patternGroup = RepoPattern.group("garden.pests")
 
     /**
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§a§lREADY"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§e1m 58s"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§e1m"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§e58s"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§c§lMAX PESTS"
+     * WRAPPED-REGEX-TEST: " Cooldown: READY"
+     * WRAPPED-REGEX-TEST: " Cooldown: 1m 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: 1m"
+     * WRAPPED-REGEX-TEST: " Cooldown: 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
      */
 
     private val pestCooldownPattern by patternGroup.pattern(
-        "cooldowntime",
-        "\\sCooldown: §r§.(?:§.)?(?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+        "cooldowntime-no-color",
+        "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -79,11 +80,14 @@ object PestSpawnTimer {
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    private val customCooldownTime get(): Duration =
+        (if (Perk.PEST_ERADICATOR.isActive) config.customCooldownTimeFinnegan else config.customCooldownTime).get().seconds
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        pestCooldownPattern.firstMatcher(event.widget.lines) {
+        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
@@ -95,7 +99,7 @@ object PestSpawnTimer {
             }
             if (time == null) return
             pestCooldownEndTime = if (config.customCooldown.get()) {
-                lastPestSpawnTime + config.customCooldownTime.get().seconds
+                lastPestSpawnTime + customCooldownTime
             } else time
 
             if (pestSpawned) {
@@ -196,7 +200,7 @@ object PestSpawnTimer {
     }
 
     private fun setCustomCooldown() {
-        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + config.customCooldownTime.get().seconds
+        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + customCooldownTime
     }
 
     private fun drawDisplay(): List<Renderable> {

@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
@@ -21,10 +23,13 @@ object CustomTodosGui {
 
     private val todos get() = SkyHanniMod.customTodos.customTodos
 
+    private val config get() = SkyHanniMod.feature.misc.customTodos
+
     private fun matchString(todo: CustomTodo, text: String): Boolean {
+        if (!todo.isValid()) return false
         val cleanedText = if (todo.ignoreColorCodes) text.removeColor() else text
         return when (todo.triggerMatcher) {
-            CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.trigger.toRegex())
+            CustomTodo.TriggerMatcher.REGEX -> cleanedText.matches(todo.getRegex() ?: return false)
             CustomTodo.TriggerMatcher.STARTS_WITH -> cleanedText.startsWith(todo.trigger)
             CustomTodo.TriggerMatcher.CONTAINS -> cleanedText.contains(todo.trigger)
             CustomTodo.TriggerMatcher.EQUALS -> cleanedText == todo.trigger
@@ -60,7 +65,7 @@ object CustomTodosGui {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         todos.forEach { todo ->
             if (todo.triggerTarget != CustomTodo.TriggerTarget.CHAT) return@forEach
             if (matchString(todo, event.message)) todo.setDoneNow()
@@ -69,10 +74,24 @@ object CustomTodosGui {
 
     @HandleEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.enabled) return
         if (todos.isEmpty()) return
+        val display = mutableListOf<Renderable>()
         for ((index, todo) in todos.withIndex()) {
-            val renderable = todo.getRenderable() ?: continue
-            todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
+            val renderable: Renderable
+            try {
+                renderable = todo.getRenderable() ?: continue
+            } catch (e: Exception) {
+                continue
+            }
+            if (config.separateGuis) {
+                todo.position.renderRenderable(renderable, posLabel = "${todo.label} $index")
+            } else {
+                display.add(renderable)
+            }
+        }
+        if (!config.separateGuis) {
+            config.position.renderRenderables(display, posLabel = "Custom Todo Display")
         }
     }
 

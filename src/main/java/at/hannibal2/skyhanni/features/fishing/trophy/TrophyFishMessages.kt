@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -38,10 +37,9 @@ object TrophyFishMessages {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val (displayName, displayRarity) = trophyFishPattern.matchMatcher(event.message) {
-            group("displayName").replace("§k", "") to
-                group("displayRarity")
+            group("displayName").replace("§k", "") to group("displayRarity")
         } ?: return
 
         val internalName = TrophyFishApi.getInternalName(displayName)
@@ -56,6 +54,24 @@ object TrophyFishMessages {
             event.blockedReason = "low_trophy_fish"
             return
         }
+
+        if (config.duplicateHider) event.chatLineId = (internalName + rarity).hashCode()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Modify) {
+        val (displayName, displayRarity) = trophyFishPattern.matchMatcher(event.message) {
+            group("displayName").replace("§k", "") to
+                group("displayRarity")
+        } ?: return
+
+        val internalName = TrophyFishApi.getInternalName(displayName)
+        val rarity = TrophyRarity.getByName(displayRarity.lowercase().removeColor()) ?: return
+
+        val trophyFishes = TrophyFishManager.fish ?: return
+        val trophyFishCounts = trophyFishes.getOrPut(internalName) { mutableMapOf() }
+        val amount = trophyFishCounts[rarity] ?: 1
+
         if (config.goldAlert && rarity == TrophyRarity.GOLD) {
             sendTitle(displayName, displayRarity, amount)
             if (config.playSound) SoundUtils.playBeepSound()
@@ -79,7 +95,7 @@ object TrophyFishMessages {
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
-            edited.appendComponent((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
+            edited.append((" §7(${total.addSeparators()}${total.ordinal()} total)"))
         }
 
         if (config.tooltip) {
@@ -88,7 +104,6 @@ object TrophyFishMessages {
             }
         }
 
-        if (config.duplicateHider) event.chatLineId = (internalName + rarity).hashCode()
         event.replaceComponent(edited, "TROPHY_FISH")
     }
 

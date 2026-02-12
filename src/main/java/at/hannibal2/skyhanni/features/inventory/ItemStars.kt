@@ -43,7 +43,7 @@ object ItemStars {
         val stars = stack.grabStarCount() ?: return
         starPattern.findMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val name = group("name")
-            event.toolTip[0] = Component.nullToEmpty("$name §c$stars✪")
+            event.toolTip[0] = Component.literal("$name §c$stars✪")
         }
     }
 

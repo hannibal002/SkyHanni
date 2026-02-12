@@ -108,7 +108,7 @@ object ExperimentsAddonsHelper {
         chronHasBeenEmpty = false
     }
 
-    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.string.removeColor()) {
         "Green" -> LorenzColor.DARK_GREEN
         "Lime" -> LorenzColor.GREEN
         "Pink" -> LorenzColor.LIGHT_PURPLE
@@ -212,7 +212,7 @@ object ExperimentsAddonsHelper {
 
     private fun ReplaceItemEvent.replaceChronomatronItem() {
         val nextClickColor = hypixelChronomatronData.getOrNull(userChronomatronProgress.size) ?: return
-        originalItem?.getLorenzColorOrNull()?.takeIf { it == nextClickColor } ?: return
+        originalItem.getLorenzColorOrNull()?.takeIf { it == nextClickColor } ?: return
         val newItem = originalItem.copy()
         newItem.addEnchantGlint()
         replace(newItem)
@@ -247,7 +247,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readPhaseOrNull(): HelperPhase? {
-        val phaseItemName = inventoryItems[PHASE_STATUS_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return null
+        val phaseItemName = inventoryItems[PHASE_STATUS_SLOT]?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return null
         return when {
             replicatePhaseItemPattern.matches(phaseItemName) -> HelperPhase.REPLICATE
             readPhaseItemPattern.matches(phaseItemName) -> HelperPhase.READ
@@ -256,7 +256,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readChronomatronRoundOrNull(): Int? {
-        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets() ?: return null
+        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return null
         return roundItemPattern.matchGroup(roundItemName, "round")?.formatIntOrNull()
     }
 
@@ -307,7 +307,7 @@ object ExperimentsAddonsHelper {
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
-            val sequenceNumber = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().toIntOrNull() ?: return@mapNotNull null
+            val sequenceNumber = stack.hoverName.string.removeColor().toIntOrNull() ?: return@mapNotNull null
             currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)
             if (sequenceNumber !in ultrasequencerDyeMap) ultrasequencerDyeMap[sequenceNumber] = stack
             UltraSequencerSlot(

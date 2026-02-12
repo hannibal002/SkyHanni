@@ -1,9 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-//#if TODO
-//$$ import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
-//$$ import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
-//#endif
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -30,10 +26,6 @@ object TestExportTools {
 
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
-        //#if TODO
-        //$$ .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
-        //$$ .registerTypeAdapterFactory(ItemStackTypeAdapterFactory)
-        //#endif
         .create()
 
     class Key<T> internal constructor(val name: String)

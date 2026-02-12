@@ -3,15 +3,55 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 
-class NeuInternalName private constructor(private val internalName: String) {
+@JvmInline
+value class NeuInternalName private constructor(private val internalName: String) {
+
+    fun asString() = internalName
+
+    override fun toString(): String = "internalName:$internalName"
+
+    fun contains(other: String) = internalName.contains(other)
+
+    fun startsWith(other: String) = internalName.startsWith(other)
+
+    fun endsWith(other: String) = internalName.endsWith(other)
+
+    fun replace(oldValue: String, newValue: String): NeuInternalName =
+        internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
+
+    fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
+
+    fun getItemCategoryOrNull(): ItemCategory? =
+        categoryCache.getOrPut(this) { getItemStackOrNull()?.getItemCategoryOrNull() ?: return null }
+
+    /**
+     * This is because skyblock has special ids in commands such as /viewrecipe for items like enchanted books and pets
+     */
+    val skyblockCommandId: String
+        get() = when {
+            isPet -> internalName.split(";").first()
+            isEnchantedBook && internalName.contains(";") -> {
+                val (name, level) = internalName.split(";", limit = 2)
+                "ENCHANTED_BOOK_${name}_$level"
+            }
+            else -> internalName
+        }
+
+    val isPet: Boolean
+        get() = petCache.getOrPut(this) {
+            PetUtils.isKnownPetInternalName(this) || (getItemCategoryOrNull() == ItemCategory.PET)
+        }
+
+    private val isEnchantedBook: Boolean
+        get() = getItemStackOrNull()?.item == Items.ENCHANTED_BOOK
+
 
     companion object {
-
-        private val internalNameMap = mutableMapOf<String, NeuInternalName>()
 
         val NONE = "NONE".toInternalName()
         val MISSING_ITEM = "MISSING_ITEM".toInternalName()
@@ -24,14 +64,15 @@ class NeuInternalName private constructor(private val internalName: String) {
         val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
 
-        fun String.toInternalName(): NeuInternalName = uppercase().replace(" ", "_").let {
-            if (it.contains("§") || it.contains("&") || it.contains("'")) {
+        fun String.toInternalName(): NeuInternalName {
+            val formatted = uppercase().replace(" ", "_")
+            if (formatted.any { it.equalsOneOf('§', '&', '\'') }) {
                 ErrorManager.skyHanniError(
                     "Internal name found with color codes",
-                    "Internal Name" to it, "Original String" to this,
+                    "Internal Name" to formatted, "Original String" to this,
                 )
             }
-            internalNameMap.getOrPut(it) { NeuInternalName(it) }
+            return NeuInternalName(formatted)
         }
 
         fun Set<String>.toInternalNames(): Set<NeuInternalName> = mapTo(mutableSetOf()) { it.toInternalName() }
@@ -44,6 +85,10 @@ class NeuInternalName private constructor(private val internalName: String) {
         }
 
         fun fromItemNameOrInternalName(itemName: String): NeuInternalName = fromItemNameOrNull(itemName) ?: itemName.toInternalName()
+
+        private val categoryCache = TimeLimitedCache<NeuInternalName, ItemCategory>(10.minutes)
+
+        private val petCache: TimeLimitedCache<NeuInternalName, Boolean> = TimeLimitedCache(10.minutes)
 
         private fun getCoins(itemName: String): NeuInternalName? = when {
             isCoins(itemName) -> SKYBLOCK_COIN
@@ -64,57 +109,4 @@ class NeuInternalName private constructor(private val internalName: String) {
             MISSING_ITEM
         }
     }
-
-    fun asString() = internalName
-
-    override fun equals(other: Any?) = this === other
-
-    override fun toString(): String = "internalName:$internalName"
-
-    override fun hashCode(): Int = internalName.hashCode()
-
-    fun contains(other: String) = internalName.contains(other)
-
-    fun startsWith(other: String) = internalName.startsWith(other)
-
-    fun endsWith(other: String) = internalName.endsWith(other)
-
-    fun replace(oldValue: String, newValue: String): NeuInternalName =
-        internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
-
-    fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
-
-    private val categoryCache = mutableMapOf<NeuInternalName, ItemCategory?>()
-
-    fun getItemCategoryOrNull(): ItemCategory? {
-        return categoryCache.getOrPut(this) {
-            getItemStackOrNull()?.getItemCategoryOrNull()
-        }
-    }
-
-    /**
-     * This is because skyblock has special ids in commands such as /viewrecipe for items like enchanted books and pets
-     */
-    val skyblockCommandId: String
-        get() = when {
-            isPet -> internalName.split(";").first()
-            isEnchantedBook -> {
-                if (internalName.contains(";")) {
-                    val (name, level) = internalName.split(";", limit = 2)
-                    "ENCHANTED_BOOK_${name}_$level"
-                } else internalName
-            }
-
-            else -> internalName
-        }
-
-    private val petCache: TimeLimitedCache<NeuInternalName, Boolean> = TimeLimitedCache(10.minutes)
-
-    val isPet: Boolean
-        get() = petCache.getOrPut(this) {
-            PetUtils.isKnownPetInternalName(this) || (getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET)
-        }
-
-    private val isEnchantedBook: Boolean
-        get() = getItemStackOrNull()?.item == Items.ENCHANTED_BOOK
 }

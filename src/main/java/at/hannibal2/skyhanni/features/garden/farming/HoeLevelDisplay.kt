@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -18,10 +20,15 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object HoeLevelDisplay {
@@ -81,16 +88,17 @@ object HoeLevelDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         levelUpPattern.matchMatcher(event.message) {
             val heldItem = InventoryUtils.getItemInHand() ?: return
             val leveledUpTool = group("tool")
-            val heldItemName = heldItem.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val heldItemName = heldItem.hoverName.string.removeColor()
             if (!heldItemName.contains(leveledUpTool)) return
             val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
             if (isEnabled() && config.overflow && overflowLevel != null) {
                 val currentLevel = heldItem.getHoeLevel() ?: return
-                event.chatComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+                val newComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+                event.replaceComponent(newComponent, "hoe_level")
             }
         }
     }
@@ -119,6 +127,38 @@ object HoeLevelDisplay {
         if (!isEnabled()) return
         val renderable = display ?: return
         config.position.renderRenderables(renderable, posLabel = "Hoe Level Display")
+    }
+
+    @HandleEvent
+    fun onUserLuck(event: UserLuckCalculateEvent) {
+        if (!config.overflow) return
+        val luck = calculateLuck()
+        if (luck < 1) return
+        event.addLuck(luck)
+        val stack = ItemUtils.createItemStack(
+            Items.NETHERITE_HOE,
+            Component.literal("✴ Overflow Hoe Levels").withColor(ChatFormatting.GREEN),
+            listOf(
+                Component.literal("Items").withColor(ChatFormatting.DARK_GRAY),
+                Component.empty(),
+                componentBuilder {
+                    appendWithColor("Value: ", ChatFormatting.GRAY)
+                    appendWithColor("$luck✴", ChatFormatting.GREEN)
+                },
+                Component.empty(),
+                Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY)
+            )
+        )
+        event.addItem(stack)
+    }
+
+    private fun calculateLuck(): Float {
+        val map = gardenStorage?.overflowHoeLevels ?: return 0f
+        var luck = 0f
+        for (entry in map) {
+            luck += entry.value / 10
+        }
+        return luck
     }
 
     @HandleEvent

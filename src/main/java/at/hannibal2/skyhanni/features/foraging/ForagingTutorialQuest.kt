@@ -56,7 +56,7 @@ object ForagingTutorialQuest {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         if (event.message == "§cYou don't have the requirements to use this warp!" ||
             event.message == "§cYou haven't unlocked this fast travel destination!"
         ) {

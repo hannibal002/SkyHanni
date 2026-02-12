@@ -26,25 +26,25 @@ import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ambient.Bat
-import net.minecraft.world.entity.animal.AbstractCow
 import net.minecraft.world.entity.animal.Animal
-import net.minecraft.world.entity.animal.Chicken
-import net.minecraft.world.entity.animal.MushroomCow
-import net.minecraft.world.entity.animal.Pig
-import net.minecraft.world.entity.animal.Rabbit
-import net.minecraft.world.entity.animal.SnowGolem
-import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.chicken.Chicken
+import net.minecraft.world.entity.animal.cow.AbstractCow
+import net.minecraft.world.entity.animal.cow.MushroomCow
+import net.minecraft.world.entity.animal.equine.Horse
+import net.minecraft.world.entity.animal.golem.SnowGolem
+import net.minecraft.world.entity.animal.pig.Pig
+import net.minecraft.world.entity.animal.rabbit.Rabbit
 import net.minecraft.world.entity.animal.sheep.Sheep
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.CaveSpider
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.entity.monster.Guardian
 import net.minecraft.world.entity.monster.Witch
-import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.npc.Villager
+import net.minecraft.world.entity.monster.spider.CaveSpider
+import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.entity.npc.villager.Villager
 import net.minecraft.world.entity.player.Player
 import org.intellij.lang.annotations.Language
 
@@ -201,14 +201,13 @@ object MobFilter {
         extraDisplayNpcByName.contains(name)
 
     private val listOfClickArmorStand = setOf(
-        "§e§lCLICK",
-        "§6§lSEASONAL SKINS",
-        "§e§lGATE KEEPER",
-        "§e§lBLACKSMITH",
-        "§e§lSHOP",
-        "§e§lTREASURES",
-        "§c§lQUEST",
-        "§e§lQUEST",
+        "CLICK",
+        "SEASONAL SKINS",
+        "GATE KEEPER",
+        "BLACKSMITH",
+        "SHOP",
+        "TREASURES",
+        "QUEST",
     )
 
     fun Entity.isSkyBlockMob(): Boolean = when {
@@ -232,7 +231,7 @@ object MobFilter {
 
     fun createDisplayNpc(entity: LivingEntity): Boolean {
         val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
-            listOfClickArmorStand.contains(armorStand.name.formattedTextCompatLessResets())
+            listOfClickArmorStand.contains(armorStand.name.string)
         } ?: return false
         val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
         MobEvent.Spawn.DisplayNpc(MobFactories.displayNpc(entity, armorStand, clickArmorStand)).post()
@@ -301,7 +300,7 @@ object MobFilter {
             else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
         }
 
-        baseEntity is Giant && baseEntity.name.formattedTextCompatLessResets() == "Dinnerbone" -> MobResult.found(
+        baseEntity is Giant && baseEntity.name.string == "Dinnerbone" -> MobResult.found(
             MobFactories.projectile(
                 baseEntity,
                 "Giant Sword",
@@ -320,7 +319,7 @@ object MobFilter {
             ),
         )
 
-        baseEntity is RemotePlayer && baseEntity.name.formattedTextCompatLessResets() == "Decoy " -> MobResult.found(
+        baseEntity is RemotePlayer && baseEntity.name.string == "Decoy " -> MobResult.found(
             MobFactories.special(
                 baseEntity,
                 "Decoy",

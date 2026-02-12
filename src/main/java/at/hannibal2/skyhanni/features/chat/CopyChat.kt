@@ -4,16 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
@@ -32,7 +29,6 @@ object CopyChat {
     }
 
     private fun processCopyChat(mouseX: Int, mouseY: Int) {
-        // On 1.8 we use our own code to find the chat lines which uses our mouse methods, on 1.21 we use the vanilla methods
         val chatLine = getChatLine(mouseX, mouseY) ?: return
 
         val formatted = chatLine.fullComponent.formattedTextCompat()
@@ -46,9 +42,9 @@ object CopyChat {
                     .removeColor()
                 ) to "modified message"
 
-            KeyboardManager.isControlKeyDown() -> chatLine.chatMessage.removeColor() to "line"
+            KeyboardManager.isControlKeyDown() -> chatLine.content.string.removeColor() to "line"
 
-            else -> formatted.removeColor() to "message"
+            else -> chatLine.fullComponent.string.removeColor() to "message"
         }
 
         ClipboardUtils.copyToClipboard(clipboard)
@@ -56,10 +52,15 @@ object CopyChat {
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
-        val mc = Minecraft.getInstance() ?: return null
+        val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return null
+        //? if < 1.21.11 {
         val chatLineY = chatGui.screenToChatY(mouseY.toDouble())
         val chatLineX = chatGui.screenToChatX(mouseX.toDouble())
+        //?} else {
+        /*val chatLineY = screenToChatY(mouseY.toDouble())
+        val chatLineX = screenToChatX(mouseX.toDouble())
+        *///?}
         val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
 
         if (chatLineX < -4.0 || chatLineX > Mth.floor(chatGui.width.toDouble() / chatGui.scale).toDouble()) return null
@@ -78,20 +79,23 @@ object CopyChat {
             matchingLines.size == 1 -> matchingLines.first()
             else -> {
                 matchingLines.firstOrNull {
-                    it.content.formattedTextCompat().stripHypixelMessage().removeColor()
+                    it.content.string.removeColor()
                         .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
                 } ?: matchingLines.first()
             }
         }
     }
 
-    private val isPatcherLoaded by lazy { PlatformUtils.isModInstalled("patcher") }
+    fun screenToChatX(d: Double): Double {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.chat ?: return 0.0
+        return d / chatGui.scale - 4.0
+    }
 
-    private fun getOffset(): Int {
-        if (!isPatcherLoaded) return 0
-        return runCatching {
-            val patcherConfigClass = Class.forName("club.sk1er.patcher.config.PatcherConfig")
-            if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
-        }.getOrDefault(0)
+    fun screenToChatY(d: Double): Double {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.chat ?: return 0.0
+        val e = mc.window.guiScaledHeight - d - 40.0
+        return e / (chatGui.scale * chatGui.lineHeight)
     }
 }

@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.monster.Ghast
@@ -99,7 +99,7 @@ object HideFarEntities {
         // Always show boss bar
         list += allEntities.filter { it is WitherBoss && it.id < 0 }
 
-        list += allEntities.filter { it is RemotePlayer && it.name.formattedTextCompatLessResets() in PartyApi.partyMembers }
+        list += allEntities.filter { it is RemotePlayer && it.name.string in PartyApi.partyMembers }
         list += DamageIndicatorManager.getAllMobs()
         list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
 

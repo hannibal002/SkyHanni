@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -90,13 +89,13 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     private fun isBingo(entity: LivingEntity) =
-        !SkyBlockUtils.isBingoProfile && entity.displayName.formattedTextCompat().endsWith("Ⓑ§r")
+        !SkyBlockUtils.isBingoProfile && entity.displayName?.string.orEmpty().endsWith("Ⓑ")
 
     private fun isIronman(entity: LivingEntity) =
-        !SkyBlockUtils.noTradeMode && entity.displayName.formattedTextCompat().endsWith("♲§r")
+        !SkyBlockUtils.noTradeMode && entity.displayName?.string.orEmpty().endsWith("♲")
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()

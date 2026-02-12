@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -72,7 +73,7 @@ object ChatManager {
 
     private fun getRecentMessageHistoryWithSearch(searchTerm: String): List<MessageFilteringResult> =
         messageHistory.toList().map { it.second }
-            .filter { it.message.formattedTextCompat().removeColor().contains(searchTerm, ignoreCase = true) }
+            .filter { it.message.string.removeColor().contains(searchTerm, ignoreCase = true) }
 
     enum class ActionKind(format: Any) {
         BLOCKED(ChatFormatting.RED.toString() + ChatFormatting.BOLD),
@@ -148,12 +149,10 @@ object ChatManager {
     }
 
     /**
-     * If the message is modified return the modified message otherwise return null.
      * If the message is cancelled return true.
      */
-    fun onChatReceive(original: Component): Pair<Component?, Boolean> {
-        var component = original
-        val message = component.formattedTextCompat().stripHypixelMessage()
+    fun onChatAllow(original: Component): Boolean {
+        val message = original.formattedTextCompat().stripHypixelMessage()
         var cancelled = false
 
         if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
@@ -161,10 +160,10 @@ object ChatManager {
             if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
                 cancelled = true
             }
-            return null to cancelled
+            return cancelled
         }
-        val key = IdentityCharacteristics(component)
-        val chatEvent = SkyHanniChatEvent(message, component)
+        val key = IdentityCharacteristics(original)
+        val chatEvent = SkyHanniChatEvent.Allow(message, original)
         chatEvent.post()
 
         val blockReason = chatEvent.blockedReason.orEmpty().uppercase()
@@ -173,48 +172,75 @@ object ChatManager {
             loggerAll.log("[$blockReason] $message")
             loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.BLOCKED, blockReason, null, null)
-            return null to true
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null, null)
+            return true
         }
+
+        loggerAllowed.log("[allowed] $message")
+        loggerAll.log("[allowed] $message")
+
+        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
+        if (chatEvent.chatLineId != 0) {
+            cancelled = true
+            original.send(chatEvent.chatLineId)
+        }
+        return cancelled
+    }
+
+    /**
+     * If the message is modified return the modified message otherwise return null.
+     */
+    fun onChatModify(original: Component): Component? {
+        val component = original
+        val message = component.formattedTextCompat().stripHypixelMessage()
+
+        val key = IdentityCharacteristics(component)
+        val chatEvent = SkyHanniChatEvent.Modify(message, component)
+        chatEvent.post()
 
         val modifiedComponent = chatEvent.chatComponent
         var modified = false
-        loggerAllowed.log("[allowed] $message")
-        loggerAll.log("[allowed] $message")
-        if (modifiedComponent.formattedTextCompat() != component.formattedTextCompat()) {
+        if (modifiedComponent != component) {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
             loggerModified.log("[original] " + component.formattedTextCompat())
             loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat())
             messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent, reason)
-            component = modifiedComponent
         } else {
             messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null, null)
         }
 
-        // TODO: Handle this with ChatManager.retractMessage or some other way for logging and /shchathistory purposes?
-        if (chatEvent.chatLineId != 0) {
-            cancelled = true
-            component.send(chatEvent.chatLineId)
-            // Because we're separately sending the chat line, we don't want to modify the component again,
-            // even if we "meant" to replace the component.
-            modified = false
-        }
-        return Pair(component.takeIf { modified }, cancelled)
+        return modifiedComponent.takeIf { modified }
     }
 
-    private fun openChatHistoryGui(args: Array<String>) {
-        SkyHanniMod.screenToOpen = if (args.isEmpty()) {
-            ChatHistoryGui(getRecentMessageHistory())
-        } else {
-            val searchTerm = args.joinToString(" ")
-            val history = getRecentMessageHistoryWithSearch(searchTerm)
-            if (history.isEmpty()) {
-                ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
-                return
-            }
-            ChatHistoryGui(history)
+    /**
+     * Adds canceled messages to /shchathistory if another mod canceled it
+     */
+    fun onChatCancel(original: Component) {
+        val key = IdentityCharacteristics(original)
+        if (messageHistory.contains(key)) return
+        val blockReason = "OTHER_MOD"
+        val message = original.formattedTextCompat().stripHypixelMessage()
+
+        loggerFiltered.log("[$blockReason] $message")
+        loggerAll.log("[$blockReason] $message")
+        loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
+            .log(message)
+        messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null, null)
+    }
+
+    /**
+     * Added edited messages to /shchathistory if they were edited by another mod
+     */
+    fun onChatModifyOtherMod(original: Component, modified: Component) {
+        val key = IdentityCharacteristics(original)
+        val key2 = IdentityCharacteristics(modified)
+        if (messageHistory[key2]?.actionKind == ActionKind.ALLOWED && messageHistory[key] == null) {
+            loggerModified.log(" ")
+            loggerModified.log("[original] " + original.formattedTextCompat())
+            loggerModified.log("[modified] " + modified.formattedTextCompat())
+            messageHistory[key2] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified, "OTHER_MOD")
         }
     }
 
@@ -225,7 +251,7 @@ object ChatManager {
         predicate: (GuiMessage) -> Boolean,
         reason: String? = null,
     ) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             indexOfFirst {
                 predicate(it)
             }.takeIf { it != -1 }?.let {
@@ -254,7 +280,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean,
     ) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             val iterator = iterator()
             var removed = 0
             while (iterator.hasNext() && removed < amount) {
@@ -284,7 +310,17 @@ object ChatManager {
         event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            legacyCallbackArgs { openChatHistoryGui(it) }
+            argCallback("search", BrigadierArguments.greedyString()) { searchTerm ->
+                val history = getRecentMessageHistoryWithSearch(searchTerm)
+                if (history.isEmpty()) {
+                    ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
+                    return@argCallback
+                }
+                SkyHanniMod.screenToOpen = ChatHistoryGui(history)
+            }
+            simpleCallback {
+                SkyHanniMod.screenToOpen = ChatHistoryGui(getRecentMessageHistory())
+            }
         }
     }
 }

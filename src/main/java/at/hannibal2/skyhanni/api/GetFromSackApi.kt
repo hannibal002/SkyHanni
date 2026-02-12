@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.events.minecraft.addAll
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.Calculator
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NeuCalculator
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
@@ -170,16 +170,16 @@ object GetFromSackApi {
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
         if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
-        // The last parameter could be "2*3". This does not support ending with ")", but it is good enough
-        val argsNull = !args.last().last().isDigit()
+        val preCalc = Calculator.calculateOrNull(args.last())
+        val argsNull = preCalc == null
         val arguments = if (argsNull) {
             args + config.defaultAmountGFS.toString()
         } else args
 
         var amountString = arguments.last()
-        amountString = NeuCalculator.calculateOrNull(amountString)?.toString() ?: amountString
+        amountString = Calculator.calculateOrNull(amountString)?.toString() ?: amountString
 
-        if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
+        if (!amountString.isDouble()) return CommandResult.WRONG_ARGUMENT to null
 
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
         val replacedString = itemString.replace("_", " ")
@@ -202,7 +202,7 @@ object GetFromSackApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.bazaarGFS || SkyBlockUtils.noTradeMode) return
         val stack = lastItemStack ?: return
         val message = event.message

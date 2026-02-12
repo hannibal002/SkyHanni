@@ -26,12 +26,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
@@ -70,8 +68,7 @@ object VisitorListener {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.VISITORS)) return
 
-        val hasVisitorInfo = event.lines.any { VisitorApi.visitorCountPattern.matches(it) }
-        if (!hasVisitorInfo) return
+        if (event.isClear()) return
 
         val visitorsInTab = VisitorApi.visitorsInTabList(event.lines)
 
@@ -98,7 +95,7 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aAccept Offer") return
+        if (offerItem.hoverName.string != "Accept Offer") return
 
         VisitorApi.inInventory = true
 
@@ -143,7 +140,7 @@ object VisitorListener {
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity.name.formattedTextCompatLessResets() == "§e§lCLICK") {
+        if (entity.name.string == "CLICK") {
             event.cancel()
         }
     }

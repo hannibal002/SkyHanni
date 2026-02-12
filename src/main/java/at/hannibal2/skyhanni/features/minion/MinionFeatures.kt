@@ -126,9 +126,7 @@ object MinionFeatures {
         val lookingAt = event.pos?.offset(vec)?.toLorenzVec() ?: return
         val equipped = InventoryUtils.getItemInHand() ?: return
 
-        if (equipped.hoverName.formattedTextCompatLeadingWhiteLessResets()
-                .contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR
-        ) {
+        if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
             newMinionName = getMinionName(equipped.cleanName())
         } else {
@@ -343,7 +341,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message

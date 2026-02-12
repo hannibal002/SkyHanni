@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig.TreeGiftBonusDropCategory as DropCategory
+import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
@@ -46,12 +46,15 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
 
+private typealias DropCategory = ForagingTrackerConfig.TreeGiftBonusDropCategory
+
 @SkyHanniModule
 object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
     "Foraging Tracker",
     { ForagingTrackerLegacy.BucketData() },
     { it.foraging.trackerData },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig },
 ) {
     private val config get() = SkyHanniMod.feature.foraging.tracker
 
@@ -171,7 +174,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isInIsland()) return
         event.tryReadLoot()
         event.tryBlock()
@@ -195,24 +198,29 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         addItem(treeType, STRETCHING_STICKS, change, command = false)
     }
 
+    private data class DropCategoryData(
+        val category: DropCategory,
+        val items: List<NeuInternalName>,
+    )
+
     private var dropsJson: TreeGiftBonusDropsJson? = null
-    private var dropsJsonCategories: Array<Pair<DropCategory, List<NeuInternalName>>> = arrayOf()
+    private var dropsJsonCategories: List<DropCategoryData> = emptyList()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         dropsJson = event.getConstant<TreeGiftBonusDropsJson>("foraging/TreeGiftBonusDrops")
         val dropsJson = dropsJson ?: return
-        dropsJsonCategories = arrayOf(
-            Pair(DropCategory.UNCOMMON_DROPS, dropsJson.uncommonDrops),
-            Pair(DropCategory.ENCHANTED_BOOKS, dropsJson.enchantedBooks),
-            Pair(DropCategory.BOOSTERS, dropsJson.boosters),
-            Pair(DropCategory.SHARDS, dropsJson.shards),
-            Pair(DropCategory.RUNES, dropsJson.runes),
-            Pair(DropCategory.MISC, dropsJson.miscDrops)
-        )
+        dropsJsonCategories = buildList {
+            add(DropCategoryData(DropCategory.UNCOMMON_DROPS, dropsJson.uncommonDrops))
+            add(DropCategoryData(DropCategory.ENCHANTED_BOOKS, dropsJson.enchantedBooks))
+            add(DropCategoryData(DropCategory.BOOSTERS, dropsJson.boosters))
+            add(DropCategoryData(DropCategory.SHARDS, dropsJson.shards))
+            add(DropCategoryData(DropCategory.RUNES, dropsJson.runes))
+            add(DropCategoryData(DropCategory.MISC, dropsJson.miscDrops))
+        }
     }
 
-    private fun SkyHanniChatEvent.tryReadLoot() {
+    private fun SkyHanniChatEvent.Allow.tryReadLoot() {
         val dropsJson = dropsJson ?: return
 
         ForagingTrackerLegacy.openCloseRewardPattern.matchMatcher(message) {
@@ -286,14 +294,13 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         loot.addOrPut(itemInternalName, 1)
 
         val bonusDropTypeList = config.compactGiftBonusDropsList
-        for ((category, itemList) in dropsJsonCategories)
-        {
-            if (itemList.contains(itemInternalName) && bonusDropTypeList.contains(category))
-                rareDrops.add(item)
+        val inCategoryList = dropsJsonCategories.any {
+            it.category in bonusDropTypeList && it.items.contains(itemInternalName)
         }
+        if (inCategoryList) rareDrops.add(item)
     }
 
-    private fun SkyHanniChatEvent.tryBlock() {
+    private fun SkyHanniChatEvent.Allow.tryBlock() {
         if (!config.compactGiftChats || !openLootLoop) return
         blockedReason = "TREE_GIFT"
     }
@@ -342,7 +349,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
             val message = "§9$lastTreeType Tree Gift. §7You helped cut $lastPercentString §7and gained §e$lastRewardCount rewards§a!"
             val component = message.asComponent()
             component.hover = lastHover
-            ChatUtils.chat(component)
+            ChatUtils.chat(component, prefix = false)
             rareDrops.forEach { drop ->
                 ChatUtils.chat("§f - $drop", prefix = false)
             }

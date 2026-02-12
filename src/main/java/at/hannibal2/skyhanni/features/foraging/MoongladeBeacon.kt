@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
@@ -39,7 +40,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -82,7 +83,7 @@ object MoongladeBeacon {
 
         override fun toString() = displayName
 
-        private val identifier = ResourceLocation.fromNamespaceAndPath("minecraft", name.lowercase() + "_stained_glass_pane")
+        private val identifier = Identifier.fromNamespaceAndPath("minecraft", name.lowercase() + "_stained_glass_pane")
         val item by lazy { itemOverride ?: BuiltInRegistries.ITEM.getValue(identifier) }
 
         companion object {
@@ -325,14 +326,14 @@ object MoongladeBeacon {
         if (!solverEnabled()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest().filter { it.hasItem() && it.item.isNotEmpty() }) {
-            val tuningData = if (slot.item.isEnchanted()) enchantedTuning else normalTuning
+            val tuningData = if (slot.item.hasEnchantGlint()) enchantedTuning else normalTuning
             tuningData.readSlot(slot)
         }
         display = drawDisplay()
     }
 
     private fun Slot.performColorApplicableSet(block: (Pair<BeaconTuneData, BeaconColor>) -> Unit): Boolean {
-        val tuningData = if (this.item.isEnchanted()) enchantedTuning else normalTuning
+        val tuningData = if (this.item.hasEnchantGlint()) enchantedTuning else normalTuning
         val stackColor = this.item?.item?.getColorOrNull() ?: return false
         block.invoke(tuningData to stackColor)
         return true

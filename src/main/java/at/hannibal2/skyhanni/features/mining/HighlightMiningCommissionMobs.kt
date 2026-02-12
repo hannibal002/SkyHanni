@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.monster.Endermite
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Slime
@@ -34,20 +35,20 @@ object HighlightMiningCommissionMobs {
     enum class MobType(val commissionName: String, val isMob: (LivingEntity) -> Boolean) {
 
         // Dwarven Mines
-        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Goblin " }),
-        STAR_PUNCHER("Star Sentry Puncher", { it.name.formattedTextCompatLessResets() == "Crystal Sentry" }),
-        ICE_WALKER("Glacite Walker Slayer", { it.name.formattedTextCompatLessResets() == "Ice Walker" }),
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.formattedTextCompatLessResets().contains("Golden Goblin") }),
-        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.formattedTextCompatLessResets() == "Treasuer Hunter" }), // typo is intentional
+        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.string == "Goblin " }),
+        STAR_PUNCHER("Star Sentry Puncher", { it.name.string == "Crystal Sentry" }),
+        ICE_WALKER("Glacite Walker Slayer", { it.name.string == "Ice Walker" }),
+        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.string.contains("Golden Goblin") }),
+        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.string == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
         AUTOMATON("Automaton Slayer", { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
-        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.string == "Team Treasurite" }),
         YOG("Yog Slayer", { it is MagmaCube && it.hasMaxHealth(35_000) }),
         THYST("Thyst Slayer", { it is Endermite && it.hasMaxHealth(5_000) }),
-        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.formattedTextCompatLessResets() == "Team Treasurite" }),
+        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.string == "Team Treasurite" }),
         SLUDGE("Sludge Slayer", { it is Slime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
-        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.formattedTextCompatLessResets() == "Weakling " }),
+        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.string == "Weakling " }),
 
         // new commissions
     }
@@ -71,13 +72,13 @@ object HighlightMiningCommissionMobs {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
         if (!isEnabled()) return
 
         // TODO Commissin API
         MobType.entries.filter { type ->
-            event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
-                ?.let { !it.endsWith("§aDONE") }
+            event.tabList.findLast { line -> line.string.removeColor().trim().startsWith(type.commissionName) }
+                ?.let { !it.string.endsWith("DONE") }
                 ?: false
         }.let {
             if (it != active) {

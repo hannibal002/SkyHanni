@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
+import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
@@ -14,8 +18,10 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStack
 import java.net.URI
+import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
@@ -103,7 +109,7 @@ private val textColorLUT = ChatFormatting.entries
     .toMap()
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")
@@ -119,42 +125,99 @@ fun Component.iterator(): Sequence<Component> {
     return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 }
 
-fun MutableComponent.withColor(formatting: ChatFormatting): Component {
+fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
     return this.withStyle { it.withColor(formatting) }
 }
 
-fun createResourceLocation(domain: String, path: String): ResourceLocation {
-    val textureLocation = ResourceLocation.fromNamespaceAndPath(domain, path)
+fun MutableComponent.withColor(color: TextColor): MutableComponent {
+    return this.withStyle { it.withColor(color) }
+}
+
+/**
+ * This might have performance issues if you render it every frame idk
+ */
+fun MutableComponent.withColor(hex: String): MutableComponent {
+    return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
+}
+
+fun createResourceLocation(domain: String, path: String): Identifier {
+    val textureLocation = Identifier.fromNamespaceAndPath(domain, path)
     return textureLocation
 }
 
-fun createResourceLocation(path: String): ResourceLocation {
-    val textureLocation = ResourceLocation.parse(path)
+fun createResourceLocation(path: String): Identifier {
+    val textureLocation = Identifier.parse(path)
     return textureLocation
 }
 
 var Component.hover: Component?
-    get() = this.style.hoverEvent?.let { if (it.action() == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_TEXT
+    }?.let { (it as HoverEvent.ShowText).value }
     set(value) {
-        value?.let { new -> (this as MutableComponent).withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
+    }
+
+var Component.stackHover: ItemStack?
+    get() = this.style.hoverEvent?.takeIf {
+        it.action() == HoverEvent.Action.SHOW_ITEM
+    }?.let { (it as HoverEvent.ShowItem).item }
+    set(value) {
+        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
     }
 
 var Component.command: String?
-    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.RUN_COMMAND
+    }?.let { (it as ClickEvent.RunCommand).command }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
     }
 
 var Component.suggest: String?
-    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.SUGGEST_COMMAND
+    }?.let { (it as ClickEvent.SuggestCommand).command }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
     }
 
 var Component.url: String?
-    get() = this.style.clickEvent?.let { if (it.action() == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
+    get() = this.style.clickEvent?.takeIf {
+        it.action() == ClickEvent.Action.OPEN_URL
+    }?.let { (it as ClickEvent.OpenUrl).uri.toString() }
     set(value) {
-        (this as MutableComponent).withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+        this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) }
+    }
+
+var MutableComponent.underlined: Boolean
+    get() = this.style.isUnderlined
+    set(value) {
+        this.withStyle { it.withUnderlined(value) }
+    }
+
+var MutableComponent.bold: Boolean
+    get() = this.style.isBold
+    set(value) {
+        this.withStyle { it.withBold(value) }
+    }
+
+var MutableComponent.strikethrough: Boolean
+    get() = this.style.isStrikethrough
+    set(value) {
+        this.withStyle { it.withStrikethrough(value) }
+    }
+
+var MutableComponent.italic: Boolean
+    get() = this.style.isItalic
+    set(value) {
+        this.withStyle { it.withItalic(value) }
+    }
+
+var MutableComponent.obfuscated: Boolean
+    get() = this.style.isObfuscated
+    set(value) {
+        this.withStyle { it.withObfuscated(value) }
     }
 
 fun Style.setClickRunCommand(text: String): Style {
@@ -162,27 +225,24 @@ fun Style.setClickRunCommand(text: String): Style {
 }
 
 fun Style.setHoverShowText(text: String): Style {
-    return this.withHoverEvent(HoverEvent.ShowText(Component.nullToEmpty(text)))
+    return this.withHoverEvent(HoverEvent.ShowText(Component.literal(text)))
 }
 
 fun Style.setHoverShowText(text: Component): Style {
     return this.withHoverEvent(HoverEvent.ShowText(text))
 }
 
-fun Component.appendString(text: String): Component =
-    (this as MutableComponent).append(text)
-
-fun Component.appendComponent(component: Component): Component =
-    (this as MutableComponent).append(component)
-
-fun addChatMessageToChat(message: Component) {
-    Minecraft.getInstance().player?.displayClientMessage(message, false)
+fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
+    if (!bypassSelfMessages) message.skyhanniCreated = true
+    DelayedRun.runOrNextTick { Minecraft.getInstance().player?.displayClientMessage(message, false) }
 }
 
-fun addDeletableMessageToChat(component: Component, id: Int) {
-    Minecraft.getInstance().execute {
-        Minecraft.getInstance().gui.chat.deleteMessage(idToMessageSignature(id))
-        Minecraft.getInstance().gui.chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
+fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
+    if (!bypassSelfMessages) component.skyhanniCreated = true
+    DelayedRun.runOrNextTick {
+        val chat = Minecraft.getInstance().gui.chat
+        chat.deleteMessage(idToMessageSignature(id))
+        chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
     }
 }
 
@@ -190,7 +250,7 @@ val map = mutableMapOf<Int, MessageSignature>()
 
 fun idToMessageSignature(id: Int): MessageSignature {
     val newId = abs(id % (255 * 128))
-    if (map.contains(newId)) return map[newId]!!
+    map[newId]?.let { return it }
     val bytes = ByteArray(256)
     val div = newId / 128
     val mod = newId % 128
@@ -239,26 +299,177 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): H
 }
 
 fun Component.changeColor(color: LorenzColor): Component =
-    this.copy().withStyle(color.toChatFormatting())
+    this.copyIfNeeded().withStyle(color.toChatFormatting())
 
 fun Component.convertToJsonString(): String {
-    //#if MC < 1.21.6
-    return Component.SerializerAdapter(net.minecraft.core.RegistryAccess.EMPTY).serialize(this, null, null).toString()
-    //#else
-    //$$ return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
-    //#endif
+    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
+        com.mojang.serialization.JsonOps.INSTANCE,
+        this
+    ).orThrow.toString()
 }
 
-fun Component.append(newText: Component): Component {
-    return (this as MutableComponent).append(newText)
+fun Component.append(newText: Component): MutableComponent {
+    return this.copyIfNeeded().append(newText)
 }
 
 val formattingPattern = Regex("§.(?:§.)?")
 
-fun Component.append(newText: String): Component {
-    val mutableText = this as MutableComponent
+fun Component.append(newText: String): MutableComponent {
+    val mutableText = this.copyIfNeeded()
     if (mutableText.string.matches(formattingPattern)) {
-        return Component.nullToEmpty(mutableText.string + newText)
+        return Component.literal(mutableText.string + newText)
     }
     return mutableText.append(newText)
+}
+
+fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Unit): MutableComponent {
+    return this.append(Component.literal(string).also(init))
+}
+
+fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
+    return this.append(comp.copyIfNeeded().also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun List<Any>.mapToComponents(): List<Component> {
+    val newList = mutableListOf<Component>()
+    for (entry in this) {
+        when (entry) {
+            is String -> newList.add(Component.literal(entry))
+            is Component -> newList.add(entry)
+            else -> throw IllegalArgumentException("$entry is not String or Component")
+        }
+    }
+    return newList
+}
+
+val ALWAYS get(): (Style?) -> Boolean = { true }
+
+/**
+ * Replace a string within a Component with another string
+ * The strings have to exist within 1 sibling
+ * AKA they have to have the same Style
+ */
+fun Component.replace(
+    oldValue: String,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
+}
+
+fun Component.replace(
+    oldValue: Regex,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
+}
+
+private fun replace(
+    component: Component,
+    oldValue: Any,
+    newValue: String,
+    onlyReplaceFirst: Boolean,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    component.visit({ style: Style?, string: String? ->
+        var edit = string
+        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+            if (oldValue is String) {
+                edit = string?.replace(oldValue, newValue)
+            } else if (oldValue is Regex) {
+                edit = string?.replace(oldValue, newValue)
+            } else {
+                ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+            }
+        }
+        if (edit != string) hasEdited = true
+
+        newComp.append(Component.literal(edit).withStyle(style))
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
+}
+
+fun Component.replace(
+    oldValue: String,
+    newValue: Component,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    val newComp = Component.empty()
+    var hasEdited = false
+
+    this.visit({ currentStyle: Style?, string: String? ->
+        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+            val split = string.split(oldValue)
+            newComp.append(
+                componentBuilder {
+                    for ((index, str) in split.withIndex()) {
+                        append(Component.literal(str).withStyle(currentStyle))
+                        if (index < split.size - 1) {
+                            if (!onlyReplaceFirst || !hasEdited) {
+                                append(newValue)
+                                hasEdited = true
+                            } else {
+                                append(oldValue) {
+                                    style = currentStyle
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        } else {
+            newComp.append(Component.literal(string).withStyle(currentStyle))
+        }
+        Optional.empty<Component>()
+    }, Style.EMPTY)
+
+    if (!hasEdited) return null
+    return newComp
+}
+
+operator fun Component.plus(string: String): Component {
+    return this.append(string)
+}
+
+fun componentBuilder(init: MutableComponent.() -> Unit): Component {
+    return Component.empty().also(init)
+}
+
+fun Component.copyIfNeeded(): MutableComponent {
+    if (this is MutableComponent) return this
+    else return this.copy()
 }

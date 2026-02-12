@@ -37,17 +37,34 @@ class CustomTodos(
             }
         }
 
+        fun save() {
+            val todosList = ObservableList<CustomTodoEditor>(mutableListOf())
+            SkyHanniMod.customTodos.customTodos.forEach { todosList.add(CustomTodoEditor(it, todosList)) }
+            CustomTodos(todosList).save()
+        }
+
     }
 
     @Bind
     fun pasteTodo() {
         SkyHanniMod.launchIOCoroutine("import custom todos") {
-            val customTodo = CustomTodo.fromTemplate(ClipboardUtils.readFromClipboard() ?: return@launchIOCoroutine)
+            val customTodo = CustomTodo.fromTemplateOrNull(
+                ClipboardUtils.readFromClipboard() ?: return@launchIOCoroutine,
+                printErrors = true,
+            )
             DelayedRun.runNextTick {
                 todos.add(CustomTodoEditor(customTodo ?: return@runNextTick, todos))
                 save()
             }
         }
+    }
+
+    @Bind
+    fun viewCommunityTodos() {
+        XmlUtils.openXmlScreen(
+            CommunityTodoViewer(CustomTodoDownload.todos, todos),
+            MyResourceLocation("skyhanni", "gui/customtodos/communitytodos.xml"),
+        )
     }
 
     @Bind

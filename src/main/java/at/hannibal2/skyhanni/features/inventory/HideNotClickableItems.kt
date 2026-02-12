@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -27,9 +29,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
+import at.hannibal2.skyhanni.utils.ItemUtils.isAnySoulbound
+import at.hannibal2.skyhanni.utils.ItemUtils.isSoulbound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -40,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
@@ -135,7 +137,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
 
@@ -150,7 +152,7 @@ object HideNotClickableItems {
         if (hide(chestName, stack)) {
             val first = event.toolTip[0]
             event.toolTip.clear()
-            event.toolTip.add("§7" + first.removeColor())
+            event.toolTip.add("§7" + first.string)
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
@@ -209,7 +211,7 @@ object HideNotClickableItems {
             hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
-            hideComposter(chestName, stack) -> true
+            hideComposter(stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
             hideFossilExcavator(stack) -> true
@@ -284,9 +286,8 @@ object HideNotClickableItems {
         return true
     }
 
-    @Suppress("UnusedParameter")
-    private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
-        if (!ComposterOverlay.inInventory) return false
+    private fun hideComposter(stack: ItemStack): Boolean {
+        if (!ComposterOverlay.isEnabled() || !ComposterOverlay.inInventory) return false
 
         showGreenLine = true
 
@@ -348,7 +349,7 @@ object HideNotClickableItems {
     private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
         if (!InventoryUtils.isInNormalChest()) return false
         if (!IslandType.PRIVATE_ISLAND.isCurrent()) return false
-        if (!stack.isSoulBound()) return false
+        if (!stack.isSoulbound()) return false
 
         hideReason = "This item cannot be stored into a chest!"
         return true
@@ -455,7 +456,7 @@ object HideNotClickableItems {
     private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
-        if (stack.isCoopSoulBound()) {
+        if ((HypixelData.noTrade && stack.isSoulbound()) || (!HypixelData.noTrade && stack.isAnySoulbound())) {
             hideReason = "Soulbound items cannot be traded!"
             return true
         }
@@ -493,7 +494,9 @@ object HideNotClickableItems {
             name = name.substring(0, name.length - amountText.length)
         }
 
-        if (!clickToSellPattern.anyMatches(stack.getLore()) && stack.getInternalNameOrNull()?.getNpcPriceOrNull() == null) {
+        val sellable = clickToSellPattern.anyMatches(stack.getLore()) ||
+            (stack.getItemId() != "PET" && (stack.getInternalNameOrNull()?.getNpcPriceOrNull() ?: 0.0) > 0)
+        if (!sellable) {
             hideReason = "This item cannot be sold at the NPC!"
             return true
         }
@@ -599,7 +602,7 @@ object HideNotClickableItems {
     }
 
     private fun isNotAuctionable(stack: ItemStack): Boolean {
-        if (stack.isCoopSoulBound()) {
+        if (stack.isAnySoulbound()) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
         }

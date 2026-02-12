@@ -22,9 +22,9 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.monster.CaveSpider
+import net.minecraft.world.entity.monster.spider.CaveSpider
 import net.minecraft.world.entity.monster.EnderMan
-import net.minecraft.world.entity.monster.Spider
+import net.minecraft.world.entity.monster.spider.Spider
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
@@ -81,7 +81,7 @@ object MobHighlight {
             ) { config.arachneKeeperHighlight }
         }
 
-        if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is RemotePlayer && entity.name.formattedTextCompatLessResets() == "Team Treasurite") {
+        if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is RemotePlayer && entity.name.string == "Team Treasurite") {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_PURPLE.toColor().addAlpha(127),

@@ -30,7 +30,7 @@ object PartyMemberOutlines {
         (SkyBlockUtils.inSkyBlock || OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) && !DungeonApi.inDungeon()
 
     private fun getEntityOutlineColor(entity: Entity): Color? {
-        if (entity !is RemotePlayer || !PartyApi.partyMembers.contains(entity.name.formattedTextCompatLessResets())) return null
+        if (entity !is RemotePlayer || !PartyApi.partyMembers.contains(entity.name.string)) return null
         return config.outlineColor.toColor()
     }
 }

@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -112,7 +111,7 @@ object EnigmaSoulWaypoints {
         for (stack in event.inventoryItems.values) {
             stack.getLore().lastOrNull()?.let {
                 if (notCompletedPattern.matches(it.removeColor())) {
-                    enigmaTitlePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+                    enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
                         inventoryUnfound.add(group("name"))
                     }
                 }
@@ -149,7 +148,7 @@ object EnigmaSoulWaypoints {
 
         if (event.slot?.item == null) return
 
-        val name = enigmaTitlePattern.matchMatcher(event.slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+        val name = enigmaTitlePattern.matchMatcher(event.slot.item.hoverName.string.removeColor()) {
             group("name")
         } ?: return
         event.makePickblock()
@@ -192,7 +191,7 @@ object EnigmaSoulWaypoints {
         val tracked = trackedSouls[area] ?: return
 
         for ((slot, stack) in chest.getAllItems()) {
-            enigmaTitlePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()) {
+            enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
                 if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }
@@ -232,9 +231,9 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (foundPattern.matches(event.message.removeColor().trim())) {
+        if (foundPattern.matches(event.cleanMessage.trim())) {
             hideClosestSoul()
         }
     }

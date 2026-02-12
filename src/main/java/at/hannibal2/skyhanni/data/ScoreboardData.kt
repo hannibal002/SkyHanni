@@ -16,11 +16,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
 import net.minecraft.network.protocol.game.ClientboundSetScorePacket
@@ -160,7 +164,7 @@ object ScoreboardData {
      * @param text The line to check and possibly replace
      * @return The replaced line, or null if it should be hidden
      */
-    fun tryToReplaceScoreboardLine(text: String): String {
+    fun tryToReplaceScoreboardLine(text: Component): Component {
         try {
             return tryToReplaceScoreboardLineHarder(text)
         } catch (t: Throwable) {
@@ -173,41 +177,41 @@ object ScoreboardData {
         }
     }
 
-    private fun tryToReplaceScoreboardLineHarder(text: String): String {
+    private fun tryToReplaceScoreboardLineHarder(component: Component): Component {
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-            PurseApi.piggyPattern.matchMatcher(text) {
-                val coins = group("coins")
-                return "Purse: $coins"
+            PurseApi.piggyPattern.matchMatcher(component) {
+                val coins = TextHelper.matcher(component, group("coins")) ?: return@matchMatcher
+                return Component.literal("Purse: ").append(coins)
             }
         }
 
         if (SkyHanniMod.feature.misc.colorMonthNames) {
             for (season in Season.entries) {
-                if (text.trim().startsWith(season.prefix)) {
-                    return season.colorCode + text
+                if (component.string.trim().startsWith(season.prefix)) {
+                    return (component as MutableComponent).withStyle(season.color)
                 }
             }
         }
-        FixIronman.fixScoreboard(text)?.let {
+        FixIronman.fixScoreboard(component)?.let {
             return it
         }
 
-        return text
+        return component
     }
 
-    enum class Season(val prefix: String, val colorCode: String) {
-        EARLY_SPRING("Early Spring", "§d"),
-        SPRING("Spring", "§d"),
-        LATE_SPRING("Late Spring", "§d"),
-        EARLY_SUMMER("Early Summer", "§6"),
-        SUMMER("Summer", "§6"),
-        LATE_SUMMER("Late Summer", "§6"),
-        EARLY_AUTUMN("Early Autumn", "§e"),
-        AUTUMN("Autumn", "§e"),
-        LATE_AUTUMN("Late Autumn", "§e"),
-        EARLY_WINTER("Early Winter", "§9"),
-        WINTER("Winter", "§9"),
-        LATE_WINTER("Late Winter", "§9")
+    enum class Season(val prefix: String, val color: ChatFormatting) {
+        EARLY_SPRING("Early Spring", ChatFormatting.LIGHT_PURPLE),
+        SPRING("Spring", ChatFormatting.LIGHT_PURPLE),
+        LATE_SPRING("Late Spring", ChatFormatting.LIGHT_PURPLE),
+        EARLY_SUMMER("Early Summer", ChatFormatting.GOLD),
+        SUMMER("Summer", ChatFormatting.GOLD),
+        LATE_SUMMER("Late Summer", ChatFormatting.GOLD),
+        EARLY_AUTUMN("Early Autumn", ChatFormatting.YELLOW),
+        AUTUMN("Autumn", ChatFormatting.YELLOW),
+        LATE_AUTUMN("Late Autumn", ChatFormatting.YELLOW),
+        EARLY_WINTER("Early Winter", ChatFormatting.BLUE),
+        WINTER("Winter", ChatFormatting.BLUE),
+        LATE_WINTER("Late Winter", ChatFormatting.BLUE)
     }
 
     // TODO USE SH-REPO
@@ -231,11 +235,11 @@ object ScoreboardData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shdebugscoreboard") {
+        event.registerBrigadier("shdebugscoreboard") {
             description = "Monitors the scoreboard changes: " +
                 "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
-            callback {
+            simpleCallback {
                 monitor = !monitor
                 val action = if (monitor) "Enabled" else "Disabled"
                 ChatUtils.chat("$action scoreboard monitoring in the console.")

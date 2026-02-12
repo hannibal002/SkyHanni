@@ -11,13 +11,11 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
-//#if MC > 1.21.5
-//$$ import org.joml.Matrix3x2f
-//#endif
+import org.joml.Matrix3x2f
 
 object ShaderRenderUtils {
 
@@ -52,15 +50,10 @@ object ShaderRenderUtils {
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        //#if MC < 1.21.6
-        this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.pose().last().pose())
-        //#endif
-        //#if MC > 1.21.6
-        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
-        //$$ this.modelViewMatrix = Matrix4f()
-        //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
-        //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
-        //#endif
+        val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
+        this.modelViewMatrix = Matrix4f()
+            .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
+            .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
     }.also { extraApplies?.invoke(this) }
 
     /**
@@ -70,7 +63,6 @@ object ShaderRenderUtils {
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
      * is called **BEFORE** [DrawContextUtils.scale], otherwise the textured rect will not be rendered correctly
      *
-     * @param filter the texture filter to use
      * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
      * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
@@ -81,14 +73,13 @@ object ShaderRenderUtils {
         y: Int,
         width: Int,
         height: Int,
-        filter: Int,
         radius: Int = 10,
         smoothness: Float = 1f,
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
     ) {
         // if radius is 0 then just draw a normal textured rect
-        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
+        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
 
         RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
 

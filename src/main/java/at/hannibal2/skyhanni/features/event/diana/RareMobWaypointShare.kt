@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -15,7 +17,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -39,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object RareMobWaypointShare {
 
-    private val config get() = SkyHanniMod.feature.event.diana.inquisitorSharing
+    private val config get() = SkyHanniMod.feature.event.diana.rareMobsSharing
 
     private val patternGroup = RepoPattern.group("diana.waypoints.inquisitor")
 
@@ -137,7 +138,7 @@ object RareMobWaypointShare {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message
 
@@ -231,8 +232,8 @@ object RareMobWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        val mobName = rareMob.mob?.name.orEmpty()
-        val name = if (mobName.isEmpty()) "" else " | $mobName"
+        val mobName = rareMob.name.string.orEmpty()
+        val name = if (mobName.isEmpty()) "" else "| $mobName"
         HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
     }
 
@@ -284,6 +285,19 @@ object RareMobWaypointShare {
     fun playUserSound() {
         with(config.sound) {
             SoundUtils.createSound(name, pitch).playSound()
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetdianamobs") {
+            description = "Resets all saved rare Diana mob locations"
+            category = CommandCategory.USERS_RESET
+            callback {
+                _waypoints.clear()
+                rareMobsNearby.clear()
+                ChatUtils.chat("Manually reset all rare mob data.")
+            }
         }
     }
 }

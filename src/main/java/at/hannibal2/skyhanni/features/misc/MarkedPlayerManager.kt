@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -35,46 +36,20 @@ object MarkedPlayerManager {
     private val patternGroup = RepoPattern.group("misc.markedplayer")
 
     /**
-     * REGEX-TEST: §8[§r§6400§r§8] §r§6HiZe_ §r§6▒
-     * REGEX-TEST: §8[§r§9318§r§8] §r§bwings_wacr §r§b§lᛝ
-     * REGEX-TEST: §8[§r§d321§r§8] §r§bbotbob21 §r§b§lᛝ
-     * REGEX-TEST: §8[§r§f42§r§8] §r§aVoidW_
-     * REGEX-TEST: §8[§r§a151§r§8] §r§bPhoenix_325
+     * REGEX-TEST: [400] HiZe_ ▒
+     * REGEX-TEST: [318] wings_wacr ᛝ
+     * REGEX-TEST: [321] botbob21 ᛝ
+     * REGEX-TEST: [42] VoidW_
+     * REGEX-TEST: [151] Phoenix_325
      */
     private val tabPlayerName by patternGroup.pattern(
-        "tabplayername",
-        "§8\\[§r(?<level>.*)§r§8] §r§\\w(?<name>[A-z0-9_]+)(?<symbol>.*)?",
+        "tabplayername-no-color",
+        "\\[(?<level>.*)] (?<name>[A-z0-9_]+)(?<symbol>.*)?",
     )
 
     private val notifyList = mutableSetOf<String>()
     private val currentLobbyPlayers = mutableSetOf<String>()
     private var personOfInterest = listOf<String>()
-
-    private fun command(args: Array<String>) {
-        if (args.size != 1) {
-            ChatUtils.userError("Usage: /shmarkplayer <name>")
-            return
-        }
-
-        val displayName = args[0]
-        val name = displayName.lowercase()
-
-        if (name == PlayerUtils.getName().lowercase()) {
-            ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
-            return
-        }
-
-        if (name !in playerNamesToMark) {
-            playerNamesToMark.add(name)
-            findPlayers()
-            ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
-        } else {
-            playerNamesToMark.remove(name)
-            markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
-            markedPlayers.remove(name)
-            ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
-        }
-    }
 
     @HandleEvent
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
@@ -172,7 +147,7 @@ object MarkedPlayerManager {
 
         currentLobbyPlayers.clear()
 
-        tabPlayerName.matchAll(event.lines) {
+        tabPlayerName.matchAll(event.lines.map { it.string }) {
             val name = group("name")
             if (name != PlayerUtils.getName()) {
                 currentLobbyPlayers.add(name)
@@ -206,9 +181,30 @@ object MarkedPlayerManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shmarkplayer") {
+        event.registerBrigadier("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
-            callback { command(it) }
+            argCallback("name", BrigadierArguments.string()) { displayName ->
+                val name = displayName.lowercase()
+
+                if (name == PlayerUtils.getName().lowercase()) {
+                    ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
+                    return@argCallback
+                }
+
+                if (name !in playerNamesToMark) {
+                    playerNamesToMark.add(name)
+                    findPlayers()
+                    ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
+                } else {
+                    playerNamesToMark.remove(name)
+                    markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
+                    markedPlayers.remove(name)
+                    ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
+                }
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shmarkplayer <name>")
+            }
         }
     }
 }

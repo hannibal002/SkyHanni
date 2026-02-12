@@ -83,11 +83,11 @@ class SearchableScrollTable private constructor(
                 xOffsets[index],
                 yShift,
             )
-            DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
+            DrawContextUtils.translate(xOffsets[index].toFloat(), 0f)
             offset += xOffsets[index]
         }
-        DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
-        DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+        DrawContextUtils.translate(-offset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, yShift.toFloat())
         renderY += yShift
     }
 
@@ -111,7 +111,7 @@ class SearchableScrollTable private constructor(
             scrollUpTip.render(mouseOffsetX, mouseOffsetY)
             val yShift = scrollUpTip.height
             renderY += yShift
-            DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+            DrawContextUtils.translate(0f, yShift.toFloat())
         }
 
         for (rowIndex in range) {
@@ -123,7 +123,7 @@ class SearchableScrollTable private constructor(
             scrollDownTip.render(mouseOffsetX, mouseOffsetY)
         }
 
-        DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
+        DrawContextUtils.translate(0f, -renderY.toFloat())
 
     }
 

@@ -107,7 +107,7 @@ object MiningEventTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {

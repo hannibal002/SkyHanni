@@ -18,17 +18,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.ambient.Bat
-import net.minecraft.world.entity.animal.IronGolem
-import net.minecraft.world.entity.animal.horse.Horse
+import net.minecraft.world.entity.animal.equine.Horse
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.boss.wither.WitherBoss
-import net.minecraft.world.entity.monster.AbstractSkeleton
 import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.Ghast
@@ -36,9 +34,10 @@ import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.entity.monster.Guardian
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Silverfish
-import net.minecraft.world.entity.monster.Spider
-import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.monster.ZombifiedPiglin
+import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton
+import net.minecraft.world.entity.monster.spider.Spider
+import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -156,7 +155,7 @@ class MobFinder {
 
     private fun tryAddDungeonF2(mob: Mob): EntityResult? {
         val entity = mob.baseEntity
-        if (entity.name.formattedTextCompatLessResets() == "Summon " && entity is RemotePlayer) {
+        if (entity.name.string == "Summon " && entity is RemotePlayer) {
             if (floor2summons1 && !floor2summonsDiedOnce.contains(entity)) {
                 if (entity.findHealthReal().toInt() != 0) {
                     return EntityResult(floor2summons1SpawnTime, bossType = BossType.DUNGEON_F2_SUMMON)
@@ -170,7 +169,7 @@ class MobFinder {
 
         if (floor2secondPhase && entity is RemotePlayer) {
             // TODO only show scarf after (all/at least x) summons are dead?
-            if (entity.name.formattedTextCompatLessResets() == "Scarf ") {
+            if (entity.name.string == "Scarf ") {
                 return EntityResult(
                     floor2secondPhaseSpawnTime,
                     finalDungeonBoss = true,

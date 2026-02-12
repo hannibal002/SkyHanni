@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
@@ -119,8 +118,8 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()
-        if (inventoryName != "§dMiscellaneous Stats") return
+        val inventoryName = event.inventoryItems[4]?.hoverName?.string.orEmpty()
+        if (inventoryName != "Miscellaneous Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItemsWithNull)
         val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")
@@ -185,7 +184,7 @@ object UserLuckBreakdown {
         event.slot ?: return
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.containerSlot == 48) {
-            event.toolTip[1] = Component.nullToEmpty("§7To Your Stats Breakdown")
+            event.toolTip[1] = Component.literal("§7To Your Stats Breakdown")
         }
         if (event.slot.containerSlot != 4 || inCustomBreakdown) return
         val luckEvent = getOrPostLuckEvent()
@@ -371,24 +370,6 @@ object UserLuckBreakdown {
             Items.ENDER_PEARL,
             "§a✴ Limbo Personal Best",
             createItemLore("limbo", luck),
-        )
-        event.addItem(stack)
-    }
-
-    @HandleEvent
-    fun modernLuck(event: UserLuckCalculateEvent) {
-        event.addLuck(5f)
-        val stack = ItemUtils.createItemStack(
-            Items.TRIDENT,
-            "§a✴ Modern Minecraft Bonus",
-            arrayOf(
-                "§8Minecraft",
-                "",
-                "§7Value: §a+5✴",
-                "",
-                "§8We put a lot of effort into updating SkyHanni.",
-                "§8This is a small bonus for using modern Minecraft.",
-            ),
         )
         event.addItem(stack)
     }

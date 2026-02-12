@@ -18,9 +18,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -32,8 +34,8 @@ object PesthunterProfit {
     private val config get() = GardenApi.config.pests.pesthunterShop
     private val patternGroup = RepoPattern.group("garden.pests.pesthunter")
     private val DENY_LIST_ITEMS = listOf(
-        "§cClose",
-        "§6Pesthunter's Wares",
+        "Close",
+        "Pesthunter's Wares",
         " ",
     )
     private var display = emptyList<Renderable>()
@@ -71,13 +73,14 @@ object PesthunterProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
-        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().takeIf {
-            it !in DENY_LIST_ITEMS && it.trim().isNotEmpty()
+        val itemName = item.hoverName.takeIf {
+            it.string !in DENY_LIST_ITEMS && it.string.trim().isNotEmpty()
         } ?: return null
         if (slot == 49) return null
 
         val totalCost = getFullCost(getRequiredItems(item)).takeIf { it >= 0 } ?: return null
-        val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return null
+        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
+        val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
         val internalName = NeuInternalName.fromItemNameOrNull(fixedDisplayName)
             ?: item.getInternalName()
@@ -90,7 +93,7 @@ object PesthunterProfit {
         val color = if (profitPerPest > 0) "§6" else "§c"
 
         val hover = listOf(
-            itemName.replace("[Lvl 100]", "[Lvl 1]"),
+            nameString.replace("[Lvl 100]", "[Lvl 1]"),
             "",
             "§7Item price: §6${itemPrice.shortFormat()} ",
             "§7Material cost: §6${totalCost.shortFormat()} ",
@@ -99,11 +102,11 @@ object PesthunterProfit {
         )
 
         return DisplayTableEntry(
-            itemName.replace("[Lvl 100]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
-            "$color${profitPerPest.shortFormat()}",
+            nameString.replace("[Lvl 100]", "[Lvl 1]").asComponent(), // show level 1 hedgehog instead of level 100
+            "$color${profitPerPest.shortFormat()}".asComponent(),
             profitPerPest,
             internalName,
-            hover,
+            hover.mapToComponents(),
             highlightsOnHoverSlots = listOf(slot),
         )
     }

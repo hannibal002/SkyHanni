@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.SimpleContainer
@@ -52,7 +53,7 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = internalName.getItemStack()
-            cachedStack[index] = new.editItemInfo(old.hoverName.formattedTextCompatLeadingWhiteLessResets(), true, old.getLore())
+            cachedStack[index] = new.editItemInfo(old.hoverName, old.getLoreComponent())
         }
     }
 

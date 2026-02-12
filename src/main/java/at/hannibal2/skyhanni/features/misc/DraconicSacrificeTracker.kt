@@ -51,7 +51,12 @@ object DraconicSacrificeTracker {
     )
 
     private val tracker =
-        SkyHanniItemTracker("Draconic Sacrifice Profit Tracker", ::Data, { it.draconicSacrificeTracker }) {
+        SkyHanniItemTracker(
+            "Draconic Sacrifice Profit Tracker",
+            ::Data,
+            { it.draconicSacrificeTracker },
+            trackerConfig = { config.perTrackerConfig }
+        ) {
             drawDisplay(it)
         }
 
@@ -100,7 +105,7 @@ object DraconicSacrificeTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")
@@ -133,10 +138,10 @@ object DraconicSacrificeTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdraconicsacrificetracker") {
+        event.registerBrigadier("shresetdraconicsacrificetracker") {
             description = "Resets the Draconic Sacrifice Tracker."
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

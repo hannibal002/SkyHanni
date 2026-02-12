@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.allMatchesComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
@@ -79,35 +78,11 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:          §r§a§lPlayers §r§f(5)
-     */
-    private val playerAmountPattern by patternGroup.pattern(
-        "playeramount",
-        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST: §8[§r§a§r§8] §r§bBpoth §r§6§l℻
+     * REGEX-TEST: [441] Throwpo ♲
      */
     private val playerAmountOnIslandPattern by patternGroup.pattern(
-        "playeramount.onisland",
-        "^§.\\[[§\\w]{6,11}] §r.*",
-    )
-
-    /**
-     * REGEX-TEST:           §r§5§lGuests §r§f(0)
-     */
-    private val playerAmountGuestingPattern by patternGroup.pattern(
-        "playeramount.guesting",
-        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST:           §r§b§lParty §r§f(4)
-     */
-    private val dungeonPartyAmountPattern by patternGroup.pattern(
-        "playeramount.dungeonparty",
-        "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
+        "playeramount.onisland-nocolor",
+        "^\\[\\w+] .*",
     )
 
     /**
@@ -175,6 +150,8 @@ object HypixelData {
     var skyBlockAreaWithSymbol: String? = null
 
     var playerAmountOnIsland = 0
+
+    private val progressCategory = ChatProgressUpdates.category("Hypixel Data")
 
     // Data from locraw
     var locrawData: JsonObject? = null
@@ -261,18 +238,18 @@ object HypixelData {
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
-        val playerPatternList = mutableListOf(
-            playerAmountPattern,
-            playerAmountGuestingPattern,
+        val playerWidgetList = mutableListOf(
+            TabWidget.PLAYER_LIST,
+            TabWidget.GUESTS,
         )
 
         if (DungeonApi.inDungeon()) {
-            playerPatternList.add(dungeonPartyAmountPattern)
+            playerWidgetList.add(TabWidget.DUNGEON_PARTY)
         }
 
-        out@ for (pattern in playerPatternList) {
-            for (line in TabListData.getTabList()) {
-                pattern.matchMatcher(line) {
+        out@ for (widget in playerWidgetList) {
+            for (component in widget.lines) {
+                widget.pattern.matchMatcher(component) {
                     amount += group("amount").toInt()
                     continue@out
                 }
@@ -361,10 +338,10 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!SkyBlockUtils.onHypixel) return
 
-        val message = event.message.removeColor().lowercase()
+        val message = event.cleanMessage.lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
@@ -382,7 +359,7 @@ object HypixelData {
 
     private fun checkProfile() {
         TabWidget.PROFILE.matchMatcherFirstLine {
-            var newProfile = group("profile").lowercase()
+            var newProfile = group("profile").lowercase().trim()
             // Hypixel shows the profile name reversed while in the Rift
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
             if (profileName == newProfile) return
@@ -423,8 +400,7 @@ object HypixelData {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
-                    val progress = ChatProgressUpdates()
-                    progress.start("hypixel join repo update check")
+                    val progress = progressCategory.start("hypixel join repo update check")
                     SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
                     EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
                     progress.end("done with checking both repos")
@@ -489,8 +465,8 @@ object HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
-            profileName = group("profile").lowercase()
+        TabWidget.PROFILE.matchMatcherFirstLine {
+            profileName = group("profile").lowercase().trim()
             ProfileJoinEvent(profileName).post()
         }
     }
@@ -621,6 +597,6 @@ object HypixelData {
 
     private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
         if (event.isClear()) return
-        playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
+        playerAmountOnIsland = playerAmountOnIslandPattern.allMatchesComponent(event.lines).size
     }
 }

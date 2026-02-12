@@ -39,8 +39,6 @@ object ShowFishingItemName {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
             val itemStack = entityItem.item.orNull() ?: continue
-            // On 1.8 if the itemstack is null it returns stone instead
-            if (itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "Stone") continue
             var text = ""
 
             val isBait = itemStack.isBait()

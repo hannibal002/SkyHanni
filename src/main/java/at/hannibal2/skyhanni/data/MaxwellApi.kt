@@ -161,7 +161,7 @@ object MaxwellApi {
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -245,7 +245,7 @@ object MaxwellApi {
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
             } ?: return
-        val displayName = selectedPowerStack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().trim()
+        val displayName = selectedPowerStack.hoverName.string.removeColor().trim()
 
         currentPower = getPowerByNameOrNull(displayName) ?: run {
             ErrorManager.logErrorWithData(

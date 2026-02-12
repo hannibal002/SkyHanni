@@ -1,21 +1,23 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.ExtendedChatColor
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.TextColor
 import java.awt.Color
+import java.util.Optional
 
+@Suppress("TooManyFunctions")
 object TextHelper {
 
     val NEWLINE = "\n".asComponent()
@@ -25,7 +27,7 @@ object TextHelper {
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
-        (Component.nullToEmpty(this) as MutableComponent).also(init)
+        Component.literal(this).also(init)
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: Component? = null): Component {
@@ -33,7 +35,7 @@ object TextHelper {
         components.forEachIndexed { index, component ->
             when (component) {
                 is Component -> result.append(component)
-                is String -> result.appendString(component)
+                is String -> result.append(component)
                 is List<*> -> result.append(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
                 else -> error("Unsupported type: ${component::class.simpleName}")
@@ -55,7 +57,7 @@ object TextHelper {
     fun Component.suffix(suffix: String): Component = join(this, suffix)
     fun Component.wrap(prefix: String, suffix: String) = this.prefix(prefix).suffix(suffix)
 
-    fun Component.width(): Int = Minecraft.getInstance().font.width(this.formattedTextCompat())
+    fun Component.width(): Int = Minecraft.getInstance().font.width(this.string)
 
     fun Component.fitToChat(): Component {
         val width = this.width()
@@ -76,17 +78,17 @@ object TextHelper {
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
-    fun Component.send(id: Int = 0) =
-        addDeletableMessageToChat(this, id)
+    fun Component.send(id: Int = 0, bypassSelfMessages: Boolean = false) =
+        addDeletableMessageToChat(this, id, bypassSelfMessages)
 
-    fun List<Component>.send(id: Int = 0) {
+    fun List<Component>.send(id: Int = 0, bypassSelfMessages: Boolean = false) {
         val parent = "".asComponent()
         forEach {
             parent.siblings.add(it)
             parent.siblings.add("\n".asComponent())
         }
 
-        parent.send(id)
+        parent.send(id, bypassSelfMessages)
     }
 
     fun Component.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
@@ -177,13 +179,90 @@ object TextHelper {
         multiline(text).send(chatLineId)
     }
 
+    fun createGradientText(start: LorenzColor, end: LorenzColor, string: String): Component {
+        return createGradientText(start.toColor(), end.toColor(), string)
+    }
+
     fun createGradientText(start: Color, end: Color, string: String): Component {
-        val length = string.length.toDouble()
-        var text = Component.nullToEmpty("")
-        for ((index, char) in string.withIndex()) {
-            val color = ColorUtils.blendRGB(start, end, index / length).rgb
-            text = text.append(ExtendedChatColor(color).asText().append(char.toString()))
+        val length = string.length
+        val text = componentBuilder {
+            for ((index, char) in string.withIndex()) {
+                val color = ColorUtils.blendRGB(start, end, index, length).rgb
+                append(char.toString()) {
+                    withColor(color)
+                }
+            }
         }
         return text
+    }
+
+    private val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
+
+    fun getChromaColorStyle(): TextColor {
+        return chromaStyle
+    }
+
+    fun matcher(component: Component, match: String): Component? {
+        var index = 0
+        var newComponent: Component = Component.empty()
+        var currentString = ""
+
+        component.visit({ style: Style?, string: String? ->
+            if (string.isNullOrEmpty()) return@visit Optional.empty()
+            for (c in string) {
+                if (index >= match.length) {
+                    if (!currentString.isEmpty()) {
+                        newComponent.append(Component.literal(currentString).withStyle(style))
+                    }
+                    currentString = ""
+                    return@visit Optional.of(newComponent)
+                }
+                if (c == match[index]) {
+                    currentString += c
+                    index++
+                } else {
+                    currentString = ""
+                    newComponent = Component.empty()
+                    index = 0
+                }
+            }
+            if (!currentString.isEmpty()) {
+                newComponent.append(Component.literal(currentString).withStyle(style))
+            }
+            currentString = ""
+
+            Optional.empty()
+        }, Style.EMPTY)
+        if (newComponent.string.isEmpty()) return null
+        return newComponent
+    }
+
+    fun split(component: Component, delimiter: String): List<Component>? {
+        val newComponents = mutableListOf<MutableComponent>()
+        var currentComponent = Component.empty()
+
+        component.visit({ style: Style?, string: String? ->
+            if (string.isNullOrEmpty()) return@visit Optional.empty()
+            val split = string.split(delimiter)
+            if (split.isEmpty() || split.size == 1) {
+                currentComponent.append(Component.literal(string).withStyle(style))
+            } else {
+                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                currentComponent = Component.empty()
+                for ((index, str) in split.withIndex()) {
+                    if (index == 0) continue
+                    currentComponent.append(Component.literal(str).withStyle(style))
+                    if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                    currentComponent = Component.empty()
+                }
+            }
+
+            Optional.empty<Component>()
+        }, Style.EMPTY)
+
+        if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+        if (newComponents.isEmpty()) return null
+        return newComponents
     }
 }

@@ -27,7 +27,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.util.Locale
@@ -47,6 +47,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getWetBookCount() = getAttributeInt("wet_book_count")
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
+
+    fun ItemStack.getOverclockerCount() = getAttributeInt("levelable_overclocks")
 
     fun ItemStack.getPolarvoidBookCount() = getAttributeInt("polarvoid")
 
@@ -144,7 +146,7 @@ object SkyBlockItemModifierUtils {
     var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun ItemStack.getPetInfo(): PetInfo? {
-        val colorlessName = hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        val colorlessName = hoverName.string.removeColor()
         // Repo pets will always return null for PetInfo, don't even attempt to parse it
         if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
         val petInfoJson = getExtraAttributes()?.takeIf {
@@ -302,7 +304,7 @@ object SkyBlockItemModifierUtils {
 
     fun isVanillaItem(itemId: String): Boolean {
         if (!identifierPattern.matches(itemId)) return false
-        return BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId)) != Items.AIR
+        return BuiltInRegistries.ITEM.getValue(Identifier.parse(itemId)) != Items.AIR
     }
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

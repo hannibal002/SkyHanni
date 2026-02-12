@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -16,7 +17,8 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
+import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaFeatures
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -44,6 +46,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * TODO
@@ -103,12 +106,13 @@ object IslandGraphs {
 
     var currentIslandGraph: Graph? = null
         private set
-    private var lastLoadedIslandType = "nothing"
+    var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
 
     var disabledNodesReason: String? = null
         private set
 
+    // TODO add carnival in hub
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
         val graph = currentIslandGraph ?: return
         disabledNodesReason = reason
@@ -125,6 +129,10 @@ object IslandGraphs {
 
     var closestNode: GraphNode? = null
         private set
+
+    private var cachedNearbyNodes = listOf<GraphNode>()
+    private var lastCacheUpdate = SimpleTimeMark.farPast()
+
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -267,7 +275,7 @@ object IslandGraphs {
         SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
                 val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
-                IslandAreas.display = null
+                IslandAreaFeatures.display = null
                 DelayedRun.runNextTick {
                     setNewGraph(graph)
                 }
@@ -301,6 +309,8 @@ object IslandGraphs {
     private fun reset() {
         stop()
         closestNode = null
+        cachedNearbyNodes = emptyList()
+        lastCacheUpdate = SimpleTimeMark.farPast()
     }
 
     /**
@@ -340,7 +350,13 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val newClosest = graph.getNearestNode()
+
+        // Update cache every second for normal movement
+        if (lastCacheUpdate.passedSince() > 1.seconds) {
+            updateClosestCache(graph)
+        }
+
+        val newClosest = cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() } ?: return
         if (closestNode == newClosest) return
         val newPath = !onCurrentPath()
 
@@ -349,6 +365,11 @@ object IslandGraphs {
         if (newPath) {
             findNewPath()
         }
+    }
+
+    private fun updateClosestCache(graph: Graph) {
+        cachedNearbyNodes = graph.sortedBy { it.distanceSqToPlayer() }.take(20)
+        lastCacheUpdate = SimpleTimeMark.now()
     }
 
     private fun onCurrentPath(): Boolean {
@@ -410,8 +431,12 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (currentIslandGraph != null && event.isLocalPlayer) {
-            hasMoved = true
+        val graph = currentIslandGraph
+        if (graph == null || !event.isLocalPlayer) return
+        hasMoved = true
+
+        if (event.distance > 20) {
+            updateClosestCache(graph)
         }
     }
 
@@ -437,7 +462,7 @@ object IslandGraphs {
 
     private fun onNewNode() {
         // TODO create an event
-        IslandAreas.nodeMoved()
+        IslandAreaBackend.nodeMoved()
         if (shouldAllowRerouting) {
             tryRerouting()
         }
@@ -455,7 +480,10 @@ object IslandGraphs {
     }
 
     fun stop() {
-        currentTarget = null
+        if (currentTarget != null) {
+            NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
+            currentTarget = null
+        }
         goal = null
         fastestPath = null
         currentTargetNode = null
@@ -463,6 +491,7 @@ object IslandGraphs {
         totalDistance = 0.0
         lastDistance = 0.0
         NavigationFeedback.setNavInactive()
+
     }
 
     /**
@@ -559,7 +588,6 @@ object IslandGraphs {
     }
 
     fun cancelClick() {
-        NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
         stop()
         onManualCancel()
     }
@@ -636,43 +664,37 @@ object IslandGraphs {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shreportlocation") {
+        event.registerBrigadier("shreportlocation") {
             description = "Allows the user to report an error with pathfinding at the current location."
             category = CommandCategory.USERS_BUG_FIX
-            callback { reportCommand(it) }
+            argCallback("reason", BrigadierArguments.greedyString()) { reason ->
+                sendReportLocation(
+                    playerPosition,
+                    reasonForReport = reason,
+                    technicalInfo = "Manual reported graph location error via /shreportlocation",
+                    "reason provided by user" to reason,
+                )
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shreportlocation <reason>")
+                ChatUtils.chat(
+                    "Give a reason that explains what's wrong at this location, e.g.: " +
+                        "pathfinding goes through wall, ignores obvious shortcut, " +
+                        "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
+                )
+            }
         }
-        event.register("shstopnavigation") {
+        event.registerBrigadier("shstopnavigation") {
             description = "Stops the current pathfinding."
             category = CommandCategory.USERS_ACTIVE
-            callback {
+            simpleCallback {
                 if (currentTarget != null) {
                     stop()
-                    NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
                 } else {
                     ChatUtils.userError("No navigation is currently active.")
                 }
             }
         }
-    }
-
-    private fun reportCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shreportlocation <reason>")
-            ChatUtils.chat(
-                "Give a reason that explains what's wrong at this location, e.g.: " +
-                    "pathfinding goes through wall, ignores obvious shortcut, " +
-                    "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
-            )
-            return
-        }
-
-        val userReportedReason = args.joinToString(" ")
-        sendReportLocation(
-            playerPosition,
-            reasonForReport = userReportedReason,
-            technicalInfo = "Manual reported graph location error via /shreportlocation",
-            "reason provided by user" to userReportedReason,
-        )
     }
 
     fun reportLocation(

@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -173,7 +172,7 @@ object PunchcardHighlight {
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
         if (entity.isNpc()) return
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.string
         if (name in playerList || name in playerQueue) return
         playerQueue.add(name)
         listening = true
@@ -184,7 +183,7 @@ object PunchcardHighlight {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!listening) return
         if (playerQueue.isEmpty()) return
         val message = event.message

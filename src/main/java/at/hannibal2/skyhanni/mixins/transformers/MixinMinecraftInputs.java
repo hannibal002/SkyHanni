@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,9 +55,9 @@ public class MixinMinecraftInputs {
     )
     public boolean handleBlockClick(boolean isLeftClick) {
         if (isLeftClick && this.missTime <= 0) {
-            if (MinecraftInputHook.shouldCancelContinuedBlockBreak(
+            if (this.gameMode != null && MinecraftInputHook.shouldCancelContinuedBlockBreak(
                 this.hitResult,
-                ((AccessorPlayerControllerMP) this.gameMode).skyhanni_getCurrentBlock()
+                this.gameMode.destroyBlockPos
             )) return false;
         }
         return isLeftClick;

@@ -65,7 +65,7 @@ object MinionCraftHelper {
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
 
         if (event.isMod(10)) {
-            hasMinionInInventory = mainInventory.map { it.hoverName.formattedTextCompatLeadingWhiteLessResets() }.any { isMinionName(it) }
+            hasMinionInInventory = mainInventory.map { it.hoverName.string }.any { isMinionName(it) }
         }
 
         if (event.repeatSeconds(2)) {
@@ -108,7 +108,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NeuInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = item.hoverName.string.removeColor()
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -119,7 +119,7 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+            val name = item.hoverName.string.removeColor()
             if (item.hasHypixelEnchantments()) continue
             val rawId = item.getInternalName()
             if (!isMinionName(name)) {

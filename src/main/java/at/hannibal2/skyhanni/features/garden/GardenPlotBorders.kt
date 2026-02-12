@@ -1,49 +1,42 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import org.lwjgl.glfw.GLFW
-import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object GardenPlotBorders {
+    private val config get() = GardenApi.config
 
-    private val config get() = GardenApi.config.plotBorders
-    private var timeLastSaved = SimpleTimeMark.farPast()
     private var showBorders = false
 
     @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
-        if (timeLastSaved.passedSince() < 250.milliseconds) return
-
-        if (event.keyCode == GLFW.GLFW_KEY_G && GLFW.GLFW_KEY_F3.isKeyHeld()) {
-            timeLastSaved = SimpleTimeMark.now()
-            showBorders = !showBorders
-        }
-        if (event.keyCode == GLFW.GLFW_KEY_F3 && GLFW.GLFW_KEY_G.isKeyHeld()) {
-            timeLastSaved = SimpleTimeMark.now()
+        if (event.keyCode == config.plotBorderKey) {
             showBorders = !showBorders
         }
     }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (!showBorders) return
+        if (!isEnabled() || !showBorders) return
         val plot = GardenPlotApi.getCurrentPlot() ?: getClosestPlot() ?: return
-        event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor(), showBuildLimit = true)
+        event.renderPlot(
+            plot,
+            LorenzColor.YELLOW.toColor(),
+            LorenzColor.DARK_BLUE.toColor(),
+            showBuildLimit = true,
+        )
     }
 
     private fun getClosestPlot(): GardenPlotApi.Plot? =
         GardenPlotApi.plots.minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isEnabled() = GardenApi.inGarden() && config
+    private fun isEnabled() = GardenApi.inGarden() && config.plotBorderKey != GLFW.GLFW_KEY_UNKNOWN
 }

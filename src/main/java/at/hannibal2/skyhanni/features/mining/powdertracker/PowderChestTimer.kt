@@ -82,9 +82,12 @@ object PowderChestTimer {
             event.oldState.`is`(Blocks.STONE) && event.newState.`is`(Blocks.AIR) -> {
                 minedBlocks.add(location)
             }
-            event.oldState.`is`(Blocks.AIR) && event.newState.`is`(Blocks.CHEST) -> {
-                if (arePlayersNearby && lastSound.passedSince() > 200.milliseconds) return
-                if (!minedBlocks.remove(location)) return
+            !event.oldState.`is`(Blocks.CHEST) && event.newState.`is`(Blocks.CHEST) -> {
+                val mined = minedBlocks.remove(location)
+                val possibleFalsePositive = arePlayersNearby || (!mined && event.oldState.`is`(Blocks.AIR))
+
+                if (possibleFalsePositive && lastSound.passedSince() > 200.milliseconds) return
+
                 chests[location] = maxDuration.fromNow()
             }
             event.oldState.`is`(Blocks.CHEST) && !event.newState.`is`(Blocks.CHEST) -> {
@@ -116,7 +119,7 @@ object PowderChestTimer {
         display = drawDisplay()
 
         chests.keys.removeIf { pos ->
-            (MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) != 0f
+            ((MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f
         }
     }
 

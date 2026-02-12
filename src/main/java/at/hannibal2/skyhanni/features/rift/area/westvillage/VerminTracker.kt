@@ -72,7 +72,12 @@ object VerminTracker {
 
     private val config get() = RiftApi.config.area.westVillage.verminTracker
 
-    private val tracker = SkyHanniTracker("Vermin Tracker", ::Data, { it.rift.verminTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Vermin Tracker",
+        ::Data,
+        { it.rift.verminTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
@@ -97,7 +102,7 @@ object VerminTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
@@ -186,10 +191,10 @@ object VerminTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetvermintracker") {
+        event.registerBrigadier("shresetvermintracker") {
             description = "Resets the Vermin Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 
