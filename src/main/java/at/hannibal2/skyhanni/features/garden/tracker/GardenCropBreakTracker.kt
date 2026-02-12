@@ -93,9 +93,11 @@ object GardenCropBreakTracker {
         if (!event.isMod(5)) return
         if (cropMap.isEmpty()) return
 
-        for (crop in cropMap) {
-            val amount = cropMap.remove(crop.key)
-            crop.key.addCollectionCounter(CropCollectionType.BREAKING_CROPS, amount?.toLong() ?: 0)
+        val iterator = cropMap.entries.iterator()
+        while (iterator.hasNext()) {
+            val (crop, amount) = iterator.next()
+            iterator.remove()
+            crop.addCollectionCounter(CropCollectionType.BREAKING_CROPS, amount.toLong())
         }
 
         if (mooshroomCowCrops > 0) {

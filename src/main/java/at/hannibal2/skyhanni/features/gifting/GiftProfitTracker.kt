@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
 
@@ -127,7 +126,12 @@ object GiftProfitTracker {
     ).map { it.toPattern() }
     // </editor-fold>
 
-    private val tracker = SkyHanniItemTracker("Gift Tracker", ::Data, { it.giftProfitTracker }) {
+    private val tracker = SkyHanniItemTracker(
+        "Gift Tracker",
+        ::Data,
+        { it.giftProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         drawDisplay(it)
     }
 
@@ -304,7 +308,7 @@ object GiftProfitTracker {
         var totalGiftCost = 0.0
         val giftCostStrings = applicableGifts.mapNotNull { (gift, count) ->
             val item = gift.toInternalName()
-            val totalPrice = SkyHanniTracker.getPricePer(item) * count
+            val totalPrice = tracker.getPricePer(item) * count
             if (totalPrice > 0) {
                 profit -= totalPrice
                 totalGiftCost += totalPrice

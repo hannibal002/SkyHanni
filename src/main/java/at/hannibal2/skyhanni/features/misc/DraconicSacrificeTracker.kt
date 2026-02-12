@@ -51,7 +51,12 @@ object DraconicSacrificeTracker {
     )
 
     private val tracker =
-        SkyHanniItemTracker("Draconic Sacrifice Profit Tracker", ::Data, { it.draconicSacrificeTracker }) {
+        SkyHanniItemTracker(
+            "Draconic Sacrifice Profit Tracker",
+            ::Data,
+            { it.draconicSacrificeTracker },
+            trackerConfig = { config.perTrackerConfig }
+        ) {
             drawDisplay(it)
         }
 

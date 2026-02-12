@@ -90,8 +90,6 @@ object MiningEventsApi {
     fun onSecondPassed() {
 
         if (TabWidget.EVENT.isActive) {
-
-
             for (eventType in MiningEventType.entries) {
                 for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
                     MiningEventType.widgetEventNotAnnouncedPattern.matchMatcher(line) {
@@ -154,7 +152,7 @@ object MiningEventsApi {
         GOBLIN_RAID(
             duration = 5.minutes,
             chatFallback = ".*§r§c§lGOBLIN RAID (?:STARTED|ENDED)!.*",
-            widgetEventFallback = "§9§lMining Event: §r§a§r§cGoblin Raid",
+            widgetEventFallback = "Mining Event: Goblin Raid",
             bossbarFallback = "§e§lEVENT §C§LGOBLIN RAID §e§lACTIVE IN §b§l(?<location>.*) §e§lfor §a§l(?<time>.*)§r",
         ),
         // all works
@@ -162,7 +160,7 @@ object MiningEventsApi {
         RAFFLE(
             duration = 3.minutes,
             chatFallback = ".*§r§6§lRAFFLE (?:STARTED|ENDED)!.*",
-            widgetEventFallback = "§9§lMining Event: §r§a§r§6Raffle",
+            widgetEventFallback = "Mining Event: Raffle",
             bossbarFallback = "§e§lEVENT §6§LRAFFLE §e§lACTIVE IN §b§l(?<location>.*) §e§lfor §a§l(?<time>.*)§r",
         ),
         // all works
@@ -171,28 +169,28 @@ object MiningEventsApi {
         MITHRIL_GOURMAND(
             duration = 10.minutes,
             chatFallback = ".*§r§b§lMITHRIL GOURMAND (?:STARTED|ENDED)!.*",
-            widgetEventFallback = "§9§lMining Event: §r§a§r§bMithril Gourmand",
+            widgetEventFallback = "Mining Event: Mithril Gourmand",
             bossbarFallback = "§e§lEVENT §B§LMITHRIL GOURMAND §e§lACTIVE IN §b§l(?<location>.*) §e§lfor §a§l(?<time>.*)§r",
         ),
         // all work
         BETTER_TOGETHER(
             duration = 20.minutes,
             chatFallback = ".*§r§d§lBETTER TOGETHER (?:STARTED|ENDED)!.*",
-            widgetEventFallback = "§9§lMining Event: §r§a§r§dBetter Together",
+            widgetEventFallback = "Mining Event: Better Together",
             bossbarFallback = "§e§lPASSIVE EVENT §b§l§D§LBETTER TOGETHER §e§lRUNNING FOR §a§l(?<time>.*)§r",
         ),
         // all work
         GONE_WITH_THE_WIND(
             duration = 20.minutes,
             chatFallback = ".*§r§9§lGONE WITH THE WIND (?:STARTED|ENDED)!.*",
-            widgetEventFallback = "§9§lMining Event: §r§a§r§9Gone with the Wind",
+            widgetEventFallback = "Mining Event: Gone with the Wind",
             bossbarFallback = "§e§lPASSIVE EVENT §9§LGONE WITH THE WIND §e§lRUNNING FOR §a§l(?<time>.*)§r",
         ),
         // all work.
         DOUBLE_POWDER(
             duration = 15.minutes,
             chatFallback = ".*§r§b§l2X POWDER (?:STARTED|ENDED)!.*",
-            widgetEventFallback = "§9§lMining Event: §r§a§r§b2x Powder",
+            widgetEventFallback = "Mining Event: 2x Powder",
             bossbarFallback = "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
         ),
 
@@ -200,23 +198,23 @@ object MiningEventsApi {
 
         private val basePath = "mining.mining.event"
         val chatPattern by RepoPattern.pattern("$basePath.chat.${asPatternId()}", chatFallback)
-        val widgetEventPattern by RepoPattern.pattern("$basePath.widget.event.${asPatternId()}", widgetEventFallback)
+        val widgetEventPattern by RepoPattern.pattern("$basePath.widget.event.${asPatternId()}-no-color", widgetEventFallback)
         val bossBarPattern by RepoPattern.pattern("$basePath.bossbar.${asPatternId()}", bossbarFallback)
 
         companion object {
             /**
-             * REGEX-TEST: Ends in: §r§c5m 30s
+             * REGEX-TEST: Ends in: 5m 30s
              */
             val widgetDurationPattern by RepoPattern.pattern(
-                "mining.mining.event.widget.duration",
-                "Ends in: §r§.(?<duration>.*)"
+                "mining.mining.event.widget.duration-no-color",
+                "Ends in: (?<duration>.*)"
             )
             /**
-             * REGEX-TEST: §9§lMining Event: §r§7Not announced
+             * REGEX-TEST: Mining Event: Not announced
              */
             val widgetEventNotAnnouncedPattern by RepoPattern.pattern(
-                "mining.mining.event.widget.not.announced",
-                "§9§lMining Event: §r§7Not announced"
+                "mining.mining.event.widget.not.announced-no-color",
+                "Mining Event: Not announced"
             )
         }
     }

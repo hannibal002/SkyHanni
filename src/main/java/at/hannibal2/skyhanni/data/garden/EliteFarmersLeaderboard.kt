@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData.updateCollections
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
@@ -58,6 +57,7 @@ object EliteFarmersLeaderboard {
     private val eliteLeaderboardData: MutableMap<EliteLeaderboardType, EliteLeaderboardData> = mutableMapOf()
 
     var apiError = false
+    var apiUnavailable = false
     private var hasWarned = false
     private var fetchAttempts = 0
     private var lastFetchAttempt = SimpleTimeMark.farPast()
@@ -230,23 +230,27 @@ object EliteFarmersLeaderboard {
 
     private fun loadLeaderboardIfAble(leaderboardType: EliteLeaderboardType): Int? {
         if (loadingLeaderboardMutex[leaderboardType::class]?.isLocked == true) return null
-        if (profileId == "") updateCollections()
 
         val category = leaderboardType::class
 
-        SkyHanniMod.launchIOCoroutine("load elite lb") {
-            loadingLeaderboardMutex[leaderboardType::class]?.withLock {
-                val oldPos = leaderboardPosMap?.get(leaderboardType)
-                val lbPos = loadLeaderboardPosition(leaderboardType)
-                lbPos?.let {
-                    leaderboardPosMap?.set(leaderboardType, lbPos)
-                    // warn for the load of each mode in each enabled display
-                    if (category !in loadedLeaderboardCategories) {
-                        checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
-                        loadedLeaderboardCategories.add(category)
+        SkyHanniMod.launchIOCoroutine("load elite lb", timeout = 15.seconds) {
+            try {
+                loadingLeaderboardMutex[leaderboardType::class]?.withLock {
+                    val oldPos = leaderboardPosMap?.get(leaderboardType)
+                    val lbPos = loadLeaderboardPosition(leaderboardType)
+                    lbPos?.let {
+                        leaderboardPosMap?.set(leaderboardType, lbPos)
+                        // warn for the load of each mode in each enabled display
+                        if (category !in loadedLeaderboardCategories) {
+                            checkOffScreenLeaderboardChanges(oldPos, leaderboardType)
+                            loadedLeaderboardCategories.add(category)
+                        }
+                        eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.lastUpdate = SimpleTimeMark.now()
                     }
-                    eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.lastUpdate = SimpleTimeMark.now()
                 }
+            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                apiUnavailable = true
+                throw e
             }
         }
         return leaderboardPosMap?.get(leaderboardType)
@@ -286,6 +290,7 @@ object EliteFarmersLeaderboard {
             lbType = leaderboardType,
             upcomingCount = upcomingPlayers,
             atRank = atRank,
+            getLeaderboardConfig(leaderboardType).gamemode.get().apiMode
         )
         // elite only updates player profiles once an hour, so assume it's wrong if it's the same as last fetch
         val shouldUpdateData = shouldUpdateData(leaderboardType, apiData)
@@ -294,6 +299,14 @@ object EliteFarmersLeaderboard {
         lbData.lastUpdate = SimpleTimeMark.now()
         lbData.shouldRefresh = false
         apiError = false
+
+        if (apiData.disabled) {
+            apiUnavailable = true
+            return leaderboardPosMap?.get(leaderboardType)
+        }
+
+        apiUnavailable = false
+
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             lbData.isUnranked = true
             // correct wrong data
@@ -306,7 +319,7 @@ object EliteFarmersLeaderboard {
 
             return null
         }
-        lbData.isUnranked = true
+        lbData.isUnranked = false
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
         handleUpcomingPlayers(leaderboardType, apiData)
         // prefer our lb pos
@@ -366,7 +379,10 @@ object EliteFarmersLeaderboard {
     ) {
         if (diff >= 0.5 || abs(diff) >= 100) {
             when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time weight in the farmingweight class
+                EliteLeaderboardMode.ALL_TIME -> {
+                    // we handle all-time weight in the farmingweight class
+                    // we only update collections on garden join
+                }
                 EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
             }
         }
@@ -381,7 +397,10 @@ object EliteFarmersLeaderboard {
         val diffWeight = diff / crop.getFactor()
         if (diffWeight >= 0.5 || abs(diffWeight) >= 100) {
             when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> updateCollections() // we handle all-time collections in the farming weight class
+                EliteLeaderboardMode.ALL_TIME -> {
+                    // we handle all-time collections in the farming weight class
+                    // we only update collections on garden join
+                }
                 EliteLeaderboardMode.MONTHLY ->
                     leaderboardAmountMap?.set(leaderboardType, apiData.amount)
             }
@@ -444,6 +463,7 @@ object EliteFarmersLeaderboard {
         leaderboardAmountMap?.clear()
         eliteLeaderboardData.clear()
         apiError = false
+        apiUnavailable = false
         hasWarned = false
         fetchAttempts = 0
         lastFetchAttempt = SimpleTimeMark.farPast()

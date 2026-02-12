@@ -22,9 +22,7 @@ object RenderData {
         val screen = Minecraft.getInstance().screen
 
         DrawContextUtils.setContext(context)
-        DrawContextUtils.translated(z = -3) {
-            renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is ChatScreen)
-        }
+        renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is ChatScreen)
         DrawContextUtils.clearContext()
     }
 
@@ -37,9 +35,7 @@ object RenderData {
 
         DrawContextUtils.pushPop {
             if (GuiEditManager.isInGui()) {
-                DrawContextUtils.translated(z = -3) {
-                    renderOverlay(DrawContextUtils.drawContext, true)
-                }
+                renderOverlay(DrawContextUtils.drawContext, true)
             }
         }
 

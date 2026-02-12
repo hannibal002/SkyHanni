@@ -38,8 +38,7 @@ object RenderLivingEntityHelper {
     @JvmStatic
     fun getEntityGlowColor(entity: Entity): Int? {
         val livingEntity = entity as? LivingEntity ?: return null
-        //? > 1.21.9
-        //if (livingEntity.isInvisible) return null
+        if (livingEntity.isInvisible) return null
         val color = internalSetColorMultiplier(livingEntity, 0)
         if (color == 0) {
             val eventColor = isEntityInGlowEvent(entity)

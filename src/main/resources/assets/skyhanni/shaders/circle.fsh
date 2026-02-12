@@ -3,29 +3,20 @@
 const float pi = 3.14159265f;
 
 in vec4 vertexColor;
-//? < 1.21.6 {
-uniform float scaleFactor;
-uniform float radius;
-uniform float smoothness;
-uniform vec2 centerPos;
-uniform mat4 modelViewMatrix;
-uniform float angle1;
-uniform float angle2;
-//?} else {
-//layout(std140) uniform SkyHanniRoundedUniforms {
-//    float scaleFactor;
-//    float radius;
-//    float smoothness;
-//    vec2 halfSize;
-//    vec2 centerPos;
-//    mat4 modelViewMatrix;
-//};
-//
-//layout(std140) uniform SkyHanniCircleUniforms {
-//    float angle1;
-//    float angle2;
-//};
-//?}
+
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
+
+layout(std140) uniform SkyHanniCircleUniforms {
+    float angle1;
+    float angle2;
+};
 out vec4 fragColor;
 
 void main() {

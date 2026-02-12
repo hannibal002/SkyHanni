@@ -61,7 +61,9 @@ object DianaProfitTracker {
                 )
             },
         ),
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
     data class Data(
         @Expose var burrowsDug: Long = 0,

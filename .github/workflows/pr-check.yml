@@ -57,7 +57,7 @@ jobs:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
                     script: |
                         const fs = require('fs');
-                        const test = fs.readFileSync('versions/1.21.5/build/changelog_errors.txt', 'utf8');
+                        const test = fs.readFileSync('versions/1.21.10/build/changelog_errors.txt', 'utf8');
                         const commentBody = `${test}`
                         
                         github.rest.issues.createComment({

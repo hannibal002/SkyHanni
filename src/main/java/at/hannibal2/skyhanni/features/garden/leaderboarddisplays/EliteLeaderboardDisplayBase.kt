@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
@@ -15,14 +16,13 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.leaderboardMinA
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.loadingLeaderboardMutex
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
+import at.hannibal2.skyhanni.data.garden.FarmingWeightData.openWebsite
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -124,8 +124,9 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
 
         val leaderboardPos = getLeaderboardFormat(leaderboardType)
+        val mode = EliteLeaderboardConfigApi.getLeaderboardConfig(leaderboardType).gamemode.get().renderableName
         return Renderable.clickable(
-            "§6$leaderboardType§7: §e$amountText$leaderboardPos",
+            "§6$leaderboardType$mode§7: §e$amountText$leaderboardPos",
             tips = listOf("§eClick to open your Farming Profile."),
             onLeftClick = { openWebsite(PlayerUtils.getName()) },
         )
@@ -160,6 +161,15 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     }
 
     private fun nullNextPlayerRenderable(leaderboardType: EliteLeaderboardType): Renderable {
+        if (EliteFarmersLeaderboard.apiUnavailable) {
+            return Renderable.hoverTips(
+                content = "§7Waiting for update...",
+                tips = listOf(
+                    "§celitebot.dev is currently overloaded or unavailable.",
+                    "§7Leaderboard data will update when the service recovers.",
+                ),
+            )
+        }
         return if (isUnranked(leaderboardType)) {
             val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0
             // the amount eligible to enter every other leaderboard is the all-time amount for that lb, except for the monthly weight lb
@@ -250,17 +260,5 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
 
         position.renderRenderables(display, posLabel = name)
-    }
-
-    private var lastName = ""
-    private var lastOpenWebsite = SimpleTimeMark.farPast()
-
-    private fun openWebsite(name: String, ignoreCooldown: Boolean = false) {
-        if (!ignoreCooldown && lastOpenWebsite.passedSince() < 5.seconds && name == lastName) return
-        lastOpenWebsite = SimpleTimeMark.now()
-        lastName = name
-
-        OSUtils.openBrowser("https://elitebot.dev/@$name/")
-        ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 }

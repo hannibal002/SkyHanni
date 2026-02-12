@@ -371,6 +371,12 @@ object HoppityEventSummary {
                 statList.addStr("§7You bought §b${boughtCount.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
             }
 
+            put(HoppityStat.VISITOR_RABBITS) { statList, stats, _ ->
+                val visitorCount = stats.mealsFound[HoppityEggType.VISITOR]?.takeIf { it > 0 } ?: return@put
+                val rabbitFormat = StringUtils.pluralize(visitorCount, "Rabbit")
+                statList.addStr("§6Hoppity §7gave you §b$visitorCount §d$rabbitFormat §r§7on your §aGarden§7.")
+            }
+
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
                 val sideDishCount = stats.mealsFound[HoppityEggType.SIDE_DISH]?.takeIf { it > 0 } ?: return@put
                 val eggFormat = StringUtils.pluralize(sideDishCount, "Egg")
