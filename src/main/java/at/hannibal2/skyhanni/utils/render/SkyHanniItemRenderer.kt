@@ -51,6 +51,8 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
     }
 
     override fun textureIsReadyToBlit(itemRenderState: SkyHanniGuiItemRenderState): Boolean {
+        // Todo, real logic here instead of just always returning false,
+        // CBF to setup real state tracking for now
         return false
         //val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
         //return !trackingItemStackRenderState.isAnimated && trackingItemStackRenderState.modelIdentity == this.modelOnTextureIdentity
