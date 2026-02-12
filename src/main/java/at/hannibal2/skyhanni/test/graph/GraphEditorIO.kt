@@ -91,10 +91,13 @@ object GraphEditorIO {
         if (config.showsStats) {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             val networkLine = if (networkCount > 1) "\n§eNetworks: ${networkCount.addSeparators()}" else ""
+            val namedNodes = nodes.count { it.name != null }.addSeparators()
             ChatUtils.chat(
-                "§lStats\n" + "§eNamed Nodes: ${
-                    nodes.count { it.name != null }.addSeparators()
-                }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length" + networkLine,
+                "§lStats\n" +
+                    "§eNamed Nodes: $namedNodes\n" +
+                    "§eNodes: ${nodes.size.addSeparators()}\n" +
+                    "§eEdges: ${edges.size.addSeparators()}\n" +
+                    "§eLength: $length$networkLine",
             )
         }
     }
@@ -139,7 +142,7 @@ object GraphEditorIO {
                     GraphEditorHistory.save("merge from clipboard")
 
                     var nextId = state.id
-                    val (newNodes, newEdges) =  convertToGraphingData(graph) { nextId++ }
+                    val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
                     nodes.addAll(newNodes)
                     edges.addAll(newEdges)
                     state.id = nextId
@@ -157,8 +160,7 @@ object GraphEditorIO {
         }
     }
 
-    private fun convertToGraphingData(graph: Graph, idProvider: (GraphNode) -> Int):
-        Pair<List<GraphingNode>, List<GraphingEdge>> {
+    private fun convertToGraphingData(graph: Graph, idProvider: (GraphNode) -> Int): Pair<List<GraphingNode>, List<GraphingEdge>> {
         val importedNodes = graph.map { graphNode ->
             GraphingNode(
                 idProvider(graphNode),
