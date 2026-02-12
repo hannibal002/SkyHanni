@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -27,4 +28,8 @@ object MinecraftCompat {
     //? } else {
     /*val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
     *///?}
+
+    val isWindowActive get(): Boolean =
+        !SkyHanniMod.feature.dev.debug.alwaysUnfocused &&
+            Minecraft.getInstance().isWindowActive
 }

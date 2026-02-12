@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -42,6 +44,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -215,8 +218,10 @@ object GardenNextJacobContest {
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
-        if (!isEnabled() || calendarDetector.isInside()) return
-        update()
+        if (isEnabled() && !calendarDetector.isInside()) {
+            update()
+        }
+        nextContest?.warnAbout()
     }
 
     @HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.GARDEN)
@@ -337,7 +342,7 @@ object GardenNextJacobContest {
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 ChatUtils.chat("§2Enabled automatic sharing of future contests!")
             },
-            "§eClick to enable autosharing!",
+            "§eClick to enable automatic sharing!",
             oneTimeClick = true,
         )
     }
@@ -351,7 +356,7 @@ object GardenNextJacobContest {
         }
 
         display = if (fetchingContestsMutex.isLocked) {
-            Renderable.text("§cFetching this years jacob contests...")
+            Renderable.text("§cFetching this year's Jacob Contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
@@ -366,7 +371,7 @@ object GardenNextJacobContest {
 
         // We only reach here if there are no contests available
         if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
-        else addString("§cOpen calendar to read Jacob contest times!")
+        else addString("§cOpen calendar to read Jacob Contest times!")
         resetContestData()
     }
 
@@ -378,7 +383,7 @@ object GardenNextJacobContest {
 
     private fun MutableList<Renderable>.drawNoContestsDisplay() =
         if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
-        else addString("§cOpen calendar to read Jacob contest times!")
+        else addString("§cOpen calendar to read Jacob Contest times!")
 
     private fun MutableList<Renderable>.drawNextContest(contest: EliteFarmingContest) {
         val activeContest = contest.startTime.isInPast() && contest.endTime.isInFuture()
@@ -395,7 +400,6 @@ object GardenNextJacobContest {
 
             else -> {
                 addString("§eNext: ")
-                contest.warnAbout()
                 contest.startTime.timeUntil()
             }
         }
@@ -415,10 +419,10 @@ object GardenNextJacobContest {
     }
 
     private fun EliteFarmingContest.warnAbout() {
-        val timeUntil = startTime.timeUntil()
-        if (!config.warn || config.warnTime.seconds <= timeUntil) return
-        val nextContest = nextContest ?: return
-        if (nextContest.crops.none { it in config.warnFor }) return
+        if (!config.warn) return
+        if (startTime.isInPast() || startTime.timeUntil() > config.warnTime.seconds) return
+        if (!config.warnOutsideGarden && !GardenApi.inGarden()) return
+        if (crops.none(config.warnFor::contains)) return
 
         // Check that it only gets called once for the current event
         if (lastWarningTime.passedSince() < config.warnTime.seconds) return
@@ -430,27 +434,26 @@ object GardenNextJacobContest {
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {
-            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
+            if (it == boostedCrop) "*${it.cropName}*" else it.cropName
         }
-        if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
-            SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
-                DialogUtils.openPopupWindow(
-                    title = "SkyHanni Jacob Contest Notification",
-                    message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
-                )
-            }
+        if (config.warnPopup && !MinecraftCompat.isWindowActive) {
+            ChatUtils.debug("Opening contest notification popup")
+            DialogUtils.openPopupWindow(
+                title = "SkyHanni Jacob Contest Notification",
+                message = "Farming Contest soon!\nCrops: $cropTextNoColor",
+            )
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -537,6 +540,22 @@ object GardenNextJacobContest {
                 add(JsonPrimitive(CropType.SUNFLOWER.name))
                 add(JsonPrimitive(CropType.MOONFLOWER.name))
                 add(JsonPrimitive(CropType.WILD_ROSE.name))
+            }
+        }
+
+        event.add(124, "$base.warnOutsideGarden") {
+            JsonPrimitive(config.showOutsideGarden)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetcontestwarning") {
+            category = CommandCategory.DEVELOPER_TEST
+            description = "Reset last warning time for upcoming Jacob Contest"
+            simpleCallback {
+                lastWarningTime = SimpleTimeMark.farPast()
+                ChatUtils.chat("Reset Jacob Contest last warning time.")
             }
         }
     }

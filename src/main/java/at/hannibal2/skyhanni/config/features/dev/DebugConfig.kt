@@ -227,6 +227,11 @@ class DebugConfig {
     val forceGreatSpook: Property<Boolean> = Property.of(false)
 
     @Expose
+    @ConfigOption(name = "Always Unfocused", desc = "Always act as if the Minecraft window is unfocused.")
+    @ConfigEditorBoolean
+    var alwaysUnfocused: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Moonglade Beacon", desc = "Add more debug information to the beacon solver.")
     @ConfigEditorBoolean
     var moongladeBeacon: Boolean = false

@@ -24,13 +24,13 @@ class NextJacobContestConfig {
     var display: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Outside Garden", desc = "Show the timer not only in the Garden but everywhere in SkyBlock.")
+    @ConfigOption(name = "Show Outside Garden", desc = "Show the timer not only in the Garden but everywhere in SkyBlock.")
     @ConfigEditorBoolean
     var showOutsideGarden: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "In Other Guis",
+        name = "In Other GUIs",
         desc = "Mark the current or next Farming Contest crops in other farming GUIs as underlined.",
     )
     @ConfigEditorBoolean
@@ -86,6 +86,14 @@ class NextJacobContestConfig {
     @ConfigOption(name = "Warning Time", desc = "Set the warning time in seconds before a Jacob's Contest begins.")
     @ConfigEditorSlider(minValue = 10f, maxValue = 300f, minStep = 1f)
     var warnTime: Int = 120
+
+    @Expose
+    @ConfigOption(
+        name = "Warn Outside Garden",
+        desc = "Warn about upcoming contests even if you're not in the Garden.",
+    )
+    @ConfigEditorBoolean
+    var warnOutsideGarden: Boolean = false
 
     @Expose
     @ConfigOption(
