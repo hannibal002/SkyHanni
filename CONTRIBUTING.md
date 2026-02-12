@@ -305,7 +305,7 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 
 ### [Stonecutter Development](https://plugins.jetbrains.com/plugin/25044-stonecutter-dev)
 
-Provides syntax highligting and quick version switching for our multiversion development setup.
+Provides syntax highlighting and quick version switching for our multiversion development setup.
 
 ## Software Used in SkyHanni
 
