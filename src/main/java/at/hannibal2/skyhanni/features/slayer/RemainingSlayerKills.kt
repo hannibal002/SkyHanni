@@ -255,7 +255,7 @@ object RemainingSlayerKills {
         if (config.remainingKillsLevel) {
             append("§8[§7Lv${level.addSeparators()}§8] ")
         }
-        append("§c${name}")
+        append("§c$name")
         if (config.remainingKillsHealth) {
             append(" §a${maxHealth.shortFormat()}§c❤")
         }
