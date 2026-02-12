@@ -97,16 +97,21 @@ object GraphEditorIO {
 
         if (config.showsStats) {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
-            val networkLine = if (networkCount > 1) "\n§cNetworks: ${networkCount.addSeparators()}" else ""
             val namedNodes = nodes.count { it.name != null }.addSeparators()
             ChatUtils.chat(
                 "§lStats\n" +
                     "§eNamed Nodes: $namedNodes\n" +
                     "§eNodes: ${nodes.size.addSeparators()}\n" +
                     "§eEdges: ${edges.size.addSeparators()}\n" +
-                    "§eLength: $length" +
-                    networkLine,
+                    "§eLength: $length",
             )
+            if (networkCount > 1) {
+                ChatUtils.clickableChat(
+                    "§cNetworks: ${networkCount.addSeparators()}",
+                    onClick = { GraphEditorNetworks.findNetworks() },
+                    hover = "Click to find networks!",
+                )
+            }
         }
     }
 
