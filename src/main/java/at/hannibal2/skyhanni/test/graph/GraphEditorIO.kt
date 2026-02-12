@@ -22,35 +22,40 @@ object GraphEditorIO {
     private val nodes get() = state.nodes
     private val edges get() = state.edges
 
-    fun compileGraph(): Graph {
-        val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val compiledNodes = nodes.mapIndexed { index, node ->
-            GraphNode(
-                index,
+    fun compileGraph(nodeSubset: Set<GraphingNode>? = null): Graph {
+        val filteredNodes = nodeSubset ?: nodes
+        val filteredEdges = if (nodeSubset != null) {
+            edges.filter { it.node1 in nodeSubset && it.node2 in nodeSubset }
+        } else {
+            edges
+        }
+
+        val compiledNodeMap = filteredNodes.associate { node ->
+            node.id to GraphNode(
+                node.id,
                 node.position,
                 node.name,
                 node.tags.map { it.internalName },
             )
         }
 
-        val edgesByNode = nodes.associateWith { node ->
-            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }
+        val edgesByNode = filteredNodes.associateWith { node ->
+            filteredEdges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }
         }
 
-        val neighbours = nodes.map { node ->
+        for (node in filteredNodes) {
+            val compiledNode = compiledNodeMap[node.id] ?: continue
             val nodeEdges = edgesByNode[node].orEmpty()
 
-            nodeEdges.map { edge ->
+            compiledNode.neighbours = nodeEdges.map { edge ->
                 val otherNode = edge.getOther(node)
-                val index = indexedTable[otherNode.id] ?: error("Invalid node ID ${otherNode.id} referenced in edge")
-                compiledNodes[index] to node.position.distance(otherNode.position)
-            }.sortedBy { it.second }
+                val compiledOther = compiledNodeMap[otherNode.id]
+                    ?: error("Invalid node ID ${otherNode.id} referenced in edge")
+                compiledOther to node.position.distance(otherNode.position)
+            }.sortedBy { it.second }.toMap()
         }
 
-        compiledNodes.forEachIndexed { index, node ->
-            node.neighbours = neighbours[index].toMap()
-        }
-        return Graph(compiledNodes)
+        return Graph(compiledNodeMap.values.toList())
     }
 
     fun createStateFrom(graph: Graph): GraphEditorState {
@@ -90,7 +95,7 @@ object GraphEditorIO {
         }
 
         newState.edges.addAll(reduced.values)
-        newState.id = newState.nodes.lastOrNull()?.id?.plus(1) ?: 0
+        newState.id = newState.nodes.maxOfOrNull { it.id }?.plus(1) ?: 0
         return newState
     }
 
