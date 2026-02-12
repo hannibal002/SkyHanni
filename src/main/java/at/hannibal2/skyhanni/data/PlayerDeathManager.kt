@@ -42,14 +42,8 @@ object PlayerDeathManager {
 
         selfDeathMessagePattern.matchMatcher(event.cleanMessage) {
             val name = PlayerUtils.getName()
-            val reason = group("reason").removeColor()
+            val reason = group("reason")
             PlayerDeathEvent(name, reason, event).post()
         }
-    }
-
-    @HandleEvent
-    fun onDeath(event: PlayerDeathEvent) {
-        println(event.name)
-        println(event.reason)
     }
 }
