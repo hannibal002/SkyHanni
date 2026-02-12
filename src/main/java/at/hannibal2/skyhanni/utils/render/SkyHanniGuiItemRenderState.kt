@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
@@ -19,6 +20,9 @@ data class SkyHanniGuiItemRenderState(
     private val y1 = (y + (scale * 16)).toInt()
 
     fun guiItemRenderState() = guiItemRenderState
+
+    fun guiTrackingState(state: SkyHanniGuiItemRenderState): TrackingItemStackRenderState? =
+        state.guiItemRenderState().itemStackRenderState()
 
     override fun x0() = x0
     override fun x1() = x1

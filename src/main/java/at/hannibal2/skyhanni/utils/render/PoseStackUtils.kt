@@ -29,5 +29,18 @@ object PoseStackUtils {
         return true
     }
 
+    /**
+     * Apply a translation, run a block, and then reverse the translation.
+     * Block must return a Boolean indicating whether it applied a rotation, so that the caller
+     * can decide whether to reset the lighting after the block.
+     */
+    fun PoseStack.translatePushPop(x: Float, y: Float, z: Float, block: PoseStack.() -> Boolean): Boolean {
+        pushPose()
+        translate(x, y, z)
+        val success = block()
+        popPose()
+        return success
+    }
+
     fun PoseStack.defaultAngleDown() = mulPose(Vec3(30.0, 45.0, 0.0))
 }
