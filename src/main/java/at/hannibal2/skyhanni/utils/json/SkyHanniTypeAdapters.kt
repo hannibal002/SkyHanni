@@ -25,6 +25,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
@@ -48,10 +49,19 @@ object SkyHanniTypeAdapters {
         { NbtBoolean.fromString(this) },
     )
 
-    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
-        { this.asString() },
-        { this.toInternalName() },
-    )
+    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = object : TypeAdapter<NeuInternalName>() {
+        override fun write(writer: JsonWriter, value: NeuInternalName?) {
+            if (value == null) writer.nullValue() else writer.value(value.asString())
+        }
+
+        override fun read(reader: JsonReader): NeuInternalName? {
+            if (reader.peek() == JsonToken.NULL) {
+                reader.nextNull()
+                return null
+            }
+            return reader.nextString().toInternalName()
+        }
+    }
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
         LorenzVec::asStoredString,

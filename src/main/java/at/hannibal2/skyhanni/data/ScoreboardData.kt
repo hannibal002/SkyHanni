@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -177,11 +178,10 @@ object ScoreboardData {
     }
 
     private fun tryToReplaceScoreboardLineHarder(component: Component): Component {
-        val text = component.formattedTextCompatLessResets()
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-            PurseApi.piggyPattern.matchMatcher(text) {
-                val coins = group("coins")
-                return Component.literal("Purse: $coins")
+            PurseApi.piggyPattern.matchMatcher(component) {
+                val coins = TextHelper.matcher(component, group("coins")) ?: return@matchMatcher
+                return Component.literal("Purse: ").append(coins)
             }
         }
 
