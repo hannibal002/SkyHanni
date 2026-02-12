@@ -77,27 +77,35 @@ object GraphEditorIO {
             return
         }
         val compileGraph = compileGraph()
-        if (config.useAsIslandArea) {
-            IslandGraphs.setNewGraph(compileGraph)
-            GraphEditorBugFinder.runTests()
-            if (GraphEditorNodeFinder.active) {
-                GraphEditorNodeFinder.calculateNewAllNodeFind()
-            }
-        }
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
+
+        if (config.useAsIslandArea) {
+            SkyHanniMod.launchCoroutine("bridge graph networks") {
+                GraphEditorNetworks.bridgeNetworks(compileGraph)
+                Minecraft.getInstance().execute {
+                    IslandGraphs.setNewGraph(compileGraph)
+                    GraphEditorBugFinder.runTests()
+                    if (GraphEditorNodeFinder.active) {
+                        GraphEditorNodeFinder.calculateNewAllNodeFind()
+                    }
+                }
+            }
+        }
+
         if (config.showsStats) {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
-            val networkLine = if (networkCount > 1) "\n§eNetworks: ${networkCount.addSeparators()}" else ""
+            val networkLine = if (networkCount > 1) "\n§cNetworks: ${networkCount.addSeparators()}" else ""
             val namedNodes = nodes.count { it.name != null }.addSeparators()
             ChatUtils.chat(
                 "§lStats\n" +
                     "§eNamed Nodes: $namedNodes\n" +
                     "§eNodes: ${nodes.size.addSeparators()}\n" +
                     "§eEdges: ${edges.size.addSeparators()}\n" +
-                    "§eLength: $length$networkLine",
+                    "§eLength: $length" +
+                    networkLine,
             )
         }
     }

@@ -1,9 +1,15 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import kotlin.math.sqrt
 
 object GraphEditorNetworks {
 
@@ -64,6 +70,88 @@ object GraphEditorNetworks {
         val nodeCount = clusterNodes.size.addSeparators()
         val edgeCount = state.edges.count { it.node1 in cluster && it.node2 in cluster }.addSeparators()
         ChatUtils.chat("Copied network with $nodeCount nodes and $edgeCount edges to clipboard.")
+    }
+
+    fun findNetworks() {
+        val state = GraphEditor.state
+        val clusters = findClusters(state.nodes, state.edges)
+
+        if (clusters.isEmpty()) {
+            ChatUtils.chat("No networks found.")
+            return
+        }
+
+        if (clusters.size == 1) {
+            val nodeCount = state.nodes.size.addSeparators()
+            ChatUtils.chat("Graph is fully connected (1 network, $nodeCount nodes).")
+            return
+        }
+
+        val sortedClusters = clusters.sortedByDescending { it.size }
+
+        ChatUtils.chat("§eGraph Networks: ${clusters.size} found")
+        for ((index, cluster) in sortedClusters.withIndex()) {
+            val colorIndex = index % networkColors.size
+            val color = networkColors[colorIndex]
+            val chatColor = color.getChatColor()
+            val nodeCount = cluster.size.addSeparators()
+            val nearestNode = cluster.minByOrNull { it.distanceSqToPlayer() } ?: continue
+            val distance = sqrt(nearestNode.distanceSqToPlayer()).toInt()
+
+            ChatUtils.clickableChat(
+                "$chatColor■ §eNetwork ${index + 1}: $nodeCount nodes (nearest: $distance blocks)",
+                onClick = {
+                    IslandGraphs.pathFind(
+                        nearestNode.position,
+                        "Network ${index + 1}",
+                        color.toColor(),
+                        condition = { GraphEditor.isEnabled() },
+                    )
+                },
+                hover = "Click to navigate! (requires Save with 'use as island area')",
+            )
+        }
+    }
+
+    fun bridgeNetworks(graph: Graph): Graph {
+        val clusters = GraphUtils.findDisjointClusters(graph).map { it.toMutableSet() }.toMutableList()
+
+        while (clusters.size > 1) {
+            var bestDistanceSq = Double.MAX_VALUE
+            var bestNodeA: GraphNode? = null
+            var bestNodeB: GraphNode? = null
+            var bestIndexA = -1
+            var bestIndexB = -1
+
+            for (i in clusters.indices) {
+                for (j in i + 1 until clusters.size) {
+                    for (nodeA in clusters[i]) {
+                        for (nodeB in clusters[j]) {
+                            val distSq = nodeA.position.distanceSq(nodeB.position)
+                            if (distSq < bestDistanceSq) {
+                                bestDistanceSq = distSq
+                                bestNodeA = nodeA
+                                bestNodeB = nodeB
+                                bestIndexA = i
+                                bestIndexB = j
+                            }
+                        }
+                    }
+                }
+            }
+
+            val nodeA = bestNodeA ?: break
+            val nodeB = bestNodeB ?: break
+            val distance = nodeA.position.distance(nodeB.position)
+
+            nodeA.neighbours += (nodeB to distance)
+            nodeB.neighbours += (nodeA to distance)
+
+            clusters[bestIndexA].addAll(clusters[bestIndexB])
+            clusters.removeAt(bestIndexB)
+        }
+
+        return graph
     }
 
     private fun findClusters(
