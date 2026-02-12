@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
@@ -29,7 +28,7 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
 
     override fun renderToTexture(itemRenderState: SkyHanniGuiItemRenderState, poseStack: PoseStack) {
         poseStack.scale(1.0f, -1.0f, -1.0f)
-        poseStack.mulPose(itemRenderState.rotVec)
+        val rotated = poseStack.mulPose(itemRenderState.rotVec)
 
         val gameRenderer = Minecraft.getInstance().gameRenderer
         val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
@@ -37,6 +36,7 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
             if (trackingItemStackRenderState.usesBlockLight()) Lighting.Entry.ITEMS_3D
             else Lighting.Entry.ITEMS_FLAT
         )
+        if (rotated) trackingItemStackRenderState.setAnimated()
 
         val featureRenderDispatcher = gameRenderer.featureRenderDispatcher
         val submitNodeStorage = featureRenderDispatcher.submitNodeStorage
@@ -51,8 +51,9 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
     }
 
     override fun textureIsReadyToBlit(itemRenderState: SkyHanniGuiItemRenderState): Boolean {
-        val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
-        return !trackingItemStackRenderState.isAnimated && trackingItemStackRenderState.modelIdentity == this.modelOnTextureIdentity
+        return false
+        //val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
+        //return !trackingItemStackRenderState.isAnimated && trackingItemStackRenderState.modelIdentity == this.modelOnTextureIdentity
     }
 
     override fun getTranslateY(i: Int, j: Int): Float {

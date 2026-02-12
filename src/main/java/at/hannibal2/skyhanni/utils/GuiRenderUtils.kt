@@ -353,14 +353,21 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        if (rotationDegrees != null || (totalItemScale > 1 && trackingState.usesBlockLight())) {
+        // || (totalItemScale > 1 && trackingState.usesBlockLight())
+        if (rotationDegrees != null ) {
             item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationDegrees)
         } else {
             item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         }
     }
 
-    private fun ItemStack.customRenderOnScreen(trackingState: TrackingItemStackRenderState, x: Float, y: Float, scale: Float, rotVec: Vec3?) {
+    private fun ItemStack.customRenderOnScreen(
+        trackingState: TrackingItemStackRenderState,
+        x: Float,
+        y: Float,
+        scale: Float,
+        rotVec: Vec3?
+    ) {
         DrawContextUtils.pushPop {
             DrawContextUtils.drawContext.pose()
 
