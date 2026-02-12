@@ -36,10 +36,10 @@ class SpecificSeaCreatures(
 
         @HandleEvent
         fun onCommandRegistration(event: CommandRegistrationEvent) {
-            event.registerBrigadier("shSpecificSeaCreatureSettings") {
+            event.registerBrigadier("shseacreatures") {
                 description = "Opens a Special Config Menu for Specific Sea Creature Settings."
                 category = CommandCategory.USERS_ACTIVE
-                aliases = listOf("SeaCreatureSpecificSettings")
+                aliases = listOf("shsc")
                 simpleCallback {
                     val existingSettings = updateList()
                     val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/seacreaturetoggles.xml")
