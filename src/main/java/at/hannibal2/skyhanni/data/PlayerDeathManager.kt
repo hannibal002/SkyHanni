@@ -14,7 +14,6 @@ object PlayerDeathManager {
 
     /**
      * REGEX-TEST: §c ☠ §r§7§r§bZeroHazel§r§7 was killed by §r§8§lAshfang§r§7§r§7.
-     * REGEX-TEST: §c ☠ §r§7You fell into the void§r§7.
      */
     private val deathMessagePattern by RepoPattern.pattern(
         "chat.player.death",
