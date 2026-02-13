@@ -217,7 +217,7 @@ object GardenNextJacobContest {
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
-        if (isEnabled() && !calendarDetector.isInside()) {
+        if (isDisplayEnabled() && !calendarDetector.isInside()) {
             update()
         }
         nextContest?.warnAbout()
@@ -418,9 +418,8 @@ object GardenNextJacobContest {
     }
 
     private fun EliteFarmingContest.warnAbout() {
-        if (!config.warn) return
+        if (!isWarningEnabled()) return
         if (startTime.isInPast() || startTime.timeUntil() > config.warnTime.seconds) return
-        if (!config.warnOutsideGarden && !GardenApi.inGarden()) return
         if (crops.none(config.warnFor::contains)) return
 
         // Check that it only gets called once for the current event
@@ -432,21 +431,24 @@ object GardenNextJacobContest {
         TitleManager.sendTitle("§eFarming Contest!")
         SoundUtils.playBeepSound()
 
-        val cropTextNoColor = crops.joinToString(", ") {
-            if (it == boostedCrop) "*${it.cropName}*" else it.cropName
-        }
         if (config.warnPopup && !MinecraftCompat.isWindowActive) {
             ChatUtils.debug("Opening contest notification popup")
             DialogUtils.openPopupWindow(
                 title = "SkyHanni Jacob Contest Notification",
-                message = "Farming Contest soon!\nCrops: $cropTextNoColor",
+                message = buildList {
+                    add("Farming Contest soon!")
+                    add("Crops: ${crops.joinToString(", ")}")
+                    boostedCrop?.let {
+                        add("Boosted crop: $it")
+                    }
+                }.joinToString("\n")
             )
         }
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
@@ -460,7 +462,10 @@ object GardenNextJacobContest {
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
-    private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())
+    private fun inCorrectArea() = sbEnabled() || outsideSbEnabled()
+    private fun isDisplayEnabled() = inCorrectArea() && config.display
+    private fun isWarningEnabled() = inCorrectArea() && config.warn
+    private fun isEnabled() = isDisplayEnabled() || isWarningEnabled()
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
 
@@ -542,9 +547,12 @@ object GardenNextJacobContest {
             }
         }
 
-        event.add(124, "$base.warnOutsideGarden") {
-            JsonPrimitive(config.showOutsideGarden)
-        }
+        event.duplicate(
+            124,
+            "$base.showOutsideGarden",
+            "$base.warnOutsideGarden",
+            JsonPrimitive(false),
+        )
     }
 
     @HandleEvent

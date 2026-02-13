@@ -90,7 +90,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Warn Outside Garden",
-        desc = "Warn about upcoming contests even if you're not in the Garden.",
+        desc = "Warn about upcoming contests not only in the Garden but everywhere in SkyBlock.",
     )
     @ConfigEditorBoolean
     var warnOutsideGarden: Boolean = false
