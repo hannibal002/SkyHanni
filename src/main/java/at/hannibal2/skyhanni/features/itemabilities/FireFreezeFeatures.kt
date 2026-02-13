@@ -74,7 +74,7 @@ object FireFreezeFeatures {
     private fun freezeMob(mob: Mob) {
         val prevTime = affectedMobs[mob]
         if (prevTime == null || prevTime.isInPast()) {
-            affectedMobs[mob] = ServerTimeMark.Companion.now() + freezeDuration
+            affectedMobs[mob] = ServerTimeMark.now() + freezeDuration
         }
     }
 
@@ -219,7 +219,7 @@ object FireFreezeFeatures {
 
     // Starts at 2.0 pitch and goes down by 0.5 every 2 seconds, not going lower than 0.0. This lets us estimate
     // how long it will take for the fire freeze to take effect
-    private fun timeFromPitch(pitch: Float): ServerTimeMark = ServerTimeMark.Companion.now() + (2.0 * pitch + 1).seconds
+    private fun timeFromPitch(pitch: Float): ServerTimeMark = ServerTimeMark.now() + (2.0 * pitch + 1).seconds
 
     private fun Rotations.isZero(): Boolean = x == 0.0f && y == 0.0f && z == 0.0f
 
