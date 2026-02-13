@@ -106,12 +106,13 @@ object IslandGraphs {
 
     var currentIslandGraph: Graph? = null
         private set
-    private var lastLoadedIslandType = "nothing"
+    var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
 
     var disabledNodesReason: String? = null
         private set
 
+    // TODO add carnival in hub
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
         val graph = currentIslandGraph ?: return
         disabledNodesReason = reason

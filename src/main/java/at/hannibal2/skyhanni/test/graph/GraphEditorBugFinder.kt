@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
@@ -29,15 +30,49 @@ object GraphEditorBugFinder {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val errorsInWorld: MutableMap<GraphNode, String> = mutableMapOf()
 
+        checkConflictingTags(graph, errorsInWorld)
+        checkConflictingAreas(graph, errorsInWorld)
+        checkMissingData(graph, errorsInWorld)
+        val clusters = checkDisjointClusters(graph, errorsInWorld)
+
+        this.errorsInWorld = errorsInWorld
+        if (clusters.size <= 1) {
+            errorsInWorld.keys.minByOrNull {
+                it.distanceSqToPlayer()
+            }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
+        }
+    }
+
+    private fun checkDisjointClusters(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>): List<Set<GraphNode>> {
+        val clusters = GraphUtils.findDisjointClusters(graph)
+        if (clusters.size <= 1) return clusters
+
+        val closestCluster = clusters.minBy { cluster -> cluster.minOf { it.distanceSqToPlayer() } }
+        val foreignClusters = clusters.filter { it !== closestCluster }
+        val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.distanceSqToPlayer() } }
+        closestForeignNodes.forEach {
+            errorsInWorld[it] = "§cDisjoint node network"
+        }
+        val closestForeignNode = closestForeignNodes.minBy { it.distanceSqToPlayer() }
+        val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
+        closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
+        return clusters
+    }
+
+    private fun checkMissingData(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {
         for (node in graph) {
-            if (node.tags.any { it in NavigationHelper.allowedTags }) {
-                val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
-                if (remainingTags.size != 1) {
-                    errorsInWorld[node] = "§cConflicting tags: $remainingTags"
-                }
+            val nameNull = node.name.isNullOrBlank()
+            val tagsEmpty = node.tags.isEmpty()
+            if (nameNull > tagsEmpty) {
+                errorsInWorld[node] = "§cMissing name despite having tags"
+            }
+            if (tagsEmpty > nameNull) {
+                errorsInWorld[node] = "§cMissing tags despite having name"
             }
         }
+    }
 
+    private fun checkConflictingAreas(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in graph) {
             val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag() != null }?.first
@@ -57,35 +92,15 @@ object GraphEditorBugFinder {
                 }
             }
         }
+    }
+
+    private fun checkConflictingTags(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {
         for (node in graph) {
-            val nameNull = node.name.isNullOrBlank()
-            val tagsEmpty = node.tags.isEmpty()
-            if (nameNull > tagsEmpty) {
-                errorsInWorld[node] = "§cMissing name despite having tags"
+            if (!node.tags.any { it in NavigationHelper.allowedTags }) continue
+            val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
+            if (remainingTags.size != 1) {
+                errorsInWorld[node] = "§cConflicting tags: $remainingTags"
             }
-            if (tagsEmpty > nameNull) {
-                errorsInWorld[node] = "§cMissing tags despite having name"
-            }
-        }
-
-        val clusters = GraphUtils.findDisjointClusters(graph)
-        if (clusters.size > 1) {
-            val closestCluster = clusters.minBy { cluster -> cluster.minOf { it.distanceSqToPlayer() } }
-            val foreignClusters = clusters.filter { it !== closestCluster }
-            val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.distanceSqToPlayer() } }
-            closestForeignNodes.forEach {
-                errorsInWorld[it] = "§cDisjoint node network"
-            }
-            val closestForeignNode = closestForeignNodes.minBy { it.distanceSqToPlayer() }
-            val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-            closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
-        }
-
-        this.errorsInWorld = errorsInWorld
-        if (clusters.size <= 1) {
-            errorsInWorld.keys.minByOrNull {
-                it.distanceSqToPlayer()
-            }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
     }
 
