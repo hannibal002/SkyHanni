@@ -18,9 +18,11 @@ object PlayerPosData {
 
     private val maxAge = 30.seconds
 
-    private data class TimedPos(val pos: LorenzVec, val time: SimpleTimeMark = SimpleTimeMark.now())
+    data class TimedPos(val pos: LorenzVec, val time: SimpleTimeMark = SimpleTimeMark.now())
 
     private val positions = ArrayDeque<TimedPos>()
+
+    val positionHistory: List<TimedPos> get() = positions
 
     @HandleEvent
     fun onWorldChange() {
@@ -41,10 +43,11 @@ object PlayerPosData {
 
     /** Returns how long the player has been within [distance] of [pos], or null if not currently there. */
     fun timeAtPos(pos: LorenzVec, distance: Double): Duration? {
-        if (positions.firstOrNull()?.pos?.distance(pos)?.let { it <= distance } != true) return null
-        val first = positions.firstOrNull { it.pos.distance(pos) > distance }
+        val first = positions.firstOrNull() ?: return null
+        if (first.pos.distance(pos) > distance) return null
+        val timedPos = positions.firstOrNull { it.pos.distance(pos) > distance }
             ?: return positions.last().time.passedSince()
-        return first.time.passedSince()
+        return timedPos.time.passedSince()
     }
 
     /** Returns how long ago the player was last within [distance] of [pos], or null if never tracked. */
