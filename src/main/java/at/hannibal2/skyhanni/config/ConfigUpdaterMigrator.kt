@@ -12,7 +12,10 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 123
+    const val CONFIG_VERSION = 124
+
+    fun JsonElement.at(path: String, init: Boolean): JsonElement? = at(path.split("."), init)
+
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
