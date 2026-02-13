@@ -26,6 +26,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphNodeEditor {
 
+    private val state get() = GraphEditor.state
+
     private val scrollValueNodes = ScrollValue()
     private val scrollValueTags = ScrollValue()
     private val textInput = SearchTextInput()
@@ -54,11 +56,11 @@ object GraphNodeEditor {
         return nodesDisplay
     }
 
-    private fun updateNodeNames() {
+    fun updateNodeNames() {
         lastUpdate = SimpleTimeMark.now()
         nodesDisplay = buildList {
             val list = drawNodeNames()
-            val total = GraphEditor.nodes.count { it.name?.isNotBlank() ?: false }
+            val total = state.nodes.count { it.name?.isNotBlank() ?: false }
             val shown = list.size
             add(
                 Renderable.clickable(
@@ -82,12 +84,12 @@ object GraphNodeEditor {
             addString("§eToggle Visible Tags")
             val map = mutableMapOf<GraphNodeTag, Int>()
             for (tag in GraphNodeTag.entries) {
-                val nodes = GraphEditor.nodes.count { tag in it.tags }
+                val nodes = state.nodes.count { tag in it.tags }
                 map[tag] = nodes
             }
             for (tag in map.sortedDesc().keys) {
                 val isVisible = tag in tagsToShow
-                val nodes = GraphEditor.nodes.count { tag in it.tags }
+                val nodes = state.nodes.count { tag in it.tags }
                 val visibilityText = if (isVisible) " §aVisible" else " §7Invisible"
                 val name = " - ${tag.displayName} §8($nodes nodes) $visibilityText"
                 add(
@@ -194,14 +196,18 @@ object GraphNodeEditor {
     )
 
     private fun drawNodeNames(): List<Searchable> = buildList {
-        for ((node, distance: Double) in GraphEditor.nodes.map {
+        for ((node, distance: Double) in state.nodes.map {
             it to it.distanceSqToPlayer()
         }.sortedBy { it.second }) {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
             }
-            val name = node.name?.takeIf { it.isNotBlank() } ?: continue
-            val color = if (node == GraphEditor.activeNode) "§a" else "§7"
+            val name = if (state.inTextMode && node == state.activeNode) {
+                state.textBox.finalText().takeIf { it.isNotBlank() }
+            } else {
+                node.name?.takeIf { it.isNotBlank() }
+            } ?: continue
+            val color = if (node == state.activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
             val tagText = node.tags.let { tags ->
                 if (tags.isEmpty()) {
@@ -243,7 +249,7 @@ object GraphNodeEditor {
             if (KeyboardManager.isModifierKeyDown()) {
                 updateTagView(node)
             } else {
-                GraphEditor.activeNode = node
+                state.activeNode = node
                 updateNodeNames()
             }
         },
