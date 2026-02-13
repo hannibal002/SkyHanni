@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.fishing.FishingApi.babySlugName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.spawnTime
@@ -71,7 +72,7 @@ object SeaCreatureDetectionApi {
             return
         }
 
-        if (mob.name == "Baby Magma Slug") {
+        if (mob.name == babySlugName) {
             recentBabyMagmaSlugs[mob] = ServerTimeMark.now()
             DelayedRun.runNextTick {
                 handleBabySlugs()
