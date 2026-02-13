@@ -61,7 +61,7 @@ object SeaCreatureDetectionApi {
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!isActive()) return // TODO: remove this workaround
+        if (!isActive()) return
         val mob = event.mob
         val data = entityIdToData[mob.id]
         if (data != null) {
@@ -73,7 +73,6 @@ object SeaCreatureDetectionApi {
 
         if (mob.name == "Baby Magma Slug") {
             recentBabyMagmaSlugs[mob] = ServerTimeMark.now()
-            // TODO: test if baby magma slugs work without delayed run
             DelayedRun.runNextTick {
                 handleBabySlugs()
             }
@@ -139,7 +138,6 @@ object SeaCreatureDetectionApi {
         if (lastSeaCreatureFished.passedSince() > 1.seconds) return
         val name = lastNameFished ?: return
         val lastBobber = lastBobberLocation ?: return
-        // TODO: create a sortedByFiltered function that removes elements when the comparator returns null
         val mobs = recentMobs.asSequence().filter { (mob, data) -> mob.name == name && data.passedSince() < 1.5.seconds }.map {
             it to it.key.baseEntity.distanceTo(lastBobber)
         }.filter { it.second <= 3 }
@@ -192,7 +190,7 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for (data in seaCreatures.values) data.updateWorld(event)
     }
@@ -266,7 +264,6 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    // TODO: remove workaround
     private fun isActive(): Boolean = !DungeonApi.inDungeon()
 
     @HandleEvent
