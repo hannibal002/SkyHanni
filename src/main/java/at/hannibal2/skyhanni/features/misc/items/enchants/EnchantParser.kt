@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.at
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -28,7 +27,6 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.value
-import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
@@ -515,12 +513,17 @@ object EnchantParser {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "inventory.enchantParsing"
-        event.add(124, "$base.maxUltimateEnchantColor") {
-            event.old.at("$base.ultimateEnchantColor", init = false)?.shDeepCopy() ?: JsonPrimitive("LIGHT_PURPLE")
-        }
-        event.add(124, "$base.advancedEnchantColors.advancedMaxUltimateColor") {
-            event.old.at("$base.advancedEnchantColors.advancedUltimateColor", init = false)?.shDeepCopy()
-                ?: JsonPrimitive("0:255:255:85:1")
-        }
+        event.duplicate(
+            since = 124,
+            sourcePath = "$base.ultimateEnchantColor",
+            newPath = "$base.maxUltimateEnchantColor",
+            default = JsonPrimitive("LIGHT_PURPLE"),
+        )
+        event.duplicate(
+            since = 124,
+            sourcePath = "$base.advancedEnchantColors.advancedUltimateColor",
+            newPath = "$base.advancedEnchantColors.advancedMaxUltimateColor",
+            default = JsonPrimitive("0:255:255:85:1"),
+        )
     }
 }
