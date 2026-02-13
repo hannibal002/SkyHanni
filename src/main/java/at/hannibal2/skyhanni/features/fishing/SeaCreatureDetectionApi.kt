@@ -134,7 +134,7 @@ object SeaCreatureDetectionApi {
     private fun handleOwnMob() {
         if (lastSeaCreatureFished.passedSince() > 1.seconds) return
         val name = lastNameFished ?: return
-        val lastBobber = FishingApi.lastBobberPosition ?: return
+        val lastBobber = FishingApi.lastBobberUpdate.second ?: return
         val mobs = recentMobs.asSequence().filter { (mob, data) -> mob.name == name && data.passedSince() < 1.5.seconds }.map {
             it to it.key.baseEntity.distanceTo(lastBobber)
         }.filter { it.second <= 3 }
@@ -259,16 +259,16 @@ object SeaCreatureDetectionApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Sea Creatures")
         event.addIrrelevant {
-            "entityIdToData" to entityIdToData.entries
-            "seaCreatures" to seaCreatures.entries
-            "lastNameFished" to lastNameFished
-            "mobsToFind" to mobsToFind
-            "lastSeaCreatureFished" to lastSeaCreatureFished
-            "recentMobs" to recentMobs.entries
-            "babyMagmaSlugsToFind" to babyMagmaSlugsToFind
-            "lastMagmaSlugLocation" to lastMagmaSlugLocation
-            "lastMagmaSlugTime" to lastMagmaSlugTime
-            "recentBabyMagmaSlugs" to recentBabyMagmaSlugs.entries
+            add("EntityIdToData: ${entityIdToData.entries}")
+            add("seaCreatures: ${seaCreatures.entries}")
+            add("lastNameFished $lastNameFished")
+            add("mobsToFind: $mobsToFind")
+            add("lastSeaCreatureFished $lastSeaCreatureFished")
+            add("recentMobs ${recentMobs.entries}")
+            add("babyMagmaSlugsToFind $babyMagmaSlugsToFind")
+            add("lastMagmaSlugLocation $lastMagmaSlugLocation")
+            add("lastMagmaSlugTime $lastMagmaSlugTime")
+            add("recentBabyMagmaSlugs ${recentBabyMagmaSlugs.entries}")
         }
     }
 }
