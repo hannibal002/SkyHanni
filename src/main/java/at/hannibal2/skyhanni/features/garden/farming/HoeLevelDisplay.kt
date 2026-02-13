@@ -196,7 +196,7 @@ object HoeLevelDisplay {
                         return@callback
                     }
 
-                    val oldLevel = MAX_LEVEL + (getOverflowHoeLevel(item.getItemUuid()) ?: errorStorage(item))
+                    val oldLevel = MAX_LEVEL + (getOverflowHoeLevel(uuid) ?: errorStorage(item))
 
                     val newLevel = getArg(newLevelArg)
                     if (newLevel < MAX_LEVEL) {
