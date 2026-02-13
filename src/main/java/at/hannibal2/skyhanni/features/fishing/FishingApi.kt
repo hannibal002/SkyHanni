@@ -94,9 +94,6 @@ object FishingApi {
         private set
     var hasTreasureHook = false
         private set
-    var lastBobberPosition: LorenzVec? = null
-        private set
-    var lastBobberUpdate: SimpleTimeMark? = null
 
     private var lavaRods = listOf<NeuInternalName>()
     private var waterRods = listOf<NeuInternalName>()
@@ -106,6 +103,7 @@ object FishingApi {
         private set
     var bobberHasTouchedLiquid = false
         private set
+    var lastBobberUpdate: Pair<SimpleTimeMark?, LorenzVec?> = Pair(null, null)
 
     var wearingTrophyArmor = false
         private set
@@ -142,16 +140,13 @@ object FishingApi {
         }
 
         val bobber = bobber ?: return
-        lastBobberUpdate?.passedSince()?.let {
-            if (it > 2.seconds) {
-                lastBobberPosition = null
-                lastBobberUpdate = null
+        lastBobberUpdate.first?.passedSince()?.let {
+            lastBobberUpdate = if (it > 2.seconds) {
+                Pair(null, null)
             } else {
-                lastBobberPosition = bobber.getLorenzVec()
-                lastBobberUpdate = SimpleTimeMark.now()
+                Pair(SimpleTimeMark.now(), bobber.getLorenzVec())
             }
         }
-
         if (bobber.deceased) {
             if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
             resetBobber()
