@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat
+package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -33,6 +33,7 @@ import net.minecraft.core.Rotations
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -73,7 +74,7 @@ object FireFreezeFeatures {
     private fun freezeMob(mob: Mob) {
         val prevTime = affectedMobs[mob]
         if (prevTime == null || prevTime.isInPast()) {
-            affectedMobs[mob] = ServerTimeMark.now() + freezeDuration
+            affectedMobs[mob] = ServerTimeMark.Companion.now() + freezeDuration
         }
     }
 
@@ -136,7 +137,7 @@ object FireFreezeFeatures {
         return texture == ARMORSTAND_SKULL_TEXTURE
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.Companion.HIGH)
     fun onRenderLiving(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!config.customCircle) return
         if (event.entity.isFireFreeze()) event.cancel()
@@ -218,7 +219,7 @@ object FireFreezeFeatures {
 
     // Starts at 2.0 pitch and goes down by 0.5 every 2 seconds, not going lower than 0.0. This lets us estimate
     // how long it will take for the fire freeze to take effect
-    private fun timeFromPitch(pitch: Float): ServerTimeMark = ServerTimeMark.now() + (2.0 * pitch + 1).seconds
+    private fun timeFromPitch(pitch: Float): ServerTimeMark = ServerTimeMark.Companion.now() + (2.0 * pitch + 1).seconds
 
     private fun Rotations.isZero(): Boolean = x == 0.0f && y == 0.0f && z == 0.0f
 

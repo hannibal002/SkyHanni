@@ -16,7 +16,7 @@ class FireFreezeConfig {
     var mobTimer: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Freeze Timer", desc = "Enables showing a timer above active Fire Freezes until they freeze mobs")
+    @ConfigOption(name = "Freeze Timer", desc = "Enables showing a timer above active Fire Freezes until they freeze mobs.")
     @ConfigEditorBoolean
     @FeatureToggle
     var freezeTimer: Boolean = false
@@ -25,7 +25,7 @@ class FireFreezeConfig {
     @ConfigOption(
         name = "Box Frozen Mobs",
         desc = "Draws a box around frozen mobs" +
-            "Color changes towards red the closer to re-freeze timing (5s post first freeze) it is.",
+            " Color changes towards red the closer to re-freeze timing (5s post first freeze) it is.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -41,7 +41,7 @@ class FireFreezeConfig {
     var customCircle: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Freeze Circle Color", desc = "Changes the Color of the Circular Line")
+    @ConfigOption(name = "Freeze Circle Color", desc = "Changes the color of the Custom Circle.")
     @ConfigEditorColour
     var displayColor: ChromaColour = ChromaColour.fromStaticRGB(0, 0, 0, 245)
 
