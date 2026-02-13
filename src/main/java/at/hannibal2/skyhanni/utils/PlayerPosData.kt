@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -11,7 +14,6 @@ import kotlin.time.Duration.Companion.seconds
  * corresponds to the time in ticks since the position was recorded, with the most recent position being at index 0.
  * This makes it so that the time can inaccurate by up to 1 tick.
  */
-@Suppress("unused")
 @SkyHanniModule
 object PlayerPosData {
 
@@ -21,17 +23,26 @@ object PlayerPosData {
     val time = TIME_SECONDS.seconds
 
     private val playerPositions = ArrayDeque<LorenzVec>()
+    private val playerTickPositions = ArrayDeque<LorenzVec>()
     val positions: List<LorenzVec> get() = playerPositions
+    val tickPositions: List<LorenzVec> get() = playerTickPositions
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onTick() {
+    @HandleEvent
+    fun onWorldChange() {
+        playerPositions.clear()
+        playerTickPositions.clear()
+    }
+
+    @HandleEvent()
+    fun onEntityMoveEvent(event: EntityMoveEvent<LocalPlayer>) {
         playerPositions.addFirst(LocationUtils.playerLocation())
         if (playerPositions.size > SIZE) playerPositions.removeLast()
     }
 
     @HandleEvent
-    fun onWorldChange() {
-        playerPositions.clear()
+    fun onTick() {
+        playerTickPositions.addFirst(LocationUtils.playerLocation())
+        if (playerTickPositions.size > SIZE) playerTickPositions.removeLast()
     }
 
     /** Returns the time the player has been at the specified position, within a distance of [distance]. */
@@ -51,4 +62,15 @@ object PlayerPosData {
         return index.ticks
     }
 
+    @HandleEvent
+    fun debug(event: DebugDataCollectEvent) {
+        event.title("PlayerPosData")
+        event.addIrrelevant {
+            add("Local Player Move Event Positions")
+            positions.forEach { add(it.toCleanString()) }
+            add("")
+            add("OnTick Based Positions")
+            tickPositions.forEach { add(it.toCleanString()) }
+        }
+    }
 }

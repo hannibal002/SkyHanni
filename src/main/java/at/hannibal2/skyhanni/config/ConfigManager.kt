@@ -278,7 +278,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
-    SEA_CREATURES("SeaCreatureSettings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
+    SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

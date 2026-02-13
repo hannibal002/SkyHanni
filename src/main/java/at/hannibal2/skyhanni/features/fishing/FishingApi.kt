@@ -99,6 +99,8 @@ object FishingApi {
 
     var bobber: FishingHook? = null
         private set
+    var previousBobber: FishingHook? = null
+        private set
     var bobberHasTouchedLiquid = false
         private set
 
@@ -120,6 +122,7 @@ object FishingApi {
     }
 
     private fun resetBobber() {
+        previousBobber = bobber
         bobber = null
         bobberHasTouchedLiquid = false
     }
@@ -127,6 +130,7 @@ object FishingApi {
     @HandleEvent
     fun onWorldChange() {
         resetBobber()
+        previousBobber = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)

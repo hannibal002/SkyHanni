@@ -34,7 +34,7 @@ object MobHealthDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         for (seaCreature in healthMap.keys) {
-            if (!seaCreature.isLoaded() || !seaCreature.canBeSeen()) continue
+            if (!seaCreature.exists() || !seaCreature.canBeSeen()) continue
             val health = seaCreature.health ?: continue
             if (health == -1) continue
             healthMap[seaCreature] = health

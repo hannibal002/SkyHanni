@@ -33,7 +33,7 @@ object SeaCreatureLootshareSphere {
         if (!config.lootshareRange) return
         existingCircles.clear()
         for (seaCreature in seaCreatures) {
-            if (!seaCreature.isLoaded()) continue
+            if (!seaCreature.exists()) continue
             val pos = seaCreature.pos ?: continue
             var circleCount = 0
             existingCircles.forEach {

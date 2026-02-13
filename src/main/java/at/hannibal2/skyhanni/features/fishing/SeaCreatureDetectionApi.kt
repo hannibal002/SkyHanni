@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -16,14 +17,14 @@ import at.hannibal2.skyhanni.utils.EntityUtils.spawnTime
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.entityId
-import at.hannibal2.skyhanni.utils.MobUtils.getLorenzVec
 import at.hannibal2.skyhanni.utils.PlayerPosData
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.common.cache.RemovalCause
+import net.minecraft.world.entity.projectile.FishingHook
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,7 +49,7 @@ object SeaCreatureDetectionApi {
     private var mobsToFind = 0
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
 
-    private val recentMobs = mutableMapOf<Mob, SimpleTimeMark>()
+    private val recentMobs = mutableMapOf<Mob, ServerTimeMark>()
 
     private var lastBobberLocation: LorenzVec? = null
 
@@ -56,13 +57,13 @@ object SeaCreatureDetectionApi {
     private var lastMagmaSlugLocation: LorenzVec? = null
     private var lastMagmaSlugTime = SimpleTimeMark.farPast()
 
-    private val recentBabyMagmaSlugs = mutableMapOf<Mob, SimpleTimeMark>()
+    private val recentBabyMagmaSlugs = mutableMapOf<Mob, ServerTimeMark>()
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isActive()) return // TODO: remove this workaround
         val mob = event.mob
-        val data = entityIdToData[mob.entityId]
+        val data = entityIdToData[mob.id]
         if (data != null) {
             seaCreatures[mob] = data
             data.mob = mob
@@ -71,7 +72,7 @@ object SeaCreatureDetectionApi {
         }
 
         if (mob.name == "Baby Magma Slug") {
-            recentBabyMagmaSlugs[mob] = SimpleTimeMark.now()
+            recentBabyMagmaSlugs[mob] = ServerTimeMark.now()
             // TODO: test if baby magma slugs work without delayed run
             DelayedRun.runNextTick {
                 handleBabySlugs()
@@ -79,7 +80,7 @@ object SeaCreatureDetectionApi {
             return
         }
         if (mob.name !in SeaCreatureManager.allFishingMobs) return
-        recentMobs[mob] = SimpleTimeMark.now()
+        recentMobs[mob] = ServerTimeMark.now()
         handleOwnMob()
     }
 
@@ -91,7 +92,7 @@ object SeaCreatureDetectionApi {
         val data = seaCreatures[mob] ?: return
         seaCreatures.remove(mob)
         val oldId = data.entityId
-        val newId = mob.entityId
+        val newId = mob.id
         data.despawn()
         if (!mob.isAlive) {
             entityIdToData.remove(oldId)
@@ -124,13 +125,13 @@ object SeaCreatureDetectionApi {
 
     private fun addMob(
         mob: Mob,
-        time: SimpleTimeMark = SimpleTimeMark.now(),
+        time: ServerTimeMark = ServerTimeMark.now(),
         isOwn: Boolean = false,
     ) {
         val seaCreature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
-        val data = LivingSeaCreatureData(isOwn, seaCreature, mob.entityId, time, mob)
+        val data = LivingSeaCreatureData(isOwn, seaCreature, mob.id, time, mob)
         seaCreatures[mob] = data
-        entityIdToData[mob.entityId] = data
+        entityIdToData[mob.id] = data
         SeaCreatureEvent.Spawn(data).post()
     }
 
@@ -145,18 +146,29 @@ object SeaCreatureDetectionApi {
             .sortedBy { it.second }
             .take(mobsToFind).toList()
 
-        if (mobs.isEmpty()) return
-        mobsToFind -= mobs.size
-        for ((entry, _) in mobs) {
-            val mob = entry.key
-            val time = mob.baseEntity.spawnTime
-            addMob(mob, time, isOwn = true)
+        val ownMobInfo = findMobs(mobs, mobsToFind) ?: return
+        mobsToFind = ownMobInfo.first
+        for (mob in ownMobInfo.second) {
             recentMobs.remove(mob)
         }
+
         if (mobsToFind == 0) {
             lastNameFished = null
             lastBobberLocation = null
         }
+    }
+
+    private fun findMobs(mobs: List<Pair<Map.Entry<Mob, ServerTimeMark>, Double>>, toBeFound: Int): Pair<Int, List<Mob>>? {
+        if (mobs.isEmpty()) return null
+        val toFind = toBeFound - mobs.size
+        val mobsToRemove = mutableListOf<Mob>()
+        for ((entry, _) in mobs) {
+            val mob = entry.key
+            val time = mob.baseEntity.spawnTime
+            addMob(mob, time, isOwn = true)
+            mobsToRemove.add(mob)
+        }
+        return Pair(toFind, mobsToRemove)
     }
 
     private fun handleBabySlugs() {
@@ -169,26 +181,25 @@ object SeaCreatureDetectionApi {
             .sortedBy { it.second }
             .take(babyMagmaSlugsToFind).toList()
 
-        if (slugs.isEmpty()) return
-        babyMagmaSlugsToFind -= slugs.size
-        for ((entry, _) in slugs) {
-            val mob = entry.key
-            val time = mob.baseEntity.spawnTime
-            addMob(mob, time, isOwn = true)
+        val mobInfo = findMobs(slugs, babyMagmaSlugsToFind) ?: return
+        babyMagmaSlugsToFind = mobInfo.first
+        for (mob in mobInfo.second) {
             recentBabyMagmaSlugs.remove(mob)
         }
+
         if (babyMagmaSlugsToFind == 0) {
             lastMagmaSlugLocation = null
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        for (data in seaCreatures.values) data.update(event)
+        for (data in seaCreatures.values) data.updateWorld(event)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
+        for (data in seaCreatures.values) data.updateNonWorld()
         recentMobs.removeIf { (mob, time) ->
             if (time.passedSince() < 1.2.seconds) return@removeIf false
             addMob(mob, time, isOwn = false)
@@ -200,8 +211,12 @@ object SeaCreatureDetectionApi {
             return@removeIf true
         }
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
-        val bobber = FishingApi.bobber ?: return
-        lastBobberLocation = bobber.getLorenzVec()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onFishingHookLeaveWorld(event: EntityLeaveWorldEvent<FishingHook>) {
+        if (event.entity != FishingApi.previousBobber) return
+        lastBobberLocation = event.entity.getLorenzVec()
     }
 
     // This should hopefully make it so that if a sea creature dies while the player isn't in the area and the despawn timer
@@ -215,13 +230,12 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    fun assumeDeathIfAreaLeft(data: LivingSeaCreatureData, playerPos: LorenzVec): Boolean {
-        if (data.isLoaded()) return false
+    private fun assumeDeathIfAreaLeft(data: LivingSeaCreatureData, playerPos: LorenzVec): Boolean {
+        if (data.exists()) return false
         val lastPos = data.actualLastPos
         if (lastPos.distance(playerPos) > MAX_WAIT_DEATH_DISTANCE) return false
         val timeAroundPos = PlayerPosData.timeAtPos(lastPos, MAX_WAIT_DEATH_DISTANCE) ?: return false
-        if (timeAroundPos < 5.seconds) return false
-        return true
+        return timeAroundPos >= 5.seconds
     }
 
     @HandleEvent
@@ -244,9 +258,9 @@ object SeaCreatureDetectionApi {
 
     @HandleEvent
     fun onCommand(event: CommandRegistrationEvent) {
-        event.registerBrigadier("skyhanniresetdata") {
-            this.aliases = listOf("shresetdata")
-            this.description = "Resets Sea Creature Data"
+        event.registerBrigadier("skyhanniresetlivingseacreaturedata") {
+            this.aliases = listOf("shresetscdata")
+            this.description = "Resets Living Sea Creature Data"
             this.category = CommandCategory.DEVELOPER_TEST
             callback { reset() }
         }
