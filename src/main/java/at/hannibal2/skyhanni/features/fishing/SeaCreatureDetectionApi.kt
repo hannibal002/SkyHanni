@@ -220,7 +220,7 @@ object SeaCreatureDetectionApi {
 
     private fun assumeDeathIfAreaLeft(data: LivingSeaCreatureData, playerPos: LorenzVec): Boolean {
         if (data.exists()) return false
-        val lastPos = data.actualLastPos
+        val lastPos = data.actualLastPos ?: return false
         if (lastPos.distance(playerPos) > MAX_WAIT_DEATH_DISTANCE) return false
         val timeAroundPos = PlayerPosData.timeAtPos(lastPos, MAX_WAIT_DEATH_DISTANCE) ?: return false
         return timeAroundPos >= 5.seconds

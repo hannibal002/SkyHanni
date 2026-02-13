@@ -34,7 +34,7 @@ class LivingSeaCreatureData(
         private set
 
     /** This tracks the real last position of the sea creature. Don't display this to the user */
-    internal var actualLastPos: LorenzVec
+    internal var actualLastPos: LorenzVec?
         private set
 
     init {
@@ -46,7 +46,7 @@ class LivingSeaCreatureData(
             pos = null
         }
         updateCanBeSeen()
-        actualLastPos = mob?.getLorenzVec() ?: LorenzVec(0.0, 0.0, 0.0)
+        actualLastPos = mob?.getLorenzVec()
     }
 
     inline val name: String get() = seaCreature.name
