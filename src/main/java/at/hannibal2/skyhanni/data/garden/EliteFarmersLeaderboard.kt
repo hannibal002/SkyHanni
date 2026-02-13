@@ -51,7 +51,7 @@ object EliteFarmersLeaderboard {
 
     data class LeaderboardPlayerInfo(
         val name: String,
-        val amountDifference: Double,
+        val amountUntil: Double,
         val rank: Int?,
     )
 

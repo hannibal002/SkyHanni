@@ -80,29 +80,28 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
     }
 
-    open val currentLeaderboardType: EliteLeaderboardType?
-        get() {
-            val enum = currentEnum ?: run {
-                // Debounce leaderboard when auto switching
-                val now = SimpleTimeMark.now()
-                if (lastEnumSwitchTime.passedSince() < 5.seconds) {
-                    lastAutoSelectedEnum
-                } else {
-                    val newDefault = getDefaultEnum()
-                    if (newDefault != lastAutoSelectedEnum) {
-                        lastEnumSwitchTime = now
-                        lastAutoSelectedEnum = newDefault
-                    }
-                    newDefault
+    open fun currentLeaderboardType(): EliteLeaderboardType? {
+        val enum = currentEnum ?: run {
+            // Debounce leaderboard when auto switching
+            val now = SimpleTimeMark.now()
+            if (lastEnumSwitchTime.passedSince() < 5.seconds) {
+                lastAutoSelectedEnum
+            } else {
+                val newDefault = getDefaultEnum()
+                if (newDefault != lastAutoSelectedEnum) {
+                    lastEnumSwitchTime = now
+                    lastAutoSelectedEnum = newDefault
                 }
+                newDefault
             }
-            return enum?.let { createType(it, currentMode) }
         }
+        return enum?.let { createType(it, currentMode) }
+    }
 
     fun update(overrideCooldown: Boolean = false) {
         // we want to avoid unnecessarily calling the api as much as possible
         if (!isEnabled()) return
-        val type = currentLeaderboardType ?: return
+        val type = currentLeaderboardType() ?: return
         leaderboardPos = getLeaderboardPosition(type, overrideCooldown)
         amount = getAmount(type)
         nextPlayer = getNextPlayer(type)
@@ -169,10 +168,10 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
                 (getLastPlayer && playerRank != currentRank + 1) // Show for last player if non-sequential
             )
 
-        if (useRankGoal && rankGoal != null) {
+        if (useRankGoal) {
             nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
         } else if (shouldShowRank) {
-            nextName += " §7[#${playerRank?.addSeparators()}]"
+            nextName += " §7[#${playerRank.addSeparators()}]"
         }
 
         val behindOrAhead = if (getLastPlayer) "ahead of" else "behind"
