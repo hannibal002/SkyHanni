@@ -10,7 +10,7 @@ import net.minecraft.world.entity.LivingEntity
  * For normal cases of "hide this entity" rather use [CheckRenderEntityEvent].
  */
 @Deprecated("use CheckRenderEntityEvent instead")
-open class SkyHanniRenderEntityEvent<T : LivingEntity>(
+sealed class SkyHanniRenderEntityEvent<T : LivingEntity>(
     val entity: T,
     val x: Double,
     val y: Double,
@@ -30,7 +30,7 @@ open class SkyHanniRenderEntityEvent<T : LivingEntity>(
         z: Double
     ) : SkyHanniRenderEntityEvent<T>(entity, x, y, z)
 
-    open class Specials<T : LivingEntity>(
+    sealed class Specials<T : LivingEntity>(
         entity: T,
         x: Double,
         y: Double,
