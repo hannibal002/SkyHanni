@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.common.cache.RemovalCause
-import net.minecraft.world.entity.projectile.FishingHook
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,8 +49,6 @@ object SeaCreatureDetectionApi {
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
 
     private val recentMobs = mutableMapOf<Mob, ServerTimeMark>()
-
-    private var lastBobberLocation: LorenzVec? = null
 
     private var babyMagmaSlugsToFind = 0
     private var lastMagmaSlugLocation: LorenzVec? = null
@@ -138,7 +134,7 @@ object SeaCreatureDetectionApi {
     private fun handleOwnMob() {
         if (lastSeaCreatureFished.passedSince() > 1.seconds) return
         val name = lastNameFished ?: return
-        val lastBobber = lastBobberLocation ?: return
+        val lastBobber = FishingApi.lastBobberPosition ?: return
         val mobs = recentMobs.asSequence().filter { (mob, data) -> mob.name == name && data.passedSince() < 1.5.seconds }.map {
             it to it.key.baseEntity.distanceTo(lastBobber)
         }.filter { it.second <= 3 }
@@ -153,7 +149,6 @@ object SeaCreatureDetectionApi {
 
         if (mobsToFind == 0) {
             lastNameFished = null
-            lastBobberLocation = null
         }
     }
 
@@ -212,12 +207,6 @@ object SeaCreatureDetectionApi {
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onFishingHookLeaveWorld(event: EntityLeaveWorldEvent<FishingHook>) {
-        if (event.entity != FishingApi.previousBobber) return
-        lastBobberLocation = event.entity.getLorenzVec()
-    }
-
     // This should hopefully make it so that if a sea creature dies while the player isn't in the area and the despawn timer
     // isn't up yet, it will be assumed that it died
     @HandleEvent(onlyOnSkyblock = true)
@@ -246,7 +235,6 @@ object SeaCreatureDetectionApi {
         seaCreatures.clear()
         recentMobs.clear()
         recentBabyMagmaSlugs.clear()
-        lastBobberLocation = null
         lastMagmaSlugLocation = null
         babyMagmaSlugsToFind = 0
         lastMagmaSlugTime = SimpleTimeMark.farPast()
@@ -277,7 +265,6 @@ object SeaCreatureDetectionApi {
             "mobsToFind" to mobsToFind
             "lastSeaCreatureFished" to lastSeaCreatureFished
             "recentMobs" to recentMobs.entries
-            "lastBobberLocation" to lastBobberLocation
             "babyMagmaSlugsToFind" to babyMagmaSlugsToFind
             "lastMagmaSlugLocation" to lastMagmaSlugLocation
             "lastMagmaSlugTime" to lastMagmaSlugTime
