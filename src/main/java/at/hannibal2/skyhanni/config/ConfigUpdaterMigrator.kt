@@ -176,6 +176,12 @@ object ConfigUpdaterMigrator {
             }
             oldParentElement.remove(op.last())
         }
+
+        fun duplicate(since: Int, sourcePath: String, newPath: String, default: JsonElement) {
+            add(since, newPath) {
+                old.at(sourcePath, init = false)?.shDeepCopy() ?: default
+            }
+        }
     }
 
     private fun merge(originalObject: JsonObject, overrideObject: JsonObject): Int {
