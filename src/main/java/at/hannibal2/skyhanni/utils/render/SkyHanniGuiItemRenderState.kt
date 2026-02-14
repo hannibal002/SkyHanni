@@ -20,6 +20,7 @@ data class SkyHanniGuiItemRenderState(
         private var counter = 0
         fun nextStableId() = counter++
     }
+
     private val x0 = x.toInt()
     private val x1 = (x + (scale * 16)).toInt()
     private val y0 = y.toInt()

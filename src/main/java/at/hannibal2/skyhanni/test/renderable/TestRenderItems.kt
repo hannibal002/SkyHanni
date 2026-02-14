@@ -32,7 +32,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
         Direction.Axis.entries.map {
             val rotationDef = ItemStackRotationDefinition(
                 axis = it,
-                rotationSpeed = 0.0,
+                rotationSpeed = 65.0,
             )
             it to Renderable.animatedItemStack(
                 animationFrames,

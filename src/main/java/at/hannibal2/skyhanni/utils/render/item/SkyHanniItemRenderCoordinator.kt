@@ -79,7 +79,6 @@ internal object SkyHanniItemRenderCoordinator {
         }
 
         // Only set up atlas if we have animated items
-        log.log("Trying to setup atlas with ${animatedStates.size} animated states and ${staticFallbackStates.size} static states")
         trySetupAtlasRendering(
             animatedStates,
             guiRenderState,
@@ -158,13 +157,10 @@ internal object SkyHanniItemRenderCoordinator {
     }
 
     private fun SkyHanniItemRenderContext.renderAnimatedItems() {
-        log.log("renderAnimatedItems: ${states.size} states")
         states.forEach { state ->
             val tracking = trackingStateOf(state) ?: return@forEach
             val animKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale, state.stableId)
             val existing = atlas.getAnimatedFrames()[animKey]
-
-            log.log("DEBUG: Rendering ${state.rotationVec} | ModelID: ${tracking.modelIdentity.hashCode()} | Existing: ${existing?.x},${existing?.y}")
 
             val slotX: Int
             val slotY: Int
@@ -179,15 +175,13 @@ internal object SkyHanniItemRenderCoordinator {
                 if (atlas.isRowFull()) atlas.newRow()
                 if (atlas.isFull()) {
                     if (atlas.getSize() < RenderSystem.getDevice().maxTextureSize) atlas.grow()
-                    log.log("   Atlas full, using fallback")
                     fallbackStates.add(state)
                     return@forEach
                 }
                 slotX = atlas.getCursorX()
                 slotY = atlas.getCursorY()
-                log.log("   New slot at $slotX, $slotY")
                 atlas.advanceCursor()
-            } else return@forEach log.log("   Already rendered this frame, skipping")
+            } else return@forEach
 
             renderItemToAtlas(state, tracking, slotX, slotY, atlas.getSlotSize())
 
@@ -209,14 +203,13 @@ internal object SkyHanniItemRenderCoordinator {
     ) {
         val ps = PoseStack()
         ps.translate(slotX.toFloat() + slotSize / 2.0f, slotY.toFloat() + slotSize / 2.0f, 0.0f)
+        ps.translate(state.translationVec)
+
         val rotationPadding = 1.0f / 1.42f  // sqrt 2 factor for safety
         val f = slotSize.toFloat()
         ps.scale(f, -f, f)
+
         ps.scale(rotationPadding, rotationPadding, rotationPadding)
-
-        // Translations
-        ps.translate(state.translationVec)
-
         val rotated = ps.mulPose(state.rotationVec)
         ps.translate(0.0f, 0.03f, 0.125f)
 
