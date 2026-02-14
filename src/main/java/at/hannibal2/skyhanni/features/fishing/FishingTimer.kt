@@ -4,186 +4,198 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi.babySlugName
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import kotlin.reflect.KMutableProperty0
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FishingTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
+    private const val GLOBAL_CAP = 60
+    private val warningDelay = 5.seconds
     private val barnLocation = LorenzVec(108, 89, -252)
-    private val mobDespawnTime = mutableMapOf<Mob, SimpleTimeMark>()
 
-    private var lastSeaCreatureFished = SimpleTimeMark.farPast()
-    private var display: String? = null
-    private var lastNameFished: String? = null
+    private enum class FishingCap(val island: IslandType, personalCap: Int? = null) {
+        CRIMSON_ISLE(IslandType.CRIMSON_ISLE, 5),
+        CRYSTAL_HOLLOWS(IslandType.CRYSTAL_HOLLOWS, 20),
+        OTHERS(IslandType.NONE),
+        ;
 
-    private var babyMagmaSlugsToFind = 0
-    private var lastMagmaSlugLocation: LorenzVec? = null
-    private var lastMagmaSlugTime = SimpleTimeMark.farPast()
-    private var recentBabyMagmaSlugs = TimeLimitedSet<Mob>(2.seconds)
+        val personalCap: Int = personalCap ?: GLOBAL_CAP
+        val hasPersonalCap: Boolean = personalCap != null
 
-    private var mobsToFind = 0
-
-    private val recentMobs = TimeLimitedSet<Mob>(2.seconds)
-    private val currentCap by RecalculatingValue(1.seconds) {
-        when (SkyBlockUtils.currentIsland) {
-            IslandType.CRYSTAL_HOLLOWS -> 20
-            IslandType.CRIMSON_ISLE -> 5
-            else -> config.fishingCapAmount
+        companion object {
+            fun getForIsland(island: IslandType): FishingCap = entries.find { it.island == island } ?: OTHERS
         }
     }
 
-    private var rightLocation = false
-    private var currentCount = 0
-    private var startTime = SimpleTimeMark.farPast()
+    private enum class AlertReason(display: String) {
+        TIME("Time Alert!"),
+        PERSONAL_CAP("Reached Personal Cap!"),
+        GLOBAL_CAP("Reached Global Cap!"),
+        NO_ALERT("You shouldn't see this, report this as a bug"),
+        ;
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        val display: String = "§c$display"
 
-        if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 3.seconds) {
-            babyMagmaSlugsToFind = 0
-            lastMagmaSlugLocation = null
-        }
+        inline val isAlert: Boolean get() = this != NO_ALERT
 
-        rightLocation = updateLocation()
-        if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
-            playSound()
-        }
-        if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
-            if (currentCount >= 20) {
-                playSound()
-                TitleManager.sendTitle("§cWORM CAP FULL!!!", duration = 2.seconds)
-            }
-        } else if (config.fishingCapAlert && currentCount >= currentCap) {
-            playSound()
-        }
+        fun getColor(reason: AlertReason): String = if (reason == this) "§c" else "§a"
     }
 
-    private fun playSound() = SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
+    private var ownMobs: Int = 0
+    private var otherMobs: Int = 0
+    private val totalMobs: Int get() = ownMobs + otherMobs
+
+    private var currentCap = FishingCap.OTHERS
+    private var enabledInIsland = false
+
+    private var oldestSeaCreature: LivingSeaCreatureData? = null
+    private var oldestTime: ServerTimeMark = ServerTimeMark.farPast()
+
+    private var display: Renderable? = null
+    private var lastWarning: ServerTimeMark = ServerTimeMark.farPast()
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = event.seaCreature.handleSpawn()
+
+    @HandleEvent
+    fun onSeaCreatureRedetect(event: SeaCreatureEvent.ReDetect) = event.seaCreature.handleSpawn()
+
+    @HandleEvent
+    fun onSeaCreatureRemove(event: SeaCreatureEvent.DeSpawn) = event.seaCreature.handleDeSpawn()
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed() = update()
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        val mob = event.mob
-        if (mob.name == babySlugName) {
-            recentBabyMagmaSlugs += mob
-            DelayedRun.runNextTick {
-                handleBabySlugs()
-            }
+        config.pos.renderRenderable(display, posLabel = "Fishing Timer")
+    }
+
+    private fun KMutableProperty0<Int>.decrease() = set((get() - 1).coerceAtLeast(0))
+
+    private fun LivingSeaCreatureData.handleSpawn() {
+        if (isOwn) ++ownMobs else ++otherMobs
+        val oldest = oldestSeaCreature
+        if (oldest == null || spawnTime < oldest.spawnTime) {
+            oldestSeaCreature = this
+            oldestTime = spawnTime
+        }
+        update()
+    }
+
+    private fun LivingSeaCreatureData.handleDeSpawn() {
+        val property = if (isOwn) ::ownMobs else ::otherMobs
+        property.decrease()
+        if (this == oldestSeaCreature) calculateOldest()
+        update()
+    }
+
+    private fun update() {
+        if (totalMobs == 0) {
+            if (display != null) reset()
             return
         }
-        if (mob.name !in SeaCreatureManager.allFishingMobs) return
-        recentMobs += mob
-        handle()
+        if (!isEnabled()) return
+        val timeSince = oldestTime.passedSince()
+
+        val reason = shouldWarn(timeSince)
+        if (reason.isAlert) {
+            lastWarning = ServerTimeMark.now()
+            SoundUtils.plingSound.playSound()
+            TitleManager.sendTitle(reason.display, duration = 2.seconds)
+        }
+
+        val timeColor = AlertReason.TIME.getColor(reason)
+        val personalCapColor = AlertReason.PERSONAL_CAP.getColor(reason)
+        val globalCapColor = AlertReason.GLOBAL_CAP.getColor(reason)
+
+        val formatTime = timeSince.format(showMilliSeconds = false)
+
+        display = Renderable.text(
+            buildString {
+                append("$timeColor$formatTime §8(")
+                if (currentCap.hasPersonalCap) append("$personalCapColor$ownMobs§7/")
+                append("$globalCapColor$totalMobs §bsea creatures§8)")
+            },
+        )
+
     }
 
-    @HandleEvent
-    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        val mob = event.mob
-        recentBabyMagmaSlugs -= event.mob
-        if (mob in mobDespawnTime) {
-            mobDespawnTime.remove(mob)
-            if (mob.name == "Magma Slug") {
-                lastMagmaSlugLocation = mob.baseEntity.getLorenzVec()
-                babyMagmaSlugsToFind += 3
-                lastMagmaSlugTime = SimpleTimeMark.now()
-                handleBabySlugs()
+    private fun shouldWarn(timeSince: Duration): AlertReason {
+        with(config) {
+            return when {
+                lastWarning.passedSince() < warningDelay -> AlertReason.NO_ALERT
+                timeAlert && timeSince >= timeAlertSeconds.seconds -> AlertReason.TIME
+                warnPersonalCap && currentCap.hasPersonalCap && ownMobs >= currentCap.personalCap -> AlertReason.PERSONAL_CAP
+                warnGlobalCap && totalMobs >= GLOBAL_CAP -> AlertReason.GLOBAL_CAP
+                else -> AlertReason.NO_ALERT
             }
         }
-        recentMobs -= mob
-        updateInfo()
+
+    }
+
+    private fun calculateOldest() {
+        oldestSeaCreature = SeaCreatureDetectionApi.getSeaCreatures().minByOrNull { it.spawnTime }
+        oldestTime = oldestSeaCreature?.spawnTime ?: ServerTimeMark.farPast()
+    }
+
+    private fun reset() {
+        ownMobs = 0
+        otherMobs = 0
+        oldestSeaCreature = null
+        oldestTime = ServerTimeMark.farPast()
+        display = null
+        lastWarning = ServerTimeMark.farPast()
     }
 
     @HandleEvent
-    fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!isEnabled()) return
-        if (!rightLocation) return
-        lastSeaCreatureFished = SimpleTimeMark.now()
-        lastNameFished = event.seaCreature.name
-        mobsToFind = if (event.doubleHook) 2 else 1
-        handle()
-    }
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Better Fishing Timer")
+        event.addIrrelevant {
+            add("ownMobs $ownMobs")
+            add("otherMobs $otherMobs")
+            add("oldestSeaCreature $oldestSeaCreature")
+            add("oldestTime $oldestTime")
+            add("Time Passed since Last Warning ${lastWarning.passedSince()}")
+            add("display $display")
 
-    private fun handle() {
-        if (lastSeaCreatureFished.passedSince() > 2.seconds) return
-        val name = lastNameFished ?: return
-        val mobs = recentMobs.filter { it.name == name && it !in mobDespawnTime }
-            .sortedBy { it.baseEntity.distanceToPlayer() }
-            .take(mobsToFind)
-        if (mobs.isEmpty()) return
-        mobsToFind -= mobs.size
-        mobs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
-        if (mobsToFind == 0) {
-            recentMobs.clear()
-            lastNameFished = null
         }
-        updateInfo()
-    }
-
-    private fun handleBabySlugs() {
-        if (lastMagmaSlugTime.passedSince() > 2.seconds) return
-        if (babyMagmaSlugsToFind == 0) return
-        val location = lastMagmaSlugLocation ?: return
-        val slugs = recentBabyMagmaSlugs.filter { it !in mobDespawnTime }
-            .sortedBy { it.baseEntity.distanceTo(location) }
-            .take(babyMagmaSlugsToFind)
-        if (slugs.isEmpty()) return
-        babyMagmaSlugsToFind -= slugs.size
-        slugs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
-        if (babyMagmaSlugsToFind == 0) {
-            recentBabyMagmaSlugs.clear()
-            lastMagmaSlugLocation = null
-        }
-        updateInfo()
     }
 
     @HandleEvent
-    fun onKeyDown(event: KeyDownEvent) {
-        if (!isEnabled()) return
-        if (Minecraft.getInstance().screen != null) return
-        if (event.keyCode != config.manualResetTimer) return
-
-        mobDespawnTime.replaceAll { _, _ ->
-            SimpleTimeMark.now()
-        }
+    fun onIslandChange(event: IslandChangeEvent) {
+        currentCap = FishingCap.getForIsland(event.newIsland)
+        enabledInIsland = updateLocation(event.newIsland)
+        reset()
     }
 
-    private fun updateInfo() {
-        currentCount = mobDespawnTime.size
-        startTime = mobDespawnTime.values.maxByOrNull { it.passedSince() } ?: SimpleTimeMark.farPast()
-        display = createDisplay()
-    }
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get() && enabledInIsland
 
-    private fun updateLocation(): Boolean {
+
+    private fun updateLocation(island: IslandType): Boolean {
         if (config.showAnywhere) return true
 
-        return when (SkyBlockUtils.currentIsland) {
+        return when (island) {
             IslandType.CRYSTAL_HOLLOWS -> config.crystalHollows.get()
             IslandType.CRIMSON_ISLE -> config.crimsonIsle.get()
             IslandType.WINTER -> config.winterIsland.get()
@@ -192,70 +204,6 @@ object FishingTimer {
             else -> false
         }
     }
-
-    @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
-        if (!rightLocation) return
-        if (currentCount == 0) return
-        if (!FishingApi.isFishing()) return
-
-        display = createDisplay()
-    }
-
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!rightLocation) return
-        if (currentCount == 0) return
-        if (!FishingApi.isFishing()) return
-
-        val text = display ?: return
-        config.pos.renderString(text, posLabel = "BarnTimer")
-    }
-
-    private fun createDisplay(): String {
-        val passedSince = startTime.passedSince()
-        val timeColor = if (passedSince > config.alertTime.seconds) "§c" else "§e"
-        val timeFormat = passedSince.format(TimeUnit.MINUTE)
-        val countColor = if (config.fishingCapAlert && currentCount >= currentCap) "§c" else "§e"
-        val name = StringUtils.pluralize(currentCount, "sea creature")
-        return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
-    }
-
-    @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Barn Fishing Timer")
-        event.addIrrelevant {
-            add("lastSeaCreatureFished: $lastSeaCreatureFished")
-            add("lastNameFished: $lastNameFished")
-            add("babyMagmaSlugsToFind: $babyMagmaSlugsToFind")
-            add("lastMagmaSlugLocation: $lastMagmaSlugLocation")
-            add("lastMagmaSlugTime: $lastMagmaSlugTime")
-            add("recentBabyMagmaSlugs: $recentBabyMagmaSlugs")
-            add("mobsToFind: $mobsToFind")
-            add("recentMobs: $recentMobs")
-            add("currentCap: $currentCap")
-            add("mobDespawnTime: $mobDespawnTime")
-            add("startTime: $startTime")
-        }
-    }
-
-    @HandleEvent
-    fun onWorldChange() {
-        mobDespawnTime.clear()
-        recentMobs.clear()
-        babyMagmaSlugsToFind = 0
-        display = null
-        lastMagmaSlugLocation = null
-        lastMagmaSlugTime = SimpleTimeMark.farPast()
-        recentBabyMagmaSlugs.clear()
-        mobsToFind = 0
-        currentCount = 0
-        startTime = SimpleTimeMark.farPast()
-    }
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
