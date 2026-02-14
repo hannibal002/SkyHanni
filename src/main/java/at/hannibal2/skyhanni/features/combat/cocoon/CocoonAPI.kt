@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -27,8 +27,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
-
-    private val recentSeaCreatures = mutableMapOf<Mob, LivingSeaCreatureData?>()
 
     val expectedLifetime = 6.4.seconds
     /*
@@ -65,9 +63,9 @@ object CocoonAPI {
             val position = entity.getLorenzVec()
             val mob = getCocoonMob(position) ?: return
             val id = entity.id
-            val cocoon = CocoonMob(mob, recentSeaCreatures[mob], position, SimpleTimeMark.now(), id, entity.canBeSeen(),entity)
+            val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
             existingCocoons.add(cocoon)
-            ChatUtils.debug("${cocoon.mob.name}  Cocoon (${cocoon.cocoonID} Entered List")
+            ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
             logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
             CocoonSpawnEvent(cocoon).post()
         }
@@ -76,6 +74,16 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onWorldChange(event: WorldChangeEvent) {
         existingCocoons.clear()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
+        if (IslandType.THE_RIFT.isCurrent()) return
+        val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
+        val cocoonMob = cocoon.mob
+        val timeSince = cocoon.spawnTime.passedSince()
+        logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
+        existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
