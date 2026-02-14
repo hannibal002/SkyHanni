@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import java.util.regex.Pattern
 
 @Suppress("TooManyFunctions")
@@ -89,7 +90,7 @@ object CustomScoreboardUtils {
     internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSBLines(), "copper") ?: "0"
 
     internal fun getSowdust() = getGroup(ScoreboardPattern.sowdustPattern, getSBLines(), "sowdust")
-        ?: ScoreboardPattern.sowdustPattern.firstMatcher(TabWidget.GARDEN_LEVEL.lines) { group("sowdust") }
+        ?: ScoreboardPattern.sowdustPattern.firstMatcher(TabWidget.GARDEN_LEVEL.lines.map { it.formattedTextCompat() }) { group("sowdust") }
         ?: "0"
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"

@@ -7,12 +7,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
@@ -54,10 +52,15 @@ object CopyChat {
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
-        val mc = Minecraft.getInstance() ?: return null
+        val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return null
+        //? if < 1.21.11 {
         val chatLineY = chatGui.screenToChatY(mouseY.toDouble())
         val chatLineX = chatGui.screenToChatX(mouseX.toDouble())
+        //?} else {
+        /*val chatLineY = screenToChatY(mouseY.toDouble())
+        val chatLineX = screenToChatX(mouseX.toDouble())
+        *///?}
         val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
 
         if (chatLineX < -4.0 || chatLineX > Mth.floor(chatGui.width.toDouble() / chatGui.scale).toDouble()) return null
@@ -83,13 +86,16 @@ object CopyChat {
         }
     }
 
-    private val isPatcherLoaded by lazy { PlatformUtils.isModInstalled("patcher") }
+    fun screenToChatX(d: Double): Double {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.chat ?: return 0.0
+        return d / chatGui.scale - 4.0
+    }
 
-    private fun getOffset(): Int {
-        if (!isPatcherLoaded) return 0
-        return runCatching {
-            val patcherConfigClass = Class.forName("club.sk1er.patcher.config.PatcherConfig")
-            if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
-        }.getOrDefault(0)
+    fun screenToChatY(d: Double): Double {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.chat ?: return 0.0
+        val e = mc.window.guiScaledHeight - d - 40.0
+        return e / (chatGui.scale * chatGui.lineHeight)
     }
 }

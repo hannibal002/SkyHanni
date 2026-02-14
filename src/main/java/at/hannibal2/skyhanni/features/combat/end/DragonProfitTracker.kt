@@ -34,6 +34,7 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
     ::BucketData,
     { it.dragonProfitTracker },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker.perTrackerConfig }
 ) {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
 

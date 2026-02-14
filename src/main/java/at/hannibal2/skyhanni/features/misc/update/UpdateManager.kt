@@ -12,10 +12,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersion
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -31,6 +33,7 @@ import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
+import net.minecraft.world.item.Items
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 import kotlin.time.Duration
@@ -279,5 +282,41 @@ object UpdateManager {
         }
 
         hasWarned = true
+    }
+
+    @HandleEvent
+    fun onUserLuck(event: UserLuckCalculateEvent) {
+        if (PlatformUtils.MC_VERSION in discontinuedVersions) {
+            val luck = discontinuedVersions[PlatformUtils.MC_VERSION]?.luckAmount ?: -10f
+            event.addLuck(luck)
+            val stack = ItemUtils.createItemStack(
+                Items.OMINOUS_BOTTLE,
+                "§a✴ ${PlatformUtils.MC_VERSION} Tax",
+                arrayOf(
+                    "§8Minecraft",
+                    "",
+                    "§7Value: §c$luck§a✴",
+                    "",
+                    "§8${PlatformUtils.MC_VERSION} is an outdated version :(",
+                    "§8You should update to a newer version :)!",
+                ),
+            )
+            event.addItem(stack)
+        } else {
+            event.addLuck(5f)
+            val stack = ItemUtils.createItemStack(
+                Items.TRIDENT,
+                "§a✴ Modern Minecraft Bonus",
+                arrayOf(
+                    "§8Minecraft",
+                    "",
+                    "§7Value: §a+5✴",
+                    "",
+                    "§8We put a lot of effort into updating SkyHanni.",
+                    "§8This is a small bonus for using modern Minecraft.",
+                ),
+            )
+            event.addItem(stack)
+        }
     }
 }

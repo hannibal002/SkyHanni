@@ -23,10 +23,12 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
             buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
                 .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+            /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
 
             buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
                 .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+            /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
         }
 
         queuedLines.clear()

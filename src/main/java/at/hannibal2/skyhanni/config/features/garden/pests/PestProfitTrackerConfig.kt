@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -65,6 +67,14 @@ class PestProfitTrackerConfig {
     @ConfigOption(name = "Coins Per Bit", desc = "Set how much bits gained from killing pests are worth.")
     @ConfigEditorSlider(minValue = 0f, maxValue = 2000f, minStep = 100f)
     val coinsPerBit: Property<Int> = Property.of(700)
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = PestProfitTrackerConfig::class, field = "enabled")

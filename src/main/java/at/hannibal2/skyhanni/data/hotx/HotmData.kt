@@ -523,12 +523,12 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: §r§299,918
-         * REGEX-TEST:  Gemstone: §r§d37,670
+         * REGEX-TEST:  Mithril: 99,918
+         * REGEX-TEST:  Gemstone: 37,670
          */
         private val powderPattern by patternGroup.pattern(
-            "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
+            "widget.powder-nocolor",
+            "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
         // </editor-fold>
 

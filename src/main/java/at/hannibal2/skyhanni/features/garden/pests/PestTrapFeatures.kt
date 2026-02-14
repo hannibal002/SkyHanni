@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -61,7 +60,6 @@ object PestTrapFeatures {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!PestTrapApi.inInventory) return
         if (!config.releaseHotkey.isKeyHeld()) return
-        if (event.guiContainer !is AccessorHandledScreen) return
         InventoryUtils.clickSlot(16)
     }
 

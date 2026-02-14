@@ -182,7 +182,8 @@ object SlayerApi {
     }
 
     private fun getSlayerLines(): List<String> =
-        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidget.SLAYER.lines }.map { it.trim() }
+        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }
+            .ifEmpty { TabWidget.SLAYER.lines.map { it.string } }.map { it.trim() }
 
     private fun updateSlayerState() {
         val lines = getSlayerLines()

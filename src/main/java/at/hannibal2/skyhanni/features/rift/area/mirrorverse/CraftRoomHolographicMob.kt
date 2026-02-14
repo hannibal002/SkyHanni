@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.monster.CaveSpider
+import net.minecraft.world.entity.monster.spider.CaveSpider
 import net.minecraft.world.entity.monster.Slime
-import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.AABB
 

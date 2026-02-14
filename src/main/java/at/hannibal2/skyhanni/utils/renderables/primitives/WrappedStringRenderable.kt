@@ -37,8 +37,8 @@ class WrappedStringRenderable private constructor(
     private val inverseScale = 1 / scale
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        DrawContextUtils.translate(1.0, 1.0, 0.0)
-        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+        DrawContextUtils.translate(1.0, 1.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat())
         map.entries.forEachIndexed { index, (text, size) ->
             GuiRenderUtils.drawString(
                 text,
@@ -47,8 +47,8 @@ class WrappedStringRenderable private constructor(
                 color.rgb,
             )
         }
-        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
-        DrawContextUtils.translate(-1.0, -1.0, 0.0)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat())
+        DrawContextUtils.translate(-1.0, -1.0)
     }
 
     companion object {

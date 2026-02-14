@@ -77,6 +77,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.component.ResolvableProfile
+import net.minecraft.world.item.component.TooltipDisplay
 import net.minecraft.world.item.enchantment.ItemEnchantments
 import java.util.LinkedList
 import java.util.UUID
@@ -85,10 +86,8 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-//? > 1.21.8 {
-/*import com.google.common.collect.ImmutableMultimap
+import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
-*///?}
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -216,7 +215,7 @@ object ItemUtils {
     }
 
     fun ItemStack.setLore(lore: List<Component>): ItemStack {
-        this.set(DataComponents.LORE, ItemLore(lore))
+        this.set(DataComponents.LORE, ItemLore(lore, lore))
         return this
     }
 
@@ -313,7 +312,7 @@ object ItemUtils {
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
     // Checks for the enchantment glint as part of the Minecraft enchantments
-    fun ItemStack.isEnchanted(): Boolean = hasFoil()
+    fun ItemStack.hasEnchantGlint(): Boolean = hasFoil()
 
     // Checks for Hypixel enchantments in the attributes
     fun ItemStack.hasHypixelEnchantments(): Boolean =
@@ -329,21 +328,13 @@ object ItemUtils {
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.PLAYER_HEAD) return null
-        //? < 1.21.9 {
-        return this.get(DataComponents.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
-        //?} else {
-        /*return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
-        *///?}
+        return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
 
     }
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.PLAYER_HEAD) return null
-        //? < 1.21.9 {
-        return this.get(DataComponents.PROFILE)?.id?.get().toString()
-        //?} else {
-        /*return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
-        *///?}
+        return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
     }
 
     @Suppress("SpreadOperator")
@@ -353,16 +344,10 @@ object ItemUtils {
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
         val stack = ItemStack(Items.PLAYER_HEAD)
-        //? < 1.21.9 {
-        val profile = GameProfile(UUID.fromString(uuid), "Throwpo")
-        profile.properties.put("textures", Property("textures", value))
-        stack.set(DataComponents.PROFILE, ResolvableProfile(profile))
-        //?} else {
-        /*val builder = ImmutableMultimap.builder<String, Property>()
+        val builder = ImmutableMultimap.builder<String, Property>()
         builder.put("textures", Property("textures", value))
         val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
         stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(profile))
-        *///?}
         stack.setCustomItemName(displayName)
         stack.setLoreString(lore.toList())
         return stack
@@ -381,14 +366,26 @@ object ItemUtils {
         val stack = ItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLoreString(lore)
-        var tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
+        setDefaultHiddenComponents(stack)
+        return stack
+    }
+
+    fun createItemStack(item: Item, displayName: Component, lore: List<Component>, amount: Int = 1): ItemStack {
+        val stack = ItemStack(item, amount)
+        stack.setCustomItemName(displayName)
+        stack.setLore(lore)
+        setDefaultHiddenComponents(stack)
+        return stack
+    }
+
+    fun setDefaultHiddenComponents(stack: ItemStack) {
+        var tooltipDisplay = TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
-        if (displayName.isBlank() && lore.isEmpty()) {
-            tooltipDisplay = net.minecraft.world.item.component.TooltipDisplay(true, tooltipDisplay.hiddenComponents)
+        if (stack.hoverName.string.isBlank() && stack.getLoreComponent().isEmpty()) {
+            tooltipDisplay = TooltipDisplay(true, tooltipDisplay.hiddenComponents)
         }
         stack.set(DataComponents.TOOLTIP_DISPLAY, tooltipDisplay)
-        return stack
     }
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
@@ -535,13 +532,13 @@ object ItemUtils {
      */
     private val enchantedBookPattern by RepoPattern.pattern(
         "item.enchantedbook",
-        "§fEnchanted Book \\((?<item>.+)\\)",
+        "(?:§f)?Enchanted Book \\((?<item>.+)\\)"
     )
 
-    fun readBookType(input: String): String? {
-        return enchantedBookPattern.matchMatcher(input) {
-            group("item").removeColor()
-        }
+    fun readBookTypeStrippedColor(input: String): String? = readBookType(input)?.removeColor()
+
+    fun readBookType(input: String): String? = enchantedBookPattern.matchMatcher(input) {
+        group("item")
     }
 
     private fun makePair(input: String, itemName: String, matcher: Matcher): Pair<String, Int> {

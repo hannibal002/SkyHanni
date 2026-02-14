@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -15,7 +17,6 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.glfw.GLFW
 
 class DianaConfig {
-    // TODO rename to highlightRareMobs
     @Expose
     @ConfigOption(
         name = "Highlight Rare Diana Mobs",
@@ -24,7 +25,7 @@ class DianaConfig {
     @SearchTag("inquisitor")
     @ConfigEditorBoolean
     @FeatureToggle
-    var highlightInquisitors: Boolean = true
+    var highlightRareMobs: Boolean = true
 
     @Expose
     @ConfigOption(name = "Rare Diana Mob Highlight", desc = "Color in which Rare Diana Mobs will be highlighted.")
@@ -40,6 +41,22 @@ class DianaConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var guess: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Beacon Distance",
+        desc = "Min distance to draw beacon, -1 is no beacons.",
+    )
+    @ConfigEditorSlider(minValue = -1.0F, maxValue = 400.0F, minStep = 1.0F)
+    var beaconDistance = 10.0F
+
+    @Expose
+    @ConfigOption(
+        name = "Text Scale",
+        desc = "Text scale.",
+    )
+    @ConfigEditorSlider(minValue = 0.1F, maxValue = 2.5F, minStep = 0.01F)
+    var textScale = 1.0F
 
     @Expose
     @ConfigOption(
@@ -134,16 +151,9 @@ class DianaConfig {
     val warpGuiPosition: Position = Position(327, 125, scale = 2.6f)
 
     @Expose
-    @ConfigOption(name = "Ignored Warps", desc = "")
-    @Accordion
-    val ignoredWarps: IgnoredWarpsConfig = IgnoredWarpsConfig()
-
-    // TODO rename to rareMobsSharing
-    @Expose
-    @ConfigOption(name = "Rare Diana Mob Waypoint Sharing", desc = "")
-    @SearchTag("inquisitor")
-    @Accordion
-    val inquisitorSharing: InquisitorSharingConfig = InquisitorSharingConfig()
+    @ConfigOption(name = "Ignored Warps", desc = "Warps listed here will not be suggested.")
+    @ConfigEditorDraggableList
+    val ignoredWarpsList: MutableList<BurrowWarpHelper.WarpPoint> = mutableListOf(BurrowWarpHelper.WarpPoint.TAYLOR)
 
     @Expose
     @ConfigOption(
@@ -153,6 +163,12 @@ class DianaConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var petWarning: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Rare Diana Mob Waypoint Sharing", desc = "")
+    @SearchTag("inquisitor")
+    @Accordion
+    val rareMobsSharing: RareMobSharingConfig = RareMobSharingConfig()
 
     @Expose
     @ConfigOption(name = "Diana Profit Tracker", desc = "")

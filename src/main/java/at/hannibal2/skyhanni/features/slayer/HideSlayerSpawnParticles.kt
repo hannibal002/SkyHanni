@@ -45,7 +45,7 @@ object HideSlayerSpawnParticles {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    fun onSecondPassed() {
         mobRecentDeaths.removeIf { it.value.passedSince() > 3.seconds }
     }
 

@@ -157,7 +157,7 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(27, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
+        event.move(27, fromPath = "misc.limboTimePB", toPath = "#player.personalBest")
     }
 
     fun printStats(onlyPlaytime: Boolean = false) {

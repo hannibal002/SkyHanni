@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
-//? > 1.21.5 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
+
+import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
 import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,4 +18,3 @@ public class MixinRenderSystem {
     }
 
 }
-*///?}

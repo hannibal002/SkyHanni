@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
@@ -51,31 +53,17 @@ object WorldRenderUtils {
     ) {
         matrices.pushPose()
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
-        BeaconRenderer.renderBeaconBeam(
-            //? < 1.21.9 {
+        BeaconRenderer.submitBeaconBeam(
             matrices,
-            vertexConsumers,
+            Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
             beaconBeam,
-            partialTicks,
             1f,
-            MinecraftCompat.localWorld.gameTime,
+            Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
             0,
             319,
             rgb,
             0.2f,
             0.25f,
-            //?} else {
-             /*matrices,
-             Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
-             beaconBeam,
-             1f,
-             Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
-             0,
-             319,
-             rgb,
-             0.2f,
-             0.25f,
-            *///?}
         )
         matrices.popPose()
     }
@@ -194,7 +182,10 @@ object WorldRenderUtils {
         val buf = vertexConsumers.getBuffer(layer)
         matrices.pushPose()
 
+        //? < 1.21.11 {
         ShapeRenderer.addChainedFilledBoxVertices(
+            //?} else
+            //addChainedFilledBoxVertices(
             matrices,
             buf,
             effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
@@ -648,6 +639,54 @@ object WorldRenderUtils {
         drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
     }
 
+    fun SkyHanniRenderWorldEvent.drawDynamicText(
+        location: LorenzVec,
+        text: Component,
+        scaleMultiplier: Double,
+        yOff: Float = 0f,
+        hideTooCloseAt: Double = 4.5,
+        smallestDistanceVew: Double = 5.0,
+        seeThroughBlocks: Boolean = true,
+        ignoreY: Boolean = false,
+        maxDistance: Int? = null,
+    ) {
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+
+        val x = location.x
+        val y = location.y
+        val z = location.z
+
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val eyeHeight = player.getEyeHeight(player.pose)
+
+        val dX = (x - viewerX) * (x - viewerX)
+        val dY = (y - (viewerY + eyeHeight)) * (y - (viewerY + eyeHeight))
+        val dZ = (z - viewerZ) * (z - viewerZ)
+        val distToPlayerSq = dX + dY + dZ
+        var distToPlayer = sqrt(distToPlayerSq)
+        // TODO this is optional maybe?
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+
+        if (distToPlayer < hideTooCloseAt) return
+        maxDistance?.let {
+            if (!seeThroughBlocks && distToPlayer > it) return
+        }
+
+        val distRender = distToPlayer.coerceAtMost(50.0)
+
+        var scale = distRender / 12
+        scale *= scaleMultiplier
+
+        val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
+            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
+        val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
+
+        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+
+        drawString(renderLocation, text, seeThroughBlocks, null, scale, true, yOff, 0)
+    }
+
     // TODO add chroma color support
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(this, lineWidth, depth) {
@@ -812,5 +851,82 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
         val add = if (player.isShiftKeyDown) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player) + add
+    }
+
+    private fun addChainedFilledBoxVertices(
+        matrices: PoseStack,
+        vertexConsumer: VertexConsumer,
+        d: Double,
+        e: Double,
+        f: Double,
+        g: Double,
+        h: Double,
+        i: Double,
+        j: Float,
+        k: Float,
+        l: Float,
+        m: Float
+    ) {
+        addChainedFilledBoxVertices(
+            matrices,
+            vertexConsumer,
+            d.toFloat(),
+            e.toFloat(),
+            f.toFloat(),
+            g.toFloat(),
+            h.toFloat(),
+            i.toFloat(),
+            j,
+            k,
+            l,
+            m
+        )
+    }
+
+    private fun addChainedFilledBoxVertices(
+        matrices: PoseStack,
+        vertexConsumer: VertexConsumer,
+        f: Float,
+        g: Float,
+        h: Float,
+        i: Float,
+        j: Float,
+        k: Float,
+        l: Float,
+        m: Float,
+        n: Float,
+        o: Float
+    ) {
+        val matrix4f = matrices.last().pose()
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
     }
 }

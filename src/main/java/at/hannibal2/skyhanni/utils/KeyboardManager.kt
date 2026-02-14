@@ -9,8 +9,7 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
-//? > 1.21.8
-//import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.KeyEvent
 
 object KeyboardManager {
 
@@ -42,11 +41,7 @@ object KeyboardManager {
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
-    //? < 1.21.9 {
-    private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(this, this)
-    //?} else {
-    /*private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
-    *///?}
+    private fun Int.matchesClosureKey() = Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
 
     @JvmStatic
     fun checkIsInventoryClosure(keycode: Int): Boolean {
@@ -88,11 +83,7 @@ object KeyboardManager {
         this < -1 -> ErrorManager.skyHanniError("Error while checking if a key is pressed. Keycode is invalid: $this")
         this == -1 -> false
         this in 0..5 -> MouseCompat.isButtonDown(this)
-        //? < 1.21.9 {
-        else -> InputConstants.isKeyDown(Minecraft.getInstance().window.window, this)
-        //?} else {
-        /*else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
-        *///?}
+        else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
     }
 
     private val lockedKeys = mutableMapOf<Int, Boolean>()

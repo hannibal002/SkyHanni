@@ -101,7 +101,7 @@ object GuiEditManager {
         if (!isInGui()) return
 
         DrawContextUtils.setContext(context)
-        DrawContextUtils.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f)
 
         RenderData.renderOverlay(context)
 
@@ -109,7 +109,7 @@ object GuiEditManager {
             GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
         }
 
-        DrawContextUtils.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f)
         DrawContextUtils.clearContext()
     }
 
