@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object ViewRecipeCommand {
@@ -56,15 +58,21 @@ object ViewRecipeCommand {
         HypixelCommands.viewRecipe(item.toInternalName(), page)
     }
 
-    val list by lazy {
-        val list = mutableListOf<String>()
-        for ((key, value) in NeuItems.allNeuRepoItems()) {
-            if (value.has("recipe") || value.has("recipes")) {
-                list.add(key.lowercase())
+    val list: List<String> by lazy {
+        NeuItems.allNeuRepoItems()
+            .asSequence()
+            .filter { (_, value) ->
+                val recipes = value.getAsJsonArray("recipes") ?: JsonArray()
+                value.getAsJsonObject("recipe")?.let { recipe ->
+                    recipe.add("type", JsonPrimitive("crafting"))
+                    recipes.add(recipe)
+                }
+
+                recipes.any { it.asJsonObject.getAsJsonPrimitive("type")?.asString == "crafting" }
             }
+            .map { (key, _) -> key.lowercase() }
+            .toList()
         }
-        list
-    }
 
     fun customTabComplete(command: String): List<String>? {
         if (!SkyBlockUtils.inSkyBlock) return null
