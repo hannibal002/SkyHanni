@@ -56,6 +56,8 @@ object SeaCreatureDetectionApi {
 
     private val recentBabyMagmaSlugs = mutableMapOf<Mob, ServerTimeMark>()
 
+    var lastBobberLocation: LorenzVec? = null
+
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isActive()) return
@@ -134,9 +136,9 @@ object SeaCreatureDetectionApi {
     private fun handleOwnMob() {
         if (lastSeaCreatureFished.passedSince() > 1.seconds) return
         val name = lastNameFished ?: return
-        val lastBobber = FishingApi.lastBobberUpdate.second ?: return
+        val bobberLocation = lastBobberLocation ?: return
         val mobs = recentMobs.asSequence().filter { (mob, data) -> mob.name == name && data.passedSince() < 1.5.seconds }.map {
-            it to it.key.baseEntity.distanceTo(lastBobber)
+            it to it.key.baseEntity.distanceTo(bobberLocation)
         }.filter { it.second <= 3 }
             .sortedBy { it.second }
             .take(mobsToFind).toList()
@@ -149,6 +151,7 @@ object SeaCreatureDetectionApi {
 
         if (mobsToFind == 0) {
             lastNameFished = null
+            lastBobberLocation = null
         }
     }
 
@@ -204,6 +207,8 @@ object SeaCreatureDetectionApi {
             addMob(mob, time, isOwn = false)
             return@removeIf true
         }
+        val bobber = FishingApi.bobber ?: return
+        lastBobberLocation = bobber.getLorenzVec()
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
     }
 
