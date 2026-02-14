@@ -301,7 +301,11 @@ Imports our custom live templates automatically. Live Templates allow for quicke
 
 ### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
 
-Helps you write minecraft specific code such as mixins and access wideners.
+Helps you write Minecraft specific code such as mixins and access wideners.
+
+### [Stonecutter Development](https://plugins.jetbrains.com/plugin/25044-stonecutter-dev)
+
+Provides syntax highlighting and quick version switching for our multiversion development setup.
 
 ## Software Used in SkyHanni
 

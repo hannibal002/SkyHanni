@@ -80,45 +80,45 @@ object ConfigUpdaterMigrator {
             return
         }
 
-        fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
-            if (listOf(oldPath, newPath).any { it.startsWith("feature") }) {
+        fun move(since: Int, fromPath: String, toPath: String, transform: (JsonElement) -> JsonElement = { it }) {
+            if (listOf(fromPath, toPath).any { it.startsWith("feature") }) {
                 ErrorManager.crashInDevEnv("Migration path should not start with 'features.'!")
             }
             if (since <= oldVersion) {
-                logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
+                logger.log("Skipping move from $fromPath to $toPath ($since <= $oldVersion)")
                 return
             }
             if (since > CONFIG_VERSION) {
                 ErrorManager.crashInDevEnv("Illegal new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
-                logger.log("Skipping move from $oldPath to $newPath (will be done in another pass)")
+                logger.log("Skipping move from $fromPath to $toPath (will be done in another pass)")
                 return
             }
-            internalMove(since, oldPath, newPath, transform)
+            internalMove(since, fromPath, toPath, transform)
         }
 
-        private fun internalMove(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement) {
-            val op = oldPath.split(".")
-            val np = newPath.split(".")
+        private fun internalMove(since: Int, fromPath: String, toPath: String, transform: (JsonElement) -> JsonElement) {
+            val op = fromPath.split(".")
+            val np = toPath.split(".")
             if (op.first().startsWith("#")) {
                 require(np.first() == op.first())
                 val realPrefixes = dynamicPrefix[op.first()]
                 if (realPrefixes == null) {
-                    logger.log("Could not resolve dynamic prefix $oldPath")
+                    logger.log("Could not resolve dynamic prefix $fromPath")
                     return
                 }
                 for (realPrefix in realPrefixes) {
                     move(
                         since,
-                        "$realPrefix.${oldPath.substringAfter('.')}",
-                        "$realPrefix.${newPath.substringAfter('.')}", transform,
+                        "$realPrefix.${fromPath.substringAfter('.')}",
+                        "$realPrefix.${toPath.substringAfter('.')}", transform,
                     )
                 }
             }
             val oldElem = old.at(op, false)
             if (oldElem == null) {
-                logger.log("Skipping move from $oldPath to $newPath ($oldPath not present)")
+                logger.log("Skipping move from $fromPath to $toPath ($fromPath not present)")
                 return
             }
             val newParentElement = new.at(np.dropLast(1), true)
@@ -131,7 +131,7 @@ object ConfigUpdaterMigrator {
             }
             movesPerformed++
             newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
-            logger.log("Moved element from $oldPath to $newPath")
+            logger.log("Moved element from $fromPath to $toPath")
             val oldParentElement = old.at(op.dropLast(1), false)
             if (oldParentElement !is JsonObject) {
                 logger.log("Warning: element at path $old could not be removed from its previous location")
