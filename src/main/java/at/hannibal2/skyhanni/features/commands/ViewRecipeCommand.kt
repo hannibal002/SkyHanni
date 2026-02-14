@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -28,8 +29,11 @@ object ViewRecipeCommand {
      */
     private val pattern by RepoPattern.pattern(
         "commands.viewrecipe",
-        "\\/viewrecipe (?<item>.*)"
+        "/viewrecipe (?<item>.*)",
     )
+
+    var list = emptyList<String>()
+        private set
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
@@ -58,8 +62,9 @@ object ViewRecipeCommand {
         HypixelCommands.viewRecipe(item.toInternalName(), page)
     }
 
-    val list: List<String> by lazy {
-        NeuItems.allNeuRepoItems()
+    @HandleEvent(NeuRepositoryReloadEvent::class)
+    fun onNeuRepoReload() {
+        list = NeuItems.allNeuRepoItems()
             .asSequence()
             .filter { (_, value) ->
                 val recipes = value.getAsJsonArray("recipes") ?: JsonArray()
@@ -72,7 +77,7 @@ object ViewRecipeCommand {
             }
             .map { (key, _) -> key.lowercase() }
             .toList()
-        }
+    }
 
     fun customTabComplete(command: String): List<String>? {
         if (!SkyBlockUtils.inSkyBlock) return null
