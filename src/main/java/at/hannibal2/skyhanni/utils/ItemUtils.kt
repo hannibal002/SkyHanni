@@ -286,10 +286,12 @@ object ItemUtils {
         if (internalName != null) {
             val maxLevel = getMaxLevel(internalName)
 
-            if (this.getPetLevel() == maxLevel) {
-                internalName = "${internalName.asString()}+${this.getPetLevel()}".toInternalName()
+            if (this.getPetLevel() == 100) {
+                internalName = "${internalName.asString()}+100".toInternalName()
             } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
+            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
+                internalName = "${internalName.asString()}+200".toInternalName()
             }
         }
         return internalName
