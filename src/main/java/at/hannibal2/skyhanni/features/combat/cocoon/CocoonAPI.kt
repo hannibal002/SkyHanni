@@ -29,6 +29,7 @@ object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
     val expectedLifetime = 6.4.seconds
+
     /*
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
@@ -59,16 +60,14 @@ object CocoonAPI {
         if (!event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val entity = event.entity
         if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
-        if (entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) {
-            val position = entity.getLorenzVec()
-            val mob = getCocoonMob(position) ?: return
-            val id = entity.id
-            val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
-            existingCocoons.add(cocoon)
-            ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-            logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-            CocoonSpawnEvent(cocoon).post()
-        }
+        val position = entity.getLorenzVec()
+        val mob = getCocoonMob(position) ?: return
+        val id = entity.id
+        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
+        existingCocoons.add(cocoon)
+        ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+        logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+        CocoonSpawnEvent(cocoon).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
