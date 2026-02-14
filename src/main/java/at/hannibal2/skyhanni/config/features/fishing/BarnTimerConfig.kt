@@ -4,18 +4,16 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.glfw.GLFW
 
 class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Barn Fishing Timer",
-        desc = "Show the time and amount of own/Global sea creatures nearby while barn fishing."
+        desc = "Show the time and amount of own/Global sea creatures nearby while barn fishing.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,7 +22,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Show Anywhere",
-        desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location."
+        desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location.",
     )
     @ConfigEditorBoolean
     var showAnywhere: Boolean = false
@@ -55,8 +53,11 @@ class BarnTimerConfig {
     var timeAlert: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Time Alert Seconds", desc = "The time in seconds to alert you at.\n" +
-        "§cNote: (sea creatures despawn after 6 minutes, aka 360s).")
+    @ConfigOption(
+        name = "Time Alert Seconds",
+        desc = "The time in seconds to alert you at.\n" +
+            "§cNote: (sea creatures despawn after 6 minutes, aka 360s).",
+    )
     @ConfigEditorSlider(minValue = 240f, maxValue = 360f, minStep = 1f)
     var timeAlertSeconds: Int = 300
 
@@ -68,7 +69,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Stranded Fishing",
-        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit."
+        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit.",
     )
     @ConfigEditorBoolean
     val forStranded: Property<Boolean> = Property.of(true)
