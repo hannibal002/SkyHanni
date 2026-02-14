@@ -435,7 +435,7 @@ object StringUtils {
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
-    fun SystemMessageEvent.applyIfPossible(
+    fun SystemMessageEvent.Modify.applyIfPossible(
         transformationReason: String? = null,
         transform: (String) -> String,
     ) {

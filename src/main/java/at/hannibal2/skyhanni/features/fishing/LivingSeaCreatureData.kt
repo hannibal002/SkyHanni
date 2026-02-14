@@ -7,18 +7,18 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.getLorenzVec
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBoxExtraEntities
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.AABB
 
-data class LivingSeaCreatureData(
+class LivingSeaCreatureData(
     val isOwn: Boolean,
     val seaCreature: SeaCreature,
     var entityId: Int,
-    val spawnTime: SimpleTimeMark,
+    val spawnTime: ServerTimeMark,
     var mob: Mob?,
 ) {
 
@@ -34,7 +34,7 @@ data class LivingSeaCreatureData(
         private set
 
     /** This tracks the real last position of the sea creature. Don't display this to the user */
-    internal var actualLastPos: LorenzVec
+    internal var actualLastPos: LorenzVec?
         private set
 
     init {
@@ -46,7 +46,7 @@ data class LivingSeaCreatureData(
             pos = null
         }
         updateCanBeSeen()
-        actualLastPos = mob?.getLorenzVec() ?: LorenzVec(0.0, 0.0, 0.0)
+        actualLastPos = mob?.getLorenzVec()
     }
 
     inline val name: String get() = seaCreature.name
@@ -59,9 +59,7 @@ data class LivingSeaCreatureData(
 
     inline val health: Int? get() = mob?.health?.toInt()
 
-    inline val despawnTime: SimpleTimeMark get() = spawnTime + SeaCreatureDetectionApi.DESPAWN_TIME
-
-    fun isLoaded(): Boolean = entity != null
+    fun exists(): Boolean = entity != null
 
     val entity: LivingEntity? get() = mob?.baseEntity ?: EntityUtils.getEntityByID(entityId) as? LivingEntity
 
@@ -91,33 +89,35 @@ data class LivingSeaCreatureData(
 
     private fun updateCanBeSeen(): Boolean {
         val mob = mob ?: return false
-        mob.baseEntity.canBeSeen()
         canBeSeenCache = mob.baseEntity.canBeSeen() || mob.extraEntities.any { it.canBeSeen() }
         return canBeSeenCache
     }
 
     @Suppress("HandleEventInspection")
-    fun update(renderWorld: SkyHanniRenderWorldEvent) {
+    fun updateNonWorld() {
         lastUpdate = SimpleTimeMark.now()
         val mob = mob ?: return
         actualLastPos = mob.getLorenzVec()
         if (!updateCanBeSeen()) return
+    }
+
+    @Suppress("HandleEventInspection")
+    fun updateWorld(renderWorld: SkyHanniRenderWorldEvent) {
+        val mob = mob ?: return
+        if (!canBeSeenCache) return
         aabb = renderWorld.exactBoundingBoxExtraEntities(mob)
         pos = renderWorld.exactLocation(mob)
     }
 
-    override fun toString(): String {
-        return buildString {
-            fun appendInfo(string: String) = append("$string, ")
-            append("SeaCreatureData(")
-            appendInfo("isOwn=$isOwn")
-            appendInfo("seaCreature=$seaCreature")
-            appendInfo("entityId=$entityId")
-            appendInfo("spawnTime=$spawnTime")
-            appendInfo("mob=$mob")
-            appendInfo("pos=$pos")
-            append("aabb=$aabb")
-            append(')')
-        }
-    }
+    override fun toString(): String = listOf(
+        "SeaCreatureData(",
+        "isOwn=$isOwn",
+        "seaCreature=$seaCreature",
+        "entityId=$entityId",
+        "spawnTime=$spawnTime",
+        "mob=$mob",
+        "pos=$pos",
+        "aabb=$aabb",
+        ')',
+    ).joinToString(", ", "SeaCreatureData(", ")")
 }

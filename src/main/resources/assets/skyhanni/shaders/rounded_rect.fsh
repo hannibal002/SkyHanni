@@ -1,23 +1,16 @@
 #version 150
 
 in vec4 vertexColor;
-//? < 1.21.6 {
-uniform float scaleFactor;
-uniform float radius;
-uniform float smoothness;
-uniform vec2 halfSize;
-uniform vec2 centerPos;
-uniform mat4 modelViewMatrix;
-//?} else {
-//layout(std140) uniform SkyHanniRoundedUniforms {
-//    float scaleFactor;
-//    float radius;
-//    float smoothness;
-//    vec2 halfSize;
-//    vec2 centerPos;
-//    mat4 modelViewMatrix;
-//};
-//?}
+
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
+
 out vec4 fragColor;
 
 // From https://www.shadertoy.com/view/WtdSDs

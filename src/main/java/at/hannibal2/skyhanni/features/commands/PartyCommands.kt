@@ -113,7 +113,7 @@ object PartyCommands {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.reversePT.clickable) return
 
         // The message was likely already modified by us, return to avoid infinite recursion

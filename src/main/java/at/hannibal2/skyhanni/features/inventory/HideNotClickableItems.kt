@@ -211,7 +211,7 @@ object HideNotClickableItems {
             hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
-            hideComposter(chestName, stack) -> true
+            hideComposter(stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
             hideFossilExcavator(stack) -> true
@@ -286,9 +286,8 @@ object HideNotClickableItems {
         return true
     }
 
-    @Suppress("UnusedParameter")
-    private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
-        if (!ComposterOverlay.inInventory) return false
+    private fun hideComposter(stack: ItemStack): Boolean {
+        if (!ComposterOverlay.isEnabled() || !ComposterOverlay.inInventory) return false
 
         showGreenLine = true
 

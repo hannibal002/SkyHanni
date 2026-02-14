@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -45,6 +46,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     ::BucketData,
     { it.garden.cropFeverTracker },
     drawDisplay = { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.garden.cropFeverTracker.perTrackerConfig }
 ) {
     data class BucketData(
         @Expose var blocksBrokenDuring: MutableMap<CropType, Long> = EnumMap(CropType::class.java),
@@ -119,7 +121,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     private var cropFeverCurrentCrop: CropType? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         cropFeverStart.matchMatcher(message) {
             startCropFever()

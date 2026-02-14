@@ -40,6 +40,7 @@ object HuntingProfitTracker {
         "Hunting Profit Tracker",
         { Data() },
         { it.hunting.huntingProfitTracker },
+        trackerConfig = { SkyHanniMod.feature.hunting.huntingProfitTracker.perTrackerConfig }
     ) { drawDisplay(it) }
 
     data class Data(

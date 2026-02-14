@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -38,6 +37,7 @@ object ExcavatorProfitTracker {
         "Fossil Excavation Profit Tracker",
         ::Data,
         { it.mining.fossilExcavatorProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     data class Data(
@@ -90,7 +90,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (fossilDustGained <= 0) return profit
-        val pricePer = SkyHanniTracker.getPricePer(scrapItem) / 500
+        val pricePer = tracker.getPricePer(scrapItem) / 500
         val fossilDustPrice = pricePer * fossilDustGained
         add(
             Renderable.hoverTips(
@@ -126,8 +126,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (timesExcavated <= 0) return profit
-        // TODO use same price source as profit tracker
-        val scrapPrice = timesExcavated * SkyHanniTracker.getPricePer(scrapItem)
+        val scrapPrice = timesExcavated * tracker.getPricePer(scrapItem)
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
             Renderable.hoverTips(

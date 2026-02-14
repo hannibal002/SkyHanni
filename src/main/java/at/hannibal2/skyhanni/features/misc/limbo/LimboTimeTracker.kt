@@ -49,7 +49,7 @@ object LimboTimeTracker {
     private val bedWarsLobbyLimbo = AABB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
@@ -157,7 +157,7 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(27, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
+        event.move(27, fromPath = "misc.limboTimePB", toPath = "#player.personalBest")
     }
 
     fun printStats(onlyPlaytime: Boolean = false) {

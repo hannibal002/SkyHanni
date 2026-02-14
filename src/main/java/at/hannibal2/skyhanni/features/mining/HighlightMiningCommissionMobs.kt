@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.monster.Endermite
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Slime
@@ -71,13 +72,13 @@ object HighlightMiningCommissionMobs {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
         if (!isEnabled()) return
 
         // TODO Commissin API
         MobType.entries.filter { type ->
-            event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
-                ?.let { !it.endsWith("§aDONE") }
+            event.tabList.findLast { line -> line.string.removeColor().trim().startsWith(type.commissionName) }
+                ?.let { !it.string.endsWith("DONE") }
                 ?: false
         }.let {
             if (it != active) {

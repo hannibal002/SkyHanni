@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.core.particles.ParticleTypes
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -22,8 +24,9 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
+    fun getBezierFitterCount(): Int { return bezierFitter.count() }
 
-    private var lastGuess: GriffinBurrowHelper.GuessEntry? = null
+    private var lastGuess: GuessEntry? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onIslandChange() {
@@ -51,16 +54,24 @@ object PreciseGuessBurrow {
 
         bezierFitter.addPoint(currLoc)
 
+        if (bezierFitter.count() < 6) {
+            val duration = (6 - bezierFitter.count()) * 100
+            BurrowWarpHelper.blockWarp(duration.milliseconds)
+        }
+
         val guessPosition = guessBurrowLocation() ?: return
 
-        val guessEntry = GriffinBurrowHelper.GuessEntry(
+        val guessEntry = GuessEntry(
             listOf(guessPosition.down(0.5).roundToBlock()),
+            spadeGuess = true,
         )
 
         if (lastGuess?.getCurrent() != guessEntry.getCurrent()) {
-            lastGuess?.let { GriffinBurrowHelper.removeGuess(it) }
-            BurrowGuessEvent(guessEntry).post()
-            lastGuess = guessEntry
+            DelayedRun.runOrNextTick {
+                lastGuess?.let { GriffinBurrowHelper.removeGuess(it, "moving spade guess", logAsPossibleBurrow = false) }
+                BurrowGuessEvent(guessEntry, "spade guess").post()
+                lastGuess = guessEntry
+            }
         }
 
     }
@@ -73,9 +84,12 @@ object PreciseGuessBurrow {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onUseAbility(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
+        if (event.clickType != ClickType.RIGHT_CLICK) {
+            DelayedRun.runOrNextTick { GriffinBurrowHelper.removeInaccurateIfLooking() }
+            return
+        }
         if (lastLavaParticle.passedSince() < 0.2.seconds) {
             event.cancel()
             return

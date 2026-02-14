@@ -30,12 +30,12 @@ object FixChimeraDescription {
         for ((index, line) in event.toolTip.withIndex()) {
             // hypixel doesn't show the 100% for chimera 5
             if (line.string.contains("Copies your active pet's stats.")) {
-                event.toolTip[index] = line.replace("Copies your active pet's stats.", "Copies §a75% §7of your active pet's stats.")
+                event.toolTip[index] = line.replace("Copies your active pet's stats.", "Copies §a75% §7of your active pet's stats.") ?: line
             }
             percentagePattern.matchMatcher(line) {
                 group("percentage").formatIntOrNull()?.let { old ->
                     val new = newChimeraValue(old)
-                    event.toolTip[index] = line.replace("$old", "$new")
+                    event.toolTip[index] = line.replace("$old", "$new") ?: line
                 }
             }
         }

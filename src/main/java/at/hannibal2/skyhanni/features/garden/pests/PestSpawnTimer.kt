@@ -55,16 +55,16 @@ object PestSpawnTimer {
     private val patternGroup = RepoPattern.group("garden.pests")
 
     /**
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§a§lREADY"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§e1m 58s"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§e1m"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§e58s"
-     * WRAPPED-REGEX-TEST: " Cooldown: §r§c§lMAX PESTS"
+     * WRAPPED-REGEX-TEST: " Cooldown: READY"
+     * WRAPPED-REGEX-TEST: " Cooldown: 1m 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: 1m"
+     * WRAPPED-REGEX-TEST: " Cooldown: 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
      */
 
     private val pestCooldownPattern by patternGroup.pattern(
-        "cooldowntime",
-        "\\sCooldown: §r§.(?:§.)?(?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+        "cooldowntime-no-color",
+        "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -87,7 +87,7 @@ object PestSpawnTimer {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        pestCooldownPattern.firstMatcher(event.widget.lines) {
+        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")

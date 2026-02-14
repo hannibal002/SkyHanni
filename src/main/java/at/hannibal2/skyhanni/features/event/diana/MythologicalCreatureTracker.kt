@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -46,6 +45,7 @@ object MythologicalCreatureTracker {
                 )
             },
         ),
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     // TODO create a draggable list from repo one that can be done
@@ -60,8 +60,10 @@ object MythologicalCreatureTracker {
         @Expose var count: MutableMap<String, Int> = mutableMapOf(),
     ) : TrackerData()
 
+    var lastSinceAmount: Int? = null
+
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
         if (config.shardWarn) {
@@ -85,7 +87,7 @@ object MythologicalCreatureTracker {
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 val trackerId = creatureEntry.trackerId
                 if (creatureEntry == type) {
-                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
+                    lastSinceAmount = since[trackerId]
                     since[trackerId] = 0
                 } else {
                     since.addOrPut(trackerId, 1)
@@ -93,6 +95,33 @@ object MythologicalCreatureTracker {
             }
         }
         if (config.hideChat) event.blockedReason = "mythological_creature_dug"
+    }
+
+    @HandleEvent
+    fun onChatModify(event: SkyHanniChatEvent.Modify) {
+        if (lastSinceAmount == null) return
+        val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
+
+        val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
+            ErrorManager.skyHanniError(
+                "Unknown mythological creature $creatureMatch",
+                "message" to event.message,
+            )
+        }
+
+        tracker.modify {
+            for (creatureEntry in DianaApi.mythologicalCreatures.values) {
+                if (creatureEntry == type) {
+                    if (lastSinceAmount != null) {
+                        val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
+                        event.replaceComponent(newComp, "diana_mobs_since")
+                    }
+                    lastSinceAmount = null
+
+                }
+            }
+        }
+        lastSinceAmount = null
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {

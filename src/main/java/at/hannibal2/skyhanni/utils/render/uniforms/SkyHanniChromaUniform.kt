@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.utils.render.uniforms
-//? > 1.21.5 {
-/*import com.mojang.blaze3d.buffers.GpuBufferSlice
+
+import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
 import net.minecraft.client.renderer.DynamicUniformStorage
 import java.nio.ByteBuffer
 
 class SkyHanniChromaUniform : AutoCloseable {
-    private val UNIFORM_SIZE = Std140SizeCalculator().putFloat().putFloat().putFloat().putInt().get()
+    private val uniformSize = Std140SizeCalculator().putFloat().putFloat().putFloat().putInt().get()
 
-    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Chroma UBO", UNIFORM_SIZE, 2)
+    val storage = DynamicUniformStorage<UniformValue>("SkyHanni Chroma UBO", uniformSize, 2)
 
     fun writeWith(
         chromaSize: Float,
@@ -47,4 +47,3 @@ class SkyHanniChromaUniform : AutoCloseable {
         }
     }
 }
-*///?}

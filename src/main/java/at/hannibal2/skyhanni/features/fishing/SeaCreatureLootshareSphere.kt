@@ -18,6 +18,7 @@ object SeaCreatureLootshareSphere {
     private const val RANGE = 30.0f
 
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
+    private val existingCircles = mutableSetOf<LorenzVec>()
 
     fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
 
@@ -30,11 +31,18 @@ object SeaCreatureLootshareSphere {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
+        existingCircles.clear()
         for (seaCreature in seaCreatures) {
-            if (!seaCreature.isLoaded()) continue
+            if (!seaCreature.exists()) continue
             val pos = seaCreature.pos ?: continue
+            var circleCount = 0
+            existingCircles.forEach {
+                if (it.distance(pos) < 10) circleCount++
+            }
+            if (circleCount > 2) continue
             val color = if (seaCreature.isOwn || isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
             event.drawSphereWireframeInWorld(color.toColor(), pos, RANGE)
+            existingCircles.add(pos)
         }
     }
 

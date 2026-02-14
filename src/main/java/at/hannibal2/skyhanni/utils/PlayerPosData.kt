@@ -1,54 +1,67 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import net.minecraft.client.player.LocalPlayer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Tracks the player's position over the last 30 seconds. THe index of the position in the list
- * corresponds to the time in ticks since the position was recorded, with the most recent position being at index 0.
- * This makes it so that the time can inaccurate by up to 1 tick.
+ * Tracks the player's position over the last 30 seconds using move events and timestamps.
+ * Used by features that need to know how long the player has been near a location.
  */
-@Suppress("unused")
 @SkyHanniModule
 object PlayerPosData {
 
-    private const val TIME_SECONDS = 30
-    private const val SIZE = TIME_SECONDS * 20
+    private val maxAge = 30.seconds
 
-    val time = TIME_SECONDS.seconds
+    data class TimedPos(val pos: LorenzVec, val time: SimpleTimeMark = SimpleTimeMark.now())
 
-    private val playerPositions = ArrayDeque<LorenzVec>()
-    val positions: List<LorenzVec> get() = playerPositions
+    private val positions = ArrayDeque<TimedPos>()
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onTick() {
-        playerPositions.addFirst(LocationUtils.playerLocation())
-        if (playerPositions.size > SIZE) playerPositions.removeLast()
-    }
+    val positionHistory: List<TimedPos> get() = positions
 
     @HandleEvent
     fun onWorldChange() {
-        playerPositions.clear()
+        positions.clear()
     }
 
-    /** Returns the time the player has been at the specified position, within a distance of [distance]. */
-    fun timeAtPos(pos: LorenzVec, distance: Double): Duration? {
-        val index = playerPositions.indexOfFirst { it.distance(pos) >= distance }
-        return when (index) {
-            0 -> null // The player is currently not at the position
-            -1 -> playerPositions.lastIndex.ticks // all the tracked positions are within the distance
-            else -> index.ticks
+    @HandleEvent
+    fun onEntityMove(event: EntityMoveEvent<LocalPlayer>) {
+        positions.addFirst(TimedPos(event.newLocation))
+    }
+
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
+        while (positions.lastOrNull()?.time?.passedSince()?.let { it > maxAge } == true) {
+            positions.removeLast()
         }
     }
 
-    /** Returns the time since the player was last at the specified [distance] or less from the specified [pos]. */
-    fun timeSinceLastAt(pos: LorenzVec, distance: Double): Duration? {
-        val index = playerPositions.indexOfFirst { it.distance(pos) <= distance }
-        if (index == -1) return null // The last position isn't within the distance, or no position is within the distance.
-        return index.ticks
+    /** Returns how long the player has been within [distance] of [pos], or null if not currently there. */
+    fun timeAtPos(pos: LorenzVec, distance: Double): Duration? {
+        val first = positions.firstOrNull() ?: return null
+        if (first.pos.distance(pos) > distance) return null
+        val timedPos = positions.firstOrNull { it.pos.distance(pos) > distance }
+            ?: return positions.last().time.passedSince()
+        return timedPos.time.passedSince()
     }
 
+    /** Returns how long ago the player was last within [distance] of [pos], or null if never tracked. */
+    fun timeSinceLastAt(pos: LorenzVec, distance: Double): Duration? =
+        positions.firstOrNull { it.pos.distance(pos) <= distance }?.time?.passedSince()
+
+    @HandleEvent
+    fun debug(event: DebugDataCollectEvent) {
+        event.title("PlayerPosData")
+        event.addIrrelevant {
+            add("Tracked positions: ${positions.size}")
+            val oldest = positions.lastOrNull()?.time?.passedSince()
+            val newest = positions.firstOrNull()?.time?.passedSince()
+            add("Age range: $oldest to $newest")
+        }
+    }
 }

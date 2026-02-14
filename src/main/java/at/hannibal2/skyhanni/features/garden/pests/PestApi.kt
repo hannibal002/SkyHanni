@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -56,6 +57,7 @@ object PestApi {
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
+    val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
@@ -117,10 +119,10 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
+     * REGEX-TEST:  Plots: 4, 12, 13, 18, 20
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
-        "tablist.infected-plots",
+        "tablist.infected-plots-no-color",
         "\\sPlots: (?<plots>.*)",
     )
 
@@ -253,7 +255,7 @@ object PestApi {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        infestedPlotsTabListPattern.firstMatcher(event.widget.lines) {
+        infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
             val apiPlots = getInfestedPlots().map { it.id }.toSet()
 
@@ -280,7 +282,7 @@ object PestApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
         }

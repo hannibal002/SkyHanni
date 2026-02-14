@@ -66,7 +66,7 @@ object FossilExcavatorApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         if (emptyPattern.matches(message)) FossilExcavationEvent(emptyList()).post()
 
@@ -94,7 +94,7 @@ object FossilExcavatorApi {
             ItemUtils.readItemAmount(group("item"))
         } ?: return
 
-        ItemUtils.readBookType(pair.first)?.let {
+        ItemUtils.readBookTypeStrippedColor(pair.first)?.let {
             pair = it to pair.second
         }
         loot.add(pair)

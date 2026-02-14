@@ -51,13 +51,19 @@ object ArmorDropTracker {
         GardenApi.inGarden() && checkArmor()
     }
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", ::Data, { it.garden.armorDropTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Armor Drop Tracker",
+        ::Data,
+        { it.garden.armorDropTracker },
+        trackerConfig = { config.perTrackerConfig }
+
+    ) {
         drawDisplay(it)
     }
 
     data class Data(
         @Expose
-        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf(),
+        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
     ) : TrackerData()
 
     init {
@@ -78,7 +84,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         for (dropType in ArmorDropType.entries) {
             if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)

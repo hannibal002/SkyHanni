@@ -1,23 +1,16 @@
 #version 150
 
 in vec2 texCoord;
-//? < 1.21.6 {
-uniform float scaleFactor;
-uniform float radius;
-uniform float smoothness;
-uniform vec2 halfSize;
-uniform vec2 centerPos;
-uniform mat4 modelViewMatrix;
-//?} else {
-//layout(std140) uniform SkyHanniRoundedUniforms {
-//    float scaleFactor;
-//    float radius;
-//    float smoothness;
-//    vec2 halfSize;
-//    vec2 centerPos;
-//    mat4 modelViewMatrix;
-//};
-//?}
+
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
+
 uniform sampler2D textureSampler;
 
 out vec4 outColor;

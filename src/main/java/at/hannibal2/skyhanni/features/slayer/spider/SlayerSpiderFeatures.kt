@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
-import net.minecraft.world.entity.monster.Spider
+import net.minecraft.world.entity.monster.spider.Spider
 
 @SkyHanniModule
 object SlayerSpiderFeatures {
@@ -41,7 +41,7 @@ object SlayerSpiderFeatures {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         if (event.message != "§cYou need to kill the Broodfather's hatchlings before it can be damaged again!") return
 
         val mob = lastClickedTier5 ?: return

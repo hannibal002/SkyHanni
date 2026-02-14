@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -54,6 +53,7 @@ object ExperimentsProfitTracker {
         "Experiments Profit Tracker",
         ::Data,
         { it.experimentation.experimentsProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     // Warn once per session about tracking XP bottle usage
@@ -86,7 +86,7 @@ object ExperimentsProfitTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         experimentRenewPattern.matchMatcher(event.cleanMessage) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
@@ -182,7 +182,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
-        val price = SkyHanniTracker.getPricePer(internalName)
+        val price = tracker.getPricePer(internalName)
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
     }

@@ -91,7 +91,7 @@ object RiftGunthersRace {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         raceStartedPattern.matchMatcher(event.message) {

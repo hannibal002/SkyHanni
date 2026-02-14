@@ -59,7 +59,7 @@ object PreventEarlyCommands {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!SkyBlockUtils.onHypixel) return
         if (!config.preventEarlyExecution) return
         val lastCommand = lastCommand ?: return

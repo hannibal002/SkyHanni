@@ -31,7 +31,7 @@ object LockMouseLook {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!gardenTeleportPattern.matches(event.message)) return
         unlockMouse()
     }
