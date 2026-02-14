@@ -50,7 +50,7 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
         if (itemRenderState.isSkull()) identityPoseStack.angleSkullDown()
 
         // Rotation
-        val rotated = identityPoseStack.mulPose(itemRenderState.rotVec)
+        val rotated = identityPoseStack.mulPose(itemRenderState.rotationVec)
         identityPoseStack.translate(0.0f, 0.03f, 0.125f)
 
         val gameRenderer = Minecraft.getInstance().gameRenderer

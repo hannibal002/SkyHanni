@@ -107,6 +107,7 @@ class AnimatedItemStackRenderable private constructor(
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
     val renderStableId = SkyHanniGuiItemRenderState.nextStableId()
 
+    private var currentTranslation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var currentRotation: Vec3 = initialRotation
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
         currentRotation.x + when (rotationDefinition.axis) {
@@ -146,15 +147,16 @@ class AnimatedItemStackRenderable private constructor(
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
-        val currentOffsetY = bounceDefinition.calculateBounce()
+        currentTranslation = Vec3(0.0, bounceDefinition.calculateBounce(), 0.0)
         tryMoveNextFrame(deltaTime.inPartialSeconds)
 
         stack.renderOnScreen(
             x = (xSpacing / 2f),
-            y = currentOffsetY.toFloat(),
+            y = 0f,
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
-            rotationDegrees = currentRotation,
+            rotationVec = currentRotation,
+            translationVec = currentTranslation,
             renderStableId = renderStableId,
         )
     }

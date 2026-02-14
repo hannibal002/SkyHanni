@@ -11,7 +11,8 @@ data class SkyHanniGuiItemRenderState(
     val guiItemRenderState: GuiItemRenderState,
     val x: Float,
     val y: Float,
-    val rotVec: Vec3,
+    val rotationVec: Vec3,
+    val translationVec: Vec3,
     val scale: Float,
     val stableId: Int,
 ) : PictureInPictureRenderState {

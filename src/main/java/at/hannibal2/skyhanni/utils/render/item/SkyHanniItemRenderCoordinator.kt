@@ -43,7 +43,7 @@ internal object SkyHanniItemRenderCoordinator {
         projectionBuffer.close()
     }
 
-    private data class SettleEntry(var rotVec: Vec3, var framesStable: Int)
+    private data class SettleEntry(var rotationVec: Vec3, var framesStable: Int)
 
     fun prepare(
         states: List<SkyHanniGuiItemRenderState>,
@@ -63,16 +63,19 @@ internal object SkyHanniItemRenderCoordinator {
             val baseKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale, state.stableId)
 
             // Track rotation stability
-            val settle = settleTracker.getOrPut(baseKey) { SettleEntry(state.rotVec, 0) }
-            if (settle.rotVec == state.rotVec) settle.framesStable++
+            val settle = settleTracker.getOrPut(baseKey) { SettleEntry(state.rotationVec, 0) }
+            if (settle.rotationVec == state.rotationVec) settle.framesStable++
             else {
-                settle.rotVec = state.rotVec
+                settle.rotationVec = state.rotationVec
                 settle.framesStable = 0
             }
 
             // Items that haven't moved in 4+ frames use fallback (direct rendering)
-            if (settle.framesStable >= SETTLE_FRAMES) staticFallbackStates.add(state)
-            else animatedStates.add(state)
+            /*if (settle.framesStable >= SETTLE_FRAMES) staticFallbackStates.add(state)
+            else animatedStates.add(state)*/
+
+            // Please?
+            animatedStates.add(state)
         }
 
         // Only set up atlas if we have animated items
@@ -135,7 +138,7 @@ internal object SkyHanniItemRenderCoordinator {
 
     private fun SkyHanniItemRenderContext.renderStaticItems() = states.forEach { state ->
         val tracking = trackingStateOf(state) ?: return@forEach
-        val key = SkyHanniAtlasKey(tracking.modelIdentity, state.rotVec, state.scale, guiScale)
+        val key = SkyHanniAtlasKey(tracking.modelIdentity, state.rotationVec, state.scale, guiScale)
         val existing = atlas.getPositions()[key]
 
         if (existing != null) return@forEach submitBlit(state, existing.u, existing.v)
@@ -161,7 +164,7 @@ internal object SkyHanniItemRenderCoordinator {
             val animKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale, state.stableId)
             val existing = atlas.getAnimatedFrames()[animKey]
 
-            log.log("DEBUG: Rendering ${state.rotVec} | ModelID: ${tracking.modelIdentity.hashCode()} | Existing: ${existing?.x},${existing?.y}")
+            log.log("DEBUG: Rendering ${state.rotationVec} | ModelID: ${tracking.modelIdentity.hashCode()} | Existing: ${existing?.x},${existing?.y}")
 
             val slotX: Int
             val slotY: Int
@@ -211,7 +214,10 @@ internal object SkyHanniItemRenderCoordinator {
         ps.scale(f, -f, f)
         ps.scale(rotationPadding, rotationPadding, rotationPadding)
 
-        val rotated = ps.mulPose(state.rotVec)
+        // Translations
+        ps.translate(state.translationVec)
+
+        val rotated = ps.mulPose(state.rotationVec)
         ps.translate(0.0f, 0.03f, 0.125f)
 
         val gameRenderer = Minecraft.getInstance().gameRenderer

@@ -16,7 +16,6 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
@@ -329,7 +328,8 @@ object GuiRenderUtils {
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
-        rotationDegrees: Vec3? = null,
+        rotationVec: Vec3? = null,
+        translationVec: Vec3? = null,
         renderStableId: Int? = null,
     ) {
         val item = checkBlinkItem()
@@ -355,9 +355,9 @@ object GuiRenderUtils {
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
         // || (totalItemScale > 1 && trackingState.usesBlockLight())
-        if (rotationDegrees != null ) {
+        if (rotationVec != null ) {
             val finalRenderId = renderStableId ?: SkyHanniGuiItemRenderState.nextStableId()
-            item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationDegrees, finalRenderId)
+            item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationVec, translationVec, finalRenderId)
         } else {
             item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         }
@@ -368,7 +368,8 @@ object GuiRenderUtils {
         x: Float,
         y: Float,
         scale: Float,
-        rotVec: Vec3?,
+        rotationVec: Vec3?,
+        translationVec: Vec3? = null,
         renderStableId: Int,
     ) {
         DrawContextUtils.pushPop {
@@ -383,10 +384,18 @@ object GuiRenderUtils {
                 DrawContextUtils.drawContext.scissorStack.peek()
             )
 
-            // Create a unique hash for this stack
-            val finalRotationVector = rotVec ?: Vec3(0.0, 0.0, 0.0)
+            val finalRotationVector = rotationVec ?: Vec3(0.0, 0.0, 0.0)
+            val finalTranslationVector = translationVec ?: Vec3(0.0, 0.0, 0.0)
             Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(
-                SkyHanniGuiItemRenderState(guiItemRenderState, x, y, finalRotationVector, scale, renderStableId)
+                SkyHanniGuiItemRenderState(
+                    guiItemRenderState,
+                    x,
+                    y,
+                    finalRotationVector,
+                    finalTranslationVector,
+                    scale,
+                    renderStableId
+                )
             )
         }
     }
