@@ -170,7 +170,7 @@ object FishingTimer {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Better Fishing Timer")
+        event.title("Fishing Timer")
         event.addIrrelevant {
             add("ownMobs $ownMobs")
             add("otherMobs $otherMobs")
