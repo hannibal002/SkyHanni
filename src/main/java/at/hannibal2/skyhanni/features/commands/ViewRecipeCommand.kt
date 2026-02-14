@@ -59,7 +59,7 @@ object ViewRecipeCommand {
     val list by lazy {
         val list = mutableListOf<String>()
         for ((key, value) in NeuItems.allNeuRepoItems()) {
-            if (value.has("recipe")) {
+            if (value.has("recipe") || value.has("recipes")) {
                 list.add(key.lowercase())
             }
         }
