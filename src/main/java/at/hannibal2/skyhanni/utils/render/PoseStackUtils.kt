@@ -42,5 +42,5 @@ object PoseStackUtils {
         return success
     }
 
-    fun PoseStack.defaultAngleDown() = mulPose(Vec3(30.0, 45.0, 0.0))
+    fun PoseStack.angleSkullDown() = mulPose(Vec3(30.0, 45.0, 0.0))
 }

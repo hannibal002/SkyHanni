@@ -32,7 +32,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
         Direction.Axis.entries.map {
             val rotationDef = ItemStackRotationDefinition(
                 axis = it,
-                rotationSpeed = 65.0,
+                rotationSpeed = 0.0,
             )
             it to Renderable.animatedItemStack(
                 animationFrames,
@@ -76,7 +76,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                 horizontal(
                     spinningStacks.map { (axis, renderable) ->
                         vertical(
-                            text("${axis.name.uppercase()} Axis"),
+                            text("${axis.name.uppercase()} Axis (#${renderable.renderStableId})"),
                             renderable.renderBounds(),
                             spacing = 1,
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

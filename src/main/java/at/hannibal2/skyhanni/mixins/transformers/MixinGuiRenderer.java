@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -72,6 +73,7 @@ public class MixinGuiRenderer {
     @Final
     private MultiBufferSource.BufferSource bufferSource;
 
+    @Unique
     public MultiBufferSource.BufferSource getBufferSource() {
         return bufferSource;
     }
@@ -82,7 +84,7 @@ public class MixinGuiRenderer {
 
     @Shadow
     @Final
-    public GuiRenderState renderState;
+    GuiRenderState renderState;
 
     @Shadow
     @Final
@@ -103,10 +105,10 @@ public class MixinGuiRenderer {
         List<SkyHanniGuiItemRenderState> states = coordinator.takePendingStates();
         if (states.isEmpty()) return;
 
-        new SkyHanniItemRenderCoordinator(getBufferSource()).prepare(
+        SkyHanniItemRenderCoordinator.INSTANCE.prepare(
             states,
             renderState,
-            bufferSource,
+            getBufferSource(),
             featureRenderDispatcher,
             frameNumber
         );

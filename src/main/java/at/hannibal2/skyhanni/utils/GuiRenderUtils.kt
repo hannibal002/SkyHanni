@@ -330,6 +330,7 @@ object GuiRenderUtils {
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
         rotationDegrees: Vec3? = null,
+        renderStableId: Int? = null,
     ) {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -355,7 +356,8 @@ object GuiRenderUtils {
 
         // || (totalItemScale > 1 && trackingState.usesBlockLight())
         if (rotationDegrees != null ) {
-            item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationDegrees)
+            val finalRenderId = renderStableId ?: SkyHanniGuiItemRenderState.nextStableId()
+            item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationDegrees, finalRenderId)
         } else {
             item.normalRenderOnScreen(translateX, translateY, finalItemScale)
         }
@@ -366,7 +368,8 @@ object GuiRenderUtils {
         x: Float,
         y: Float,
         scale: Float,
-        rotVec: Vec3?
+        rotVec: Vec3?,
+        renderStableId: Int,
     ) {
         DrawContextUtils.pushPop {
             DrawContextUtils.drawContext.pose()
@@ -380,9 +383,10 @@ object GuiRenderUtils {
                 DrawContextUtils.drawContext.scissorStack.peek()
             )
 
+            // Create a unique hash for this stack
             val finalRotationVector = rotVec ?: Vec3(0.0, 0.0, 0.0)
             Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(
-                SkyHanniGuiItemRenderState(guiItemRenderState, x, y, finalRotationVector, scale)
+                SkyHanniGuiItemRenderState(guiItemRenderState, x, y, finalRotationVector, scale, renderStableId)
             )
         }
     }

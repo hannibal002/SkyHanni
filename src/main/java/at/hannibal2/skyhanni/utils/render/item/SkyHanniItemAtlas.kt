@@ -40,7 +40,8 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         cursorY += slotSize
     }
 
-    fun isFull() = cursorX + slotSize > sizePixels && cursorY + slotSize * 2 > sizePixels
+    fun isFull() = cursorY + slotSize > sizePixels ||
+        (cursorX + slotSize > sizePixels && cursorY + slotSize * 2 > sizePixels)
     fun isRowFull() = cursorX + slotSize > sizePixels
 
     fun recordPosition(key: SkyHanniAtlasKey, frameNumber: Int) {

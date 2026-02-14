@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
 import net.minecraft.core.Direction.Axis
@@ -104,6 +105,7 @@ class AnimatedItemStackRenderable private constructor(
 
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
+    val renderStableId = SkyHanniGuiItemRenderState.nextStableId()
 
     private var currentRotation: Vec3 = initialRotation
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
@@ -153,6 +155,7 @@ class AnimatedItemStackRenderable private constructor(
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation,
+            renderStableId = renderStableId,
         )
     }
 

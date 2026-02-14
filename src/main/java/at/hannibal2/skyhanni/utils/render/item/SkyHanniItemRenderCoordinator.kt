@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.item
 
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.SkyHanniItemRenderer
@@ -19,30 +20,28 @@ import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.phys.Vec3
 
-internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
+internal object SkyHanniItemRenderCoordinator {
 
-    companion object {
-        // items actively spinning re-render every frame, same as mojang's isAnimated path.
-        // items that have been stable for this many frames are committed to the atlas.
-        private const val SETTLE_FRAMES = 4
-        private val projectionBuffer = CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
-        private val settleTracker = HashMap<SkyHanniAnimatedKey, SettleEntry>()
-        internal val atlas = SkyHanniItemAtlas()
-        @JvmStatic
-        private var atlasNeedsGrow = false
+    // items actively spinning re-render every frame, same as mojang's isAnimated path.
+    // items that have been stable for this many frames are committed to the atlas.
+    private const val SETTLE_FRAMES = 4
+    private val projectionBuffer = CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
+    private val settleTracker = HashMap<SkyHanniAnimatedKey, SettleEntry>()
+    private val atlas = SkyHanniItemAtlas()
+    private val log = LorenzLogger("render/items")
 
-        fun invalidateAtlas() {
-            atlas.invalidate()
-            settleTracker.clear()
-        }
+    @JvmStatic
+    private var atlasNeedsGrow = false
 
-        fun closeAtlas() {
-            atlas.close()
-            projectionBuffer.close()
-        }
+    fun invalidateAtlas() {
+        atlas.invalidate()
+        settleTracker.clear()
     }
 
-    private val fallbackRenderer = SkyHanniItemRenderer(bufferSource)
+    fun closeAtlas() {
+        atlas.close()
+        projectionBuffer.close()
+    }
 
     private data class SettleEntry(var rotVec: Vec3, var framesStable: Int)
 
@@ -56,31 +55,54 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
         if (states.isEmpty()) return
 
         val guiScale = Minecraft.getInstance().window.guiScale
-        val staticStates = ArrayList<SkyHanniGuiItemRenderState>(states.size)
         val animatedStates = ArrayList<SkyHanniGuiItemRenderState>(states.size)
+        val staticFallbackStates = ArrayList<SkyHanniGuiItemRenderState>(states.size)
 
         for (state in states) {
             val tracking = trackingStateOf(state) ?: continue
-            val baseKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale)
+            val baseKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale, state.stableId)
 
-            if (state.rotVec == Vec3.ZERO) {
-                staticStates.add(state)
-                continue
-            }
-
+            // Track rotation stability
             val settle = settleTracker.getOrPut(baseKey) { SettleEntry(state.rotVec, 0) }
-            if (settle.rotVec == state.rotVec) {
-                settle.framesStable++
-            } else {
+            if (settle.rotVec == state.rotVec) settle.framesStable++
+            else {
                 settle.rotVec = state.rotVec
                 settle.framesStable = 0
             }
 
-            if (settle.framesStable >= SETTLE_FRAMES) staticStates.add(state)
+            // Items that haven't moved in 4+ frames use fallback (direct rendering)
+            if (settle.framesStable >= SETTLE_FRAMES) staticFallbackStates.add(state)
             else animatedStates.add(state)
         }
 
-        val maxScale = states.maxOf { it.scale }
+        // Only set up atlas if we have animated items
+        log.log("Trying to setup atlas with ${animatedStates.size} animated states and ${staticFallbackStates.size} static states")
+        trySetupAtlasRendering(
+            animatedStates,
+            guiRenderState,
+            bufferSource,
+            featureRenderDispatcher,
+            frameNumber,
+            guiScale
+        )
+
+        val fallbackRenderer = SkyHanniItemRenderer(bufferSource)
+        staticFallbackStates.forEach { state ->
+            fallbackRenderer.prepare(state, guiRenderState, guiScale)
+        }
+    }
+
+    private fun trySetupAtlasRendering(
+        animatedStates: List<SkyHanniGuiItemRenderState>,
+        guiRenderState: GuiRenderState,
+        bufferSource: BufferSource,
+        featureRenderDispatcher: FeatureRenderDispatcher,
+        frameNumber: Int,
+        guiScale: Int,
+    ) {
+        atlas.getAnimatedFrames().entries.removeIf { (_, pos) -> frameNumber - pos.lastRenderedFrame > 2 }
+        if (animatedStates.isEmpty()) return
+        val maxScale = animatedStates.maxOf { it.scale }
         atlas.ensureCapacity(guiScale, maxScale)
 
         RenderSystem.setProjectionMatrix(
@@ -91,7 +113,7 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
 
         val fallbackStates = mutableListOf<SkyHanniGuiItemRenderState>()
         val context = SkyHanniItemRenderContext(
-            states,
+            animatedStates,
             guiRenderState,
             bufferSource,
             featureRenderDispatcher,
@@ -99,7 +121,6 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
             guiScale,
             fallbackStates
         )
-        context.renderStaticItems()
         context.renderAnimatedItems()
 
         bufferSource.endBatch()
@@ -108,6 +129,7 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
             atlas.grow()
             atlasNeedsGrow = false
         }
+        val fallbackRenderer = SkyHanniItemRenderer(bufferSource)
         fallbackStates.forEach { state -> fallbackRenderer.prepare(state, guiRenderState, guiScale)}
     }
 
@@ -127,44 +149,52 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
         renderItemToAtlas(state, tracking, atlas.getCursorX(), atlas.getCursorY(), atlas.getSlotSize())
 
         atlas.recordPosition(key, frameNumber)
-        submitBlit(state, atlas.getPositions()[key]!!.u, atlas.getPositions()[key]!!.v)
+        val positions = atlas.getPositions()[key] ?: throw Error("Recorded position not found")
+        submitBlit(state, positions.u, positions.v)
         atlas.advanceCursor()
     }
 
-    private fun SkyHanniItemRenderContext.renderAnimatedItems() = states.forEach { state ->
-        val tracking = trackingStateOf(state) ?: return@forEach
-        val animKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale)
-        val existing = atlas.getAnimatedFrames()[animKey]
+    private fun SkyHanniItemRenderContext.renderAnimatedItems() {
+        log.log("renderAnimatedItems: ${states.size} states")
+        states.forEach { state ->
+            val tracking = trackingStateOf(state) ?: return@forEach
+            val animKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale, state.stableId)
+            val existing = atlas.getAnimatedFrames()[animKey]
 
-        // reuse last frame's slot position for this animated item, clearing and re-rendering into it
-        // this mirrors exactly what mojang does for isAnimated items in prepareItemElements()
-        val slotX: Int
-        val slotY: Int
+            log.log("DEBUG: Rendering ${state.rotVec} | ModelID: ${tracking.modelIdentity.hashCode()} | Existing: ${existing?.x},${existing?.y}")
 
-        if (existing != null && existing.lastRenderedFrame != frameNumber) {
-            slotX = existing.x
-            slotY = existing.y
-            atlas.clearSlot(slotX, slotY, atlas.getSlotSize())
-        } else {
-            if (atlas.isRowFull()) atlas.newRow()
-            if (atlas.isFull()) {
-                if (atlas.getSize() < RenderSystem.getDevice().maxTextureSize) atlas.grow()
-                fallbackStates.add(state)
-                return@forEach
-            }
-            slotX = atlas.getCursorX()
-            slotY = atlas.getCursorY()
-            atlas.advanceCursor()
+            val slotX: Int
+            val slotY: Int
+
+            if (existing != null && existing.lastRenderedFrame != frameNumber) {
+                // Reuse existing slot - _dont_ advance cursor
+                slotX = existing.x
+                slotY = existing.y
+                atlas.clearSlot(slotX, slotY, atlas.getSlotSize())
+            } else if (existing == null) {
+                // First time seeing this animated item - allocate new slot
+                if (atlas.isRowFull()) atlas.newRow()
+                if (atlas.isFull()) {
+                    if (atlas.getSize() < RenderSystem.getDevice().maxTextureSize) atlas.grow()
+                    log.log("   Atlas full, using fallback")
+                    fallbackStates.add(state)
+                    return@forEach
+                }
+                slotX = atlas.getCursorX()
+                slotY = atlas.getCursorY()
+                log.log("   New slot at $slotX, $slotY")
+                atlas.advanceCursor()
+            } else return@forEach log.log("   Already rendered this frame, skipping")
+
+            renderItemToAtlas(state, tracking, slotX, slotY, atlas.getSlotSize())
+
+            val u = slotX.toFloat() / atlas.getSize().toFloat()
+            val v = (atlas.getSize() - slotY).toFloat() / atlas.getSize().toFloat()
+
+            val position = SkyHanniAtlasPosition(slotX, slotY, u, v, frameNumber)
+            atlas.recordAnimatedPosition(animKey, position)
+            submitBlit(state, u, v)
         }
-
-        renderItemToAtlas(state, tracking, slotX, slotY, atlas.getSlotSize())
-
-        val u = slotX.toFloat() / atlas.getSize().toFloat()
-        val v = (atlas.getSize() - slotY).toFloat() / atlas.getSize().toFloat()
-
-        val position = SkyHanniAtlasPosition(slotX, slotY, u, v, frameNumber)
-        atlas.recordAnimatedPosition(animKey, position)
-        submitBlit(state, u, v)
     }
 
     private fun SkyHanniItemRenderContext.renderItemToAtlas(
@@ -176,9 +206,10 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
     ) {
         val ps = PoseStack()
         ps.translate(slotX.toFloat() + slotSize / 2.0f, slotY.toFloat() + slotSize / 2.0f, 0.0f)
+        val rotationPadding = 1.0f / 1.42f  // sqrt 2 factor for safety
         val f = slotSize.toFloat()
         ps.scale(f, -f, f)
-        ps.scale(1.0f, -1.0f, -1.0f)
+        ps.scale(rotationPadding, rotationPadding, rotationPadding)
 
         val rotated = ps.mulPose(state.rotVec)
         ps.translate(0.0f, 0.03f, 0.125f)
@@ -214,7 +245,7 @@ internal class SkyHanniItemRenderCoordinator(bufferSource: BufferSource) {
         val textureView = atlas.getTextureView() ?: throw Error("TextureView")
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
-                RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
+                RenderPipelines.GUI_TEXTURED,
                 TextureSetup.singleTexture(textureView),
                 state.pose(),
                 state.x0(),

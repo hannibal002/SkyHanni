@@ -9,16 +9,17 @@ import net.minecraft.client.renderer.MultiBufferSource
 class SkyHanniPipCoordinatorRenderer(
     bufferSource: MultiBufferSource.BufferSource,
 ) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(bufferSource) {
+    companion object {
+        private val pendingStates = ArrayList<SkyHanniGuiItemRenderState>(256)
+    }
 
-    private val pendingStates = ArrayList<SkyHanniGuiItemRenderState>(256)
-
-    fun takePendingStates(): List<SkyHanniGuiItemRenderState> {
+    fun takePendingStates(): List<SkyHanniGuiItemRenderState> = synchronized(pendingStates) {
         val result = ArrayList(pendingStates)
         pendingStates.clear()
         return result
     }
 
-    override fun textureIsReadyToBlit(state: SkyHanniGuiItemRenderState): Boolean {
+    override fun textureIsReadyToBlit(state: SkyHanniGuiItemRenderState): Boolean = synchronized(pendingStates) {
         pendingStates.add(state)
         return true
     }

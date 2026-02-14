@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -37,12 +38,14 @@ object VisitorApi {
     const val ACCEPT_SLOT = 29
     const val REFUSE_SLOT = 33
 
-    val patternGroup = RepoPattern.group("garden.visitor.api")
+    private val patternGroup = RepoPattern.group("garden.visitor.api")
 
     /**
      * REGEX-TEST:  §r§aEmissary Carlton
      * REGEX-TEST:  §r§6Madame Eleanor Q. Goldsworth III
      * REGEX-TEST:  §r§9Lazy Miner
+     * REGEX-TEST:  §r§9Archaeologist §r§fNether Wart
+     * REGEX-TEST:  §r§6Dante Goon §r§fWild Rose §r§b§lNEW!
      */
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
@@ -168,6 +171,12 @@ object VisitorApi {
         ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().addAlpha(80)),
         REFUSED("§cRefused", LorenzColor.RED.toColor().addAlpha(60)),
     }
+
+    data class TabVisitor(
+        val name: String,
+        val crop: CropType? = null,
+        val isNew: Boolean = false,
+    )
 
     fun visitorsInTabList(tabList: List<Component>): List<String> {
         var visitorCount = 0

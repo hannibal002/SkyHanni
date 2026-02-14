@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.utils.render.PoseStackUtils.angleSkullDown
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
@@ -26,6 +27,7 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
 
     override fun getRenderStateClass() = SkyHanniGuiItemRenderState::class.java
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun renderToTexture(itemRenderState: SkyHanniGuiItemRenderState) {
         // We ignore the passed poseStack, since its transformations make it borderline impossible to perform
         // precise rotations in 3D space, due to unpredictable matrix offsets on the passed stack.
@@ -43,6 +45,9 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
         val f = i * itemRenderState.scale()
         identityPoseStack.scale(f, f, -f)
         identityPoseStack.scale(1.0f, -1.0f, -1.0f)
+
+        // Default rotation for skulls
+        if (itemRenderState.isSkull()) identityPoseStack.angleSkullDown()
 
         // Rotation
         val rotated = identityPoseStack.mulPose(itemRenderState.rotVec)
