@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.gson.JsonPrimitive
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
@@ -115,8 +117,14 @@ object EnchantParser {
             config.advancedEnchantColors.advancedGoodColor,
             config.advancedEnchantColors.useAdvancedPoorColor,
             config.advancedEnchantColors.advancedPoorColor,
+            config.advancedEnchantColors.useAdvancedUltimateColor,
+            config.advancedEnchantColors.advancedUltimateColor,
+            config.advancedEnchantColors.useAdvancedMaxUltimateColor,
+            config.advancedEnchantColors.advancedMaxUltimateColor,
             config.hideVanillaEnchants,
             config.hideEnchantDescriptions,
+            config.maxUltimateEnchantColor,
+            config.ultimateEnchantColor,
             ChromaManager.config.enabled,
         ) {
             markCacheDirty()
@@ -168,7 +176,7 @@ object EnchantParser {
                     "SkyHanni's enchant parsing breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::colorParsing,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
-                    { removeAaronMaxEnchant() }
+                    { removeAaronMaxEnchant() },
                 )
             }
             if (config.hideEnchantDescriptions.get()) {
@@ -176,7 +184,7 @@ object EnchantParser {
                     "SkyHanni's hide enchant descriptions breaks with Aaron's Mod's 'Rainbow Max Enchants'",
                     config::hideEnchantDescriptions,
                     "turn off Aaron's Mod's Rainbow Max Enchants",
-                    { removeAaronMaxEnchant() }
+                    { removeAaronMaxEnchant() },
                 )
             }
         }
@@ -415,7 +423,7 @@ object EnchantParser {
             val notLastEnchantOnLine = (i % maxEnchantsPerLine != maxEnchantsPerLine - 1 && orderedEnchant != lastElement)
 
             component = component.append(
-                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent),
             )
 
             if (notLastEnchantOnLine) {
@@ -443,7 +451,7 @@ object EnchantParser {
             val notLastEnchantOnLine = (i % 3 != 2 && orderedEnchant != lastElement)
 
             component = component.append(
-                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent)
+                orderedEnchant.getComponent(currentItem, !notLastEnchantOnLine && fromChatComponent),
             )
 
             if (itemIsBook() && maxEnchantsPerLine == 1) {
@@ -500,5 +508,22 @@ object EnchantParser {
 
     fun openConfigLink() {
         SkyHanniMod.feature.gui.chroma::enabled.jumpToEditor()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "inventory.enchantParsing"
+        event.duplicate(
+            since = 124,
+            sourcePath = "$base.ultimateEnchantColor",
+            newPath = "$base.maxUltimateEnchantColor",
+            default = JsonPrimitive("LIGHT_PURPLE"),
+        )
+        event.duplicate(
+            since = 124,
+            sourcePath = "$base.advancedEnchantColors.advancedUltimateColor",
+            newPath = "$base.advancedEnchantColors.advancedMaxUltimateColor",
+            default = JsonPrimitive("0:255:255:85:1"),
+        )
     }
 }
