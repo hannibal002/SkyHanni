@@ -23,7 +23,7 @@ object ContributorManager {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val map = event.getConstant<ContributorsJson>("Contributors").contributors
+        val map = event.getConstant<ContributorsJson>("ContributorList").contributors
 
         val failedKeys = mutableMapOf<String, ContributorJsonEntry>()
 
