@@ -154,7 +154,7 @@ class FishingConfig {
     @FeatureToggle
     var seaCreatureKillTimerOwnMobsOnly: Boolean = true
 
-    @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
     var notice1: String = ""
 
@@ -168,7 +168,7 @@ class FishingConfig {
     @FeatureToggle
     var lootshareRange = false
 
-    @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
     var notice: String = ""
 }

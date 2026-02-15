@@ -22,7 +22,7 @@ class SeaCreatureHealthDisplayConfig {
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var limit = 5
 
-    @ConfigOption(name = "Custom Health Display Mobs", desc = "This Feature's Mobs can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigOption(name = "Custom Health Display Mobs", desc = "This Feature's Mobs can be customized under /shseacreatures!")
     @ConfigEditorInfoText
     var notice: String = ""
 
