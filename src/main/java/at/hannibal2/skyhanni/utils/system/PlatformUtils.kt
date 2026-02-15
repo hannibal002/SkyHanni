@@ -19,7 +19,7 @@ import kotlin.system.exitProcess
 @SkyHanniModule
 object PlatformUtils {
 
-    val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name
+    val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name()
 
     val isDevEnvironment: Boolean by lazy {
         FabricLoader.getInstance().isDevelopmentEnvironment

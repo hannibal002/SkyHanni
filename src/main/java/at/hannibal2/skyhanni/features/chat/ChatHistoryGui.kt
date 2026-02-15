@@ -42,12 +42,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         DrawContextUtils.pushMatrix()
         val l = (width / 2.0 - w / 2.0).toInt()
         val t = (height / 2.0 - h / 2.0).toInt()
-        DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
+        DrawContextUtils.translate(l + 0.0, t + 0.0)
         GuiRenderUtils.drawFloatingRectDark(0, 0, w, h)
-        DrawContextUtils.translate(-l + 0.0, -t + 0.0, 0.0)
+        DrawContextUtils.translate(-l + 0.0, -t + 0.0)
         GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
-        DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
-        DrawContextUtils.translate(5.0, 5.0 - scroll, 1.0)
+        DrawContextUtils.translate(l + 0.0, t + 0.0)
+        DrawContextUtils.translate(5.0, 5.0 - scroll)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt() - 5
@@ -114,7 +114,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     private fun drawMultipleTextLines(lines: List<FormattedCharSequence>, xPos: Int) {
         for (line in lines) {
             GuiRenderUtils.drawString(line, xPos, 0, -1)
-            DrawContextUtils.translate(0f, 10f, 0f)
+            DrawContextUtils.translate(0f, 10f)
         }
     }
 

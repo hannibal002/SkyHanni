@@ -180,7 +180,6 @@ object CroesusChestTracker {
                     "lore" to lore,
                 ).run { null }
             }
-            run.kismetUsed = kismetUsedInCroesusPattern.anyMatches(lore)
         }
     }
 
@@ -196,7 +195,6 @@ object CroesusChestTracker {
     private fun DungeonRunInfo.setValuesNull() {
         floor = null
         openState = null
-        kismetUsed = null
     }
 
     @HandleEvent(InventoryCloseEvent::class)
@@ -242,7 +240,7 @@ object CroesusChestTracker {
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
         val run = croesusSlotMapToRun(event.slot.containerSlot) ?: return
-        if (!getKismetUsed(run)) return
+        if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getLore())) return
         event.offsetY = -1
         event.offsetX = -9
         event.stackTip = "§a✔"
@@ -331,8 +329,6 @@ object CroesusChestTracker {
     private fun Int.getRun() = getRun0(this)
 
     private fun getRun0(run: Int = currentRunIndex) = croesusChests?.takeIf { run < it.size }?.get(run)
-
-    private fun getKismetUsed(runIndex: Int) = getRun0(runIndex)?.kismetUsed ?: false
 
     private fun getKismetAmount() = kismetInternalName.getAmountInSacks() + kismetInternalName.getAmountInInventory()
 

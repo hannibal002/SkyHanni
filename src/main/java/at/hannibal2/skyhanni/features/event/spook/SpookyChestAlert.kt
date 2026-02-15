@@ -25,7 +25,7 @@ object SpookyChestAlert {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
         chestMessagePattern.matchMatcher(event.message) {
             TitleManager.sendTitle(

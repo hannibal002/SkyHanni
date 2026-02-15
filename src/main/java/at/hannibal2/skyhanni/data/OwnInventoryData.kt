@@ -171,7 +171,7 @@ object OwnInventoryData {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
             ignoreItem(500.milliseconds) { it.repoItemName.contains(name) }

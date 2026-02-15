@@ -55,7 +55,7 @@ class ScrollTable private constructor(
     private var renderY = 0
 
     override fun renderCell(mouseOffsetX: Int, mouseOffsetY: Int, rowIndex: Int, columnIndex: Int, renderable: Renderable) {
-        DrawContextUtils.translated(xOffsets[columnIndex].toFloat(), 0f, 0f) {
+        DrawContextUtils.translated(xOffsets[columnIndex].toFloat(), 0f) {
             renderable.renderXYAligned(
                 mouseOffsetX + xOffsets[columnIndex],
                 mouseOffsetY + renderY,
@@ -68,7 +68,7 @@ class ScrollTable private constructor(
     override fun renderRow(mouseOffsetX: Int, mouseOffsetY: Int, rowIndex: Int, row: List<Renderable>) {
         super.renderRow(mouseOffsetX, mouseOffsetY, rowIndex, row)
         val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
-        DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+        DrawContextUtils.translate(0f, yShift.toFloat())
         renderY += yShift
     }
 
@@ -87,7 +87,7 @@ class ScrollTable private constructor(
         else
             for (rowIndex in range) renderRow(mouseOffsetX, mouseOffsetY, rowIndex, content[rowIndex])
 
-        DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
+        DrawContextUtils.translate(0f, -renderY.toFloat())
     }
 
     companion object {

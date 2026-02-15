@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -145,7 +146,7 @@ object MinionXP {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
         if (!config.xpDisplay) return
         when {
             MinionFeatures.minionInventoryOpen -> {
@@ -163,7 +164,7 @@ object MinionXP {
         }
     }
 
-    private fun addXPInfoToTooltip(event: ToolTipEvent) {
+    private fun addXPInfoToTooltip(event: ToolTipTextEvent) {
         xpItemMap[toPrimitiveItemStack(event.itemStack)]?.let {
             event.toolTip.add("")
             event.toolTip.add(it)

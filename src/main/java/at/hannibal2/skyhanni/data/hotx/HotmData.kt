@@ -480,11 +480,11 @@ enum class HotmData(
         // but the value might be useful in the future or for debugging
 
         /**
-         * REGEX-TEST: §7Cost
+         * REGEX-TEST: Cost
          */
         val perkCostPattern by patternGroup.pattern(
-            "perk.cost",
-            "(?:§.)*§7Cost",
+            "perk.cost.new",
+            "Cost",
         )
 
         override val resetChatPattern by patternGroup.pattern(
@@ -523,12 +523,12 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: §r§299,918
-         * REGEX-TEST:  Gemstone: §r§d37,670
+         * REGEX-TEST:  Mithril: 99,918
+         * REGEX-TEST:  Gemstone: 37,670
          */
         private val powderPattern by patternGroup.pattern(
-            "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
+            "widget.powder-nocolor",
+            "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
         // </editor-fold>
 
@@ -631,14 +631,14 @@ enum class HotmData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+        override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
 
-        override fun tryBlock(event: SkyHanniChatEvent) {
+        override fun tryBlock(event: SkyHanniChatEvent.Allow) {
             if (!chatConfig.hideSkyMall || IslandTypeTags.MINING.inAny()) return
             event.blockedReason = "skymall"
         }
 
-        override fun extraChatHandling(event: SkyHanniChatEvent) {
+        override fun extraChatHandling(event: SkyHanniChatEvent.Allow) {
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")

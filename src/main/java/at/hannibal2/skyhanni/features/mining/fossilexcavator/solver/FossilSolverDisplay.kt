@@ -92,7 +92,7 @@ object FossilSolverDisplay {
         possibleFossilTypes = emptySet()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
@@ -146,7 +146,7 @@ object FossilSolverDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
@@ -160,7 +160,7 @@ object FossilSolverDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
@@ -173,7 +173,7 @@ object FossilSolverDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.showPercentage) return
@@ -186,7 +186,7 @@ object FossilSolverDisplay {
         event.offsetY = 10
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -237,5 +237,5 @@ object FossilSolverDisplay {
         isCompleted = true
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && config.enabled && FossilExcavatorApi.inInventory
+    private fun isEnabled() = config.enabled && FossilExcavatorApi.excavatorInventory.isInside()
 }

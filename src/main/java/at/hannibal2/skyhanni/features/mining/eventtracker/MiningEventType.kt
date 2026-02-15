@@ -43,11 +43,11 @@ enum class MiningEventType(
             val wind = Renderable.text("§9≈", scale = 0.75)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                DrawContextUtils.translate(1f, 1f, -2f)
+                DrawContextUtils.translate(1f, 1f)
                 compass.render(mouseOffsetX, mouseOffsetY)
-                DrawContextUtils.translate(-1f, -2f, 2f)
+                DrawContextUtils.translate(-1f, -2f)
                 wind.render(mouseOffsetX, mouseOffsetY)
-                DrawContextUtils.translate(0f, 1f, 0f)
+                DrawContextUtils.translate(0f, 1f)
             }
         },
     ),
@@ -63,11 +63,11 @@ enum class MiningEventType(
             val dyePink = Renderable.item(DyeCompat.PINK.createStack(), 0.45)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                DrawContextUtils.translate(1f, 0f, 0f)
+                DrawContextUtils.translate(1f, 0f)
                 dyePink.render(mouseOffsetX + 1, mouseOffsetY - 1)
-                DrawContextUtils.translate(-2f, 1.5f, 0f)
+                DrawContextUtils.translate(-2f, 1.5f)
                 dyeGreen.render(mouseOffsetX, mouseOffsetY)
-                DrawContextUtils.translate(1f, -1.5f, 0f)
+                DrawContextUtils.translate(1f, -1.5f)
             }
 
         },
@@ -99,11 +99,11 @@ enum class MiningEventType(
             }
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                DrawContextUtils.translate(-1f, 0f, 0f)
+                DrawContextUtils.translate(-1f, 0f)
                 alexHead.render(mouseOffsetX, mouseOffsetY)
-                DrawContextUtils.translate(+4f, +3f, 0f)
+                DrawContextUtils.translate(+4f, +3f)
                 steveHead.render(mouseOffsetX, mouseOffsetY)
-                DrawContextUtils.translate(-3f, -3f, 0f)
+                DrawContextUtils.translate(-3f, -3f)
             }
 
         },

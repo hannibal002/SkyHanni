@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import net.minecraft.world.entity.projectile.Arrow
+import net.minecraft.world.entity.projectile.arrow.Arrow
 import java.util.LinkedList
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration

@@ -142,7 +142,7 @@ object CompactStarlynSisters {
     private var collectionPB = StarlynCollectionPersonalBests()
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isInIsland()) return
         event.blockAndCompact()
     }
@@ -154,7 +154,7 @@ object CompactStarlynSisters {
         resetPersonalBestVariables()
     }
 
-    private fun SkyHanniChatEvent.blockAndCompact() {
+    private fun SkyHanniChatEvent.Allow.blockAndCompact() {
         val message = this.message
         if (config.compactPersonalBest)
             compactCollectionPB(message)
@@ -162,7 +162,7 @@ object CompactStarlynSisters {
             compactContestResults(message)
     }
 
-    private fun SkyHanniChatEvent.compactCollectionPB(message: String) {
+    private fun SkyHanniChatEvent.Allow.compactCollectionPB(message: String) {
         sisterCollPBDuringContestPattern.matchMatcher(message) {
             val foragingSister = group("foragingSister")
             val previousRecord = group("previousRecord")
@@ -172,7 +172,7 @@ object CompactStarlynSisters {
                     "§b$previousRecord §6$woodType logs §ecollected during a contest! Keep it up!"
                 )
             val hoverableLockInWarning = formattedLockInWarning.asComponent()
-            ChatUtils.chat(hoverableLockInWarning)
+            ChatUtils.chat(hoverableLockInWarning, prefix = false)
             blockedReason = "STARLYN_COLLECTION"
             return
         }
@@ -214,7 +214,7 @@ object CompactStarlynSisters {
                 hoverablePersonalBest.onClick(onClick = {
                     HypixelCommands.starlynSisters()
                 })
-                ChatUtils.chat(hoverablePersonalBest)
+                ChatUtils.chat(hoverablePersonalBest, prefix = false)
                 isInPersonalBest = false
                 blockedReason = "STARLYN_COLLECTION"
                 resetPersonalBestVariables()
@@ -222,7 +222,7 @@ object CompactStarlynSisters {
         }
     }
 
-    private fun SkyHanniChatEvent.compactContestResults(message: String) {
+    private fun SkyHanniChatEvent.Allow.compactContestResults(message: String) {
         if (!isInResults) {
             startContestResultsPattern.matchMatcher(message) {
                 isInResults = true
@@ -265,7 +265,7 @@ object CompactStarlynSisters {
                         HypixelCommands.starlynSisters()
                     },
                 )
-                ChatUtils.chat(hoverableResults)
+                ChatUtils.chat(hoverableResults, prefix = false)
                 isInResults = false
                 blockedReason = "STARLYN_RESULTS"
                 resetContestResultVariables()

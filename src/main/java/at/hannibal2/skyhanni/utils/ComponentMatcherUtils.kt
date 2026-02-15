@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.appendComponent
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
@@ -309,7 +309,7 @@ class ComponentSpan internal constructor(
     operator fun plus(other: ComponentSpan): ComponentSpan {
         val left = this.intoComponent()
         val right = other.intoComponent()
-        left.appendComponent(right)
+        left.append(right)
         return left.intoSpan()
     }
 

@@ -21,17 +21,17 @@ import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.IronGolem
-import net.minecraft.world.entity.animal.Ocelot
-import net.minecraft.world.entity.animal.Pig
+import net.minecraft.world.entity.animal.feline.Ocelot
+import net.minecraft.world.entity.animal.golem.IronGolem
+import net.minecraft.world.entity.animal.pig.Pig
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.CaveSpider
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.monster.Giant
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Slime
-import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.entity.monster.ZombifiedPiglin
+import net.minecraft.world.entity.monster.spider.CaveSpider
+import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin
 
 object IslandExceptions {
 

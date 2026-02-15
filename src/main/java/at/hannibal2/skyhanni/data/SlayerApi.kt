@@ -140,7 +140,7 @@ object SlayerApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
             questStartTime = SimpleTimeMark.now()
         }
@@ -182,7 +182,8 @@ object SlayerApi {
     }
 
     private fun getSlayerLines(): List<String> =
-        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.ifEmpty { TabWidget.SLAYER.lines }.map { it.trim() }
+        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }
+            .ifEmpty { TabWidget.SLAYER.lines.map { it.string } }.map { it.trim() }
 
     private fun updateSlayerState() {
         val lines = getSlayerLines()

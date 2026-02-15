@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 
@@ -49,21 +49,21 @@ object CropMilestonesApi {
     )
 
     /**
-     * REGEX-TEST:  Cocoa Beans 31: §r§a68%
-     * REGEX-TEST:  Potato 32: §r§a97.7%
+     * REGEX-TEST:  Cocoa Beans 31: 68%
+     * REGEX-TEST:  Potato 32: 97.7%
      */
     val tabListPercentPattern by patternGroup.pattern(
-        "tablist.percent",
-        " (?<crop>[\\w ]+) (?<tier>\\d+): §r§a(?<percentage>.*)%",
+        "tablist.percent-no-color",
+        " (?<crop>[\\w ]+) (?<tier>\\d+): (?<percentage>.*)%",
     )
 
     /**
-     * REGEX-TEST:  Potato 46: §r§c§lMAX
-     * REGEX-TEST:  Cocoa Beans 46: §r§c§lMAX
+     * REGEX-TEST:  Potato 46: MAX
+     * REGEX-TEST:  Cocoa Beans 46: MAX
      */
     val tabListMaxPattern by patternGroup.pattern(
-        "tablist.max",
-        " (?<crop>[\\w ]+) (?<tier>\\d+): §r§c§lMAX"
+        "tablist.max-no-color",
+        " (?<crop>[\\w ]+) (?<tier>\\d+): MAX"
     )
 
     /**
@@ -356,7 +356,6 @@ object CropMilestonesApi {
         cropMilestoneTierCache.clear()
         amountToNextTierCache.clear()
         maxTier = null
-        GardenCropMilestoneDisplay.update()
     }
 
     private fun resetMilestones() {
@@ -373,9 +372,11 @@ object CropMilestonesApi {
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneRepoData = event.getConstant<GardenJson>("Garden").cropMilestones
         missingMilestoneRepoData = false
-        CustomGoals.loadCustomGoals()
         clearMilestoneCache()
-        CropMilestoneUpdateEvent.post()
+        if (MinecraftCompat.localPlayerExists) {
+            CustomGoals.loadCustomGoals()
+            CropMilestoneUpdateEvent.post()
+        }
     }
 
     @HandleEvent

@@ -166,7 +166,7 @@ object CakeTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
         cakePurchasedPattern.matchMatcher(event.message) {
             val year = group("year").formatInt()

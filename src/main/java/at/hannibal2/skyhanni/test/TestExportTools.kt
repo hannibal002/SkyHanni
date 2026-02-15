@@ -18,10 +18,6 @@ import com.google.gson.JsonElement
 import net.minecraft.world.item.ItemStack
 import java.io.InputStreamReader
 import java.io.Reader
-//#if TODO
-//$$ import at.hannibal2.skyhanni.utils.json.ItemStackTypeAdapterFactory
-//$$ import at.hannibal2.skyhanni.utils.json.NBTTypeAdapter
-//#endif
 
 @SkyHanniModule
 object TestExportTools {
@@ -30,10 +26,6 @@ object TestExportTools {
 
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
-        //#if TODO
-        //$$ .registerTypeAdapter(NBTTagCompound::class.java, NBTTypeAdapter)
-        //$$ .registerTypeAdapterFactory(ItemStackTypeAdapterFactory)
-        //#endif
         .create()
 
     class Key<T> internal constructor(val name: String)

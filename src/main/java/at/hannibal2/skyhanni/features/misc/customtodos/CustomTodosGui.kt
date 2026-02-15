@@ -65,7 +65,7 @@ object CustomTodosGui {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         todos.forEach { todo ->
             if (todo.triggerTarget != CustomTodo.TriggerTarget.CHAT) return@forEach
             if (matchString(todo, event.message)) todo.setDoneNow()

@@ -37,7 +37,7 @@ object SirihHelper {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 1.minutes) return
         if (!sirihLine.matches(event.message)) return
