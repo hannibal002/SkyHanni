@@ -39,7 +39,7 @@ object ContributorManager {
 
         if (failedKeys.isNotEmpty())
             SkyHanniMod.logger.warn(
-                "Failed to parse ${failedKeys.keys.size} UUIDs in REPO: Contributors.json. Failed keys:\n" +
+                "Failed to parse ${failedKeys.keys.size} UUIDs in REPO file: ContributorList.json. Failed keys:\n" +
                     failedKeys.entries.joinToString("\n") { "Key: ${it.key}, DisplayName: ${it.value.displayName}" }
             )
     }
