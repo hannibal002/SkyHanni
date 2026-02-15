@@ -43,7 +43,7 @@ class RareCatchesConfig {
     @ConfigEditorBoolean
     var playSound: Boolean = true
 
-    @ConfigOption(name = "Custom Party Chat List", desc = "This Feature can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigOption(name = "Custom Party Chat List", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
     var notice: String = ""
 
