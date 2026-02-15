@@ -39,7 +39,7 @@ open class Enchant : Comparable<Enchant> {
     private val goodLevel = 0
 
     @Expose
-    val maxLevel = 0
+    protected val maxLevel = 0
 
     private fun isNormal() = this is Normal
     private fun isUltimate() = this is Ultimate

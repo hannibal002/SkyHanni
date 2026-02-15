@@ -11,7 +11,7 @@ class AdvancedEnchantmentColors {
 
     @Expose
     @ConfigOption(
-        name = "Use Advanced Ultimate Color?",
+        name = "Use Advanced Ultimate Color",
         desc = "Enable this to override the color selected for Ultimate enchantments from above."
     )
     @ConfigEditorBoolean
@@ -24,20 +24,20 @@ class AdvancedEnchantmentColors {
 
     @Expose
     @ConfigOption(
-        name = "Use Advanced Maxed Ultimate Color?",
+        name = "Use Custom Max Ultimate Color",
         desc = "Enable this to override the color selected for Maxed Ultimate enchantments from above."
     )
     @ConfigEditorBoolean
     val useAdvancedMaxUltimateColor: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "Advanced Maxed Ultimate Color", desc = "Select a custom color to use for maxed Ultimate enchantments.")
+    @ConfigOption(name = "Custom Max Ultimate Color", desc = "Select a custom color to use for maxed Ultimate enchantments.")
     @ConfigEditorColour
     val advancedMaxUltimateColor: Property<ChromaColour> = Property.of(ChromaColour.fromStaticRGB(255, 255, 85, 1))
 
     @Expose
     @ConfigOption(
-        name = "Use Advanced Perfect Color?",
+        name = "Use Advanced Perfect Color",
         desc = "Enable this to override the color selected for perfect level enchantments from above."
     )
     @ConfigEditorBoolean
@@ -50,7 +50,7 @@ class AdvancedEnchantmentColors {
 
     @Expose
     @ConfigOption(
-        name = "Use Advanced Great Color?",
+        name = "Use Advanced Great Color",
         desc = "Enable this to override the color selected for great level enchantments from above."
     )
     @ConfigEditorBoolean
@@ -63,7 +63,7 @@ class AdvancedEnchantmentColors {
 
     @Expose
     @ConfigOption(
-        name = "Use Advanced Good Color?",
+        name = "Use Advanced Good Color",
         desc = "Enable this to override the color selected for good level enchantments from above."
     )
     @ConfigEditorBoolean
@@ -76,7 +76,7 @@ class AdvancedEnchantmentColors {
 
     @Expose
     @ConfigOption(
-        name = "Use Advanced Poor Color?",
+        name = "Use Advanced Poor Color",
         desc = "Enable this to override the color selected for poor level enchantments from above."
     )
     @ConfigEditorBoolean
