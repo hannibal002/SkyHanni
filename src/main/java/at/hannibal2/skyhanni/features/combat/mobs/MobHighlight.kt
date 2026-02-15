@@ -33,21 +33,21 @@ object MobHighlight {
 
         val (color, isEnabled) = when {
             name == "Boss Corleone" ->
-                LorenzColor.DARK_PURPLE to config.corleoneHighlighter
+                LorenzColor.DARK_PURPLE to config::corleoneHighlighter
 
             name == "Arachne's Keeper" ->
-                LorenzColor.DARK_BLUE to config.arachneKeeperHighlight
+                LorenzColor.DARK_BLUE to config::arachneKeeperHighlight
 
             name == "Arachne's Brood" ->
-                LorenzColor.GOLD to config.arachneBossHighlighter
+                LorenzColor.GOLD to config::arachneBossHighlighter
 
             name == "Arachne" -> {
                 arachne = mob
-                LorenzColor.RED to config.arachneBossHighlighter
+                LorenzColor.RED to config::arachneBossHighlighter
             }
 
             mob.isRunic ->
-                LorenzColor.LIGHT_PURPLE to config.runicMobHighlight
+                LorenzColor.LIGHT_PURPLE to config::runicMobHighlight
 
             else -> return
         }
@@ -55,7 +55,7 @@ object MobHighlight {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             mob.baseEntity,
             color.toColor().addAlpha(127),
-        ) { isEnabled }
+        ) { isEnabled() }
     }
 
     @HandleEvent
@@ -63,6 +63,8 @@ object MobHighlight {
         if (arachne == event.mob) arachne = null
     }
 
+    // TODO: change to use nametags instead
+    // as this method does not work for mobs that spawn corrupted naturally
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!config.corruptedMobHighlight) return
@@ -85,22 +87,22 @@ object MobHighlight {
 
         val heldBlock = entity.getBlockInHand()?.block
 
-        val (color, isEnabled) = when {
+        val (color, alpha, isEnabled) = when {
             heldBlock == Blocks.END_PORTAL_FRAME ->
-                LorenzColor.DARK_RED to config.specialZealotHighlighter
+                Triple(LorenzColor.DARK_RED, 50, config::specialZealotHighlighter)
 
             heldBlock == Blocks.ENDER_CHEST ->
-                LorenzColor.GREEN to config.chestZealotHighlighter
+                Triple(LorenzColor.GREEN, 127, config::chestZealotHighlighter)
 
             entity.isZealotOrBruiser() ->
-                LorenzColor.DARK_AQUA to config.zealotBruiserHighlighter
+                Triple(LorenzColor.DARK_AQUA, 127, config::zealotBruiserHighlighter)
             else -> return
         }
 
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             entity,
-            color.toColor().addAlpha(127),
-        ) { isEnabled }
+            color.toColor().addAlpha(alpha),
+        ) { isEnabled() }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
