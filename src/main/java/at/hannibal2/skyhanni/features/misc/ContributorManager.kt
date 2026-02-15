@@ -60,19 +60,5 @@ object ContributorManager {
     fun shouldBeUpsideDown(uuid: UUID): Boolean = getContributor(uuid)?.upsideDown ?: false
 
     private fun getContributor(uuid: UUID) =
-        contributors[uuid]?.let { it.takeIf { it.isAllowed() } }
-
-    private fun ContributorJsonEntry.isAllowed(): Boolean {
-        if (!config.fancyContributors) return false
-        return when (externalMod) {
-            // normal SkyHanni contributor
-            null -> true
-
-            // TODO add other mod's devs, e.g skytils
-
-            "SBA" -> config.fancySbaContributors
-
-            else -> false
-        }
-    }
+        if (config.fancyContributors) contributors[uuid] else null
 }
