@@ -76,7 +76,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                 horizontal(
                     spinningStacks.map { (axis, renderable) ->
                         vertical(
-                            text("${axis.name.uppercase()} Axis (#${renderable.renderStableId})"),
+                            text("${axis.name.uppercase()} Axis (#${renderable.getStableId()})"),
                             renderable.renderBounds(),
                             spacing = 1,
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

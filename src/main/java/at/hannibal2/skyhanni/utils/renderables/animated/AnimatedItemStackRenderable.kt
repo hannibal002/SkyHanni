@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
 import net.minecraft.core.Direction.Axis
@@ -102,10 +101,13 @@ class AnimatedItemStackRenderable private constructor(
     private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
     private val fullBounceHeight = if (bounceDefinition.isEnabled()) bounceDefinition.getTotalBounceHeight() else 0
     private val bounceOffset = fullBounceHeight / 2.0
+    private val bounceEnvelope = Vec3(0.0, fullBounceHeight.toDouble(), 0.0)
 
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
-    val renderStableId = SkyHanniGuiItemRenderState.nextStableId()
+
+    private var stableRenderId: Int = -1
+    fun getStableId() = stableRenderId
 
     private var currentTranslation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var currentRotation: Vec3 = initialRotation
@@ -150,14 +152,15 @@ class AnimatedItemStackRenderable private constructor(
         currentTranslation = Vec3(0.0, bounceDefinition.calculateBounce(), 0.0)
         tryMoveNextFrame(deltaTime.inPartialSeconds)
 
-        stack.renderOnScreen(
+        this.stableRenderId = stack.renderOnScreen(
             x = (xSpacing / 2f),
             y = 0f,
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
             rotationVec = currentRotation,
             translationVec = currentTranslation,
-            renderStableId = renderStableId,
+            bounceEnvelopeVec = bounceEnvelope,
+            stableRenderId = this.stableRenderId,
         )
     }
 

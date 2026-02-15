@@ -322,6 +322,10 @@ object GuiRenderUtils {
 
     private const val SKULL_SCALE = (5f / 4f)
 
+    /**
+     * Returns either the stable ID of the custom render (if used) or -1 if the item was
+     * rendered using the normal method (either is static, or 'small')
+     */
     @Suppress("unused")
     fun ItemStack.renderOnScreen(
         x: Float,
@@ -330,8 +334,9 @@ object GuiRenderUtils {
         rescaleSkulls: Boolean = true,
         rotationVec: Vec3? = null,
         translationVec: Vec3? = null,
-        renderStableId: Int? = null,
-    ) {
+        bounceEnvelopeVec: Vec3? = null,
+        stableRenderId: Int? = null,
+    ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
 
@@ -355,12 +360,9 @@ object GuiRenderUtils {
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
         // || (totalItemScale > 1 && trackingState.usesBlockLight())
-        if (rotationVec != null ) {
-            val finalRenderId = renderStableId ?: SkyHanniGuiItemRenderState.nextStableId()
-            item.customRenderOnScreen(trackingState, translateX, translateY, finalItemScale, rotationVec, translationVec, finalRenderId)
-        } else {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
-        }
+        return if (rotationVec != null) item.customRenderOnScreen(
+            trackingState, translateX, translateY, finalItemScale, rotationVec, translationVec, bounceEnvelopeVec, stableRenderId
+        ) else item.normalRenderOnScreen(translateX, translateY, finalItemScale)
     }
 
     private fun ItemStack.customRenderOnScreen(
@@ -368,48 +370,41 @@ object GuiRenderUtils {
         x: Float,
         y: Float,
         scale: Float,
-        rotationVec: Vec3?,
+        rotationVec: Vec3? = null,
         translationVec: Vec3? = null,
-        renderStableId: Int,
-    ) {
-        DrawContextUtils.pushPop {
-            DrawContextUtils.drawContext.pose()
+        bounceEnvelopeVec: Vec3? = null,
+        stableRenderId: Int? = null,
+    ): Int = DrawContextUtils.pushPopResult {
+        DrawContextUtils.drawContext.pose()
+        val newRenderState = SkyHanniGuiItemRenderState(
+            trackingState,
+            this,
+            x,
+            y,
+            rotationVec,
+            translationVec,
+            bounceEnvelopeVec,
+            scale,
+            stableRenderId,
+        )
 
-            val guiItemRenderState = GuiItemRenderState(
-                this.item.name.toString(),
-                Matrix3x2f(DrawContextUtils.drawContext.pose()),
-                trackingState,
-                0,
-                0,
-                DrawContextUtils.drawContext.scissorStack.peek()
-            )
-
-            val finalRotationVector = rotationVec ?: Vec3(0.0, 0.0, 0.0)
-            val finalTranslationVector = translationVec ?: Vec3(0.0, 0.0, 0.0)
-            Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(
-                SkyHanniGuiItemRenderState(
-                    guiItemRenderState,
-                    x,
-                    y,
-                    finalRotationVector,
-                    finalTranslationVector,
-                    scale,
-                    renderStableId
-                )
-            )
-        }
+        Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        return@pushPopResult newRenderState.stableId
     }
 
-    private fun ItemStack.normalRenderOnScreen(translateX: Float, translateY: Float, scale: Float) {
-        DrawContextUtils.pushPop {
-            DrawContextUtils.translate(translateX, translateY)
-            DrawContextUtils.scale(scale, scale)
+    private fun ItemStack.normalRenderOnScreen(
+        translateX: Float,
+        translateY: Float,
+        scale: Float
+    ): Int = DrawContextUtils.pushPopResult {
+        DrawContextUtils.translate(translateX, translateY)
+        DrawContextUtils.scale(scale, scale)
 
-            RenderSystem.assertOnRenderThread()
+        RenderSystem.assertOnRenderThread()
 
-            Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
+        Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
 
-            DrawContextUtils.drawItem(this, 0, 0)
-        }
+        DrawContextUtils.drawItem(this, 0, 0)
+        return@pushPopResult -1
     }
 }

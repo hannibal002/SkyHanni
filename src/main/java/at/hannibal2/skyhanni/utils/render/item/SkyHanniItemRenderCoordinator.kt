@@ -71,11 +71,8 @@ internal object SkyHanniItemRenderCoordinator {
             }
 
             // Items that haven't moved in 4+ frames use fallback (direct rendering)
-            /*if (settle.framesStable >= SETTLE_FRAMES) staticFallbackStates.add(state)
-            else animatedStates.add(state)*/
-
-            // Please?
-            animatedStates.add(state)
+            if (settle.framesStable >= SETTLE_FRAMES) staticFallbackStates.add(state)
+            else animatedStates.add(state)
         }
 
         // Only set up atlas if we have animated items
@@ -174,7 +171,7 @@ internal object SkyHanniItemRenderCoordinator {
                 // First time seeing this animated item - allocate new slot
                 if (atlas.isRowFull()) atlas.newRow()
                 if (atlas.isFull()) {
-                    if (atlas.getSize() < RenderSystem.getDevice().maxTextureSize) atlas.grow()
+                    atlasNeedsGrow = true
                     fallbackStates.add(state)
                     return@forEach
                 }
@@ -202,8 +199,8 @@ internal object SkyHanniItemRenderCoordinator {
         slotSize: Int,
     ) {
         val ps = PoseStack()
+        log.log("slotSize: $slotSize, atlasSize: ${atlas.getSize()}, slotX: $slotX, slotY: $slotY, translationVec: ${state.translationVec}, rotationVec: ${state.rotationVec}")
         ps.translate(slotX.toFloat() + slotSize / 2.0f, slotY.toFloat() + slotSize / 2.0f, 0.0f)
-        ps.translate(state.translationVec)
 
         val rotationPadding = 1.0f / 1.42f  // sqrt 2 factor for safety
         val f = slotSize.toFloat()
