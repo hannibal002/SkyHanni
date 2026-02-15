@@ -60,11 +60,13 @@ import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import com.mojang.authlib.properties.PropertyMap
 import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
@@ -85,9 +87,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
-import com.google.common.collect.ImmutableMultimap
-import com.mojang.authlib.properties.PropertyMap
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -287,11 +286,11 @@ object ItemUtils {
 
             if (this.getPetLevel() == 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
-            } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
-                internalName = "${internalName.asString()}+100".toInternalName()
             } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
                 // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
                 internalName = "${internalName.asString()}+200".toInternalName()
+            } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
+                internalName = "${internalName.asString()}+100".toInternalName()
             }
         }
         return internalName
@@ -532,7 +531,7 @@ object ItemUtils {
      */
     private val enchantedBookPattern by RepoPattern.pattern(
         "item.enchantedbook",
-        "(?:§f)?Enchanted Book \\((?<item>.+)\\)"
+        "(?:§f)?Enchanted Book \\((?<item>.+)\\)",
     )
 
     fun readBookTypeStrippedColor(input: String): String? = readBookType(input)?.removeColor()
