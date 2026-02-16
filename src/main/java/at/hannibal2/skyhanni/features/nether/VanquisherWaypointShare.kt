@@ -51,8 +51,8 @@ object VanquisherWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
-        "coords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)(?<mobName> \\| .*)?.*"
+        "coords-vanquisher",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+) \\| Vanquisher.*"
     )
 
     /**
@@ -148,9 +148,8 @@ object VanquisherWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        val mobName = entity.name.string.orEmpty()
-        val name = if (mobName.isEmpty()) "" else "| $mobName"
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
+
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
     }
 
     private fun sendVanquisherDeath() {
@@ -237,9 +236,9 @@ object VanquisherWaypointShare {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true)
     fun readChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        val message = event.cleanMessage
+        val message = event.message
 
-        if (vanquisherSpawnedPattern.matches(message)) {
+        if (vanquisherSpawnedPattern.matches(event.cleanMessage)) {
             if (myVanquisherId == -1) {
                 val closestId = vanquisherNearby.values.minByOrNull {
                     it.distanceToPlayer()
