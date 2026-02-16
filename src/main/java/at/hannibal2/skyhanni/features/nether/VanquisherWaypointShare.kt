@@ -43,17 +43,11 @@ object VanquisherWaypointShare {
     private val config get() = SkyHanniMod.feature.crimsonIsle.vanquisherSharing
     private val patternGroup = RepoPattern.group("vanquisher.waypoint")
 
-
-
-    /**
-     * REGEX-TEST: §9Party §8> User Name§f: x: 2.3, y: 4.5, z: -6.7 | Vanquisher
-     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] itsseth3§f: x: 86, y: 73, z: -29 | Vanquisher
-     */
-    @Suppress("MaxLineLength")
-    private val vanquisherSharedPattern by patternGroup.list(
-        "coords-clean",
-        "^(?:.*> )?(?<playerName>[^:]+): x: (?<x>-?[\\d.]+),? y: (?<y>-?[\\d.]+),? z: (?<z>-?[\\d.]+) \\| Vanquisher.*"
-    )
+//     @Suppress("MaxLineLength")
+//     private val vanquisherSharedPattern by patternGroup.list(
+//         "coords",
+//         "^(?:.*> )?(?<playerName>[^:]+): x: (?<x>-?[\\d.]+),? y: (?<y>-?[\\d.]+),? z: (?<z>-?[\\d.]+) \\| Vanquisher.*"
+//     )
 
     /**
      * REGEX-TEST: §9Party §8> User Name§f: Vanquisher dead!
@@ -166,38 +160,38 @@ object VanquisherWaypointShare {
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.readGlobalChat
 
-    private fun Matcher.detectFromChat(): Boolean {
-
-
-        val playerName = group("playerName").trim()
-        val name = playerName.cleanPlayerName()
-        val playerDisplayName = playerName.cleanPlayerName(displayName = true)
-
-        val x = group("x").toDoubleOrNull() ?: return false
-        val y = group("y").toDoubleOrNull() ?: return false
-        val z = group("z").toDoubleOrNull() ?: return false
-        val location = LorenzVec(x, y, z)
-
-        val yourName = Minecraft.getInstance().player?.name?.string?: ""
-        val playerIsYou = name.equals(yourName, ignoreCase = true)
-
-        if(playerIsYou) {
-            sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
-            return false
-        }
-        ChatUtils.chat("§5§l$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
-
-        TitleManager.sendTitle(
-            "§5§lVanquisher from $playerDisplayName",
-            null,
-            5.seconds,
-            null,
-            TitleManager.TitleLocation.GLOBAL,
-            TitleManager.TitleAddType.FORCE_FIRST
-        )
-        sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
-        return true
-    }
+//     private fun Matcher.detectFromChat(): Boolean {
+//
+//
+//         val playerName = group("playerName").trim()
+//         val name = playerName.cleanPlayerName()
+//         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
+//
+//         val x = group("x").toDoubleOrNull() ?: return false
+//         val y = group("y").toDoubleOrNull() ?: return false
+//         val z = group("z").toDoubleOrNull() ?: return false
+//         val location = LorenzVec(x, y, z)
+//
+//         val yourName = Minecraft.getInstance().player?.name?.string?: ""
+//         val playerIsYou = name.equals(yourName, ignoreCase = true)
+//
+//         if(playerIsYou) {
+//             sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+//             return false
+//         }
+//         ChatUtils.chat("§5§l$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
+//
+//         TitleManager.sendTitle(
+//             "§5§lVanquisher from $playerDisplayName",
+//             null,
+//             5.seconds,
+//             null,
+//             TitleManager.TitleLocation.GLOBAL,
+//             TitleManager.TitleAddType.FORCE_FIRST
+//         )
+//         sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+//         return true
+//     }
 
     @HandleEvent
     fun whenChangeWorld(event: WorldChangeEvent) {
@@ -250,13 +244,49 @@ object VanquisherWaypointShare {
             }
         }
 
-        vanquisherSharedPattern.matchMatchers(message) {
-            if (!detectFromChat()) return@matchMatchers
-            event.blockedReason = "vanquisher_waypoint"
+//         vanquisherSharedPattern.matchMatchers(message) {
+//             if (!detectFromChat()) return@matchMatchers
+//             event.blockedReason = "vanquisher_waypoint"
+//         }
+
+        val customRegex = Regex("^(?:Party > |Guild > |Officer > )?([^:]+):.*?x:\\s*(-?[\\d.]+).*?y:\\s*(-?[\\d.]+).*?z:\\s*(-?[\\d.]+).*?Vanquisher.*", RegexOption.IGNORE_CASE)
+        val match = customRegex.find(message)
+
+        if (match != null) {
+            val rawName = match.groupValues[1].trim()
+            val x = match.groupValues[2].toDoubleOrNull() ?: return
+            val y = match.groupValues[3].toDoubleOrNull() ?: return
+            val z = match.groupValues[4].toDoubleOrNull() ?: return
+
+            val name = rawName.cleanPlayerName()
+            val playerDisplayName = rawName.cleanPlayerName(displayName = true)
+
+            val yourName = Minecraft.getInstance().player?.name?.string ?: ""
+            val playerIsYou = name.equals(yourName, ignoreCase = true)
+
+            val location = LorenzVec(x, y, z)
+
+            if (playerIsYou) {
+                sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+            } else {
+                ChatUtils.chat("§5§l$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
+                TitleManager.sendTitle(
+                    "§5§lVanquisher from $playerDisplayName",
+                    null,
+                    5.seconds,
+                    null,
+                    TitleManager.TitleLocation.GLOBAL,
+                    TitleManager.TitleAddType.FORCE_FIRST
+                )
+                sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+
+                event.blockedReason = "vanquisher_waypoint"
+            }
+            return
         }
 
         vanquisherDiedPattern.matchMatcher(message) {
-            if (block()) return
+            if (block()) return@matchMatcher
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
             sharedWaypoints.remove(name)
