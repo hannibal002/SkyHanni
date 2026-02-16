@@ -43,12 +43,6 @@ object VanquisherWaypointShare {
     private val config get() = SkyHanniMod.feature.crimsonIsle.vanquisherSharing
     private val patternGroup = RepoPattern.group("vanquisher.waypoint")
 
-//     @Suppress("MaxLineLength")
-//     private val vanquisherSharedPattern by patternGroup.list(
-//         "coords",
-//         "^(?:.*> )?(?<playerName>[^:]+): x: (?<x>-?[\\d.]+),? y: (?<y>-?[\\d.]+),? z: (?<z>-?[\\d.]+) \\| Vanquisher.*"
-//     )
-
     /**
      * REGEX-TEST: §9Party §8> User Name§f: Vanquisher dead!
      */
@@ -88,14 +82,7 @@ object VanquisherWaypointShare {
         lastShareTime = SimpleTimeMark.farPast()
         myVanquisherId = entityId
 
-        TitleManager.sendTitle(
-            "§5§lVanquisher Spawned!",
-            "§r§7You found one nearby!",
-            5.seconds,
-            null,
-            TitleManager.TitleLocation.GLOBAL,
-            TitleManager.TitleAddType.FORCE_FIRST
-        )
+        TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
 
         val entity = vanquisherNearby[entityId] ?: EntityUtils.getEntityByID(entityId)
         if (entity != null) {
@@ -159,39 +146,6 @@ object VanquisherWaypointShare {
     private fun isEnabled() = config.enabled
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.readGlobalChat
-
-//     private fun Matcher.detectFromChat(): Boolean {
-//
-//
-//         val playerName = group("playerName").trim()
-//         val name = playerName.cleanPlayerName()
-//         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
-//
-//         val x = group("x").toDoubleOrNull() ?: return false
-//         val y = group("y").toDoubleOrNull() ?: return false
-//         val z = group("z").toDoubleOrNull() ?: return false
-//         val location = LorenzVec(x, y, z)
-//
-//         val yourName = Minecraft.getInstance().player?.name?.string?: ""
-//         val playerIsYou = name.equals(yourName, ignoreCase = true)
-//
-//         if(playerIsYou) {
-//             sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
-//             return false
-//         }
-//         ChatUtils.chat("§5§l$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
-//
-//         TitleManager.sendTitle(
-//             "§5§lVanquisher from $playerDisplayName",
-//             null,
-//             5.seconds,
-//             null,
-//             TitleManager.TitleLocation.GLOBAL,
-//             TitleManager.TitleAddType.FORCE_FIRST
-//         )
-//         sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
-//         return true
-//     }
 
     @HandleEvent
     fun whenChangeWorld(event: WorldChangeEvent) {
@@ -269,15 +223,9 @@ object VanquisherWaypointShare {
             if (playerIsYou) {
                 sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
             } else {
-                ChatUtils.chat("§5§l$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
-                TitleManager.sendTitle(
-                    "§5§lVanquisher from $playerDisplayName",
-                    null,
-                    5.seconds,
-                    null,
-                    TitleManager.TitleLocation.GLOBAL,
-                    TitleManager.TitleAddType.FORCE_FIRST
-                )
+                ChatUtils.chat("$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
+                TitleManager.sendTitle("§5§lVanquisher from $playerDisplayName")
+
                 sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
 
                 event.blockedReason = "vanquisher_waypoint"
@@ -329,6 +277,12 @@ object VanquisherWaypointShare {
                 event.renderBeaconBeam(
                     waypoint.location,
                     beaconColor.rgb
+                )
+                event.drawLineToEye(
+                    location = waypoint.location,
+                    color = beaconColor,
+                    lineWidth = 3,
+                    depth = true
                 )
             }
         }
