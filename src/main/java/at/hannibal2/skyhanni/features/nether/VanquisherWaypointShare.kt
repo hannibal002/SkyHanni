@@ -33,7 +33,6 @@ import net.minecraft.world.entity.Entity
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import java.awt.Color
 
@@ -53,7 +52,7 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "coords-clean",
-        "(?<party>Party > )?(?:\\[.*?] )?(?<playerName>[a-zA-Z0-9_]+): x: (?<x>-?[\\d.]+),? y: (?<y>-?[\\d.]+),? z: (?<z>-?[\\d.]+) \\| Vanquisher.*"
+        "^(?:.*> )?(?<playerName>[^:]+): x: (?<x>-?[\\d.]+),? y: (?<y>-?[\\d.]+),? z: (?<z>-?[\\d.]+) \\| Vanquisher.*"
     )
 
     /**
@@ -168,15 +167,17 @@ object VanquisherWaypointShare {
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.readGlobalChat
 
     private fun Matcher.detectFromChat(): Boolean {
-        if (block()) return false
-        val playerName = group("playerName")
-        val x = group("x").trim().toDoubleOrNull() ?: return false
-        val y = group("y").trim().toDoubleOrNull() ?: return false
-        val z = group("z").trim().toDoubleOrNull() ?: return false
-        val location = LorenzVec(x, y, z)
 
+
+        val playerName = group("playerName").trim()
         val name = playerName.cleanPlayerName()
         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
+
+        val x = group("x").toDoubleOrNull() ?: return false
+        val y = group("y").toDoubleOrNull() ?: return false
+        val z = group("z").toDoubleOrNull() ?: return false
+        val location = LorenzVec(x, y, z)
+
         val yourName = Minecraft.getInstance().player?.name?.string?: ""
         val playerIsYou = name.equals(yourName, ignoreCase = true)
 
@@ -184,7 +185,7 @@ object VanquisherWaypointShare {
             sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
             return false
         }
-        ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+        ChatUtils.chat("§5§l$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
 
         TitleManager.sendTitle(
             "§5§lVanquisher from $playerDisplayName",
