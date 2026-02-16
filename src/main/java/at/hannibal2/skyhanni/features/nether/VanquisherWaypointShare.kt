@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.world.entity.boss.wither.WitherBoss
+import at.hannibal2.skyhanni.data.PartyApi
 import java.awt.Color
 
 
@@ -49,7 +50,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        ".*Vanquisher dead!",
+        "^(?:.*> )?(?<playerName>[^:]+): Vanquisher dead!.*"
     )
 
     /**
@@ -130,8 +131,11 @@ object VanquisherWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
+        if(PartyApi.isInParty()) {
+            HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
+        } else {
+            HypixelCommands.allChat("x: $x, y: $y, z: $z | Vanquisher")
+        }
     }
 
     private fun sendVanquisherDeath() {
@@ -140,7 +144,11 @@ object VanquisherWaypointShare {
         if (myVanquisherId == -1) return
 
         myVanquisherId = -1
-        HypixelCommands.partyChat("Vanquisher dead!")
+        if(PartyApi.isInParty()) {
+            HypixelCommands.partyChat("Vanquisher dead!")
+        } else{
+            HypixelCommands.allChat("Vanquisher dead!")
+        }
     }
 
     private fun isEnabled() = config.enabled
@@ -232,7 +240,6 @@ object VanquisherWaypointShare {
         }
 
         vanquisherDiedPattern.matchMatcher(message) {
-            if (block()) return@matchMatcher
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
             sharedWaypoints.remove(name)
@@ -280,7 +287,7 @@ object VanquisherWaypointShare {
                     location = waypoint.location,
                     color = beaconColor,
                     lineWidth = 3,
-                    depth = true
+                    depth = false
                 )
             }
         }
