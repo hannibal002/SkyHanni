@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -45,11 +44,12 @@ object VanquisherWaypointShare {
 
     /**
      * REGEX-TEST: §9Party §8> User Name§f: Vanquisher dead!
+     * REGEX-TEST: §b[MVP§9+§b] itsseth3§f: Vanquisher dead!
      */
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rVanquisher dead!",
+        ".*Vanquisher dead!",
     )
 
     /**
@@ -111,7 +111,7 @@ object VanquisherWaypointShare {
 
         if (myVanquisherId == -1) {
             val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
-            if(closestId != null) {
+            if (closestId != null) {
                 myVanquisherId = closestId.id
             } else {
                 ChatUtils.debug("Trying to send Vanquisher via chat, but no mob found nearby.")
@@ -119,7 +119,7 @@ object VanquisherWaypointShare {
             }
         }
 
-        val entity = vanquisherNearby[myVanquisherId]?: EntityUtils.getEntityByID(myVanquisherId)
+        val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId)
 
         if (entity == null || entity.deceased) {
             ChatUtils.chat("§cRare Mob is dead")
@@ -198,12 +198,10 @@ object VanquisherWaypointShare {
             }
         }
 
-//         vanquisherSharedPattern.matchMatchers(message) {
-//             if (!detectFromChat()) return@matchMatchers
-//             event.blockedReason = "vanquisher_waypoint"
-//         }
-
-        val customRegex = Regex("^(?:Party > |Guild > |Officer > )?([^:]+):.*?x:\\s*(-?[\\d.]+).*?y:\\s*(-?[\\d.]+).*?z:\\s*(-?[\\d.]+).*?Vanquisher.*", RegexOption.IGNORE_CASE)
+        val customRegex = Regex(
+            "^(?:Party > |Guild > |Officer > )?([^:]+):.*?x:\\s*(-?[\\d.]+).*?y:\\s*(-?[\\d.]+).*?z:\\s*(-?[\\d.]+).*?Vanquisher.*",
+            RegexOption.IGNORE_CASE
+        )
         val match = customRegex.find(message)
 
         if (match != null) {
@@ -215,7 +213,7 @@ object VanquisherWaypointShare {
             val name = rawName.cleanPlayerName()
             val playerDisplayName = rawName.cleanPlayerName(displayName = true)
 
-            val yourName = Minecraft.getInstance().player?.name?.string ?: ""
+            val yourName = Minecraft.getInstance().player?.name?.string.orEmpty()
             val playerIsYou = name.equals(yourName, ignoreCase = true)
 
             val location = LorenzVec(x, y, z)
