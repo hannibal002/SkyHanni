@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.world.entity.boss.wither.WitherBoss
+import java.awt.Color
 
 
 @SkyHanniModule
@@ -50,8 +51,8 @@ object VanquisherWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
-        "coords_",
-        "(?<party>Party > )?(?<playerName>.+): x: (?<x>-?[\\d.]+), y: (?<y>-?[\\d.]+), z: (?<z>-?[\\d.]+) \\| Vanquisher"
+        "coords",
+        "(?<party>Party > )?(?<playerName>.+): Found a Vanquisher at (?<x>-?[\\d.]+) (?<y>-?[\\d.]+) (?<z>-?[\\d.]+)!?"
     )
 
     /**
@@ -64,7 +65,7 @@ object VanquisherWaypointShare {
     )
 
     /**
-     * REGEX-TEST: .*A Vanquisher is spawning nearby!
+     * REGEX-TEST: A Vanquisher is spawning nearby!
      */
 
     private val vanquisherSpawnedPattern by patternGroup.pattern(
@@ -129,9 +130,12 @@ object VanquisherWaypointShare {
 
         if (myVanquisherId == -1) {
             val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
-            if (closestId != null) { myVanquisherId = closestId.id }
-            ChatUtils.chat("No Vanquisher found to share!")
-            return
+            if (closestId != null) {
+                myVanquisherId = closestId.id
+            } else {
+                ChatUtils.chat("No Vanquisher found to share!")
+                return
+            }
         }
 
         val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId)
@@ -146,7 +150,7 @@ object VanquisherWaypointShare {
         val y = location.y.toInt()
         val z = location.z.toInt()
 
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
+        HypixelCommands.partyChat("Found a Vanquisher at $x $y $z!")
     }
 
     private fun sendVanquisherDeath() {
@@ -172,16 +176,23 @@ object VanquisherWaypointShare {
 
         val name = playerName.cleanPlayerName()
         val playerDisplayName = playerName.cleanPlayerName(displayName = true)
+        val yourName = Minecraft.getInstance().player?.name?.string?: ""
+        val playerIsYou = name.equals(yourName, ignoreCase = true)
 
-        ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
-        TitleManager.sendTitle(
-            "Vanquisher from $playerDisplayName",
-            null,
-            5.seconds,
-            null,
-            TitleManager.TitleLocation.GLOBAL,
-            TitleManager.TitleAddType.FORCE_FIRST
-        )
+        if(!playerIsYou){
+            ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+
+            TitleManager.sendTitle(
+                "§5§lVanquisher from $playerDisplayName",
+                null,
+                5.seconds,
+                null,
+                TitleManager.TitleLocation.GLOBAL,
+                TitleManager.TitleAddType.FORCE_FIRST
+            )
+        } else {
+            ChatUtils.chat("§aSuccessfully shared coords to party members")
+        }
         sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
         return true
     }
@@ -275,7 +286,7 @@ object VanquisherWaypointShare {
             for (waypoint in waypoints.values) {
                 if (waypoint.spawnTime.passedSince() > 30.seconds) continue
 
-                val beaconColor = java.awt.Color(160, 37, 191)
+                val beaconColor = Color(160, 37, 191)
 
                 event.drawWaypointFilled(
                     location = waypoint.location,
