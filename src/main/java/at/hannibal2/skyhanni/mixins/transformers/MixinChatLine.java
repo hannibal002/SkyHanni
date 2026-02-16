@@ -17,25 +17,25 @@ import net.minecraft.network.chat.MessageSignature;
 public class MixinChatLine implements ChatLineData {
 
     @Unique
-    private Component skyHanni$fullComponent;
+    private Component skyhanni$fullComponent;
 
     @Unique
     @NotNull
     @Override
-    public Component getSkyHanni_fullComponent() {
-        return skyHanni$fullComponent;
+    public Component skyhanni$getFullComponent() {
+        return skyhanni$fullComponent;
     }
 
     @Unique
     @Override
-    public void setSkyHanni_fullComponent(@NotNull Component fullComponent) {
-        skyHanni$fullComponent = fullComponent;
+    public void skyhanni$setFullComponent(@NotNull Component fullComponent) {
+        skyhanni$fullComponent = fullComponent;
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(int creationTick, Component line, MessageSignature messageSignatureData, GuiMessageTag messageIndicator, CallbackInfo ci) {
         Component component = GuiChatHook.getCurrentComponent();
-        skyHanni$fullComponent = component == null ? line : component;
+        skyhanni$fullComponent = component == null ? line : component;
     }
 
 }

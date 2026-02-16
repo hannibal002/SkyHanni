@@ -36,15 +36,15 @@ object MarkedPlayerManager {
     private val patternGroup = RepoPattern.group("misc.markedplayer")
 
     /**
-     * REGEX-TEST: §8[§r§6400§r§8] §r§6HiZe_ §r§6▒
-     * REGEX-TEST: §8[§r§9318§r§8] §r§bwings_wacr §r§b§lᛝ
-     * REGEX-TEST: §8[§r§d321§r§8] §r§bbotbob21 §r§b§lᛝ
-     * REGEX-TEST: §8[§r§f42§r§8] §r§aVoidW_
-     * REGEX-TEST: §8[§r§a151§r§8] §r§bPhoenix_325
+     * REGEX-TEST: [400] HiZe_ ▒
+     * REGEX-TEST: [318] wings_wacr ᛝ
+     * REGEX-TEST: [321] botbob21 ᛝ
+     * REGEX-TEST: [42] VoidW_
+     * REGEX-TEST: [151] Phoenix_325
      */
     private val tabPlayerName by patternGroup.pattern(
-        "tabplayername",
-        "§8\\[§r(?<level>.*)§r§8] §r§\\w(?<name>[A-z0-9_]+)(?<symbol>.*)?",
+        "tabplayername-no-color",
+        "\\[(?<level>.*)] (?<name>[A-z0-9_]+)(?<symbol>.*)?",
     )
 
     private val notifyList = mutableSetOf<String>()
@@ -147,7 +147,7 @@ object MarkedPlayerManager {
 
         currentLobbyPlayers.clear()
 
-        tabPlayerName.matchAll(event.lines) {
+        tabPlayerName.matchAll(event.lines.map { it.string }) {
             val name = group("name")
             if (name != PlayerUtils.getName()) {
                 currentLobbyPlayers.add(name)

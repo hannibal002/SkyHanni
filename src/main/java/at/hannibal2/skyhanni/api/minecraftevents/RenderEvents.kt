@@ -1,18 +1,15 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.Identifier
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
-import net.minecraft.client.renderer.MultiBufferSource
 
 @SkyHanniModule
 object RenderEvents {
@@ -24,7 +21,8 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        WorldRenderEvents.END_MAIN.register { event ->
+        // makes the lines render weird idk
+        /*WorldRenderEvents.END_MAIN.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
             val stack = event.matrices()
             SkyHanniRenderWorldEvent(
@@ -33,7 +31,7 @@ object RenderEvents {
                 immediateVertexConsumers,
                 Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
             ).post()
-        }
+        }*/
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {

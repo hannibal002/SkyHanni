@@ -119,10 +119,10 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  Plots: §r§b4§r§f, §r§b12§r§f, §r§b13§r§f, §r§b18§r§f, §r§b20
+     * REGEX-TEST:  Plots: 4, 12, 13, 18, 20
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
-        "tablist.infected-plots",
+        "tablist.infected-plots-no-color",
         "\\sPlots: (?<plots>.*)",
     )
 
@@ -255,7 +255,7 @@ object PestApi {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        infestedPlotsTabListPattern.firstMatcher(event.widget.lines) {
+        infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
             val apiPlots = getInfestedPlots().map { it.id }.toSet()
 

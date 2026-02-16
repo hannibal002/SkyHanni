@@ -8,7 +8,6 @@ import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
-import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
 
@@ -40,13 +39,16 @@ runDirectory.mkdirs()
 
 // Minecraft configuration:
 loom {
-    val accessWidenerFile = sc.process(rootProject.file("src/main/resources/skyhanni.accesswidener"), "build/accesswidener.access")
-
-    if (accessWidenerFile.exists()) {
-        accessWidenerPath = accessWidenerFile
+    val classTweakerFile = sc.process(
+        rootProject.file("src/main/resources/skyhanni.classtweaker"),
+        "build/skyhanni.classtweaker",
+    )
+    if (classTweakerFile.exists()) {
+        accessWidenerPath = classTweakerFile
     } else {
-        println("No accesswidener file for ${target.minecraftVersion}")
+        println("No classTweaker file for ${target.minecraftVersion}")
     }
+
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
 
     runs {
@@ -122,6 +124,8 @@ dependencies {
 
     // Discord RPC client
     includeImplementation("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
+    include("com.kohlschutter.junixsocket:junixsocket-common:2.6.2")
+    include("com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2")
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 

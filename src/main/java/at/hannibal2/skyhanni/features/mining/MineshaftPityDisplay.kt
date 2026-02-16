@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -191,8 +190,7 @@ object MineshaftPityDisplay {
         if (!isDisplayEnabled()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
-            val cleanLine = line.removeColor()
-            tabPityPattern.matchMatcher(cleanLine) {
+            tabPityPattern.matchMatcher(line) {
                 everFoundPityWidget = true
                 tablistPity = MAX_COUNTER - group("pity").formatInt()
             }

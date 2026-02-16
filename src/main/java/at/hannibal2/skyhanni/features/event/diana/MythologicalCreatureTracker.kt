@@ -98,7 +98,7 @@ object MythologicalCreatureTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Modify) {
+    fun onChatModify(event: SkyHanniChatEvent.Modify) {
         if (lastSinceAmount == null) return
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
@@ -112,8 +112,12 @@ object MythologicalCreatureTracker {
         tracker.modify {
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 if (creatureEntry == type) {
-                    val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
-                    event.replaceComponent(newComp, "diana_mobs_since")
+                    if (lastSinceAmount != null) {
+                        val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
+                        event.replaceComponent(newComp, "diana_mobs_since")
+                    }
+                    lastSinceAmount = null
+
                 }
             }
         }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.SoundCompat
 
 class PlaySoundEvent(
     val rawSoundName: String,
@@ -27,13 +28,11 @@ class PlaySoundEvent(
      */
     fun replaceWithOther(rawSoundName: String) {
         this.cancel()
-        val newSound = SoundUtils.createSound(rawSoundName, pitch, volume)
-        newSound.playSound()
+        SoundUtils.createSound(rawSoundName, pitch, volume).playSound()
     }
 
     companion object {
-        private fun getSoundName(rawSoundName: String): String {
-            return at.hannibal2.skyhanni.utils.compat.SoundCompat.getLegacySoundName(rawSoundName)
-        }
+        private fun getSoundName(rawSoundName: String): String =
+            SoundCompat.getLegacySoundName(rawSoundName)
     }
 }
