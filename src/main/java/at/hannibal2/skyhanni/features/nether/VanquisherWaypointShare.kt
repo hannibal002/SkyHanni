@@ -131,7 +131,7 @@ object VanquisherWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-        if(PartyApi.isInParty()) {
+        if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
         } else {
             HypixelCommands.allChat("x: $x, y: $y, z: $z | Vanquisher")
@@ -144,9 +144,9 @@ object VanquisherWaypointShare {
         if (myVanquisherId == -1) return
 
         myVanquisherId = -1
-        if(PartyApi.isInParty()) {
+        if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("Vanquisher dead!")
-        } else{
+        } else {
             HypixelCommands.allChat("Vanquisher dead!")
         }
     }
