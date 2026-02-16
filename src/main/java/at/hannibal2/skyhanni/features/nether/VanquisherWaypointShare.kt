@@ -51,7 +51,7 @@ object VanquisherWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
-        "coords",
+        "coords-new",
         "(?<party>Party > )?(?<playerName>.+): Found a Vanquisher at (?<x>-?[\\d.]+) (?<y>-?[\\d.]+) (?<z>-?[\\d.]+)!?"
     )
 
