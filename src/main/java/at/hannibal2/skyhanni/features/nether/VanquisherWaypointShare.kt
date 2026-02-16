@@ -129,17 +129,18 @@ object VanquisherWaypointShare {
         lastShareTime = SimpleTimeMark.now()
 
         if (myVanquisherId == -1) {
-            ChatUtils.debug("Trying to send Vanquisher via chat, but no mob found nearby.")
-            return
+            val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
+            if(closestId != null) {
+                myVanquisherId = closestId.id
+            } else {
+                ChatUtils.debug("Trying to send Vanquisher via chat, but no mob found nearby.")
+                return
+            }
         }
 
-        val entity = EntityUtils.getEntityByID(myVanquisherId)
-        if (entity  == null) {
-            ChatUtils.chat("§cRare Mob out of range!")
-            return
-        }
+        val entity = vanquisherNearby[myVanquisherId]?: EntityUtils.getEntityByID(myVanquisherId)
 
-        if (entity.deceased) {
+        if (entity == null || entity.deceased) {
             ChatUtils.chat("§cRare Mob is dead")
             return
         }
@@ -178,20 +179,20 @@ object VanquisherWaypointShare {
         val yourName = Minecraft.getInstance().player?.name?.string?: ""
         val playerIsYou = name.equals(yourName, ignoreCase = true)
 
-        if(!playerIsYou){
-            ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
-
-            TitleManager.sendTitle(
-                "§5§lVanquisher from $playerDisplayName",
-                null,
-                5.seconds,
-                null,
-                TitleManager.TitleLocation.GLOBAL,
-                TitleManager.TitleAddType.FORCE_FIRST
-            )
-        } else {
-            ChatUtils.chat("§aSuccessfully shared coords to party members")
+        if(playerIsYou) {
+            sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+            return false
         }
+        ChatUtils.chat("$playerDisplayName found a Vanquisher at ${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+
+        TitleManager.sendTitle(
+            "§5§lVanquisher from $playerDisplayName",
+            null,
+            5.seconds,
+            null,
+            TitleManager.TitleLocation.GLOBAL,
+            TitleManager.TitleAddType.FORCE_FIRST
+        )
         sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
         return true
     }
