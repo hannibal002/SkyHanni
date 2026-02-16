@@ -33,6 +33,7 @@ import net.minecraft.world.entity.Entity
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import java.awt.Color
 
@@ -51,8 +52,8 @@ object VanquisherWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
-        "coords-vanquisher",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+) \\| Vanquisher.*"
+        "coords-clean",
+        "(?<party>Party > )?(?:\\[.*?] )?(?<playerName>[a-zA-Z0-9_]+): x: (?<x>-?[\\d.]+),? y: (?<y>-?[\\d.]+),? z: (?<z>-?[\\d.]+) \\| Vanquisher.*"
     )
 
     /**
@@ -237,9 +238,9 @@ object VanquisherWaypointShare {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true)
     fun readChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        val message = event.message
+        val message = event.cleanMessage
 
-        if (vanquisherSpawnedPattern.matches(event.cleanMessage)) {
+        if (vanquisherSpawnedPattern.matches(message)) {
             if (myVanquisherId == -1) {
                 val closestId = vanquisherNearby.values.minByOrNull {
                     it.distanceToPlayer()

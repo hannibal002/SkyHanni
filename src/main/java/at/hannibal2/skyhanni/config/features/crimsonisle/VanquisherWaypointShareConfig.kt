@@ -25,7 +25,7 @@ class VanquisherWaypointShareConfig {
     var keybindSharing: Int = GLFW.GLFW_KEY_Y
 
     @Expose
-    @ConfigOption(name = "Read Global Chat", desc = "Register Vanquisher spawns from All Chat and Party Chat")
+    @ConfigOption(name = "Read Global Chat", desc = "Register Vanquisher spawns from All Chat")
     @ConfigEditorBoolean
     var readGlobalChat: Boolean = false
 }
