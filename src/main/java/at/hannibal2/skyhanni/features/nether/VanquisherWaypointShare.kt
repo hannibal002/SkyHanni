@@ -51,8 +51,8 @@ object VanquisherWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
-        "coords-new",
-        "(?<party>Party > )?(?<playerName>.+): Found a Vanquisher at (?<x>-?[\\d.]+) (?<y>-?[\\d.]+) (?<z>-?[\\d.]+)!?"
+        "coords",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)(?<mobName> \\| .*)?.*"
     )
 
     /**
@@ -61,7 +61,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        "(?<party>Party > )?(?<playerName>.*): Vanquisher dead!",
+        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rVanquisher dead!",
     )
 
     /**
@@ -129,19 +129,18 @@ object VanquisherWaypointShare {
         lastShareTime = SimpleTimeMark.now()
 
         if (myVanquisherId == -1) {
-            val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
-            if (closestId != null) {
-                myVanquisherId = closestId.id
-            } else {
-                ChatUtils.chat("No Vanquisher found to share!")
-                return
-            }
+            ChatUtils.debug("Trying to send Vanquisher via chat, but no mob found nearby.")
+            return
         }
 
-        val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId)
+        val entity = EntityUtils.getEntityByID(myVanquisherId)
+        if (entity  == null) {
+            ChatUtils.chat("§cRare Mob out of range!")
+            return
+        }
 
-        if (entity == null || entity.deceased) {
-            sendVanquisherDeath()
+        if (entity.deceased) {
+            ChatUtils.chat("§cRare Mob is dead")
             return
         }
 
@@ -149,8 +148,9 @@ object VanquisherWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
-
-        HypixelCommands.partyChat("Found a Vanquisher at $x $y $z!")
+        val mobName = entity.name.string.orEmpty()
+        val name = if (mobName.isEmpty()) "" else "| $mobName"
+        HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
     }
 
     private fun sendVanquisherDeath() {
