@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -280,7 +279,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             var sprayCosts = 0.0
             val hoverTips = if (sumSpraysUsed > 0) buildList {
                 applicableSpraysUsed.forEach { (spray, count) ->
-                    val sprayString = spray.toInternalName().getPriceOrNull()?.let { price ->
+                    val sprayString = getPricePerOrNull(spray.toInternalName())?.let { price ->
                         val sprayCost = price * count
                         sprayCosts += sprayCost
                         "§7${spray.displayName}: §a${count.shortFormat()} §7(§c-${sprayCost.shortFormat()}§7)"
