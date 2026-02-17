@@ -67,6 +67,9 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldSelfNotifyOnCatch = seaCreature.rare,
+                            shouldNotifyForNonOwn = seaCreature.rare,
+                            shouldHighlight = seaCreature.rare,
                         ),
                     ),
                 )
@@ -87,6 +90,9 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldSelfNotifyOnCatch = seaCreature.rare,
+                            shouldNotifyForNonOwn = seaCreature.rare,
+                            shouldHighlight = seaCreature.rare,
                         ),
                     ),
                 )
@@ -106,6 +112,9 @@ class SpecificSeaCreatures(
                         seaCreature.shouldShowHealthOverlay,
                         seaCreature.shouldShareInChat,
                         seaCreature.shouldShowKillTime,
+                        seaCreature.shouldSelfNotifyOnCatch,
+                        seaCreature.shouldNotifyForNonOwn,
+                        seaCreature.shouldHighlight,
                     )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
@@ -130,26 +139,41 @@ class SpecificSeaCreatures(
 
     @Bind
     fun showLootshare() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/lootsharesphere.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("lootsharesphere")
     }
 
     @Bind
     fun showHealthDisp() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/healthdisplay.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("healthdisplay")
     }
 
     @Bind
     fun showShareParty() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/sharetoparty.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("sharetoparty")
     }
 
     @Bind
     fun showKillTime() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/killtime.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("killtime")
     }
 
+    @Bind
+    fun showSelfNotify() {
+        openXML("selfnotif")
+    }
+
+    @Bind
+    fun showOtherNotify() {
+        openXML("notifynonown")
+    }
+
+    @Bind
+    fun showHighlight() {
+        openXML("shouldhighlight")
+    }
+
+    private fun openXML(string: String) {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
+        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+    }
 }

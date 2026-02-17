@@ -36,6 +36,26 @@
                     </Button>
                 </Row>
             </Center>
+            <Spacer height = "5"/>
+            <Center><Text text = "Title Notification Toggles"/></Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showSelfNotify">
+                        <Text text = "Own Mobs"/>
+                    </Button>
+                    <Spacer width = "10"/>
+                    <Button onClick = "@showOtherNotify">
+                        <Text text = "Other's Mobs"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick = "@showHighlight">
+                        <Text text = "Mobs To Highlight"/>
+                    </Button>
+                </Row>
+            </Center>
         </Column>
     </Gui>
 </Root>

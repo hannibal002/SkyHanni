@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -35,18 +37,14 @@ object SeaCreatureFeatures {
 
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
-    private var lastRareCatch = SimpleTimeMark.farPast()
-    private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
-        if (!creature.rare) return
-
-        rareSeaCreatures.add(mob)
+        val name = mob.seaCreature?.seaCreature?.name ?: return
+        if (scSpecificConfig[name]?.shouldHighlight == false) return
 
         if (!config.highlight) return
 
@@ -54,17 +52,17 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
-    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+    fun onSkyblockMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        if (mob !in rareSeaCreatures) return
+        val seaCreature = mob.seaCreature ?: return
+        val creature = seaCreature.seaCreature
         val entity = mob.baseEntity
         val shouldNotify = entity.id !in entityIds
         entityIds.addIfAbsent(entity.id)
-        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
-        if (!creature.rare) return
+        if (seaCreature.isOwn) return
 
-        if (lastRareCatch.passedSince() < 1.seconds) return
+        if (scSpecificConfig[seaCreature.name]?.shouldNotifyForNonOwn == false) return
         if (mob.name == "Water Hydra" && entity.findHealthReal() == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
@@ -74,22 +72,15 @@ object SeaCreatureFeatures {
         }
     }
 
-    @HandleEvent
-    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        rareSeaCreatures.remove(event.mob)
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (scSpecificConfig[event.seaCreature.name]?.shouldShareInChat == false) return
-        if (config.alertOwnCatches) {
+        if (config.alertOwnCatches && scSpecificConfig[event.seaCreature.name]?.shouldSelfNotifyOnCatch == true) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
             TitleManager.sendTitle(text)
             if (config.playSound) SoundUtils.playBeepSound()
-            lastRareCatch = SimpleTimeMark.now()
         }
-        if (config.announceRareInParty && PartyApi.isInParty()) {
+        if (config.announceRareInParty && PartyApi.isInParty() && scSpecificConfig[event.seaCreature.name]?.shouldShareInChat == true) {
             val name = event.seaCreature.name
             val message = buildString {
                 if (event.doubleHook) append("DOUBLE HOOK: ")
@@ -101,7 +92,6 @@ object SeaCreatureFeatures {
 
     @HandleEvent
     fun onWorldChange() {
-        rareSeaCreatures.clear()
         entityIds.clear()
     }
 
@@ -121,21 +111,9 @@ object SeaCreatureFeatures {
 
     private val getEntityOutlineColor: (entity: Entity) -> Color? = { entity ->
         (entity as? LivingEntity)?.mob?.let { mob ->
-            if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
+            if (scSpecificConfig[mob.seaCreature?.seaCreature?.name]?.shouldHighlight == true && entity.distanceToPlayer() < 30) {
                 LorenzColor.GREEN.toColor()
             } else null
         }
-    }
-
-    @JvmStatic
-    fun isRareSeaCreature(entity: Entity): Boolean {
-        return (entity as? LivingEntity)?.mob?.let { mob ->
-            mob in rareSeaCreatures
-        } ?: false
-    }
-
-    @JvmStatic
-    fun isRareSeaCreatureBody(entity: Entity): Boolean {
-        return entity is Slime && isRareSeaCreature(entity)
     }
 }
