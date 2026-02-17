@@ -4,7 +4,7 @@
             <Meta afterClose="@afterClose"/>
             <Center>
                 <Scale scale="2">
-                    <Text text="Send To Party Chat Toggle per sea creature"/>
+                    <Text text="Share To Party Chat"/>
                 </Scale>
             </Center>
             <Center>
