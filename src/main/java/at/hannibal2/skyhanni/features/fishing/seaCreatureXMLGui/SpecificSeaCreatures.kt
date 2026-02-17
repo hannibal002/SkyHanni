@@ -154,20 +154,18 @@ class SpecificSeaCreatures(
         openXML("killtime")
     }
 
-    private fun openXML(string: String) {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
-    }
-
     @Bind
     fun showCocoonChatSettings() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/sharecocoontoparty.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("sharecocoontoparty")
     }
 
     @Bind
     fun showCocoonWarnSettings() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/warnwhencocooned.xml")
+        openXML("warnwhencocooned")
+    }
+
+    private fun openXML(string: String) {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
         XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
     }
 
