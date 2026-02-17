@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.item.ItemStack
@@ -24,14 +25,16 @@ object SuperPairsItemVisibility {
     private val superpairsSlotsToRead: MutableSet<Int> = mutableSetOf()
 
     /**
-     * REGEX-TEST: §8?
-     * REGEX-TEST: §eClick any button!
-     * REGEX-TEST: §bClick a second button!
-     * REGEX-TEST: §dNext button is instantly rewarded!
+     * REGEX-TEST: ?
+     * REGEX-TEST: Click any button!
+     * REGEX-TEST: Click a second button!
+     * REGEX-TEST: Next button is instantly rewarded!
      */
-    private val unknownSuperpairsClickPattern by ExperimentationTableApi.patternGroup.pattern(
-        "superpairs.unknown-click",
-        "(?:§.)+(?:\\?|(?:Click a(?: seco)?n[dy]|Next) button(?: is instantly rewarded)?!?)"
+    private val unknownSuperpairsClickPattern by ExperimentationTableApi.patternGroup.list(
+        "superpairs.unknown-click-nocolor",
+        "\\?",
+        "Click (?:any|a second) button!",
+        "Next button is instantly rewarded!",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -39,7 +42,7 @@ object SuperPairsItemVisibility {
         if (!config.enabled) return
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (!unknownSuperpairsClickPattern.matches(event.originalItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!unknownSuperpairsClickPattern.matches(event.originalItem.cleanName())) return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
@@ -50,23 +53,26 @@ object SuperPairsItemVisibility {
         superpairsSlotsToRead.clear()
     }
 
+    // tryReadUncoveredItem
     @HandleEvent
-    fun GuiContainerEvent.SlotClickEvent.tryReadUncoveredItem() {
-        val slotNumber = slot?.index?.takeIf {
-            it !in superpairsSlotMap.keys
-        } ?: return
-        val clickedItem = item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) superpairsSlotsToRead.add(slotNumber)
-        else superpairsSlotMap[slotNumber] = clickedItem
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        val slotNumber = event.slot?.index?.takeUnless(superpairsSlotMap.keys::contains) ?: return
+        val clickedItem = event.item ?: return
+        if (unknownSuperpairsClickPattern.matches(clickedItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            superpairsSlotsToRead.add(slotNumber)
+        } else {
+            superpairsSlotMap[slotNumber] = clickedItem
+        }
     }
 
+    // tryReadSuperpairsSlots
     @HandleEvent
-    fun InventoryOpenEvent.tryReadSuperpairsSlots() {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotsToRead.isEmpty()) return
 
-        inventoryItems.filter {
-            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        event.inventoryItems.filter { (slot, stack) ->
+            slot in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(stack.cleanName())
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)

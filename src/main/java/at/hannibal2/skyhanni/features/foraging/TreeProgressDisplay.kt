@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
@@ -23,6 +23,15 @@ object TreeProgressDisplay {
 
     private val config get() = SkyHanniMod.feature.foraging.trees.progress
     private var display: Renderable? = null
+
+    /**
+     * REGEX-TEST: FIG TREE 88%
+     * REGEX-TEST: MANGROVE TREE 5%
+     */
+    private val currentTreeProgressPattern by RepoPattern.pattern(
+        "foraging.tree.progress-nocolor",
+        "(?<treeType>\\w+) TREE (?<percent>\\d+)%",
+    )
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -42,7 +51,7 @@ object TreeProgressDisplay {
         }
         for (entity in EntityUtils.getEntities<ArmorStand>()) {
             val name = entity.displayName.formattedTextCompat()
-            ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
+            currentTreeProgressPattern.matchMatcher(name) {
                 if (config.compact) {
                     display = Renderable.text("${group("treeType")} §b§l${group("percent")}%")
                 } else {
