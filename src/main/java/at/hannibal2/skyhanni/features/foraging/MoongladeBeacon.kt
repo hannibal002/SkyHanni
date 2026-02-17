@@ -90,24 +90,26 @@ object MoongladeBeacon {
      * Represents the order of colors for the beacon minigame.
      * Attempts to auto-fetch the item from the registry if not provided.
      *
-     * @param displayName The display name of the color as shown in the GUI.
      * @param itemOverride Optional override for the item to use for this color.
      */
-    enum class BeaconColor(private val displayName: String, itemOverride: Item? = null) {
-        WHITE("White"),
-        ORANGE("Orange"),
-        MAGENTA("Magenta"),
-        LIGHT_BLUE("Light Blue"), // Why did hypixel do this
-        YELLOW("Yellow"),
-        LIME("Lime"),
-        PINK("Pink"),
-        CYAN("Cyan"), // This too
-        PURPLE("Purple"),
-        BLUE("Blue"), // This one makes sense ig
-        BROWN("Brown"),
-        GREEN("Green"),
-        RED("Red"),
+    enum class BeaconColor(itemOverride: Item? = null) {
+        WHITE,
+        ORANGE,
+        MAGENTA,
+        LIGHT_BLUE,
+        YELLOW,
+        LIME,
+        PINK,
+        CYAN,
+        PURPLE,
+        BLUE,
+        BROWN,
+        GREEN,
+        RED,
         ;
+
+        val displayName: String
+            get() = name.split("_").joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }
 
         override fun toString() = displayName
 
