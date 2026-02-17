@@ -561,4 +561,15 @@ object CollectionUtils {
 
     fun <T> Set<T>.optionalEmpty(): Set<T> = if (isEmpty()) emptySet() else this
 
+    fun <T> MutableCollection<T>.clearAnd(predicate: (T) -> Unit) {
+        val it = iterator()
+        while (it.hasNext()) {
+            predicate(it.next())
+            it.remove()
+        }
+    }
+
+    fun <K, V> MutableMap<K, V>.clearAnd(predicate: (Map.Entry<K, V>) -> Unit) = entries.clearAnd(predicate)
+
+
 }
