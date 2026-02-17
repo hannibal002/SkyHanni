@@ -56,11 +56,10 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Hide Vanilla Scoreboard",
-        desc = "Hide the vanilla scoreboard.\n" +
+        desc = "Hide the vanilla scoreboard while the custom scoreboard is visible.\n" +
             "§cMods that add their own scoreboard will not be affected by this setting!",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     val hideVanillaScoreboard: Property<Boolean> = Property.of(true)
 
     @Expose
