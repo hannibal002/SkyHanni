@@ -27,7 +27,7 @@ import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object VanquisherApi {
+object VanquisherAPI {
 
     data class VanquisherData(
         val isOwn: Boolean,
@@ -85,7 +85,7 @@ object VanquisherApi {
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         val entity = event.entity as? ArmorStand ?: return
         val helmet = entity.getStandHelmet() ?: return
-        if (helmet.item != Items.WITHER_SKELETON_SKULL) return // wither skeleton skull
+        if (helmet.item != Items.WITHER_SKELETON_SKULL) return
         lastVanqSpawnEntityPos = entity.getLorenzVec()
         lastPossibleVanqSpawnEntity = entity
         lastVanqSpawnEntityTime = SimpleTimeMark.now()
@@ -160,7 +160,7 @@ object VanquisherApi {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("NautilusApi")
+        event.title("VanquisherAPI")
         event.addIrrelevant {
             "vanquishers $vanquishers"
             "lastOwnVanqTime $lastOwnVanqTime"
