@@ -108,8 +108,8 @@ object MoongladeBeacon {
         RED,
         ;
 
-        val displayName: String
-            get() = name.split("_").joinToString(" ") { it.replaceFirstChar(Char::uppercaseChar) }
+        val displayName: String =
+            name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercaseChar) }
 
         override fun toString() = displayName
 
