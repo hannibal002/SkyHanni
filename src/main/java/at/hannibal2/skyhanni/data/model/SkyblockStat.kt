@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import org.intellij.lang.annotations.Language
 import java.util.EnumMap
 import java.util.regex.Pattern
@@ -258,7 +259,7 @@ enum class SkyblockStat(
         fun onTabList(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS)) return
             val type = if (event.isWidget(TabWidget.DUNGEON_SKILLS_AND_STATS)) StatSourceType.TABLIST_DUNGEON else StatSourceType.TABLIST
-            assignEntry(event.lines.map { it.string }, type) { it.tablistPattern }
+            assignEntryComponent(event.lines, type) { it.tablistPattern }
         }
 
         private fun assignEntry(lines: List<String>, type: StatSourceType, pattern: (SkyblockStat) -> Pattern) {
@@ -267,6 +268,19 @@ enum class SkyblockStat(
                     groupOrNull("value")?.replace("[,%]".toRegex(), "")?.toDouble()
                 } ?: continue
                 entry.lastKnownValue = matchResult
+                entry.lastSource = type
+                entry.lastAssignment = SimpleTimeMark.now()
+                break // Exit the inner loop once a match is found
+            }
+        }
+
+        private fun assignEntryComponent(lines: List<Component>, type: StatSourceType, pattern: (SkyblockStat) -> Pattern) {
+            for (line in lines) for (entry in entries) {
+                val matchResult = pattern(entry).matchMatcher(line) {
+                    groupOrNull("value")?.replace("[,%]".toRegex(), "")?.toDouble()
+                } ?: continue
+                if (line.style.isStrikethrough) entry.lastKnownValue = 0.0
+                else entry.lastKnownValue = matchResult
                 entry.lastSource = type
                 entry.lastAssignment = SimpleTimeMark.now()
                 break // Exit the inner loop once a match is found
