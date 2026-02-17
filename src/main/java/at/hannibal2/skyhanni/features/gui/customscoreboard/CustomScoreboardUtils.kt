@@ -104,12 +104,12 @@ object CustomScoreboardUtils {
     internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSBLines(), "symbol").orEmpty()
 
     internal fun getTablistEvent(): String? {
+        if (!TabWidget.EVENT.isActive || TabWidget.EVENT.lines.isEmpty()) return null
         val first = TabWidget.EVENT.lines.first()
-        TabWidget.EVENT.pattern.matchMatcher(first) {
+        return TabWidget.EVENT.pattern.matchMatcher(first) {
             val matcher = TextHelper.matcher(first, group("event")) ?: return null
-            return matcher.formattedTextCompat()
+            matcher.formattedTextCompat()
         }
-        return null
     }
 
     internal fun getElementsFromAny(element: Any?): List<ScoreboardLine> = when (element) {
