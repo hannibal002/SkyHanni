@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.events.fishing
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 
 sealed class SeaCreatureEvent(val seaCreature: LivingSeaCreatureData) : SkyHanniEvent() {
@@ -20,8 +19,6 @@ sealed class SeaCreatureEvent(val seaCreature: LivingSeaCreatureData) : SkyHanni
 
     /** Gets called when a Sea Creature is re-detected after despawning. */
     class ReDetect(seaCreature: LivingSeaCreatureData) : SeaCreatureEvent(seaCreature)
-
-    class FirstSeen(seaCreature: LivingSeaCreatureData): SeaCreatureEvent(seaCreature)
 
     inline val name: String get() = seaCreature.name
     inline val isOwn: Boolean get() = seaCreature.isOwn

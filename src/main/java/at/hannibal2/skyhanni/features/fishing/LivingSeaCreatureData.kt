@@ -21,8 +21,6 @@ class LivingSeaCreatureData(
     val spawnTime: ServerTimeMark,
     var mob: Mob?,
 ) {
-    private var hasBeenSeen: Boolean = false
-
     /** This tracks the last position of the sea creature that the user was able to see. */
     var pos: LorenzVec?
         private set
@@ -91,10 +89,6 @@ class LivingSeaCreatureData(
     private fun updateCanBeSeen(): Boolean {
         val mob = mob ?: return false
         canBeSeenCache = mob.baseEntity.canBeSeen() || mob.extraEntities.any { it.canBeSeen() }
-        if (!hasBeenSeen && canBeSeenCache) {
-            SeaCreatureEvent.FirstSeen(this).post()
-            hasBeenSeen = canBeSeenCache
-        }
         return canBeSeenCache
     }
 
