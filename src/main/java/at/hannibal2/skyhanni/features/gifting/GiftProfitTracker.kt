@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
@@ -140,7 +141,7 @@ object GiftProfitTracker {
         @Expose var rarityRewardTypesGained: MutableMap<GiftRewardRarityType, Long> = mutableMapOf(),
         @Expose var northStarsGained: Long = 0,
         @Expose var skillXpGained: MutableMap<SkillType, Long> = mutableMapOf(),
-    ) : ItemTrackerData() {
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val totalRewards = rarityRewardTypesGained.sumAllValues().toLong().takeIf { it > 0 } ?: 1
             val percentage = timesGained.toDouble() / totalRewards
