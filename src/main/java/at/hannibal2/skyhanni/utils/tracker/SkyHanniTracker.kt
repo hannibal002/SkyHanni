@@ -17,12 +17,14 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -39,7 +41,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
-open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTrackerConfig<*>>(
+open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrackerConfig<*>>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
@@ -82,6 +84,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
     }
 
     fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
+    fun getPricePerOrNull(name: NeuInternalName) = name.getPriceOrNull(config.priceSource)
 
     fun isInventoryOpen() = inventoryOpen
 
@@ -183,9 +186,11 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         update()
     }
 
-    fun getTotalUptime(): Duration? = displayMode?.let { getSharedTracker()?.get(it)?.getTotalUptime() }
+    private fun getDisplayModeTracker(dispMode: DisplayMode? = displayMode) = dispMode?.let { getSharedTracker()?.get(it) }
 
-    open fun getCurrentStopwatch(): Stopwatch? = displayMode?.let { getSharedTracker()?.get(it)?.getActiveStopwatch() }
+    fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
+
+    fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
 
     fun startSessionUptime() {
         if (!this.trackUptime) return
@@ -203,10 +208,10 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         update()
     }
 
-    fun swapActiveSession(session: SessionUptime) {
+    fun swapActiveSession(session: SessionUptime, swapExtraTime: Boolean = true) {
         if (!this.customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
-        sharedTracker.modify { it.setActiveStopwatch(session) }
+        sharedTracker.modify { it.setActiveStopwatch(session, swapExtraTime) }
         update()
     }
 
@@ -214,18 +219,25 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         val sessionUptime = getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
-        // Uptime added after trackers already had data
-        return if (isTotalDisplay) {
-            Renderable.hoverTips(
-                Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
-                tips = listOf(
-                    "§eⓘ §7Uptime tracked only from",
-                    "§7SkyHanni version 6.0.0 onwards",
-                ),
-            )
-        } else {
-            Renderable.text("§eSession Uptime: §b${sessionUptime.format()}$pausedText")
+        val sessionList: List<String> = buildList {
+            getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
+                if (it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
+            }
         }
+
+        return Renderable.hoverTips(
+            Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
+            tips = buildList {
+                addAll(sessionList)
+                if (isTotalDisplay) {
+                    // Uptime added after trackers already had data
+                    addAll(
+                        "§eⓘ §7Uptime tracked only from",
+                        "§7SkyHanni version 6.0.0 onwards",
+                    )
+                }
+            }
+        )
     }
 
     private fun buildSessionResetButton() = Renderable.clickable(
@@ -310,7 +322,7 @@ open class SkyHanniTracker<Data : TrackerData, Config : GenericIndividualTracker
         )
     }
 
-    inner class SharedTracker<Data : TrackerData>(
+    inner class SharedTracker<Data : TrackerData<*>>(
         private val entries: Map<DisplayMode, Data>,
     ) {
 
