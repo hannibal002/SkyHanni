@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -25,7 +26,13 @@ object TextHelper {
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
 
-    fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
+    fun text(text: String = "", init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
+
+    fun textWithColor(text: String, rgb: Int): MutableComponent = text(text) { withColor(rgb) }
+    fun textWithColor(text: String, textColor: TextColor): MutableComponent = text(text) { withColor(textColor) }
+    fun textWithColor(text: String, formatting: ChatFormatting): MutableComponent = text(text) { withColor(formatting) }
+    fun textWithColor(text: String, lorenzColor: LorenzColor): MutableComponent = text(text) { withColor(lorenzColor) }
+
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
         Component.literal(this).also(init)
 

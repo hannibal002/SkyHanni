@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.TextColor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -86,6 +87,13 @@ object TimeUtils {
         in 0.seconds..60.seconds -> "§c"
         in 60.seconds..3.minutes -> "§6"
         in 3.minutes..10.minutes -> "§e"
+        else -> default
+    }
+
+    fun Duration.timerColor(default: LorenzColor) = when (this) {
+        in 0.seconds..60.seconds -> LorenzColor.RED
+        in 60.seconds..3.minutes -> LorenzColor.GOLD
+        in 3.minutes..10.minutes -> LorenzColor.YELLOW
         else -> default
     }
 

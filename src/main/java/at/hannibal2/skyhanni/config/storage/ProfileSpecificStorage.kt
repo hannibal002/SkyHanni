@@ -656,6 +656,7 @@ class ProfileSpecificStorage(
 
         class GreenHouseStorage(
             @Expose var nextCycle: SimpleTimeMark = farPast(),
+            @Expose var notifiedCycle: Boolean = false,
         )
     }
 

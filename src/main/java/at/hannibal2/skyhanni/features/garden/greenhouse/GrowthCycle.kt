@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -18,13 +19,13 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
-import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -47,7 +48,11 @@ object GrowthCycle {
     )
 
     private var display: Renderable? = null
-    private var beep = true
+    private var beep: Boolean
+        get() = storage?.notifiedCycle ?: false
+        set(value) {
+            storage?.notifiedCycle = value
+        }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -64,8 +69,8 @@ object GrowthCycle {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!config.showDisplay) return
 
         updateDisplay()
@@ -73,9 +78,8 @@ object GrowthCycle {
 
     private fun updateDisplay() {
         val nextCycle = storage?.nextCycle ?: return
-        if (nextCycle.isFarPast() || nextCycle.passedSince() > 60.minutes) {
+        if (nextCycle.isFarPast()) {
             display = null
-            beep = false
             return
         }
         display = drawDisplay(nextCycle)
@@ -83,25 +87,38 @@ object GrowthCycle {
 
     private fun drawDisplay(nextCycle: SimpleTimeMark): Renderable? {
         val timeUntil = nextCycle.timeUntil()
-        val color = timeUntil.timerColor("§a")
+        val absolute = timeUntil.absoluteValue
+        val format = absolute.format(maxUnits = 2)
         val formatted = if (nextCycle.isInPast()) {
+            val time = componentBuilder {
+                appendWithColor(" (", LorenzColor.DARK_GRAY)
+                appendWithColor("$format ago", LorenzColor.DARK_RED)
+                appendWithColor(")", LorenzColor.DARK_GRAY)
+            }
             if (!beep) {
                 SoundUtils.playPlingSound()
-                ChatUtils.chat(
-                    componentBuilder {
-                        append("Greenhouse Growth Stage is ready in the Garden") {
-                            withColor(ChatFormatting.GREEN)
-                        }
+                ChatUtils.chat {
+                    appendWithColor("Greenhouse Growth Stage is ready in the Garden", LorenzColor.GREEN)
+                    if (absolute > 1.minutes) {
+                        append(time)
                     }
-                )
+                }
+
                 beep = true
             }
-            "§cOVERDUE"
+            componentBuilder {
+                appendWithColor("OVERDUE", LorenzColor.RED)
+                append(time)
+            }
         } else {
             if (config.onlyShowWhenOverdue) return null
-            "$color${timeUntil.format(maxUnits = 2)}"
+            val color = timeUntil.timerColor(LorenzColor.GREEN)
+            TextHelper.textWithColor("in $format", color)
         }
-        return Renderable.text("§6Next Greenhouse Growth Stage: $formatted")
+        return Renderable.text(TextHelper.text {
+            appendWithColor("Greenhouse Growth Stage: ", LorenzColor.GOLD)
+            append(formatted)
+        })
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)

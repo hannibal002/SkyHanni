@@ -133,6 +133,10 @@ fun MutableComponent.withColor(color: TextColor): MutableComponent {
     return this.withStyle { it.withColor(color) }
 }
 
+fun MutableComponent.withColor(lorenzColor: LorenzColor): MutableComponent {
+    return this.withStyle { it.withColor(lorenzColor.rgb) }
+}
+
 /**
  * This might have performance issues if you render it every frame idk
  */
@@ -351,6 +355,14 @@ fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: LorenzColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(Component.literal(string).withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: LorenzColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
     return this.append(comp.copyIfNeeded().withColor(color).also(init))
 }
 

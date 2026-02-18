@@ -42,6 +42,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     // TODO make this public fun unnecesary, replace with chroma color
     fun toColor(): Color = color
+    val rgb: Int get() = color.rgb
 
     // TODO make this functin return moulconfig.ChromaColour, and eventually remove awt.Color support
     fun addOpacity(opacity: Int): Color {
