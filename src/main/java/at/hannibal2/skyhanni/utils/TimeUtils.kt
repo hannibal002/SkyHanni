@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.TextColor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
