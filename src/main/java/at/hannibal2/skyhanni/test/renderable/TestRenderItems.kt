@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.renderable
 
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
@@ -22,7 +23,10 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule(devOnly = true)
-object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
+object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRenderPostEvent>(
+    "items",
+    eventClass = GameOverlayRenderPostEvent::class,
+) {
 
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val bambooProvider = NeuItemStackProvider("BAMBOO".toInternalName())

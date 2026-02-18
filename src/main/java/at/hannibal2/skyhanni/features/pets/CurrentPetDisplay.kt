@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroun
 import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -336,15 +337,12 @@ object CurrentPetDisplay {
         }
     }
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGameOverlayRenderPost(event: GameOverlayRenderPostEvent) {
+        if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.enabled.get()) return
-        val currentPet = CurrentPetApi.currentPet ?: run {
-            lastPetHash = 0
-            return
-        }
-        petOverlay = currentPet.buildRenderable()
-        petOverlay?.let {
+        val currentPet = CurrentPetApi.currentPet ?: return run {  lastPetHash = 0 }
+        petOverlay = currentPet.buildRenderable()?.also {
             config.position.renderRenderable(it, posLabel = "Current Pet")
         }
     }

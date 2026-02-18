@@ -90,12 +90,12 @@ public class MixinGuiRenderer {
     @Final
     private Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> pictureInPictureRenderers;
 
-    // Inject at the tail of preparePictureInPicture, after Fabric's
+    // Inject at the tail of preparePictureInPictureState, after Fabric's
     // postPrepareSpecialElements has run. At this point all PIP states have
     // been submitted, our collector has gathered them, and renderState is
     // ready to accept new BlitRenderState submissions before sortElements runs.
     @Inject(
-        method = "preparePictureInPicture",
+        method = "preparePictureInPictureState",
         at = @At("TAIL")
     )
     private void skyhanni$prepareSkyHanniItems(CallbackInfo ci) {

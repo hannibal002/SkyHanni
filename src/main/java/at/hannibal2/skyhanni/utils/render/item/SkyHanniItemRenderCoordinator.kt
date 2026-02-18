@@ -159,26 +159,22 @@ internal object SkyHanniItemRenderCoordinator {
             val animKey = SkyHanniAnimatedKey(tracking.modelIdentity, state.scale, guiScale, state.stableId)
             val existing = atlas.getAnimatedFrames()[animKey]
 
-            val slotX: Int
-            val slotY: Int
-
-            if (existing != null && existing.lastRenderedFrame != frameNumber) {
+            val (slotX, slotY) =
                 // Reuse existing slot - _dont_ advance cursor
-                slotX = existing.x
-                slotY = existing.y
-                atlas.clearSlot(slotX, slotY, atlas.getSlotSize())
-            } else if (existing == null) {
-                // First time seeing this animated item - allocate new slot
-                if (atlas.isRowFull()) atlas.newRow()
-                if (atlas.isFull()) {
-                    atlasNeedsGrow = true
-                    fallbackStates.add(state)
-                    return@forEach
-                }
-                slotX = atlas.getCursorX()
-                slotY = atlas.getCursorY()
-                atlas.advanceCursor()
-            } else return@forEach
+                if (existing != null && existing.lastRenderedFrame != frameNumber) (existing.x to existing.y).also {
+                    atlas.clearSlot(existing.x, existing.y, atlas.getSlotSize())
+                } else if (existing == null) {
+                    // First time seeing this animated item - allocate new slot
+                    if (atlas.isRowFull()) atlas.newRow()
+                    if (atlas.isFull()) {
+                        atlasNeedsGrow = true
+                        fallbackStates.add(state)
+                        return@forEach
+                    }
+                    (atlas.getCursorX() to atlas.getCursorY()).also {
+                        atlas.advanceCursor()
+                    }
+                } else return@forEach
 
             renderItemToAtlas(state, tracking, slotX, slotY, atlas.getSlotSize())
 
@@ -202,7 +198,7 @@ internal object SkyHanniItemRenderCoordinator {
         log.log("slotSize: $slotSize, atlasSize: ${atlas.getSize()}, slotX: $slotX, slotY: $slotY, translationVec: ${state.translationVec}, rotationVec: ${state.rotationVec}")
         ps.translate(slotX.toFloat() + slotSize / 2.0f, slotY.toFloat() + slotSize / 2.0f, 0.0f)
 
-        val rotationPadding = 1.0f / 1.42f  // sqrt 2 factor for safety
+        val rotationPadding = 1.0f / 1.42f // sqrt 2 factor for safety
         val f = slotSize.toFloat()
         ps.scale(f, -f, f)
 

@@ -365,6 +365,18 @@ object GuiRenderUtils {
         ) else item.normalRenderOnScreen(translateX, translateY, finalItemScale)
     }
 
+    /**
+     * This is used to render items that fit these criteria:
+     *  - Uses block light (mostly skulls)
+     *  - Has a rotation (either from the GUI editor or from the animation)
+     *  - Has animations (either animated skins/items, or a bounce animation from AnimatedItemStackRenderable)
+     *  - Needs to be rendered at a higher resolution (scale > 1)
+     *
+     *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
+     *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
+     *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
+     *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+     */
     private fun ItemStack.customRenderOnScreen(
         trackingState: TrackingItemStackRenderState,
         x: Float,

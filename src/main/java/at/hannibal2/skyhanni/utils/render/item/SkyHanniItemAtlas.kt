@@ -54,8 +54,9 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         animatedFrames[key] = position
     }
 
-    // Called once per frame. Only creates or grows the atlas — never shrinks or resets it.
-    // slotSize is fixed per guiScale+maxScale combination; if it changes we must invalidate externally.
+    // Called once per frame. Only creates or grows the atlas; never shrinks or resets it.
+    // slotSize is fixed per guiScale + maxScale combination.
+    //  If it changes we must invalidate externally.
     fun ensureCapacity(guiScale: Int, maxScale: Float) {
         val newSlotSize = (16 * guiScale * maxScale).toInt()
 
@@ -64,16 +65,16 @@ internal class SkyHanniItemAtlas : AutoCloseable {
             invalidate()
             slotSize = newSlotSize
         }
-
         if (texture != null) return
 
-        // Start with a modest size — the atlas grows if we run out of space.
+        // Start with a modest size - the atlas grows if we run out of space.
         val initialSize = calculateSize(16, slotSize)
         allocate(initialSize)
     }
 
     // Called when the current atlas is full and we need more space.
-    // Doubles the atlas size, copies nothing — all positions are invalidated and items re-render next frame.
+    // Doubles the atlas size, copies nothing.
+    // All positions are invalidated and items re-render next frame.
     fun grow() {
         val newSize = (sizePixels * 2).coerceAtMost(RenderSystem.getDevice().maxTextureSize)
         if (newSize == sizePixels) return // Already at max size, nothing we can do
