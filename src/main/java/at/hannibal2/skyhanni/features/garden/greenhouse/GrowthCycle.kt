@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -77,7 +79,7 @@ object GrowthCycle {
 
     private fun updateDisplay() {
         val nextCycle = storage?.nextCycle ?: return
-        if (nextCycle.isFarPast()) {
+        if (nextCycle.isFarPast() || nextCycle.passedSince() > config.maxOverdueTime.hours) {
             display = null
             return
         }
