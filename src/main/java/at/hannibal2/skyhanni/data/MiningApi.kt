@@ -281,7 +281,7 @@ object MiningApi {
 
     @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
-        if (event.name == PlayerUtils.getName()) {
+        if (event.isSelf) {
             updateCold(0)
             updateHeat(0)
             lastColdReset = SimpleTimeMark.now()
