@@ -51,14 +51,24 @@ object TotemOfCorruption {
     private val warnedTotems = TimeLimitedSet<UUID>(2.minutes)
 
     private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
+
     private val totemNamePattern by patternGroup.pattern(
         "totemname-nocolor",
         "Totem of Corruption",
     )
+
+    /**
+     * Remaining: 2m 30s
+     * Remaining: 5s
+     */
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining-nocolor",
         "Remaining: (?:(?<min>\\d+)m )?(?<sec>\\d+)s"
     )
+
+    /**
+     * Owner: hannibal2
+     */
     private val ownerPattern by patternGroup.pattern(
         "owner-nocolor",
         "Owner: (?<owner>.+)"

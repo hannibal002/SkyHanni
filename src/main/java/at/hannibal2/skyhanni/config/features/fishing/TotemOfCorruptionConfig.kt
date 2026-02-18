@@ -31,7 +31,7 @@ class TotemOfCorruptionConfig {
             "§eMay break if you are nicked!"
     )
     @ConfigEditorBoolean
-    val ownTotemOnly: Boolean = true
+    var ownTotemOnly: Boolean = true
 
     @Expose
     @ConfigOption(
