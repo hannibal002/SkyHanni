@@ -223,7 +223,7 @@ object CurrentPetDisplay {
             horizontalAlign = petItemConfig.placement.get().horizontal,
             verticalAlign = petItemConfig.placement.get().vertical,
         )
-        return Renderable.doubleLayered(this, petItemRenderable, topLayerTranslation = 30f)
+        return Renderable.doubleLayered(this, petItemRenderable, forceBottomRenderFirst = true)
     }
 
     private fun PetData.buildBaseItemRenderable(
