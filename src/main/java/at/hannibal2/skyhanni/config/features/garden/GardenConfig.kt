@@ -149,6 +149,11 @@ class GardenConfig {
     val atmosphericFilterDisplay: AtmosphericFilterDisplayConfig = AtmosphericFilterDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Garden Tracker Uptime Settings", desc = "")
+    @Accordion
+    val trackerUptimeSettings: GardenTrackerUptimeConfig = GardenTrackerUptimeConfig()
+
+    @Expose
     @ConfigOption(name = "Hoe Levels Display", desc = "")
     @Accordion
     val hoeLevelDisplay: HoeLevelsDisplayConfig = HoeLevelsDisplayConfig()
