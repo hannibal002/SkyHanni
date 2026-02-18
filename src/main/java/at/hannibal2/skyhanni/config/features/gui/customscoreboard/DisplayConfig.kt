@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
 import at.hannibal2.skyhanni.utils.RenderUtils
