@@ -116,10 +116,12 @@ object GrowthCycle {
             val color = timeUntil.timerColor(LorenzColor.GREEN)
             TextHelper.textWithColor("in $format", color)
         }
-        return Renderable.text(TextHelper.text {
-            appendWithColor("Greenhouse Growth Stage: ", LorenzColor.GOLD)
-            append(formatted)
-        })
+        return Renderable.text(
+            TextHelper.text {
+                appendWithColor("Greenhouse Growth Stage: ", LorenzColor.GOLD)
+                append(formatted)
+            }
+        )
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
