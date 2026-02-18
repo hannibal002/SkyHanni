@@ -14,6 +14,9 @@ object PlayerDeathManager {
 
     /**
      * WRAPPED-REGEX-TEST: " ☠ ZeroHazel was killed by Ashfang."
+     * WRAPPED-REGEX-TEST: " ☠ You fell into the void."
+     * WRAPPED-REGEX-TEST: " ☠ You burned to death."
+     * WRAPPED-REGEX-TEST: " ☠ You were killed by Bladesoul."
      */
     private val deathMessagePattern by RepoPattern.pattern(
         "chat.player.death-nocolor",
