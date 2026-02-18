@@ -22,7 +22,7 @@ object SeaCreatureCocoonWarning {
         if (mob.seaCreature == null) return
         if (!mob.seaCreature.isOwn) return
         val name = mob.seaCreature.name
-        if (scSpecificConfig[name]?.shouldWarnWhenCocooned == true && config.shareInPartyChat) {
+        if (scSpecificConfig[name]?.shouldWarnWhenCocooned == true && config.warnWhenCocooned) {
             TitleManager.sendTitle("§c$name Has Been Cocooned")
             SoundUtils.repeatSound(
                 1,
@@ -30,7 +30,7 @@ object SeaCreatureCocoonWarning {
                 sound = SoundUtils.plingSound,
             )
         }
-        if (scSpecificConfig[name]?.shouldShareCocoonInChat == true && config.warnWhenCocooned) {
+        if (scSpecificConfig[name]?.shouldShareCocoonInChat == true && config.shareInPartyChat) {
             if (PartyApi.isInParty()) {
                 HypixelCommands.partyChat("I Cocooned ${StringUtils.optionalAn(name)} $name!")
             }
