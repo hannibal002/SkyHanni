@@ -159,7 +159,7 @@ class SpecificSeaCreatures(
 
     @Bind
     fun showSelfNotify() {
-        openXML("selfnotif")
+        openXML("selfnotify")
     }
 
     @Bind
