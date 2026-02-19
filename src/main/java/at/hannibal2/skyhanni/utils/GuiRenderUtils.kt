@@ -25,10 +25,8 @@ import net.minecraft.world.phys.Vec3
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
-import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.world.item.ItemDisplayContext
-import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates

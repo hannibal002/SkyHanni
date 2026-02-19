@@ -10,7 +10,9 @@ import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.texture.OverlayTexture
 
-class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(bufferSource) {
+class SkyHanniItemRenderer(
+    bufferSource: MultiBufferSource.BufferSource
+) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(bufferSource) {
 
     private var usedOnThisFrame = false
     private var modelOnTextureIdentity: Any? = null

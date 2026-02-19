@@ -341,7 +341,7 @@ object CurrentPetDisplay {
     fun onGameOverlayRenderPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.enabled.get()) return
-        val currentPet = CurrentPetApi.currentPet ?: return run {  lastPetHash = 0 }
+        val currentPet = CurrentPetApi.currentPet ?: return run { lastPetHash = 0 }
         petOverlay = currentPet.buildRenderable()?.also {
             config.position.renderRenderable(it, posLabel = "Current Pet")
         }
