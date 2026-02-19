@@ -548,7 +548,7 @@ object GardenNextJacobContest {
         }
 
         event.duplicate(
-            124,
+            125,
             "$base.showOutsideGarden",
             "$base.warnOutsideGarden",
             JsonPrimitive(false),

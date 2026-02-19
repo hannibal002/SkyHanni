@@ -21,6 +21,7 @@ data class GardenJson(
     @Expose @SerializedName("hoe_exp_levels") val hoeExpLevels: List<Int>,
     @Expose @SerializedName("hoe_exp_overflow") val hoeExpOverflow: Int,
     @Expose @SerializedName("dna_solver_allows_ends") val dnaSolverAllowsEnds: Boolean = false,
+    @Expose @SerializedName("money_per_hour_ignored_items") val moneyPerHourIgnoredItems: List<NeuInternalName>,
 )
 
 data class GardenVisitor(
