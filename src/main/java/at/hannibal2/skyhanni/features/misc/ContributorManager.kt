@@ -54,11 +54,8 @@ object ContributorManager {
         }
     }
 
-    fun getSuffix(uuid: UUID): String? = getContributor(uuid)?.suffix
+    fun getSuffix(uuid: UUID): String? = contributors[uuid]?.suffix
 
-    fun shouldSpin(uuid: UUID): Boolean = getContributor(uuid)?.spinny ?: false
-    fun shouldBeUpsideDown(uuid: UUID): Boolean = getContributor(uuid)?.upsideDown ?: false
-
-    private fun getContributor(uuid: UUID) =
-        if (config.fancyContributors) contributors[uuid] else null
+    fun shouldSpin(uuid: UUID): Boolean = contributors[uuid]?.spinny ?: false
+    fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
 }

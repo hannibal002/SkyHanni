@@ -204,9 +204,12 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
-            ContributorManager.getSuffix(playerInfo.profile.id)?.let {
-                suffix += " $it"
+
+        if (SkyHanniMod.feature.dev.fancyContributors) {
+            Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
+                ContributorManager.getSuffix(playerInfo.profile.id)?.let {
+                    suffix += " $it"
+                }
             }
         }
 
