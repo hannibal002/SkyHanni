@@ -146,6 +146,7 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         sizePixels = size
         val device = RenderSystem.getDevice()
         texture = device.createTexture("SkyHanni item atlas", 12, TextureFormat.RGBA8, size, size, 1, 1)
+            //? if < 1.21.11
             .also { it.setTextureFilter(FilterMode.NEAREST, false) }
         textureView = device.createTextureView(texture!!)
         depthTexture = device.createTexture("SkyHanni item atlas depth", 8, TextureFormat.DEPTH32, size, size, 1, 1)

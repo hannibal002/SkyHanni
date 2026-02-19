@@ -4,10 +4,8 @@ import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.SkyHanniGuiAnimatedItemRenderState
 import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.SkyHanniItemRenderer
-import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAnimatedAtlasKey
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAtlasKey
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
-import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
@@ -158,7 +156,10 @@ internal object SkyHanniItemRenderCoordinator {
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
+                //? if < 1.21.11
                 TextureSetup.singleTexture(textureView),
+                //?} else {
+                // TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST))
                 state.pose(),
                 state.x0(),
                 state.y0(),
