@@ -102,11 +102,11 @@ public class MixinGuiRenderer {
         PictureInPictureRenderer<?> renderer = pictureInPictureRenderers.get(SkyHanniGuiItemRenderState.class);
         if (!(renderer instanceof SkyHanniPipCoordinatorRenderer coordinator)) return;
 
-        List<SkyHanniGuiItemRenderState> states = coordinator.takePendingStates();
-        if (states.isEmpty()) return;
+        List<SkyHanniGuiItemRenderState> pipCoordinatorStates = coordinator.takePendingStates();
+        if (pipCoordinatorStates.isEmpty()) return;
 
         SkyHanniItemRenderCoordinator.INSTANCE.prepare(
-            states,
+            pipCoordinatorStates,
             renderState,
             getBufferSource(),
             featureRenderDispatcher,

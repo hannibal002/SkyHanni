@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.utils.render.PoseStackUtils.angleSkullDown
+import at.hannibal2.skyhanni.utils.render.PoseStackUtils.angleForBlockLight
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
@@ -28,7 +28,7 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
     override fun getRenderStateClass() = SkyHanniGuiItemRenderState::class.java
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun renderToTexture(itemRenderState: SkyHanniGuiItemRenderState) {
+    fun renderToTexture(shItemRenderState: SkyHanniGuiItemRenderState) {
         // We ignore the passed poseStack, since its transformations make it borderline impossible to perform
         // precise rotations in 3D space, due to unpredictable matrix offsets on the passed stack.
         val identityPoseStack = PoseStack()
@@ -37,35 +37,34 @@ class SkyHanniItemRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictu
 
         // Translation
         val i = Minecraft.getInstance().window.guiScale
-        val j = (itemRenderState.x1() - itemRenderState.x0()) * i
-        val k = (itemRenderState.y1() - itemRenderState.y0()) * i
+        val j = (shItemRenderState.x1() - shItemRenderState.x0()) * i
+        val k = (shItemRenderState.y1() - shItemRenderState.y0()) * i
         identityPoseStack.translate(j / 2.0f, k / 2.0f, 0.0f)
 
         // Scale
-        val f = i * itemRenderState.scale()
+        val f = i * shItemRenderState.scale()
         identityPoseStack.scale(f, f, -f)
         identityPoseStack.scale(1.0f, -1.0f, -1.0f)
 
-        // Default rotation for skulls
-        if (itemRenderState.isSkull()) identityPoseStack.angleSkullDown()
+        // Default rotation for block light
+        if (shItemRenderState.usesBlockLight()) identityPoseStack.angleForBlockLight()
 
         // Rotation
-        val rotated = identityPoseStack.mulPose(itemRenderState.rotationVec)
+        val rotated = identityPoseStack.mulPose(shItemRenderState.rotationVec)
         identityPoseStack.translate(0.0f, 0.03f, 0.125f)
 
         val gameRenderer = Minecraft.getInstance().gameRenderer
-        val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
         gameRenderer.lighting.setupFor(
-            if (trackingItemStackRenderState.usesBlockLight()) Lighting.Entry.ITEMS_3D
+            if (shItemRenderState.usesBlockLight()) Lighting.Entry.ITEMS_3D
             else Lighting.Entry.ITEMS_FLAT
         )
-        if (rotated) trackingItemStackRenderState.setAnimated()
+        if (rotated) shItemRenderState.setAnimated()
 
         val featureRenderDispatcher = gameRenderer.featureRenderDispatcher
         val submitNodeStorage = featureRenderDispatcher.submitNodeStorage
-        trackingItemStackRenderState.submit(identityPoseStack, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
+        shItemRenderState.submit(identityPoseStack, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
         featureRenderDispatcher.renderAllFeatures()
-        this.modelOnTextureIdentity = trackingItemStackRenderState.modelIdentity
+        this.modelOnTextureIdentity = shItemRenderState.getModelIdentity()
     }
 
     override fun renderToTexture(itemRenderState: SkyHanniGuiItemRenderState, poseStack: PoseStack) =
