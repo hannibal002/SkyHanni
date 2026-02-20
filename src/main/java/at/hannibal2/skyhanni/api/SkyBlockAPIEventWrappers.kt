@@ -62,7 +62,7 @@ object SkyBlockAPIEventWrappers {
             val profileData = hypixelApiGson.fromJson<HypixelApiProfile>(data)
             val playerData = HypixelPlayerApiJson(listOf(profileData))
 
-            NeuProfileDataLoadedEvent(playerData).post()
+            NeuProfileDataLoadedEvent(playerData, data).post()
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error reading hypixel player api data",

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -93,6 +94,12 @@ object CrimsonIsleReputationHelper {
         TabWidget.REPUTATION.matchMatcherFirstLine {
             factionType = FactionType.fromName(group("faction"))
         }
+    }
+
+    @HandleEvent
+    fun onProfileViewerLoad(event: NeuProfileDataLoadedEvent) {
+        val faction = event.getCurrentPlayerData()?.netherData?.currentFaction ?: ""
+        factionType = FactionType.fromAPIName(faction)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
