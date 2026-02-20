@@ -328,7 +328,7 @@ object GuiRenderUtils {
     fun ItemStack.renderOnScreen(
         x: Float,
         y: Float,
-        scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
+        scale: Float = 1f,
         rescaleSkulls: Boolean = true,
         rotationVec: Vec3? = null,
         translationVec: Vec3? = null,
@@ -339,10 +339,10 @@ object GuiRenderUtils {
         val isItemSkull = rescaleSkulls && item.isSkull()
 
         val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
-        val finalItemScale = (baseItemScale * scaleMultiplier).toFloat()
+        val finalItemScale = (baseItemScale * scale)
 
         val (translateX, translateY) = if (isItemSkull) {
-            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
+            val skullDiff = ((scale) * 2.5f)
             x - skullDiff to y - skullDiff
         } else x to y
 

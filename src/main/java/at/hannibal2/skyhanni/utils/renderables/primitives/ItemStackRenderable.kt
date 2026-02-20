@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.renderables.primitives
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
@@ -12,7 +11,7 @@ import net.minecraft.world.item.ItemStack
 
 open class ItemStackRenderable protected constructor(
     private val stackGetter: () -> ItemStack,
-    val scale: Double = NeuItems.ITEM_FONT_SIZE,
+    val scale: Float = 1f,
     val xSpacing: Int = 2,
     val ySpacing: Int = 1,
     val rescaleSkulls: Boolean = true,
@@ -29,7 +28,7 @@ open class ItemStackRenderable protected constructor(
         stack.renderOnScreen(
             xSpacing / 2f,
             ySpacing / 2f,
-            scaleMultiplier = scale,
+            scale = scale,
             rescaleSkulls,
         )
     }
@@ -43,7 +42,7 @@ open class ItemStackRenderable protected constructor(
     companion object {
         fun Renderable.Companion.item(
             stackGetter: () -> ItemStack,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
+            scale: Float = 1f,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -61,7 +60,7 @@ open class ItemStackRenderable protected constructor(
 
         fun Renderable.Companion.item(
             stack: ItemStack,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
+            scale: Float = 1f,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -79,7 +78,7 @@ open class ItemStackRenderable protected constructor(
 
         fun Renderable.Companion.item(
             provider: NeuItemStackProvider,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
+            scale: Float = 1f,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -97,7 +96,7 @@ open class ItemStackRenderable protected constructor(
 
         fun Renderable.Companion.item(
             item: NeuInternalName,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
+            scale: Float = 1f,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,

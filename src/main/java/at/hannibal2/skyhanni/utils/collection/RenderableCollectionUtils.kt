@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -52,11 +51,9 @@ object RenderableCollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NeuItems.ITEM_FONT_SIZE,
+        scale: Float = 1f,
     ) {
-        if (highlight) {
-            itemStack.addEnchantGlint()
-        }
+        if (highlight) itemStack.addEnchantGlint()
         add(Renderable.item(itemStack, scale = scale))
     }
 
