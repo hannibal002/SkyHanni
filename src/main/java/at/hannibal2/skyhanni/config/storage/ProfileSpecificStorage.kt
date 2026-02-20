@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.mining.tracker.MiningTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
@@ -805,6 +806,10 @@ class ProfileSpecificStorage(
 
         @Expose
         var flowstatePersonalBest = 0
+
+        @Expose
+        var miningTracker: at.hannibal2.skyhanni.features.mining.tracker.MiningTracker.Data =
+            MiningTracker.Data()
     }
 
     @Expose
