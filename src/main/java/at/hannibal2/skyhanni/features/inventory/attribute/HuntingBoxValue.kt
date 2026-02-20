@@ -63,7 +63,7 @@ object HuntingBoxValue {
             addString("§eHunting Box Value")
 
             if (table.isNotEmpty()) {
-                add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7, height = 225, velocity = 5.0))
+                add(RenderableUtils.fillScrollTable(table, padding = 5, itemScale = 0.7f, height = 225, velocity = 5.0))
             } else {
                 possiblyAddWarning()
             }

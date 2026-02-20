@@ -72,7 +72,7 @@ object AgathaCouponProfit {
 
         display = buildList {
             addString("§eProfit per Agatha Coupon")
-            add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+            add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7f))
         }
     }
 

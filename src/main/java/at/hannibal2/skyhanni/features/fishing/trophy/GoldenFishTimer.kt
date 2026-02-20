@@ -236,7 +236,7 @@ object GoldenFishTimer {
             add(
                 Renderable.item(
                     goldenFishSkullItem,
-                    2.5,
+                    2.5f,
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 ),
             )

@@ -189,7 +189,7 @@ object ScrapGFS {
                     Renderable.animatedItemStack(
                         scrapFrames,
                         scrapRotationDefinition,
-                        scale = 1.2,
+                        scale = 1.2f,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         initialRotation = currentScrapRotation,
                     ) { currentScrapRotation = it },

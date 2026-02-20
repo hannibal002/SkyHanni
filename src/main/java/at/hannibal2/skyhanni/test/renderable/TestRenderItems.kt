@@ -46,20 +46,19 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                     downwardBounce = 25,
                     bounceSpeed = 8.0,
                 ),
-                scale = 4.0,
+                scale = 4.0f,
             )
         }
     }
 
     override fun renderable(): Renderable {
-        val scale = 0.1
-
-        val scaleList = generateSequence(scale) { it + 0.1 }.take(25).toList()
-
+        val scaleList = generateSequence(0.1f) { it + 0.1f }.take(25).toList()
         val labels = scaleList.map { Renderable.text(it.roundTo(1).toString()) }
 
         val items = listOf(
-            ItemStack(Blocks.GLASS_PANE), ItemStack(Items.DIAMOND_SWORD), ItemStack(Items.PLAYER_HEAD),
+            ItemStack(Blocks.GLASS_PANE),
+            ItemStack(Items.DIAMOND_SWORD),
+            ItemStack(Items.PLAYER_HEAD),
             ItemStack(Blocks.MELON),
         ).map { item ->
             scaleList.map { Renderable.item(item, it, 0).renderBounds() }

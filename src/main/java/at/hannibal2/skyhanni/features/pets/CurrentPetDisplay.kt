@@ -219,7 +219,7 @@ object CurrentPetDisplay {
         if (!enabled) return this
         val petItemRenderable = Renderable.item(
             petData.heldItemInternalName?.getItemStackOrNull() ?: return this,
-            scale = petItemConfig.scale.get().toDouble(),
+            scale = petItemConfig.scale.get(),
             horizontalAlign = petItemConfig.placement.get().horizontal,
             verticalAlign = petItemConfig.placement.get().vertical,
         )
@@ -229,7 +229,7 @@ object CurrentPetDisplay {
     private fun PetData.buildBaseItemRenderable(
         spinDirection: OrbitDirection,
         spinFrequency: Float,
-        iconScale: Double,
+        iconScale: Float,
         skinAnimation: Boolean,
     ): Renderable {
         val spinMultiplier = if (spinDirection == OrbitDirection.CLOCKWISE) -1 else 1

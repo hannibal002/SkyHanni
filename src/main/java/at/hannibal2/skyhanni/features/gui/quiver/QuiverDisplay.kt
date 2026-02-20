@@ -57,7 +57,7 @@ object QuiverDisplay {
             if (hideAmount || arrow == NONE_ARROW_TYPE) arrow.arrow else StringUtils.pluralize(amount, arrow.arrow)
 
         if (config.showIcon.get()) {
-            addItemStack(itemStack, scale = 1.0)
+            addItemStack(itemStack, scale = 1.0f)
         }
         if (!hideAmount) addString("§b${amount.addSeparators()}x")
         addString(" $rarity$arrowDisplayName")

@@ -69,7 +69,7 @@ object PesthunterProfit {
     private fun buildRenderables(items: Map<Int, ItemStack>) = buildList {
         val table = items.mapNotNull { (slot, stack) -> readItem(slot, stack) }
         addString("§ePesthunter Shop Profit")
-        add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7f))
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {

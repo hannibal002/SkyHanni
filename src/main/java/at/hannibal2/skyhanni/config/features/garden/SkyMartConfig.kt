@@ -20,7 +20,7 @@ class SkyMartConfig {
     @Expose
     @ConfigOption(name = "Item Scale", desc = "Change the size of the items.")
     @ConfigEditorSlider(minValue = 0.3f, maxValue = 5f, minStep = 0.1f)
-    var itemScale: Double = 1.0
+    var itemScale: Float = 1.0f
 
     // TODO move to an accordion for Copper Price Config, rename to position
     @Expose

@@ -199,7 +199,7 @@ class VisualPetDisplayConfig {
     @Expose
     @ConfigOption(name = "Icon Scale", desc = "How large the icon should be - Default is 2.0")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 6.0f, minStep = 0.1f)
-    val iconScale: Property<Double> = Property.of(2.0)
+    val iconScale: Property<Float> = Property.of(2.0f)
 
     @Expose
     @ConfigOption(name = "Skin Animation", desc = "If your pet has an animated skin, display the animated skin for the icon.")
