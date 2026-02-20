@@ -11,28 +11,19 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import com.google.gson.annotations.Expose
-import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.MiningProfitTrackerConfig.GemstoneType
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -40,7 +31,6 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -136,7 +126,7 @@ object MiningTracker {
         override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
             if (internalName.getItemCategoryOrNull() != ItemCategory.GEMSTONE ||
                 config.gemstoneType == GemstoneType.DEFAULT
-                ) {
+            ) {
                 return super.getCustomPricePer(internalName, tracker)
             }
 
@@ -242,20 +232,20 @@ object MiningTracker {
             oldBlock == newBlock ||
             oldBlock == Blocks.AIR ||
             oldBlock == Blocks.BEDROCK
-            ) return
+        ) return
 
         if (newBlock == Blocks.AIR ||
             newBlock == Blocks.BEDROCK ||
             isTitanium(newState)
-            ){
+        ){
             if (OreBlock.getByStateOrNull(oldState) != null &&
                 blockUpdateControl &&
                 event.location == lastClickedPos
-                ) {
-                 // Does NOT count spread
-                     tracker.modify {
-                         it.totalBlocksMined += 1
-                     }
+            ) {
+                // Does NOT count spread
+                tracker.modify {
+                    it.totalBlocksMined += 1
+                }
                 // necessary because it updates twice randomly
                 // TODO: Make an event handler to investigate and get rid of this switch condition
                 blockUpdateControl = false
