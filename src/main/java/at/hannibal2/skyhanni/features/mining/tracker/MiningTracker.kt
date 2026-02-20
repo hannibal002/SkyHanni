@@ -98,13 +98,12 @@ object MiningTracker {
     // Associated data when hovering over tracker lines.
     data class Data(
         @Expose var totalBlocksMined: Long = 0L
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class){
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         // Description when hovering over a tracker code line
         override fun getDescription(timesGained: Long): List<String> {
             /* times gained here is only every time the sack updates, so the best calculable
                 quantity is how often we gain it from sack */
-            val percentage = timesGained.toDouble() / totalBlocksMined
             // TODO: Find an actually useful metric to display, especially glossy/mineral drop rate
             return listOf(
                 "§7Gained §e${timesGained.addSeparators()} §7times from sack/inventory updates."
@@ -154,9 +153,9 @@ object MiningTracker {
     private val tracker = SkyHanniItemTracker(
         name = "Mining Profit Tracker",
         ::Data,
-        getStorage = {it.mining.miningTracker},
-        trackerConfig = {config.perTrackerConfig}
-    ) {drawDisplay(data=it)}
+        getStorage = { it.mining.miningTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) { drawDisplay(data = it) }
 
     // What should be displayed on the tracker
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -165,7 +164,7 @@ object MiningTracker {
         val filter: (NeuInternalName) -> Boolean = addCategories(data)
 
         // Populates values into the tracker
-        val profit = tracker.drawItems(data, filter, lists=this)
+        val profit = tracker.drawItems(data, filter, lists = this)
 
         // Rendering the total blocks mined field.
         val totalBlocksMined = data.totalBlocksMined
@@ -237,7 +236,7 @@ object MiningTracker {
         if (newBlock == Blocks.AIR ||
             newBlock == Blocks.BEDROCK ||
             isTitanium(newState)
-        ){
+        ) {
             if (OreBlock.getByStateOrNull(oldState) != null &&
                 blockUpdateControl &&
                 event.location == lastClickedPos
@@ -326,7 +325,7 @@ object MiningTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetminingtracker"){
+        event.registerBrigadier("shresetminingtracker") {
             description = "Resets the TOTAL Mining profit Tracker"
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }

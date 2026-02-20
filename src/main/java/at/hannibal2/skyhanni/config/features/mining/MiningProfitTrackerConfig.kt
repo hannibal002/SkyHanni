@@ -18,7 +18,10 @@ class MiningProfitTrackerConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Gemstone Calculation Type", desc = "Use a different tier gemstone price in case of highly manipulated bazaar prices.")
+    @ConfigOption(
+        name = "Gemstone Calculation Type",
+        desc = "Use a different tier gemstone price in case of highly manipulated bazaar prices."
+    )
     @ConfigEditorDropdown
     var gemstoneType: GemstoneType = GemstoneType.FLAWLESS
 
