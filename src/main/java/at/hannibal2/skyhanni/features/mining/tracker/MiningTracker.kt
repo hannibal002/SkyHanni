@@ -65,7 +65,7 @@ object MiningTracker {
     val config get() = SkyHanniMod.feature.mining.miningTracker
 
     // Block Types; see [https://github.com/hannibal002/SkyHanni-REPO/blob/main/constants/Mining.json]
-    private var BlockTypes : Map<String, List<NeuInternalName>>
+    private var BlockTypes: Map<String, List<NeuInternalName>>
 
     private val group = RepoPattern.group("data.miningtracker")
 
@@ -100,7 +100,7 @@ object MiningTracker {
         )
     }
 
-    fun onMiningIsland() : Boolean{
+    fun onMiningIsland(): Boolean {
         return MiningApi.inDwarvenMines or MiningApi.inGlaciteArea() or
             MiningApi.inEnd or MiningApi.inCrimsonIsle or MiningApi.inCrystalHollows
     }
@@ -108,7 +108,7 @@ object MiningTracker {
     // Associated data when hovering over tracker lines.
     data class Data(
         @Expose var totalBlocksMined: Long = 0L
-    ): ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class){
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class){
 
         // Description when hovering over a tracker code line
         override fun getDescription(timesGained: Long): List<String> {
@@ -124,7 +124,7 @@ object MiningTracker {
         override fun getCoinName(item: TrackedItem) = "§6Coins gained while mining"
 
         // Description when hovering over the above line
-        override fun getCoinDescription(item: TrackedItem) : List<String>{
+        override fun getCoinDescription(item: TrackedItem): List<String> {
             val mobKillCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7You have gained §6$mobKillCoinsFormat coins §7from mining associated tasks."
@@ -241,15 +241,16 @@ object MiningTracker {
         if (oldState == newState ||
             oldBlock == newBlock ||
             oldBlock == Blocks.AIR ||
-            oldBlock == Blocks.BEDROCK) return
+            oldBlock == Blocks.BEDROCK
+            ) return
 
         if (newBlock == Blocks.AIR ||
             newBlock == Blocks.BEDROCK ||
             isTitanium(newState)
             ){
-            if (OreBlock.getByStateOrNull(oldState) != null
-                && blockUpdateControl
-                && event.location == lastClickedPos
+            if (OreBlock.getByStateOrNull(oldState) != null &&
+                blockUpdateControl &&
+                event.location == lastClickedPos
                 ) {
                  // Does NOT count spread
                      tracker.modify {
@@ -263,7 +264,7 @@ object MiningTracker {
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent){
+    fun onItemAdd(event: ItemAddEvent) {
         if (!config.enabled) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
@@ -334,7 +335,7 @@ object MiningTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent){
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetminingtracker"){
             description = "Resets the TOTAL Mining profit Tracker"
             category = CommandCategory.USERS_RESET
