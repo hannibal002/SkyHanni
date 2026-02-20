@@ -93,8 +93,7 @@ object MiningTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = {
-                config.enabled && SkyBlockUtils.inSkyBlock && onMiningIsland()},
+            condition = { config.enabled && SkyBlockUtils.inSkyBlock && onMiningIsland() },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
@@ -165,7 +164,7 @@ object MiningTracker {
     private val tracker = SkyHanniItemTracker(
         name = "Mining Profit Tracker",
         ::Data,
-        getStorage={it.mining.miningTracker},
+        getStorage = {it.mining.miningTracker},
         trackerConfig = {config.perTrackerConfig}
     ) {drawDisplay(data=it)}
 
@@ -187,11 +186,15 @@ object MiningTracker {
             ).toSearchable(),
         )
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit,
-            data.totalBlocksMined,
-            "block",
-            duration,
-            "Blocks"))
+        addAll(
+            tracker.addTotalProfit(
+                profit,
+                data.totalBlocksMined,
+                "block",
+                duration,
+                "Blocks"
+            )
+        )
         if (tracker.isInventoryOpen()) {
             addButton(
                 label = "Gemstone Type",
@@ -240,22 +243,23 @@ object MiningTracker {
             oldBlock == Blocks.AIR ||
             oldBlock == Blocks.BEDROCK) return
 
-        if ((newBlock == Blocks.AIR ||
+        if (newBlock == Blocks.AIR ||
             newBlock == Blocks.BEDROCK ||
-            isTitanium(newState)) &&
-            OreBlock.getByStateOrNull(oldState) != null
-             && blockUpdateControl
-            && event.location == lastClickedPos
-        ) {
-            // Does NOT count spread
-            tracker.modify {
-                it.totalBlocksMined += 1
+            isTitanium(newState)
+            ){
+            if (OreBlock.getByStateOrNull(oldState) != null
+                && blockUpdateControl
+                && event.location == lastClickedPos
+                ) {
+                 // Does NOT count spread
+                     tracker.modify {
+                         it.totalBlocksMined += 1
+                     }
+                // necessary because it updates twice randomly
+                // TODO: Make an event handler to investigate and get rid of this switch condition
+                blockUpdateControl = false
             }
-            // necessary because it updates twice randomly
-            // TODO: Make an event handler to investigate and get rid of this switch condition
-            blockUpdateControl = false
         }
-
     }
 
     @HandleEvent
