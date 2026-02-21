@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import com.google.gson.JsonObject
 
 class NeuProfileDataLoadedEvent(val playerData: HypixelPlayerApiJson) : SkyHanniEvent() {
     fun getCurrentProfileData() =

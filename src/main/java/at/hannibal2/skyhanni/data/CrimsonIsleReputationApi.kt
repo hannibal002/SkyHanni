@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.serialization.json.JsonObject
 
 @SkyHanniModule
 object CrimsonIsleReputationApi {
