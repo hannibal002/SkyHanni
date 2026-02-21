@@ -373,7 +373,6 @@ object GuiRenderUtils {
          *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
          *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
-        DrawContextUtils.drawContext.pose()
         val guiRenderState = GuiItemRenderState(
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
