@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.utils.render.item
 
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
-import at.hannibal2.skyhanni.utils.render.SkyHanniItemRenderer
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAtlasKey
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft

@@ -50,6 +50,7 @@ class OrbitSystemRenderable private constructor(
     private var currentAngle = 0f
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
+
         val angleDelta = orbitSpeed * deltaTime.inPartialSeconds * orbitDirection.dirFactor
         currentAngle = (currentAngle + angleDelta).toFloat() % 360f
         mainBody.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)

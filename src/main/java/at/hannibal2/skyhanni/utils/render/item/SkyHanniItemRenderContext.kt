@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render.item
 
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher

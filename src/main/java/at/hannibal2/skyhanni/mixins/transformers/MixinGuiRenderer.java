@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState;
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState;
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator;
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;

@@ -35,7 +35,7 @@ object RenderableTestSuite {
     }
 
     @HandleEvent
-    fun onGameOverlayRenderPost(event: GameOverlayRenderPostEvent) {
+    fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         for (test in active.filter { it.eventClass == GameOverlayRenderPostEvent::class }) {
             test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render.item
 
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.gui.render.state.GuiRenderState

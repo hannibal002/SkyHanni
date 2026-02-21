@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.platform.Lighting

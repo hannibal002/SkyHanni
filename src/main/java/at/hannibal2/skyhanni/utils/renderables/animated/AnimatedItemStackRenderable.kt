@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables.animated
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -70,7 +71,7 @@ class AnimatedItemStackRenderable private constructor(
     private val rotationDefinition: ItemStackRotationDefinition = ItemStackRotationDefinition(),
     initialRotation: Vec3 = Vec3(0.0, 0.0, 0.0),
     private val bounceDefinition: ItemStackBounceDefinition = ItemStackBounceDefinition(),
-    scale: Float = 2f / 3f,
+    scale: Double = NeuItems.ITEM_FONT_SIZE,
     xSpacing: Int = 2,
     ySpacing: Int = 1,
     rescaleSkulls: Boolean = true,
@@ -158,7 +159,6 @@ class AnimatedItemStackRenderable private constructor(
             rotationVec = currentRotation,
             translationVec = currentTranslation,
             stableRenderId = this.stableRenderId,
-            frameNumber = frameIndex,
         )
     }
 
@@ -172,7 +172,7 @@ class AnimatedItemStackRenderable private constructor(
             rotationDefinition: ItemStackRotationDefinition = ItemStackRotationDefinition(),
             initialRotation: Vec3 = Vec3(0.0, 0.0, 0.0),
             bounceDefinition: ItemStackBounceDefinition = ItemStackBounceDefinition(),
-            scale: Float = 2f / 3f,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,

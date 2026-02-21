@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -321,7 +321,6 @@ object GuiRenderUtils {
     }
 
     private const val SKULL_SCALE = (5f / 4f)
-    private const val DOWNSCALE_FACTOR = (2f / 3f)
 
     /**
      * Returns either the stable ID of the custom render (if used) or -1 if the item was
@@ -331,12 +330,11 @@ object GuiRenderUtils {
     fun ItemStack.renderOnScreen(
         x: Float,
         y: Float,
-        scale: Float = DOWNSCALE_FACTOR,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
-        frameNumber: Int = -1,
     ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -345,7 +343,7 @@ object GuiRenderUtils {
         val finalItemScale = (baseItemScale * scale)
 
         val (translateX, translateY) = if (isItemSkull) {
-            val skullDiff = ((scale) * 2.5f)
+            val skullDiff = (scale.toFloat() * 2.5f)
             x - skullDiff to y - skullDiff
         } else x to y
 
@@ -361,7 +359,7 @@ object GuiRenderUtils {
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
         if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
-            return item.normalRenderOnScreen(translateX, translateY, finalItemScale)
+            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
         /**
          * This is used to render items that fit these criteria:
@@ -375,7 +373,6 @@ object GuiRenderUtils {
          *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
          *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
-        DrawContextUtils.drawContext.pose()
         val guiRenderState = GuiItemRenderState(
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
@@ -387,8 +384,8 @@ object GuiRenderUtils {
         val newRenderState = SkyHanniGuiItemRenderState(
             guiRenderState, x, y,
             rotationVec, translationVec,
-            scale = scale,
-            adjustedScale = scale * guiScaleX,
+            scale = scale.toFloat(),
+            adjustedScale = (scale * guiScaleX).toFloat(),
             stableRenderId,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
