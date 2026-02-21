@@ -405,7 +405,7 @@ object GardenNextJacobContest {
             val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
                 if (isBoosted) addEnchantGlint()
             }
-            val stack = Renderable.item(cropStack, 1.0f)
+            val stack = Renderable.item(cropStack, 1.0)
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toColor()))
             } else add(stack)

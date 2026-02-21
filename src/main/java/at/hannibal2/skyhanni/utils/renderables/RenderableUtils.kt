@@ -414,7 +414,7 @@ internal object RenderableUtils {
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Float = 1f,
+        itemScale: Double = 2.0 / 3.0,
     ): Renderable {
         val outerList = constructOuterList(data, itemScale)
         return Renderable.table(outerList, xSpacing = 5, ySpacing = padding)
@@ -423,7 +423,7 @@ internal object RenderableUtils {
     fun fillScrollTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Float = 1f,
+        itemScale: Double = 2.0 / 3.0,
         height: Int,
         velocity: Double = 2.0,
     ): Renderable {
@@ -434,7 +434,7 @@ internal object RenderableUtils {
 
     private fun constructOuterList(
         data: List<DisplayTableEntry>,
-        itemScale: Float = 1f,
+        itemScale: Double = 2.0 / 3.0,
     ): MutableList<List<Renderable>> {
         val sorted = data.sortedByDescending { it.sort.toDouble() }
         val outerList = mutableListOf<List<Renderable>>()

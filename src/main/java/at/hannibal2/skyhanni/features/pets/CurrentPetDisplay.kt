@@ -229,7 +229,7 @@ object CurrentPetDisplay {
     private fun PetData.buildBaseItemRenderable(
         spinDirection: OrbitDirection,
         spinFrequency: Float,
-        iconScale: Float,
+        iconScale: Double,
         skinAnimation: Boolean,
     ): Renderable {
         val spinMultiplier = if (spinDirection == OrbitDirection.CLOCKWISE) -1 else 1

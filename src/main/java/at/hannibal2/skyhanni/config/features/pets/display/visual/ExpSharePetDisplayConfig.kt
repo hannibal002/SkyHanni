@@ -87,7 +87,7 @@ class ExpSharePetDisplayConfig {
     @Expose
     @ConfigOption(name = "Icon Scale", desc = "How large the icon should be - Default is 0.5")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 2.0f, minStep = 0.1f)
-    val iconScale: Property<Float> = Property.of(0.5f)
+    val iconScale: Property<Double> = Property.of(0.5)
 
     @Expose
     @ConfigOption(

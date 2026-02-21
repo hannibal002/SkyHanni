@@ -51,7 +51,7 @@ object RenderableCollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Float = 1f,
+        scale: Double = 2.0 / 3.0,
     ) {
         if (highlight) itemStack.addEnchantGlint()
         add(Renderable.item(itemStack, scale = scale))

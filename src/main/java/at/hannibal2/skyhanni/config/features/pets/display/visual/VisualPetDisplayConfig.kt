@@ -84,7 +84,7 @@ class VisualPetDisplayConfig {
             desc = "How large the pet item icon should be."
         )
         @ConfigEditorSlider(minValue = 0.1f, maxValue = 2.0f, minStep = 0.1f)
-        val scale: Property<Float> = Property.of(1.0f)
+        val scale: Property<Double> = Property.of(1.0)
     }
 
     @Expose
@@ -199,7 +199,7 @@ class VisualPetDisplayConfig {
     @Expose
     @ConfigOption(name = "Icon Scale", desc = "How large the icon should be - Default is 2.0")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 6.0f, minStep = 0.1f)
-    val iconScale: Property<Float> = Property.of(2.0f)
+    val iconScale: Property<Double> = Property.of(2.0)
 
     @Expose
     @ConfigOption(name = "Skin Animation", desc = "If your pet has an animated skin, display the animated skin for the icon.")

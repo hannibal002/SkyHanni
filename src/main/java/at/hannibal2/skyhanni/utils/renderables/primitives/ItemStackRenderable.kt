@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack
 
 open class ItemStackRenderable protected constructor(
     private val stackGetter: () -> ItemStack,
-    val scale: Float = 1f,
+    val scale: Double = 2.0 / 3.0,
     val xSpacing: Int = 2,
     val ySpacing: Int = 1,
     val rescaleSkulls: Boolean = true,
@@ -42,7 +42,7 @@ open class ItemStackRenderable protected constructor(
     companion object {
         fun Renderable.Companion.item(
             stackGetter: () -> ItemStack,
-            scale: Float = 1f,
+            scale: Double = 2.0 / 3.0,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -60,7 +60,7 @@ open class ItemStackRenderable protected constructor(
 
         fun Renderable.Companion.item(
             stack: ItemStack,
-            scale: Float = 1f,
+            scale: Double = 2.0 / 3.0,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -78,7 +78,7 @@ open class ItemStackRenderable protected constructor(
 
         fun Renderable.Companion.item(
             provider: NeuItemStackProvider,
-            scale: Float = 1f,
+            scale: Double = 2.0 / 3.0,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -96,7 +96,7 @@ open class ItemStackRenderable protected constructor(
 
         fun Renderable.Companion.item(
             item: NeuInternalName,
-            scale: Float = 1f,
+            scale: Double = 2.0 / 3.0,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,

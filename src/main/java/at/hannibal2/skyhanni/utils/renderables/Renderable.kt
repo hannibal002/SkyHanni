@@ -87,7 +87,7 @@ interface Renderable {
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Float = 1f): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = 2.0 / 3.0): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
             is String -> text(any)
