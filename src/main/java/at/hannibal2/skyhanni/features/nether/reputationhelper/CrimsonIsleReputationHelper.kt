@@ -98,7 +98,7 @@ object CrimsonIsleReputationHelper {
 
     @HandleEvent
     fun onProfileViewerLoad(event: NeuProfileDataLoadedEvent) {
-        val faction = event.getCurrentPlayerData()?.netherData?.currentFaction ?: ""
+        val faction = event.getCurrentPlayerData()?.netherData?.currentFaction.orEmpty()
         factionType = FactionType.fromAPIName(faction)
     }
 
