@@ -125,4 +125,12 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "All Waypoint Color", desc = "Color used for waypoints when using show all mode.")
     @ConfigEditorColour
     var showAllWaypointColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 102)
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-Load Shaft Routes",
+        desc = "Will load a matching Shaft route if found (Format is from tablist e.g. Jasp_1/Peri_C)"
+    )
+    @ConfigEditorBoolean
+    var autoLoadMatchingShaftRoute: Boolean = false
 }

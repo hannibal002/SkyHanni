@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -55,10 +55,8 @@ object MineshaftDetection {
         if (!config.mineshaftDetection) return
         found = false
     }
-
-    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.MINESHAFT)
-    fun onSecondPassed() {
-        if (!config.mineshaftDetection) return
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onScoreboardLineChange(event: ScoreboardUpdateEvent) {
         if (found) return
 
         val matchingLine = ScoreboardData.sidebarLinesFormatted
@@ -73,7 +71,13 @@ object MineshaftDetection {
         found = true
 
         ChatUtils.debug("Found a ${type.name} mineshaft! [$areaName]")
+        GlaciteMineshaftDetectEvent(type).post()
+    }
 
+    @HandleEvent
+    fun onShaftEntry(event: GlaciteMineshaftDetectEvent) {
+        if (!config.mineshaftDetection) return
+        val type = event.type
         val sinceThis = getSinceMineshaftType(type)
         val timeSinceThis = getTimeSinceMineshaftType(type)
         val formattedTime = if (!timeSinceThis.isFarPast()) {
