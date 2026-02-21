@@ -433,7 +433,7 @@ object SkillProgress {
             addString("§9[§d$level§9] ")
 
         if (config.useIcon.get()) {
-            addItemStack(activeSkill.item, scale = 1.0f)
+            addItemStack(activeSkill.item, scale = 1.0)
         }
 
         addString(

@@ -78,7 +78,7 @@ object FishyTreatProfit {
 
         val newList = mutableListOf<Renderable>()
         newList.addString("§eProfit per Fishy Treat")
-        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7f))
+        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
         return
     }
