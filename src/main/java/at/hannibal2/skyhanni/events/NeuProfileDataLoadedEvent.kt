@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import com.google.gson.JsonObject
 
-class NeuProfileDataLoadedEvent(val playerData: HypixelPlayerApiJson, val rawJson: JsonObject) : SkyHanniEvent() {
+class NeuProfileDataLoadedEvent(val playerData: HypixelPlayerApiJson) : SkyHanniEvent() {
     fun getCurrentProfileData() =
         playerData.profiles.firstOrNull { it.profileName.equals(HypixelData.profileName, ignoreCase = true) }
 
