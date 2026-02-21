@@ -16,6 +16,7 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
@@ -27,6 +28,7 @@ import kotlin.math.min
 import kotlin.math.sqrt
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.world.item.ItemDisplayContext
+import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -319,6 +321,7 @@ object GuiRenderUtils {
     }
 
     private const val SKULL_SCALE = (5f / 4f)
+    private const val DOWNSCALE_FACTOR = (2f / 3f)
 
     /**
      * Returns either the stable ID of the custom render (if used) or -1 if the item was
@@ -328,12 +331,12 @@ object GuiRenderUtils {
     fun ItemStack.renderOnScreen(
         x: Float,
         y: Float,
-        scale: Float = 1f,
+        scale: Float = DOWNSCALE_FACTOR,
         rescaleSkulls: Boolean = true,
-        rotationVec: Vec3? = null,
-        translationVec: Vec3? = null,
-        bounceEnvelopeVec: Vec3? = null,
+        rotationVec: Vec3 = Vec3.ZERO,
+        translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
+        frameNumber: Int = -1,
     ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -357,49 +360,39 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        // || (totalItemScale > 1 && trackingState.usesBlockLight())
-        return if (rotationVec != null) item.customRenderOnScreen(
-            trackingState, translateX, translateY, finalItemScale, rotationVec, translationVec, bounceEnvelopeVec, stableRenderId
-        ) else item.normalRenderOnScreen(translateX, translateY, finalItemScale)
-    }
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
+            return item.normalRenderOnScreen(translateX, translateY, finalItemScale)
 
-    /**
-     * This is used to render items that fit these criteria:
-     *  - Uses block light (mostly skulls)
-     *  - Has a rotation (either from the GUI editor or from the animation)
-     *  - Has animations (either animated skins/items, or a bounce animation from AnimatedItemStackRenderable)
-     *  - Needs to be rendered at a higher resolution (scale > 1)
-     *
-     *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
-     *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
-     *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
-     *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
-     */
-    private fun ItemStack.customRenderOnScreen(
-        trackingState: TrackingItemStackRenderState,
-        x: Float,
-        y: Float,
-        scale: Float,
-        rotationVec: Vec3? = null,
-        translationVec: Vec3? = null,
-        bounceEnvelopeVec: Vec3? = null,
-        stableRenderId: Int? = null,
-    ): Int = DrawContextUtils.pushPopResult {
+        /**
+         * This is used to render items that fit these criteria:
+         *  - Uses block light (mostly skulls)
+         *  - Has a rotation (either from the GUI editor or from the animation)
+         *  - Has animations (either animated skins/items, or a bounce animation from AnimatedItemStackRenderable)
+         *  - Needs to be rendered at a higher resolution (scale > 1)
+         *
+         *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
+         *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
+         *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         */
         DrawContextUtils.drawContext.pose()
-        val newRenderState = SkyHanniGuiItemRenderState(
+        val guiRenderState = GuiItemRenderState(
+            this.item.name.toString(),
+            Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
-            this,
-            x,
-            y,
-            rotationVec,
-            translationVec,
-            bounceEnvelopeVec,
-            scale,
+            0,
+            0,
+            DrawContextUtils.drawContext.scissorStack.peek()
+        )
+        val newRenderState = SkyHanniGuiItemRenderState(
+            guiRenderState, x, y,
+            rotationVec, translationVec,
+            scale = scale,
+            adjustedScale = scale * guiScaleX,
             stableRenderId,
         )
-
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
-        return@pushPopResult newRenderState.stableId
+        return newRenderState.stableId
     }
 
     private fun ItemStack.normalRenderOnScreen(

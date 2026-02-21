@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render.item
 
-import at.hannibal2.skyhanni.utils.render.SkyHanniGuiAnimatedItemRenderState
 import at.hannibal2.skyhanni.utils.render.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.SkyHanniItemRenderer
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAtlasKey
@@ -43,7 +42,7 @@ internal object SkyHanniItemRenderCoordinator {
         if (pipStates.isEmpty()) return
 
         val guiScale = Minecraft.getInstance().window.guiScale
-        val animatedStates = ArrayList<SkyHanniGuiAnimatedItemRenderState>(pipStates.size)
+        val animatedStates = ArrayList<SkyHanniGuiItemRenderState>(pipStates.size)
         val staticFallbackStates = ArrayList<SkyHanniGuiItemRenderState>(pipStates.size)
 
         for (state in pipStates) {
@@ -58,7 +57,7 @@ internal object SkyHanniItemRenderCoordinator {
             }
 
             // Items that haven't moved in 4+ frames (or are static) use fallback (direct rendering)
-            if (settle.framesStable >= SETTLE_FRAMES || state !is SkyHanniGuiAnimatedItemRenderState) staticFallbackStates.add(state)
+            if (settle.framesStable >= SETTLE_FRAMES || !state.isAnimated()) staticFallbackStates.add(state)
             else animatedStates.add(state)
         }
 

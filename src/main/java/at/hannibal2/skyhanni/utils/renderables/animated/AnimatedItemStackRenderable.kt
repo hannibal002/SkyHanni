@@ -70,7 +70,7 @@ class AnimatedItemStackRenderable private constructor(
     private val rotationDefinition: ItemStackRotationDefinition = ItemStackRotationDefinition(),
     initialRotation: Vec3 = Vec3(0.0, 0.0, 0.0),
     private val bounceDefinition: ItemStackBounceDefinition = ItemStackBounceDefinition(),
-    scale: Float = 1f,
+    scale: Float = 2f / 3f,
     xSpacing: Int = 2,
     ySpacing: Int = 1,
     rescaleSkulls: Boolean = true,
@@ -100,7 +100,6 @@ class AnimatedItemStackRenderable private constructor(
     private val baseItemHeight = (15.5 * scale + 0.5).toInt() + ySpacing
     private val fullBounceHeight = if (bounceDefinition.isEnabled()) bounceDefinition.getTotalBounceHeight() else 0
     private val bounceOffset = fullBounceHeight / 2.0
-    private val bounceEnvelope = Vec3(0.0, fullBounceHeight.toDouble(), 0.0)
 
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
@@ -158,8 +157,8 @@ class AnimatedItemStackRenderable private constructor(
             rescaleSkulls = rescaleSkulls,
             rotationVec = currentRotation,
             translationVec = currentTranslation,
-            bounceEnvelopeVec = bounceEnvelope,
             stableRenderId = this.stableRenderId,
+            frameNumber = frameIndex,
         )
     }
 
@@ -173,7 +172,7 @@ class AnimatedItemStackRenderable private constructor(
             rotationDefinition: ItemStackRotationDefinition = ItemStackRotationDefinition(),
             initialRotation: Vec3 = Vec3(0.0, 0.0, 0.0),
             bounceDefinition: ItemStackBounceDefinition = ItemStackBounceDefinition(),
-            scale: Float = 1f,
+            scale: Float = 2f / 3f,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,

@@ -78,11 +78,7 @@ class SkyHanniItemRenderer(
     }
 
     override fun textureIsReadyToBlit(itemRenderState: SkyHanniGuiItemRenderState): Boolean {
-        // Todo, real logic here instead of just always returning false,
-        // CBF to setup real state tracking for now
-        return false
-        //val trackingItemStackRenderState = itemRenderState.guiItemRenderState().itemStackRenderState()
-        //return !trackingItemStackRenderState.isAnimated && trackingItemStackRenderState.modelIdentity == this.modelOnTextureIdentity
+        return !itemRenderState.isAnimated() && itemRenderState.getModelIdentity() == this.modelOnTextureIdentity
     }
 
     override fun getTranslateY(i: Int, j: Int): Float {
