@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -414,7 +415,7 @@ internal object RenderableUtils {
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Double = 2.0 / 3.0,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): Renderable {
         val outerList = constructOuterList(data, itemScale)
         return Renderable.table(outerList, xSpacing = 5, ySpacing = padding)
@@ -423,7 +424,7 @@ internal object RenderableUtils {
     fun fillScrollTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Double = 2.0 / 3.0,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
         height: Int,
         velocity: Double = 2.0,
     ): Renderable {
@@ -434,7 +435,7 @@ internal object RenderableUtils {
 
     private fun constructOuterList(
         data: List<DisplayTableEntry>,
-        itemScale: Double = 2.0 / 3.0,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
     ): MutableList<List<Renderable>> {
         val sorted = data.sortedByDescending { it.sort.toDouble() }
         val outerList = mutableListOf<List<Renderable>>()

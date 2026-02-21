@@ -188,6 +188,8 @@ object NeuItems {
         return string.substring(prefix.length).toInternalName()
     }
 
+    const val ITEM_FONT_SIZE = 2.0 / 3.0
+
     fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.getItemInformation()
 
     fun getInternalNamesForItemId(item: Item): List<NeuInternalName> {

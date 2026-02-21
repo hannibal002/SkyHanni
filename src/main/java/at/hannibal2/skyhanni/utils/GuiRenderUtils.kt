@@ -330,7 +330,7 @@ object GuiRenderUtils {
     fun ItemStack.renderOnScreen(
         x: Float,
         y: Float,
-        scale: Double = 2.0 / 3.0,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
