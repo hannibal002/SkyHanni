@@ -41,7 +41,7 @@ data class PetData(
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     constructor(petInfo: SkyBlockItemModifierUtils.PetInfo) : this(
-        petInfo.let { "${it.type};${it.tier.id}".toInternalName() },
+        petInfo._internalName,
         petInfo.properSkinItem,
         petInfo.getSkinVariantIndex(),
         petInfo.heldItem,
