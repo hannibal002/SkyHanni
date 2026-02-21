@@ -22,5 +22,5 @@ class CFShopPriceConfig {
     @Expose
     @ConfigOption(name = "Item Scale", desc = "Change the size of the items.")
     @ConfigEditorSlider(minValue = 0.3f, maxValue = 3f, minStep = 0.1f)
-    var itemScale: Double = 0.6
+    var itemScale: Float = 0.6f
 }

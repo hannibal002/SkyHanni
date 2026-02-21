@@ -176,7 +176,7 @@ object CFShopPrice {
             addString("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}")
             // TODO add chocolate spend needed for next milestone
             addString("§eChocolate spent: §6${chocolateSpent.addSeparators()}")
-            add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+            add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale.toDouble()))
         }
     }
 
