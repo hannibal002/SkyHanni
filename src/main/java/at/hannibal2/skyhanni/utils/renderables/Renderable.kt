@@ -394,6 +394,7 @@ interface Renderable {
             bottomLayer: Renderable,
             topLayer: Renderable,
             blockBottomHover: Boolean = true,
+            forceBottomRenderFirst: Boolean = false,
         ) = object : Renderable {
             override val width = bottomLayer.width
             override val height = bottomLayer.height
@@ -401,14 +402,22 @@ interface Renderable {
             override val verticalAlign = bottomLayer.verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                val (x, y) = topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+                val (x, y) = if (forceBottomRenderFirst) {
+                    RenderableUtils.calculateAlignmentXOffset(topLayer, width) to
+                        RenderableUtils.calculateAlignmentYOffset(topLayer, height)
+                } else topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+
                 val topLayerHovered = topLayer.isHovered(mouseOffsetX + x, mouseOffsetY + y)
                 val (nMouseOffsetX, nMouseOffsetY) = if (topLayerHovered && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     mouseOffsetX to mouseOffsetY
                 }
+
                 bottomLayer.render(nMouseOffsetX, nMouseOffsetY)
+                if (forceBottomRenderFirst) {
+                    topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+                }
             }
         }
 

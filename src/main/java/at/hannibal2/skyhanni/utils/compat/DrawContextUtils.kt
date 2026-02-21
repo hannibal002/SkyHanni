@@ -79,6 +79,16 @@ object DrawContextUtils {
     }
 
     /**
+     * Push and pop the matrix stack, running the action in between, and returning the result of the action.
+     */
+    @Suppress("DEPRECATION")
+    inline fun <T> pushPopResult(action: () -> T): T {
+        pushMatrix()
+        val result = action()
+        popMatrix().also { return result }
+    }
+
+    /**
      * Run operations inside a DrawContext translation
      */
     inline fun translated(x: Number = 0, y: Number = 0, action: () -> Unit) {
