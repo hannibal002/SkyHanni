@@ -3,13 +3,11 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -26,7 +24,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -34,8 +31,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.decoration.ArmorStand
-import kotlin.time.Duration.Companion.seconds
 
+// Todo combine with VisitorApi
 @SkyHanniModule
 object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
@@ -44,8 +41,6 @@ object VisitorListener {
     )
 
     private val config get() = VisitorApi.config
-
-    private val logger = LorenzLogger("garden/visitors/listener")
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -62,30 +57,6 @@ object VisitorListener {
         val entityId = entity.id
 
         lastClickedNpc = entityId
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.VISITORS)) return
-
-        if (event.isClear()) return
-
-        val visitorsInTab = VisitorApi.visitorsInTabList(event.lines)
-
-        if (SkyBlockUtils.lastWorldSwitch.passedSince() > 2.seconds) {
-            for (visitor in VisitorApi.getVisitors()) {
-                val name = visitor.visitorName
-                val removed = name !in visitorsInTab
-                if (removed) {
-                    logger.log("Removed old visitor: '$name'")
-                    VisitorApi.removeVisitor(name)
-                }
-            }
-        }
-
-        for (name in visitorsInTab) {
-            VisitorApi.addVisitor(name)
-        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

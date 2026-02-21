@@ -89,6 +89,7 @@ import kotlin.math.round
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// Todo combine with VisitorApi
 @Suppress("LargeClass")
 @SkyHanniModule
 object GardenVisitorFeatures {
@@ -198,18 +199,17 @@ object GardenVisitorFeatures {
         drawVisitors(newVisitors, shoppingList)
     }
 
-    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<String>> {
+    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<VisitorApi.Visitor>> {
         val globalShoppingList = mutableMapOf<NeuInternalName, Int>()
-        val newVisitors = mutableListOf<String>()
-        for ((visitorName, visitor) in VisitorApi.getVisitorsMap()) {
+        val newVisitors = mutableListOf<VisitorApi.Visitor>()
+        for (visitor in VisitorApi.getVisitors()) {
             if (visitor.status == VisitorApi.VisitorStatus.ACCEPTED || visitor.status == VisitorApi.VisitorStatus.REFUSED) continue
 
             if (visitor.visitorName.removeColor() == "Spaceman" && config.shoppingList.ignoreSpaceman) continue
 
             val shoppingList = visitor.shoppingList
-            if (shoppingList.isEmpty()) {
-                newVisitors.add(visitorName)
-            }
+            if (shoppingList.isEmpty()) newVisitors.add(visitor)
+
             for ((internalName, amount) in shoppingList) {
                 val old = globalShoppingList.getOrDefault(internalName, 0)
                 globalShoppingList[internalName] = old + amount
@@ -315,7 +315,7 @@ object GardenVisitorFeatures {
     }
 
     private fun MutableList<Renderable>.drawVisitors(
-        newVisitors: List<String>,
+        newVisitors: List<VisitorApi.Visitor>,
         shoppingList: Map<NeuInternalName, Int>,
     ) {
         if (newVisitors.isEmpty()) return
@@ -330,22 +330,25 @@ object GardenVisitorFeatures {
         }
     }
 
-    private fun MutableList<Renderable>.drawVisitor(visitorName: String) {
+    private fun MutableList<Renderable>.drawVisitor(visitor: VisitorApi.Visitor) {
+        val visitorName = visitor.visitorName
         val displayName = GardenVisitorColorNames.getColoredName(visitorName)
 
         val list = mutableListOf<Renderable>()
         list.addString(" §7- $displayName")
 
         if (config.shoppingList.itemPreview) {
-            val visitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
-            val items = visitor?.needItems
+            val mappedVisitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
+            val items = mappedVisitor?.needItems
             if (items == null) {
                 logMissingRepoItems(visitorName)
                 list.addString(" §7(§c?§7)")
                 return
             }
             if (items.isEmpty()) {
-                if (visitor.unknownRewards == true) {
+                if (visitor.tabCrop != null) {
+                    list.addItemStack(visitor.tabCrop.getItemStack())
+                } else if (mappedVisitor.unknownRewards == true) {
                     list.addString(" §7(§fUnknown§7)")
                 } else {
                     list.addString(" §7(§fAny§7)")
@@ -549,8 +552,8 @@ object GardenVisitorFeatures {
         }
     }
 
-    val LEGENDARY_JERRY = "JERRY;4".toInternalName()
-    val SPACE_HELM = "DCTR_SPACE_HELM".toInternalName()
+    private val LEGENDARY_JERRY = "JERRY;4".toInternalName()
+    private val SPACE_HELM = "DCTR_SPACE_HELM".toInternalName()
 
     @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
@@ -615,7 +618,7 @@ object GardenVisitorFeatures {
         val name = group("name")
         if (name in setOf("Beth", "Maeve", "Spaceman")) return false
 
-        val isInKnownVisitors = VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
+        val isInKnownVisitors = VisitorApi.isVisitorPresent(name)
 
         return if (isInKnownVisitors) true
         else doesVisitorEntityExist(name)
