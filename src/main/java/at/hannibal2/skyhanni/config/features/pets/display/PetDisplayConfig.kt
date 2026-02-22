@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.pets.display
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.MainVisualPetDisplayConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -25,7 +25,7 @@ class PetDisplayConfig {
     @Expose
     @ConfigOption(name = "Visual Elements", desc = "")
     @Accordion
-    val visual: VisualPetDisplayConfig = VisualPetDisplayConfig()
+    val visual: MainVisualPetDisplayConfig = MainVisualPetDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Text Elements", desc = "")

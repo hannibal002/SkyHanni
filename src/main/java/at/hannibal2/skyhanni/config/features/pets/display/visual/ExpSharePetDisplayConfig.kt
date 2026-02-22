@@ -9,53 +9,22 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class ExpSharePetDisplayConfig {
-    @Expose
-    @ConfigOption(name = "Icon Spin", desc = "")
-    @Accordion
-    val iconSpin: VisualPetDisplayConfig.IconSpinConfig = VisualPetDisplayConfig.IconSpinConfig()
-
-    @Expose
-    @ConfigOption(name = "Background Color", desc = "")
-    @Accordion
-    val rarityBackground: BackgroundColorConfig = BackgroundColorConfig()
-
-    class BackgroundColorConfig {
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Display a background color of the rarity of the pet.")
-        @ConfigEditorBoolean
-        val enabled: Property<Boolean> = Property.of(true)
-
-        @Expose
-        @ConfigOption(name = "Customization", desc = "")
-        @Accordion
-        val customization: RarityBackgroundConfig = RarityBackgroundConfig()
-    }
+class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
 
     @Expose
     @ConfigOption(name = "Border Ring", desc = "")
     @Accordion
-    val borderRing: BorderRingConfig = BorderRingConfig()
+    // extend the class with additional note prop
+    override val borderRing: BorderRingConfig = ExpSharePetDisplayBorderRingConfig()
 
-    class BorderRingConfig {
+    class ExpSharePetDisplayBorderRingConfig : BorderRingConfig() {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Display a border ring around the background color")
-        @ConfigEditorBoolean
-        val enabled: Property<Boolean> = Property.of(true)
-
-        @Suppress("StorageVarOrVal")
         @ConfigOption(
-            name = "Note",
-            desc = "§eDue to the complexities of calculating Exp Share XP, you cannot currently have " +
-                "the pets' level displayed in the ring. This may come in the future."
+            name = "Border Ring Note",
+            desc = "The border ring will not be displayed for the additional pets, only the main pet."
         )
         @ConfigEditorInfoText
-        val note: String = ""
-
-        @Expose
-        @ConfigOption(name = "Customization", desc = "")
-        @Accordion
-        val customization: VisualPetDisplayConfig.RingConfig = VisualPetDisplayConfig.RingConfig()
+        val note: Property<String> = Property.of("")
     }
 
     @Expose

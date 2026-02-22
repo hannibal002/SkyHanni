@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayCon
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroundConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.MainVisualPetDisplayConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
@@ -204,7 +204,7 @@ object CurrentPetDisplay {
 
     private fun Renderable.wrapInRingOrSelf(
         enabled: Boolean,
-        ringConfig: VisualPetDisplayConfig.RingConfig,
+        ringConfig: MainVisualPetDisplayConfig.RingConfig,
     ): Renderable = if (!enabled) this else Renderable.circularContainer(
         this,
         ringConfig.color.get(),
@@ -214,7 +214,7 @@ object CurrentPetDisplay {
     private fun Renderable.wrapInPetItemOrSelf(
         enabled: Boolean,
         petData: PetData,
-        petItemConfig: VisualPetDisplayConfig.PetItemConfig,
+        petItemConfig: MainVisualPetDisplayConfig.PetItemConfig,
     ): Renderable {
         if (!enabled) return this
         val petItemRenderable = Renderable.item(
