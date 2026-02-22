@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyHanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -55,14 +57,6 @@ object OrderedWaypoints {
 
     fun saveConfig() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ROUTES, "Save file")
-    }
-
-    @HandleEvent
-    fun onEnterShaft(event: GlaciteMineshaftDetectEvent) {
-        if (config.autoLoadMatchingShaftRoute) {
-            SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") { load(event.type.name, isAutomated = true) }
-        }
-
     }
 
     @HandleEvent
@@ -232,6 +226,21 @@ object OrderedWaypoints {
                 }
                 simpleCallback { toggleSetupMode(!config.setupMode) }
             }
+        }
+    }
+
+    @HandleEvent
+    fun onEnterShaft(event: GlaciteMineshaftDetectEvent) {
+        if (config.autoLoadMatchingShaftRoute) {
+            SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") { load(event.type.name, isAutomated = true) }
+        }
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        when (event.oldIsland) {
+            IslandType.MINESHAFT -> if (config.autoUnloadWhenLeavingineshaft || config.autoUnload) unload()
+            else -> if (config.autoUnload) unload()
         }
     }
 

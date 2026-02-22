@@ -128,9 +128,25 @@ class OrderedWaypointsConfig {
 
     @Expose
     @ConfigOption(
+        name = "Auto Unload",
+        desc = "Automatically Unloads route when changing Islands."
+    )
+    @ConfigEditorBoolean
+    var autoUnload: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Auto-Load Shaft Routes",
         desc = "Will load a matching Shaft route if found (Format is from tablist e.g. Jasp_1/Peri_C)"
     )
     @ConfigEditorBoolean
     var autoLoadMatchingShaftRoute: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto Unload when Leaving a Mineshaft",
+        desc = "Automatically unloads shaft route when leaving mineshafts."
+    )
+    @ConfigEditorBoolean
+    var autoUnloadWhenLeavingineshaft: Boolean = false
 }
