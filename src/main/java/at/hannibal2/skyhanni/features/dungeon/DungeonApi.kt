@@ -86,12 +86,11 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor VII
-     * REGEX-TEST: §f                         §r§cThe Catacombs §r§8- §r§eFloor V
+     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
      */
     private val dungeonComplete by patternGroup.pattern(
-        "complete",
-        "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
+        "completecolorless",
+        "\\s+(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)",
     )
 
     /**
@@ -286,7 +285,7 @@ object DungeonApi {
             }
             return
         }
-        dungeonComplete.matchMatcher(event.message) {
+        dungeonComplete.matchMatcher(event.cleanMessage) {
             completed = true
             DungeonCompleteEvent(floor).post()
             return
