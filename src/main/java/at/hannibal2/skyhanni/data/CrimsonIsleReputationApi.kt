@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOWEST
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper.factionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -41,7 +41,7 @@ object CrimsonIsleReputationApi {
     }
 
     @HandleEvent
-    fun onProfileViewerLoad(event: NeuProfileDataLoadedEvent) {
+    fun onProfileViewerLoad(event: ProfileViewerDataLoadedEvent) {
         val factionReputation = ProfileStorageData.profileSpecific?.crimsonIsleReputation ?: return
         val facInfo = event.getCurrentPlayerData()?.netherData ?: return
         factionReputation[FactionType.MAGE] = facInfo.mageReputation
