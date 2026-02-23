@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
