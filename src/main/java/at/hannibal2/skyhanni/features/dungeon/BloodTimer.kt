@@ -23,7 +23,7 @@ object BloodTimer {
     private var bloodOpenTime = SimpleTimeMark.farPast()
     private var bloodOpenLength = ServerTimeMark.farPast()
 
-    private var patternGroup = RepoPattern.group("dungeons.bloodtimer")
+    private val patternGroup = RepoPattern.group("dungeons.bloodtimer")
 
     private val bloodOpenMessages by patternGroup.list(
         "open",
