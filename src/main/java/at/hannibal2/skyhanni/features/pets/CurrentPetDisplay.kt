@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetOrganizationConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig.IconRotationConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroundConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RingConfig
@@ -84,7 +85,7 @@ object CurrentPetDisplay {
         val baseItemRenderable = buildBaseItemRenderable(
             rotationConfig = icon.rotation,
             iconScale = icon.scale.get(),
-            skinAnimation = icon.skinAnimation.get(),
+            skinAnimationConfig = icon.skinAnimation.get(),
         )
 
         val petItemEnabled = petItem.enabled.get()
@@ -180,7 +181,7 @@ object CurrentPetDisplay {
         val baseItemRenderable = buildBaseItemRenderable(
             rotationConfig = expShareConfig.icon.rotation,
             iconScale = expShareConfig.icon.scale.get(),
-            skinAnimation = expShareConfig.icon.skinAnimation.get(),
+            skinAnimationConfig = expShareConfig.icon.skinAnimation,
         )
 
         val backgroundEnabled = expShareConfig.rarityBackground.enabled.get()
@@ -235,11 +236,11 @@ object CurrentPetDisplay {
     private fun PetData.buildBaseItemRenderable(
         rotationConfig: IconRotationConfig,
         iconScale: Double,
-        skinAnimation: Boolean,
+        skinAnimationConfig: IconConfig.SkinAnimationConfig,
     ): Renderable = Renderable.animatedItemStack {
         frameStorage = AnimatedFrameLocalStorage(
             getAnimatedItemStackSequence(
-                firstFrameOnly = !skinAnimation,
+                firstFrameOnly = !skinAnimationConfig.enabled.get(),
             ) ?: listOf(
                 ItemStackAnimatedFrame(
                     getItemStackOrNull() ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")

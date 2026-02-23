@@ -23,7 +23,7 @@ open class IconConfig {
     @Expose
     @ConfigOption(name = "Skin Animation", desc = "If your pet has an animated skin, the icon will also animate.")
     @ConfigEditorBoolean
-    val skinAnimation: Property<Boolean> = Property.of(true)
+    val skinAnimation: SkinAnimationConfig = SkinAnimationConfig()
 
     class SkinAnimationConfig {
         @Expose
@@ -31,6 +31,8 @@ open class IconConfig {
         @ConfigEditorBoolean
         val enabled: Property<Boolean> = Property.of(true)
 
+        // Not used right now, but should be in future
+        /*
         @Expose
         @ConfigOption(
             name = "Animation Speed",
@@ -38,6 +40,7 @@ open class IconConfig {
         )
         @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
         val animationSpeed: Property<Float> = Property.of(5f)
+         */
     }
 
     @Expose
@@ -96,17 +99,17 @@ open class IconConfig {
 
             @Expose
             @ConfigOption(name = "Rotation Speed (X)", desc = "How many degrees per second the pet icon should rotate on the X axis.")
-            @ConfigEditorSlider(minValue = -1400f, maxValue = 1400f, minStep = 25f)
+            @ConfigEditorSlider(minValue = -725f, maxValue = 725f, minStep = 25f)
             val speedX: Property<Double> = Property.of(0.0)
 
             @Expose
             @ConfigOption(name = "Rotation Speed (Y)", desc = "How many degrees per second the pet icon should rotate on the Y axis.")
-            @ConfigEditorSlider(minValue = 25f, maxValue = 1400f, minStep = 25f)
+            @ConfigEditorSlider(minValue = -725f, maxValue = 725f, minStep = 25f)
             val speedY: Property<Double> = Property.of(0.0)
 
             @Expose
             @ConfigOption(name = "Rotation Speed (Z)", desc = "How many degrees per second the pet icon should rotate on the Z axis.")
-            @ConfigEditorSlider(minValue = 25f, maxValue = 1400f, minStep = 25f)
+            @ConfigEditorSlider(minValue = -725f, maxValue = 725f, minStep = 1f)
             val speedZ: Property<Double> = Property.of(0.0)
 
             @ConfigOption(name = "Reset", desc = "Reset the rotation speeds to the default value of 0.")
