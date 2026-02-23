@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -243,11 +246,25 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
+    private val TIKI_MASK = "TIKI_MASK".toInternalName()
+
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         if (!FishingApi.isFishing(checkRodInHand = false)) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
+        }
+        if (internalName == TIKI_MASK) {
+            var foundCleanTikiMask = false
+            for (stack in InventoryUtils.getItemsInOwnInventory()) {
+                if (stack.getInternalName() == TIKI_MASK) {
+                    if (stack.getReforgeModifier().isNullOrBlank()) {
+                        foundCleanTikiMask = true
+                        break
+                    }
+                }
+            }
+            if (!foundCleanTikiMask) return
         }
 
         tracker.addItem(internalName, amount, command)
