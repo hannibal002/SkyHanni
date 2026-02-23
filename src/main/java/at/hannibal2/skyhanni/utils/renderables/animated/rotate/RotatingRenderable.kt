@@ -31,7 +31,7 @@ internal interface RotatingBehavior : AnimatedRotationStorage {
     }
 }
 
-class RotatingRenderable(
+class RotatingRenderable private constructor(
     override val root: Renderable,
     override val rotationStorage: AnimatedRotationStorage,
 ) : RenderableDecorator, TimeDependentRenderable, RotatingBehavior {

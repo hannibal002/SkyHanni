@@ -441,7 +441,7 @@ internal object RenderableUtils {
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
-                Renderable.item(it, scale = itemScale)
+                Renderable.item(it) { scale = itemScale }
             } ?: continue
             val left = hoverTips(
                 entry.left,

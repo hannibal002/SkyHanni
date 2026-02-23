@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables.animated.bounce
 
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
-import at.hannibal2.skyhanni.utils.system.LazyVar
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction.Axis
 
 /**
@@ -11,6 +11,20 @@ import net.minecraft.core.Direction.Axis
 interface AnimatedBounceStorage {
     val bounceDefinition: AnimatedBounceDefinition
     var currentBounce: SnappedVec3
+}
+
+open class AnimatedBounceLocalStorage(
+    override var bounceDefinition: AnimatedBounceDefinition = AnimatedBounceDefinition(),
+    override var currentBounce: SnappedVec3 = SnappedVec3.ZERO,
+) : AnimatedBounceStorage
+
+open class AnimatedBouncePropertyStorage(
+    override var bounceDefinition: AnimatedBounceDefinition = AnimatedBounceDefinition(),
+    val propGetter: () -> Property<SnappedVec3>,
+) : AnimatedBounceStorage {
+    override var currentBounce: SnappedVec3
+        get() = propGetter().get()
+        set(value) = propGetter().set(value)
 }
 
 /**
@@ -28,7 +42,12 @@ data class AnimatedBounceDefinition(
         Axis.Z to AxisBounceDefinition(),
     )
 ) : Map<Axis, AxisBounceDefinition> by axes {
-    private var enabled: Boolean by LazyVar { axes.values.any { it.isEnabled() } }
+    constructor(vararg entries: Collection<Map.Entry<Axis, AxisBounceDefinition>>) : this(
+        entries.asSequence().flatten().associate { it.key to it.value }
+    )
+    constructor(vararg pairs: Pair<Axis, AxisBounceDefinition>) : this(pairs.asList().associate { it.first to it.second })
+
+    private val enabled get() = axes.values.any { it.isEnabled() }
     fun isEnabled() = enabled
     fun isAxisEnabled(axis: Axis) = axes[axis]?.isEnabled() ?: false
 
@@ -58,7 +77,7 @@ data class AxisBounceDefinition(
     val speed: Double = 0.0,
 ) {
     constructor(bounceOffset: Double, speed: Double) : this(bounceOffset, bounceOffset, speed)
-    private var enabled by LazyVar { speed > 0.0 && bounceOffsetPositive + bounceOffsetNegative != 0.0 }
+    private val enabled get() = speed > 0.0 && bounceOffsetPositive + bounceOffsetNegative != 0.0
     fun isEnabled() = enabled
 
     val period by lazy {

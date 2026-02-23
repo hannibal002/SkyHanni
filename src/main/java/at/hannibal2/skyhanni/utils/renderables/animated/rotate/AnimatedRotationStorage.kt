@@ -1,16 +1,39 @@
 package at.hannibal2.skyhanni.utils.renderables.animated.rotate
 
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
-import at.hannibal2.skyhanni.utils.system.LazyVar
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction.Axis
 
 /**
- * Stores properties, and a getter/setter of a storage location, for the rotation
- * definition, and current rotation vector of, an AnimatedItemStackRenderable.
+ * Stores properties for the rotation definition, and current rotation vector of,
+ * an AnimatedItemStackRenderable.
  */
-interface AnimatedRotationStorage {
+sealed interface AnimatedRotationStorage {
     val rotationDefinition: AnimatedRotationDefinition
     var currentRotation: SnappedVec3
+}
+
+open class AnimatedRotationLocalStorage(
+    override val rotationDefinition: AnimatedRotationDefinition = AnimatedRotationDefinition(),
+    override var currentRotation: SnappedVec3 = SnappedVec3.ZERO
+) : AnimatedRotationStorage {
+    constructor(rotationSpeed: Double) : this(
+        AnimatedRotationDefinition(
+            Axis.X to AxisRotationDefinition(rotationSpeed),
+            Axis.Y to AxisRotationDefinition(rotationSpeed),
+            Axis.Z to AxisRotationDefinition(rotationSpeed),
+        )
+    )
+    constructor(vararg definitionPairs: Pair<Axis, AxisRotationDefinition>) : this(AnimatedRotationDefinition(*definitionPairs))
+}
+
+open class AnimatedRotationPropertyStorage(
+    override val rotationDefinition: AnimatedRotationDefinition = AnimatedRotationDefinition(),
+    val propGetter: () -> Property<SnappedVec3>
+) : AnimatedRotationStorage {
+    override var currentRotation: SnappedVec3
+        get() = propGetter().get()
+        set(value) = propGetter().set(value)
 }
 
 /**
@@ -30,7 +53,9 @@ data class AnimatedRotationDefinition(
         Axis.Z to AxisRotationDefinition(),
     )
 ) : Map<Axis, AxisRotationDefinition> by axes {
-    private var enabled: Boolean by LazyVar { axes.values.any { it.isEnabled() } }
+    constructor(vararg pairs: Pair<Axis, AxisRotationDefinition>) : this(pairs.asList().associate { it.first to it.second })
+
+    private val enabled get() = axes.values.any { it.isEnabled() }
     fun isEnabled() = enabled
     fun isAxisEnabled(axis: Axis) = axes[axis]?.isEnabled() ?: false
 
@@ -48,8 +73,9 @@ data class AnimatedRotationDefinition(
  * @param rotationSpeed How many degrees the item should rotate per second.
  */
 data class AxisRotationDefinition(
-    val staticRotation: Double = 0.0,
     val rotationSpeed: Double = 0.0,
+    val staticRotation: Double = 0.0,
 ) {
+    constructor(rotationSpeed: Double) : this(rotationSpeed, 0.0)
     fun isEnabled() = rotationSpeed != 0.0 || staticRotation != 0.0
 }

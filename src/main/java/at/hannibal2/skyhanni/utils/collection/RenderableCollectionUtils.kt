@@ -54,10 +54,8 @@ object RenderableCollectionUtils {
         highlight: Boolean = false,
         scale: Double = NeuItems.ITEM_FONT_SIZE,
     ) {
-        if (highlight) {
-            itemStack.addEnchantGlint()
-        }
-        add(Renderable.item(itemStack, scale = scale))
+        if (highlight) itemStack.addEnchantGlint()
+        add(Renderable.item(itemStack) { this.scale = scale })
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
