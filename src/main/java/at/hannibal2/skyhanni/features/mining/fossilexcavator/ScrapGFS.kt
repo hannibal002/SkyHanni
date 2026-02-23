@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.item.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.skyhanni.utils.renderables.animated.item.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -191,7 +191,7 @@ object ScrapGFS {
                         scrapRotationDefinition,
                         scale = 1.2,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        initialRotation = currentScrapRotation,
+                        rotationGetter = currentScrapRotation,
                     ) { currentScrapRotation = it },
                     Renderable.text(currentFetchAmount.toString(), scale = 0.9, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                 ),

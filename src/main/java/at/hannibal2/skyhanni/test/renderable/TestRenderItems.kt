@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackBounceDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.item.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.skyhanni.utils.renderables.animated.item.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedBounceDefinition
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -37,7 +37,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
             it to Renderable.animatedItemStack(
                 animationFrames,
                 rotationDefinition = rotationDef,
-                bounceDefinition = ItemStackBounceDefinition(
+                bounceDefinition = AnimatedBounceDefinition(
                     upwardBounce = 25,
                     downwardBounce = 25,
                     bounceSpeed = 8.0,
