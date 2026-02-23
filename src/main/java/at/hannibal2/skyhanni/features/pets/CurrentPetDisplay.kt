@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.item.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.skyhanni.utils.renderables.animated.item.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitSystemRenderable.Companion.orbitalSystem

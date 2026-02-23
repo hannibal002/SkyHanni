@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.text.DecimalFormat
@@ -60,11 +60,10 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
             ),
         )
         add(
-            Renderable.item(
-                requiredItem.getItemStack(),
-                scale = (8.0 / 9.0),
-                verticalAlign = VerticalAlignment.CENTER,
-            ).withTip(),
+            Renderable.item(requiredItem.getItemStack()) {
+                scale = 8.0 / 9.0
+                verticalAlign = VerticalAlignment.CENTER
+            }.withTip()
         )
         add(
             Renderable.wrappedText(

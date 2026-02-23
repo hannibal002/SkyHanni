@@ -14,7 +14,6 @@ class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
     @Expose
     @ConfigOption(name = "Border Ring", desc = "")
     @Accordion
-    // extend the class with additional note prop
     override val borderRing: BorderRingConfig = ExpSharePetDisplayBorderRingConfig()
 
     class ExpSharePetDisplayBorderRingConfig : BorderRingConfig() {
