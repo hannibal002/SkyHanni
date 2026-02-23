@@ -44,8 +44,8 @@ class AnimatedItemStackRenderable private constructor(
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
     override var ticksInFrame: Double = 0.0
 
-    override val height: Int get() = super.height + bounceDefinition.getTotalBounceHeight(Direction.Axis.Y)
-    override val width: Int get() = super.width + bounceDefinition.getTotalBounceHeight(Direction.Axis.X)
+    override val height: Int get() = super.height + bounceDefinition.getTotalBounceOffset(Direction.Axis.Y)
+    override val width: Int get() = super.width + bounceDefinition.getTotalBounceOffset(Direction.Axis.X)
 
     private var stableRenderId: Int = -1
     fun getStableId() = stableRenderId

@@ -21,8 +21,8 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
             bounceStorage.currentBounce = value
         }
 
-    val bounceExtraHeight: Int get() = bounceDefinition.getTotalBounceHeight(Axis.Y)
-    val bounceExtraWidth: Int get() = bounceDefinition.getTotalBounceHeight(Axis.X)
+    val bounceExtraHeight: Int get() = bounceDefinition.getTotalBounceOffset(Axis.Y)
+    val bounceExtraWidth: Int get() = bounceDefinition.getTotalBounceOffset(Axis.X)
 
     fun applyBounce() {
         currentBounce = generateNextBounce()
@@ -33,11 +33,11 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
         val t = bounceStartTime.passedSince().inPartialSeconds
         return Axis.entries.fold(currentBounce) { vec, axis ->
             if (!bounceDefinition.isAxisEnabled(axis)) return@fold vec
-            val bounceHeight = bounceDefinition.getTotalBounceHeight(axis)
+            val bounceOffset = bounceDefinition.getTotalBounceOffset(axis)
             val axisPeriod = bounceDefinition.getBouncePeriod(axis)
             val theta = (t % axisPeriod) / axisPeriod * (2 * Math.PI)
             val bounceCoordinateOffset = sin(theta) * bounceDefinition.getBounceOffset(axis, sin(theta))
-            val bounceCoordinate = (bounceHeight / 2.0) + bounceCoordinateOffset
+            val bounceCoordinate = (bounceOffset / 2.0) + bounceCoordinateOffset
             vec.applyAxisValue(axis, bounceCoordinate)
         }
     }

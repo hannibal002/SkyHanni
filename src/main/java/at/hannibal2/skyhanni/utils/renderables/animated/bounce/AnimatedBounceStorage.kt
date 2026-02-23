@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables.animated.bounce
 
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
+import at.hannibal2.skyhanni.utils.renderables.SnappedVec3.Companion.toSnapped
+import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AnimatedBounceStorage.Companion.BOUNCE_SNAP
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction.Axis
+import net.minecraft.world.phys.Vec3
 
 /**
  * Stores properties, and a getter/setter of a storage location, for the bounce
@@ -11,19 +14,23 @@ import net.minecraft.core.Direction.Axis
 interface AnimatedBounceStorage {
     val bounceDefinition: AnimatedBounceDefinition
     var currentBounce: SnappedVec3
+
+    companion object {
+        internal const val BOUNCE_SNAP = 0.05
+    }
 }
 
 open class AnimatedBounceLocalStorage(
     override var bounceDefinition: AnimatedBounceDefinition = AnimatedBounceDefinition(),
-    override var currentBounce: SnappedVec3 = SnappedVec3.ZERO,
+    override var currentBounce: SnappedVec3 = Vec3.ZERO.toSnapped(BOUNCE_SNAP),
 ) : AnimatedBounceStorage
 
 open class AnimatedBouncePropertyStorage(
     override var bounceDefinition: AnimatedBounceDefinition = AnimatedBounceDefinition(),
-    val propGetter: () -> Property<SnappedVec3>,
+    val propGetter: () -> Property<Vec3>,
 ) : AnimatedBounceStorage {
     override var currentBounce: SnappedVec3
-        get() = propGetter().get()
+        get() = propGetter().get().toSnapped(BOUNCE_SNAP)
         set(value) = propGetter().set(value)
 }
 
@@ -56,7 +63,7 @@ data class AnimatedBounceDefinition(
     fun getBouncePeriod(axis: Axis): Double = axes[axis]?.period ?: 1.0
 
     private val totalBounceHeightCache = mutableMapOf<Axis, Int>()
-    fun getTotalBounceHeight(axis: Axis): Int = totalBounceHeightCache.getOrPut(axis) {
+    fun getTotalBounceOffset(axis: Axis): Int = totalBounceHeightCache.getOrPut(axis) {
         axes[axis]?.let {
             it.bounceOffsetPositive + it.bounceOffsetNegative
         }?.toInt() ?: 0

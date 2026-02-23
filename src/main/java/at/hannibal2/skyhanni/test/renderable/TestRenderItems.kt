@@ -38,8 +38,13 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val bambooProvider = NeuItemStackProvider("BAMBOO".toInternalName())
     private val animationFrames = listOf(ItemStackAnimatedFrame(boxOfSeedsProvider, ticks = 0))
-    private val animatedBounceStorage = AnimatedBounceLocalStorage(
-        AnimatedBounceDefinition(Axis.Y to AxisBounceDefinition(25.0, 8.0))
+
+    private val poleBounceDef = Axis.Y to AxisBounceDefinition(25.0, 8.0)
+    private val animatedBounceStorage = AnimatedBounceLocalStorage(AnimatedBounceDefinition(poleBounceDef))
+    private val sideBounceDef = Axis.X to AxisBounceDefinition(30.0, 10.0)
+    private val sidewaysAnimatedBounceStorage = AnimatedBounceLocalStorage(AnimatedBounceDefinition(sideBounceDef))
+    private val multiBounceDef = AnimatedBounceLocalStorage(
+        AnimatedBounceDefinition(poleBounceDef, sideBounceDef)
     )
     private val itemProviders: List<ItemStackProvider> = listOf(
         ItemStack(Blocks.GLASS_PANE).asProvider(),
@@ -50,13 +55,34 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     )
     private val spinningStacks by lazy {
         Direction.Axis.entries.map {
-            it to Renderable.animatedItemStack {
+            "${it.name.uppercase()} Axis" to Renderable.animatedItemStack {
                 frameStorage = AnimatedFrameLocalStorage(animationFrames)
-                rotationStorage = AnimatedRotationLocalStorage(it to AxisRotationDefinition(rotationSpeed = 65.0))
+                rotationStorage = AnimatedRotationLocalStorage(it to AxisRotationDefinition(65.0))
                 bounceStorage = animatedBounceStorage
                 scale = 4.0
             }
-        }
+        }.toList() + listOf(
+            "All Axes" to Renderable.animatedItemStack {
+                frameStorage = AnimatedFrameLocalStorage(animationFrames)
+                rotationStorage = AnimatedRotationLocalStorage(65.0).apply {
+                    this.rotationDefinition.setStaticRotation(Axis.X, 25.0)
+                }
+                bounceStorage = animatedBounceStorage
+                scale = 4.0
+            },
+            "All Axes (Side)" to Renderable.animatedItemStack {
+                frameStorage = AnimatedFrameLocalStorage(animationFrames)
+                rotationStorage = AnimatedRotationLocalStorage(-65.0)
+                bounceStorage = sidewaysAnimatedBounceStorage
+                scale = 4.0
+            },
+            "All Axes (Multi)" to Renderable.animatedItemStack {
+                frameStorage = AnimatedFrameLocalStorage(animationFrames)
+                rotationStorage = AnimatedRotationLocalStorage(65.0)
+                bounceStorage = multiBounceDef
+                scale = 4.0
+            },
+        )
     }
     private val itemRenderables by lazy {
         itemProviders.map { provider ->
@@ -76,7 +102,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     }
 
     override fun renderable(): Renderable = with(Renderable) {
-        horizontal(
+        vertical(
             vertical(
                 table(tableContent),
                 horizontal(
@@ -86,26 +112,21 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                 ),
             ),
             horizontal(
-                spinningStacks.map { (axis, renderable) ->
+                spinningStacks.map { (axisLabel, renderable) ->
                     vertical(
-                        text("${axis.name.uppercase()} Axis (#${renderable.getStableId()})"),
+                        text(axisLabel),
+                        text("(#${renderable.getStableId()})"),
                         renderable.renderBounds(),
                         spacing = 1,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     )
-                } + vertical {
-                    text("All Axes")
-                    Renderable.animatedItemStack {
-                        frameStorage = AnimatedFrameLocalStorage(animationFrames)
-                        rotationStorage = AnimatedRotationLocalStorage(65.0)
-                        bounceStorage = animatedBounceStorage
-                        scale = 4.0
-                    }.renderBounds()
                 },
                 spacing = 2,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             ),
             spacing = 4,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         )
     }
 }

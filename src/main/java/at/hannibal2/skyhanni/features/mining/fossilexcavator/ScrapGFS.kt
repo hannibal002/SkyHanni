@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrameLocalStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
@@ -36,6 +35,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction.Axis
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -46,7 +46,7 @@ object ScrapGFS {
     private val currentFetchAmount get() = config.fetchAmount.get()
     private val scrapProvider = NeuItemStackProvider(FossilExcavatorApi.scrapItem)
     private val validRange = 1..2048
-    private val currentScrapRotation: Property<SnappedVec3> = Property.of(SnappedVec3.ZERO)
+    private val currentScrapRotation: Property<Vec3> = Property.of(Vec3.ZERO)
 
     private val darkGray = LorenzColor.DARK_GRAY.toColor()
     private val darkerGray = darkGray.darker()

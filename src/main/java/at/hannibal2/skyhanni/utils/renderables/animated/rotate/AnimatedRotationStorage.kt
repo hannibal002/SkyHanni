@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables.animated.rotate
 
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
+import at.hannibal2.skyhanni.utils.renderables.SnappedVec3.Companion.toSnapped
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationStorage.Companion.ROTATION_SNAP
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction.Axis
+import net.minecraft.world.phys.Vec3
 
 /**
  * Stores properties for the rotation definition, and current rotation vector of,
@@ -11,12 +14,20 @@ import net.minecraft.core.Direction.Axis
 sealed interface AnimatedRotationStorage {
     val rotationDefinition: AnimatedRotationDefinition
     var currentRotation: SnappedVec3
+
+    companion object {
+        internal const val ROTATION_SNAP = 0.1
+    }
 }
 
 open class AnimatedRotationLocalStorage(
     override val rotationDefinition: AnimatedRotationDefinition = AnimatedRotationDefinition(),
-    override var currentRotation: SnappedVec3 = SnappedVec3.ZERO
 ) : AnimatedRotationStorage {
+    override var currentRotation: SnappedVec3 = Axis.entries.fold(Vec3.ZERO.toSnapped(ROTATION_SNAP)) { vec, axis ->
+        val staticRotation = rotationDefinition.getStaticRotation(axis).takeIf { it != 0.0 } ?: return@fold vec
+        if (vec[axis] != 0.0) return@fold vec
+        vec.applyAxisValue(axis, staticRotation)
+    }
     constructor(rotationSpeed: Double) : this(
         AnimatedRotationDefinition(
             Axis.X to AxisRotationDefinition(rotationSpeed),
@@ -29,10 +40,22 @@ open class AnimatedRotationLocalStorage(
 
 open class AnimatedRotationPropertyStorage(
     override val rotationDefinition: AnimatedRotationDefinition = AnimatedRotationDefinition(),
-    val propGetter: () -> Property<SnappedVec3>
+    val propGetter: () -> Property<Vec3>,
 ) : AnimatedRotationStorage {
+    private var staticRotationApplied = false
     override var currentRotation: SnappedVec3
-        get() = propGetter().get()
+        get() {
+            val snapped = propGetter().get().toSnapped(ROTATION_SNAP)
+            if (staticRotationApplied) return snapped
+            staticRotationApplied = true
+            val withStatic = Axis.entries.fold(snapped) { vec, axis ->
+                val staticRotation = rotationDefinition.getStaticRotation(axis).takeIf { it != 0.0 } ?: return@fold vec
+                if (vec[axis] != 0.0) return@fold vec
+                vec.applyAxisValue(axis, staticRotation)
+            }
+            propGetter().set(withStatic)
+            return withStatic
+        }
         set(value) = propGetter().set(value)
 }
 
@@ -58,10 +81,14 @@ data class AnimatedRotationDefinition(
     private val enabled get() = axes.values.any { it.isEnabled() }
     fun isEnabled() = enabled
     fun isAxisEnabled(axis: Axis) = axes[axis]?.isEnabled() ?: false
+    fun getStaticRotation(axis: Axis) = axes[axis]?.staticRotation ?: 0.0
+    fun setStaticRotation(axis: Axis, rotation: Double) {
+        axes[axis]?.staticRotation = rotation
+    }
 
-    fun getRotation(axis: Axis, deltaTime: Double): Double {
+    fun getRotationOffset(axis: Axis, deltaTime: Double): Double {
         val axisDef = axes[axis] ?: return 0.0
-        return axisDef.staticRotation + (axisDef.rotationSpeed * deltaTime)
+        return axisDef.rotationSpeed * deltaTime
     }
 }
 
@@ -73,8 +100,8 @@ data class AnimatedRotationDefinition(
  * @param rotationSpeed How many degrees the item should rotate per second.
  */
 data class AxisRotationDefinition(
-    val rotationSpeed: Double = 0.0,
-    val staticRotation: Double = 0.0,
+    var rotationSpeed: Double = 0.0,
+    var staticRotation: Double = 0.0,
 ) {
     constructor(rotationSpeed: Double) : this(rotationSpeed, 0.0)
     fun isEnabled() = rotationSpeed != 0.0 || staticRotation != 0.0
