@@ -1,0 +1,100 @@
+package at.hannibal2.skyhanni.config.features.pets.display.visual
+
+import at.hannibal2.skyhanni.config.storage.Resettable
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
+
+open class BorderRingConfig : Resettable {
+    @Expose
+    @ConfigOption(
+        name = "Enabled",
+        desc = "Display a border ring around the background color, showing your pet's progress to leveling up.",
+    )
+    @ConfigEditorBoolean
+    open val enabled: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Customization", desc = "")
+    @Accordion
+    open val customization: XPRingConfig = XPRingConfig()
+
+    @Expose
+    @ConfigOption(name = "Separator Ring", desc = "")
+    @Accordion
+    open val separator: SeparatorRingConfig = SeparatorRingConfig(Property.of(2))
+
+    class SeparatorRingConfig(padding: Property<Int>) : RingConfig(padding) {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Display a separator ring between the background and the XP ring.")
+        @ConfigEditorBoolean
+        val enabled: Property<Boolean> = Property.of(true)
+    }
+
+    @ConfigOption(name = "Reset", desc = "Reset border ring settings to the default values.")
+    @ConfigEditorButton(buttonText = "Reset Ring Settings")
+    open val reset: Runnable = Runnable(::reset)
+}
+
+class XPRingConfig(
+    padding: Property<Int> = Property.of(6),
+    @Expose
+    @ConfigOption(
+        name = "Filled Ring Color",
+        desc = "The color of the filled portion of the ring.\n" +
+            "§7Default: §#§0§0§f§f§f§f§/#00FFFF",
+    )
+    @ConfigEditorColour
+    val filledColor: Property<ChromaColour> = Property.of(DEFAULT_FILLED_COLOR),
+    @Expose
+    @ConfigOption(
+        name = "Unfilled Ring Color",
+        desc = "The color of the unfilled portion of the ring.\n" +
+            "§7Default: §#§c§0§c§0§c§0§/#C0C0C0",
+    )
+    @ConfigEditorColour
+    val unfilledColor: Property<ChromaColour> = Property.of(DEFAULT_UNFILLED_COLOR)
+) : RingConfig(padding = padding) {
+    override val color: Property<ChromaColour> get() = filledColor
+
+    @ConfigOption(name = "Reset", desc = "Reset XP  to the default values.")
+    @ConfigEditorButton(buttonText = "Reset")
+    override val reset: Runnable = Runnable(::reset)
+
+    companion object {
+        private val DEFAULT_FILLED_COLOR = ChromaColour.fromRGB(0, 255, 255, 0, 255)
+        private val DEFAULT_UNFILLED_COLOR = ChromaColour.fromRGB(192, 192, 192, 0, 255)
+    }
+}
+
+open class RingConfig(
+    @Expose
+    @ConfigOption(
+        name = "Ring Padding",
+        desc = "How wide the ring should be."
+    )
+    @ConfigEditorSlider(minValue = 2f, maxValue = 10f, minStep = 0.5f)
+    val padding: Property<Int> = Property.of(6),
+    @Expose
+    @ConfigOption(
+        name = "Ring Color",
+        desc = "The color of the ring.\n" +
+            "§7Default: §#§8§0§8§0§8§0§/#808080"
+    )
+    @ConfigEditorColour
+    open val color: Property<ChromaColour> = Property.of(DEFAULT_RING_COLOR),
+) : Resettable {
+    companion object {
+        private val DEFAULT_RING_COLOR = ChromaColour.fromRGB(128, 128, 128, 0, 255)
+    }
+
+    @ConfigOption(name = "Reset", desc = "Reset the ring settings to the default values.")
+    @ConfigEditorButton(buttonText = "Reset Ring Settings")
+    open val reset: Runnable = Runnable(::reset)
+}

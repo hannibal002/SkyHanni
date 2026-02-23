@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.config.features.pets.display.visual
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class ExpSharePetConfig {
+class ExpSharePetOrganizationConfig {
     @Expose
     @ConfigOption(
-        name = "Placement",
+        name = "Placement Location",
         desc = "Where the other pets should be displayed, relative to the main pet icon."
     )
     @ConfigEditorDropdown
@@ -24,6 +23,23 @@ class ExpSharePetConfig {
         LEFT("Left"),
         RIGHT("Right"),
         ORBIT("Orbit")
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "Group Orientation",
+        desc = "How the group icons should be oriented.\n" +
+            "Does not apply to Orbit mode."
+    )
+    @ConfigEditorDropdown
+    val groupOrientation: Property<GroupOrientation> = Property.of(GroupOrientation.VERTICAL)
+
+    enum class GroupOrientation(private val displayName: String) {
+        HORIZONTAL("Horizontally"),
+        VERTICAL("Vertically"),
         ;
 
         override fun toString() = displayName
@@ -50,17 +66,4 @@ class ExpSharePetConfig {
         @ConfigEditorSlider(minValue = 10f, maxValue = 360f, minStep = 10f)
         val orbitSpeed: Property<Float> = Property.of(20f)
     }
-
-    @Expose
-    @ConfigOption(name = "Display Customization", desc = "")
-    @Accordion
-    val displayCustomization: ExpSharePetDisplayConfig = ExpSharePetDisplayConfig()
-
-    @Expose
-    @ConfigOption(
-        name = "Active Slots Only",
-        desc = "Only show pets from Exp Share slots if that slot is unlocked by Diana's §dSharing is Caring §7Perk."
-    )
-    @ConfigEditorBoolean
-    val activeSlotsOnly: Property<Boolean> = Property.of(true)
 }

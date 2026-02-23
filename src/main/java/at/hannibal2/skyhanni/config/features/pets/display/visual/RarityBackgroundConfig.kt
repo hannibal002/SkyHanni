@@ -68,7 +68,7 @@ class RarityBackgroundConfig : Resettable {
     @ConfigEditorColour
     val mythicColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 85, 255, 0, 255))
 
-    @ConfigOption(name = "Reset Colors", desc = "Reset the colors to the default values.")
+    @ConfigOption(name = "Reset Colors", desc = "Reset colors to their default values.")
     @ConfigEditorButton(buttonText = "Reset")
     val reset: Runnable = Runnable(::reset)
 }

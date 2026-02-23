@@ -6,10 +6,11 @@ import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetOrganizationConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig.IconRotationConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroundConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.MainVisualPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.RingConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig.PetItemConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
@@ -28,33 +29,39 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.animated.item.AnimatedItemStackRenderable.Companion.animatedItemStack
-import at.hannibal2.skyhanni.utils.renderables.animated.item.ItemStackAnimationFrame
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitSystemRenderable.Companion.orbitalSystem
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrameLocalStorage
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationPropertyStorage
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AxisRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.decorators.CircularContainerRenderable.Companion.circularContainer
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 private typealias TElement = TextPetDisplayConfig.TextElement
 private typealias TLO = TextPetDisplayConfig.TextLocationOption
 private typealias NFE = TextPetDisplayConfig.NumberFormatEntry
-private typealias EXPSharePlace = ExpSharePetConfig.ExpShareLocationOption
-private typealias EXPShareGO = ExpSharePetDisplayConfig.GroupOrientation
+private typealias EXPSharePlace = ExpSharePetOrganizationConfig.ExpShareLocationOption
+private typealias EXPShareGO = ExpSharePetOrganizationConfig.GroupOrientation
 
 @SkyHanniModule
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.display
-    private val expShareConfig get() = config.visual.expSharePetCustomization
+    private val expShareConfig get() = config.visual.expSharePets
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
+    private val currentRotation: Property<Vec3> = Property.of(Vec3.ZERO)
     private val EXP_SHARE = "PET_ITEM_EXP_SHARE".toInternalName()
 
     private fun LorenzRarity.getRarityBackgroundColor(
@@ -71,83 +78,84 @@ object CurrentPetDisplay {
         }
     }
 
-    private fun PetData.buildMainIconRenderableOrNull(): Renderable? {
-        if (!config.visual.icon.get()) return null
+    private fun PetData.buildMainIconRenderableOrNull(): Renderable? = with(config.visual) {
+        if (!icon.enabled.get()) return null
 
         val baseItemRenderable = buildBaseItemRenderable(
-            spinDirection = config.visual.iconSpin.direction.get(),
-            spinFrequency = config.visual.iconSpin.frequency.get(),
-            iconScale = config.visual.iconScale.get(),
-            skinAnimation = config.visual.skinAnimation.get(),
+            rotationConfig = icon.rotation,
+            iconScale = icon.scale.get(),
+            skinAnimation = icon.skinAnimation.get(),
         )
 
-        val petItemEnabled = config.visual.petItem.get()
+        val petItemEnabled = petItem.enabled.get()
         val petItemWrappedRenderable = baseItemRenderable.wrapInPetItemOrSelf(
             enabled = petItemEnabled,
-            petData = this,
-            petItemConfig = config.visual.petItemCustomization,
+            petData = this@buildMainIconRenderableOrNull,
+            petItemConfig = petItem,
         )
 
-        val backgroundEnabled = config.visual.rarityBackground.get()
+        val backgroundEnabled = rarityBackground.enabled.get()
         val backgroundWrappedRenderable = petItemWrappedRenderable.wrapInBackgroundColorOrSelf(
             enabled = backgroundEnabled,
-            backgroundConfig = config.visual.rarityBackgroundCustomization,
+            backgroundConfig = rarityBackground.customization,
             rarity = rarity,
         )
 
-        val separatorEnabled = config.visual.separatorRing.get()
-        val xpRingEnabled = config.visual.xpRing.get()
+        val separatorEnabled = rarityBackground.borderRing.separator.enabled.get()
+        val xpRingEnabled = rarityBackground.borderRing.enabled.get()
         val separatorWrappedRenderable = backgroundWrappedRenderable.wrapInRingOrSelf(
             enabled = backgroundEnabled && xpRingEnabled && separatorEnabled,
-            ringConfig = config.visual.separatorRingCustomization
+            ringConfig = rarityBackground.borderRing.separator,
         )
 
         val shouldUseXpRing = backgroundEnabled && xpRingEnabled
         val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable else Renderable.circularContainer(
             separatorWrappedRenderable,
-            backgroundColor = config.visual.xpRingCustomization.filledColor.get(),
-            unfilledColor = config.visual.xpRingCustomization.unfilledColor.get(),
+            backgroundColor = rarityBackground.borderRing.customization.filledColor.get(),
+            unfilledColor = rarityBackground.borderRing.customization.unfilledColor.get(),
             filledPercentage = levelProgressionPercentage,
-            padding = config.visual.xpRingCustomization.padding.get(),
+            padding = rarityBackground.borderRing.customization.padding.get(),
         )
 
         return xpRingWrappedRenderable
     }
 
     private fun Renderable.wrapInExpShareIconsOrSelf(currentPetUuid: UUID): Renderable {
-        if (!config.visual.expSharePet.get()) return this
+        if (!config.visual.expSharePets.enabled.get()) return this
         val storage = ProfileStorageData.petProfiles ?: return this
         val expShareRenderables = storage.pets.filter {
             it.uuid != currentPetUuid && it.uuid in storage.expSharePets || it.heldItemInternalName == EXP_SHARE
         }.map { it.buildExpShareIconRenderable() }.takeIfNotEmpty() ?: return this
 
-        return when (val placement: EXPSharePlace = expShareConfig.placement.get()) {
+        val organization = expShareConfig.organization
+        val subOrbit = organization.subOrbit
+        return when (val placement: EXPSharePlace = organization.placement.get()) {
             EXPSharePlace.ORBIT -> {
-                val orbitDirection = expShareConfig.subOrbit.orbitDirection.get()
+                val orbitDirection = subOrbit.orbitDirection.get()
                 val orbitSpeed = when (orbitDirection) {
                     OrbitDirection.NONE -> 0
-                    else -> expShareConfig.subOrbit.orbitSpeed.get().toInt()
+                    else -> subOrbit.orbitSpeed.get().toInt()
                 }
                 Renderable.orbitalSystem(
                     this,
-                    subBodySpacing = expShareConfig.subOrbit.orbitDistance.get(),
+                    subBodySpacing = subOrbit.orbitDistance.get(),
                     orbitSpeed = orbitSpeed,
                     orbitDirection = orbitDirection,
                     subBodies = expShareRenderables,
                 )
             }
             else -> {
-                val expShareOrientation: EXPShareGO = expShareConfig.displayCustomization.groupOrientation.get()
+                val expShareOrientation: EXPShareGO = organization.groupOrientation.get()
                 val expShareContainer = when (expShareOrientation) {
                     EXPShareGO.VERTICAL -> Renderable.vertical(
                         expShareRenderables,
-                        spacing = expShareConfig.displayCustomization.iconSpacing.get(),
+                        spacing = expShareConfig.icon.iconSpacing.get(),
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                     )
                     EXPShareGO.HORIZONTAL -> Renderable.horizontal(
                         expShareRenderables,
-                        spacing = expShareConfig.displayCustomization.iconSpacing.get(),
+                        spacing = expShareConfig.icon.iconSpacing.get(),
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                     )
@@ -170,23 +178,22 @@ object CurrentPetDisplay {
 
     private fun PetData.buildExpShareIconRenderable(): Renderable {
         val baseItemRenderable = buildBaseItemRenderable(
-            spinDirection = expShareConfig.displayCustomization.iconSpin.direction.get(),
-            spinFrequency = expShareConfig.displayCustomization.iconSpin.frequency.get(),
-            iconScale = expShareConfig.displayCustomization.iconScale.get(),
-            skinAnimation = expShareConfig.displayCustomization.skinAnimation.get(),
+            rotationConfig = expShareConfig.icon.rotation,
+            iconScale = expShareConfig.icon.scale.get(),
+            skinAnimation = expShareConfig.icon.skinAnimation.get(),
         )
 
-        val backgroundEnabled = expShareConfig.displayCustomization.rarityBackground.enabled.get()
+        val backgroundEnabled = expShareConfig.rarityBackground.enabled.get()
         val backgroundWrappedRenderable = baseItemRenderable.wrapInBackgroundColorOrSelf(
             enabled = backgroundEnabled,
-            backgroundConfig = expShareConfig.displayCustomization.rarityBackground.customization,
+            backgroundConfig = expShareConfig.rarityBackground.customization,
             rarity = rarity,
         )
 
-        val borderEnabled = expShareConfig.displayCustomization.borderRing.enabled.get()
+        val borderEnabled = expShareConfig.rarityBackground.borderRing.enabled.get()
         val borderWrappedRenderable = backgroundWrappedRenderable.wrapInRingOrSelf(
             enabled = borderEnabled,
-            ringConfig = expShareConfig.displayCustomization.borderRing.customization,
+            ringConfig = expShareConfig.rarityBackground.borderRing.customization,
         )
 
         return borderWrappedRenderable
@@ -204,7 +211,7 @@ object CurrentPetDisplay {
 
     private fun Renderable.wrapInRingOrSelf(
         enabled: Boolean,
-        ringConfig: MainVisualPetDisplayConfig.RingConfig,
+        ringConfig: RingConfig,
     ): Renderable = if (!enabled) this else Renderable.circularContainer(
         this,
         ringConfig.color.get(),
@@ -214,40 +221,51 @@ object CurrentPetDisplay {
     private fun Renderable.wrapInPetItemOrSelf(
         enabled: Boolean,
         petData: PetData,
-        petItemConfig: MainVisualPetDisplayConfig.PetItemConfig,
+        petItemConfig: PetItemConfig,
     ): Renderable {
         if (!enabled) return this
-        val petItemRenderable = Renderable.item(
-            petData.heldItemInternalName?.getItemStackOrNull() ?: return this,
-            scale = petItemConfig.scale.get(),
-            horizontalAlign = petItemConfig.placement.get().horizontal,
-            verticalAlign = petItemConfig.placement.get().vertical,
-        )
+        val petItemRenderable = Renderable.item(petData.heldItemInternalName?.getItemStackOrNull() ?: return this) {
+            scale = petItemConfig.scale.get()
+            horizontalAlign = petItemConfig.placement.get().horizontal
+            verticalAlign = petItemConfig.placement.get().vertical
+        }
         return Renderable.doubleLayered(this, petItemRenderable, forceBottomRenderFirst = true)
     }
 
     private fun PetData.buildBaseItemRenderable(
-        spinDirection: OrbitDirection,
-        spinFrequency: Float,
+        rotationConfig: IconRotationConfig,
         iconScale: Double,
         skinAnimation: Boolean,
-    ): Renderable {
-        val spinMultiplier = if (spinDirection == OrbitDirection.CLOCKWISE) -1 else 1
-        val degreesPerSecond = if (spinDirection != OrbitDirection.NONE) ((360 / spinFrequency) * spinMultiplier) else 0.0f
-        val itemStack = getItemStackOrNull()
-            ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")
-        return Renderable.animatedItemStack(
-            frames = getAnimatedItemStackSequence(
-                firstFrameOnly = !skinAnimation
-            ) ?: listOf(ItemStackAnimationFrame(itemStack)),
-            scale = iconScale,
-            rotationDefinition = ItemStackRotationDefinition(
-                axis = Direction.Axis.Y,
-                rotationSpeed = degreesPerSecond.toDouble(),
+    ): Renderable = Renderable.animatedItemStack {
+        frameStorage = AnimatedFrameLocalStorage(
+            getAnimatedItemStackSequence(
+                firstFrameOnly = !skinAnimation,
+            ) ?: listOf(
+                ItemStackAnimatedFrame(
+                    getItemStackOrNull() ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")
+                )
             ),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
+        rotationStorage = AnimatedRotationPropertyStorage(
+            rotationDefinition = AnimatedRotationDefinition(
+                Direction.Axis.X to AxisRotationDefinition(
+                    staticRotation = rotationConfig.staticRotation.xRotation.get(),
+                    rotationSpeed = rotationConfig.spinRotation.speedX.get(),
+                ),
+                Direction.Axis.Y to AxisRotationDefinition(
+                    rotationSpeed = rotationConfig.spinRotation.speedY.get(),
+                    staticRotation = rotationConfig.staticRotation.yRotation.get(),
+                ),
+                Direction.Axis.Z to AxisRotationDefinition(
+                    rotationSpeed = rotationConfig.spinRotation.speedZ.get(),
+                    staticRotation = rotationConfig.staticRotation.zRotation.get(),
+                ),
+            ),
+        ) { currentRotation }
+
+        scale = iconScale
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        verticalAlign = RenderUtils.VerticalAlignment.CENTER
     }
 
     private fun PetData.buildTextRenderableOrNull(): Renderable? = Renderable.vertical(

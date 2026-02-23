@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
-import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
+import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class IconConfig {
+open class IconConfig {
     @Expose
     @ConfigOption(
         name = "Pet Icon",
@@ -35,6 +36,8 @@ class IconConfig {
             name = "Animation Speed",
             desc = "How fast the skin animation should play, in ticks per frame"
         )
+        @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
+        val animationSpeed: Property<Float> = Property.of(5f)
     }
 
     @Expose
@@ -57,31 +60,58 @@ class IconConfig {
         @Accordion
         val staticRotation = StaticRotationConfig()
 
-        class StaticRotationConfig {
+        class StaticRotationConfig : Resettable {
             @Expose
             @ConfigOption(name = "X Rotation", desc = "Rotate the pet icon on the X axis, by this many degrees.")
             @ConfigEditorSlider(minValue = 0f, maxValue = 360f, minStep = 5f)
-            val xRotation: Property<Float> = Property.of(0f)
+            val xRotation: Property<Double> = Property.of(0.0)
 
             @Expose
             @ConfigOption(name = "Y Rotation", desc = "Rotate the pet icon on the Y axis, by this many degrees.")
             @ConfigEditorSlider(minValue = 0f, maxValue = 360f, minStep = 5f)
-            val yRotation: Property<Float> = Property.of(0f)
+            val yRotation: Property<Double> = Property.of(0.0)
 
             @Expose
             @ConfigOption(name = "Z Rotation", desc = "Rotate the pet icon on the Z axis, by this many degrees.")
             @ConfigEditorSlider(minValue = 0f, maxValue = 360f, minStep = 5f)
-            val zRotation: Property<Float> = Property.of(0f)
+            val zRotation: Property<Double> = Property.of(0.0)
+
+            @ConfigOption(name = "Reset", desc = "Reset static rotations to the default value of 0.")
+            @ConfigEditorButton(buttonText = "Reset Static Rotation")
+            val reset: Runnable = Runnable(::reset)
         }
 
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Spin the pet icon in place.")
-        @ConfigEditorDropdown
-        val direction: Property<OrbitDirection> = Property.of(OrbitDirection.NONE)
+        @ConfigOption(name = "Spin Rotation", desc = "Continuously rotate the pet icon at a set speed.")
+        @Accordion
+        val spinRotation = SpinRotationConfig()
 
-        @Expose
-        @ConfigOption(name = "Spin Speed", desc = "How long in milliseconds it should take for one spin to complete.")
-        @ConfigEditorSlider(minValue = 250f, maxValue = 10000f, minStep = 250f)
-        val frequency: Property<Float> = Property.of(2000f)
+        class SpinRotationConfig : Resettable {
+            @ConfigOption(
+                name = "Note",
+                desc = "Positive values will rotate clockwise, negative values will rotate counter-clockwise."
+            )
+            @ConfigEditorInfoText
+            val note: Unit = Unit
+
+            @Expose
+            @ConfigOption(name = "Rotation Speed (X)", desc = "How many degrees per second the pet icon should rotate on the X axis.")
+            @ConfigEditorSlider(minValue = -1400f, maxValue = 1400f, minStep = 25f)
+            val speedX: Property<Double> = Property.of(0.0)
+
+            @Expose
+            @ConfigOption(name = "Rotation Speed (Y)", desc = "How many degrees per second the pet icon should rotate on the Y axis.")
+            @ConfigEditorSlider(minValue = 25f, maxValue = 1400f, minStep = 25f)
+            val speedY: Property<Double> = Property.of(0.0)
+
+            @Expose
+            @ConfigOption(name = "Rotation Speed (Z)", desc = "How many degrees per second the pet icon should rotate on the Z axis.")
+            @ConfigEditorSlider(minValue = 25f, maxValue = 1400f, minStep = 25f)
+            val speedZ: Property<Double> = Property.of(0.0)
+
+            @ConfigOption(name = "Reset", desc = "Reset the rotation speeds to the default value of 0.")
+            @ConfigEditorButton(buttonText = "Reset Rotation Speeds")
+            val reset: Runnable = Runnable(::reset)
+        }
     }
 }

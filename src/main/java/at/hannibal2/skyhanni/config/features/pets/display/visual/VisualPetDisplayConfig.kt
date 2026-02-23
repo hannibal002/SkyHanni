@@ -2,13 +2,9 @@ package at.hannibal2.skyhanni.config.features.pets.display.visual
 
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -18,24 +14,32 @@ open class VisualPetDisplayConfig : Resettable {
     @Expose
     @ConfigOption(name = "Pet Icon", desc = "")
     @Accordion
-    val icon: IconConfig = IconConfig()
+    open val icon: IconConfig = IconConfig()
 
     @Expose
     @ConfigOption(name = "Background Color", desc = "")
     @Accordion
-    val rarityBackground: BackgroundColorConfig = BackgroundColorConfig()
+    open val rarityBackground: BackgroundColorConfig = BackgroundColorConfig()
 
     open class BackgroundColorConfig {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Display a background color around your pet.\n" +
-            "Default is to display the rarity color of the pet.")
+        @ConfigOption(
+            name = "Enabled",
+            desc = "Display a background color around your pet.\n" +
+            "Default is to display the rarity color of the pet."
+        )
         @ConfigEditorBoolean
         open val enabled: Property<Boolean> = Property.of(true)
 
         @Expose
-        @ConfigOption(name = "Customization", desc = "")
+        @ConfigOption(name = "Color Customization", desc = "")
         @Accordion
         open val customization: RarityBackgroundConfig = RarityBackgroundConfig()
+
+        @Expose
+        @ConfigOption(name = "Border Ring", desc = "")
+        @Accordion
+        open val borderRing: BorderRingConfig = BorderRingConfig()
     }
 
     @Expose
@@ -85,69 +89,5 @@ open class VisualPetDisplayConfig : Resettable {
         )
         @ConfigEditorSlider(minValue = 0.1f, maxValue = 2.0f, minStep = 0.1f)
         val scale: Property<Double> = Property.of(1.0)
-    }
-
-    @Expose
-    @ConfigOption(name = "XP Ring", desc = "")
-    @Accordion
-    open val borderRing: XPBorderRingConfig = XPBorderRingConfig()
-
-    open class XPBorderRingConfig {
-        @Expose
-        @ConfigOption(
-            name = "Enabled",
-            desc = "Display a border ring around the background color, showing your pet's progress to leveling up.",
-        )
-        @ConfigEditorBoolean
-        val enabled: Property<Boolean> = Property.of(true)
-
-        @Expose
-        @ConfigOption(name = "Customization", desc = "")
-        @Accordion
-        open val customization: XPRingConfig = XPRingConfig()
-
-        open class RingConfig : Resettable {
-            @Expose
-            @ConfigOption(
-                name = "Ring Padding",
-                desc = "How wide the ring should be."
-            )
-            @ConfigEditorSlider(minValue = 2f, maxValue = 10f, minStep = 0.5f)
-            val padding: Property<Int> = Property.of(6)
-
-            @Expose
-            @ConfigOption(
-                name = "Ring Color",
-                desc = "The color of the ring.\n" +
-                    "§7Default: §#§8§0§8§0§8§0§/#808080"
-            )
-            @ConfigEditorColour
-            open val color: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(128, 128, 128, 0, 255))
-        }
-
-        class XPRingConfig : RingConfig() {
-            @Expose
-            @ConfigOption(
-                name = "Filled Ring Color",
-                desc = "The color of the filled portion of the ring.\n" +
-                    "§7Default: §#§0§0§f§f§f§f§/#00FFFF",
-            )
-            @ConfigEditorColour
-            val filledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(0, 255, 255, 0, 255))
-            override val color: Property<ChromaColour> get() = filledColor
-
-            @Expose
-            @ConfigOption(
-                name = "Unfilled Ring Color",
-                desc = "The color of the unfilled portion of the ring.\n" +
-                    "§7Default: §#§c§0§c§0§c§0§/#C0C0C0",
-            )
-            @ConfigEditorColour
-            val unfilledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(192, 192, 192, 0, 255))
-
-            @ConfigOption(name = "Reset Colors", desc = "Reset the colors to the default values.")
-            @ConfigEditorButton(buttonText = "Reset")
-            val reset: Runnable = Runnable(::reset)
-        }
     }
 }
