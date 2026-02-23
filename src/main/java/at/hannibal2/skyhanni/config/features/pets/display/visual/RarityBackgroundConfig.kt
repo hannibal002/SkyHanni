@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
+import at.hannibal2.skyhanni.config.features.pets.display.ResettableScalableConfig
 import at.hannibal2.skyhanni.config.storage.NoReset
-import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -10,7 +10,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class RarityBackgroundConfig : Resettable {
+class RarityBackgroundConfig(
+    scalar: Float = 1.0f,
+) : ResettableScalableConfig {
+    companion object {
+        private const val DEFAULT_PADDING = 4
+    }
+
+    @Suppress("CanBePrimaryConstructorProperty")
+    @Transient
+    override val scalar: Float = scalar
+
     @Expose
     @NoReset
     @ConfigOption(
@@ -18,7 +28,7 @@ class RarityBackgroundConfig : Resettable {
         desc = "How much extra padding should be added to the background circle."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 8f, minStep = 0.25f)
-    val padding: Property<Int> = Property.of(4)
+    val padding: Property<Int> = Property.of((DEFAULT_PADDING * scalar).toInt())
 
     @Expose
     @ConfigOption(

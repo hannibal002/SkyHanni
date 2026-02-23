@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.renderables.animated.OrbitDirection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class ExpSharePetOrganizationConfig {
+class ExpSharePetOrganizationConfig : Resettable {
     @Expose
     @ConfigOption(
         name = "Placement Location",
@@ -66,4 +68,8 @@ class ExpSharePetOrganizationConfig {
         @ConfigEditorSlider(minValue = 10f, maxValue = 360f, minStep = 10f)
         val orbitSpeed: Property<Float> = Property.of(20f)
     }
+
+    @ConfigOption(name = "Reset Organization", desc = "Reset the organization settings to the default values.")
+    @ConfigEditorButton(buttonText = "Reset")
+    val reset: Runnable = Runnable(::reset)
 }

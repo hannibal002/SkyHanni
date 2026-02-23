@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
+import at.hannibal2.skyhanni.config.features.pets.display.ResettableScalableConfig
 import at.hannibal2.skyhanni.config.storage.Resettable
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -10,7 +11,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-open class IconConfig {
+open class IconConfig(
+    scalar: Float = 1.0f,
+) : ResettableScalableConfig {
+    companion object {
+        private const val DEFAULT_ICON_SCALE = 2.0
+    }
+
+    @Suppress("CanBePrimaryConstructorProperty")
+    @Transient
+    override val scalar: Float = scalar
+
     @Expose
     @ConfigOption(
         name = "Pet Icon",
@@ -23,41 +34,22 @@ open class IconConfig {
     @Expose
     @ConfigOption(name = "Skin Animation", desc = "If your pet has an animated skin, the icon will also animate.")
     @ConfigEditorBoolean
-    val skinAnimation: SkinAnimationConfig = SkinAnimationConfig()
-
-    class SkinAnimationConfig {
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "If your pet has an animated skin, the icon will also animate.")
-        @ConfigEditorBoolean
-        val enabled: Property<Boolean> = Property.of(true)
-
-        // Not used right now, but should be in future
-        /*
-        @Expose
-        @ConfigOption(
-            name = "Animation Speed",
-            desc = "How fast the skin animation should play, in ticks per frame"
-        )
-        @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
-        val animationSpeed: Property<Float> = Property.of(5f)
-         */
-    }
+    val skinAnimation: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
         name = "Icon Scale",
         desc = "How large the pet icon should be.",
     )
-    @ConfigEditorSlider(minValue = 0.1f, maxValue = 2.0f, minStep = 0.1f)
-    val scale: Property<Double> = Property.of(1.0)
+    @ConfigEditorSlider(minValue = 0.1f, maxValue = 3.0f, minStep = 0.1f)
+    open val scale: Property<Double> = Property.of(DEFAULT_ICON_SCALE * scalar)
 
     @Expose
     @ConfigOption(name = "Icon Rotation/Spin", desc = "")
     @Accordion
     val rotation: IconRotationConfig = IconRotationConfig()
 
-    open class IconRotationConfig {
-
+    class IconRotationConfig : Resettable {
         @Expose
         @ConfigOption(name = "Static Rotation", desc = "Set a static rotation offset for the pet icon.")
         @Accordion
@@ -79,8 +71,8 @@ open class IconConfig {
             @ConfigEditorSlider(minValue = 0f, maxValue = 360f, minStep = 5f)
             val zRotation: Property<Double> = Property.of(0.0)
 
-            @ConfigOption(name = "Reset", desc = "Reset static rotations to the default value of 0.")
-            @ConfigEditorButton(buttonText = "Reset Static Rotation")
+            @ConfigOption(name = "Reset Rotations", desc = "Reset static rotations to the default value of 0.")
+            @ConfigEditorButton(buttonText = "Reset")
             val reset: Runnable = Runnable(::reset)
         }
 
@@ -112,9 +104,13 @@ open class IconConfig {
             @ConfigEditorSlider(minValue = -725f, maxValue = 725f, minStep = 1f)
             val speedZ: Property<Double> = Property.of(0.0)
 
-            @ConfigOption(name = "Reset", desc = "Reset the rotation speeds to the default value of 0.")
-            @ConfigEditorButton(buttonText = "Reset Rotation Speeds")
+            @ConfigOption(name = "Reset Rotation Speeds", desc = "Reset the rotation speeds to the default value of 0.")
+            @ConfigEditorButton(buttonText = "Reset")
             val reset: Runnable = Runnable(::reset)
         }
     }
+
+    @ConfigOption(name = "Reset Icon Settings", desc = "Reset the icon settings to the default values.")
+    @ConfigEditorButton(buttonText = "Reset")
+    open val reset: Runnable = Runnable(::reset)
 }

@@ -8,7 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
+class ExpSharePetDisplayConfig(
+    scalar: Float = 0.6f,
+) : VisualPetDisplayConfig(scalar) {
+    @Suppress("CanBePrimaryConstructorProperty")
+    @Transient
+    override val scalar: Float = scalar
+
     @Expose
     @ConfigOption(
         name = "Exp-Share Pets",
@@ -19,11 +25,20 @@ class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
     val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
+    @ConfigOption(name = "Organization", desc = "")
+    @Accordion
+    val organization: ExpSharePetOrganizationConfig = ExpSharePetOrganizationConfig()
+
+    @Expose
     @ConfigOption(name = "Pet Icon", desc = "")
     @Accordion
-    override val icon: SpaceIconConfig = SpaceIconConfig()
+    override val icon: SpaceIconConfig = SpaceIconConfig(scalar)
 
-    class SpaceIconConfig : IconConfig() {
+    class SpaceIconConfig(scalar: Float = 1.0f) : IconConfig(scalar) {
+        companion object {
+            private const val DEFAULT_ICON_SPACING = 1
+        }
+
         @Expose
         @ConfigOption(
             name = "Icon Spacing",
@@ -31,19 +46,30 @@ class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
                 "Does not apply to Orbit mode."
         )
         @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f)
-        val iconSpacing: Property<Int> = Property.of(1)
+        val iconSpacing: Property<Int> = Property.of(DEFAULT_ICON_SPACING)
     }
+
+    @Expose
+    @ConfigOption(name = "Pet Item", desc = "")
+    @Accordion
+    override val petItem: PetItemConfig = PetItemConfig(scalar)
 
     @Expose
     @ConfigOption(name = "Background Color", desc = "")
     @Accordion
-    override val rarityBackground: ExpShareBackgroundColorConfig = ExpShareBackgroundColorConfig()
+    override val rarityBackground: ExpShareBackgroundColorConfig = ExpShareBackgroundColorConfig(scalar)
 
-    open class ExpShareBackgroundColorConfig : BackgroundColorConfig() {
+    open class ExpShareBackgroundColorConfig(
+        scalar: Float = 1.0f,
+    ) : BackgroundColorConfig() {
+        @Suppress("CanBePrimaryConstructorProperty")
+        @Transient
+        override val scalar: Float = scalar
+
         @Expose
         @ConfigOption(name = "XP Ring", desc = "")
         @Accordion
-        override val borderRing = object : BorderRingConfig() {
+        override val borderRing = object : BorderRingConfig(scalar) {
             @Expose
             @ConfigOption(
                 name = "Enabled",
@@ -51,6 +77,11 @@ class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
             )
             @ConfigEditorBoolean
             override val enabled: Property<Boolean> = Property.of(true)
+
+            @Expose
+            @ConfigOption(name = "Separator Ring", desc = "")
+            @Accordion
+            override val separator: SeparatorRingConfig = SeparatorRingConfig(scalar)
 
             @ConfigOption(
                 name = "Static Borders",
@@ -61,11 +92,6 @@ class ExpSharePetDisplayConfig : VisualPetDisplayConfig() {
             val staticNote: Unit = Unit
         }
     }
-
-    @Expose
-    @ConfigOption(name = "Organization", desc = "")
-    @Accordion
-    val organization: ExpSharePetOrganizationConfig = ExpSharePetOrganizationConfig()
 
     @Expose
     @ConfigOption(

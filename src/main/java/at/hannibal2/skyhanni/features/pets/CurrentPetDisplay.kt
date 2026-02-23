@@ -7,11 +7,10 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetOrganizationConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig.IconRotationConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.PetItemConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroundConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RingConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig.PetItemConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
@@ -85,7 +84,7 @@ object CurrentPetDisplay {
         val baseItemRenderable = buildBaseItemRenderable(
             rotationConfig = icon.rotation,
             iconScale = icon.scale.get(),
-            skinAnimationConfig = icon.skinAnimation.get(),
+            useSkinAnimations = icon.skinAnimation.get(),
         )
 
         val petItemEnabled = petItem.enabled.get()
@@ -181,7 +180,7 @@ object CurrentPetDisplay {
         val baseItemRenderable = buildBaseItemRenderable(
             rotationConfig = expShareConfig.icon.rotation,
             iconScale = expShareConfig.icon.scale.get(),
-            skinAnimationConfig = expShareConfig.icon.skinAnimation,
+            useSkinAnimations = expShareConfig.icon.skinAnimation.get(),
         )
 
         val backgroundEnabled = expShareConfig.rarityBackground.enabled.get()
@@ -236,15 +235,12 @@ object CurrentPetDisplay {
     private fun PetData.buildBaseItemRenderable(
         rotationConfig: IconRotationConfig,
         iconScale: Double,
-        skinAnimationConfig: IconConfig.SkinAnimationConfig,
+        useSkinAnimations: Boolean,
     ): Renderable = Renderable.animatedItemStack {
         frameStorage = AnimatedFrameLocalStorage(
-            getAnimatedItemStackSequence(
-                firstFrameOnly = !skinAnimationConfig.enabled.get(),
-            ) ?: listOf(
-                ItemStackAnimatedFrame(
-                    getItemStackOrNull() ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")
-                )
+            getAnimatedItemStackSequence(firstFrameOnly = !useSkinAnimations) ?: listOf(
+                getItemStackOrNull()?.let { ItemStackAnimatedFrame(it) }
+                    ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")
             ),
         )
         rotationStorage = AnimatedRotationPropertyStorage(

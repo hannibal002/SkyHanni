@@ -3,7 +3,8 @@ package at.hannibal2.skyhanni.config.features.pets.display
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.MainVisualPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -26,6 +27,13 @@ class PetDisplayConfig {
     @ConfigOption(name = "Visual Elements", desc = "")
     @Accordion
     val visual: MainVisualPetDisplayConfig = MainVisualPetDisplayConfig()
+
+    class MainVisualPetDisplayConfig : VisualPetDisplayConfig() {
+        @Expose
+        @ConfigOption(name = "Exp-Share Pets Customization", desc = "")
+        @Accordion
+        val expSharePets: ExpSharePetDisplayConfig = ExpSharePetDisplayConfig(scalar = 0.6f)
+    }
 
     @Expose
     @ConfigOption(name = "Text Elements", desc = "")
