@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
+import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.world.item.ItemStack
 
@@ -24,8 +24,8 @@ open class ItemStackRenderable internal constructor(
 
     open val stack: ItemStack get() = stackGetter()
 
-    override val width = (15.5 * scale + 0.5).toInt() + xSpacing
-    override val height = (15.5 * scale + 0.5).toInt() + ySpacing
+    override val width: Int get() = (15.5 * scale + 0.5).toInt() + xSpacing
+    override val height: Int get() = (15.5 * scale + 0.5).toInt() + ySpacing
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         stack.renderOnScreen(
@@ -41,6 +41,20 @@ open class ItemStackRenderable internal constructor(
         stack.getTooltipCompat(advancedTooltipCompat),
         stack = stack,
     )
+
+    companion object {
+        fun Renderable.Companion.item(stackGetter: () -> ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
+            ItemStackRenderable(ItemRenderableConfig().apply(config), stackGetter)
+
+        fun Renderable.Companion.item(stack: ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
+            item({ stack }, config)
+
+        fun Renderable.Companion.item(provider: ItemStackProvider, config: ItemRenderableConfig.() -> Unit = {}) =
+            item(provider::stack, config)
+
+        fun Renderable.Companion.item(item: NeuInternalName, config: ItemRenderableConfig.() -> Unit = {}) =
+            item(NeuItemStackProvider(item), config)
+    }
 }
 
 open class ItemRenderableConfig(
@@ -50,18 +64,4 @@ open class ItemRenderableConfig(
     open var rescaleSkulls: Boolean = true,
     open var horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     open var verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-) {
-    companion object {
-        fun Renderable.Companion.item(stackGetter: () -> ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
-            ItemStackRenderable(ItemRenderableConfig().apply(config), stackGetter)
-
-        fun Renderable.Companion.item(stack: ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
-            item({ stack }, config)
-
-        fun Renderable.Companion.item(provider: NeuItemStackProvider, config: ItemRenderableConfig.() -> Unit = {}) =
-            item(provider::stack, config)
-
-        fun Renderable.Companion.item(item: NeuInternalName, config: ItemRenderableConfig.() -> Unit = {}) =
-            item(NeuItemStackProvider(item), config)
-    }
-}
+)

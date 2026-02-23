@@ -98,7 +98,14 @@ object RenderableInventory {
                 val uvArray = uv.getUvCoords()
                 drawInsideFixedSizedImage(
                     if (uv == SlotsUv.CENTER)
-                        items[index++]?.let { item(it, scale, 0, 0, false) } ?: emptySlot
+                        items[index++]?.let {
+                            item(it) {
+                                this.scale = scale
+                                xSpacing = 0
+                                ySpacing = 0
+                                rescaleSkulls = false
+                            }
+                        } ?: emptySlot
                     else Renderable.empty(),
                     inventoryTextures,
                     (uv.width() * scale).toInt(),

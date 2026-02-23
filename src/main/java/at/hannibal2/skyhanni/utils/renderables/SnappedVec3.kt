@@ -16,7 +16,12 @@ data class SnappedVec3(
         Axis.Z -> copy(snappedZ = value % maxValue)
     }
 
-    private fun snap(value: Double) = snap(value, snapValue)
+    fun applyAxisOffset(axis: Axis, offset: Double): SnappedVec3 = when (axis) {
+        Axis.X -> copy(snappedX = (snappedX + offset) % maxValue)
+        Axis.Y -> copy(snappedY = (snappedY + offset) % maxValue)
+        Axis.Z -> copy(snappedZ = (snappedZ + offset) % maxValue)
+    }
+
     companion object {
         val ZERO = SnappedVec3(0.0, 0.0, 0.0)
 

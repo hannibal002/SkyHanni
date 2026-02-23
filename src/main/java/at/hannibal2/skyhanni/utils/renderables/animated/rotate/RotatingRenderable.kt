@@ -24,14 +24,14 @@ internal interface RotatingBehavior : AnimatedRotationStorage {
 
     private fun generateNextRotation(deltaTime: Double): SnappedVec3 {
         if (!rotationDefinition.isEnabled()) return SnappedVec3.ZERO
-        return Axis.entries.fold(currentRotation) { vec, axis ->
-            if (!rotationDefinition.isAxisEnabled(axis)) vec
-            else vec.applyAxisValue(axis, rotationDefinition.getRotation(axis, deltaTime))
+        return Axis.entries.filter { rotationDefinition.isAxisEnabled(it) }.fold(currentRotation) { vec, axis ->
+            val offset = rotationDefinition.getRotationOffset(axis, deltaTime)
+            vec.applyAxisOffset(axis, offset)
         }
     }
 }
 
-class RotatingRenderable(
+class RotatingRenderable private constructor(
     override val root: Renderable,
     override val rotationStorage: AnimatedRotationStorage,
 ) : RenderableDecorator, TimeDependentRenderable, RotatingBehavior {
