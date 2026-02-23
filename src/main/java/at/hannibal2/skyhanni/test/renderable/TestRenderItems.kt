@@ -71,7 +71,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     private val labels by lazy {
         scaleList.map { Renderable.text(it.roundTo(1).toString()) }
     }
-    val tableContent by lazy {
+    private val tableContent by lazy {
         listOf(labels) + itemRenderables
     }
 
