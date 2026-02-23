@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.renderable
 
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
@@ -29,7 +30,10 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule(devOnly = true)
-object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
+object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRenderPostEvent>(
+    "items",
+    eventClass = GameOverlayRenderPostEvent::class,
+) {
 
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val bambooProvider = NeuItemStackProvider("BAMBOO".toInternalName())
@@ -49,8 +53,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
     }
 
     override fun renderable(): Renderable {
-        val localScale = 0.1
-        val scaleList = generateSequence(localScale) { it + 0.1 }.take(25).toList()
+        val scaleList = generateSequence(0.1) { it + 0.1 }.take(25).toList()
         val labels = scaleList.map { Renderable.text(it.roundTo(1).toString()) }
 
         val itemProviders: List<ItemStackProvider> = listOf(
@@ -84,7 +87,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
                 horizontal(
                     spinningStacks.map { (axis, renderable) ->
                         vertical(
-                            text("${axis.name.uppercase()} Axis"),
+                            text("${axis.name.uppercase()} Axis (#${renderable.getStableId()})"),
                             renderable.renderBounds(),
                             spacing = 1,
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

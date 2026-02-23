@@ -31,7 +31,7 @@ open class ItemStackRenderable internal constructor(
         stack.renderOnScreen(
             xSpacing / 2f,
             ySpacing / 2f,
-            scaleMultiplier = scale,
+            scale = scale,
             rescaleSkulls,
         )
     }

@@ -43,17 +43,22 @@ class AnimatedItemStackRenderable private constructor(
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
     override var ticksInFrame: Double = 0.0
 
+    private var stableRenderId: Int = -1
+    fun getStableId() = stableRenderId
+
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         applyRotation(deltaTime)
         applyBounce()
         tryMoveNextFrame(deltaTime.inPartialSeconds)
 
-        stack.renderOnScreen(
+        this.stableRenderId = stack.renderOnScreen(
             x = (xSpacing / 2f),
             y = 0f,
-            scaleMultiplier = scale,
+            scale = config.scale,
             rescaleSkulls = rescaleSkulls,
-            rotationDegrees = currentRotation,
+            rotationVec = currentRotation,
+            translationVec = currentBounce,
+            stableRenderId = this.stableRenderId,
         )
     }
 
