@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationS
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.RotatingBehavior
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
+import net.minecraft.core.Direction
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 
@@ -42,6 +43,9 @@ class AnimatedItemStackRenderable private constructor(
     override val bounceStartTime: SimpleTimeMark = SimpleTimeMark.now()
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
     override var ticksInFrame: Double = 0.0
+
+    override val height: Int get() = super.height + bounceDefinition.getTotalBounceHeight(Direction.Axis.Y)
+    override val width: Int get() = super.width + bounceDefinition.getTotalBounceHeight(Direction.Axis.X)
 
     private var stableRenderId: Int = -1
     fun getStableId() = stableRenderId
