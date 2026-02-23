@@ -211,6 +211,7 @@ class DungeonConfig {
     @ConfigEditorButton(buttonText = "Go")
     val chestOverlayRunnable = Runnable { SkyHanniMod.feature.combat.instanceChestProfit::enabled.jumpToEditor() }
 
+    @Expose
     @ConfigOption(
         name = "Blood Camp Move Title/Message",
         desc = "Display a message and title for when to kill blood mobs when Blood Camping for Dialogue skip."
