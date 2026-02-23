@@ -34,12 +34,19 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     "items",
     eventClass = GameOverlayRenderPostEvent::class,
 ) {
-
+    private val scaleList = generateSequence(0.1) { it + 0.1 }.take(25).toList()
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val bambooProvider = NeuItemStackProvider("BAMBOO".toInternalName())
     private val animationFrames = listOf(ItemStackAnimatedFrame(boxOfSeedsProvider, ticks = 0))
     private val animatedBounceStorage = AnimatedBounceLocalStorage(
         AnimatedBounceDefinition(Axis.Y to AxisBounceDefinition(25.0, 8.0))
+    )
+    private val itemProviders: List<ItemStackProvider> = listOf(
+        ItemStack(Blocks.GLASS_PANE).asProvider(),
+        ItemStack(Items.DIAMOND_SWORD).asProvider(),
+        ItemStack(Items.PLAYER_HEAD).asProvider(),
+        ItemStack(Blocks.MELON).asProvider(),
+        bambooProvider
     )
     private val spinningStacks by lazy {
         Direction.Axis.entries.map {
@@ -51,20 +58,8 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
             }
         }
     }
-
-    override fun renderable(): Renderable {
-        val scaleList = generateSequence(0.1) { it + 0.1 }.take(25).toList()
-        val labels = scaleList.map { Renderable.text(it.roundTo(1).toString()) }
-
-        val itemProviders: List<ItemStackProvider> = listOf(
-            ItemStack(Blocks.GLASS_PANE).asProvider(),
-            ItemStack(Items.DIAMOND_SWORD).asProvider(),
-            ItemStack(Items.PLAYER_HEAD).asProvider(),
-            ItemStack(Blocks.MELON).asProvider(),
-            bambooProvider
-        )
-
-        val itemRenderables = itemProviders.map { provider ->
+    private val itemRenderables by lazy {
+        itemProviders.map { provider ->
             scaleList.map { scale ->
                 Renderable.item(provider) {
                     this.scale = scale
@@ -72,40 +67,45 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                 }.renderBounds()
             }
         }
+    }
+    private val labels by lazy {
+        scaleList.map { Renderable.text(it.roundTo(1).toString()) }
+    }
+    val tableContent by lazy {
+        listOf(labels) + itemRenderables
+    }
 
-        val tableContent = listOf(labels) + itemRenderables
-        return with(Renderable) {
-            horizontal(
-                vertical(
-                    table(tableContent),
-                    horizontal(
-                        text("Default:").renderBounds(),
-                        item(ItemStack(Items.DIAMOND_SWORD)).renderBounds(),
-                        spacing = 1,
-                    ),
-                ),
+    override fun renderable(): Renderable = with(Renderable) {
+        horizontal(
+            vertical(
+                table(tableContent),
                 horizontal(
-                    spinningStacks.map { (axis, renderable) ->
-                        vertical(
-                            text("${axis.name.uppercase()} Axis (#${renderable.getStableId()})"),
-                            renderable.renderBounds(),
-                            spacing = 1,
-                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        )
-                    } + vertical {
-                        text("All Axes")
-                        Renderable.animatedItemStack {
-                            frameStorage = AnimatedFrameLocalStorage(animationFrames)
-                            rotationStorage = AnimatedRotationLocalStorage(65.0)
-                            bounceStorage = animatedBounceStorage
-                            scale = 4.0
-                        }.renderBounds()
-                    },
-                    spacing = 2,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    text("Default:").renderBounds(),
+                    item(ItemStack(Items.DIAMOND_SWORD)).renderBounds(),
+                    spacing = 1,
                 ),
-                spacing = 4,
-            )
-        }
+            ),
+            horizontal(
+                spinningStacks.map { (axis, renderable) ->
+                    vertical(
+                        text("${axis.name.uppercase()} Axis (#${renderable.getStableId()})"),
+                        renderable.renderBounds(),
+                        spacing = 1,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    )
+                } + vertical {
+                    text("All Axes")
+                    Renderable.animatedItemStack {
+                        frameStorage = AnimatedFrameLocalStorage(animationFrames)
+                        rotationStorage = AnimatedRotationLocalStorage(65.0)
+                        bounceStorage = animatedBounceStorage
+                        scale = 4.0
+                    }.renderBounds()
+                },
+                spacing = 2,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            ),
+            spacing = 4,
+        )
     }
 }
