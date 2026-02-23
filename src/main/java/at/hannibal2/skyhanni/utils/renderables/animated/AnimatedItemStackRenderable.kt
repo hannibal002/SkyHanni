@@ -68,7 +68,9 @@ class AnimatedItemStackRenderable private constructor(
 
     companion object {
         fun Renderable.Companion.animatedItemStack(
-            config: AnimatedItemRenderableConfig.() -> Unit = {},
+            config: AnimatedItemRenderableConfig.() -> Unit = {
+                AnimatedItemRenderableConfig()
+            },
         ) = AnimatedItemStackRenderable(AnimatedItemRenderableConfig().apply(config))
     }
 }

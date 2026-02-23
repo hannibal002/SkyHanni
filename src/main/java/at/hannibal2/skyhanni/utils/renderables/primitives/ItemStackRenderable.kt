@@ -24,8 +24,8 @@ open class ItemStackRenderable internal constructor(
 
     open val stack: ItemStack get() = stackGetter()
 
-    override val width = (15.5 * scale + 0.5).toInt() + xSpacing
-    override val height = (15.5 * scale + 0.5).toInt() + ySpacing
+    override val width: Int get() = (15.5 * scale + 0.5).toInt() + xSpacing
+    override val height: Int get() = (15.5 * scale + 0.5).toInt() + ySpacing
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         stack.renderOnScreen(
