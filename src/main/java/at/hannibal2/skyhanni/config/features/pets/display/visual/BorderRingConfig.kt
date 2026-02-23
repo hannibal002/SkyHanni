@@ -45,8 +45,8 @@ open class BorderRingConfig(
         val enabled: Property<Boolean> = Property.of(true)
     }
 
-    @ConfigOption(name = "Reset", desc = "Reset border ring settings to the default values.")
-    @ConfigEditorButton(buttonText = "Reset Ring Settings")
+    @ConfigOption(name = "Reset Ring Settings", desc = "Reset border ring settings to the default values.")
+    @ConfigEditorButton(buttonText = "Reset")
     open val reset: Runnable = Runnable(::reset)
 }
 
@@ -77,7 +77,7 @@ class XPRingConfig(
     @ConfigEditorColour
     val unfilledColor: Property<ChromaColour> = Property.of(DEFAULT_UNFILLED_COLOR)
 
-    @ConfigOption(name = "Reset", desc = "Reset XP  to the default values.")
+    @ConfigOption(name = "Reset", desc = "Reset XP ring settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")
     override val reset: Runnable = Runnable(::reset)
 }
@@ -87,7 +87,7 @@ open class RingConfig(
 ) : ResettableScalableConfig {
     companion object {
         private val DEFAULT_RING_COLOR = ChromaColour.fromRGB(128, 128, 128, 0, 255)
-        private const val DEFAULT_PADDING = 6
+        private const val DEFAULT_PADDING = 3
     }
 
     @Suppress("CanBePrimaryConstructorProperty")
@@ -111,7 +111,7 @@ open class RingConfig(
     @ConfigEditorColour
     open val color: Property<ChromaColour> = Property.of(DEFAULT_RING_COLOR)
 
-    @ConfigOption(name = "Reset", desc = "Reset the ring settings to the default values.")
-    @ConfigEditorButton(buttonText = "Reset Ring Settings")
+    @ConfigOption(name = "Reset Ring Settings", desc = "Reset the ring settings to the default values.")
+    @ConfigEditorButton(buttonText = "Reset")
     open val reset: Runnable = Runnable(::reset)
 }

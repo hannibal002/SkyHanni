@@ -15,7 +15,7 @@ open class IconConfig(
     scalar: Float = 1.0f,
 ) : ResettableScalableConfig {
     companion object {
-        private const val DEFAULT_ICON_SCALE = 2.0
+        private const val DEFAULT_ICON_SCALE = 2.5
     }
 
     @Suppress("CanBePrimaryConstructorProperty")

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
 import at.hannibal2.skyhanni.config.features.pets.display.ResettableScalableConfig
-import at.hannibal2.skyhanni.config.storage.NoReset
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -22,7 +21,6 @@ class RarityBackgroundConfig(
     override val scalar: Float = scalar
 
     @Expose
-    @NoReset
     @ConfigOption(
         name = "Background Padding",
         desc = "How much extra padding should be added to the background circle."

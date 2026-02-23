@@ -47,7 +47,7 @@ open class VisualPetDisplayConfig(
         open val enabled: Property<Boolean> = Property.of(true)
 
         @Expose
-        @ConfigOption(name = "Color Customization", desc = "")
+        @ConfigOption(name = "Customization", desc = "")
         @Accordion
         open val customization: RarityBackgroundConfig = RarityBackgroundConfig(scalar)
 

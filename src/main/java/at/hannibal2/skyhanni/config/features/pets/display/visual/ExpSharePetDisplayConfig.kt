@@ -61,11 +61,7 @@ class ExpSharePetDisplayConfig(
 
     open class ExpShareBackgroundColorConfig(
         scalar: Float = 1.0f,
-    ) : BackgroundColorConfig() {
-        @Suppress("CanBePrimaryConstructorProperty")
-        @Transient
-        override val scalar: Float = scalar
-
+    ) : BackgroundColorConfig(scalar) {
         @Expose
         @ConfigOption(name = "XP Ring", desc = "")
         @Accordion
