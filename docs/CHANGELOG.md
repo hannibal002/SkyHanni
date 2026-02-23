@@ -313,6 +313,7 @@
 
 + Fixed Kismet Overlay not working sometimes. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5159)
 + Fixed Instance Chest Profit not Counting Stacked Items Properly. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5170)
++ Fixed Croesus Chest Count/Highlight Not Working At All. - Fazfoxy
 
 #### Misc
 
