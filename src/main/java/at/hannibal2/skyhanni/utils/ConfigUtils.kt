@@ -5,9 +5,14 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.common.text.StructuredText
+import io.github.notenoughupdates.moulconfig.gui.GuiContext
+import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
+import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
+import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.javaField
 
@@ -47,7 +52,16 @@ object ConfigUtils {
         val option = tryFindEditor(editor) ?: return false
         editor.search("")
         if (!editor.goToOption(option)) return false
-        SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        openEditor(editor)
         return true
     }
+
+    fun openEditor(editor: MoulConfigEditor<*>) {
+        SkyHanniMod.screenToOpen = MoulConfigScreenComponent(Component.empty(), GuiContext(GuiElementComponent(editor)), null)
+    }
+
+    val configScreenCurrentlyOpen: Boolean
+        get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
+
+    fun String.asStructuredText() = StructuredText.of(this)
 }

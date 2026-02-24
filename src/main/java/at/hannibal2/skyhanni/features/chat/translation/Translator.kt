@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,7 +18,9 @@ import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
-import net.minecraft.event.ClickEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.minecraft.network.chat.ClickEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
@@ -33,7 +34,7 @@ object Translator {
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -41,10 +42,10 @@ object Translator {
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
-        if (editedComponent.chatStyle?.chatClickEvent?.action == ClickEvent.Action.OPEN_URL) return
+        if (editedComponent.style?.clickEvent?.action() == ClickEvent.Action.OPEN_URL) return
 
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
-        editedComponent.chatStyle.setClickRunCommand("/shtranslate $text").setHoverShowText("§bClick to translate!")
+        editedComponent.style.setClickRunCommand("/shtranslate $text").setHoverShowText("§bClick to translate!")
     }
 
     @HandleEvent
@@ -52,10 +53,10 @@ object Translator {
         event.move(55, "chat.translator", "chat.translator.translateOnClick")
     }
 
-    var lastUserChange = SimpleTimeMark.farPast()
+    private var lastUserChange = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.languageCode.onToggle {
             if (lastUserChange.passedSince() < 50.milliseconds) return@onToggle
             lastUserChange = SimpleTimeMark.now()
@@ -102,23 +103,24 @@ object Translator {
      * ]
      */
 
-    suspend fun getTranslation(
+    @Suppress("InjectDispatcher")
+    private suspend fun getTranslation(
         message: String,
         targetLanguage: String,
         sourceLanguage: String = "auto",
-    ): Array<String>? {
+    ): Array<String>? = withContext(Dispatchers.IO) {
         // TODO add &dj=1 to use named json
         val encode = URLEncoder.encode(message, "UTF-8")
         val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 
         var messageToSend = ""
         val (_, jsonResponse) = ApiUtils.getTypedJsonResponse<JsonArray>(url, "Google Translate API").assertSuccessWithData()
-            ?: return null
+            ?: return@withContext null
         val fullResponse = jsonResponse.asJsonArray
-        if (fullResponse.size() < 3) return null
+        if (fullResponse.size() < 3) return@withContext null
 
         val language = fullResponse[2].toString() // the detected language the message is in
-        val sentences = fullResponse[0] as? JsonArray ?: return null
+        val sentences = fullResponse[0] as? JsonArray ?: return@withContext null
 
         for (rawSentence in sentences) {
             val arrayPhrase = rawSentence as? JsonArray ?: continue
@@ -127,14 +129,14 @@ object Translator {
             messageToSend = "$messageToSend$sentenceWithoutQuotes"
         }
         messageToSend = URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "") // Not sure if this is actually needed
-        return arrayOf(messageToSend, language)
+        return@withContext arrayOf(messageToSend, language)
     }
 
     private fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
-        SkyHanniMod.launchIOCoroutine {
-            val translation = getTranslation(message, nativeLanguage())
+        SkyHanniMod.launchIOCoroutine("translator toNativeLanguage") {
+            val translation = getTranslation(message, getNativeLanguage())
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
 
@@ -158,8 +160,8 @@ object Translator {
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
-        SkyHanniMod.launchIOCoroutine {
-            val translation = getTranslation(message, language, nativeLanguage())?.get(0) ?: "Error!"
+        SkyHanniMod.launchIOCoroutine("translator fromNativeLanguage") {
+            val translation = getTranslation(message, language, getNativeLanguage())?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
                 onClick = { OSUtils.copyToClipboard(translation) },
@@ -170,21 +172,21 @@ object Translator {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtranslateadvanced") {
+        event.registerBrigadier("shtranslateadvanced") {
             description = "Translates a message in an inputted language to another inputted language."
             category = CommandCategory.DEVELOPER_TEST
-            callback { translateAdvancedCommand(it) }
+            legacyCallbackArgs { translateAdvancedCommand(it) }
         }
-        event.register("shcopytranslation") {
+        event.registerBrigadier("shcopytranslation") {
             description = "Copy the translation of a message in another language to your clipboard.\n" +
                 "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
-            callback { fromNativeLanguage(it) }
+            legacyCallbackArgs { fromNativeLanguage(it) }
         }
-        event.register("shtranslate") {
+        event.registerBrigadier("shtranslate") {
             description = "Translate a message in another language your language."
             category = CommandCategory.USERS_ACTIVE
-            callback { toNativeLanguage(it) }
+            legacyCallbackArgs { toNativeLanguage(it) }
         }
     }
 
@@ -197,7 +199,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("shtranslateadvanced") {
             val translation = getTranslation(message, targetLanguage, sourceLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
@@ -210,7 +212,7 @@ object Translator {
         }
     }
 
-    fun nativeLanguage(): String = config.languageCode.get().ifEmpty { "en" }
+    private fun getNativeLanguage(): String = config.languageCode.get().ifEmpty { "en" }
 
     fun isEnabled() = config.translateOnClick
 }

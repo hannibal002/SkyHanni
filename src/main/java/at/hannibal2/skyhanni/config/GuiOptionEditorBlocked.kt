@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config
 
+import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -21,13 +22,13 @@ class GuiOptionEditorBlocked(private val base: GuiOptionEditor, private val extr
         val oneThird: Float = height / 3f
 
         context.drawStringScaledMaxWidth(
-            "This option is currently not available.",
+            "This option is currently not available.".asStructuredText(),
             fontRenderer,
             (x + iconWidth).toInt(), (y + oneThird - fontRenderer.height / 2f).toInt(),
             true, (width - iconWidth).toInt(), -0xbbbc,
         )
         context.drawStringScaledMaxWidth(
-            extraMessage,
+            extraMessage.asStructuredText(),
             fontRenderer,
             (x + iconWidth).toInt(), (y + (oneThird * 2) - fontRenderer.height / 2f).toInt(),
             true, (width - iconWidth).toInt(), -0xbbbc,

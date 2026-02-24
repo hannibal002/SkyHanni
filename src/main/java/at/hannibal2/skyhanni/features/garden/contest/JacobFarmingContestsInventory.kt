@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,10 +26,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.Slot
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -68,8 +71,8 @@ object JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            foundEvents.add(item.displayName)
-            val time = FarmingContestApi.getSBTimeFor(item.displayName) ?: continue
+            foundEvents.add(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            val time = FarmingContestApi.getSBTimeFor(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: continue
             FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -91,7 +94,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack?.displayName ?: return
+        val itemName = slot.item?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
@@ -144,7 +147,7 @@ object JacobFarmingContestsInventory {
         slot: Slot,
     ) {
         GardenNextJacobContest.monthPattern.matchMatcher(chestName) {
-            if (!slot.stack.getLore().any { it.contains("§eJacob's Farming Contest") }) return
+            if (!slot.item.getLore().any { it.contains("§eJacob's Farming Contest") }) return
 
             val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
             val year = group("year")
@@ -169,21 +172,24 @@ object JacobFarmingContestsInventory {
         // hide green border for a tick
         if (hideEverything) return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
 
         for ((slot, stack) in chest.getUpperItems()) {
-            if (stack.getLore().any { it == "§eClick to claim reward!" }) {
+            if (isClaimableContest(stack)) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
     }
 
+    fun isClaimableContest(stack: ItemStack): Boolean = stack.getLore().lastOrNull() == "§eClick to claim reward!"
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onToolTip(event: ToolTipEvent) {
+    fun onToolTip(event: ToolTipTextEvent) {
+        event.slot ?: return
         if (!FarmingContestApi.inInventory) return
 
-        val slot = event.slot.slotNumber
+        val slot = event.slot.index
         if (config.realTime) {
             realTime[slot]?.let {
                 val toolTip = event.toolTip

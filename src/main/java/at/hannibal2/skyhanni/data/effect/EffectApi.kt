@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
@@ -17,12 +17,16 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -34,11 +38,11 @@ object EffectApi {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §cGod Potion§f: 4d
+     * REGEX-TEST: God Potion: 4d
      */
     private val godPotTabPattern by RepoPattern.pattern(
-        "stats.tabpatterns.godpot",
-        "(?:§.)*God Potion(?:§.)*: (?:§.)*(?<time>[dhms0-9 ]+)(?:§.)*",
+        "stats.tabpatterns.godpot-no-color",
+        "God Potion: (?<time>[dhms0-9 ]+)",
     )
 
     /**
@@ -93,40 +97,41 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST:  Repellent: §r§9MAX §r§7(12s)
+     * REGEX-TEST:  Repellent: MAX (12s)
      */
     private val repellentPattern by RepoPattern.pattern(
-        "misc.nongodpot.repellant",
-        " Repellent: §r§[97a](?<tier>\\w+)?(?: §r§7\\((?<time>\\d)s\\))?",
+        "misc.nongodpot.repellant-no-color",
+        " Repellent: (?<tier>\\w+)?(?: \\((?<time>\\d)s\\))?",
     )
 
     /**
-     * REGEX-TEST:  §r§aSmoldering Polarization I§r§f: 58s
-     * REGEX-TEST:  §r§bWisp's Ice-Flavored Water I§r§f: 29m
-     * REGEX-TEST:      §2Mushed Glowy Tonic I §r§f43m
-     * REGEX-TEST: §r§r§bWisp's Ice-Flavored Water I§r§r§r §r§f10m§r
+     * REGEX-TEST:  Smoldering Polarization I: 58s
+     * REGEX-TEST:  Wisp's Ice-Flavored Water I: 29m
+     * REGEX-TEST:      Mushed Glowy Tonic I 43m
+     * REGEX-TEST: Wisp's Ice-Flavored Water I 10m
      */
     private val tabEffectPattern by RepoPattern.pattern(
-        "tab.effects",
-        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.|[: ])+(?<time>[dhms0-9 ]+)(?:§.)*"
+        "tab.effects-no-color",
+        " *(?<effect>[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:|[: ])+(?<time>[dhms0-9 ]+)"
     )
 
     /**
-     * REGEX-TEST: §r§5Lushlilac Bonbon§r§f: §r§a12h
-     * REGEX-TEST: §r§5Prime Lushlilac Bonbon§r§f: §r§a18h
-     * REGEX-TEST: §r§5Prime Lushlilac Bonbon§r§f: §r§a17h 58m
+     * REGEX-TEST: Lushlilac Bonbon: 12h
+     * REGEX-TEST: Prime Lushlilac Bonbon: 18h
+     * REGEX-TEST: Prime Lushlilac Bonbon: 17h 58m
      */
     private val saltTabPattern by RepoPattern.pattern(
-        "tab.salts",
-        " (?<effect>(?:§.)*[\\w\\-' ]+(?:§.)*)*: *(?:§.)*(?<time>[dhms0-9 ]+)"
+        "tab.salts-no-color",
+        " (?<effect>[\\w\\-' ]+)*: *(?<time>[dhms0-9 ]+)"
     )
     // </editor-fold>
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
+    // TODO: Move these to repo
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
             val durationAdded = TimeUtils.getDuration(group("time"))
             EffectDurationChangeEvent(
@@ -176,12 +181,12 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 25.minutes
             }
-            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+            "§a§lYUM! §r§2ൠ Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effect = NonGodPotEffect.PEST_REPELLENT
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
-            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+            "§a§lYUM! §r§2ൠ Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effect = NonGodPotEffect.PEST_REPELLENT_MAX
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
@@ -208,24 +213,24 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        val footerLines = event.footer.split("\n")
+    fun onTabUpdate(event: TablistFooterUpdateComponentEvent) {
+        val footerLines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         footerLines.readNonGodPotEffects()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun readEffects(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.ACTIVE_EFFECTS)) return
-        godPotTabPattern.firstMatcher(event.lines) {
+        godPotTabPattern.firstMatcher(event.lines.map { it.string }) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
         }
         event.lines.readNonGodPotEffects()
     }
 
-    private fun List<String>.readNonGodPotEffects() = tabEffectPattern.matchAll(this) {
+    private fun List<Component>.readNonGodPotEffects() = tabEffectPattern.matchAllComponents(this) {
         val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull {
             it.tabListName == group("effect")
-        } ?: return@matchAll
+        } ?: return@matchAllComponents
         try {
             val duration = TimeUtils.getDuration(group("time"))
             EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.SET, duration).post()
@@ -238,7 +243,7 @@ object EffectApi {
     fun readPestRepellent(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        repellentPattern.firstMatcher(event.lines) {
+        repellentPattern.firstMatcher(event.lines.map { it.string }) {
             // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
             val time = group("time")?.toIntOrNull() ?: return@firstMatcher
             val tier = group("tier")
@@ -255,12 +260,12 @@ object EffectApi {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun readSalts(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SALTS)) return
-        saltTabPattern.firstMatcher(event.lines) {
+        saltTabPattern.matchAll(event.lines.map { it.string }) {
             val effect = group("effect")
             val duration = TimeUtils.getDuration(group("time"))
             val salt = NonGodPotEffect.entries.firstOrNull {
                 it.tabListName == effect
-            } ?: return@firstMatcher
+            } ?: return@matchAll
             EffectDurationChangeEvent(salt, EffectDurationChangeType.SET, duration).post()
         }
     }
@@ -285,13 +290,13 @@ object EffectApi {
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
         effectsInventoryPattern.matches(this.inventoryName) &&
             this.inventoryItems.values.firstOrNull {
-                filterPattern.matches(it.displayName)
+                filterPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())
             }?.getLore()?.any {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
     private fun ItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        displayName.contains(it.inventoryItemName)
+        hoverName.formattedTextCompatLeadingWhiteLessResets().contains(it.inventoryItemName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -46,7 +46,7 @@ object DungeonBossMessages {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isBoss(event.message)) return
 
         DungeonApi.handleBossMessage(event.message)

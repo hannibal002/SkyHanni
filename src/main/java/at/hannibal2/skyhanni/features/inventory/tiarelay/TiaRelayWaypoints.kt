@@ -25,7 +25,7 @@ object TiaRelayWaypoints {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.nextWaypoint) return
 
         val message = event.message

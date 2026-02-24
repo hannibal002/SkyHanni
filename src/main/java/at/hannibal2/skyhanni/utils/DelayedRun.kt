@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import net.minecraft.client.Minecraft
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.Executor
 import kotlin.time.Duration
 
+// TODO add names for runs
 object DelayedRun {
 
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
@@ -18,10 +18,20 @@ object DelayedRun {
         return time
     }
 
-    /** Runs in the next full Tick so the delay is between 50ms to 100ms**/
-    fun runNextTick(run: () -> Unit) {
-        futureTasks.add(run to SimpleTimeMark.farPast())
-    }
+    /**
+     * Runs in the next game tick (up to 50ms delay), always on the main thread.
+     */
+    fun runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
+
+    /**
+     * I'm not sure why, but this acts different to the above one
+     */
+    fun runNextTickOld(run: () -> Unit) = futureTasks.add(run to SimpleTimeMark.farPast())
+
+    /**
+     * Runs now if we are on the main thread, otherwise queues it for the next tick.
+     */
+    fun runOrNextTick(run: () -> Unit) = Minecraft.getInstance().execute(run)
 
     fun checkRuns() {
         tasks.removeIf { (runnable, time) ->
@@ -36,15 +46,5 @@ object DelayedRun {
             inPast
         }
         futureTasks.drainTo(tasks)
-    }
-
-    @JvmField
-    val onThread = Executor {
-        val mc = Minecraft.getMinecraft()
-        if (mc.isCallingFromMinecraftThread) {
-            it.run()
-        } else {
-            mc.addScheduledTask(it)
-        }
     }
 }

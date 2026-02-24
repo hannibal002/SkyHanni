@@ -34,7 +34,7 @@ class JacobContestConfig {
     @Expose
     @ConfigOption(
         name = "FF for Contest",
-        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
+        desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -43,4 +43,13 @@ class JacobContestConfig {
     @Expose
     @ConfigLink(owner = JacobContestConfig::class, field = "ffForContest")
     val ffForContestPosition: Position = Position(180, 156)
+
+    @Expose
+    @ConfigOption(
+        name = "Zorro's Cape Protection",
+        desc = "Block Jacob's Farming Contest claims when not wearing a §6Zorro's Cape§f. Do not waste the 20% chance of duplicate medals!",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var zorroCapeProtection: Boolean = false
 }

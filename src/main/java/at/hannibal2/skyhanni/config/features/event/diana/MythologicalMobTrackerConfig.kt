@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -28,4 +30,20 @@ class MythologicalMobTrackerConfig {
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat messages when digging up a mythological mob.")
     @ConfigEditorBoolean
     var hideChat: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Black Hole Title",
+        desc = "Sends \"Black Hole\" title when a Cretan Bull, Harpy, or Minotaur spawns",
+    )
+    @ConfigEditorBoolean
+    var shardWarn: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 }

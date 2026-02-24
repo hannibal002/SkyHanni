@@ -7,7 +7,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -19,14 +18,6 @@ class CakeTrackerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
-
-    @ConfigOption(
-        name = "Note",
-        desc = "This feature is not compatible with the NEU Storage Overlay." +
-            "Backpacks/Ender Chest will not be scanned correctly with it enabled."
-    )
-    @ConfigEditorInfoText
-    var incompatibleNote: Boolean = false
 
     @Expose
     @ConfigLink(owner = CakeTrackerConfig::class, field = "enabled")

@@ -15,23 +15,30 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
+import net.minecraft.ChatFormatting
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -66,17 +73,37 @@ object MetalDetectorSolver {
     private var lastLoc: LorenzVec? = null
     private var playedPling = false
     private var lastTreasureFound = SimpleTimeMark.farPast()
+    private val DWARVEN_LAPIS_SWORD = "DWARVEN_LAPIS_SWORD".toInternalName()
+    private val DWARVEN_EMERALD_HAMMER = "DWARVEN_EMERALD_HAMMER".toInternalName()
+    private val DWARVEN_GOLD_HAMMER = "DWARVEN_GOLD_HAMMER".toInternalName()
+    private val DWARVEN_DIAMOND_AXE = "DWARVEN_DIAMOND_AXE".toInternalName()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         chestLocations = event.getConstant<MetalDetectorChestsJson>("MetalDetectorChests").locations
     }
-
+    // TODO make this less complex instead of ignoring the problem
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    @Suppress("CyclomaticComplexMethod")
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (predictedChestLocations.size == 1) return
-
+        if (config.metalDetectorStopWhenAllTools) {
+            var hasLapis = false
+            var hasDiamond = false
+            var hasEmerald = false
+            var hasGold = false
+            InventoryUtils.getItemsInOwnInventory().forEach {
+                val internalName = it.getInternalName()
+                when (internalName) {
+                    DWARVEN_LAPIS_SWORD -> hasLapis = true
+                    DWARVEN_DIAMOND_AXE -> hasDiamond = true
+                    DWARVEN_EMERALD_HAMMER -> hasEmerald = true
+                    DWARVEN_GOLD_HAMMER -> hasGold = true
+                }
+            }
+            if (hasLapis && hasDiamond && hasEmerald && hasGold) return
+        }
         val player = LocationUtils.playerLocation()
         if (lastLoc != player) {
             lastLoc = player
@@ -133,7 +160,7 @@ object MetalDetectorSolver {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!treasureFoundPattern.matches(event.message)) return
 
@@ -144,7 +171,12 @@ object MetalDetectorSolver {
         if (config.showTimeTaken && !lastTreasureFound.isFarPast()) {
             DelayedRun.runNextTick {
                 ChatUtils.chat(
-                    "§aYou found the treasure in §e${timeTaken.inWholeSeconds}§a seconds.",
+                    componentBuilder {
+                        withColor(ChatFormatting.GREEN)
+                        append("You found the treasure in ")
+                        appendWithColor("${timeTaken.inWholeSeconds}", ChatFormatting.YELLOW)
+                        append(" seconds.")
+                    }
                 )
             }
         }
@@ -197,7 +229,7 @@ object MetalDetectorSolver {
                 for (k in -50 until 50) {
                     val blockPosition = player.add(i, j, k).roundToBlock()
                     val nextBlockPosition = blockPosition.add(0, 13, 0)
-                    if (blockPosition.getBlockAt() == Blocks.quartz_stairs && nextBlockPosition.getBlockAt() == Blocks.barrier) {
+                    if (blockPosition.getBlockAt() == Blocks.QUARTZ_STAIRS && nextBlockPosition.getBlockAt() == Blocks.BARRIER) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)
                         return
                     }
@@ -212,15 +244,15 @@ object MetalDetectorSolver {
         var currentPosition = blockPosition
         while (changed) {
             changed = false
-            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(1, 0, 0)
             }
-            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(0, 1, 0)
             }
-            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.barrier) {
+            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.BARRIER) {
                 changed = true
                 currentPosition = currentPosition.add(0, 0, 1)
             }

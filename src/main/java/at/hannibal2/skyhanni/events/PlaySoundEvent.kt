@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.SoundCompat
 
 class PlaySoundEvent(
     val rawSoundName: String,
     override val location: LorenzVec,
     val pitch: Float,
-    val volume: Float
+    val volume: Float,
 ) : CancellableWorldEvent() {
 
     val soundName by lazy { getSoundName(rawSoundName) }
@@ -27,17 +28,11 @@ class PlaySoundEvent(
      */
     fun replaceWithOther(rawSoundName: String) {
         this.cancel()
-        val newSound = SoundUtils.createSound(rawSoundName, pitch, volume)
-        newSound.playSound()
+        SoundUtils.createSound(rawSoundName, pitch, volume).playSound()
     }
 
     companion object {
-        private fun getSoundName(rawSoundName: String): String {
-            //#if MC < 1.21
-            return rawSoundName
-            //#else
-            //$$ return at.hannibal2.skyhanni.utils.compat.SoundCompat.getLegacySoundName(rawSoundName)
-            //#endif
-        }
+        private fun getSoundName(rawSoundName: String): String =
+            SoundCompat.getLegacySoundName(rawSoundName)
     }
 }
