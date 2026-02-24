@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -51,6 +50,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.JsonPrimitive
@@ -66,7 +66,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     ::BucketData,
     { it.garden.pestProfitTracker },
     { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.garden.pests.pestProfitTracker.perTrackerConfig }
+    trackerConfig = { SkyHanniMod.feature.garden.pests.pestProfitTracker.perTrackerConfig },
+    customUptimeControl = true
 ) {
     val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
@@ -107,7 +108,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         @Expose private var totalPestsKills: Long = 0L,
         @Expose var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java),
         @Expose var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java),
-    ) : BucketedItemTrackerData<PestType>(PestType::class) {
+    ) : BucketedItemTrackerData<PestType, SessionUptime.Garden>(PestType::class, SessionUptime.Garden::class) {
         override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / getTotalPestCount()
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -278,7 +279,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             var sprayCosts = 0.0
             val hoverTips = if (sumSpraysUsed > 0) buildList {
                 applicableSpraysUsed.forEach { (spray, count) ->
-                    val sprayString = spray.toInternalName().getPriceOrNull()?.let { price ->
+                    val sprayString = getPricePerOrNull(spray.toInternalName())?.let { price ->
                         val sprayCost = price * count
                         sprayCosts += sprayCost
                         "§7${spray.displayName}: §a${count.shortFormat()} §7(§c-${sprayCost.shortFormat()}§7)"

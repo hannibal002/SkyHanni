@@ -205,12 +205,12 @@ object SkyHanniMod {
                 function()
             }
         } catch (e: TimeoutCancellationException) {
-            ErrorManager.logErrorWithData(
+            /*ErrorManager.logErrorWithData(
                 e,
                 "Coroutine $name timed out after $timeout",
                 "coroutine name" to name,
                 "timeout" to timeout,
-            )
+            )*/
             throw e
         } catch (e: CancellationException) {
             // Don't notify the user about cancellation exceptions - these are to be expected at times
