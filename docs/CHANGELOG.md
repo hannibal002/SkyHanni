@@ -106,6 +106,12 @@
 + Improved error handling for elite leaderboards. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5181)
 + The Garden Plot Borders feature is now activated with a custom keybind instead of F3+G. - Luna (https://github.com/hannibal002/SkyHanni/pull/5173)
   + If you previously had this option enabled, you will have to set a keybind in the config to continue using it.
++ Added `/shsethoelevel` command that allows you to manually change your overflow hoe level in case it is incorrect. - Luna (https://github.com/hannibal002/SkyHanni/pull/5234)
+  + Example: `/shsethoelevel 60` (while holding your farming tool).
++ Changed the uptime of Garden trackers to be based on farming activities instead of when the tracker last gained items. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4700)
+  + Activities are: Breaking Crops, Visitor interactions, and Killing Pests.
+  + Uptime for each activity are saved separately so you can include/exclude them as you wish.
++ Added Wild Strawberry Dye to rare visitor rewards. - Luna (https://github.com/hannibal002/SkyHanni/pull/5230)
 
 #### Inventory
 
@@ -116,6 +122,10 @@
 + Show all instance chest profits in the instance chest profit display. - frostyy1905 (https://github.com/hannibal002/SkyHanni/pull/5054)
 + Added hide soulbound items from Chest Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
 + Made Not Clickable Items not prevent soulbound items in trades on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
++ Estimated Item Value now accurately calculates level 100 pets. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5137)
+  + This means Chest Value will seperate Level 100 pets & Calculate them properly.
++ Open recipe for items in more places on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5263)
+  + This includes sack display and sunflower oil in composter.
 
 #### Rift
 
@@ -131,6 +141,12 @@
 #### Dungeons
 
 + Improved Livid Solver to have higher Range of detection. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5006)
+
+#### Fishing
+
++ Totem of Corruption Overlay now only shows your own totems by default. - Luna (https://github.com/hannibal002/SkyHanni/pull/5257)
+  + This can be changed in the config if necessary, e.g. if you're nicked.
+  + The totem priority was also changed from highest duration to lowest distance.
 
 #### Misc
 
@@ -160,6 +176,7 @@
 + Bumped the minimum Fabric API version for 1.21.10. - nopo + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5178)
 + Improved Item Stat Icon compatibility with other mods. - nopo (https://github.com/hannibal002/SkyHanni/pull/5176)
 + Dark Auction Item Display now also adds the item name when no one bid on the item. - Luna (https://github.com/hannibal002/SkyHanni/pull/5199)
++ Added support for changing diana warps via the repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/5240)
 
 ### Fixes
 
@@ -185,6 +202,7 @@
 + Fixed Abiphone Snake Keybindings not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5152)
 + Fixed reforging not stopping when the highlighted reforge appears. - krazun123 (https://github.com/hannibal002/SkyHanni/pull/5150)
 + Fixed Beacon Power Display sometimes displaying colour incorrectly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5200)
++ Auto Copy Underbid No Longer runs multiple times per Item. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5137)
 
 #### Farming
 
@@ -216,6 +234,12 @@
 + Fixed /shfarmingprofile not existing. - Chissl (https://github.com/hannibal002/SkyHanni/pull/5163)
 + Fixed Highlight Harvestable Status not highlighting multi drop crops yellow. - nopo (https://github.com/hannibal002/SkyHanni/pull/5168)
 + Fixed error when quickly switching between crops while farming. - Luna (https://github.com/hannibal002/SkyHanni/pull/5202)
++ Fixed Not sprayed! warning showing while on a Greenhouse plot. - Luna (https://github.com/hannibal002/SkyHanni/pull/5228)
+  + Greenhouse plots cannot be sprayed.
++ Fixed Pest Tracker counting Tasty Cheese as 0 coins. - nopo (https://github.com/hannibal002/SkyHanni/pull/5250)
++ Fixed Pest Tracker using bz prices for sprays when set to NPC. - nopo (https://github.com/hannibal002/SkyHanni/pull/5250)
++ Fixed praying mantis leaderboard erroring out. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5227)
++ Fixed Prickly Kiss and Sunflower Oil showing up in Garden Money/Hour. - Luna (https://github.com/hannibal002/SkyHanni/pull/5233)
 
 #### Mining
 
@@ -231,6 +255,8 @@
 + Fixed some pet rules breaking double hook detection. - appable (https://github.com/hannibal002/SkyHanni/pull/5030)
 + Fixed Thunder Sparks Highlighters not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5125)
 + Fixed Fishing Hook Display showing even when the Hypixel fishing timer is not visible to the player. - Luna (https://github.com/hannibal002/SkyHanni/pull/5184)
++ Fixed a recent change causing Fishing Hook Display to sometimes not show when it should. - Luna (https://github.com/hannibal002/SkyHanni/pull/5236)
++ Fixed Mute Banshee not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5245)
 
 #### Combat
 
@@ -245,6 +271,8 @@
 + Fixed warping to early causing inaccurate burrow waypoints. - SidOfThe7CS (https://github.com/hannibal002/SkyHanni/pull/5084)
 + Fixed Diana since tracker showing 3 times in chat message. - nopo (https://github.com/hannibal002/SkyHanni/pull/5204)
 + Fixed Hoppity Compact Chat + Event Summary not working with Hoppity's random rabbit reward on Garden. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5201)
++ Fixed Diana perks not being detected from calendar during Perkpocalypse. - Luna (https://github.com/hannibal002/SkyHanni/pull/5249)
++ Fixed warping in diana having an unnecessary delay on non-spade guesses. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5223)
 
 #### Chat
 
@@ -258,6 +286,7 @@
 + Maybe fixed SkyHanni not editing some messages correctly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5127)
 + Fixed Guild messages looking wrong with Player Name Formatter on. - nopo (https://github.com/hannibal002/SkyHanni/pull/5140)
 + Fixed Shorten Coins editing non coin messages. - nopo (https://github.com/hannibal002/SkyHanni/pull/5138)
++ Fixed `/viewrecipe` autocomplete not showing some items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5246)
 
 #### Rift
 
@@ -284,6 +313,7 @@
 
 + Fixed Kismet Overlay not working sometimes. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5159)
 + Fixed Instance Chest Profit not Counting Stacked Items Properly. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5170)
++ Fixed Croesus Chest Count/Highlight Not Working At All. - Fazfoxy
 
 #### Misc
 
@@ -323,6 +353,9 @@
 + Fixed Performance issue with the scoreboard. - nopo (https://github.com/hannibal002/SkyHanni/pull/5217)
 + Fixed Stranded profiles not getting recognised. - nopo (https://github.com/hannibal002/SkyHanni/pull/5221)
 + Fixed Widget display lines having too much spacing. - nopo (https://github.com/hannibal002/SkyHanni/pull/5216)
++ Fixed Discord rich presence not starting for some people. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/5226)
++ Fixed Scoreboard events sometimes saying null. - nopo (https://github.com/hannibal002/SkyHanni/pull/5239)
++ Fixed Custom Scoreboard not hiding vanilla scoreboard by default if you turned off all features in `/shdefaultoptions` and then turned it on manually. - Luna (https://github.com/hannibal002/SkyHanni/pull/5255)
 
 ### Technical Details
 
@@ -416,6 +449,15 @@
 + Switched from accessWidener to classTweaker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5190)
 + Updated CONTRIBUTING.md to reflect current project architecture. - hannibal002 (https://github.com/hannibal002/SkyHanni/pull/5213)
 + Updated MoulConfig from 4.3.0-beta to 4.4.0-beta. - Luna (https://github.com/hannibal002/SkyHanni/pull/5220)
++ `/shdebug crop money` now includes all crops instead of only the currently farmed one. - Luna (https://github.com/hannibal002/SkyHanni/pull/5233)
++ Added support for non-sequential upcoming player lists in leaderboards. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5227)
++ Fixed player death event not firing on yourself. - nopo (https://github.com/hannibal002/SkyHanni/pull/5237)
++ Moved ignored items for Garden Money/Hour to repo. - Luna (https://github.com/hannibal002/SkyHanni/pull/5233)
++ Refactored GraphEditor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5027)
+  + Cut it down in smaller pieces.
+  + Improved rendering and loading performance.
+  + Added undo/redo support.
++ Fixed `JsonElement.addElementsAfter` never adding the elements if `after` is null. - Luna (https://github.com/hannibal002/SkyHanni/pull/5230)
 
 ### Removed Features
 

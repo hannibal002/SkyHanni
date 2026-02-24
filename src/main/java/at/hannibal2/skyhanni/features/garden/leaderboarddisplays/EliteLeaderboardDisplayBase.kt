@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
+import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.LeaderboardPlayerInfo
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getAmount
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.getLastPlayer
@@ -39,10 +40,11 @@ import kotlin.time.Duration.Companion.seconds
 abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType.WithEnum<E>>(
     private val typeClass: KClass<out T>,
     private val createType: (E, EliteLeaderboardMode) -> EliteLeaderboardType,
-    private val name: String
+    private val name: String,
 ) {
     protected val configBase get() = GardenApi.config.eliteFarmersLeaderboards
     private val config get() = baseClass?.let { getConfigFromClass(it) }
+
     @Suppress("Unchecked_cast")
     private val baseClass: KClass<out EliteLeaderboardType>?
         get() = typeClass as? KClass<out EliteLeaderboardType>
@@ -54,7 +56,9 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     protected var apiError = false
     protected var amount: Double? = null
     private var leaderboardPos: Int? = null
-    private var nextPlayer: Pair<String, Double>? = null
+    private var nextPlayer: LeaderboardPlayerInfo? = null
+    private var lastEnumSwitchTime = SimpleTimeMark.farPast()
+    private var lastAutoSelectedEnum: E? = null
 
     protected abstract var currentMode: EliteLeaderboardMode
     protected abstract var currentEnum: E?
@@ -76,13 +80,28 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         }
     }
 
-    open val currentLeaderboardType: EliteLeaderboardType?
-        get() = (currentEnum ?: getDefaultEnum())?.let { createType(it, currentMode) }
+    open fun currentLeaderboardType(): EliteLeaderboardType? {
+        val enum = currentEnum ?: run {
+            // Debounce leaderboard when auto switching
+            val now = SimpleTimeMark.now()
+            if (lastEnumSwitchTime.passedSince() < 5.seconds) {
+                lastAutoSelectedEnum
+            } else {
+                val newDefault = getDefaultEnum()
+                if (newDefault != lastAutoSelectedEnum) {
+                    lastEnumSwitchTime = now
+                    lastAutoSelectedEnum = newDefault
+                }
+                newDefault
+            }
+        }
+        return enum?.let { createType(it, currentMode) }
+    }
 
     fun update(overrideCooldown: Boolean = false) {
         // we want to avoid unnecessarily calling the api as much as possible
         if (!isEnabled()) return
-        val type = currentLeaderboardType ?: return
+        val type = currentLeaderboardType() ?: return
         leaderboardPos = getLeaderboardPosition(type, overrideCooldown)
         amount = getAmount(type)
         nextPlayer = getNextPlayer(type)
@@ -133,15 +152,26 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     }
 
     private fun overtakeRenderable(leaderboardType: EliteLeaderboardType, getLastPlayer: Boolean = false): Renderable {
-        val next: Pair<String, Double>? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
+        val playerInfo: LeaderboardPlayerInfo? = if (getLastPlayer) getLastPlayer(leaderboardType) else getNextPlayer(leaderboardType)
 
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = useEtaGoalRank() && rankGoal != null
         if (useRankGoal && getLastPlayer) return Renderable.empty()
 
-        var (nextName, amountUntil) = next ?: return nullNextPlayerRenderable(leaderboardType)
+        val (playerName, amountUntil, playerRank) = playerInfo ?: return nullNextPlayerRenderable(leaderboardType)
+        var nextName = playerName
+
+        val currentRank = leaderboardPos
+        val shouldShowRank = playerRank != null && currentRank != null && (
+            useRankGoal || // Always show when using rank goal
+                (!getLastPlayer && playerRank != currentRank - 1) || // Show for next player if non-sequential
+                (getLastPlayer && playerRank != currentRank + 1) // Show for last player if non-sequential
+            )
+
         if (useRankGoal) {
-            nextName += " §7[§b#${rankGoal?.addSeparators()}§7]"
+            nextName += " §7[§b#${rankGoal.addSeparators()}§7]"
+        } else if (shouldShowRank) {
+            nextName += " §7[#${playerRank.addSeparators()}]"
         }
 
         val behindOrAhead = if (getLastPlayer) "ahead of" else "behind"
@@ -149,8 +179,8 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         val text = "§e${amountUntil.roundTo(2).addSeparators()}$overtakeETA §7$behindOrAhead §b$nextName"
         return Renderable.clickable(
             text,
-            tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
-            onLeftClick = { openWebsite(nextName) },
+            tips = listOf("§eClick to open the Farming Profile of §b$playerName."),
+            onLeftClick = { openWebsite(playerName) },
         )
     }
 

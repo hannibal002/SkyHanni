@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -48,18 +48,20 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 open class
-SkyHanniItemTracker<Data : ItemTrackerData>(
+SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
     extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
-    trackerConfig: () -> IndividualItemTrackerConfig,
-    drawDisplay: (Data) -> List<Searchable>
-) : SkyHanniTracker<Data, IndividualItemTrackerConfig>(
+    trackerConfig: () -> GenericIndividualTrackerConfig<ItemTrackerGenericConfig>,
+    customUptimeControl: Boolean = false,
+    drawDisplay: (Data) -> List<Searchable>,
+) : SkyHanniTracker<Data, GenericIndividualTrackerConfig<ItemTrackerGenericConfig>>(
     name,
     createNewSession,
     getStorage,
     extraDisplayModes,
+    customUptimeControl = customUptimeControl,
     drawDisplay = drawDisplay,
     trackerConfig = { trackerConfig() }
 ) {
@@ -215,7 +217,7 @@ SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
-        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
+        val scrollValue = (data as? BucketedItemTrackerData<*, *>)?.selectedScrollValue ?: scrollValue
         Renderable.searchableScrollable(
             table,
             key = 99,
