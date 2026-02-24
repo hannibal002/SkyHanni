@@ -144,8 +144,8 @@ class OrderedWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Auto unload when Leaving a Mineshaft",
-        desc = "Automatically unloads shaft route when leaving mineshafts."
+        name = "Auto unload Mineshaft",
+        desc = "Automatically unloads SHO route when leaving mineshafts."
     )
     @ConfigEditorBoolean
     var autoUnloadWhenLeavingMineshaft: Boolean = false
