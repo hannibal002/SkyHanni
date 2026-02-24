@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.json.addElementsAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import com.google.gson.JsonArray
@@ -305,12 +306,10 @@ object VisitorApi {
             drops
         }
         event.transform(54, "garden.visitors.rewardWarning.drops") { element ->
-            val drops = JsonArray()
-            for (entry in element.asJsonArray) {
-                drops.add(JsonPrimitive(entry.asString))
-            }
-            drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
-            drops
+            element.addElementsAfter(arrayOf(VisitorReward.COPPER_DYE))
+        }
+        event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
