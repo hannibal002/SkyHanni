@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -58,7 +59,7 @@ object SlayerProfitTracker {
     data class Data(
         @Expose var slayerSpawnCost: Long = 0L,
         @Expose var slayerCompletedCount: Long = 0L,
-    ) : ItemTrackerData() {
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / slayerCompletedCount
             val perBoss = percentage.coerceAtMost(1.0).formatPercentage()

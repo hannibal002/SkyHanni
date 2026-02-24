@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
@@ -152,7 +153,7 @@ object CFStrayTracker {
         @Expose var straysCaught: MutableMap<LorenzRarity, Int> = mutableMapOf(),
         @Expose var straysExtraChocMs: MutableMap<LorenzRarity, Long> = mutableMapOf(),
         @Expose var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf(),
-    ) : TrackerData()
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     private fun incrementRarity(rarity: LorenzRarity, chocAmount: Long = 0) {
         tracker.modify { it.straysCaught.addOrPut(rarity, 1) }

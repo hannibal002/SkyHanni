@@ -45,9 +45,16 @@ object EliteFarmersLeaderboard {
     val loadingLeaderboardMutex = mutableMapOf<KClass<out EliteLeaderboardType>, Mutex>(
         EliteLeaderboardType.Crop::class to Mutex(),
         EliteLeaderboardType.Weight::class to Mutex(),
-        EliteLeaderboardType.Pest::class to Mutex()
+        EliteLeaderboardType.Pest::class to Mutex(),
     )
     private val storage get() = GardenApi.storage?.farmingWeight
+
+    data class LeaderboardPlayerInfo(
+        val name: String,
+        val amountUntil: Double,
+        val rank: Int?,
+    )
+
     private val leaderboardPosMap: MutableMap<EliteLeaderboardType, Int>? get() = storage?.lastLeaderboardPosMap
     private val leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double>? get() = storage?.leaderboardAmountMap
     private val minAmount: MutableMap<EliteLeaderboardType, Double>? get() = storage?.minAmountMap
@@ -155,7 +162,7 @@ object EliteFarmersLeaderboard {
         return pos
     }
 
-    fun getNextPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+    fun getNextPlayer(leaderboardType: EliteLeaderboardType): LeaderboardPlayerInfo? {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val amount = getAmount(leaderboardType) ?: return null
         var nextPlayer = lbData.nextPlayers.firstOrNull() ?: return null
@@ -168,15 +175,15 @@ object EliteFarmersLeaderboard {
             lbData.shouldRefresh = true
             return null
         }
-        return Pair(nextPlayer.name, amountBehind)
+        return LeaderboardPlayerInfo(nextPlayer.name, amountBehind, nextPlayer.rank)
     }
 
-    fun getLastPlayer(leaderboardType: EliteLeaderboardType): Pair<String, Double>? {
+    fun getLastPlayer(leaderboardType: EliteLeaderboardType): LeaderboardPlayerInfo? {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         val amount = getAmount(leaderboardType) ?: return null
         val lastPlayer = lbData.lastPlayer ?: return null
         val amountAhead = amount - lastPlayer.amount
-        return if (amountAhead < 0) null else Pair(lastPlayer.name, amountAhead)
+        return if (amountAhead < 0) null else LeaderboardPlayerInfo(lastPlayer.name, amountAhead, lastPlayer.rank)
     }
 
     fun getAmount(leaderboardType: EliteLeaderboardType): Double? {
@@ -190,13 +197,15 @@ object EliteFarmersLeaderboard {
     fun getAmount(leaderboardType: EliteLeaderboardType, eliteLeaderboardMode: EliteLeaderboardMode): Double? {
         return when (leaderboardType) {
             is EliteLeaderboardType.Weight -> getAmount(
-                leaderboardType.copy(mode = eliteLeaderboardMode)
+                leaderboardType.copy(mode = eliteLeaderboardMode),
             )
+
             is EliteLeaderboardType.Crop -> getAmount(
-                leaderboardType.copy(mode = eliteLeaderboardMode)
+                leaderboardType.copy(mode = eliteLeaderboardMode),
             )
+
             is EliteLeaderboardType.Pest -> getAmount(
-                leaderboardType.copy(mode = eliteLeaderboardMode)
+                leaderboardType.copy(mode = eliteLeaderboardMode),
             )
         }
     }
@@ -224,7 +233,15 @@ object EliteFarmersLeaderboard {
             return null
         }
         val rankGoal = getRankGoal(leaderboardType) // getRankGoal returns null if we're at or in front of it
-        leaderboardPosMap?.set(leaderboardType, rankGoal ?: (currentRank - 1)) // player we passed should be at rank goal if not null
+
+        // Use the rank from the player if available, otherwise decrement
+        val newRank = if (nextPlayer.rank != null && nextPlayer.rank > 0) {
+            nextPlayer.rank
+        } else {
+            rankGoal ?: (currentRank - 1)
+        }
+
+        leaderboardPosMap?.set(leaderboardType, newRank)
         return lbData.nextPlayers.firstOrNull()
     }
 
@@ -290,7 +307,7 @@ object EliteFarmersLeaderboard {
             lbType = leaderboardType,
             upcomingCount = upcomingPlayers,
             atRank = atRank,
-            getLeaderboardConfig(leaderboardType).gamemode.get().apiMode
+            getLeaderboardConfig(leaderboardType).gamemode.get().apiMode,
         )
         // elite only updates player profiles once an hour, so assume it's wrong if it's the same as last fetch
         val shouldUpdateData = shouldUpdateData(leaderboardType, apiData)
@@ -375,7 +392,7 @@ object EliteFarmersLeaderboard {
     private fun handleWeightDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double
+        diff: Double,
     ) {
         if (diff >= 0.5 || abs(diff) >= 100) {
             when (leaderboardType.mode) {
@@ -383,6 +400,7 @@ object EliteFarmersLeaderboard {
                     // we handle all-time weight in the farmingweight class
                     // we only update collections on garden join
                 }
+
                 EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
             }
         }
@@ -391,7 +409,7 @@ object EliteFarmersLeaderboard {
     private fun handleCollectionDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double
+        diff: Double,
     ) {
         val crop = leaderboardType.crop ?: return
         val diffWeight = diff / crop.getFactor()
@@ -401,6 +419,7 @@ object EliteFarmersLeaderboard {
                     // we handle all-time collections in the farming weight class
                     // we only update collections on garden join
                 }
+
                 EliteLeaderboardMode.MONTHLY ->
                     leaderboardAmountMap?.set(leaderboardType, apiData.amount)
             }
@@ -410,7 +429,7 @@ object EliteFarmersLeaderboard {
     private fun handlePestDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double
+        diff: Double,
     ) {
         if (diff >= 1 || abs(diff) >= 150) {
             leaderboardAmountMap?.set(leaderboardType, apiData.amount)
