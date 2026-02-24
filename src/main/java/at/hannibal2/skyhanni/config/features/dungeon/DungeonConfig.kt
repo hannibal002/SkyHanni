@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class DungeonConfig {
     @Expose
@@ -214,9 +215,10 @@ class DungeonConfig {
     @Expose
     @ConfigOption(
         name = "Blood Camp Move",
-        desc = "Display a message and title for when to kill blood mobs when Blood Camping for Dialogue skip."
+        desc = "Predicts when to kill blood mobs during Blood Camp to skip the Watcher dialogue"
     )
     @FeatureToggle
     @ConfigEditorBoolean
+    @SearchTag("Dialogue Skip Message Title")
     var bloodCampTimer: Boolean = false
 }
