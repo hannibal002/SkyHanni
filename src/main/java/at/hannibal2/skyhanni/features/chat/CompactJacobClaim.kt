@@ -112,9 +112,9 @@ object CompactJacobClaim {
         messageSet.clear()
     }
 
-    @Suppress("DEPRECATION")
     private fun SkyHanniChatEvent.Allow.block(reason: String) {
         // We need the message with color for the hover
+        @Suppress("DEPRECATION")
         messageSet.add(message)
         blockedReason = reason
     }
