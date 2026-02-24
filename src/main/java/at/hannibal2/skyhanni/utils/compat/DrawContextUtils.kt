@@ -74,8 +74,11 @@ object DrawContextUtils {
     @Suppress("DEPRECATION")
     inline fun pushPop(action: () -> Unit) {
         pushMatrix()
-        action()
-        popMatrix()
+        try {
+            action()
+        } finally {
+            popMatrix()
+        }
     }
 
     /**
@@ -84,8 +87,11 @@ object DrawContextUtils {
     @Suppress("DEPRECATION")
     inline fun <T> pushPopResult(action: () -> T): T {
         pushMatrix()
-        val result = action()
-        popMatrix().also { return result }
+        try {
+            return action()
+        } finally {
+            popMatrix()
+        }
     }
 
     /**

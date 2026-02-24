@@ -80,15 +80,13 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         (cursorX + slotSize > sizePixels && cursorY + slotSize * 2 > sizePixels)
     private fun isRowFull() = cursorX + slotSize > sizePixels
 
-    private fun recordPosition(key: SkyHanniAtlasKey, slotX: Int, slotY: Int): SkyHanniItemAtlasEntry? {
+    private fun recordPosition(key: SkyHanniAtlasKey, slotX: Int, slotY: Int): SkyHanniItemAtlasEntry {
         val u = slotX.toFloat() / sizePixels.toFloat()
         val v = (sizePixels - slotY).toFloat() / sizePixels.toFloat()
-        if (key is SkyHanniAnimatedAtlasKey) {
-            animatedFrames[key] = SkyHanniAnimatedItemAtlasEntry(slotX, slotY, u, v, key.frameNumber)
-            return animatedFrames[key]
+        return if (key is SkyHanniAnimatedAtlasKey) {
+            SkyHanniAnimatedItemAtlasEntry(slotX, slotY, u, v, key.frameNumber).also { animatedFrames[key] = it }
         } else {
-            positions[key] = SkyHanniItemAtlasEntry(slotX, slotY, u, v)
-            return positions[key]
+            SkyHanniItemAtlasEntry(slotX, slotY, u, v).also { positions[key] = it }
         }
     }
 
@@ -109,7 +107,6 @@ internal class SkyHanniItemAtlas : AutoCloseable {
 
                 renderItemToAtlas(state, slotX, slotY)
                 val atlasEntry = recordPosition(stateKey, slotX, slotY)
-                    ?: throw Error("Entry not found")
                 submitBlitRenderState(state, atlasEntry.u, atlasEntry.v)
             }
             bufferSource.endBatch()

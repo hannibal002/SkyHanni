@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "UnusedPrivateProperty")
 @SkyHanniModule
 object DungeonApi {
 
@@ -86,12 +86,21 @@ object DungeonApi {
     )
 
     /**
+     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
+     */
+    private val dungeonComplete by patternGroup.pattern(
+        "completecolorless",
+        "\\s+(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)",
+    )
+
+    /**
      * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor VII
      * REGEX-TEST: §f                         §r§cThe Catacombs §r§8- §r§eFloor V
      */
-    private val dungeonComplete by patternGroup.pattern(
+    private val dungeonCompleteOld by patternGroup.pattern(
+        // TODO: If It's April or Later and you're Reading This, remove this.
         "complete",
-        "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
+        "\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
 
     /**
@@ -286,7 +295,7 @@ object DungeonApi {
             }
             return
         }
-        dungeonComplete.matchMatcher(event.message) {
+        dungeonComplete.matchMatcher(event.cleanMessage) {
             completed = true
             DungeonCompleteEvent(floor).post()
             return

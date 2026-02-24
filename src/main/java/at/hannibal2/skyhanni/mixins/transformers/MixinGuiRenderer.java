@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
-import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState;
-import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator;
-import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -13,7 +10,6 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -99,14 +95,8 @@ public class MixinGuiRenderer {
         at = @At("TAIL")
     )
     private void skyhanni$prepareSkyHanniItems(CallbackInfo ci) {
-        PictureInPictureRenderer<?> renderer = pictureInPictureRenderers.get(SkyHanniGuiItemRenderState.class);
-        if (!(renderer instanceof SkyHanniPipCoordinatorRenderer coordinator)) return;
-
-        List<SkyHanniGuiItemRenderState> pipCoordinatorStates = coordinator.takePendingStates();
-        if (pipCoordinatorStates.isEmpty()) return;
-
-        SkyHanniItemRenderCoordinator.INSTANCE.prepare(
-            pipCoordinatorStates,
+        GuiRendererHook.INSTANCE.prepareSkyHanniItems(
+            pictureInPictureRenderers,
             renderState,
             getBufferSource(),
             featureRenderDispatcher,
