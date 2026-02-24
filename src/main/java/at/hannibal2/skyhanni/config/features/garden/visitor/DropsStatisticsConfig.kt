@@ -91,6 +91,7 @@ class DropsStatisticsConfig {
         VOTER_BADGE_VIP("§aVIP Voter's Badge"),
         VOTER_BADGE_ELITE("§9Elite Voter's Badge"),
         VOTER_BADGE_SUPREME("§5Supreme Voter's Badge"),
+        DYE_WILD_STRAWBERRY("§dWild Strawberry Dye"),
         ;
 
         override fun toString() = displayName

@@ -2,15 +2,19 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,10 +32,14 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object HoeLevelDisplay {
+
+    private const val OVERCLOCK_THRESHOLD = 40
+    private const val MAX_LEVEL = 50
 
     private var hoeLevels: List<Int>? = null
     private var hoeOverflow = 200000
@@ -42,15 +50,15 @@ object HoeLevelDisplay {
     private val patternGroup = RepoPattern.group("hoe.levels")
 
     /**
-     * REGEX-TEST: §3§lOVERFLOW! §r§7Your §r§5Turing Sugar Cane Hoe Mk. III §r§7has just dropped a §r§9Tool Exp Capsule§r§7!
+     * REGEX-TEST: OVERFLOW! Your Turing Sugar Cane Hoe Mk. III has just dropped a Tool Exp Capsule!
      */
     val levelUpPattern by patternGroup.pattern(
-        "levelup",
-        "§3§lOVERFLOW! §r§7Your (?:§.)+(?<tool>.*) §r§7has just dropped a §r§9Tool Exp Capsule§r§7!",
+        "levelup-nocolor",
+        "OVERFLOW! Your (?<tool>.+) has just dropped a Tool Exp Capsule!",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         display = null
         val list = mutableListOf<Renderable>()
@@ -77,7 +85,7 @@ object HoeLevelDisplay {
         var colorPrefix = "§e"
         if (hoeExp > next) {
             colorPrefix = "§c§l"
-            if (hoeLevel >= 40) list.add(Renderable.text("§3§lOVERCLOCK REQUIRED!"))
+            if (hoeLevel >= OVERCLOCK_THRESHOLD) list.add(Renderable.text("§3§lOVERCLOCK REQUIRED!"))
             else list.add(Renderable.text("§c§lUPGRADE REQUIRED!"))
         }
         val formattedXp = hoeExp.addSeparators()
@@ -89,17 +97,17 @@ object HoeLevelDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Modify) {
-        levelUpPattern.matchMatcher(event.message) {
-            val heldItem = InventoryUtils.getItemInHand() ?: return
-            val leveledUpTool = group("tool")
-            val heldItemName = heldItem.hoverName.string.removeColor()
-            if (!heldItemName.contains(leveledUpTool)) return
-            val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
-            if (isEnabled() && config.overflow && overflowLevel != null) {
-                val currentLevel = heldItem.getHoeLevel() ?: return
-                val newComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
-                event.replaceComponent(newComponent, "hoe_level")
-            }
+        val heldItem = InventoryUtils.getItemInHand() ?: return
+        val leveledUpTool = levelUpPattern.matchMatcher(event.cleanMessage) {
+            group("tool")
+        } ?: return
+        val heldItemName = heldItem.hoverName.string.removeColor()
+        if (!heldItemName.contains(leveledUpTool)) return
+        val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
+        if (isEnabled() && config.overflow && overflowLevel != null) {
+            val currentLevel = heldItem.getHoeLevel() ?: return
+            val newComponent = event.chatComponent.copy().append(" §8(§3Level ${currentLevel + overflowLevel}§8)")
+            event.replaceComponent(newComponent, "hoe_level")
         }
     }
 
@@ -122,8 +130,8 @@ object HoeLevelDisplay {
         return currentLevel + 1
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onRender() {
         if (!isEnabled()) return
         val renderable = display ?: return
         config.position.renderRenderables(renderable, posLabel = "Hoe Level Display")
@@ -146,8 +154,8 @@ object HoeLevelDisplay {
                     appendWithColor("$luck✴", ChatFormatting.GREEN)
                 },
                 Component.empty(),
-                Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY)
-            )
+                Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY),
+            ),
         )
         event.addItem(stack)
     }
@@ -161,10 +169,63 @@ object HoeLevelDisplay {
         return luck
     }
 
+    private fun errorNoTool() {
+        ChatUtils.userError("You must hold a specialized farming tool to use this command!")
+    }
+
+    private fun errorStorage(item: ItemStack): Nothing {
+        ErrorManager.skyHanniError(
+            "Error getting overflow hoe level storage",
+            "item" to item,
+        )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shsethoelevel") {
+            category = CommandCategory.USERS_BUG_FIX
+            description = "Manually sets your overflow hoe level"
+            arg("level", BrigadierArguments.integer()) { newLevelArg ->
+                callback {
+                    val item = InventoryUtils.getItemInHand() ?: return@callback errorNoTool()
+                    val uuid = item.getItemUuid() ?: return@callback errorNoTool()
+
+                    val realLevel = item.getHoeLevel() ?: return@callback errorNoTool()
+                    if (realLevel < MAX_LEVEL) {
+                        ChatUtils.userError("Tools below level $MAX_LEVEL cannot have overflow levels!")
+                        return@callback
+                    }
+
+                    val oldLevel = MAX_LEVEL + (getOverflowHoeLevel(uuid) ?: errorStorage(item))
+
+                    val newLevel = getArg(newLevelArg)
+                    if (newLevel < MAX_LEVEL) {
+                        ChatUtils.userError("Overflow level cannot be below $MAX_LEVEL!")
+                        return@callback
+                    }
+                    val storage = gardenStorage?.overflowHoeLevels ?: errorStorage(item)
+                    storage[uuid] = newLevel - MAX_LEVEL
+                    ChatUtils.chat(
+                        componentBuilder {
+                            append("Updated overflow level for ")
+                            append(item.hoverName)
+                            append(" from ")
+                            appendWithColor(oldLevel.toString(), ChatFormatting.AQUA)
+                            append(" to ")
+                            appendWithColor(newLevel.toString(), ChatFormatting.AQUA)
+                            append(".")
+                        },
+                    )
+                }
+            }
+        }
+    }
+
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        hoeLevels = event.getConstant<GardenJson>("Garden").hoeExpLevels
-        hoeOverflow = event.getConstant<GardenJson>("Garden").hoeExpOverflow
+        val data = event.getConstant<GardenJson>("Garden")
+        hoeLevels = data.hoeExpLevels
+        hoeOverflow = data.hoeExpOverflow
     }
 
     fun isEnabled() = config.enabled

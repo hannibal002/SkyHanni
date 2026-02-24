@@ -82,6 +82,7 @@ enum class TabWidgetDisplay(
                         subWidget.lines.map { Renderable.text(it) }
                     },
                     posLabel = "Display Widget: ${widget.name}",
+                    extraSpace = -2
                 )
             }
         }
