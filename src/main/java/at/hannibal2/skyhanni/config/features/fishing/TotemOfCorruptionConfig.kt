@@ -26,6 +26,15 @@ class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigOption(
+        name = "Own Totem Only",
+        desc = "Ignore totems from other players, since they won't affect your sea creatures.\n" +
+            "§eMay break if you are nicked!"
+    )
+    @ConfigEditorBoolean
+    var ownTotemOnly: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Distance Threshold",
         desc = "The minimum distance to the Totem of Corruption for the overlay.\n" +
             "The effective distance of the totem is 16.\n" +

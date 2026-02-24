@@ -480,6 +480,10 @@ object SackApi {
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
+    fun NeuInternalName.isMissingSackItem(): Boolean {
+        return fetchSackItem(this).getStatus() == SackStatus.MISSING
+    }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestsackapi") {

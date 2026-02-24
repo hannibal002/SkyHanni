@@ -54,6 +54,7 @@ data class EliteLeaderboardPlayer(
     @Expose val profile: String,
     @Expose val uuid: UUID,
     @Expose val amount: Double,
+    @Expose val rank: Int? = null,
     @Expose val mode: String? = null,
     @Expose val meta: JsonObject? = null,
 )
@@ -77,7 +78,7 @@ sealed class EliteLeaderboardType {
 
     data class Weight(
         @Expose val weight: FarmingWeight,
-        @Expose override val mode: EliteLeaderboardMode
+        @Expose override val mode: EliteLeaderboardMode,
     ) : EliteLeaderboardType(),
         WithEnum<FarmingWeight> {
         override val enumValue: FarmingWeight = weight
@@ -86,7 +87,7 @@ sealed class EliteLeaderboardType {
 
     data class Crop(
         @Expose val crop: CropType,
-        @Expose override val mode: EliteLeaderboardMode
+        @Expose override val mode: EliteLeaderboardMode,
     ) : EliteLeaderboardType(), WithEnum<CropType> {
         override val enumValue: CropType = crop
         override fun toString() = "${crop.cropName} Collection${mode.displaySuffix}"
@@ -94,7 +95,7 @@ sealed class EliteLeaderboardType {
 
     data class Pest(
         @Expose val pest: PestType?,
-        @Expose override val mode: EliteLeaderboardMode
+        @Expose override val mode: EliteLeaderboardMode,
     ) : EliteLeaderboardType(), WithEnum<PestType> {
         override val enumValue: PestType? = pest
         override fun toString() = "${pest?.displayName ?: "Pest"} Kills${mode.displaySuffix}"
@@ -124,7 +125,7 @@ val EliteLeaderboardType.crop: CropType?
 enum class EliteLeaderboardMode(
     val displayName: String,
     val lbSuffix: String = "",
-    val displaySuffix: String = ""
+    val displaySuffix: String = "",
 ) {
     ALL_TIME("All-Time"),
     MONTHLY("Monthly", "-monthly", " Monthly"),
@@ -149,11 +150,13 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
                 out.name("weight").value(value.weight.name)
                 out.name("mode").value(value.mode.name)
             }
+
             is Crop -> {
                 out.name("type").value("crop")
                 out.name("crop").value(value.crop.name)
                 out.name("mode").value(value.mode.name)
             }
+
             is Pest -> {
                 out.name("type").value("pest")
                 out.name("pest")
@@ -190,6 +193,7 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
                         pest = PestType.valueOf(reader.nextString())
                     }
                 }
+
                 else -> reader.skipValue()
             }
         }
@@ -202,18 +206,21 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
                 }
                 Weight(weight, mode)
             }
+
             "crop" -> {
                 if (crop == null || mode == null) {
                     throw JsonParseException("Missing required fields for Crop")
                 }
                 Crop(crop, mode)
             }
+
             "pest" -> {
                 if (mode == null) {
                     throw JsonParseException("Missing required fields for Pest")
                 }
                 Pest(pest, mode)
             }
+
             else -> throw JsonParseException("Unknown type: $type")
         }
     }

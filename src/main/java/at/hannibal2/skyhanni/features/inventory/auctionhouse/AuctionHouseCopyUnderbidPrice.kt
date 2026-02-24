@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -48,6 +48,8 @@ object AuctionHouseCopyUnderbidPrice {
         "Auctions Browser|Manage Auctions|Auctions: \".*\"?",
     )
 
+    private var lastCopiedItem: NeuInternalName? = null
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.autoCopyUnderbidPrice) return
@@ -55,7 +57,9 @@ object AuctionHouseCopyUnderbidPrice {
         if (event.inventoryName != "Create BIN Auction") return
         val item = event.inventoryItems[13] ?: return
 
-        val internalName = item.getInternalName()
+        val internalName = item.getPetInternalNameWithLevel()
+        if (internalName == lastCopiedItem) return
+        lastCopiedItem = internalName
         if (internalName == NeuInternalName.NONE) return
 
         val price = internalName.getPrice().toLong()
@@ -82,7 +86,6 @@ object AuctionHouseCopyUnderbidPrice {
         OSUtils.copyToClipboard("$underbidPrice")
         ChatUtils.chat(
             "Copied ${underbidPrice.addSeparators()} to clipboard. (Copy Underbid Price)",
-            replaceSameMessage = true,
         )
     }
 

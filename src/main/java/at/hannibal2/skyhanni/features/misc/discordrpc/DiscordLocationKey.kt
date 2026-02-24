@@ -50,7 +50,6 @@ object DiscordLocationKey {
         "mithril-deposits",
         "precursor-remnants",
         "goblin-holdout",
-        "magma-fields",
         "crystal-nucleus",
         "dungeon-hub"
     )
@@ -147,7 +146,8 @@ object DiscordLocationKey {
         "Fairy Grotto" to "crystal-nucleus",
         "Goblin Queen's Den" to "goblin-holdout",
         "Jungle Temple" to "jungle",
-        "Khazad-dûm" to "magma-fields",
+        "Magma Fields" to "gold-mine",
+        "Khazad-dûm" to "gold-mine",
         "Lost Precursor City" to "precursor-remnants",
         "Mines of Divan" to "mithril-deposits",
 

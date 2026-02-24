@@ -68,7 +68,7 @@ fun JsonElement.shDeepCopy(): JsonElement {
 
 fun JsonElement.addElementsAfter(elements: Array<out Enum<*>>, after: Enum<*>? = null): JsonArray {
     val newArray = JsonArray()
-    var found = after == null
+    var found = false
     this.asJsonArray.forEach {
         newArray.add(it)
         if (!found && it.asString == after?.name) {
