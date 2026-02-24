@@ -213,7 +213,7 @@ class DungeonConfig {
 
     @Expose
     @ConfigOption(
-        name = "Blood Camp Move Title/Message",
+        name = "Blood Camp Move",
         desc = "Display a message and title for when to kill blood mobs when Blood Camping for Dialogue skip."
     )
     @FeatureToggle
