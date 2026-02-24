@@ -219,6 +219,6 @@ class DungeonConfig {
     )
     @FeatureToggle
     @ConfigEditorBoolean
-    @SearchTag("Dialogue Skip Message Title")
+    @SearchTag("Dialogue Message Title")
     var bloodCampTimer: Boolean = false
 }
