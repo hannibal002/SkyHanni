@@ -77,7 +77,7 @@ object SkyHanniMod {
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         runtime.addShutdownHook(
-            Thread(SkyHanniItemRenderCoordinator::closeAtlas)
+            Thread { SkyHanniItemRenderCoordinator.closeAtlas() }
         )
         try {
             if (PlatformUtils.getRepoPatternDumpLocation() == null) SkyHanniRepoManager.initRepo()
