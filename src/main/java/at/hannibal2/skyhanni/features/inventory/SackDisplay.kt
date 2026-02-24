@@ -111,7 +111,7 @@ object SackDisplay {
                         name.replace("§k", ""),
                         onLeftClick = {
                             if (!SackApi.isTrophySack) {
-                                BazaarApi.searchForBazaarItem(internalName)
+                                BazaarApi.searchForBazaarItemOrRecipe(internalName)
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
@@ -282,7 +282,7 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onLeftClick = {
-                                BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
+                                BazaarApi.searchForBazaarItemOrRecipe(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
                         ),

@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
+import kotlin.reflect.KClass
 
-abstract class ItemTrackerData : TrackerData() {
+abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerData<T>(clazz) {
 
     // default implementation, delegates to below
     open fun getDescription(item: TrackedItem) = getDescription(item.timesGained)

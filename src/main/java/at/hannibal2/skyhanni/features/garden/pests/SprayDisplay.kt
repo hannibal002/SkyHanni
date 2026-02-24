@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.greenhouse
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
@@ -31,7 +32,7 @@ object SprayDisplay {
         if (!event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
-            display = GardenPlotApi.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
+            display = GardenPlotApi.getCurrentPlot()?.takeUnless { it.isBarn() || it.greenhouse }?.let { plot ->
                 plot.currentSpray?.let {
                     val timer = it.expiry.timeUntil()
                     "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"

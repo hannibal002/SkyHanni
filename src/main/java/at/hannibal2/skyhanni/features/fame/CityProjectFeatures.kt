@@ -193,7 +193,7 @@ object CityProjectFeatures {
             if (Minecraft.getInstance().screen is SignEditScreen) {
                 SignUtils.setTextIntoSign("$amount")
             } else {
-                BazaarApi.searchForBazaarItem(name, amount)
+                BazaarApi.searchForBazaarItemOrRecipe(name, amount)
             }
         },
     ) { inInventory }

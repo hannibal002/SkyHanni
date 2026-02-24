@@ -148,7 +148,7 @@ object MinionUpgradeHelper {
         val internalName = internalName ?: return
         val remainingItems = itemsNeeded - itemsInSacks
         if (remainingItems > 0) {
-            BazaarApi.searchForBazaarItem(internalName, remainingItems)
+            BazaarApi.searchForBazaarItemOrRecipe(internalName, remainingItems)
         } else {
             GetFromSackApi.getFromSack(internalName, itemsNeeded)
         }
