@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BloodTimer {
     private var bloodOpenTime = SimpleTimeMark.farPast()
-    private var bloodOpenLength = ServerTimeMark.farPast()
+    private var bloodOpenTimeServer = ServerTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("dungeons.bloodtimer")
 
@@ -47,12 +47,12 @@ object BloodTimer {
         if (!isEnabled()) return
         if (bloodOpenMessages.anyMatches(event.cleanMessage)) {
             bloodOpenTime = SimpleTimeMark.now()
-            bloodOpenLength = ServerTimeMark.now()
+            bloodOpenTimeServer = ServerTimeMark.now()
         }
 
         if (bloodMoveMessage.matches(event.cleanMessage)) {
             val bloodMove = bloodOpenTime.passedSince() + 0.1.seconds
-            val bloodMoveTime = bloodOpenLength.passedSince() + 0.1.seconds
+            val bloodMoveTime = bloodOpenTimeServer.passedSince() + 0.1.seconds
 
             val bloodLag = bloodMove - bloodMoveTime
 
