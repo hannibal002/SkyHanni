@@ -335,7 +335,7 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
-    ): Int {
+    ): Int? {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
 
@@ -358,8 +358,10 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
-            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight())) {
+            item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+            return null
+        }
 
         /**
          * This is used to render items that fit these criteria:
@@ -396,15 +398,9 @@ object GuiRenderUtils {
         translateX: Float,
         translateY: Float,
         scale: Float
-    ): Int = DrawContextUtils.pushPopResult {
-        DrawContextUtils.translate(translateX, translateY)
-        DrawContextUtils.scale(scale, scale)
-
-        RenderSystem.assertOnRenderThread()
-
-        Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-
-        DrawContextUtils.drawItem(this, 0, 0)
-        return@pushPopResult -1
+    ) = RenderUtils.runOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
+        DrawContextUtils.translatedPushPopResult(translateX, translateY, postTranslateScale = scale) {
+            DrawContextUtils.drawItem(this, 0, 0)
+        }
     }
 }

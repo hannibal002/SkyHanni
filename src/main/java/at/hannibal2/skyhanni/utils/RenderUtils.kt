@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.world.inventory.Slot
@@ -41,6 +43,21 @@ object RenderUtils {
 
         override fun toString() = value
     }
+
+    /**
+     * Runs a block on an asserted Render Thread.
+     * @param block the block to run
+     */
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun runOnRenderThread(
+        setupFor: Lighting.Entry? = null,
+        noinline block: () -> Unit,
+    ) = Minecraft.getInstance().execute {
+        RenderSystem.assertOnRenderThread()
+        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
+        block()
+    }
+
 
     /**
      * Used for some debugging purposes.
