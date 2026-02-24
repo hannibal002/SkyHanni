@@ -29,6 +29,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     VOTER_BADGE_VIP("VOTER_BADGE_VIP", "§aVIP Voter's Badge"),
     VOTER_BADGE_ELITE("VOTER_BADGE_ELITE", "§9Elite Voter's Badge"),
     VOTER_BADGE_SUPREME("VOTER_BADGE_SUPREME", "§5Supreme Voter's Badge"),
+    DYE_WILD_STRAWBERRY("DYE_WILD_STRAWBERRY", "§dWild Strawberry Dye"),
     ;
 
     private val internalName = rawInternalName.toInternalName()

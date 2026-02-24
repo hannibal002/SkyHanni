@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AutoUpdatingItemStack
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -36,12 +37,14 @@ object UbikReminder {
 
     private val cube by AutoUpdatingItemStack("UBIKS_CUBE")
 
+    private val storage get() = ProfileStorageData.profileSpecific?.rift
+
     /**
-     * REGEX-TEST: ROUND 7 (FINAL): You chose STEAL and gained 55,000 Motes!
+     * REGEX-TEST: Split or Steal
      */
-    private val ubikRoundPattern by patternGroup.pattern(
-        "reminder-nocolor",
-        "ROUND \\d+ \\(FINAL\\): You chose \\w+ and gained [\\d,]+ Motes!",
+    private val inventoryPattern by patternGroup.pattern(
+        "inventory",
+        "Split or Steal",
     )
 
     /**
@@ -56,25 +59,27 @@ object UbikReminder {
         "SPLIT! You need to wait (?<duration>.+) before you can play again\\.",
     )
 
+    init {
+        InventoryDetector(
+            onOpenInventory = {
+                if (!config.ubikReminder) return@InventoryDetector
+                storage?.ubikRemindTime = 2.hours.fromNow()
+            },
+        ) { name -> inventoryPattern.matches(name) }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.ubikReminder) return
-        val storage = ProfileStorageData.profileSpecific?.rift ?: return
-        val message = event.cleanMessage
 
-        if (ubikRoundPattern.matches(message)) {
-            storage.ubikRemindTime = 2.hours.fromNow()
-            return
-        }
-
-        cooldownPattern.matchMatcher(message) {
-            storage.ubikRemindTime = TimeUtils.getDuration(group("duration")).fromNow()
+        cooldownPattern.matchMatcher(event.cleanMessage) {
+            storage?.ubikRemindTime = TimeUtils.getDuration(group("duration")).fromNow()
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        val storage = ProfileStorageData.profileSpecific?.rift ?: return
+        val storage = storage ?: return
         if (storage.ubikRemindTime.isInFuture()) return
         if (config.ubikReminder) {
             ChatUtils.chat(
@@ -89,7 +94,7 @@ object UbikReminder {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.ubikReminder || !config.ubikGui) return
-        val storage = ProfileStorageData.profileSpecific?.rift ?: return
+        val storage = storage ?: return
         val remindTime = storage.ubikRemindTime
         val renderable: Renderable
         if (remindTime.isFarFuture()) {

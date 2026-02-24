@@ -122,7 +122,7 @@ object SkillApi {
 
     @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        val actionBar = event.chatComponent.string
+        val actionBar = event.chatComponent.string.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {
             val matcher = listOf(skillPercentPattern, skillMultiplierPattern).firstOrNull {
