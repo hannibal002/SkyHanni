@@ -55,8 +55,9 @@ object MineshaftDetection {
         if (!config.mineshaftDetection) return
         found = false
     }
-    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onScoreboardLineChange(event: ScoreboardUpdateEvent) {
+
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnIsland = IslandType.MINESHAFT)
+    fun onScoreboardLineChange() {
         if (found) return
 
         val matchingLine = ScoreboardData.sidebarLinesFormatted
@@ -75,7 +76,7 @@ object MineshaftDetection {
     }
 
     @HandleEvent
-    fun onShaftEntry(event: GlaciteMineshaftDetectEvent) {
+    fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
         if (!config.mineshaftDetection) return
         val type = event.type
         val sinceThis = getSinceMineshaftType(type)

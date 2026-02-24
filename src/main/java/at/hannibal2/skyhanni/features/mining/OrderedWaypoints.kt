@@ -230,16 +230,21 @@ object OrderedWaypoints {
     }
 
     @HandleEvent
-    fun onEnterShaft(event: GlaciteMineshaftDetectEvent) {
+    fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
         if (config.autoLoadMatchingShaftRoute) {
-            SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") { load(event.type.name, isAutomated = true) }
+            SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
+                if (storage?.routes?.get(event.type.name) == null) {
+                    ChatUtils.debug("No Route found for ${event.type.name}")
+                }
+                load(event.type.name)
+            }
         }
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         when (event.oldIsland) {
-            IslandType.MINESHAFT -> if (config.autoUnloadWhenLeavingineshaft || config.autoUnload) unload()
+            IslandType.MINESHAFT -> if (config.autoUnloadWhenLeavingMineshaft || config.autoUnload) unload()
             else -> if (config.autoUnload) unload()
         }
     }
@@ -249,24 +254,22 @@ object OrderedWaypoints {
 
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
-    private suspend fun load(name: String, isAutomated: Boolean = false) {
+    private suspend fun load(name: String) {
         if (loadJob?.isActive == true) {
             return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
         }
-        loadJob = setupLoadJob(name, isAutomated)
+        loadJob = setupLoadJob(name)
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String, isAutomated: Boolean = false): Job =
+    private fun setupLoadJob(name: String): Job =
         SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
             val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-            else storage?.routes?.get(name) ?: return@launchIOCoroutine if (!isAutomated) ChatUtils.userError(
+            else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
                 "Route $name doesn't exist.\n" +
                     "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
                     "§cIf you would like to import a route from your clipboard, leave the route name blank.",
-            ) else {
-                ChatUtils.debug("No Automated route found for $name")
-            }
+            )
 
             if (loadedRoute == null) return@launchIOCoroutine ChatUtils.userError(
                 "There was an error parsing waypoints. " +
