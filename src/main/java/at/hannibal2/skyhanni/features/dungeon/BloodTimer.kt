@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,7 +29,7 @@ object BloodTimer {
     private val bloodOpenMessages by patternGroup.list(
         "open",
         "\\[BOSS] The Watcher: Things feel a little more roomy now, eh\\?",
-        "\\[BOSS] The Watcher: Oh.. hello\\?",
+        "\\[BOSS] The Watcher: Oh\\.\\. hello\\?",
         "\\[BOSS] The Watcher: I'm starting to get tired of seeing you around here\\.\\.\\.",
         "\\[BOSS] The Watcher: You've managed to scratch and claw your way here, eh\\?",
         "\\[BOSS] The Watcher: So you made it this far\\.\\.\\. interesting\\.",
@@ -58,17 +59,15 @@ object BloodTimer {
             ChatUtils.debug("Blood Timer: $bloodMoveTime move time.")
 
             // Selects move prediction for 4th/5th mob based on how long watcher took to say activation line
-            val bloodMovePredictionNumber: Duration? = when (bloodMoveTime.inPartialSeconds) {
-                in 31.0..34.0 -> bloodLag + 36.seconds
-                in 28.0..31.0 -> bloodLag + 33.seconds
-                in 25.0..28.0 -> bloodLag + 30.seconds
-                in 22.0..25.0 -> bloodLag + 27.seconds
-                in 1.0..22.0 -> bloodLag + 24.seconds
-                else -> null
+            val bloodMovePredictionNumber = selectMoveTime(bloodMoveTime, bloodLag)
+            if (bloodMovePredictionNumber == 5.days) {
+                // This seems sufficiently impossible to use as an early return clause while warning the user.
+                ChatUtils.chat("§cInvalid Prediction")
+                return
             }
-            val bloodMovePrediction = bloodMovePredictionNumber?.inPartialSeconds?.let { "%.2f".format(it) }
+            val bloodMovePrediction = bloodMovePredictionNumber.inPartialSeconds.let { "%.2f".format(it) }
 
-            bloodMovePrediction?.let {
+            bloodMovePrediction.let {
                 ChatUtils.chat("§7Move Prediction: §f$it Seconds§7.")
                 TitleManager.sendTitle("", "§7Move Prediction: §f${it}s", 2.5.seconds)
                 val delay = bloodMovePredictionNumber - bloodMoveTime - 150.milliseconds
@@ -76,12 +75,20 @@ object BloodTimer {
                 runDelayed(delay) {
                     TitleManager.sendTitle("", "§cKill Blood", 1.5.seconds)
                 }
-            } ?: run {
-                ChatUtils.chat("§cInvalid Prediction")
             }
         }
     }
 
-    fun isEnabled() = SkyHanniMod.feature.dungeon.bloodCampTimer && IslandType.CATACOMBS.isCurrent()
+    fun selectMoveTime(bloodMoveTime: Duration, bloodLag: Duration): Duration {
+        return when (bloodMoveTime.inPartialSeconds) {
+            in 31.0..34.0 -> bloodLag + 36.seconds
+            in 28.0..31.0 -> bloodLag + 33.seconds
+            in 25.0..28.0 -> bloodLag + 30.seconds
+            in 22.0..25.0 -> bloodLag + 27.seconds
+            in 1.0..22.0 -> bloodLag + 24.seconds
+            else -> 5.days
+        }
+    }
 
+    private fun isEnabled() = SkyHanniMod.feature.dungeon.bloodCampTimer && IslandType.CATACOMBS.isCurrent()
 }

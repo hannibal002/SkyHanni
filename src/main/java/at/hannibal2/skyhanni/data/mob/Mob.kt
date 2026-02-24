@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -96,7 +96,9 @@ class Mob(
     companion object {
 
         fun Entity?.belongsToPlayer(): Boolean = this?.mob.belongsToPlayer()
-        fun Mob?.belongsToPlayer(): Boolean = this?.owner?.equals(PlayerUtils.getName()) ?: false
+        fun Mob?.belongsToPlayer(): Boolean {
+            return this?.seaCreature?.isOwn ?: return this?.owner?.equals(PlayerUtils.getName()) ?: false
+        }
     }
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
