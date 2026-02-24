@@ -271,17 +271,17 @@ object SlayerApi {
         "Arachne's Burrow",
         "Arachne's Sanctuary",
         "Burning Desert",
-            -> Type.TARANTULA
+        -> Type.TARANTULA
 
         "Ruins",
         "Howling Cave",
         "Soul Cave",
         "Spirit Cave",
-            -> Type.SVEN
+        -> Type.SVEN
 
         "Void Sepulture",
         "Zealot Bruiser Hideout",
-            -> Type.VOID
+        -> Type.VOID
 
         "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
         AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
@@ -289,11 +289,11 @@ object SlayerApi {
         "Stronghold",
         "The Wasteland", // TODO check if we can remove this
         "Smoldering Tomb",
-            -> Type.INFERNO
+        -> Type.INFERNO
 
         "Stillgore Château",
         "Oubliette",
-            -> Type.VAMPIRE
+        -> Type.VAMPIRE
 
         else -> null
     }
