@@ -33,7 +33,6 @@ import net.minecraft.core.Rotations
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -137,7 +136,7 @@ object FireFreezeFeatures {
         return texture == ARMORSTAND_SKULL_TEXTURE
     }
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.Companion.HIGH)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
     fun onRenderLiving(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!config.customCircle) return
         if (event.entity.isFireFreeze()) event.cancel()
