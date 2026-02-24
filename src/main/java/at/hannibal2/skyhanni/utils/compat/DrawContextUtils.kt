@@ -74,8 +74,17 @@ object DrawContextUtils {
     @Suppress("DEPRECATION")
     inline fun pushPop(action: () -> Unit) {
         pushMatrix()
-        action()
-        popMatrix()
+        try {
+            action()
+        } catch (e: Exception) {
+            ErrorManager.logErrorStateWithData(
+                "Error in pushPop action",
+                "Exception: ${e.message}"
+            )
+            throw e
+        } finally {
+            popMatrix()
+        }
     }
 
     /**
@@ -84,8 +93,19 @@ object DrawContextUtils {
     @Suppress("DEPRECATION")
     inline fun <T> pushPopResult(action: () -> T): T {
         pushMatrix()
-        val result = action()
-        popMatrix().also { return result }
+        val result: T
+        try {
+            result = action()
+        } catch (e: Exception) {
+            ErrorManager.logErrorStateWithData(
+                "Error in pushPopResult action",
+                "Exception: ${e.message}"
+            )
+            throw e
+        } finally {
+            popMatrix()
+        }
+        return result ?: throw IllegalStateException("Result of pushPopResult action cannot be null")
     }
 
     /**

@@ -11,7 +11,7 @@ open class SkyHanniAtlasKey(
     open val rotationVector: Vec3,
 ) {
     open val rotationSnapDegrees: Float = 2f
-    private val quantizedRotationVector by lazy {
+    private val quantizedRotationVector: Vec3 by lazy {
         quantizeRotation(rotationVector)
     }
 
@@ -20,15 +20,22 @@ open class SkyHanniAtlasKey(
         return Vec3(snap(vec.x), snap(vec.y), snap(vec.z))
     }
 
+    /**
+     * We intentionally do not include stable ID in the equals.
+     * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
+     */
     override fun equals(other: Any?): Boolean =
         if (other !is SkyHanniAtlasKey) false
         else if (this === other) true
         else modelIdentity == other.modelIdentity &&
             quantizedRotationVector == other.quantizedRotationVector &&
             scale == other.scale &&
-            guiScale == other.guiScale &&
-            stableId == other.stableId
+            guiScale == other.guiScale
 
+    /**
+     * We intentionally do not include stable ID in the hashcode.
+     * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
+     */
     override fun hashCode(): Int = Objects.hash(modelIdentity, quantizedRotationVector, scale, guiScale)
 }
 
@@ -42,10 +49,18 @@ data class SkyHanniAnimatedAtlasKey(
 ) : SkyHanniAtlasKey(modelIdentity, scale, guiScale, stableId, rotationVector) {
     override val rotationSnapDegrees: Float = 0.125f
 
+    /**
+     * We intentionally do not include stable ID in the equals.
+     * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
+     */
     override fun equals(other: Any?): Boolean =
         if (this === other) true
         else if (other !is SkyHanniAnimatedAtlasKey) false
         else super.equals(other) && frameNumber == other.frameNumber
 
-    override fun hashCode(): Int = Objects.hash(super.hashCode(), stableId)
+    /**
+     * We intentionally do not include stable ID in the hashcode.
+     * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
+     */
+    override fun hashCode(): Int = Objects.hash(super.hashCode(), frameNumber)
 }

@@ -390,6 +390,18 @@ interface Renderable {
         }
 
         /** Bottom Layer must be bigger then the top layer */
+
+        /**
+         * Render two renderables, one on top of the other.
+         * The {bottomLayer} must be bigger then the {topLayer}.
+         * @param bottomLayer The renderable that is rendered at the bottom
+         * @param topLayer The renderable that is rendered on top of the bottom layer
+         * @param blockBottomHover Prevents hovering over the bottom renderable if the top renderable is hovered
+         * @param forceBottomRenderFirst forces the bottom layer to be rendered before the top layer, regardless of hover state.
+         *  This is useful if the top layer has transparent parts, and you want the bottom layer to be visible through them.
+         *  Setting to true is also necessary for rendering items on top of one another, since all items are rendered on the same
+         *  frame layer.
+         */
         fun doubleLayered(
             bottomLayer: Renderable,
             topLayer: Renderable,

@@ -59,25 +59,21 @@ internal object SkyHanniItemRenderCoordinator {
             else animatedStates.add(state)
         }
 
-        // Only set up atlas if we have animated items
-        if (animatedStates.isNotEmpty()) SkyHanniItemRenderContext(
+        SkyHanniItemRenderContext(
             animatedStates, staticFallbackStates, guiRenderState,
             bufferSource, featureRenderDispatcher,
             frameNumber, guiScale,
         ).setupRendering()
-
-        val fallbackRenderer = SkyHanniItemRenderer(bufferSource)
-        staticFallbackStates.forEach { state ->
-            fallbackRenderer.prepare(state, guiRenderState, guiScale)
-        }
     }
 
     private fun SkyHanniItemRenderContext.setupRendering() {
-        with(atlas) {
+        if (atlasStates.isNotEmpty()) with(atlas) {
             setupAtlasRendering(frameNumber, projectionBuffer)
         }
-        val fallbackRenderer = SkyHanniItemRenderer(bufferSource)
-        fallbackStates.forEach { state -> fallbackRenderer.prepare(state, guiRenderState, guiScale) }
+        if (fallbackStates.isNotEmpty()) {
+            val fallbackRenderer = SkyHanniItemRenderer(bufferSource)
+            fallbackStates.forEach { state -> fallbackRenderer.prepare(state, guiRenderState, guiScale) }
+        }
     }
 
 }
