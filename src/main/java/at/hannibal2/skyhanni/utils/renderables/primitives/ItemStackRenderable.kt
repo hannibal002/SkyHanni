@@ -17,10 +17,11 @@ open class ItemStackRenderable internal constructor(
     open val config: ItemRenderableConfig,
     private val stackGetter: () -> ItemStack = { ItemStack.EMPTY },
 ) : Renderable {
-    override val horizontalAlign: HorizontalAlignment get() = config.horizontalAlign
+    override val horizontalAlign get() = config.horizontalAlign
     override val verticalAlign get() = config.verticalAlign
-    override val width: Int get() = (15.5 * config.scale + 0.5).toInt() + config.xSpacing
-    override val height: Int get() = (15.5 * config.scale + 0.5).toInt() + config.ySpacing
+    private val scaledSize get() = (15.5 * config.scale + 0.5).toInt()
+    override val width: Int get() = scaledSize + config.xSpacing
+    override val height: Int get() = scaledSize + config.ySpacing
 
     open val stack: ItemStack get() = stackGetter()
 
