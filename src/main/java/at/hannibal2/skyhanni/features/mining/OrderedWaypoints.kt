@@ -242,7 +242,6 @@ object OrderedWaypoints {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        ChatUtils.debug(event.oldIsland.name)
         if (event.oldIsland == IslandType.MINESHAFT && config.autoUnloadWhenLeavingMineshaft) unload()
         if (config.autoUnload) unload()
     }
