@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -73,7 +73,7 @@ object CurrentChatDisplay {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         changedChatPattern.matchMatcher(message) {
             return updateChat(ChatType.fromName(group("chat")))
@@ -88,7 +88,7 @@ object CurrentChatDisplay {
     }
 
     @HandleEvent
-    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (currentChat == ChatType.PRIVATE && privateMessagePlayer == event.author.cleanPlayerName()) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
             update()
@@ -131,7 +131,7 @@ object CurrentChatDisplay {
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen !is GuiChat && lastClosedChatTime.passedSince() > 2.seconds) return
+        if (Minecraft.getInstance().screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
         config.currentChatDisplayPos.renderString(display, posLabel = "Current Chat")
     }
 

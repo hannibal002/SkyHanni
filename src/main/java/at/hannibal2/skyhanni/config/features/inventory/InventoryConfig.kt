@@ -90,6 +90,11 @@ class InventoryConfig {
     val rngMeter: RngMeterConfig = RngMeterConfig()
 
     @Expose
+    @ConfigOption(name = "Super Crafting", desc = "")
+    @Accordion
+    val superCrafting: SuperCraftingConfig = SuperCraftingConfig()
+
+    @Expose
     @ConfigOption(name = "Stats Tuning", desc = "")
     @Accordion
     val statsTuning: StatsTuningConfig = StatsTuningConfig()
@@ -335,7 +340,7 @@ class InventoryConfig {
     var essenceShopHelper: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone/PlantBoy Advance snake game.")
     @ConfigEditorBoolean
     @FeatureToggle
     var snakeGameKeybinds: Boolean = true
@@ -358,4 +363,14 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var savePrivateIslandChests: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Middle Click Fix",
+        desc = "Fixes not being able to middle click items in inventories (e.g. to disable a full set bonus or rune).",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("pick block")
+    var middleClickFix: Boolean = true
 }

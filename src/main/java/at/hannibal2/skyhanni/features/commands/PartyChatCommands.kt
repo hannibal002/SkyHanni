@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,7 +31,7 @@ object PartyChatCommands {
         val isEnabled: () -> Boolean,
         val requiresPartyLead: Boolean = true,
         val triggerableBySelf: Boolean = true,
-        val executable: (PartyChatEvent) -> Unit,
+        val executable: (PartyChatEvent.Allow) -> Unit,
     )
 
     private var lastWarp = SimpleTimeMark.farPast()
@@ -69,13 +68,9 @@ object PartyChatCommands {
             requiresPartyLead = false,
             executable = {
                 if (!CurrentPing.isEnabled()) {
-                    ChatUtils.clickableChat(
+                    ChatUtils.notifyOrDisable(
                         "Ping API is disabled, the ping command won't work!",
-                        prefixColor = "§c",
-                        onClick = {
-                            devConfig::pingApi.jumpToEditor()
-                        },
-                        hover = "§eClick to find setting in the config!",
+                        devConfig::pingApi,
                     )
                     return@PartyChatCommand
                 }
@@ -123,7 +118,7 @@ object PartyChatCommands {
     }
 
     @HandleEvent
-    fun onPartyCommand(event: PartyChatEvent) {
+    fun onPartyCommand(event: PartyChatEvent.Allow) {
         if (event.message.firstOrNull() !in commandPrefixes) return
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return

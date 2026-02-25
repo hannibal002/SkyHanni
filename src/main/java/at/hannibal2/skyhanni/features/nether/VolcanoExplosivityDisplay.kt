@@ -7,24 +7,18 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object VolcanoExplosivityDisplay {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
-    private val patternGroup = RepoPattern.group("crimson.volcano")
-
-    /**
-     * REGEX-TEST:  Volcano: §r§8INACTIVE
-     */
-    private val statusPattern by patternGroup.pattern(
-        "tablistline",
-        " *Volcano: (?<status>(?:§.)*\\S+)",
-    )
-    private var display = ""
+    private var display: Component = Component.empty()
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -32,19 +26,22 @@ object VolcanoExplosivityDisplay {
         if (!event.isWidget(TabWidget.VOLCANO)) return
 
         if (event.isClear()) {
-            display = ""
+            display = Component.empty()
             return
         }
-        // TODO merge widget pattern with statusPattern
-        statusPattern.matchMatcher(event.lines.first()) {
-            display = "§bVolcano Explosivity§7: ${group("status")}"
+
+        TabWidget.VOLCANO.pattern.matchGroup(event.lines.first(), "status")?.let {
+            display = componentBuilder {
+                append("§bVolcano Explosivity§7: ")
+                append(it)
+            }
         }
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.positionVolcano.renderString(display, posLabel = "Volcano Explosivity")
+        config.positionVolcano.renderRenderable(Renderable.text(display), posLabel = "Volcano Explosivity")
     }
 
     private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.volcanoExplosivity

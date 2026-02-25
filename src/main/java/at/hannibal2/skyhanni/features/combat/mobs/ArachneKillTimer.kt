@@ -41,7 +41,7 @@ object ArachneKillTimer {
      */
     private val arachneDeathPattern by patternGroup.pattern(
         "dead",
-        "§f.*§r§6§lARACHNE DOWN!",
+        ".*§r§6§lARACHNE DOWN!",
     )
 
     /**
@@ -49,14 +49,14 @@ object ArachneKillTimer {
      */
     private val arachneDamagePattern by patternGroup.pattern(
         "damage",
-        "§f +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)",
+        ".*§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)",
     )
 
     private var arachneSpawnedTime = SimpleTimeMark.farPast()
     private var arachneKillTime = Duration.ZERO
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (arachneCallingSpawnedPattern.matches(event.message) || arachneCrystalSpawnedPattern.matches(event.message)) {
             arachneSpawnedTime = SimpleTimeMark.now()

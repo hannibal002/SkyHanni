@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -25,12 +24,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.network.play.server.S0EPacketSpawnObject
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.12
-//$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
-//#endif
 
 @SkyHanniModule
 object PestParticleWaypoint {
@@ -38,7 +33,6 @@ object PestParticleWaypoint {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    private const val FIREWORK_ID = 76
 
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
     private var lastParticle = SimpleTimeMark.farPast()
@@ -50,7 +44,7 @@ object PestParticleWaypoint {
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (MinecraftCompat.localPlayer.isSneaking) return
+        if (MinecraftCompat.localPlayer.isShiftKeyDown) return
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
@@ -58,6 +52,9 @@ object PestParticleWaypoint {
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnIsland = IslandType.GARDEN)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
+
+        if (config.hideParticles && event.type == ParticleTypes.FIREWORK) event.cancel()
+
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
         when {
             event.isEnchantmentTable() -> {
@@ -88,10 +85,10 @@ object PestParticleWaypoint {
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
-        type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 10 && speed == -2f && offset.isZero()
+        type == ParticleTypes.ENCHANT && count == 10 && speed == -2f && offset.isZero()
 
     private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
-        type == EnumParticleTypes.VILLAGER_ANGRY && count == 1 && speed == 0f && offset.isZero()
+        type == ParticleTypes.ANGRY_VILLAGER && count == 1 && speed == 0f && offset.isZero()
 
     @HandleEvent
     fun onWorldChange() = reset()
@@ -101,21 +98,6 @@ object PestParticleWaypoint {
         guessPosition = null
         isGuessPlotMiddle = false
         bezierFitter.reset()
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onFireWorkSpawn(event: PacketReceivedEvent) {
-        //#if MC < 1.12
-        val packet = event.packet as? S0EPacketSpawnObject ?: return
-        //#else
-        //$$ val packet = event.packet as? ParticleS2CPacket ?: return
-        //#endif
-        if (!config.hideParticles) return
-        //#if MC < 1.12
-        if (packet.type == FIREWORK_ID) event.cancel()
-        //#else
-        //$$ if (packet.parameters == ParticleTypes.FIREWORK) event.cancel()
-        //#endif
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

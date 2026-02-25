@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object AnvilCombineHelper {
@@ -40,9 +40,9 @@ object AnvilCombineHelper {
         if (leftStack == null && rightStack == null) return emptySet()
 
         return InventoryUtils.getSlotsInOwnInventory().filter { slot ->
-            val name = slot.stack.getInternalName()
+            val name = slot.item.getInternalName()
             name == leftStack || name == rightStack
-        }.map { it.slotNumber }.toSet()
+        }.map { it.index }.toSet()
 
     }
 
@@ -51,7 +51,7 @@ object AnvilCombineHelper {
         if (!isEnabled()) return
 
         for (slot in InventoryUtils.getSlotsInOwnInventory()) {
-            if (slot.slotNumber in highlightedSlots) {
+            if (slot.index in highlightedSlots) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

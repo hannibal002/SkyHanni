@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldIt
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -27,7 +29,8 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
@@ -37,12 +40,12 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.average
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -52,16 +55,16 @@ object PestSpawnTimer {
     private val patternGroup = RepoPattern.group("garden.pests")
 
     /**
-     * REGEX-TEST:  Cooldown: §r§a§lREADY
-     * REGEX-TEST:  Cooldown: §r§e1m 58s
-     * REGEX-TEST:  Cooldown: §r§e1m
-     * REGEX-TEST:  Cooldown: §r§e58s
-     * REGEX-TEST:  Cooldown: §r§c§lMAX PESTS
+     * WRAPPED-REGEX-TEST: " Cooldown: READY"
+     * WRAPPED-REGEX-TEST: " Cooldown: 1m 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: 1m"
+     * WRAPPED-REGEX-TEST: " Cooldown: 58s"
+     * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
      */
 
     private val pestCooldownPattern by patternGroup.pattern(
-        "cooldown",
-        "\\sCooldown: §r§.(?:§.)?(?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+        "cooldowntime-no-color",
+        "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -77,41 +80,37 @@ object PestSpawnTimer {
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    private val customCooldownTime get(): Duration =
+        (if (Perk.PEST_ERADICATOR.isActive) config.customCooldownTimeFinnegan else config.customCooldownTime).get().seconds
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        pestCooldownPattern.firstMatcher(event.widget.lines) {
-            val minutes = groupOrNull("minutes")?.formatInt()
-            val seconds = groupOrNull("seconds")?.formatInt()
+        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
 
             if (ready || maxPests) {
+                pestCooldownEndTime = SimpleTimeMark.farPast()
                 shouldRepeatWarning = false
                 return
             }
-            if (minutes == null && seconds == null) return
+            if (time == null) return
+            pestCooldownEndTime = if (config.customCooldown.get()) {
+                lastPestSpawnTime + customCooldownTime
+            } else time
 
-            val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
-
-            if (shouldSetCooldown(tablistCooldownEnd, seconds)) {
-                // hypixel sometimes rounds time down, we'll assume times are rounded down if seconds are null and add a minute
-                pestCooldownEndTime = if (seconds == null) {
-                    tablistCooldownEnd + 1.minutes
-                } else {
-                    tablistCooldownEnd
-                }
-                if (pestSpawned) {
-                    hasWarned = false
-                    pestSpawned = false
-                }
+            if (pestSpawned) {
+                hasWarned = false
+                pestSpawned = false
             }
         }
     }
 
-    @HandleEvent
-    fun onPestSpawn(event: PestSpawnEvent) {
+    @HandleEvent(PestSpawnEvent::class)
+    fun onPestSpawn() {
         shouldRepeatWarning = false
         val spawnTime = lastPestSpawnTime.passedSince()
 
@@ -130,8 +129,8 @@ object PestSpawnTimer {
         lastPestSpawnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onRenderOverlay() {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
@@ -148,8 +147,8 @@ object PestSpawnTimer {
         lastCropBrokenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         update()
         if (shouldRepeatWarning) {
@@ -184,20 +183,24 @@ object PestSpawnTimer {
         shouldRender = shouldRender()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onIslandChange() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
 
-    private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, seconds: Int?): Boolean {
-        // tablist can have up to 6 seconds of delay, besides this, there is no scenario where tablist will overestimate cooldown
-        if (tabCooldownEnd > ((pestCooldownEndTime) + 6.seconds)) return true
-        // tablist sometimes rounds down to nearest min
-        if ((tabCooldownEnd + 1.minutes) < (pestCooldownEndTime) && seconds == null) return true
-        // tablist shouldn't underestimate if it is displaying seconds
-        if ((tabCooldownEnd + 1.seconds) < (pestCooldownEndTime) && seconds != null) return true
-        return false
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        config.customCooldown.onToggle {
+            setCustomCooldown()
+        }
+        config.customCooldownTime.afterChange {
+            setCustomCooldown()
+        }
+    }
+
+    private fun setCustomCooldown() {
+        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + customCooldownTime
     }
 
     private fun drawDisplay(): List<Renderable> {
@@ -234,9 +237,8 @@ object PestSpawnTimer {
         return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> {
-        return config.pestDisplay.mapNotNull { lineMap[it] }
-    }
+    private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> =
+        config.pestDisplay.mapNotNull { lineMap[it] }
 
     private fun update() {
         display = drawDisplay()

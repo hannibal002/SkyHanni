@@ -5,32 +5,27 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
-import net.minecraft.client.network.NetworkPlayerInfo
-import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
+import net.minecraft.world.level.GameType
 import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.16
-import net.minecraft.world.WorldSettings
-//#else
-//$$ import net.minecraft.world.level.GameType
-//#endif
 
 @SkyHanniModule
 object TabListData {
@@ -68,7 +63,7 @@ object TabListData {
             debugCache = null
             return
         }
-        SkyHanniMod.launchCoroutine {
+        SkyHanniMod.launchCoroutine("tab list toggle debug") {
             val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
             debugCache = clipboard.lines()
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
@@ -79,7 +74,7 @@ object TabListData {
         if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
-                onClick = { toggleDebug() },
+                onClick = ::toggleDebug,
                 "§eClick to disable!",
             )
             return
@@ -94,10 +89,8 @@ object TabListData {
         val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
         val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
 
-        val widgets = TabWidget.entries.filter { it.isActive }
-            .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
         val string =
-            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\n"
 
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Tab list copied into the clipboard!")
@@ -105,45 +98,29 @@ object TabListData {
 
     private val playerOrdering = Ordering.from(PlayerComparator())
 
-    @SideOnly(Side.CLIENT)
-    internal class PlayerComparator : Comparator<NetworkPlayerInfo> {
+    @Environment(EnvType.CLIENT)
+    internal class PlayerComparator : Comparator<PlayerInfo> {
 
-        override fun compare(o1: NetworkPlayerInfo, o2: NetworkPlayerInfo): Int {
-            val team1 = o1.playerTeam
-            val team2 = o2.playerTeam
-            return ComparisonChain.start().compareTrueFirst(
-                //#if MC < 1.16
-                o1.gameType != WorldSettings.GameType.SPECTATOR,
-                o2.gameType != WorldSettings.GameType.SPECTATOR,
-                //#else
-                //$$ o1.gameMode != GameType.SPECTATOR,
-                //$$ o2.gameMode != GameType.SPECTATOR,
-                //#endif
-            )
+        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int {
+            val team1 = o1.team
+            val team2 = o2.team
+            return ComparisonChain.start().compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
                 .compare(
-                    if (team1 != null) team1.registeredName else "",
-                    if (team2 != null) team2.registeredName else ""
+                    if (team1 != null) team1.name else "",
+                    if (team2 != null) team2.name else "",
                 )
-                .compare(o1.gameProfile.name, o2.gameProfile.name).result()
+                .compare(o1.profile.name, o2.profile.name).result()
         }
     }
 
     private fun readTabList(): List<String>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
-        //#if MC < 1.16
-        val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
-        //#else
-        //$$ val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
-        //#endif
+        val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
-            val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            //#if MC < 1.16
-            result.add(name.stripHypixelMessage())
-            //#else
-            //$$ result.add(name.formattedTextCompat().stripHypixelMessage())
-            //#endif
+            val name = Minecraft.getInstance().gui.tabList.getNameForDisplay(info)
+            result.add(name.formattedTextCompat().stripHypixelMessage())
         }
         tabListGuard = false
         return if (result.size < 80) result.dropLast(1)
@@ -154,7 +131,7 @@ object TabListData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        if (event.packet is S38PacketPlayerListItem) {
+        if (event.packet is ClientboundPlayerInfoUpdatePacket) {
             dirty = true
         }
     }
@@ -173,10 +150,11 @@ object TabListData {
             }
         }
 
-        val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedText.orEmpty()
+        val tabListOverlay = Minecraft.getInstance().gui.tabList
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
+        header = tabListOverlay.header?.formattedTextCompat().orEmpty()
+
+        val tabFooter = tabListOverlay.footer?.formattedTextCompat().orEmpty()
         if (tabFooter != footer && tabFooter != "") {
             TablistFooterUpdateEvent(tabFooter).post()
         }

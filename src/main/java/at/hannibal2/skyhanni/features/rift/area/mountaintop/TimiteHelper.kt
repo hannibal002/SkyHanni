@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import net.minecraft.block.state.IBlockState
-import net.minecraft.init.Blocks
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,12 +37,13 @@ object TimiteHelper {
     private var lastClick = SimpleTimeMark.farPast()
     private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
     private var currentPos: LorenzVec? = null
-    private var currentBlockState: IBlockState? = null
+    private var currentBlockState: BlockState? = null
     private var doubleTimeShooting = false
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockHit(event: BlockClickEvent) {
         if (!isEnabled()) return
+        if (!config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (event.position != currentPos || currentBlockState != event.getBlockState) {
@@ -72,6 +73,7 @@ object TimiteHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
         if (lastClick + 400.milliseconds < SimpleTimeMark.now()) {
             holdingClick = SimpleTimeMark.farPast()
@@ -93,7 +95,8 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftApi.inMountainTop() || !config.expiryTimer) return
+        if (!isEnabled()) return
+        if (!config.expiryTimer) return
 
         val map = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
@@ -110,7 +113,7 @@ object TimiteHelper {
         val iterator = locations.entries.iterator()
         while (iterator.hasNext()) {
             val state = iterator.next().key.getBlockStateAt()
-            if (state.block == Blocks.air) {
+            if (state.block == Blocks.AIR) {
                 iterator.remove()
             } else if (state.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) {
                 iterator.remove()
@@ -120,7 +123,8 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!RiftApi.inMountainTop() || !config.expiryTimer) return
+        if (!isEnabled()) return
+        if (!config.expiryTimer) return
 
         for (location in locations.entries) {
             val timeLeft = location.value + 31.seconds
@@ -135,5 +139,5 @@ object TimiteHelper {
         locations.clear()
     }
 
-    private fun isEnabled() = RiftApi.inMountainTop() && config.evolutionTimer
+    private fun isEnabled() = RiftApi.inMountainTop() && config.enabled
 }

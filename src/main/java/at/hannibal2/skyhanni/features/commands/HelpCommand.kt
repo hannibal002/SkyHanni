@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.tree.CommandNode
-import net.minecraft.util.IChatComponent
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object HelpCommand {
@@ -20,7 +20,7 @@ object HelpCommand {
     private const val COMMANDS_PER_PAGE = 15
     private val messageId = ChatUtils.getUniqueMessageId()
 
-    private fun createCommandEntry(command: CommandData, dispatcher: CommandDispatcher<Any?>): IChatComponent {
+    private fun createCommandEntry(command: CommandData, dispatcher: CommandDispatcher<Any?>): Component {
         val category = command.category
         val color = category.color
         val description = command.descriptor.splitLines(300).replace("§r", "§7")

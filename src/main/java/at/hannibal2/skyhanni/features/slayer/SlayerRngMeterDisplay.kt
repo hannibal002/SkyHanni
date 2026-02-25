@@ -31,8 +31,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
@@ -91,7 +95,7 @@ object SlayerRngMeterDisplay {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (config.hideChat && SlayerApi.isInCorrectArea) {
@@ -147,7 +151,15 @@ object SlayerRngMeterDisplay {
                         "timesUpdatedSinceLastDrop" to timesUpdatedSinceLastDrop,
                     )
                 }
-                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
+                ChatUtils.chat(
+                    componentBuilder {
+                        appendWithColor("RNG Meter ", ChatFormatting.LIGHT_PURPLE)
+                        withColor(ChatFormatting.GRAY)
+                        append("dropped at ")
+                        appendWithColor("$percentage ", ChatFormatting.YELLOW)
+                        append("XP ($from/$to)")
+                    }
+                )
                 lastItemDroppedTime = SimpleTimeMark.now()
                 timesUpdatedSinceLastDrop = 0
             }
@@ -165,7 +177,7 @@ object SlayerRngMeterDisplay {
         }
     }
 
-    private fun getCurrentSlayer() = SlayerApi.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
+    private fun getCurrentSlayer() = SlayerApi.latestCategory.removeWordsAtEnd(1).removeColor()
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -237,14 +249,14 @@ object SlayerRngMeterDisplay {
         text,
         tips = listOf("§eClick to open RNG Meter Inventory."),
         onLeftClick = {
-            HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
+            HypixelCommands.showRng("slayer", SlayerApi.activeType?.rngName)
         },
     )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
 
-        if (SlayerApi.latestSlayerCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
+        if (SlayerApi.latestCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
             return ""
         }
 
@@ -272,7 +284,7 @@ object SlayerRngMeterDisplay {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
             },
@@ -282,7 +294,7 @@ object SlayerRngMeterDisplay {
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
         if (!SlayerApi.isInCorrectArea) return false
-        if (!SlayerApi.hasActiveSlayerQuest()) return false
+        if (!SlayerApi.hasActiveQuest()) return false
 
         return true
     }

@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
-abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniBaseScreen() {
+abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyHanniBaseScreen() {
     companion object {
         const val SELECTED_COLOR = 0x50000000
         const val NOT_SELECTED_COLOR = 0x50303030
@@ -54,26 +54,26 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
 
     private fun renderHorizontalTabs() {
         var offset = Pair(TAB_SPACING.toFloat() * 3f, -TAB_LONG_SIDE.toFloat())
-        DrawContextUtils.translate(offset.first, offset.second, 0f)
+        DrawContextUtils.translate(offset.first, offset.second)
         for (tab in horizontalTabs) {
             tab.render(offset.first.toInt(), offset.second.toInt())
             val xShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first + xShift to offset.second
-            DrawContextUtils.translate(xShift, 0f, 0f)
+            DrawContextUtils.translate(xShift, 0f)
         }
-        DrawContextUtils.translate(-offset.first, -offset.second, 0f)
+        DrawContextUtils.translate(-offset.first, -offset.second)
     }
 
     private fun renderVerticalTabs() {
         var offset = Pair(-TAB_LONG_SIDE.toFloat(), TAB_SPACING.toFloat() * 3f)
-        DrawContextUtils.translate(offset.first, offset.second, 0f)
+        DrawContextUtils.translate(offset.first, offset.second)
         for (tab in verticalTabs) {
             tab.render(offset.first.toInt(), offset.second.toInt())
             val yShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first to offset.second + yShift
-            DrawContextUtils.translate(0f, yShift, 0f)
+            DrawContextUtils.translate(0f, yShift)
         }
-        DrawContextUtils.translate(-offset.first, -offset.second, 0f)
+        DrawContextUtils.translate(-offset.first, -offset.second)
     }
 
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) = try {
@@ -85,7 +85,7 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
         val relativeMouseY = originalMouseY - guiTop
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(guiLeft.toFloat(), guiTop.toFloat(), 0f)
+        DrawContextUtils.translate(guiLeft.toFloat(), guiTop.toFloat())
         GuiRenderUtils.drawRect(0, 0, sizeX, sizeY, 0x50000000)
 
         Renderable.withMousePosition(relativeMouseX, relativeMouseY) {
@@ -101,7 +101,7 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
             val page = pageList[currentPage]
             page?.drawPage(relativeMouseX, relativeMouseY)
 
-            DrawContextUtils.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
+            DrawContextUtils.translate(-guiLeft.toFloat(), -guiTop.toFloat())
         }
         DrawContextUtils.popMatrix()
     } catch (e: Exception) {

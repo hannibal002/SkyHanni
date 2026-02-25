@@ -1,98 +1,72 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.compat.ReiCompat
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.inventory.Container
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-//#if FABRIC
-//$$ import net.minecraft.screen.slot.SlotActionType
-//$$ import at.hannibal2.skyhanni.compat.ReiCompat
-//#endif
-
-fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
-    //#if MC < 1.21
-    return this.inventory?.itemStack
-    //#else
-    //$$ val stack = this.currentScreenHandler?.cursorStack
-    //$$ if (stack?.isEmpty == true) return null
-    //$$ return stack
-    //#endif
+fun LocalPlayer.getItemOnCursor(): ItemStack? {
+    val stack = this.containerMenu?.carried
+    if (stack?.isEmpty == true) return null
+    return stack
 }
 
 fun stackUnderCursor(): ItemStack? {
-    val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return null
-    //#if FORGE
-    return screen.slotUnderMouse?.stack
-    //#else
-    //$$ var stack = screen.focusedSlot?.stack
-    //$$ if (stack != null) return stack
-    //$$ stack = ReiCompat.getHoveredStackFromRei()
-    //$$ return stack
-    //#endif
+    val screen = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return null
+    var stack = screen.hoveredSlot?.item
+    if (stack != null) return stack
+    stack = ReiCompat.getHoveredStackFromRei()
+    return stack
 }
 
 fun slotUnderCursor(): Slot? {
-    val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return null
-    //#if FORGE
-    return screen.slotUnderMouse
-    //#else
-    //$$ return screen.focusedSlot
-    //#endif
+    val screen = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return null
+    return screen.hoveredSlot
 }
 
-val GuiChest.container: Container
-    //#if MC < 1.16
-    get() = this.inventorySlots
-//#else
-//$$ get() = this.screenHandler
-//#endif
+val ContainerScreen.container: AbstractContainerMenu
+    get() = this.menu
 
 object InventoryCompat {
 
-    // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun getOpenChestName(): String {
-        val currentScreen = Minecraft.getMinecraft().currentScreen
-        //#if MC < 1.16
-        if (currentScreen !is GuiChest) return ""
-        val value = currentScreen.inventorySlots as ContainerChest
-        return value.lowerChestInventory?.displayName?.unformattedText.orEmpty()
-        //#else
-        //$$ return currentScreen?.title.formattedTextCompat()
-        //#endif
+    /**
+     * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
+     */
+    fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: Int) {
+        val controller = Minecraft.getInstance().gameMode ?: return
+        val player = Minecraft.getInstance().player ?: return
+        controller.handleInventoryMouseClick(windowId, slotId, mouseButton, ClickType.entries[mode], player)
     }
 
-
-    fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int, mode: Int) {
-        windowId ?: return
-        val controller = Minecraft.getMinecraft().playerController ?: return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
-        //#if FORGE
-        controller.windowClick(windowId, slot, mouseButton, mode, player)
-        //#else
-        //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
-        //#endif
+    /**
+     * Internal method, not meant to be called directly. Prefer `InventoryUtils.mouseClickSlot()`.
+     */
+    fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
+        if (slot < 0) return
+        val gui = Minecraft.getInstance().screen
+        if (gui is AbstractContainerScreen<*>) {
+            val slotObj = gui.menu.getSlot(slot)
+            val actionType = ClickType.entries[mode]
+            gui.slotClicked(slotObj, slot, mouseButton, actionType)
+        }
     }
 
-    fun containerSlots(container: GuiContainer): List<Slot> =
-        //#if FORGE
-        container.inventorySlots.inventorySlots
-//#else
-//$$ container.screenHandler.slots
-//#endif
+    fun containerSlots(container: SkyHanniGuiContainer): List<Slot> =
+        container.menu.slots
 
-    private fun getWindowId(): Int? =
-        //#if FORGE
-        (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
-//#else
-//$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
-//#endif
+    fun getWindowIdOrNull(): Int? =
+        (Minecraft.getInstance().screen as? ContainerScreen)?.menu?.containerId
+
+    fun getWindowId(): Int =
+        getWindowIdOrNull() ?: ErrorManager.skyHanniError("windowId is null")
 
     fun Array<ItemStack?>?.filterNotNullOrEmpty(): List<ItemStack>? {
         return this?.filterNotNull()?.filter { it.isNotEmpty() }
@@ -115,17 +89,10 @@ object InventoryCompat {
             returns(true) implies (this@isNotEmpty != null)
         }
         this ?: return false
-        //#if MC > 1.21
-        //$$ return !this.isEmpty
-        //#else
-        return true
-        //#endif
+        return !this.isEmpty
     }
 
     fun ItemStack?.orNull(): ItemStack? {
-        //#if MC > 1.21
-        //$$ return this?.takeUnless { it.isEmpty }
-        //#endif
-        return this
+        return this?.takeUnless { it.isEmpty }
     }
 }

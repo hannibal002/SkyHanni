@@ -34,15 +34,15 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.EnumFacing
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.core.Direction
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
-typealias FacePointEntry = Map.Entry<EnumFacing, PointSet>
-typealias FacePointSet = MutableMap<EnumFacing, PointSet>
+typealias FacePointEntry = Map.Entry<Direction, PointSet>
+typealias FacePointSet = MutableMap<Direction, PointSet>
 
 @SkyHanniModule
 object TestCanSeeFace {
@@ -55,7 +55,7 @@ object TestCanSeeFace {
         var generallySeen: Boolean = false,
         var finished: Boolean = false,
         var debugRenderable: Renderable? = null,
-    ) : Resettable() {
+    ) : Resettable {
         fun resetFromBlockVec(blockVec: LorenzVec) {
             this.reset()
             val base = blockVec.floor()
@@ -120,11 +120,11 @@ object TestCanSeeFace {
         override fun toString(): String = displayName
     }
 
-    private val faceStates: MutableMap<EnumFacing, FaceState> by lazy {
-        EnumFacing.entries.associateWith { FaceState.VISIBLE }.toMutableMap()
+    private val faceStates: MutableMap<Direction, FaceState> by lazy {
+        Direction.entries.associateWith { FaceState.VISIBLE }.toMutableMap()
     }
 
-    private fun toggleFaceVisibility(face: EnumFacing) {
+    private fun toggleFaceVisibility(face: Direction) {
         faceStates[face] = when (faceStates[face]) {
             FaceState.VISIBLE -> FaceState.HIDDEN
             else -> FaceState.VISIBLE
@@ -156,7 +156,7 @@ object TestCanSeeFace {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!enabled || !event.isLocalPlayer) return
         if (!config.refreshOnMove.get()) return
         recalcContext(true)
@@ -264,7 +264,7 @@ object TestCanSeeFace {
     )
 
     private fun SkyHanniRenderWorldEvent.drawRaysFromFacePoints(
-        face: EnumFacing,
+        face: Direction,
         points: Collection<Pair<LorenzVec, Boolean>>,
     ) {
         if (!rayConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
@@ -284,7 +284,7 @@ object TestCanSeeFace {
 
     private fun SkyHanniRenderWorldEvent.tryHighlightFace(
         context: FaceCheckContext,
-        face: EnumFacing,
+        face: Direction,
     ) {
         if (!faceHighlightConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
         val vec1 = context.vec1 ?: return
@@ -292,7 +292,7 @@ object TestCanSeeFace {
         val points = context.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
         val color = if (faceSeen) faceHighlightConfig.seenColor.get() else rayConfig.unSeenColor.get()
-        val aabb = AxisAlignedBB(
+        val aabb = AABB(
             vec1.x, vec1.y, vec1.z,
             vec2.x, vec2.y, vec2.z,
         )

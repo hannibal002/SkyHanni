@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 
@@ -29,7 +29,7 @@ object ProfitPerMineshaftCorpse {
             val internalName = NeuInternalName.fromItemNameOrNull(name) ?: continue
             val pricePer = internalName.getPriceOrNull() ?: continue
             val profit = amount * pricePer
-            val text = "§eFound $name §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
+            val text = "§eFound ${internalName.getPriceName(amount, pricePer)}"
             map[text] = profit
             totalProfit += profit
         }

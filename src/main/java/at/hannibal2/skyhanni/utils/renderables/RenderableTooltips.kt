@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.RenderHelper
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object RenderableTooltips {
@@ -70,35 +68,22 @@ object RenderableTooltips {
             x // normal
         }
 
-        GlStateManager.disableRescaleNormal()
-        //#if TODO
-        RenderHelper.disableStandardItemLighting()
-        //#endif
-        GlStateManager.enableDepth()
-
-        val zLevel = 400f
-        DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
+        DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat())
 
         drawTooltipBackground(tooltipTextWidth, tooltipHeight, borderColorStart)
 
-        DrawContextUtils.translate(-1f, -1f, 0f)
+        DrawContextUtils.translate(-1f, -1f)
 
         var yTranslateSum = 0
         tips.forEachIndexed { index, line ->
             line.renderXAligned(tooltipX, tooltipY, tooltipTextWidth)
             var yShift = line.height
             if (index == 0 && isSpacedTitle) yShift += 2
-            DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
+            DrawContextUtils.translate(0f, yShift.toFloat())
             yTranslateSum += yShift
         }
 
-        DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
-        GlStateManager.enableLighting()
-        //#if TODO
-        RenderHelper.enableStandardItemLighting()
-        //#endif
-        GlStateManager.enableRescaleNormal()
-        GlStateManager.disableLighting()
+        DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat())
     }
 
     private fun drawTooltipBackground(tooltipTextWidth: Int, tooltipHeight: Int, borderColorStart: Int) {

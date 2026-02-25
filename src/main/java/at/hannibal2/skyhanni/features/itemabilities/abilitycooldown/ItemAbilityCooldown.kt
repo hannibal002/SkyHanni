@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -160,7 +160,7 @@ object ItemAbilityCooldown {
                 }
             }
             // Weird Tuba & Weirder Tuba
-            event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
+            (event.soundName == "mob.wolf.howl" || event.soundName == "mob.wolf.death") && event.volume == 0.5f -> {
                 if (WEIRD_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }
@@ -370,7 +370,7 @@ object ItemAbilityCooldown {
 
         val stack = event.stack
 
-        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val guiOpen = Minecraft.getInstance().screen != null
         val uuid = stack.getIdentifier() ?: return
         val list = items[uuid] ?: return
 
@@ -391,7 +391,7 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
 
-        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val guiOpen = Minecraft.getInstance().screen != null
         val stack = event.stack
 
         val uuid = stack?.getIdentifier() ?: return
@@ -418,7 +418,7 @@ object ItemAbilityCooldown {
 
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message

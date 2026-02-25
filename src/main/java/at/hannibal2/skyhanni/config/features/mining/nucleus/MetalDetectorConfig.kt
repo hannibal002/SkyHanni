@@ -28,10 +28,17 @@ class MetalDetectorConfig {
     @Expose
     @ConfigOption(name = "All Tools Alert", desc = "Alert when you have all the metal detector tools.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var metalDetectorAllToolsAlert: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Stop After All Tools", desc = "Stop looking for treasure when you have all the metal detector tools.")
+    @ConfigEditorBoolean
+    var metalDetectorStopWhenAllTools: Boolean = false
 
     @Expose
     @ConfigOption(name = "Mute Metal Detector", desc = "Mute the metal detector sound.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var muteMetalDetectorSound: Boolean = false
 }

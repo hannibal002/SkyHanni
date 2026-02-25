@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -22,7 +22,7 @@ import java.util.NavigableMap
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class ChangeLogViewerScreen : SkyhanniBaseScreen() {
+class ChangeLogViewerScreen : SkyHanniBaseScreen() {
     private val changelogScroll = ScrollValue()
 
     private lateinit var scrollList: Renderable
@@ -66,11 +66,11 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
         val yTranslate = this.height / 10
 
         drawDefaultBackground(mouseX, mouseY, partialTicks)
-        DrawContextUtils.translate(xTranslate - 2.0, yTranslate - 2.0, 0.0)
+        DrawContextUtils.translate(xTranslate - 2.0, yTranslate - 2.0)
         GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
-        DrawContextUtils.translate(-(xTranslate - 2.0), -(yTranslate - 2.0), 0.0)
+        DrawContextUtils.translate(-(xTranslate - 2.0), -(yTranslate - 2.0))
 
-        DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat() + 5, 0f)
+        DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat() + 5)
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
             if (!ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)) {
                 ChangelogViewer.shouldMakeNewList = true
@@ -102,17 +102,17 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                 }
                 scrollList
             }.renderXYAligned(0, 0, width, height)
-            DrawContextUtils.translate(0f, -5f, 0f)
+            DrawContextUtils.translate(0f, -5f)
             val topOfGui = -buttonPanel.height - 5
-            DrawContextUtils.translate(0f, topOfGui.toFloat(), 0f)
+            DrawContextUtils.translate(0f, topOfGui.toFloat())
             buttonPanel.renderXAligned(0, topOfGui, width)
             Renderable.drawInsideDarkRect(
                 Renderable.text("§9${ChangelogViewer.startVersion} §e➜ §9${ChangelogViewer.endVersion}"),
                 horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
             ).renderXAligned(0, topOfGui, width)
-            DrawContextUtils.translate(0f, -topOfGui.toFloat(), 0f)
+            DrawContextUtils.translate(0f, -topOfGui.toFloat())
         }
-        DrawContextUtils.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
+        DrawContextUtils.translate(-xTranslate.toFloat(), -yTranslate.toFloat())
     }
 
     private fun makeScrollList(

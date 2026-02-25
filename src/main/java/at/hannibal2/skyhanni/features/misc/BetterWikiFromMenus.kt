@@ -18,6 +18,7 @@ object BetterWikiFromMenus {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "fandomWiki", "commands.fandomWiki")
+        // Apparently the above got changed again at some point but never got a migration
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
@@ -28,8 +29,8 @@ object BetterWikiFromMenus {
 
         if (chestName.isEmpty()) return
 
-        val itemClickedStack = event.slot?.stack ?: return
-        val itemClickedName = itemClickedStack.displayName
+        val itemClickedStack = event.slot?.item ?: return
+        val itemClickedName = itemClickedStack.hoverName.string
 
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")
@@ -39,7 +40,7 @@ object BetterWikiFromMenus {
 
         if (inBiblioInventory) {
             if (isWiki) {
-                WikiManager.sendWikiMessage(useFandom = true)
+                WikiManager.sendWikiMessage(useUnofficial = true)
                 return
             }
 

@@ -11,13 +11,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class ChatConfig {
     @Expose
     @ConfigOption(name = "Peek Chat", desc = "Hold this key to keep the chat open.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
-    var peekChat: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_Z)
+    var peekChat: Int = GLFW.GLFW_KEY_UNKNOWN
 
     // TODO move into own sub category
     @Expose
@@ -67,8 +67,7 @@ class ChatConfig {
     @ConfigOption(
         name = "Copy Chat",
         desc = "Right click a chat message to copy it. Holding Shift will copy the message with " +
-            "Shwords applied, and holding Ctrl will copy only one line.\n" +
-            "§cNote: Will not work correctly with the Chatting mod.",
+            "Shwords applied, and holding Ctrl will copy only one line."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -190,6 +189,17 @@ class ChatConfig {
     var hideSkyMall: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Show Actual Powder Gained",
+        desc = "Shows both base and actual Gemstone Powder amounts in chat messages, " +
+            "accounting for 2x Powder events, Sky Mall perks, and other multipliers.\n" +
+            "§eFormat: §dGemstone Powder §r§8x1,944 §7(x3,888)"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showEffectivePowder: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -214,4 +224,14 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     var hideClickableHint: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Dark Auction Item Display",
+        desc = "Adds the item name to the highest bidder message at the Dark Auction.",
+    )
+    @ConfigEditorBoolean
+    @SearchTag("da sirius")
+    @FeatureToggle
+    var darkAuctionItemDisplay: Boolean = true
 }

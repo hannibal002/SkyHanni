@@ -48,6 +48,7 @@ object CrystalNucleusApi {
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
     val EPIC_BAL_ITEM = "BAL;3".toInternalName()
     val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
+    val BAL_SHARD_ITEM = "ATTRIBUTE_SHARD_DEEP_TECHNIQUE;1".toInternalName()
     private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
     val JUNGLE_KEY_ITEM = "JUNGLE_KEY".toInternalName()
     private val ROBOT_PARTS_ITEMS = listOf(
@@ -63,7 +64,7 @@ object CrystalNucleusApi {
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
-        if (event.itemStack.displayName != "§fEnchanted Book") return
+        if (event.itemStack.hoverName.string != "Enchanted Book") return
         when (event.itemStack.getHypixelEnchantments()?.keys?.firstOrNull() ?: return) {
             "lapidary" -> loot.addOrPut(LAPIDARY_I_BOOK_ITEM, 1)
             "fortune" -> loot.addOrPut(FORTUNE_IV_BOOK_ITEM, 1)
@@ -89,7 +90,7 @@ object CrystalNucleusApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
 
         if (startPattern.matches(message)) {
@@ -115,7 +116,7 @@ object CrystalNucleusApi {
         }
     }
 
-    private fun SkyHanniChatEvent.getLoot(): Pair<NeuInternalName, Int>? {
+    private fun SkyHanniChatEvent.Allow.getLoot(): Pair<NeuInternalName, Int>? {
         // All loot rewards start with 4 spaces.
         // To simplify regex statements, this check is done outside the main logic.
         // This also nerfs the "§r§a§lREWARDS" message.
@@ -129,7 +130,7 @@ object CrystalNucleusApi {
         if (itemName.contains(" Powder")) return null
         // Books are not directly added to the loot map, but are checked for later.
         if (itemName.startsWith("§fEnchanted")) {
-            val bookType = ItemUtils.readBookType(itemName)
+            val bookType = ItemUtils.readBookTypeStrippedColor(itemName)
             return when (bookType) {
                 "Lapidary I" -> LAPIDARY_I_BOOK_ITEM to 1
                 "Fortune IV" -> FORTUNE_IV_BOOK_ITEM to 1

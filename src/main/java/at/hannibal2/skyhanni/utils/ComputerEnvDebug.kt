@@ -3,18 +3,16 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LauncherEntry
+import at.hannibal2.skyhanni.data.jsonobjects.repo.LaunchersJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-//#if MC == 1.8.9
-import net.minecraftforge.fml.client.FMLClientHandler
-import net.minecraftforge.fml.common.Loader
-//#endif
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -23,14 +21,23 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComputerEnvDebug {
 
+    private var launchers: List<LauncherEntry> = listOf()
+    private var genericStacks: List<String> = listOf()
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         os(event)
-        java(event)
         launcher(event)
         ram(event)
         uptime(event)
         performanceMods(event)
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val repoJson = event.getConstant<LaunchersJson>("Launchers")
+        launchers = repoJson.launchers
+        genericStacks = repoJson.genericStacks
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -41,83 +48,46 @@ object ComputerEnvDebug {
             return
         }
 
-        val (launcher, relevant) = findLauncher(firstStack)
+        val launcherBrand = runCatching {
+            System.getProperty("minecraft.launcher.brand")
+        }.getOrNull().orEmpty()
+        val (launcher, relevant) = findLauncher(firstStack, launcherBrand)
 
         launcher?.let {
-            if (relevant) {
-                event.addData(it)
-            } else {
-                event.addIrrelevant(it)
-            }
+            if (relevant) event.addData(it)
+            else event.addIrrelevant(it)
             return
         }
 
         event.addData {
             add("Unknown launcher!")
-            val launcherBrand = System.getProperty("minecraft.launcher.brand")
             add("System property of 'minecraft.launcher.brand': '$launcherBrand'")
             add("firstStack: '$firstStack'")
         }
     }
 
-    // TODO put into repo
-    private fun findLauncher(firstStack: String): Pair<String?, Boolean> {
-        if (firstStack.contains("net.fabricmc.devlaunchinjector.Main.main")) {
-            return Pair("Dev Env", false)
+    private fun findLauncher(firstStack: String, launcherBrand: String): Pair<String?, Boolean> {
+        val isGeneric = genericStacks.any { firstStack.contains(it) }
+        val matchingLaunchers = launchers.filter { launcher ->
+            val firstStackMatch = launcher.firstStacks.any { firstStack.contains(it) }
+            val brandMatch = launcher.brand.isNullOrBlank() || launcher.brand.equals(launcherBrand, ignoreCase = true)
+            (isGeneric || firstStackMatch) && brandMatch
         }
-        if (firstStack.contains("net.minecraft.launchwrapper.Launch.main")) {
-            return Pair("Vanilla Launcher", false)
+        val fallbackPair = null to true
+        return when (matchingLaunchers.size) {
+            0 -> fallbackPair
+            1 -> matchingLaunchers.first().getIdPair()
+            else -> matchingLaunchers.firstOrNull {
+                it.brand.equals(launcherBrand, ignoreCase = true)
+            }?.getIdPair() ?: fallbackPair
         }
-        if (firstStack.contains("org.prismlauncher.EntryPoint.main")) {
-            return Pair("Prism", false)
-        }
-        if (firstStack.contains("org.multimc.EntryPoint.main")) {
-            return Pair("MultiMC", false)
-        }
-        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
-            return Pair("Feather Client", true)
-        }
-        return Pair(null, true)
     }
 
-    private fun getFirstStack(): String? {
-        val firstStack = try {
-            Thread.currentThread().stackTrace.last().toString()
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
-            null
-        }
-        return firstStack
-    }
-
-    private fun java(event: DebugDataCollectEvent) {
-        // outdated java 8 is only a mc 1.8.9 thing. in mc 1.21 we have modern java 21 anyway
-        if (!PlatformUtils.IS_LEGACY) return
-
-        event.title("Computer Java Version")
-        val version = System.getProperty("java.version")
-        val pattern = "1\\.8\\.0_(?<update>.*)".toPattern()
-        pattern.matchMatcher(version) {
-            group("update").toIntOrNull()?.let {
-                val devEnvironment = PlatformUtils.isDevEnvironment
-                if (it < 300 && !devEnvironment) {
-                    event.addData {
-                        add("Old java version: $it")
-                        add("Update to a newer version if you have performance issues.")
-                        add("For more infos: https://github.com/hannibal002/SkyHanni/blob/beta/docs/update_java.md")
-                    }
-                } else {
-                    if (devEnvironment) {
-                        event.addIrrelevant("Update version: $it (dev env)")
-                    } else {
-                        event.addIrrelevant("New update: $it")
-                    }
-                }
-                return
-            }
-        }
-        event.addData("Unknown java version: '$version'")
-    }
+    private fun getFirstStack(): String? = kotlin.runCatching {
+        Thread.currentThread().stackTrace.last().toString()
+    }.onFailure { e ->
+        ErrorManager.logErrorWithData(e, "Failed loading current thread stack trace info")
+    }.getOrNull()
 
     private fun os(event: DebugDataCollectEvent) {
         event.title("Computer Operating System")
@@ -159,9 +129,9 @@ object ComputerEnvDebug {
         text.add("Minecraft Allocated: $allocatedPercentage% ${totalMemoryGB.formatGB()} GB")
 
         // Get total system memory using OS-specific APIs
-        val osBean = ManagementFactory.getOperatingSystemMXBean()
-        val totalPhysicalMemory = (osBean as com.sun.management.OperatingSystemMXBean).totalPhysicalMemorySize
-        val freePhysicalMemory = osBean.freePhysicalMemorySize
+        val osBean = ManagementFactory.getOperatingSystemMXBean() as com.sun.management.OperatingSystemMXBean
+        val totalPhysicalMemory = osBean.totalMemorySize
+        val freePhysicalMemory = osBean.freeMemorySize
         val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
 
         // Convert system memory to GB
@@ -227,48 +197,26 @@ object ComputerEnvDebug {
     private fun performanceMods(event: DebugDataCollectEvent) {
         if (PlatformUtils.isDevEnvironment) return
         event.title("Performance Mods")
-        //#if MC < 1.21
-        val hasOptifine = FMLClientHandler.instance().hasOptifine()
-        val hasPatcher = Loader.isModLoaded("patcher")
-        if (!hasOptifine || !hasPatcher) {
+        val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
+        if (!hasSodium) {
             event.addData {
-                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
-                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
-                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
-                if (!hasOptifine) {
-                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-                }
-                if (!hasPatcher) {
-                    add("https://modrinth.com/mod/patcher")
-                }
+                add("Sodium is not installed")
+                add("This mod greatly improve performance")
+                add("https://modrinth.com/mod/sodium")
             }
         } else {
             event.addIrrelevant {
-                add("Optifine and Patcher are installed")
+                add("Sodium is installed")
             }
         }
-        //#else
-        //$$ val hasSodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")
-        //$$ if (!hasSodium) {
-        //$$     event.addData {
-        //$$         add("Sodium is not installed")
-        //$$         add("This mod greatly improve performance")
-        //$$         add("https://modrinth.com/mod/sodium")
-        //$$     }
-        //$$ } else {
-        //$$     event.addIrrelevant {
-        //$$         add("Sodium is installed")
-        //$$     }
-        //$$ }
-        //#endif
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shuptime") {
+        event.registerBrigadier("shuptime") {
             description = "Shows the time since the start of minecraft"
             category = CommandCategory.USERS_RESET
-            callback {
+            simpleCallback {
                 val uptime = getUptime()
                 ChatUtils.chat("Minecraft is running for §b${uptime.format()}§e.")
             }

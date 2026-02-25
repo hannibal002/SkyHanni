@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.block.state.IBlockState
+import net.minecraft.world.level.block.state.BlockState
 
 enum class OreType(
     val oreName: String,
@@ -192,6 +192,8 @@ enum class OreType(
     val internalName: NeuInternalName = internalName.toInternalName()
 
     fun isGemstone(): Boolean = this in gemstones
+    fun isLowTierGemstone(): Boolean = this in lowTierGemstones
+    fun isHighTierGemstone(): Boolean = this in highTierGemstones
 
     companion object {
 
@@ -201,7 +203,15 @@ enum class OreType(
             AQUAMARINE, CITRINE, ONYX, PERIDOT,
         )
 
-        fun IBlockState.isOreType(oreType: OreType): Boolean {
+        private val lowTierGemstones = setOf(
+            RUBY, AMBER, AMETHYST, JADE, SAPPHIRE,
+        )
+
+        private val highTierGemstones = setOf(
+            AQUAMARINE, CITRINE, ONYX, PERIDOT,
+        )
+
+        fun BlockState.isOreType(oreType: OreType): Boolean {
             for (oreBlock in oreType.oreBlocks) {
                 if (oreBlock !in MiningApi.currentAreaOreBlocks) continue
                 if (oreBlock.checkBlock(this)) {
