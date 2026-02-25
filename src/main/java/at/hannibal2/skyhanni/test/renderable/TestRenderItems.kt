@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -54,7 +53,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
         bambooProvider
     )
     private val spinningStacks by lazy {
-        Direction.Axis.entries.map {
+        Axis.entries.map {
             "${it.name.uppercase()} Axis" to Renderable.animatedItemStack {
                 frameStorage = AnimatedFrameLocalStorage(animationFrames)
                 rotationStorage = AnimatedRotationLocalStorage(it to AxisRotationDefinition(65.0))
@@ -115,7 +114,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                 spinningStacks.map { (axisLabel, renderable) ->
                     vertical(
                         text(axisLabel),
-                        text("(#${renderable.getStableId()})"),
+                        text("(#${renderable.stableRenderId})"),
                         renderable.renderBounds(),
                         spacing = 1,
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

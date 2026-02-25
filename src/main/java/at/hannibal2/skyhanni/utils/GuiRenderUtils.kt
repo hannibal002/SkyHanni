@@ -9,11 +9,12 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.render.state.GuiItemRenderState
@@ -321,6 +322,24 @@ object GuiRenderUtils {
     }
 
     private const val SKULL_SCALE = (5f / 4f)
+
+    /**
+     * Wrapper for rendering an item on screen, with the config pre-built.
+     */
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        config: ItemRenderableConfig,
+        stableRenderId: Int? = null,
+    ) = renderOnScreen(
+        x,
+        y,
+        scale = config.scale,
+        rescaleSkulls = config.rescaleSkulls,
+        rotationVec = if (config is AnimatedItemRenderableConfig<*>) config.rotationStorage.currentRotation else Vec3.ZERO,
+        translationVec = if (config is AnimatedItemRenderableConfig<*>) config.bounceStorage.currentBounce else Vec3.ZERO,
+        stableRenderId = stableRenderId,
+    )
 
     /**
      * Returns either the stable ID of the custom render (if used) or -1 if the item was

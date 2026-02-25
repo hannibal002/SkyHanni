@@ -65,7 +65,7 @@ object ScrapGFS {
         propGetter = { currentScrapRotation },
     )
 
-    private val scrapFrameStorage = AnimatedFrameLocalStorage<ItemStackAnimatedFrame>(
+    private val scrapFrameStorage = AnimatedFrameLocalStorage(
         listOf(ItemStackAnimatedFrame(scrapProvider, ticks = 0))
     )
 

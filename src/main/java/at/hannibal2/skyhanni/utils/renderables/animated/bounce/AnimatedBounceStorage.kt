@@ -38,20 +38,10 @@ open class AnimatedBouncePropertyStorage(
  * A data class that defines the bouncing behavior of an item stack.
  * The render will start in the 'middle' and will move up/down relative to that position.
  *
- * @param upwardBounce The upward bounce distance in pixels.
- * @param downwardBounce The downward bounce distance in pixels.
- * @param bounceSpeed How many pixels the object should move per second.
  */
 data class AnimatedBounceDefinition(
-    private val axes: Map<Axis, AxisBounceDefinition> = mapOf(
-        Axis.X to AxisBounceDefinition(),
-        Axis.Y to AxisBounceDefinition(),
-        Axis.Z to AxisBounceDefinition(),
-    )
+    private val axes: Map<Axis, AxisBounceDefinition> = emptyMap()
 ) : Map<Axis, AxisBounceDefinition> by axes {
-    constructor(vararg entries: Collection<Map.Entry<Axis, AxisBounceDefinition>>) : this(
-        entries.asSequence().flatten().associate { it.key to it.value }
-    )
     constructor(vararg pairs: Pair<Axis, AxisBounceDefinition>) : this(pairs.asList().associate { it.first to it.second })
 
     private val enabled get() = axes.values.any { it.isEnabled() }
