@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.FacePointSet
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.entity.Entity
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.EnumFacing
+import net.minecraft.core.Direction
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.AABB
+import kotlin.collections.getOrPut
+import kotlin.getValue
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -25,12 +27,7 @@ object LocationUtils {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean =
-        //#if MC < 1.21
-        BlockUtils.rayTrace(a, b) == null
-    //#else
-    //$$ BlockUtils.rayTrace(a, b)?.missed == true
-    //#endif
+    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.rayTrace(a, b)?.miss == true
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
@@ -55,12 +52,12 @@ object LocationUtils {
     fun playerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val vec = player.getLorenzVec()
-        return vec.up(player.getEyeHeight().toDouble())
+        return vec.up(player.eyeHeight.toDouble())
     }
 
-    fun AxisAlignedBB.isInside(vec: LorenzVec) = isVecInside(vec.toVec3())
+    fun AABB.isInside(vec: LorenzVec) = contains(vec.toVec3())
 
-    fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
+    fun AABB.isPlayerInside() = isInside(playerLocation())
 
     /**
      * Extension function on top of [canSeeFace], allowing checking of more than one face with a singular call.
@@ -77,9 +74,9 @@ object LocationUtils {
         stepDensity: Int = 4,
         pointFill: FacePointSet? = null,
         offset: Double? = null,
-        vararg ignoreFaces: EnumFacing,
+        vararg ignoreFaces: Direction,
     ): Boolean {
-        for (face in EnumFacing.entries) {
+        for (face in Direction.entries) {
             if (ignoreFaces.contains(face)) continue
             val faceResult = canSeeFace(face, min, max, viewDistance, stepCount, stepDensity, pointFill, offset)
             if (faceResult && pointFill == null) return true
@@ -109,7 +106,7 @@ object LocationUtils {
      * @return True if the player can see the specified face, false otherwise.
      */
     fun canSeeFace(
-        face: EnumFacing,
+        face: Direction,
         min: LorenzVec,
         max: LorenzVec,
         viewDistance: Number = 150.0,
@@ -118,7 +115,7 @@ object LocationUtils {
         pointFill: FacePointSet? = null,
         offset: Double? = null,
     ): Boolean {
-        val aabb = AxisAlignedBB(min.x, min.y, min.z, max.x, max.y, max.z)
+        val aabb = AABB(min.x, min.y, min.z, max.x, max.y, max.z)
         val eye = playerEyeLocation()
         val center = aabb.getBoxCenter()
         val faceCenter = face.getCenterPos(center, aabb)
@@ -131,8 +128,8 @@ object LocationUtils {
         else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset)
     }
 
-    private fun EnumFacing.performStepping(
-        aabb: AxisAlignedBB,
+    private fun Direction.performStepping(
+        aabb: AABB,
         faceCenter: LorenzVec,
         eye: LorenzVec,
         viewDistance: Number,
@@ -166,19 +163,19 @@ object LocationUtils {
         return false
     }
 
-    private fun FacePointSet?.wrapCanSee(face: EnumFacing, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
+    private fun FacePointSet?.wrapCanSee(face: Direction, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
         val canSeeResult = canSee(a, b, offset)
         this?.getOrPut(face) { TimeLimitedSet(5.seconds) }?.add(b to canSeeResult)
         return canSeeResult
     }
 
-    private fun EnumFacing.getCenterPos(center: LorenzVec, aabb: AxisAlignedBB) = when (this) {
-        EnumFacing.DOWN -> LorenzVec(center.x, aabb.minY, center.z)
-        EnumFacing.UP -> LorenzVec(center.x, aabb.maxY, center.z)
-        EnumFacing.NORTH -> LorenzVec(center.x, center.y, aabb.minZ)
-        EnumFacing.SOUTH -> LorenzVec(center.x, center.y, aabb.maxZ)
-        EnumFacing.WEST -> LorenzVec(aabb.minX, center.y, center.z)
-        EnumFacing.EAST -> LorenzVec(aabb.maxX, center.y, center.z)
+    private fun Direction.getCenterPos(center: LorenzVec, aabb: AABB) = when (this) {
+        Direction.DOWN -> LorenzVec(center.x, aabb.minY, center.z)
+        Direction.UP -> LorenzVec(center.x, aabb.maxY, center.z)
+        Direction.NORTH -> LorenzVec(center.x, center.y, aabb.minZ)
+        Direction.SOUTH -> LorenzVec(center.x, center.y, aabb.maxZ)
+        Direction.WEST -> LorenzVec(aabb.minX, center.y, center.z)
+        Direction.EAST -> LorenzVec(aabb.maxX, center.y, center.z)
     }
 
     private val xIdentityVector = LorenzVec(1.0, 0.0, 0.0)
@@ -186,21 +183,21 @@ object LocationUtils {
     private val zIdentityVector = LorenzVec(0.0, 0.0, 1.0)
 
     // Cache the identity vectors for each face to avoid recalculating them every time
-    private val faceMap: Map<EnumFacing, Pair<LorenzVec, LorenzVec>> by lazy {
+    private val faceMap: Map<Direction, Pair<LorenzVec, LorenzVec>> by lazy {
         val verticalSet = xIdentityVector to zIdentityVector
         val northSouthSet = xIdentityVector to yIdentityVector
         val eastWestSet = zIdentityVector to yIdentityVector
         mapOf(
-            EnumFacing.DOWN to verticalSet,
-            EnumFacing.UP to verticalSet,
-            EnumFacing.NORTH to northSouthSet,
-            EnumFacing.SOUTH to northSouthSet,
-            EnumFacing.WEST to eastWestSet,
-            EnumFacing.EAST to eastWestSet
+            Direction.DOWN to verticalSet,
+            Direction.UP to verticalSet,
+            Direction.NORTH to northSouthSet,
+            Direction.SOUTH to northSouthSet,
+            Direction.WEST to eastWestSet,
+            Direction.EAST to eastWestSet
         )
     }
 
-    private fun EnumFacing.getFaceRayConfig(
+    private fun Direction.getFaceRayConfig(
         halfX: Double,
         halfY: Double,
         halfZ: Double,
@@ -208,9 +205,9 @@ object LocationUtils {
         // The identity vectors for each face
         val (axis1Iden, axis2Iden) = faceMap[this] ?: return null
         return when (this) {
-            EnumFacing.UP, EnumFacing.DOWN -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfZ)
-            EnumFacing.NORTH, EnumFacing.SOUTH -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfY)
-            EnumFacing.WEST, EnumFacing.EAST -> FaceRayConfig(axis1Iden, axis2Iden, halfZ, halfY)
+            Direction.UP, Direction.DOWN -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfZ)
+            Direction.NORTH, Direction.SOUTH -> FaceRayConfig(axis1Iden, axis2Iden, halfX, halfY)
+            Direction.WEST, Direction.EAST -> FaceRayConfig(axis1Iden, axis2Iden, halfZ, halfY)
         }
     }
 
@@ -234,11 +231,11 @@ object LocationUtils {
             up(offset).canBeSeen(radius)
         }
 
-    fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
+    fun AABB.minBox() = LorenzVec(minX, minY, minZ)
 
-    fun AxisAlignedBB.maxBox() = LorenzVec(maxX, maxY, maxZ)
+    fun AABB.maxBox() = LorenzVec(maxX, maxY, maxZ)
 
-    fun AxisAlignedBB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
+    fun AABB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
         val t1 = (this.minBox() - origin) * rayDirectionInverse
@@ -249,7 +246,7 @@ object LocationUtils {
         return tMax >= tMin && tMax >= 0.0
     }
 
-    fun AxisAlignedBB.union(aabbs: List<AxisAlignedBB>?): AxisAlignedBB? {
+    fun AABB.union(aabbs: List<AABB>?): AABB? {
         if (aabbs.isNullOrEmpty()) {
             return null
         }
@@ -270,28 +267,28 @@ object LocationUtils {
             if (aabb.maxZ > maxZ) maxZ = aabb.maxZ
         }
 
-        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+        return AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
-    fun AxisAlignedBB.getEdgeLengths() = maxBox() - minBox()
+    fun AABB.getEdgeLengths() = maxBox() - minBox()
 
-    fun AxisAlignedBB.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
+    fun AABB.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun AxisAlignedBB.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
+    fun AABB.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
 
-    fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
+    fun AABB.clampTo(other: AABB): AABB {
         val minX = max(this.minX, other.minX)
         val minY = max(this.minY, other.minY)
         val minZ = max(this.minZ, other.minZ)
         val maxX = min(this.maxX, other.maxX)
         val maxY = min(this.maxY, other.maxY)
         val maxZ = min(this.maxZ, other.maxZ)
-        return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+        return AABB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
     fun calculatePlayerYaw(): Float {
         val player = MinecraftCompat.localPlayer
-        var yaw = player.rotationYaw % 360
+        var yaw = player.yRot % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360
 
@@ -326,7 +323,7 @@ object LocationUtils {
         return location
     }
 
-    fun AxisAlignedBB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
+    fun AABB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
         val bottomLeftFront = LorenzVec(minX, minY, minZ)
         val bottomLeftBack = LorenzVec(minX, minY, maxZ)
         val topLeftFront = LorenzVec(minX, maxY, minZ)
@@ -379,7 +376,7 @@ object LocationUtils {
         return guessPitch
     }
 
-    fun AxisAlignedBB.getCornersAtHeight(y: Double): List<LorenzVec> {
+    fun AABB.getCornersAtHeight(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
         val cornerTwo = LorenzVec(minX, y, maxZ)
         val cornerThree = LorenzVec(maxX, y, maxZ)

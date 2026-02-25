@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.compat.replace
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object FixIronman {
@@ -16,9 +17,9 @@ object FixIronman {
     private val sbLevelingInventory = InventoryDetector { name -> name == "SkyBlock Leveling" }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltipEvent(event: ItemHoverEvent) {
+    fun onTooltipEvent(event: ToolTipTextEvent) {
         // We don't need to always fix this
-        if (!SkyHanniDebugsAndTests.isAprilFoolsDay) return
+        if (!TimeUtils.isAprilFoolsDay) return
 
         if (!profileManagementInventory.isInside() &&
             !selectModeInventory.isInside() &&
@@ -27,38 +28,39 @@ object FixIronman {
         ) return
 
         for ((index, line) in event.toolTip.withIndex()) {
-            if (line.contains("Ironman")) {
-                event.toolTip[index] = line.replace("Ironman", "Ironperson")
+            if (line.string.contains("Ironman")) {
+                event.toolTip[index] = line.replace("Ironman", "Ironperson") ?: line
             }
         }
 
         if (selectModeInventory.isInside()) {
             for ((index, line) in event.toolTip.withIndex()) {
-                if (line.contains("No Auction House!")) {
-                    event.toolTip[index] = line.replace("No Auction House!", "Ironperson-Only Auction House!")
+                if (line.string.contains("No Auction House!")) {
+                    event.toolTip[index] = line.replace("No Auction House!", "Ironperson-Only Auction House!") ?: line
                 }
             }
         }
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Modify) {
         // We don't need to always fix this
-        if (!SkyHanniDebugsAndTests.isAprilFoolsDay) return
+        if (!TimeUtils.isAprilFoolsDay) return
 
         if (event.message.contains("Ironman")) {
-            event.chatComponent = event.message.replace("Ironman", "Ironperson").asComponent()
+            val newComponent = event.chatComponent.replace("Ironman", "Ironperson") ?: return
+            event.replaceComponent(newComponent, "fix_ironman")
         }
     }
 
-    fun fixScoreboard(text: String): String? {
-        return if (SkyHanniDebugsAndTests.isAprilFoolsDay && text.contains("Ironman")) {
-            text.replace("Ironman", "Ironperson")
+    fun fixScoreboard(component: Component): Component? {
+        return if (TimeUtils.isAprilFoolsDay && component.string.contains("Ironman")) {
+            component.replace("Ironman", "Ironperson")
         } else null
     }
 
     fun getIronmanName(): String {
-        return if (SkyHanniDebugsAndTests.isAprilFoolsDay) {
+        return if (TimeUtils.isAprilFoolsDay) {
             "Ironperson"
         } else "Ironman"
     }

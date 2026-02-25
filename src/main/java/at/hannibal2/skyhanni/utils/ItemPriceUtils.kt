@@ -24,9 +24,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -79,12 +77,8 @@ object ItemPriceUtils {
     fun NeuInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null
 
     private fun NeuInternalName.getLowestBinOrNull(): Double? = when {
-        PlatformUtils.isNeuLoaded() -> getNeuLowestBin(this)
         else -> getShLowestBin(this)
     }.takeIf { it != -1L }?.toDouble()
-
-    private fun getNeuLowestBin(internalName: NeuInternalName) =
-        NotEnoughUpdates.INSTANCE.manager.auctionManager.getLowestBin(internalName.asString())
 
     // We can not use NEU craft cost, since we want to respect the price source choice
     // NEUItems.manager.auctionManager.getCraftCost(asString())?.craftCost
@@ -153,12 +147,11 @@ object ItemPriceUtils {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (PlatformUtils.isNeuLoaded()) return
         if (ApiUtils.isMoulberryLowestBinDisabled()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
-        SkyHanniMod.launchIOCoroutine {
+        SkyHanniMod.launchIOCoroutine("neu lowest bin item price fetch", timeout = 1.minutes) {
             val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lbinStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(data)
         }
@@ -172,9 +165,9 @@ object ItemPriceUtils {
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
         val price = pricePer * amount.toDouble()
-        if (this == SKYBLOCK_COIN) return " ${price.formatCoin()} coins"
+        if (this == SKYBLOCK_COIN) return "${price.formatCoin()} coins"
 
-        return " ${getNumberedName(amount)} ${price.formatCoinWithBrackets()}"
+        return "${getNumberedName(amount)} ${price.formatCoinWithBrackets()}"
     }
 
     fun Number.formatCoinWithBrackets(gray: Boolean = false): String {
@@ -182,7 +175,11 @@ object ItemPriceUtils {
     }
 
     fun Number.formatCoin(gray: Boolean = false): String {
-        val color = if (gray) "§7" else "§6"
+        val color = when {
+            gray -> "§7"
+            this.toDouble() < 0 -> "§c"
+            else -> "§6"
+        }
         return color + shortFormat()
     }
 
@@ -204,7 +201,7 @@ object ItemPriceUtils {
             description = "Test fetching Moulberry's lowest bin data."
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
-                SkyHanniMod.launchIOCoroutine {
+                SkyHanniMod.launchIOCoroutine("shfetchmoulblbins command", timeout = 1.minutes) {
                     val timeNow = SimpleTimeMark.now()
                     val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(lbinStatic).assertSuccessWithData()
                         ?: ErrorManager.skyHanniError("Failed to fetch Moulberry's lowest bin data!")

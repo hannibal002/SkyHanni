@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
@@ -7,10 +8,10 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
@@ -23,9 +24,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -34,32 +37,15 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiIngameMenu
-import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
-import org.lwjgl.opengl.GL11
+import net.minecraft.client.gui.screens.PauseScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
+import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.max
-//#if TODO
-import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
-import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.features.misc.DarkenShader
-import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
-//#if MC < 1.21
-import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
-//#else
-//$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
-//$$ import at.hannibal2.skyhanni.utils.compat.RenderCompat
-//$$ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers
-//#endif
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions")
 interface Renderable {
 
@@ -106,6 +92,7 @@ interface Renderable {
             null -> placeholder(12)
             is Renderable -> any
             is String -> text(any)
+            is Component -> text(any)
             is ItemStack -> item(any, itemScale)
             else -> null
         }
@@ -293,7 +280,6 @@ interface Renderable {
                             onHover.invoke()
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                             DrawContextUtils.pushMatrix()
-                            DrawContextUtils.translate(0F, 0F, 400F)
 
                             RenderableTooltips.setTooltipForRender(
                                 tips = tipsRender,
@@ -312,39 +298,33 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getMinecraft().currentScreen.takeIf { it != null } ?: return false
+            val guiScreen = Minecraft.getInstance().screen.takeIf { it != null } ?: return false
 
             // Never support grayed out inventories
             if (RenderData.outsideInventory) return false
 
             if (bypassChecks) return true
 
-            val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
+            val inMenu = Minecraft.getInstance().screen !is PauseScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null
                     || GuiData.preDrawEventCancelled
             } else true
-            val isConfigScreen = guiScreen !is GuiScreenElementWrapper
+            val isConfigScreen = !ConfigUtils.configScreenCurrentlyOpen
 
             val openGui = guiScreen.javaClass.name ?: "none"
-            val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
-            val neuFocus = NeuItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
             val isInSkytilsSettings =
                 openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
-            val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
                 isGuiPositionEditor &&
                     inMenu &&
                     isNotInSignAndOnSlot &&
                     isConfigScreen &&
-                    !isInNeuPv &&
                     !isInSkytilsPv &&
-                    !neuFocus &&
-                    !isInSkytilsSettings &&
-                    !isInNeuSettings
+                    !isInSkytilsSettings
 
             if (debug) {
                 if (!result) {
@@ -354,11 +334,8 @@ interface Renderable {
                     if (!inMenu) logger.log("inMenu")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
                     if (!isConfigScreen) logger.log("isConfigScreen")
-                    if (isInNeuPv) logger.log("isInNeuPv")
-                    if (neuFocus) logger.log("neuFocus")
                     if (isInSkytilsPv) logger.log("isInSkytilsPv")
                     if (isInSkytilsSettings) logger.log("isInSkytilsSettings")
-                    if (isInNeuSettings) logger.log("isInNeuSettings")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
@@ -378,7 +355,6 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawRect(0, height, width, 11, color.rgb)
-                GlStateManager.color(1F, 1F, 1F, 1F)
                 renderable.render(mouseOffsetX, mouseOffsetY)
             }
         }
@@ -436,24 +412,6 @@ interface Renderable {
             }
         }
 
-        fun Renderable.darken(amount: Float = 1f) = object : Renderable {
-            override val width = this@darken.width
-            override val height = this@darken.height
-            override val horizontalAlign = this@darken.horizontalAlign
-            override val verticalAlign = this@darken.verticalAlign
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                //#if TODO
-                DarkenShader.darknessLevel = amount
-                ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
-                //#endif
-                this@darken.render(mouseOffsetX, mouseOffsetY)
-                //#if TODO
-                ShaderManager.disableShader()
-                //#endif
-            }
-        }
-
         /**
          * @param searchPrefix text that is static in front of the textbox
          * @param onUpdateSize function that is called if the size changes (since the search text can get bigger than [content])
@@ -494,9 +452,9 @@ interface Renderable {
 
             val searchWidth: Int
                 get() {
-                    val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                    val fontRenderer = Minecraft.getInstance().font
                     val string = searchPrefix + textInput.editTextWithAlwaysCarriage()
-                    return (fontRenderer.getStringWidth(string) * scale).toInt() + 1
+                    return (fontRenderer.width(string) * scale).toInt() + 1
                 }
 
             init {
@@ -534,7 +492,7 @@ interface Renderable {
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
                     RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
-                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat())
                 }
                 if (isHovered(mouseOffsetX, mouseOffsetY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
@@ -551,14 +509,14 @@ interface Renderable {
                     content.render(mouseOffsetX, mouseOffsetY)
                 } else if (!shouldRenderTopElseBottom) {
                     content.render(mouseOffsetX, mouseOffsetY)
-                    DrawContextUtils.translate(0f, (ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing).toFloat())
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
-                    DrawContextUtils.translate(0f, -(ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing).toFloat())
                 } else {
                     content.render(mouseOffsetX, mouseOffsetY + textBoxHeight + ySpacing)
-                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat())
                 }
             }
 
@@ -595,89 +553,57 @@ interface Renderable {
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 if (texture == null) {
                     GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
-
-                    //#if MC < 1.21
-                    if (useChroma) ChromaShaderManager.begin(ChromaType.STANDARD)
-                    //#endif
-
                     val factor = 0.2
                     val bgColor = if (useChroma) Color.GRAY.darker() else color
                     GuiRenderUtils.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
-                    //#if MC < 1.21
-                    GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
-                    //#else
-                    //$$ if (useChroma) {
-                    //$$     DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
-                    //$$ } else {
-                    //$$     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
-                    //$$ }
-                    //#endif
-
-                    //#if MC < 1.21
-                    if (useChroma) ChromaShaderManager.end()
-                    //#endif
+                    if (useChroma) {
+                        DrawContextUtils.drawContext.fill(SkyHanniRenderLayers.getChromaStandard(), 1, 1, progress, height - 1, color.rgb)
+                    } else {
+                        GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
+                    }
                 } else {
                     val scale = 0.00390625f
 
                     val (uMin, vMin) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK)
                         Pair(0f, 64f * scale) else Pair(0f, 0f)
-                    val (uMax, vMax) = Pair(uMin + (width * scale), vMin + (height * scale))
 
-                    //#if MC < 1.21
-                    GuiRenderUtils.drawTexturedRect(
-                        mouseOffsetX, mouseOffsetY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
-                        alpha = 1f, filter = GL11.GL_NEAREST
-                    )
-                    //#else
-                    //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                    //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
-                    //$$         mouseOffsetX, mouseOffsetY, width, height)
-                    //$$ } else {
-                    //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
-                    //$$         mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1)
-                    //$$ }
-                    //#endif
-
-                    if (useChroma) {
-                        GlStateManager.color(1f, 1f, 1f, 1f)
-                        //#if MC < 1.21
-                        ChromaShaderManager.begin(ChromaType.TEXTURED)
-                        GuiRenderUtils.drawTexturedRect(
-                            mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
-                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST
+                    if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                        DrawContextUtils.drawContext.blitSprite(
+                            RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_background"),
+                            mouseOffsetX, mouseOffsetY, width, height,
                         )
-                        //#else
-                        //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
-                        //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
-                        //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
-                        //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
-                        //$$ }
-                        //#endif
                     } else {
-                        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
-                        //#if MC < 1.21
-                        GuiRenderUtils.drawTexturedRect(
-                            mouseOffsetX, mouseOffsetY, progress, height, uMin, uMin + (progress * scale),
-                            vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
-                            alpha = 1f, filter = GL11.GL_NEAREST
+                        DrawContextUtils.drawContext.blit(
+                            RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                            mouseOffsetX, mouseOffsetY, 0f, 0f, width, height, 182, 5, 256, 256, -1,
                         )
-                        //#else
-                        //$$ if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
-                        //$$     DrawContextUtils.drawContext.drawGuiTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
-                        //$$         width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height)
-                        //$$ } else {
-                        //$$     DrawContextUtils.drawContext.drawTexture(RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
-                        //$$         mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1)
-                        //$$ }
-                        //#endif
                     }
 
-                    //#if MC < 1.21
-                    if (useChroma) ChromaShaderManager.end()
-                    //#endif
+                    if (useChroma) {
+                        if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                            DrawContextUtils.drawContext.blitSprite(
+                                SkyHanniRenderLayers.getChromaTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height,
+                            )
+                        } else {
+                            DrawContextUtils.drawContext.blit(
+                                SkyHanniRenderLayers.getChromaTextured(), createResourceLocation(texture.path),
+                                mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1,
+                            )
+                        }
+                    } else {
+                        if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) {
+                            DrawContextUtils.drawContext.blitSprite(
+                                RenderCompat.getMinecraftGuiTextured(), createResourceLocation("hud/experience_bar_progress"),
+                                width, height, 0, 0, mouseOffsetX, mouseOffsetY, progress, height,
+                            )
+                        } else {
+                            DrawContextUtils.drawContext.blit(
+                                RenderCompat.getMinecraftGuiTextured(), createResourceLocation(texture.path),
+                                mouseOffsetX, mouseOffsetY, 0f, 5f, progress, height, progress, 5, 256, 256, -1,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -735,9 +661,9 @@ interface Renderable {
                     realColor = color
                 }
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, realColor.rgb, radius, smoothness.toFloat())
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 content.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -780,9 +706,9 @@ interface Renderable {
                         GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
                     }
                 }
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 content.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -825,9 +751,9 @@ interface Renderable {
                     val x = it.width + spacing
                     it.renderXYAligned(xOffset, mouseOffsetY, x, height)
                     xOffset += x
-                    DrawContextUtils.translate(x.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(x.toFloat(), 0f)
                 }
-                DrawContextUtils.translate(-(xOffset - mouseOffsetX).toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-(xOffset - mouseOffsetX).toFloat(), 0f)
             }
         }
 
@@ -981,7 +907,7 @@ interface Renderable {
             // there are more items above
             if (showScrollableTipsInList && !scroll.atMinimum()) {
                 scrollUpTip.renderXAligned(mouseOffsetX, mouseOffsetY, width)
-                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat())
                 renderY += scrollUpTip.height
                 negativeSpace1 -= scrollUpTip.height
             }
@@ -996,13 +922,13 @@ interface Renderable {
             for (renderable in list) {
                 if ((virtualY..virtualY + renderable.height) in window) {
                     renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
-                    DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, renderable.height.toFloat())
                     renderY += renderable.height
                     found = true
                 } else if (found) {
                     if (renderY + renderable.height <= height + negativeSpace2) {
                         renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
-                        DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
+                        DrawContextUtils.translate(0f, renderable.height.toFloat())
                         renderY += renderable.height
                     }
                     break
@@ -1016,7 +942,7 @@ interface Renderable {
                 scrollDownTip.renderXAligned(mouseOffsetX, mouseOffsetY + height - scrollDownTip.height, width)
             }
 
-            DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
+            DrawContextUtils.translate(0f, -renderY.toFloat())
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
@@ -1090,9 +1016,9 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1109,9 +1035,9 @@ interface Renderable {
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawFloatingRectDark(0, 0, width, height)
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1132,9 +1058,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
 
                 ShaderRenderUtils.drawRoundRectOutline(
                     0,
@@ -1152,7 +1078,7 @@ interface Renderable {
 
         fun drawInsideImage(
             input: Renderable,
-            texture: ResourceLocation,
+            texture: Identifier,
             alpha: Int = 255,
             padding: Int = 2,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -1171,30 +1097,29 @@ interface Renderable {
                     0,
                     width,
                     height,
-                    GL11.GL_NEAREST,
                     radius,
                     smoothness,
                     texture = texture,
                     alpha = alpha / 255f,
                 )
 
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
         fun drawInsideFixedSizedImage(
             input: Renderable,
-            texture: ResourceLocation,
+            texture: Identifier,
             width: Int = input.width,
             height: Int = input.height,
             alpha: Int = 255,
             padding: Int = 2,
             uMin: Float = 0f,
-            uMax: Float = 1f,
+            uMax: Float = width.toFloat(),
             vMin: Float = 0f,
-            vMax: Float = 1f,
+            vMax: Float = height.toFloat(),
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -1206,9 +1131,9 @@ interface Renderable {
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax, texture, alpha / 255f)
 
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
 
@@ -1244,68 +1169,9 @@ interface Renderable {
                     blur,
                 )
 
-                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
-                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
-            }
-        }
-
-        fun fakePlayer(
-            player: EntityPlayer,
-            followMouse: Boolean = false,
-            eyesX: Float = 0f,
-            eyesY: Float = 0f,
-            width: Int = 50,
-            height: Int = 100,
-            entityScale: Int = 30,
-            padding: Int = 5,
-            color: Color? = null,
-            colorCondition: () -> Boolean = { true },
-        ) = object : Renderable {
-            override val width = width + 2 * padding
-            override val height = height + 2 * padding
-            override val horizontalAlign = HorizontalAlignment.LEFT
-            override val verticalAlign = VerticalAlignment.TOP
-            val playerHeight = entityScale * 2
-            val playerX = width / 2 + padding
-            val playerY = height / 2 + playerHeight / 2 + padding
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                GlStateManager.color(1f, 1f, 1f, 1f)
-                if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
-                val mouse = currentRenderPassMousePosition ?: return
-                val (mouseXRelativeToPlayer, mouseYRelativeToPlayer) = if (followMouse) {
-                    val newOffsetX = (mouseOffsetX + playerX - mouse.first).toFloat()
-                    val newOffsetY = (mouseOffsetY + playerY - mouse.second - 1.62 * entityScale).toFloat()
-                    newOffsetX to newOffsetY
-                } else eyesX to eyesY
-                DrawContextUtils.translate(0f, 0f, 100f)
-                //#if MC < 1.21
-                drawEntityOnScreen(
-                    playerX,
-                    playerY,
-                    entityScale,
-                    mouseXRelativeToPlayer,
-                    mouseYRelativeToPlayer,
-                    player,
-                )
-                //#else
-                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
-                //$$ drawEntity(
-                //$$     DrawContextUtils.drawContext,
-                //$$     playerX,
-                //$$     playerY,
-                //$$     playerX + width,
-                //$$     playerY + height,
-                //$$     entityScale,
-                //$$     0.0625f,
-                //$$     -mouseXRelativeToPlayer + if (followMouse) 70f else 0f,
-                //$$     -mouseYRelativeToPlayer + if (followMouse) 195f else 0f,
-                //$$     player
-                //$$ )
-                //$$ DrawContextUtils.translate(35f, 125f, 0f)
-                //#endif
-                DrawContextUtils.translate(0f, 0f, -100f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
             }
         }
     }

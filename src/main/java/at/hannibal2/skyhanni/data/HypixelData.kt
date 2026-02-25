@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -26,7 +28,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.allMatchesComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -34,8 +36,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -63,16 +65,6 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §b§lArea: §r§7Private Island
-     * REGEX-TEST: §b§lDungeon: §r§7Catacombs
-     */
-    @Suppress("UnusedPrivateProperty")
-    private val islandNamePattern by patternGroup.pattern(
-        "islandname",
-        "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
-    )
-
-    /**
      * REGEX-TEST: §711/15/24 §8m19CJ
      * REGEX-TEST: §711/15/24 §8m1F
      */
@@ -86,43 +78,20 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:          §r§a§lPlayers §r§f(5)
-     */
-    private val playerAmountPattern by patternGroup.pattern(
-        "playeramount",
-        "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST: §8[§r§a§r§8] §r§bBpoth §r§6§l℻
+     * REGEX-TEST: [441] Throwpo ♲
      */
     private val playerAmountOnIslandPattern by patternGroup.pattern(
-        "playeramount.onisland",
-        "^§.\\[[§\\w]{6,11}] §r.*",
+        "playeramount.onisland-nocolor",
+        "^\\[\\w+] .*",
     )
 
     /**
-     * REGEX-TEST:           §r§5§lGuests §r§f(0)
-     */
-    private val playerAmountGuestingPattern by patternGroup.pattern(
-        "playeramount.guesting",
-        "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST:           §r§b§lParty §r§f(4)
-     */
-    private val dungeonPartyAmountPattern by patternGroup.pattern(
-        "playeramount.dungeonparty",
-        "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST:  §a✌ §7(§a11§7/20)
+     * WRAPPED-REGEX-TEST: " §a✌ §7(§a11§7/20)"
+     * WRAPPED-REGEX-TEST: " §a✌ §7(§e1/1§7)"
      */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
-        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
+        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
     )
     private val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
@@ -133,10 +102,14 @@ object HypixelData {
      * REGEX-TEST: SKYBLOCK
      * REGEX-TEST: SKYBLOCK GUEST
      * REGEX-TEST: SKYBLOCK CO-OP
+     * REGEX-TEST: SKYBLOCK ♲
+     * REGEX-TEST: SKYBLOCK ☀
+     * REGEX-TEST: SKYBLOCK Ⓑ
+     *
      */
     private val scoreboardTitlePattern by patternGroup.pattern(
         "scoreboard.title",
-        "SK[YI]BLOCK(?: CO-OP| GUEST)?",
+        "SK[YI]BLOCK(?: CO-OP| GUEST)?(?: [♲☀Ⓑ])?",
     )
 
     /**
@@ -177,6 +150,8 @@ object HypixelData {
     var skyBlockAreaWithSymbol: String? = null
 
     var playerAmountOnIsland = 0
+
+    private val progressCategory = ChatProgressUpdates.category("Hypixel Data")
 
     // Data from locraw
     var locrawData: JsonObject? = null
@@ -263,18 +238,18 @@ object HypixelData {
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
-        val playerPatternList = mutableListOf(
-            playerAmountPattern,
-            playerAmountGuestingPattern,
+        val playerWidgetList = mutableListOf(
+            TabWidget.PLAYER_LIST,
+            TabWidget.GUESTS,
         )
 
         if (DungeonApi.inDungeon()) {
-            playerPatternList.add(dungeonPartyAmountPattern)
+            playerWidgetList.add(TabWidget.DUNGEON_PARTY)
         }
 
-        out@ for (pattern in playerPatternList) {
-            for (line in TabListData.getTabList()) {
-                pattern.matchMatcher(line) {
+        out@ for (widget in playerWidgetList) {
+            for (component in widget.lines) {
+                widget.pattern.matchMatcher(component) {
                     amount += group("amount").toInt()
                     continue@out
                 }
@@ -363,10 +338,10 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!SkyBlockUtils.onHypixel) return
 
-        val message = event.message.removeColor().lowercase()
+        val message = event.cleanMessage.lowercase()
         if (message.startsWith("your profile was changed to:")) {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
@@ -384,7 +359,7 @@ object HypixelData {
 
     private fun checkProfile() {
         TabWidget.PROFILE.matchMatcherFirstLine {
-            var newProfile = group("profile").lowercase()
+            var newProfile = group("profile").lowercase().trim()
             // Hypixel shows the profile name reversed while in the Rift
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
             if (profileName == newProfile) return
@@ -424,9 +399,14 @@ object HypixelData {
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                SkyHanniRepoManager.displayRepoStatus(true)
-                EnoughUpdatesRepoManager.displayRepoStatus(true)
+                SkyHanniMod.launchIOCoroutine("hypixel join repo update") {
+                    val progress = progressCategory.start("hypixel join repo update check")
+                    SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
+                    progress.end("done with checking both repos")
+                }
             }
+
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false
@@ -442,7 +422,7 @@ object HypixelData {
 
         val inSkyBlock = checkScoreboard()
         if (inSkyBlock) {
-            checkSidebar()
+            checkSpecialModes()
             checkCurrentServerId()
         } else {
             if (!skyBlock) {
@@ -485,31 +465,27 @@ object HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
-            profileName = group("profile").lowercase()
+        TabWidget.PROFILE.matchMatcherFirstLine {
+            profileName = group("profile").lowercase().trim()
             ProfileJoinEvent(profileName).post()
         }
     }
 
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getMinecraft()
-        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val mc = Minecraft.getInstance()
+        MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
-        //#if MC < 1.21
-        val clientBrand = player.clientBrand
-        //#else
-        //$$ val clientBrand = mc.networkHandler?.brand
-        //#endif
+        val clientBrand = mc.connection?.serverBrand()
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP.orEmpty()) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServer?.ip.orEmpty()) {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -529,11 +505,20 @@ object HypixelData {
         HypixelLocationApi.checkEquals()
     }
 
-    private fun checkSidebar() {
+    private fun checkSpecialModes() {
+        val scoreboardTitle = getScoreboardTitle() ?: return
+        if (scoreboardTitle.contains("GUEST")) return
         ironman = false
         stranded = false
         bingo = false
 
+
+
+        if (scoreboardTitle.contains("♲")) ironman = true
+        else if (scoreboardTitle.contains("☀")) stranded = true
+
+        // remove once update is on main
+        // make sure to keep the bingo part when you remove it
         for (line in ScoreboardData.sidebarLinesFormatted) {
             if (BingoApi.getRankFromScoreboard(line) != null) {
                 bingo = true
@@ -596,17 +581,22 @@ object HypixelData {
         return islandType
     }
 
-    private fun checkScoreboard(): Boolean {
-        val world = MinecraftCompat.localWorldOrNull ?: return false
+    fun getScoreboardTitle(): String? {
+        val world = MinecraftCompat.localWorldOrNull ?: return null
 
-        val objective = world.scoreboard.getSidebarObjective() ?: return false
-        val displayName = objective.displayName
+        val objective = world.scoreboard.getSidebarObjective() ?: return null
+        val displayName = objective.displayName.formattedTextCompat()
+        return displayName
+    }
+
+    private fun checkScoreboard(): Boolean {
+        val displayName = getScoreboardTitle() ?: return false
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
     private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
         if (event.isClear()) return
-        playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
+        playerAmountOnIsland = playerAmountOnIslandPattern.allMatchesComponent(event.lines).size
     }
 }

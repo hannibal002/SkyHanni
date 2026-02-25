@@ -98,21 +98,25 @@ object CompactJacobClaim {
 
         CropType.MUSHROOM to Pair(LorenzColor.RED, "Mu"),
         CropType.NETHER_WART to Pair(LorenzColor.RED, "Ne"),
+        CropType.WILD_ROSE to Pair(LorenzColor.RED, "Wr"),
 
         CropType.CARROT to Pair(LorenzColor.GOLD, "Ca"),
         CropType.COCOA_BEANS to Pair(LorenzColor.GOLD, "Co"),
         CropType.POTATO to Pair(LorenzColor.GOLD, "Po"),
         CropType.PUMPKIN to Pair(LorenzColor.GOLD, "Pu"),
         CropType.WHEAT to Pair(LorenzColor.GOLD, "Wh"),
+        CropType.SUNFLOWER to Pair(LorenzColor.GOLD, "Sf"),
+
+        CropType.MOONFLOWER to Pair(LorenzColor.AQUA, "Mf"),
     )
 
-    private fun SkyHanniChatEvent.block(reason: String) {
+    private fun SkyHanniChatEvent.Allow.block(reason: String) {
         messageSet.add(message)
         blockedReason = reason
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.compactJacobClaim) return
         val message = event.message
         var eventDelay = 300.milliseconds
@@ -142,6 +146,7 @@ object CompactJacobClaim {
         bookPattern.matchMatcher(message) {
             val crop = CropType.getByNameOrNull(group("crop")) ?: when (group("crop").lowercase()) {
                 "cacti" -> CropType.CACTUS
+                "rose" -> CropType.WILD_ROSE
                 else -> return@matchMatcher
             }
             val amount = group("amount").formatInt()

@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.misc.discordrpc.AutoStatus
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -43,15 +45,15 @@ class DiscordRPCConfig {
         PriorityEntry.SLAYER,
         PriorityEntry.STACKING_ENCHANT,
         PriorityEntry.DUNGEONS,
-        PriorityEntry.AFK
+        PriorityEntry.AFK,
     )
 
-    enum class PriorityEntry(private val displayName: String) {
-        CROP_MILESTONES("Crop Milestones"),
-        SLAYER("Slayer"),
-        STACKING_ENCHANT("Stacking Enchantment"),
-        DUNGEONS("Dungeon"),
-        AFK("AFK Indicator"),
+    enum class PriorityEntry(private val displayName: String, val associatedAutoStatus: AutoStatus) {
+        CROP_MILESTONES("Crop Milestones", AutoStatus.CROP_MILESTONES),
+        SLAYER("Slayer", AutoStatus.SLAYER),
+        STACKING_ENCHANT("Stacking Enchantment", AutoStatus.STACKING),
+        DUNGEONS("Dungeon", AutoStatus.DUNGEONS),
+        AFK("AFK Indicator", AutoStatus.AFK),
         ;
 
         override fun toString() = displayName
@@ -60,7 +62,7 @@ class DiscordRPCConfig {
     @Expose
     @ConfigOption(
         name = "Dynamic Fallback",
-        desc = "What to show when none of your \"Dynamic Priority\" statuses are active."
+        desc = "What to show when none of your \"Dynamic Priority\" statuses are active.",
     )
     @ConfigEditorDropdown
     val auto: Property<LineEntry> = Property.of(LineEntry.NOTHING)
@@ -93,4 +95,12 @@ class DiscordRPCConfig {
 
         override fun toString() = displayName
     }
+
+    @ConfigOption(
+        name = "Image Credits",
+        desc = "Hypixel Pack HQ (old images), @unfamiliartunes (Winter Island),\n" +
+            "@next_g (Crystal Nucleus)",
+    )
+    @ConfigEditorInfoText
+    val credits = ""
 }

@@ -15,13 +15,13 @@ object PetItemDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
+        val stack = event.stack?.takeIf { it.count == 1 } ?: return
         if (config.petItemDisplay.isEmpty()) return
 
         val petItem = stack.getHeldPetItem() ?: return
         val icon = config.petItemDisplay.firstOrNull { it.item == petItem.asString() }?.icon ?: return
 
-        val width = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(icon) * config.petItemDisplayScale).toInt()
+        val width = (Minecraft.getInstance().font.width(icon) * config.petItemDisplayScale).toInt()
         val x = event.x + 22 - width
         val y = event.y - 1
 

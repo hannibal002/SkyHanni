@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -20,13 +19,11 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(name = "Foraging", desc = "")
-    @OnlyModern
     @Accordion
     val foraging: ForagingFilterConfig = ForagingFilterConfig()
 
     @Expose
     @ConfigOption(name = "Hunting", desc = "")
-    @OnlyModern
     @Accordion
     val hunting: HuntingFilterConfig = HuntingFilterConfig()
 
@@ -64,10 +61,10 @@ class FilterTypesConfig {
     var welcome: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Guild EXP", desc = "Hide Guild EXP messages.")
+    @ConfigOption(name = "Guild/Event EXP", desc = "Hide Guild and Event EXP messages.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var guildExp: Boolean = false
+    var guildEventExp: Boolean = false
 
     @Expose
     @ConfigOption(name = "Friend Join/Left", desc = "Hide friend join/left messages.")
@@ -138,6 +135,18 @@ class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var factoryUpgrade: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hoppity's Hunt Begin", desc = "Hide \"Hoppity's Hunt has begun\" messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hoppityBegun: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hoppity's Hunt Eggs", desc = "Hide \"An egg has appeared!\" messages during hoppity's hunt.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hoppityEggs: Boolean = false
 
     @Expose
     @ConfigOption(name = "Sacrifice", desc = "Hide other players' sacrifice messages.")

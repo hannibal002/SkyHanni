@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -242,6 +243,14 @@ class CFConfig {
     var strayRabbitTracker: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Stray Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val strayTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+
+    @Expose
     @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
     val strayRabbitTrackerPosition: Position = Position(300, 300)
 
@@ -258,7 +267,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "§6CF §zParty Mode",
-        desc = "Don't turn this on.\n§cRequires SkyHanni Chroma to be enabled to fully function.",
+        desc = "Don't turn this on. Epilepsy Warning.\n§cRequires SkyHanni Chroma to be enabled to fully function.",
     )
     @ConfigEditorBoolean
     val partyMode: Property<Boolean> = Property.of(false)

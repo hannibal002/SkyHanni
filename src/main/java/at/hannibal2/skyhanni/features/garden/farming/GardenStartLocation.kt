@@ -55,6 +55,7 @@ object GardenStartLocation {
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK || !GardenApi.hasFarmingToolInHand()) return
+        if (GardenApi.onUnfarmablePlot) return
         val startLocations = GardenApi.storage?.cropStartLocations ?: return
         val lastFarmedLocations = GardenApi.storage?.cropLastFarmedLocations ?: return
         val crop = GardenApi.getCurrentlyFarmedCrop() ?: return
@@ -105,10 +106,10 @@ object GardenStartLocation {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shcropstartlocation") {
+        event.registerBrigadier("shcropstartlocation") {
             description = "Manually sets the crop start location"
             category = CommandCategory.USERS_ACTIVE
-            callback { setLocationCommand() }
+            simpleCallback { setLocationCommand() }
         }
     }
 

@@ -29,7 +29,10 @@ jobs:
 
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
-
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Download release file
                 env:
                     GITHUB_TOKEN: ${{ github.token }}

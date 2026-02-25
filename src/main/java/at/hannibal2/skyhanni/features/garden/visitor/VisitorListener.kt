@@ -12,35 +12,29 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.INFO_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils.slots
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.network.play.client.C02PacketUseEntity
+import net.minecraft.network.protocol.game.ServerboundInteractPacket
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-//$$ import net.minecraft.server.world.ServerWorld
-//#endif
 
 @SkyHanniModule
 object VisitorListener {
@@ -62,15 +56,10 @@ object VisitorListener {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
-        if (packet !is C02PacketUseEntity) return
+        if (packet !is ServerboundInteractPacket) return
 
-        //#if MC < 1.21
-        val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
-        //#else
-        //$$ val world = MinecraftCompat.localPlayer.world
-        //$$ val entity = world.getEntityById(packet.entityId) ?: return
-        //#endif
-        val entityId = entity.entityId
+        val entity = MinecraftCompat.localWorld.getEntity(packet.entityId) ?: return
+        val entityId = entity.id
 
         lastClickedNpc = entityId
     }
@@ -79,8 +68,7 @@ object VisitorListener {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.VISITORS)) return
 
-        val hasVisitorInfo = event.lines.any { VisitorApi.visitorCountPattern.matches(it) }
-        if (!hasVisitorInfo) return
+        if (event.isClear()) return
 
         val visitorsInTab = VisitorApi.visitorsInTabList(event.lines)
 
@@ -107,13 +95,13 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.displayName != "§aAccept Offer") return
+        if (offerItem.hoverName.string != "Accept Offer") return
 
         VisitorApi.inInventory = true
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.displayName
+        var name = npcItem.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
@@ -135,14 +123,11 @@ object VisitorListener {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
-        val inventory = event.guiContainer as? AccessorGuiContainer ?: return
-        inventory as GuiContainer
-        val slot = inventory.slots()[29]
-        InventoryCompat.clickInventorySlot(slot.slotIndex, mouseButton = 0, mode = 0)
+        InventoryUtils.mouseClickSlot(29)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTooltip(event: ItemHoverEvent) {
+    fun onTooltip(event: ToolTipEvent) {
         if (!GardenApi.onBarnPlot) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
@@ -150,12 +135,12 @@ object VisitorListener {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!GardenApi.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity.name == "§e§lCLICK") {
+        if (entity.name.string == "CLICK") {
             event.cancel()
         }
     }

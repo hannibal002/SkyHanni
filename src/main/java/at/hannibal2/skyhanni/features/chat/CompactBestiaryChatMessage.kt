@@ -25,7 +25,7 @@ object CompactBestiaryChatMessage {
     private const val TITLE_MESSAGE = "§f                                  §6§lBESTIARY"
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
 
         val message = event.message
@@ -37,7 +37,7 @@ object CompactBestiaryChatMessage {
             }
 
             for (sibling in event.chatComponent.siblings) {
-                sibling.chatStyle?.chatClickEvent?.let {
+                sibling.style?.clickEvent?.let {
                     command = it.value()
                 }
             }

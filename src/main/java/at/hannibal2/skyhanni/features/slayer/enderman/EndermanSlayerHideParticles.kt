@@ -7,43 +7,29 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.monster.EntityEnderman
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.entity.monster.EnderMan
 
 @SkyHanniModule
 object EndermanSlayerHideParticles {
-
-    private var endermanLocations = listOf<LorenzVec>()
-
-    @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
-
-        endermanLocations = EntityUtils.getEntities<EntityEnderman>().map { it.getLorenzVec() }.toList()
-    }
 
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
 
         when (event.type) {
-            EnumParticleTypes.SMOKE_LARGE,
-            EnumParticleTypes.FLAME,
-            EnumParticleTypes.SPELL_WITCH,
+            ParticleTypes.LARGE_SMOKE,
+            ParticleTypes.FLAME,
+            ParticleTypes.WITCH,
             -> Unit
 
             else -> return
         }
 
-        val distance = event.location.distanceToNearestEnderman() ?: return
-        if (distance < 9) {
+        if (EntityUtils.getEntitiesInBoundingBox<EnderMan>(event.location.boundingCenter(3.0)).isNotEmpty()) {
             event.cancel()
         }
     }
-
-    private fun LorenzVec.distanceToNearestEnderman() = endermanLocations.minOfOrNull { it.distanceSq(this) }
 
     fun isEnabled() = IslandType.THE_END.isCurrent() && SlayerApi.config.endermen.hideParticles
 

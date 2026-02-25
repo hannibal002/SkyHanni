@@ -8,18 +8,17 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -39,7 +38,12 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker }) {
+    private val tracker = SkyHanniTracker(
+        "Frozen Treasure Tracker",
+        ::Data,
+        { it.frozenTreasureTracker },
+        trackerConfig = { config.perTrackerConfig }
+    ) {
         formatDisplay(drawDisplay(it))
     }
 
@@ -47,23 +51,11 @@ object FrozenTreasureTracker {
         FrozenTreasure.entries.forEach { it.chatPattern }
     }
 
-    class Data : TrackerData() {
-
-        override fun reset() {
-            treasureCount.clear()
-            treasuresMined = 0
-            compactProcs = 0
-        }
-
-        @Expose
-        var treasuresMined = 0
-
-        @Expose
-        var compactProcs = 0
-
-        @Expose
-        var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf()
-    }
+    data class Data(
+        @Expose var treasuresMined: Long = 0,
+        @Expose var compactProcs: Long = 0,
+        @Expose var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf(),
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     @HandleEvent
     fun onWorldChange() {
@@ -74,7 +66,7 @@ object FrozenTreasureTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         val difference = estimatedIce - lastEstimatedIce
         lastEstimatedIce = estimatedIce
 
@@ -111,10 +103,10 @@ object FrozenTreasureTracker {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!ProfileStorageData.loaded) return
 
-        val message = event.message.removeColor().trim()
+        val message = event.cleanMessage.trim()
 
         compactPattern.matchMatcher(message) {
             tracker.modify {
@@ -132,7 +124,7 @@ object FrozenTreasureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data) = buildList {
         calculateIce(data)
         addSearchString("§e§lFrozen Treasure Tracker")
         addSearchString("§6${formatNumber(data.treasuresMined)} Treasures Mined")
@@ -181,10 +173,10 @@ object FrozenTreasureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetfrozentreasuretracker") {
+        event.registerBrigadier("shresetfrozentreasuretracker") {
             description = "Resets the Frozen Treasure Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

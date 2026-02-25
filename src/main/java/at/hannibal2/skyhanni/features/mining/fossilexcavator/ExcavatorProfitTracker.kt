@@ -23,11 +23,11 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 @SkyHanniModule
 object ExcavatorProfitTracker {
@@ -36,17 +36,16 @@ object ExcavatorProfitTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Fossil Excavation Profit Tracker",
-        { Data() },
+        ::Data,
         { it.mining.fossilExcavatorProfitTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            timesExcavated = 0
-            glacitePowderGained = 0
-            fossilDustGained = 0
-        }
-
+    data class Data(
+        @Expose var timesExcavated: Long = 0L,
+        @Expose var glacitePowderGained: Long = 0L,
+        @Expose var fossilDustGained: Long = 0L,
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / timesExcavated
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -55,23 +54,8 @@ object ExcavatorProfitTracker {
                 "§7Your drop rate: §c$dropRate.",
             )
         }
-
         override fun getCoinName(item: TrackedItem) = "<no coins>"
-
-        override fun getCoinDescription(item: TrackedItem): List<String> {
-            return listOf(
-                "<no coins>",
-            )
-        }
-
-        @Expose
-        var timesExcavated = 0L
-
-        @Expose
-        var glacitePowderGained = 0L
-
-        @Expose
-        var fossilDustGained = 0L
+        override fun getCoinDescription(item: TrackedItem) = listOf("<no coins>")
     }
 
     private val scrapItem get() = FossilExcavatorApi.scrapItem
@@ -96,7 +80,8 @@ object ExcavatorProfitTracker {
             addGlacitePowder(data)
         }
 
-        add(tracker.addTotalProfit(profit, data.timesExcavated, "excavation"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.timesExcavated, "excavation", duration, "Excavations"))
 
         tracker.addPriceFromButton(this)
     }
@@ -106,7 +91,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (fossilDustGained <= 0) return profit
-        val pricePer = SkyHanniTracker.getPricePer(scrapItem) / 500
+        val pricePer = tracker.getPricePer(scrapItem) / 500
         val fossilDustPrice = pricePer * fossilDustGained
         add(
             Renderable.hoverTips(
@@ -142,8 +127,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (timesExcavated <= 0) return profit
-        // TODO use same price source as profit tracker
-        val scrapPrice = timesExcavated * SkyHanniTracker.getPricePer(scrapItem)
+        val scrapPrice = timesExcavated * tracker.getPricePer(scrapItem)
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
             Renderable.hoverTips(
@@ -218,11 +202,9 @@ object ExcavatorProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
-        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        if (Minecraft.getInstance().screen !is ContainerScreen) return true
         // Only show in excavation menu
-        if (inChest && !FossilExcavatorApi.inExcavatorMenu) return false
-
-        return true
+        return FossilExcavatorApi.inExcavatorMenu
     }
 
     @HandleEvent
@@ -236,10 +218,10 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetexcavatortracker") {
+        event.registerBrigadier("shresetexcavatortracker") {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 }

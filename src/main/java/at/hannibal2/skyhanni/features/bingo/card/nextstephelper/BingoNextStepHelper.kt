@@ -161,7 +161,7 @@ object BingoNextStepHelper {
     private var nextMessageIsCrystal = false
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         for (currentStep in currentSteps) {
@@ -195,7 +195,7 @@ object BingoNextStepHelper {
             if (step is ItemsStep) {
                 var totalCount = 0L
                 for ((itemName, multiplier) in step.variants) {
-                    val count = InventoryUtils.countItemsInLowerInventory { it.displayName.removeColor() == itemName }
+                    val count = InventoryUtils.countItemsInLowerInventory { it.hoverName.string.removeColor() == itemName }
                     totalCount += count * multiplier
                 }
                 if (step.amountHaving != totalCount) {

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorMana
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object TerracottaPhase {
@@ -29,7 +29,7 @@ object TerracottaPhase {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (terracottaStartPattern.matches(event.message)) {
             inTerracottaPhase = true
         } else if (terracottaEndPattern.matches(event.message)) {
@@ -38,7 +38,7 @@ object TerracottaPhase {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
         if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.cancel()
         }

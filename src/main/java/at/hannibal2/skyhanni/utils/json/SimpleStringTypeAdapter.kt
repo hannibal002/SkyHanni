@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.json
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 
 class SimpleStringTypeAdapter<T>(
@@ -9,11 +10,16 @@ class SimpleStringTypeAdapter<T>(
     val deserializer: String.() -> T,
 ) : TypeAdapter<T>() {
 
-    override fun write(writer: JsonWriter, value: T) {
-        writer.value(serializer(value))
+    override fun write(writer: JsonWriter, value: T?) {
+        if (value == null) writer.nullValue()
+        else writer.value(serializer(value))
     }
 
-    override fun read(reader: JsonReader): T {
+    override fun read(reader: JsonReader): T? {
+        if (reader.peek() == JsonToken.NULL) {
+            reader.nextNull()
+            return null
+        }
         return deserializer(reader.nextString())
     }
 
@@ -37,7 +43,7 @@ class SimpleStringTypeAdapter<T>(
                 deserializer = {
                     try {
                         enumValueOf(this.replace(" ", "_").uppercase())
-                    } catch (e: IllegalArgumentException) {
+                    } catch (_: IllegalArgumentException) {
                         enumReplacementMap[defaultValue] = this
                         defaultValue
                     }
