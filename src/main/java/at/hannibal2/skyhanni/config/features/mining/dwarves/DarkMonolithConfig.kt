@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining.dwarves
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -76,6 +77,14 @@ class DarkMonolithConfig {
         var text: String = "§5§lDark Monolith"
 
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Tracker Settings",
+        desc = ""
+    )
+    @Accordion
+    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     companion object {
         @Suppress("StorageVarOrVal")

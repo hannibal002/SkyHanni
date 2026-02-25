@@ -30,22 +30,19 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.init.Blocks
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.EnumFacing
+import net.minecraft.core.Direction
+import net.minecraft.world.level.block.Blocks.DRAGON_EGG
+import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DarkMonolithFeatures {
 
-    class Data : ItemTrackerData() {
-        override fun resetItems() {
-            monolithsLooted = 0
-        }
-
+    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long) = emptyList<String>()
         override fun getCoinName(item: TrackedItem) = "§6Monolith Coins"
         override fun getCoinDescription(item: TrackedItem) = emptyList<String>()
@@ -62,7 +59,8 @@ object DarkMonolithFeatures {
     private val tracker = SkyHanniItemTracker(
         "Dark Monolith Tracker",
         createNewSession = { Data() },
-        getStorage = { it.mining.darkMonolithTracker }
+        getStorage = { it.mining.darkMonolithTracker },
+        trackerConfig = { config.perTrackerConfig },
     ) { drawDisplay(it) }
 
     // Todo: need chat pattern for rock the fish drop
@@ -81,7 +79,7 @@ object DarkMonolithFeatures {
     private var knownEggs: Set<LorenzVec> = setOf()
     private var foundEggVec: LorenzVec? = null
     private var lastFoundEggVec: LorenzVec? = null
-    private var renderBox: AxisAlignedBB? = null
+    private var renderBox: AABB? = null
     private var nextBlockCheck: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun reset() {
@@ -104,7 +102,7 @@ object DarkMonolithFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         dropPattern.matchMatcher(event.message) {
             DarkMonolithFeatures.reset()
             groupOrNull("coins")?.let {
@@ -136,7 +134,7 @@ object DarkMonolithFeatures {
         knownEggs = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
             distance = 40,
-            filter = Blocks.dragon_egg,
+            filter = DRAGON_EGG,
         ).keys
     }
 
@@ -156,7 +154,7 @@ object DarkMonolithFeatures {
             min = aabb.minBox(),
             max = aabb.maxBox(),
             stepCount = 4,
-            ignoreFaces = listOf(EnumFacing.DOWN).toTypedArray(),
+            ignoreFaces = listOf(Direction.DOWN).toTypedArray(),
         )
     }
 
@@ -180,7 +178,9 @@ object DarkMonolithFeatures {
         addSearchString("§5§lDark Monolith Tracker")
         val profit = tracker.drawItems(data, { true }, this)
         add(Renderable.text("§7Monoliths looted: §d${data.monolithsLooted}").toSearchable())
-        add(tracker.addTotalProfit(profit, data.monolithsLooted, "loot"))
+        addAll(
+            tracker.addTotalProfit(profit, data.monolithsLooted, "loot", data.getTotalUptime())
+        )
         tracker.addPriceFromButton(this)
     }
 
