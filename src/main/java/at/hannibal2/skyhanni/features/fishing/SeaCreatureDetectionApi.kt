@@ -258,6 +258,7 @@ object SeaCreatureDetectionApi {
 
     private fun isActive(): Boolean = !DungeonApi.inDungeon()
 
+    @Suppress("MaxLineLength")
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Sea Creatures")
