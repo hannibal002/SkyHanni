@@ -262,11 +262,15 @@ object SeaCreatureDetectionApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Sea Creatures")
         event.addIrrelevant {
-            add("EntityIdToData: ${entityIdToData.entries}")
-            add("seaCreatures: ${seaCreatures.entries}")
+            entityIdToData.forEach { (entityID, data) ->
+                add("$entityID: isOwn=${data.isOwn} repoSeaCreatureData=${data.seaCreature} spawnTime=${data.spawnTime} mob=${data.mob} pos=${data.pos} aabb=${data.aabb}")
+            }
+            seaCreatures.forEach { (_, data) ->
+                add("repoSeaCreatureData=${data.seaCreature} spawnTime=${data.spawnTime} mob=${data.mob} pos=${data.pos} aabb=${data.aabb}")
+            }
             add("lastNameFished $lastNameFished")
             add("mobsToFind: $mobsToFind")
-            add("lastSeaCreatureFished $lastSeaCreatureFished")
+            add("lastSeaCreatureFishedTime: $lastSeaCreatureFished")
             add("recentMobs ${recentMobs.entries}")
             add("babyMagmaSlugsToFind $babyMagmaSlugsToFind")
             add("lastMagmaSlugLocation $lastMagmaSlugLocation")

@@ -108,16 +108,4 @@ class LivingSeaCreatureData(
         aabb = renderWorld.exactBoundingBoxExtraEntities(mob)
         pos = renderWorld.exactLocation(mob)
     }
-
-    override fun toString(): String = listOf(
-        "SeaCreatureData(",
-        "isOwn=$isOwn",
-        "seaCreature=$seaCreature",
-        "entityId=$entityId",
-        "spawnTime=$spawnTime",
-        "mob=$mob",
-        "pos=$pos",
-        "aabb=$aabb",
-        ')',
-    ).joinToString(", ", "SeaCreatureData(", ")")
 }
