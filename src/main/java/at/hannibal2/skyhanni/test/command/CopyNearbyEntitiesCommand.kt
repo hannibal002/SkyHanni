@@ -35,9 +35,9 @@ import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.Panda
-import net.minecraft.world.entity.animal.TropicalFish
+import net.minecraft.world.entity.animal.fish.TropicalFish
 import net.minecraft.world.entity.animal.frog.Frog
+import net.minecraft.world.entity.animal.panda.Panda
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity

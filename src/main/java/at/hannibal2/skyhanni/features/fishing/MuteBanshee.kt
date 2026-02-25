@@ -35,6 +35,6 @@ object MuteBanshee {
     @HandleEvent(onlyOnIsland = IslandType.BACKWATER_BAYOU)
     fun onSound(event: PlaySoundEvent) {
         if (!SkyHanniMod.feature.fishing.muteBanshee) return
-        if (event.pitch in bansheePitches && event.soundName == "entity.ghast.warn") event.cancel()
+        if (event.pitch in bansheePitches && event.soundName == "mob.ghast.affectionate_scream") event.cancel()
     }
 }

@@ -70,6 +70,7 @@ private fun drawEntityWithoutScissor(
     mouseY: Float,
     entity: LivingEntity,
 ) {
+    //? if < 1.21.11 {
     val n: Float = (x1 + x2).toFloat() / 2.0f
     val o: Float = (y1 + y2).toFloat() / 2.0f
     val p = atan(((n - mouseX) / 40.0f).toDouble()).toFloat()
@@ -107,4 +108,6 @@ private fun drawEntityWithoutScissor(
     entity.setXRot(t)
     entity.yHeadRotO = u
     entity.yHeadRot = v
+    //?} else
+    //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
 }

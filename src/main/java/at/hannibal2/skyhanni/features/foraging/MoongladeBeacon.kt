@@ -40,7 +40,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -83,7 +83,7 @@ object MoongladeBeacon {
 
         override fun toString() = displayName
 
-        private val identifier = ResourceLocation.fromNamespaceAndPath("minecraft", name.lowercase() + "_stained_glass_pane")
+        private val identifier = Identifier.fromNamespaceAndPath("minecraft", name.lowercase() + "_stained_glass_pane")
         val item by lazy { itemOverride ?: BuiltInRegistries.ITEM.getValue(identifier) }
 
         companion object {

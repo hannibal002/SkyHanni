@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -20,13 +19,11 @@ class FilterTypesConfig {
 
     @Expose
     @ConfigOption(name = "Foraging", desc = "")
-    @OnlyModern
     @Accordion
     val foraging: ForagingFilterConfig = ForagingFilterConfig()
 
     @Expose
     @ConfigOption(name = "Hunting", desc = "")
-    @OnlyModern
     @Accordion
     val hunting: HuntingFilterConfig = HuntingFilterConfig()
 

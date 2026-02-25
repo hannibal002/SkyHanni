@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
@@ -17,7 +18,7 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import java.net.URI
 import java.util.Optional
@@ -139,13 +140,13 @@ fun MutableComponent.withColor(hex: String): MutableComponent {
     return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }
 }
 
-fun createResourceLocation(domain: String, path: String): ResourceLocation {
-    val textureLocation = ResourceLocation.fromNamespaceAndPath(domain, path)
+fun createResourceLocation(domain: String, path: String): Identifier {
+    val textureLocation = Identifier.fromNamespaceAndPath(domain, path)
     return textureLocation
 }
 
-fun createResourceLocation(path: String): ResourceLocation {
-    val textureLocation = ResourceLocation.parse(path)
+fun createResourceLocation(path: String): Identifier {
+    val textureLocation = Identifier.parse(path)
     return textureLocation
 }
 
@@ -232,15 +233,16 @@ fun Style.setHoverShowText(text: Component): Style {
 }
 
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
-    if (!bypassSelfMessages) (message as ComponentCreatedStore).`skyhanni$setCreated`()
-    Minecraft.getInstance().player?.displayClientMessage(message, false)
+    if (!bypassSelfMessages) message.skyhanniCreated = true
+    DelayedRun.runOrNextTick { Minecraft.getInstance().player?.displayClientMessage(message, false) }
 }
 
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
-    if (!bypassSelfMessages) (component as ComponentCreatedStore).`skyhanni$setCreated`()
-    Minecraft.getInstance().execute {
-        Minecraft.getInstance().gui.chat.deleteMessage(idToMessageSignature(id))
-        Minecraft.getInstance().gui.chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
+    if (!bypassSelfMessages) component.skyhanniCreated = true
+    DelayedRun.runOrNextTick {
+        val chat = Minecraft.getInstance().gui.chat
+        chat.deleteMessage(idToMessageSignature(id))
+        chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
     }
 }
 
@@ -300,7 +302,10 @@ fun Component.changeColor(color: LorenzColor): Component =
     this.copyIfNeeded().withStyle(color.toChatFormatting())
 
 fun Component.convertToJsonString(): String {
-    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, this).orThrow.toString()
+    return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
+        com.mojang.serialization.JsonOps.INSTANCE,
+        this
+    ).orThrow.toString()
 }
 
 fun Component.append(newText: Component): MutableComponent {
@@ -368,21 +373,37 @@ val ALWAYS get(): (Style?) -> Boolean = { true }
  * The strings have to exist within 1 sibling
  * AKA they have to have the same Style
  */
-fun Component.replace(oldValue: String, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
-    return replace(this, oldValue, newValue, predicate)
+fun Component.replace(
+    oldValue: String,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
 
-fun Component.replace(oldValue: Regex, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
-    return replace(this, oldValue, newValue, predicate)
+fun Component.replace(
+    oldValue: Regex,
+    newValue: String,
+    onlyReplaceFirst: Boolean = false,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
+    return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
 
-private fun replace(component: Component, oldValue: Any, newValue: String, predicate: (Style?) -> Boolean = ALWAYS): MutableComponent? {
+private fun replace(
+    component: Component,
+    oldValue: Any,
+    newValue: String,
+    onlyReplaceFirst: Boolean,
+    predicate: (Style?) -> Boolean = ALWAYS
+): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
     component.visit({ style: Style?, string: String? ->
         var edit = string
-        if (predicate(style)) {
+        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
             if (oldValue is String) {
                 edit = string?.replace(oldValue, newValue)
             } else if (oldValue is Regex) {

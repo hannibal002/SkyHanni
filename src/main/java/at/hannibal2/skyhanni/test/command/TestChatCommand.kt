@@ -55,13 +55,16 @@ object TestChatCommand {
     }
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean) {
-        val component = if (isComplex) try {
-            ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(text)).getOrThrow().first
-        } catch (ex: Exception) {
-            ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
-            return
+        val component = if (isComplex) {
+            try {
+                ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(text)).getOrThrow().first
+            } catch (_: Exception) {
+                ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+                return
+            }
+        } else {
+            text.replace("&", "§").asComponent()
         }
-        else text.replace("&", "§").asComponent()
 
         println("component unformatted: ${component.unformattedTextCompat()}")
         println("${component.unformattedTextForChatCompat()} ${component.style} ${component.siblings}")

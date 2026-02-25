@@ -10,7 +10,7 @@ import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -27,12 +27,12 @@ enum class SkyHanniRenderPipeline(
 ) {
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        vFormat = DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/,
         vDrawMode = VertexFormat.Mode.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
-        vFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        vFormat = DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/,
         vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
@@ -106,7 +106,7 @@ enum class SkyHanniRenderPipeline(
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
-        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+        uniforms = getCommonRoundedUniforms() + mapOf(
             "SkyHanniCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
     ),
@@ -115,7 +115,7 @@ enum class SkyHanniRenderPipeline(
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle",
-        uniforms = getCommonRoundedUniforms(withHalfSize = false) + mapOf(
+        uniforms = getCommonRoundedUniforms() + mapOf(
             "SkyHanniRadialGradientCircleUniforms" to UniformType.UNIFORM_BUFFER
         ),
     ),
@@ -137,14 +137,14 @@ enum class SkyHanniRenderPipeline(
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
+            .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
                 blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
-                vertexShaderPath?.let { withVertexShader(ResourceLocation.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
+                vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
                     withFragmentShader(
-                        ResourceLocation.fromNamespaceAndPath(
+                        Identifier.fromNamespaceAndPath(
                             SkyHanniMod.MODID, it
                         )
                     )
@@ -160,10 +160,7 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    fun getCommonRoundedUniforms(
-        withSmoothness: Boolean = true,
-        withHalfSize: Boolean = true,
-    ): Map<String, UniformType> {
+    fun getCommonRoundedUniforms(): Map<String, UniformType> {
         return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     }
 

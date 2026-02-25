@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
@@ -63,7 +63,6 @@ object ShaderRenderUtils {
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
      * is called **BEFORE** [DrawContextUtils.scale], otherwise the textured rect will not be rendered correctly
      *
-     * @param filter the texture filter to use
      * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
      * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
@@ -74,14 +73,13 @@ object ShaderRenderUtils {
         y: Int,
         width: Int,
         height: Int,
-        filter: Int,
         radius: Int = 10,
         smoothness: Float = 1f,
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
     ) {
         // if radius is 0 then just draw a normal textured rect
-        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
+        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
 
         RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
 

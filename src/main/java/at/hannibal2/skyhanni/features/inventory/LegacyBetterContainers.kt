@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 @SuppressWarnings("unused")
 object LegacyBetterContainers {
@@ -17,13 +17,13 @@ object LegacyBetterContainers {
         override fun toString() = displayName
         private val resourceIndex = ordinal + 1
 
-        val configId: ResourceLocation =
-            ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_config.json")
-        val baseId: ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54.png")
-        val slotId: ResourceLocation =
-            ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54_slot_ctm.png")
-        val buttonId: ResourceLocation =
-            ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54_button_ctm.png")
+        val configId: Identifier =
+            Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_config.json")
+        val baseId: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54.png")
+        val slotId: Identifier =
+            Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54_slot_ctm.png")
+        val buttonId: Identifier =
+            Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style$resourceIndex/dynamic_54_button_ctm.png")
     }
 
 }

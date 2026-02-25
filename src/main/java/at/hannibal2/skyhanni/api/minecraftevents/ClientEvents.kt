@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.mixins.hooks.ComponentCreatedStore
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -25,10 +24,9 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.PreparableReloadListener
-import net.minecraft.server.packs.resources.ResourceManager
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
@@ -68,9 +66,10 @@ object ClientEvents {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             object : IdentifiableResourceReloadListener {
 
-                override fun getFabricId(): ResourceLocation =
-                    ResourceLocation.fromNamespaceAndPath("skyhanni", "resources")
+                override fun getFabricId(): Identifier =
+                    Identifier.fromNamespaceAndPath("skyhanni", "resources")
 
+                @Suppress("ForbiddenVoid")
                 override fun reload(
                     store: PreparableReloadListener.SharedState,
                     prepareExecutor: Executor,
@@ -95,11 +94,8 @@ object ClientEvents {
 
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
         // if we created the message we don't want to pipe it back into our events
-        try {
-            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return true
-        } catch (exception: Exception) {
-            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
-        }
+        if (message.skyhanniCreated) return true
+
         if (actionBar) {
             // we never cancel the action bar
             return true
@@ -121,11 +117,7 @@ object ClientEvents {
     }
 
     private fun onModify(message: Component, actionBar: Boolean): Component {
-        try {
-            if ((message as ComponentCreatedStore).`skyhanni$didCreate`()) return message
-        } catch (exception: Exception) {
-            ErrorManager.logErrorWithData(exception, "Unable to work out if message was created by SkyHanni")
-        }
+        if (message.skyhanniCreated) return message
 
         if (actionBar) {
             // we don't have to worry about cancelling the action bar

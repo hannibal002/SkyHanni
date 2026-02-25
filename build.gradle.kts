@@ -8,7 +8,6 @@ import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
-import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
 
@@ -40,20 +39,18 @@ runDirectory.mkdirs()
 
 // Minecraft configuration:
 loom {
-    val accessWidenerFile = sc.process(rootProject.file("src/main/resources/skyhanni.accesswidener"), "build/accesswidener.access")
-
-    if (accessWidenerFile.exists()) {
-        accessWidenerPath = accessWidenerFile
+    val classTweakerFile = sc.process(
+        rootProject.file("src/main/resources/skyhanni.classtweaker"),
+        "build/skyhanni.classtweaker",
+    )
+    if (classTweakerFile.exists()) {
+        accessWidenerPath = classTweakerFile
     } else {
-        println("No accesswidener file for ${target.minecraftVersion}")
+        println("No classTweaker file for ${target.minecraftVersion}")
     }
+
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
 
-    @Suppress("UnstableApiUsage")
-    mixin {
-        useLegacyMixinAp.set(true)
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
-    }
     runs {
         named("client") {
             isIdeConfigGenerated = true
@@ -95,10 +92,6 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
-val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
-    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
-}
-
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
@@ -119,13 +112,20 @@ dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
     if (target.mappingDependency == "official") {
-        mappings(loom.officialMojangMappings())
+        mappings(loom.layered {
+            officialMojangMappings()
+            if (versionName == "1.21.10") {
+                mappings("dev.lambdaurora:yalmm-mojbackward:1.21.10+build.3")
+            }
+        })
     } else {
         mappings(target.mappingDependency)
     }
 
     // Discord RPC client
     includeImplementation("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
+    include("com.kohlschutter.junixsocket:junixsocket-common:2.6.2")
+    include("com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2")
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
@@ -173,6 +173,8 @@ dependencies {
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+
+    if (target != ProjectTarget.MODERN_12110) shadowImpl("org.apache.httpcomponents:httpclient:4.5.14")
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
@@ -226,7 +228,7 @@ tasks.processResources {
     }
 }
 
-if (target == ProjectTarget.MODERN_12105) {
+if (target == ProjectTarget.MODERN_12110) {
     fabricApi {
         configureTests {
             modId = "skyhanni"
@@ -357,7 +359,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MODERN_12105 && project.findProperty("skipDetekt") != "true"
+        target == ProjectTarget.MODERN_12110 && project.findProperty("skipDetekt") != "true"
     }
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
@@ -384,7 +386,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     outputs.cacheIf { false } // Custom rules won't work if cached
     onlyIf {
         // We only need one baseline for the main source set
-        target == ProjectTarget.MODERN_12105
+        target == ProjectTarget.MODERN_12110
     }
 
     val isMainBaseline = (this.name == "detektBaselineMain")

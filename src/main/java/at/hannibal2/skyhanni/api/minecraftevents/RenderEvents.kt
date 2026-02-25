@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.resources.ResourceLocation
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object RenderEvents {
@@ -17,9 +17,21 @@ object RenderEvents {
     init {
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
-            ResourceLocation.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
+            Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
             RenderEvents::postGui
         )
+
+        // makes the lines render weird idk
+        /*WorldRenderEvents.END_MAIN.register { event ->
+            val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
+            val stack = event.matrices()
+            SkyHanniRenderWorldEvent(
+                stack,
+                event.gameRenderer().mainCamera,
+                immediateVertexConsumers,
+                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
+            ).post()
+        }*/
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {

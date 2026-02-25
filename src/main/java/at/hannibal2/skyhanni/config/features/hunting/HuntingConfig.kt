@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.hunting
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -26,7 +25,6 @@ class HuntingConfig {
     val huntingProfitTracker: HuntingProfitTrackerConfig = HuntingProfitTrackerConfig()
 
     @Expose
-    @OnlyModern
     @Category(name = "Galatea Mob Highlights", desc = "Settings for Galatea mob highlights")
     var mobHighlight = GalateaMobHighlightConfig()
 
@@ -41,7 +39,6 @@ class HuntingConfig {
     val lassoDisplayPosition: Position = Position(380, 210)
 
     @Expose
-    @OnlyModern
     @Category(name = "Fusion Keybinds", desc = "Settings for fusion keybinds")
     @SearchTag("hunting box")
     var fusionKeybinds = FusionKeybindsConfig()
@@ -65,7 +62,6 @@ class HuntingConfig {
     var hideonleafFinder = false
 
     @Expose
-    @OnlyModern
     @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var nextHideonleafKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
@@ -74,7 +70,6 @@ class HuntingConfig {
     @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var fusionDisplay = true
 
     @Expose
