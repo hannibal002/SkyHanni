@@ -233,20 +233,18 @@ object OrderedWaypoints {
     fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
         if (config.autoLoadMatchingShaftRoute) {
             SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
-                if (storage?.routes?.get(event.type.name) == null) {
-                    ChatUtils.debug("No Route found for ${event.type.name}")
+                if (storage?.routes?.get(event.type.name) != null) {
+                    load(event.type.name)
                 }
-                load(event.type.name)
             }
         }
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        when (event.oldIsland) {
-            IslandType.MINESHAFT -> if (config.autoUnloadWhenLeavingMineshaft || config.autoUnload) unload()
-            else -> if (config.autoUnload) unload()
-        }
+        ChatUtils.debug(event.oldIsland.name)
+        if (event.oldIsland == IslandType.MINESHAFT && config.autoUnloadWhenLeavingMineshaft) unload()
+        if (config.autoUnload) unload()
     }
 
     private fun shouldRenderName(waypointIndice: Int) =
@@ -284,7 +282,7 @@ object OrderedWaypoints {
         }
 
     private fun unload() {
-        if (!orderedWaypointsList.isEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
+        if (orderedWaypointsList.isNotEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
         orderedWaypointsList.clear()
         renderWaypoints.clear()
         currentOrderedWaypointIndex = 0

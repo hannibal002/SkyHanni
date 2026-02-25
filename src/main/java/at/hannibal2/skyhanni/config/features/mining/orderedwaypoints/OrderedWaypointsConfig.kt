@@ -137,7 +137,7 @@ class OrderedWaypointsConfig {
     @Expose
     @ConfigOption(
         name = "Auto-Load Shaft Routes",
-        desc = "Will automatically load a matching route when entering a Mineshaft (format is from the Scoreboard e.g. Jasp_1/Peri_C)"
+        desc = "Automatically loads a matching route if found when entering a Mineshaft. (format is from the Scoreboard e.g. Jasp_1/Peri_C)"
     )
     @ConfigEditorBoolean
     var autoLoadMatchingShaftRoute: Boolean = false

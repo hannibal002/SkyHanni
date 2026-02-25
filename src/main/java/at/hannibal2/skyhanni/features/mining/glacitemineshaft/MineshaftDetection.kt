@@ -52,7 +52,6 @@ object MineshaftDetection {
 
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
-        if (!config.mineshaftDetection) return
         found = false
     }
 
