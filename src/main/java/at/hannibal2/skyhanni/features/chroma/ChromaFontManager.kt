@@ -19,7 +19,7 @@ fun checkIfGlyphIsChroma(drawnGlyph: GlyphInstance) {
 
 fun setChromaColorStyle(style: Style, text: String, colorCode: Char): Style {
     if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
-    if (colorCode.lowercaseChar() == 'z') {
+    if (colorCode.lowercaseChar() == 'z' || colorCode == '\uE002') {
         return Style.EMPTY.withColor(textColor)
     }
     return style
