@@ -279,7 +279,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onPlayerDeath(event: PlayerDeathEvent) {
+    fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
         if (event.isSelf) {
             updateCold(0)
             updateHeat(0)
