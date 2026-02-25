@@ -48,13 +48,13 @@ object SeaCreatureDetectionApi {
     private var mobsToFind = 0
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
 
-    private val recentMobs = mutableMapOf<Mob, ServerTimeMark>()
+    private var recentMobs = mutableMapOf<Mob, ServerTimeMark>()
 
     private var babyMagmaSlugsToFind = 0
     private var lastMagmaSlugLocation: LorenzVec? = null
     private var lastMagmaSlugTime = SimpleTimeMark.farPast()
 
-    private val recentBabyMagmaSlugs = mutableMapOf<Mob, ServerTimeMark>()
+    private var recentBabyMagmaSlugs = mutableMapOf<Mob, ServerTimeMark>()
 
     var lastBobberLocation: LorenzVec? = null
 
@@ -143,11 +143,9 @@ object SeaCreatureDetectionApi {
             .sortedBy { it.second }
             .take(mobsToFind).toList()
 
-        val ownMobInfo = findMobs(mobs, mobsToFind) ?: return
+        val ownMobInfo = findMobs(mobs, mobsToFind, recentMobs) ?: return
         mobsToFind = ownMobInfo.first
-        for (mob in ownMobInfo.second) {
-            recentMobs.remove(mob)
-        }
+        recentMobs = ownMobInfo.second
 
         if (mobsToFind == 0) {
             lastNameFished = null
@@ -155,17 +153,18 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    private fun findMobs(mobs: List<Pair<Map.Entry<Mob, ServerTimeMark>, Double>>, toBeFound: Int): Pair<Int, List<Mob>>? {
+    // This list Pair Map Entry call is ugly and bad but, I do not know a better way atm.
+    @Suppress("MaxLineLength")
+    private fun findMobs(mobs: List<Pair<Map.Entry<Mob, ServerTimeMark>, Double>>, toBeFound: Int, nonParsedMobs: MutableMap<Mob, ServerTimeMark>): Pair<Int, MutableMap<Mob, ServerTimeMark>>? {
         if (mobs.isEmpty()) return null
         val toFind = toBeFound - mobs.size
-        val mobsToRemove = mutableListOf<Mob>()
         for ((entry, _) in mobs) {
             val mob = entry.key
             val time = mob.baseEntity.spawnTime
             addMob(mob, time, isOwn = true)
-            mobsToRemove.add(mob)
+            nonParsedMobs.remove(mob)
         }
-        return Pair(toFind, mobsToRemove)
+        return Pair(toFind, nonParsedMobs)
     }
 
     private fun handleBabySlugs() {
@@ -178,11 +177,9 @@ object SeaCreatureDetectionApi {
             .sortedBy { it.second }
             .take(babyMagmaSlugsToFind).toList()
 
-        val mobInfo = findMobs(slugs, babyMagmaSlugsToFind) ?: return
+        val mobInfo = findMobs(slugs, babyMagmaSlugsToFind, recentBabyMagmaSlugs) ?: return
         babyMagmaSlugsToFind = mobInfo.first
-        for (mob in mobInfo.second) {
-            recentBabyMagmaSlugs.remove(mob)
-        }
+        recentBabyMagmaSlugs = mobInfo.second
 
         if (babyMagmaSlugsToFind == 0) {
             lastMagmaSlugLocation = null
@@ -246,6 +243,7 @@ object SeaCreatureDetectionApi {
         lastSeaCreatureFished = SimpleTimeMark.farPast()
         lastNameFished = null
         mobsToFind = 0
+        lastBobberLocation = null
     }
 
     @HandleEvent
