@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class HoppityLiveDisplayConfig {
     @Expose
@@ -75,8 +75,8 @@ class HoppityLiveDisplayConfig {
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var toggleKeybind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var toggleKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(

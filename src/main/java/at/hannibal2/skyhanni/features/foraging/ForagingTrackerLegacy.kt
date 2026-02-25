@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
 
 // todo move back to TreeGiftTracker when 1.8 is no longer supported
@@ -41,7 +42,7 @@ object ForagingTrackerLegacy {
         @Expose var hotfExperience: MutableMap<TreeType, Long> = enumMapOf(),
         @Expose var foragingExperience: MutableMap<TreeType, Long> = enumMapOf(),
         @Expose var forestWhispers: MutableMap<TreeType, Long> = enumMapOf(),
-    ) : BucketedItemTrackerData<TreeType>(TreeType::class) {
+    ) : BucketedItemTrackerData<TreeType, SessionUptime.Normal>(TreeType::class, SessionUptime.Normal::class) {
         override fun getDescription(bucket: TreeType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
@@ -159,7 +160,17 @@ object ForagingTrackerLegacy {
      */
     val enchantedBookPattern by patternGroup.pattern(
         "bonus-gift.enchanted-book",
-        "(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+        " *(?:§.)+Enchanted Book \\((?:§.)+(?<book>.*) (?<tier>[IVCLX])(?:§.)+\\)"
+    )
+
+    /**
+     * REGEX-TEST: §r§7A §r§dPhanpyre §r§7fell from the Tree!
+     * REGEX-TEST: §r§7A §r§dPhanflare §r§7fell from the Tree!
+     * REGEX-TEST: §r§7A §r§dDreadwing §r§7fell from the Tree!
+     */
+    val phantomSpawnPattern by patternGroup.pattern(
+        "bonus-gift.phantoms",
+        " *(?:§.)+A (?:§.)+(?<phantom>.*) (?:§.)+fell from the Tree!"
     )
 
     /**

@@ -23,6 +23,11 @@ class FossilExcavatorConfig {
     val tooltipHider: ExcavatorTooltipHiderConfig = ExcavatorTooltipHiderConfig()
 
     @Expose
+    @ConfigOption(name = "Get Scrap from Sacks", desc = "")
+    @Accordion
+    val scrapGFS: ExcavatorScrapGFSConfig = ExcavatorScrapGFSConfig()
+
+    @Expose
     @ConfigOption(
         name = "Profit per Excavation",
         desc = "Show profit/loss in chat after each excavation. Also includes breakdown information on hover."

@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -58,7 +59,7 @@ object SlayerProfitTracker {
     data class Data(
         @Expose var slayerSpawnCost: Long = 0L,
         @Expose var slayerCompletedCount: Long = 0L,
-    ) : ItemTrackerData() {
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / slayerCompletedCount
             val perBoss = percentage.coerceAtMost(1.0).formatPercentage()
@@ -107,7 +108,8 @@ object SlayerProfitTracker {
         }
         // TODO spawn costs in repo
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
-            if (coins < -150000 || coins > 0) {
+            val coinsCap = -350_000
+            if (coins < coinsCap || coins > 0) {
                 ChatUtils.debug("Wrong Slayer Spawn Cost! Ignoring!")
                 return
             }
@@ -116,7 +118,7 @@ object SlayerProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         autoSlayerBankPattern.matchMatcher(event.message) {
             addSlayerCosts(-group("coins").formatDouble())
@@ -140,7 +142,12 @@ object SlayerProfitTracker {
                     category,
                 ) { Data() }
             }
-            SkyHanniItemTracker("$categoryName Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
+            SkyHanniItemTracker(
+                "$categoryName Profit Tracker",
+                ::Data,
+                getStorage,
+                trackerConfig = { config.perTrackerConfig }
+            ) { drawDisplay(it) }
         }
     }
 
@@ -201,7 +208,8 @@ object SlayerProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss", duration, "Bosses"))
 
         tracker.addPriceFromButton(this)
     }
@@ -223,7 +231,7 @@ object SlayerProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = ::shouldShowDisplay,
             onRender = {
                 getTracker()?.renderDisplay(config.pos)
             },
@@ -275,10 +283,10 @@ object SlayerProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetslayerprofits") {
+        event.registerBrigadier("shresetslayerprofits") {
             description = "Resets the total slayer profit for the current slayer type"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

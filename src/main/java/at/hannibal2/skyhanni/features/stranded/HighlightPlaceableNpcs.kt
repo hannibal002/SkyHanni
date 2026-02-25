@@ -66,7 +66,7 @@ object HighlightPlaceableNpcs {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.slotIndex in highlightedItems) {
+            if (slot.containerSlot in highlightedItems) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

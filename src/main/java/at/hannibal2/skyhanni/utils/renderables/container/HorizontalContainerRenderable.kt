@@ -22,9 +22,9 @@ class HorizontalContainerRenderable private constructor(
         renderables.forEach {
             it.renderYAligned(x, mouseOffsetY, height)
             x += it.width + spacing
-            DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
+            DrawContextUtils.translate((it.width + spacing).toFloat(), 0f)
         }
-        DrawContextUtils.translate((-width - spacing).toFloat(), 0f, 0f)
+        DrawContextUtils.translate((-width - spacing).toFloat(), 0f)
     }
 
     companion object {

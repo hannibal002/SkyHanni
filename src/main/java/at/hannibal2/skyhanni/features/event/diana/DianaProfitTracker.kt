@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.itemabilities.CrownOfAvariceCounter.isAvariceConsuming
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
@@ -51,7 +53,7 @@ object DianaProfitTracker {
 
     private val tracker = SkyHanniItemTracker(
         "Diana Profit Tracker",
-        { Data() },
+        ::Data,
         { it.diana.profitTracker },
         extraDisplayModes = mapOf(
             SkyHanniTracker.DisplayMode.MAYOR to {
@@ -60,11 +62,13 @@ object DianaProfitTracker {
                 )
             },
         ),
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
     data class Data(
-        @Expose var burrowsDug: Long = 0
-    ) : ItemTrackerData() {
+        @Expose var burrowsDug: Long = 0,
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = percentage.coerceAtMost(1.0).formatPercentage()
@@ -99,7 +103,8 @@ object DianaProfitTracker {
             ).toSearchable(),
         )
 
-        add(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows"))
 
         tracker.addPriceFromButton(this)
     }
@@ -123,7 +128,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
@@ -132,10 +137,12 @@ object DianaProfitTracker {
             }
             tryHide(event)
         }
-        chatDugOutCoinsPattern.matchMatcher(message) {
-            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-            tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
-            tryHide(event)
+        if (!isAvariceConsuming()) {
+            chatDugOutCoinsPattern.matchMatcher(message) {
+                BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+                tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
+                tryHide(event)
+            }
         }
 
         if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
@@ -146,7 +153,7 @@ object DianaProfitTracker {
         }
     }
 
-    private fun tryHide(event: SkyHanniChatEvent) {
+    private fun tryHide(event: SkyHanniChatEvent.Allow) {
         if (SkyHanniMod.feature.chat.filterType.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }
@@ -173,10 +180,10 @@ object DianaProfitTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetdianaprofittracker") {
+        event.registerBrigadier("shresetdianaprofittracker") {
             description = "Resets the Diana Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

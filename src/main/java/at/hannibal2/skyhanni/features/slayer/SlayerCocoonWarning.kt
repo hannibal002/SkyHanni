@@ -22,7 +22,7 @@ object SlayerCocoonWarning {
     private val config get() = SlayerApi.config
 
     @HandleEvent
-    fun onChatMessage(event: SkyHanniChatEvent) {
+    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
         if (slayerCocoonPattern.matches(event.message)) {
             if (config.cocoonTitle) TitleManager.sendTitle("§lSlayer Boss Cocooned!")
             if (config.cocoonDing) SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)

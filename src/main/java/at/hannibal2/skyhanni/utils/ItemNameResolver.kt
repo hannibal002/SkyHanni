@@ -123,7 +123,7 @@ object ItemNameResolver {
             val tier = group("tier")
             return "ULTIMATE_REITERATE;$tier".toInternalName()
         }
-        return originalName.toInternalName()
+        return originalName.removeColor().toInternalName()
     }
 
     private fun getInternalNameOrNullIgnoreCase(itemName: String): NeuInternalName? {

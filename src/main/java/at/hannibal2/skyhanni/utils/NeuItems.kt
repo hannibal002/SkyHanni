@@ -23,18 +23,16 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
-import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Blocks
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.minutes
@@ -54,7 +52,7 @@ object NeuItems {
      */
     private val neuPetLevelRegex by patternGroup.pattern(
         "pet-level",
-        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] "
+        "(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] ",
     )
 
     /** Keys are internal names as String */
@@ -71,7 +69,7 @@ object NeuItems {
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
-            ItemStack(Blocks.barrier).item,
+            ItemStack(Blocks.BARRIER).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
         )
@@ -86,8 +84,10 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        DelayedRun.onThread.execute {
+        DelayedRun.runOrNextTick {
             readAllNeuItems()
+            multiplierCache.clear()
+            itemIdCache.clear()
         }
     }
 
@@ -105,7 +105,7 @@ object NeuItems {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
-            val cleanName = stack.displayName?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
+            val cleanName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().lowercase().removePrefix(neuPetLevelRegex).takeIf {
                 it.isNotEmpty()
             } ?: return@forEach
 
@@ -240,16 +240,6 @@ object NeuItems {
                     internalItemId = "CACTUS".toInternalName()
                 }
 
-                // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE".toInternalName() && internalItemId == "WHEAT".toInternalName()) {
-                    continue
-                }
-
-                // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT".toInternalName() && internalItemId == "GOLDEN_CARROT".toInternalName()) {
-                    continue
-                }
-
                 // ignore rabbit hide in leather
                 if (internalName == "LEATHER".toInternalName() && internalItemId == "RABBIT_HIDE".toInternalName()) {
                     continue
@@ -277,19 +267,6 @@ object NeuItems {
 
     fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
-    fun neuHasFocus(): Boolean {
-        //#if MC < 1.16
-        if (!PlatformUtils.isNeuLoaded()) return false
-        if (AuctionSearchOverlay.shouldReplace()) return true
-        if (BazaarSearchOverlay.shouldReplace()) return true
-        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
-        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
-        if (NEUOverlay.searchBarHasFocus) return true
-        //#endif
-        return false
-    }
-
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {
@@ -304,7 +281,7 @@ object NeuItems {
         val jsonString = StringUtils.decodeBase64(encoded)
         val neuItem = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(jsonString) ?: run {
             println("\nCould not load NEU item from encoded string:\n\n $encoded.\n")
-            return ItemUtils.createItemStack(Items.map, "unloaded")
+            return ItemUtils.createItemStack(Items.MAP, "unloaded")
         }
         return EnoughUpdatesManager.neuItemToStack(neuItem, useCache = false)
     }

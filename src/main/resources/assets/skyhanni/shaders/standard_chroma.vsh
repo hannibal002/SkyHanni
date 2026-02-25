@@ -1,13 +1,15 @@
-// Chroma Vertex Shader
-// (Same as textured_chroma.vsh but isn't restricted to only texture elements)
+#version 150
 
-#version 120
+in vec3 Position;
+in vec4 Color;
 
-varying vec4 originalColor;
+#moj_import <minecraft:dynamictransforms.glsl>
+#moj_import <minecraft:projection.glsl>
+
+out vec4 vertexColor;
 
 void main() {
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_Position = ProjMat * ModelViewMat * vec4(Position, 1.0);
 
-    // Pass original color to fragment
-    originalColor = gl_Color;
+    vertexColor = Color;
 }

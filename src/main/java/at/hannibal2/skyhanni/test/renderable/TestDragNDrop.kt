@@ -11,14 +11,14 @@ import at.hannibal2.skyhanni.utils.renderables.interactables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.interactables.toDragItem
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 @SkyHanniModule(devOnly = true)
 object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
 
     override fun renderable(): Renderable {
-        val bone = ItemStack(Items.bone, 1).toDragItem()
+        val bone = ItemStack(Items.BONE, 1).toDragItem()
         val leaf = ItemStack(BlockCompat.getAllLeaves().first(), 1).toDragItem()
 
         return with(Renderable) {
@@ -32,7 +32,7 @@ object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
                     object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as ItemStack
-                            if (unit.item == Items.bone) {
+                            if (unit.item == Items.BONE) {
                                 ChatUtils.chat("Oh, a bone!")
                             } else {
                                 ChatUtils.chat("Disgusting that is not a bone!")

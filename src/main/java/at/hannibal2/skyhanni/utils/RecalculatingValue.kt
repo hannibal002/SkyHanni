@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.time.Duration
@@ -55,8 +55,6 @@ class ResettableValue<T>(private val calculation: () -> T) : ReadOnlyProperty<An
 
 class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, ItemStack> {
 
-    constructor(rawInternalName: String) : this(rawInternalName.toInternalName())
-
     private val value: ResettableValue<ItemStack> = ResettableValue {
         internalName.getItemStack()
     }.also { list.add(it) }
@@ -65,6 +63,11 @@ class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<An
 
     @SkyHanniModule
     companion object {
+        // We cant have a real constructor that uses a string, as NeuInternalName is a string on runtime, and they would have
+        // the same jvm signature. Using an invoke operator makes it look like a fake constructor
+        fun of(internalName: String) = AutoUpdatingItemStack(internalName.toInternalName())
+        operator fun invoke(internalName: String) = of(internalName)
+
         val list = mutableListOf<ResettableValue<ItemStack>>()
 
         @HandleEvent(RepositoryReloadEvent::class)

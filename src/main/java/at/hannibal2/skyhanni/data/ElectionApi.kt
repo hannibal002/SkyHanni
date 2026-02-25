@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ForcedRepoPerksJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -31,9 +33,10 @@ import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -162,7 +165,7 @@ object ElectionApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = ElectionCandidate.UNKNOWN
@@ -176,7 +179,7 @@ object ElectionApi {
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 
         val stack: ItemStack = event.inventoryItems.values.firstOrNull {
-            mayorHeadPattern.matchMatcher(it.displayName) {
+            mayorHeadPattern.matchMatcher(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 group("name") == "Jerry"
             } ?: false
         } ?: return
@@ -302,8 +305,23 @@ object ElectionApi {
     }
 
     val isDerpy get() = Perk.DOUBLE_MOBS_HP.isActive
+    val isAura get() = Perk.WORK_HARDER.isActive
 
-    fun Int.derpy() = if (isDerpy) this / 2 else this
+    fun Int.derpy() = if (isDerpy) this / 2 else if (isAura) (this / 11 * 10) else this
 
-    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else if (isAura) (this * 1.1).toInt() else this
+
+    var repoPerks: List<Perk>? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ForcedRepoPerksJson>("misc/ForcedRepoPerks")
+        repoPerks?.forEach { it.isActive = false }
+        repoPerks = data.perks
+        if (data.perks != null) {
+            val mayor = currentMayor
+            mayor?.addAdditionalPerks(data.perks)
+            currentMayor = mayor
+        }
+    }
 }

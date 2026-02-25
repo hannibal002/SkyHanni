@@ -3,23 +3,28 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class SensitivityReducerConfig {
     @Expose
-    @ConfigOption(name = "Mode", desc = "Lower mouse sensitivity while in the garden.")
-    @ConfigEditorDropdown
-    var mode: Mode = Mode.OFF
+    @ConfigOption(name = "Enabled", desc = "Lower mouse sensitivity while in the garden.")
+    @ConfigEditorBoolean
+    val enabled: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(name = "Mode", desc = "Decide when the mouse sensitivity should be lowered.")
+    @ConfigEditorDraggableList
+    val mode: MutableList<Mode> = mutableListOf(Mode.TOOL)
 
     enum class Mode(private val displayName: String) {
-        OFF("Disabled"),
-        TOOL("Holding farming tool"),
+        TOOL("Farming tool"),
+        FISHING_ROD("Fishing Rod"),
         KEYBIND("Holding Keybind"),
         ;
 
@@ -28,8 +33,8 @@ class SensitivityReducerConfig {
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_N)
-    var keybind: Int = Keyboard.KEY_N
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_N)
+    var keybind: Int = GLFW.GLFW_KEY_N
 
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")

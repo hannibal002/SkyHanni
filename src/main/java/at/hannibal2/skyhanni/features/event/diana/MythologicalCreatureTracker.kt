@@ -6,11 +6,12 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper.genericMythologicalSpawnPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -20,37 +21,24 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MythologicalCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
-    private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
-
-    /**
-     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Gaia Construct§r§e!
-     * REGEX-TEST: §c§lOi! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
-     * REGEX-TEST: §c§lOi! §r§eYou dug out §r§2Siamese Lynxes§r§e!
-     * REGEX-TEST: §c§lWoah! §r§eYou dug out a §r§2Cretan Bull§r§e!
-     * REGEX-TEST: §c§lDanger! §r§eYou dug out a §r§2Cretan Bull§r§e!
-     */
-    private val genericMythologicalSpawnPattern by patternGroup.pattern(
-        "generic-spawn",
-        "§c§l(?:Oh|Uh oh|Yikes|Oi|Good Grief|Danger|Woah)! §r§eYou dug out (?:a )?(?:§[a-f0-9r])*(?<creatureType>[\\w\\s]+)§r§e!",
-    )
-
     private val tracker = SkyHanniTracker(
-        "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
+        "Mythological Creature Tracker", ::Data, { it.diana.mythologicalMobTracker },
         extraDisplayModes = mapOf(
             SkyHanniTracker.DisplayMode.MAYOR to {
                 it.diana.mythologicalMobTrackerPerElection.getOrPut(
@@ -58,16 +46,32 @@ object MythologicalCreatureTracker {
                 )
             },
         ),
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
+
+    // TODO create a draggable list from repo one that can be done
+    private val shardMobs = listOf<String>(
+        "Cretan Bull",
+        "Harpy",
+        "Minotaur",
+    )
 
     data class Data(
         @Expose var since: MutableMap<String, Int> = mutableMapOf(),
         @Expose var count: MutableMap<String, Int> = mutableMapOf(),
-    ) : Resettable
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
+
+    var lastSinceAmount: Int? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
+
+        if (config.shardWarn) {
+            if (shardMobs.contains(creatureMatch)) {
+                TitleManager.sendTitle("Black Hole", duration = 2.seconds)
+            }
+        }
 
         BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
 
@@ -84,7 +88,7 @@ object MythologicalCreatureTracker {
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 val trackerId = creatureEntry.trackerId
                 if (creatureEntry == type) {
-                    event.chatComponent = (event.message + " §e(${since[trackerId]})").asComponent()
+                    lastSinceAmount = since[trackerId]
                     since[trackerId] = 0
                 } else {
                     since.addOrPut(trackerId, 1)
@@ -94,9 +98,37 @@ object MythologicalCreatureTracker {
         if (config.hideChat) event.blockedReason = "mythological_creature_dug"
     }
 
+    @HandleEvent
+    fun onChatModify(event: SkyHanniChatEvent.Modify) {
+        if (lastSinceAmount == null) return
+        val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
+
+        val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
+            ErrorManager.skyHanniError(
+                "Unknown mythological creature $creatureMatch",
+                "message" to event.message,
+            )
+        }
+
+        tracker.modify {
+            for (creatureEntry in DianaApi.mythologicalCreatures.values) {
+                if (creatureEntry == type) {
+                    if (lastSinceAmount != null) {
+                        val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
+                        event.replaceComponent(newComp, "diana_mobs_since")
+                    }
+                    lastSinceAmount = null
+
+                }
+            }
+        }
+        lastSinceAmount = null
+    }
+
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
+        val foundCreatures = data.count.filterValues { it > 0 }.keys
         for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = (amount.toDouble() / total).formatPercentage()
@@ -112,12 +144,16 @@ object MythologicalCreatureTracker {
         }
         addSearchString("§7Total Mythological Creatures: §e${total.addSeparators()}")
 
-        addSearchString("§7Creatures since:")
+        var addedCreaturesSince = false
 
         for ((creatureTrackerId, since) in data.since.entries.sortedBy { it.value }) {
-            val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId)
-            if (creature?.rare != true) continue
+            val creature = DianaApi.getCreatureByTrackerName(creatureTrackerId) ?: continue
+            if (!creature.rare || creatureTrackerId !in foundCreatures) continue
 
+            if (!addedCreaturesSince) {
+                addSearchString("§7Creatures since:")
+                addedCreaturesSince = true
+            }
             addSearchString("§7- §e${creature.name}§7: §e${since.addSeparators()} ")
         }
 
@@ -155,10 +191,10 @@ object MythologicalCreatureTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetmythologicalcreaturetracker") {
+        event.registerBrigadier("shresetmythologicalcreaturetracker") {
             description = "Resets the Mythological Creature Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

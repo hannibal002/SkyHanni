@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.item.ItemStack
+import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object DianaApi {
@@ -32,11 +32,13 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory()
+    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInHotbar()
 
     val ItemStack.isDianaSpade get() = getInternalName() in spades
 
-    private fun hasSpadeInInventory() = InventoryUtils.getItemsInOwnInventory().any { it.isDianaSpade }
+    val NeuInternalName.isDianaSpade get() = this in spades
+
+    private fun hasSpadeInHotbar() = InventoryUtils.getItemsInHotbar().any { it.isDianaSpade }
 
     var mythologicalCreatures = emptyMap<String, MythologicalCreatureType>()
         private set
@@ -62,10 +64,10 @@ object DianaApi {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onJoinWorld(event: EntityEnterWorldEvent<EntityOtherPlayerMP>) {
+    fun onJoinWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         val entity = event.entity
         // TODO: fetch rare mobs from repo instead
-        if (rareDianaMobNamePattern.matches(entity.name.trim())) {
+        if (rareDianaMobNamePattern.matches(entity.name.string.trim())) {
             RareDianaMobFoundEvent(entity).post()
         }
     }

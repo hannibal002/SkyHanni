@@ -12,8 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.util.ChatComponentText
+import net.minecraft.world.entity.LivingEntity
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -38,7 +37,7 @@ object CarnivalQuickStart {
     fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (lastChat.passedSince() > 5.0.seconds) return
-        val mob = (event.clickedEntity as? EntityLivingBase)?.mob ?: return
+        val mob = (event.clickedEntity as? LivingEntity)?.mob ?: return
         val type = when {
             cowboy.matches(mob.name) -> "carnival_cowboy"
             fisher.matches(mob.name) -> "carnival_fisherman"
@@ -52,10 +51,10 @@ object CarnivalQuickStart {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         // IDK what is wrong here, but it does not work with event.message
-        if (!chatPattern.matches((event.chatComponent as? ChatComponentText)?.unformattedTextForChat)) return
+        if (!chatPattern.matches(event.chatComponent)) return
         lastChat = SimpleTimeMark.now()
     }
 

@@ -29,7 +29,7 @@ object PatcherFixes {
             "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!",
             config::fixPatcherLines,
             actionName = "disable this option in Patcher",
-            action = { tryFix() },
+            action = ::tryFix,
         )
     }
 

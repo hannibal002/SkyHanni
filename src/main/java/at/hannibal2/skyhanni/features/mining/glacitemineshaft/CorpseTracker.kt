@@ -28,21 +28,23 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
     "Corpse Tracker",
-    { BucketData() },
+    ::BucketData,
     { it.mining.mineshaft.corpseProfitTracker },
     { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker.perTrackerConfig }
 ) {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
     data class BucketData(
         @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
-    ) : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
+    ) : BucketedItemTrackerData<CorpseType, SessionUptime.Normal>(CorpseType::class, SessionUptime.Normal::class) {
         override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
@@ -127,7 +129,8 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             )
         }
 
-        add(addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
+        val duration = bucketData.getTotalUptime()
+        addAll(addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
 
         addPriceFromButton(this)
     }
@@ -145,10 +148,10 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetcorpsetracker") {
+        event.registerBrigadier("shresetcorpsetracker") {
             description = "Resets the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

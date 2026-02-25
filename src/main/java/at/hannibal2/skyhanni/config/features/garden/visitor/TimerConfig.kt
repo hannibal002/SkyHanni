@@ -24,6 +24,7 @@ class TimerConfig {
         desc = "Estimate when the sixth visitor in the queue will arrive.\n" +
             "§eMay be inaccurate with co-op members farming simultaneously."
     )
+    @SearchTag("6th")
     @ConfigEditorBoolean
     var sixthVisitorEnabled: Boolean = true
 
@@ -33,6 +34,7 @@ class TimerConfig {
         desc = "Notify when it is believed that the sixth visitor has arrived.\n" +
             "§eMay be inaccurate with co-op members farming simultaneously."
     )
+    @SearchTag("6th")
     @ConfigEditorBoolean
     @FeatureToggle
     var sixthVisitorWarning: Boolean = true

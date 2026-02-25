@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class VisitorConfig {
     @Expose
@@ -97,8 +97,8 @@ class VisitorConfig {
             "§eUseful for getting Ephemeral Gratitudes during the Great Spook event."
     )
     @SearchTag("halloween")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var acceptHotkey: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var acceptHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
 
     @Expose

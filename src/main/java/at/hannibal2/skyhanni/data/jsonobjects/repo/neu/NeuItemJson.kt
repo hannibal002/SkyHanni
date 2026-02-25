@@ -12,14 +12,9 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.internal.LinkedTreeMap
-//#if MC < 1.21
-import net.minecraft.nbt.CompressedStreamTools
-import net.minecraft.nbt.NBTTagCompound
-//#else
-//$$ import net.minecraft.nbt.NbtCompound
-//$$ import net.minecraft.nbt.NbtIo
-//$$ import net.minecraft.nbt.NbtSizeTracker
-//#endif
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtAccounter
+import net.minecraft.nbt.NbtIo
 import java.io.ByteArrayInputStream
 import java.util.Base64
 
@@ -56,28 +51,20 @@ data class NeuItemJson(
             )
         }
     }
-    val nbtTag by lazy { getParsedNBT() }
 
     private val neuParsableNbt by lazy { fixedNbtTagString.replace(nbtListRegex, "$1") }
     val neuNbt by lazy { convertToNeuNbt() }
 
-    //#if MC < 1.21
-    private fun getParsedNBT(): NBTTagCompound {
-        //#else
-        //$$ private fun getParsedNBT(): NbtCompound {
-        //#endif
+    private fun getParsedNBT(): CompoundTag {
         return try {
             val decodedBytes = Base64.getDecoder().decode(fixedNbtTagString.toByteArray(Charsets.UTF_8))
             val inputStream = ByteArrayInputStream(decodedBytes)
-            //#if MC < 1.21
-            CompressedStreamTools.readCompressed(inputStream)
-            //#else
-            //$$ NbtIo.readCompressed(inputStream, NbtSizeTracker.ofUnlimitedBytes())
-            //#endif
+            NbtIo.readCompressed(inputStream, NbtAccounter.unlimitedHeap())
         } catch (e: Exception) {
             throw IllegalArgumentException("Failed to parse NBT tag: $fixedNbtTagString", e)
         }
     }
+    val nbtTag get() = getParsedNBT()
 
     private fun convertToNeuNbt(): NeuNbtInfoJson? = runCatching {
         ConfigManager.gson.fromJson<NeuNbtInfoJson>(neuParsableNbt)

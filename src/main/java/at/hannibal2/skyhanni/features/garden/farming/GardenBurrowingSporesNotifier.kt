@@ -20,9 +20,13 @@ object GardenBurrowingSporesNotifier {
 
     private val config get() = GardenApi.config
     private val patternGroup = RepoPattern.group("garden.burrowingspores")
+
+    /**
+     * REGEX-TEST: §6§lVERY RARE CROP! §r§f§r§9Burrowing Spores
+     */
     private val sporeDropMessage by patternGroup.pattern(
         "drop",
-        "§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores\\.",
+        "§6§lVERY RARE CROP! (?:§.)*§9Burrowing Spores",
     )
     private val BURROWING_SPORES = "BURROWING_SPORES".toInternalName()
 
@@ -30,7 +34,7 @@ object GardenBurrowingSporesNotifier {
     private val blinkSet = setOf(GardenConfig.BurrowingSporesNotificationType.BLINK, GardenConfig.BurrowingSporesNotificationType.BOTH)
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val selected = config.burrowingSporesNotificationType
         val titleEnabled = selected in titleSet
         val blinkEnabled = selected in blinkSet

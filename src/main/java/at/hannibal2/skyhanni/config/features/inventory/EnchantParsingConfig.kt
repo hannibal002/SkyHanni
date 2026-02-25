@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -32,12 +35,20 @@ class EnchantParsingConfig {
         override fun toString() = displayName
     }
 
-    @Expose
     @ConfigOption(
-        name = "Perfect Enchantment Color",
-        desc = "The color an enchantment will be at max level. " +
-            "§eIf SkyHanni chroma is disabled this will default to §6Gold."
+        name = "§cChroma Warning",
+        desc = "Chroma requires a separate setting.\n§eIf SkyHanni chroma is disabled Chroma will default to §6Gold.",
     )
+    @ConfigEditorButton(buttonText = "Go")
+    val chromaRunnable = Runnable { EnchantParser.openConfigLink() }
+
+    @Expose
+    @ConfigOption(name = "Ultimate Enchantment Color", desc = "The color the Ultimate enchantment will be. (Will always be bold)")
+    @ConfigEditorDropdown
+    val ultimateEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.LIGHT_PURPLE)
+
+    @Expose
+    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
     @ConfigEditorDropdown
     val perfectEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.CHROMA)
 
@@ -62,17 +73,9 @@ class EnchantParsingConfig {
     val poorEnchantColor: Property<LorenzColor> = Property.of(LorenzColor.GRAY)
 
     @Expose
-    @ConfigOption(name = "Comma Format", desc = "Change the format of the comma after each enchant.")
-    @ConfigEditorDropdown
-    val commaFormat: Property<CommaFormat> = Property.of(CommaFormat.COPY_ENCHANT)
-
-    enum class CommaFormat(private val displayName: String) {
-        COPY_ENCHANT("Copy enchant format"),
-        DEFAULT("Default (Blue)"),
-        ;
-
-        override fun toString() = displayName
-    }
+    @ConfigOption(name = "Advanced Enchantment Colors", desc = "")
+    @Accordion
+    val advancedEnchantColors: AdvancedEnchantmentColors = AdvancedEnchantmentColors()
 
     @Expose
     @ConfigOption(

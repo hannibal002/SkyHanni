@@ -1,5 +1,4 @@
 import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
 
 pluginManagement {
     includeBuild("sharedVariables")
@@ -9,9 +8,7 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://repo.essential.gg/repository/maven-public")
         maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://maven.architectury.dev/")
         maven("https://maven.fabricmc.net")
-        maven("https://maven.minecraftforge.net/")
         maven("https://repo.spongepowered.org/maven/")
         maven("https://repo.nea.moe/releases")
         maven("https://jitpack.io") {
@@ -19,6 +16,7 @@ pluginManagement {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
+        maven("https://maven.kikugie.dev/snapshots") // stone cutter
     }
     resolutionStrategy.eachPlugin {
         requested.apply {
@@ -27,15 +25,13 @@ pluginManagement {
                 useModule("com.github.$user:$name:$version")
             }
         }
-        when (requested.id.id) {
-            "gg.essential.loom" -> useModule("gg.essential:architectury-loom:${requested.version}")
-        }
     }
 }
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.0")
     id("at.skyhanni.shared-variables")
+    id("dev.kikugie.stonecutter") version "0.8.3"
 }
 
 MultiVersionStage.initFrom(file(".gradle/private.properties"))
@@ -45,10 +41,8 @@ include("detekt")
 rootProject.name = "SkyHanni"
 rootProject.buildFileName = "root.gradle.kts"
 
-ProjectTarget.activeVersions().forEach { target ->
-    include(target.projectPath)
-    val p = project(target.projectPath)
-    p.projectDir = file("versions/${target.projectName}")
-    p.buildFileName = "../../build.gradle.kts"
+stonecutter {
+    create(rootProject) {
+        versions("1.21.10", "1.21.11")
+    }
 }
-

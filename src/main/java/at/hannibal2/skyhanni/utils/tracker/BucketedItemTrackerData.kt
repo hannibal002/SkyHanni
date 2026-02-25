@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
 
-abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrackerData() {
+abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KClass<E>, session: KClass<T>) : ItemTrackerData<T>(session) {
 
     final override fun getDescription(timesGained: Long): List<String> =
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
@@ -78,10 +78,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrac
     @Expose
     val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = mutableMapOf()
 
-    fun getBucketedItems(bucket: E) = bucketedItems[bucket] ?: flattenBucketsItems()
+    open fun getBucketedItems(bucket: E) = bucketedItems[bucket] ?: flattenBucketsItems()
 
     private val E.items get() = bucketedItems[this] ?: mutableMapOf()
-    val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
+    open val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
     private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
         buckets.distinct().fold(mutableMapOf()) { acc, bucket ->

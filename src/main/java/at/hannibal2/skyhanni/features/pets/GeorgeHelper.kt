@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -29,7 +30,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object GeorgeHelper {
 
     private val config get() = SkyHanniMod.feature.misc.pets.tamingSixty
-    private val useFandomWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useFandom
+    private val useUnofficialWiki get() = SkyHanniMod.feature.misc.commands.betterWiki.useUnofficial
     private const val SPAWN_EGG_SLOT = 41
 
     private val patternGroup = RepoPattern.group("george.taming-sixty")
@@ -103,18 +104,12 @@ object GeorgeHelper {
                 onLeftClick = { HypixelCommands.auctionSearch("] $petName") },
             )
         } else {
-            val selectedWiki = if (useFandomWiki) "Fandom" else "Hypixel"
+            val wiki = if (useUnofficialWiki) WikiManager.data.unofficial else WikiManager.data.official
             Renderable.clickable(
-                text = " §7- $formattedPet: §cNo price found. §eSee the $selectedWiki Wiki.",
-                tips = listOf("§eView the $selectedWiki Wiki article for $formattedPet§e."),
+                text = " §7- $formattedPet: §cNo price found. §eSee the ${wiki.name}.",
+                tips = listOf("§eView the ${wiki.name} article for $formattedPet§e."),
                 onLeftClick = {
-                    val urlCompliantPet = formattedPet.removeColor().replace(" ", "%20")
-                    val petURL = if (useFandomWiki) {
-                        "https://hypixel-skyblock.fandom.com/wiki/Special:Search?query=$urlCompliantPet&scope=internal"
-                    } else {
-                        "https://wiki.hypixel.net/index.php?search=$urlCompliantPet"
-                    }
-                    OSUtils.openBrowser(petURL)
+                    OSUtils.openBrowser(WikiManager.getSearchUrl("$petName Pet", useUnofficial = useUnofficialWiki))
                 },
             )
         }
@@ -154,4 +149,5 @@ object GeorgeHelper {
     private fun petInternalName(pet: String, tier: Int) = "$pet;$tier"
     private fun String.getPetPrice(otherRarity: Boolean = false): Double =
         this.toInternalName().getPriceOrNull() ?: if (otherRarity) Double.MAX_VALUE else -1.0
+
 }
