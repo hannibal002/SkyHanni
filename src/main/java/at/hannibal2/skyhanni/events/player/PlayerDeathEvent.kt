@@ -5,17 +5,13 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.PlayerUtils
 
 abstract class AbstractPlayerDeathEvent(
-    override val name: String,
-    override val reason: String
-) : SkyHanniEvent(), PlayerDeathEvent {
-    override val isSelf: Boolean = name == PlayerUtils.getName()
+    val name: String,
+    val reason: String
+) : SkyHanniEvent() {
+    val isSelf: Boolean = name == PlayerUtils.getName()
 }
 
-sealed interface PlayerDeathEvent {
-    val name: String
-    val reason: String
-    val isSelf: Boolean
-
+object PlayerDeathEvent {
     class Allow(
         name: String,
         reason: String,
