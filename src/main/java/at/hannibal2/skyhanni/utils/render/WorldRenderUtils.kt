@@ -854,13 +854,15 @@ object WorldRenderUtils {
         renderRelativeToCamera: Boolean = false,
         epsilon: Double = 0.05,
     ) = QuadDrawer.draw3D(this) {
-        val effectiveAABB = if (!renderRelativeToCamera) {
-            val vp = getViewerPos(partialTicks)
+        val effectiveAABB = if (!renderRelativeToCamera) AABB(
+            aabb.minX - epsilon, aabb.minY - epsilon, aabb.minZ - epsilon,
+            aabb.maxX + epsilon, aabb.maxY + epsilon, aabb.maxZ + epsilon,
+        ) else getViewerPos().let { vp ->
             AABB(
-                aabb.minX - vp.x - epsilon, aabb.minY - vp.y - epsilon, aabb.minZ - vp.z - epsilon,
-                aabb.maxX - vp.x + epsilon, aabb.maxY - vp.y + epsilon, aabb.maxZ - vp.z + epsilon,
+                aabb.minX + vp.x - epsilon, aabb.minY + vp.y - epsilon, aabb.minZ + vp.z - epsilon,
+                aabb.maxX + vp.x + epsilon, aabb.maxY + vp.y + epsilon, aabb.maxZ + vp.z + epsilon,
             )
-        } else aabb
+        }
 
         val corners = effectiveAABB.getFaceCorners(face)
         val effectiveAlpha = ((color.alpha / 255f) * alpha * 255).toInt().coerceIn(0, 255)
