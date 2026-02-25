@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -60,33 +59,30 @@ object BloodTimer {
 
             // Selects move prediction for 4th/5th mob based on how long watcher took to say activation line
             val bloodMovePredictionNumber = selectMoveTime(bloodMoveTime, bloodLag)
-            if (bloodMovePredictionNumber == 5.days) {
+            if (bloodMovePredictionNumber == null) {
                 // This seems sufficiently impossible to use as an early return clause while warning the user.
                 ChatUtils.chat("§cInvalid Prediction")
                 return
             }
             val bloodMovePrediction = bloodMovePredictionNumber.inPartialSeconds.let { "%.2f".format(it) }
-
-            bloodMovePrediction.let {
-                ChatUtils.chat("§7Move Prediction: §f$it Seconds§7.")
-                TitleManager.sendTitle("", "§7Move Prediction: §f${it}s", 2.5.seconds)
-                val delay = bloodMovePredictionNumber - bloodMoveTime - 150.milliseconds
-                ChatUtils.debug("Blood Timer: $delay delay.")
-                runDelayed(delay) {
-                    TitleManager.sendTitle("", "§cKill Blood", 1.5.seconds)
-                }
+            ChatUtils.chat("§7Move Prediction: §f$bloodMovePrediction Seconds§7.")
+            TitleManager.sendTitle("", "§7Move Prediction: §f${bloodMovePrediction}s", 2.5.seconds)
+            val delay = bloodMovePredictionNumber - bloodMoveTime - 150.milliseconds
+            ChatUtils.debug("Blood Timer: $delay delay.")
+            runDelayed(delay) {
+                TitleManager.sendTitle("", "§cKill Blood", 1.5.seconds)
             }
         }
     }
 
-    fun selectMoveTime(bloodMoveTime: Duration, bloodLag: Duration): Duration {
+    private fun selectMoveTime(bloodMoveTime: Duration, bloodLag: Duration): Duration? {
         return when (bloodMoveTime.inPartialSeconds) {
             in 31.0..34.0 -> bloodLag + 36.seconds
             in 28.0..31.0 -> bloodLag + 33.seconds
             in 25.0..28.0 -> bloodLag + 30.seconds
             in 22.0..25.0 -> bloodLag + 27.seconds
             in 1.0..22.0 -> bloodLag + 24.seconds
-            else -> 5.days
+            else -> null
         }
     }
 
