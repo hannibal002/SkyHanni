@@ -21,11 +21,14 @@ data class SnappedVec3(
         Axis.Z -> copy(snappedZ = value % maxValue)
     }
 
-    fun applyAxisOffset(axis: Axis, offset: Double): SnappedVec3 = applyAxisValue(axis, offset + when (axis) {
-        Axis.X -> snappedX
-        Axis.Y -> snappedY
-        Axis.Z -> snappedZ
-    })
+    fun applyAxisOffset(axis: Axis, offset: Double): SnappedVec3 = applyAxisValue(
+        axis,
+        offset + when (axis) {
+            Axis.X -> snappedX
+            Axis.Y -> snappedY
+            Axis.Z -> snappedZ
+        }
+    )
 
     companion object {
         val ZERO = SnappedVec3(0.0, 0.0, 0.0)
