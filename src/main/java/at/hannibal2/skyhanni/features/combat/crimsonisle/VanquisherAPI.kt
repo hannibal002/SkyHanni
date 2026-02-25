@@ -47,7 +47,6 @@ object VanquisherAPI {
     private val spawnPattern by patternGroup.pattern(
         "spawnpattern",
         "A Vanquisher is spawning nearby!"
-
     )
 
     private var lastOwnVanqTime = SimpleTimeMark.farPast()
@@ -63,6 +62,9 @@ object VanquisherAPI {
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
         if (mob != null && data != null) data.postDespawn()
     }
+
+    private val vanquisherShortTimeout = 2.seconds
+    private val vanquisherLongTimeout = 5.seconds
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onChat(event: SkyHanniChatEvent.Allow) {
@@ -97,9 +99,9 @@ object VanquisherAPI {
         val entityPos = lastVanqSpawnEntityPos ?: return
         val entity = lastPossibleVanqSpawnEntity ?: return
         val now = SimpleTimeMark.now()
-        if (now - lastVanqSoundTime > 2.seconds) return
-        if (now - lastVanqSpawnEntityTime > 2.seconds) return
-        if (now - lastOwnVanqTime > 2.seconds) return
+        if (now - lastVanqSoundTime > vanquisherShortTimeout) return
+        if (now - lastVanqSpawnEntityTime > vanquisherShortTimeout) return
+        if (now - lastOwnVanqTime > vanquisherShortTimeout) return
         if (soundPos.distance(entityPos) > 3) return
         vanqSpawnEntity = entity
         lastVanqSpawnEntityPos = null
@@ -128,7 +130,7 @@ object VanquisherAPI {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onSecondPassed() {
         if ((lastPossibleVanqSpawnEntity != null || lastVanqSpawnEntityPos != null || lastVanqSoundPos != null) &&
-            lastOwnVanqTime.passedSince() > 5.seconds
+            lastOwnVanqTime.passedSince() > vanquisherLongTimeout
         ) {
             lastPossibleVanqSpawnEntity = null
             lastVanqSpawnEntityPos = null
