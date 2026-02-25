@@ -60,7 +60,6 @@ object BloodTimer {
             // Selects move prediction for 4th/5th mob based on how long watcher took to say activation line
             val bloodMovePredictionNumber = selectMoveTime(bloodMoveTime, bloodLag)
             if (bloodMovePredictionNumber == null) {
-                // This seems sufficiently impossible to use as an early return clause while warning the user.
                 ChatUtils.chat("§cInvalid Prediction")
                 return
             }
