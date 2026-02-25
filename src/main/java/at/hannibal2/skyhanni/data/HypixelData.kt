@@ -442,13 +442,13 @@ object HypixelData {
         }
     }
 
-     @HandleEvent
-     fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
-         val oldIsland = skyBlockIsland
-         if (oldIsland != IslandType.NONE) {
-             IslandChangeEvent(IslandType.NONE, oldIsland)
-         }
-   }
+    @HandleEvent
+    fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
+        val oldIsland = skyBlockIsland
+        if (oldIsland != IslandType.NONE) {
+            IslandChangeEvent(IslandType.NONE, oldIsland)
+        }
+    }
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
