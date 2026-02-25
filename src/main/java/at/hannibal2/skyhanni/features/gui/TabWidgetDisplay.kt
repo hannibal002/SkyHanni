@@ -58,24 +58,13 @@ enum class TabWidgetDisplay(
     SLAYER("Slayer", TabWidget.SLAYER),
     PITY("Pity", TabWidget.PITY),
     PICKAXE_COOLDOWN("Pickaxe Cooldown", TabWidget.PICKAXE_COOLDOWN),
-    RIFT_INFO("Rift Info", TabWidget.RIFT_INFO),
-    JACOB_CONTEST("Jacob's Contest", TabWidget.JACOB_CONTEST),
     POWDERS("Powders", TabWidget.POWDER),
-    ELECTION("Election", TabWidget.ELECTION),
     NORTH_STARS("North Stars", TabWidget.NORTH_STARS),
-    EVENT("Event", TabWidget.EVENT),
-    ESSENCE("Essence", TabWidget.ESSENCE),
     FORGE("Forge", TabWidget.FORGE),
     PARTY("Party", TabWidget.PARTY),
-    TRAPPER("Trapper", TabWidget.TRAPPER),
-    CRYSTAL("Crystals", TabWidget.CRYSTAL),
     REPUTATION("Reputation", TabWidget.REPUTATION),
-    FACTION_QUESTS("Faction Quests", TabWidget.FACTION_QUESTS),
-    TROPHY_FISH("Trophy Fish", TabWidget.TROPHY_FISH),
-    COMPOSTER("Composter", TabWidget.COMPOSTER),
-    COPPER("Copper", TabWidget.COPPER),
-    VISITORS("Visitors", TabWidget.VISITORS),
     SALTS("Salts", TabWidget.SALTS),
+
     ;
 
     val position get() = config.displayPositions[ordinal]
