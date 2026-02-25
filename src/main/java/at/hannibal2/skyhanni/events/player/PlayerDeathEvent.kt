@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 
 abstract class AbstractPlayerDeathEvent(
     val name: String,
-    val reason: String
+    val reason: String,
 ) : SkyHanniEvent() {
     val isSelf: Boolean = name == PlayerUtils.getName()
 }
