@@ -284,11 +284,11 @@ object OrderedWaypoints {
         }
 
     private fun unload() {
+        if (!orderedWaypointsList.isEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
         orderedWaypointsList.clear()
         renderWaypoints.clear()
         currentOrderedWaypointIndex = 0
         lastCloser = 0
-        ChatUtils.chat("Unloaded ordered waypoints.")
     }
 
     private fun skip(amount: Int) {

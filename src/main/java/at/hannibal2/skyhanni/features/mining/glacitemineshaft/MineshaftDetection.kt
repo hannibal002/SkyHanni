@@ -77,7 +77,6 @@ object MineshaftDetection {
 
     @HandleEvent
     fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
-        if (!config.mineshaftDetection) return
         val type = event.type
         val sinceThis = getSinceMineshaftType(type)
         val timeSinceThis = getTimeSinceMineshaftType(type)
@@ -86,8 +85,7 @@ object MineshaftDetection {
         } else {
             "Unknown (no data yet)"
         }
-
-        ChatUtils.chat("You entered a ${type.displayName} mineshaft!".asComponent())
+        if (config.mineshaftDetection) ChatUtils.chat("You entered a ${type.displayName} mineshaft!".asComponent())
 
         if (type in config.mineshaftsToTrack) {
             TitleManager.sendTitle(type.displayName)
