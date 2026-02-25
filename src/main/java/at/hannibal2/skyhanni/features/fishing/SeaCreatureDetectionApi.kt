@@ -259,10 +259,14 @@ object SeaCreatureDetectionApi {
         event.title("Sea Creatures")
         event.addIrrelevant {
             entityIdToData.forEach { (entityID, data) ->
-                add("$entityID: isOwn=${data.isOwn} repoSeaCreatureData=${data.seaCreature} spawnTime=${data.spawnTime} mob=${data.mob} pos=${data.pos} aabb=${data.aabb}")
+                with(data) {
+                    add("$entityID: isOwn=$isOwn repoSeaCreatureData=$seaCreature spawnTime=$spawnTime mob=$mob pos=$pos aabb=$aabb")
+                }
             }
             seaCreatures.forEach { (_, data) ->
-                add("repoSeaCreatureData=${data.seaCreature} spawnTime=${data.spawnTime} mob=${data.mob} pos=${data.pos} aabb=${data.aabb}")
+                with(data) {
+                    add("repoSeaCreatureData=$seaCreature spawnTime=$spawnTime mob=$mob pos=$pos aabb=$aabb")
+                }
             }
             add("lastNameFished $lastNameFished")
             add("mobsToFind: $mobsToFind")
