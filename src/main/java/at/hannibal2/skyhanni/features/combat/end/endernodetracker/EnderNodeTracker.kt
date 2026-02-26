@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -74,7 +75,7 @@ object EnderNodeTracker {
         @Expose var totalNodesMined: Long = 0,
         @Expose var totalEndermiteNests: Long = 0,
         @Expose var lootCount: MutableMap<EnderNode, Int> = mutableMapOf(),
-    ) : TrackerData()
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {

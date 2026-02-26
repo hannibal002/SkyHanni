@@ -15,9 +15,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import java.util.regex.Pattern
 
@@ -101,7 +103,14 @@ object CustomScoreboardUtils {
 
     internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSBLines(), "symbol").orEmpty()
 
-    internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { groupOrNull("color") + group("event") }
+    internal fun getTablistEvent(): String? {
+        if (!TabWidget.EVENT.isActive || TabWidget.EVENT.lines.isEmpty()) return null
+        val first = TabWidget.EVENT.lines.first()
+        return TabWidget.EVENT.pattern.matchMatcher(first) {
+            val matcher = TextHelper.matcher(first, group("event")) ?: return null
+            matcher.formattedTextCompat()
+        }
+    }
 
     internal fun getElementsFromAny(element: Any?): List<ScoreboardLine> = when (element) {
         null -> listOf()

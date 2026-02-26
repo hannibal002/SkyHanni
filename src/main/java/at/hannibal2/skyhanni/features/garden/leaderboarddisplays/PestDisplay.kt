@@ -31,8 +31,9 @@ class PestDisplay : EliteLeaderboardDisplayBase<PestType, EliteLeaderboardType.P
         return null
     }
 
-    override val currentLeaderboardType: EliteLeaderboardType
-        get() = EliteLeaderboardType.Pest(currentEnum, currentMode)
+    override fun currentLeaderboardType(): EliteLeaderboardType {
+        return EliteLeaderboardType.Pest(currentEnum, currentMode)
+    }
 
     // We don't track pest kills over a time period so we can't support this right now
     override fun overtakeEta(amountUntil: Double): String {
