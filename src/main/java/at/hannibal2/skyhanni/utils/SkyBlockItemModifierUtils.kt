@@ -449,6 +449,9 @@ object SkyBlockItemModifierUtils {
         }
     }
 
+    /**
+     * returns null for older items.
+     */
     fun ItemStack.getTimestamp(): SimpleTimeMark? =
         getAttributeLong("timestamp")?.let { SimpleTimeMark(it) }
 }
