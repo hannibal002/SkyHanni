@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
-/*
-    Many widgets were not added to the display because skyhanni already has specific features relating to them
-    or because other mods have features that are better than the widget.
-*/
+/**
+ * Many widgets were not added to the display because SkyHanni already has specific features relating to them
+ * or because other mods have features that are better than the widget.
+ */
 enum class TabWidgetDisplay(
     private val configName: String?,
     vararg val widgets: TabWidget,
@@ -68,7 +68,6 @@ enum class TabWidgetDisplay(
     PARTY("Party", TabWidget.PARTY),
     REPUTATION("Reputation", TabWidget.REPUTATION),
     SALTS("Salts", TabWidget.SALTS),
-
     ;
 
     val position get() = config.displayPositions[ordinal]
@@ -93,7 +92,7 @@ enum class TabWidgetDisplay(
                         subWidget.lines.map { Renderable.text(it) }
                     },
                     posLabel = "Display Widget: ${widget.name}",
-                    extraSpace = -2
+                    extraSpace = -2,
                 )
             }
         }
