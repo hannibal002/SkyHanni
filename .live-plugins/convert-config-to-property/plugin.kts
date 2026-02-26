@@ -23,7 +23,7 @@ class ConvertConfigOptionToPropertyIntention :
 
     override fun isApplicableTo(element: KtProperty): Boolean =
         element.isVar &&
-            /*element.annotationEntries.any { it.shortName?.asString() == "ConfigOption" } &&*/
+            element.annotationEntries.any { it.shortName?.asString() == "ConfigOption" } &&
             element.typeReference != null &&
             element.initializer != null
 
