@@ -448,4 +448,7 @@ object SkyBlockItemModifierUtils {
             fun getColorCode(name: String) = getByName(name).colorCode
         }
     }
+
+    fun ItemStack.getTimestamp(): SimpleTimeMark? =
+        getAttributeLong("timestamp")?.let { SimpleTimeMark(it) }
 }

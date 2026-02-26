@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTimestamp
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 typealias CategoryName = String
@@ -68,11 +69,11 @@ object FishingProfitTracker {
         "Fishing Profit Tracker",
         ::Data,
         { it.fishing.fishingProfitTracker },
-        trackerConfig = { config.perTrackerConfig }
+        trackerConfig = { config.perTrackerConfig },
     ) { drawDisplay(it) }
 
     data class Data(
-        @Expose var totalCatchAmount: Long = 0L
+        @Expose var totalCatchAmount: Long = 0L,
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / totalCatchAmount
@@ -255,16 +256,11 @@ object FishingProfitTracker {
             return
         }
         if (internalName == TIKI_MASK) {
-            var foundCleanTikiMask = false
-            for (stack in InventoryUtils.getItemsInOwnInventory()) {
-                if (stack.getInternalName() == TIKI_MASK) {
-                    if (stack.getReforgeModifier().isNullOrBlank()) {
-                        foundCleanTikiMask = true
-                        break
-                    }
-                }
+            val isOld = InventoryUtils.getItemsInOwnInventory().any {
+                it.getInternalName() == TIKI_MASK &&
+                    it.getTimestamp()?.passedSince()?.let { age -> age > 2.minutes } == true
             }
-            if (!foundCleanTikiMask) return
+            if (isOld) return
         }
 
         tracker.addItem(internalName, amount, command)
