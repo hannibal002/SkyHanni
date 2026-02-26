@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
+import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -327,10 +329,13 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
-        val entityLocation = exactLocation(entity)
-        val x = entityLocation.x
-        val y = entityLocation.y
-        val z = entityLocation.z
+        drawCircleWireframe(exactLocation(entity), rad, color)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(location: LorenzVec, rad: Double, color: Color) {
+        val x = location.x
+        val y = location.y
+        val z = location.z
 
         val segments = 64
         LineDrawer.draw3D(this, 5, false) {
@@ -916,6 +921,8 @@ object WorldRenderUtils {
         return LorenzVec(x, y, z)
     }
 
+    fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
+
     fun exactLocation(camera: Camera): LorenzVec {
         val pos = camera.position
         return LorenzVec(pos.x, pos.y, pos.z)
@@ -934,6 +941,13 @@ object WorldRenderUtils {
         if (entity.deceased) return entity.boundingBox
         val offset = exactLocation(entity) - entity.getLorenzVec()
         return entity.boundingBox.move(offset.x, offset.y, offset.z)
+    }
+
+    fun SkyHanniRenderWorldEvent.exactBoundingBoxExtraEntities(mob: Mob): AABB {
+        val aabb = exactBoundingBox(mob.baseEntity)
+        return aabb.union(
+            mob.extraEntities.map { exactBoundingBox(it) },
+        ) ?: aabb
     }
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
