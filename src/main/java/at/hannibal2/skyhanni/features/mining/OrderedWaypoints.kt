@@ -231,12 +231,10 @@ object OrderedWaypoints {
 
     @HandleEvent
     fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
-        if (config.autoLoadMatchingShaftRoute) {
-            SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
-                if (storage?.routes?.get(event.type.name) != null) {
-                    load(event.type.name)
-                }
-            }
+        if (!config.autoLoadMatchingShaftRoute) return
+        if (storage?.routes?.get(event.type.name) == null) return ChatUtils.chat("No Route found for ${event.type.name}")
+        SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
+            load(event.type.name)
         }
     }
 
