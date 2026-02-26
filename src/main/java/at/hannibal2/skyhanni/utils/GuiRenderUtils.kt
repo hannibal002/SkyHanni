@@ -9,11 +9,12 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.render.state.GuiItemRenderState
@@ -323,6 +324,24 @@ object GuiRenderUtils {
     private const val SKULL_SCALE = (5f / 4f)
 
     /**
+     * Wrapper for rendering an item on screen, with the config pre-built.
+     */
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        config: ItemRenderableConfig,
+        stableRenderId: Int? = null,
+    ) = renderOnScreen(
+        x,
+        y,
+        scale = config.scale,
+        rescaleSkulls = config.rescaleSkulls,
+        rotationVec = if (config is AnimatedItemRenderableConfig<*>) config.rotationStorage.currentRotation else Vec3.ZERO,
+        translationVec = if (config is AnimatedItemRenderableConfig<*>) config.bounceStorage.currentBounce else Vec3.ZERO,
+        stableRenderId = stableRenderId,
+    )
+
+    /**
      * Returns either the stable ID of the custom render (if used) or -1 if the item was
      * rendered using the normal method (either is static, or 'small')
      */
@@ -335,7 +354,7 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
-    ): Int {
+    ): Int? {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
 
@@ -358,8 +377,10 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
-            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight())) {
+            item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+            return null
+        }
 
         /**
          * This is used to render items that fit these criteria:
@@ -396,15 +417,9 @@ object GuiRenderUtils {
         translateX: Float,
         translateY: Float,
         scale: Float
-    ): Int = DrawContextUtils.pushPopResult {
-        DrawContextUtils.translate(translateX, translateY)
-        DrawContextUtils.scale(scale, scale)
-
-        RenderSystem.assertOnRenderThread()
-
-        Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-
-        DrawContextUtils.drawItem(this, 0, 0)
-        return@pushPopResult -1
+    ) = RenderUtils.runOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
+        DrawContextUtils.translatedPushPopResult(translateX, translateY, postTranslateScale = scale) {
+            DrawContextUtils.drawItem(this, 0, 0)
+        }
     }
 }

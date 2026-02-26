@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.animated.TimeDependentRenderable
 import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecorator
 import net.minecraft.core.Direction.Axis
@@ -11,7 +12,8 @@ import kotlin.math.sin
 import kotlin.time.Duration
 
 internal interface BouncingBehavior : AnimatedBounceStorage {
-    val bounceStorage: AnimatedBounceStorage
+    val config: AnimatedItemRenderableConfig<*>
+    val bounceStorage: AnimatedBounceStorage get() = config.bounceStorage
     val bounceStartTime: SimpleTimeMark
 
     override val bounceDefinition: AnimatedBounceDefinition get() = bounceStorage.bounceDefinition
@@ -25,10 +27,10 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
     val bounceExtraWidth: Int get() = bounceDefinition.getTotalBounceOffset(Axis.X)
 
     fun applyBounce() {
-        currentBounce = generateNextBounce()
+        currentBounce = generateBounce()
     }
 
-    private fun generateNextBounce(): SnappedVec3 {
+    private fun generateBounce(): SnappedVec3 {
         if (!bounceDefinition.isEnabled()) return SnappedVec3.ZERO
         val t = bounceStartTime.passedSince().inPartialSeconds
         return Axis.entries.fold(currentBounce) { vec, axis ->
@@ -45,7 +47,7 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
 
 class BouncingRenderable(
     override val root: Renderable,
-    override val bounceStorage: AnimatedBounceStorage,
+    override val config: AnimatedItemRenderableConfig<*>,
 ) : RenderableDecorator, TimeDependentRenderable, BouncingBehavior {
     override val bounceStartTime: SimpleTimeMark = SimpleTimeMark.now()
     override val height: Int get() = root.height + bounceExtraHeight

@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.animated.TimeDependentRenderable
-import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecorator
+import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
 import net.minecraft.core.Direction.Axis
 import kotlin.time.Duration
 
 internal interface RotatingBehavior : AnimatedRotationStorage {
-    val rotationStorage: AnimatedRotationStorage
+    val config: AnimatedItemRenderableConfig<*>
+    val rotationStorage: AnimatedRotationStorage get() = config.rotationStorage
     override val rotationDefinition: AnimatedRotationDefinition get() = rotationStorage.rotationDefinition
     override var currentRotation: SnappedVec3
         get() = rotationStorage.currentRotation
@@ -33,14 +35,9 @@ internal interface RotatingBehavior : AnimatedRotationStorage {
 
 class RotatingRenderable private constructor(
     override val root: Renderable,
-    override val rotationStorage: AnimatedRotationStorage,
-) : RenderableDecorator, TimeDependentRenderable, RotatingBehavior {
-    override val height: Int get() = root.height
-    override val width: Int get() = root.width
-    override val horizontalAlign get() = root.horizontalAlign
-    override val verticalAlign get() = root.verticalAlign
+    override val config: AnimatedItemRenderableConfig<*>,
+) : RenderableDecoratorOnlyRender, TimeDependentRenderable, RotatingBehavior {
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
-
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         applyRotation(deltaTime)
     }

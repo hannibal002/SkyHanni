@@ -9,31 +9,24 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.system.PropertyVar
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.item.ItemStack
 
 open class ItemStackRenderable internal constructor(
     open val config: ItemRenderableConfig,
-    private val stackGetter: () -> ItemStack,
+    private val stackGetter: () -> ItemStack = { ItemStack.EMPTY },
 ) : Renderable {
-    val scale: Double get() = config.scale
-    val xSpacing: Int get() = config.xSpacing
-    val ySpacing: Int get() = config.ySpacing
-    val rescaleSkulls get() = config.rescaleSkulls
-    override val horizontalAlign: HorizontalAlignment get() = config.horizontalAlign
+    override val horizontalAlign get() = config.horizontalAlign
     override val verticalAlign get() = config.verticalAlign
+    private val scaledSize get() = (15.5 * config.scale + 0.5).toInt()
+    override val width: Int get() = scaledSize + config.xSpacing
+    override val height: Int get() = scaledSize + config.ySpacing
 
     open val stack: ItemStack get() = stackGetter()
 
-    override val width: Int get() = (15.5 * scale + 0.5).toInt() + xSpacing
-    override val height: Int get() = (15.5 * scale + 0.5).toInt() + ySpacing
-
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        stack.renderOnScreen(
-            xSpacing / 2f,
-            ySpacing / 2f,
-            scale = scale,
-            rescaleSkulls,
-        )
+        stack.renderOnScreen(config.xSpacing / 2f, config.ySpacing / 2f, config)
     }
 
     fun withTip(advancedTooltipCompat: Boolean = false) = Renderable.hoverTips(
@@ -57,11 +50,11 @@ open class ItemStackRenderable internal constructor(
     }
 }
 
-open class ItemRenderableConfig(
-    open var scale: Double = NeuItems.ITEM_FONT_SIZE,
-    open var xSpacing: Int = 2,
-    open var ySpacing: Int = 1,
-    open var rescaleSkulls: Boolean = true,
-    open var horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-    open var verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
-)
+open class ItemRenderableConfig {
+    open var scale: Double by PropertyVar(NeuItems.ITEM_FONT_SIZE)
+    open var xSpacing: Int by PropertyVar(2)
+    open var ySpacing: Int by PropertyVar(1)
+    open var rescaleSkulls: Boolean by PropertyVar(true)
+    open var horizontalAlign: HorizontalAlignment by PropertyVar(HorizontalAlignment.LEFT)
+    open var verticalAlign: VerticalAlignment by PropertyVar { Property.of(VerticalAlignment.CENTER) }
+}
