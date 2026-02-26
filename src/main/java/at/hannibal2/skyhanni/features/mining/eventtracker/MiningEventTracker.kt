@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -118,8 +119,9 @@ object MiningEventTracker {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected() && !SkyBlockUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!config.outsideMining && !isMiningIsland()) return
         if (!canRequestAt.isInPast()) return
