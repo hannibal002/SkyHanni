@@ -143,11 +143,7 @@ object SeaCreatureDetectionApi {
             .sortedBy { it.second }
             .take(mobsToFind).toList()
 
-        val ownMobInfo = findMobs(mobs, mobsToFind) ?: return
-        mobsToFind = ownMobInfo.first
-        for (mob in ownMobInfo.second) {
-            recentMobs.remove(mob)
-        }
+        mobsToFind = findMobs(mobs, mobsToFind, recentMobs) ?: return
 
         if (mobsToFind == 0) {
             lastNameFished = null
@@ -155,17 +151,17 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    private fun findMobs(mobs: List<Pair<Map.Entry<Mob, ServerTimeMark>, Double>>, toBeFound: Int): Pair<Int, List<Mob>>? {
+    private fun findMobs(
+        mobs: List<Pair<Map.Entry<Mob, ServerTimeMark>, Double>>,
+        toBeFound: Int,
+        nonParsedMobs: MutableMap<Mob, ServerTimeMark>,
+    ): Int? {
         if (mobs.isEmpty()) return null
-        val toFind = toBeFound - mobs.size
-        val mobsToRemove = mutableListOf<Mob>()
-        for ((entry, _) in mobs) {
-            val mob = entry.key
-            val time = mob.baseEntity.spawnTime
-            addMob(mob, time, isOwn = true)
-            mobsToRemove.add(mob)
+        for (mob in mobs.map { it.first.key }) {
+            addMob(mob, mob.baseEntity.spawnTime, isOwn = true)
+            nonParsedMobs.remove(mob)
         }
-        return Pair(toFind, mobsToRemove)
+        return toBeFound - mobs.size
     }
 
     private fun handleBabySlugs() {
@@ -178,11 +174,7 @@ object SeaCreatureDetectionApi {
             .sortedBy { it.second }
             .take(babyMagmaSlugsToFind).toList()
 
-        val mobInfo = findMobs(slugs, babyMagmaSlugsToFind) ?: return
-        babyMagmaSlugsToFind = mobInfo.first
-        for (mob in mobInfo.second) {
-            recentBabyMagmaSlugs.remove(mob)
-        }
+        babyMagmaSlugsToFind = findMobs(slugs, babyMagmaSlugsToFind, recentBabyMagmaSlugs) ?: return
 
         if (babyMagmaSlugsToFind == 0) {
             lastMagmaSlugLocation = null
@@ -246,6 +238,7 @@ object SeaCreatureDetectionApi {
         lastSeaCreatureFished = SimpleTimeMark.farPast()
         lastNameFished = null
         mobsToFind = 0
+        lastBobberLocation = null
     }
 
     @HandleEvent
@@ -260,15 +253,28 @@ object SeaCreatureDetectionApi {
 
     private fun isActive(): Boolean = !DungeonApi.inDungeon()
 
+    @Suppress("MaxLineLength")
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Sea Creatures")
         event.addIrrelevant {
-            add("EntityIdToData: ${entityIdToData.entries}")
-            add("seaCreatures: ${seaCreatures.entries}")
+            entityIdToData.forEach { (entityID, data) ->
+                with(data) {
+                    val rare = if (seaCreature.rare) " rare!" else ""
+                    val name = "${seaCreature.name} ($rarity$rare) "
+                    add("$entityID: isOwn=$isOwn repoSeaCreatureData=$name spawnTime=$spawnTime mob=$mob pos=$pos aabb=$aabb")
+                }
+            }
+            seaCreatures.forEach { (_, data) ->
+                with(data) {
+                    val rare = if (seaCreature.rare) " rare!" else ""
+                    val name = "${seaCreature.name} ($rarity$rare) "
+                    add("repoSeaCreatureData=$name spawnTime=$spawnTime mob=$mob pos=$pos aabb=$aabb")
+                }
+            }
             add("lastNameFished $lastNameFished")
             add("mobsToFind: $mobsToFind")
-            add("lastSeaCreatureFished $lastSeaCreatureFished")
+            add("lastSeaCreatureFishedTime: $lastSeaCreatureFished")
             add("recentMobs ${recentMobs.entries}")
             add("babyMagmaSlugsToFind $babyMagmaSlugsToFind")
             add("lastMagmaSlugLocation $lastMagmaSlugLocation")

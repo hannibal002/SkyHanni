@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
@@ -72,8 +73,12 @@ object SkyHanniMod {
         configManager.firstLoad()
         if (PlatformUtils.getRepoPatternDumpLocation() == null) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
-        Runtime.getRuntime().addShutdownHook(
+        val runtime = Runtime.getRuntime()
+        runtime.addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
+        )
+        runtime.addShutdownHook(
+            Thread { SkyHanniItemRenderCoordinator.closeAtlas() }
         )
         try {
             if (PlatformUtils.getRepoPatternDumpLocation() == null) SkyHanniRepoManager.initRepo()
@@ -207,12 +212,12 @@ object SkyHanniMod {
                 function()
             }
         } catch (e: TimeoutCancellationException) {
-            ErrorManager.logErrorWithData(
+            /*ErrorManager.logErrorWithData(
                 e,
                 "Coroutine $name timed out after $timeout",
                 "coroutine name" to name,
                 "timeout" to timeout,
-            )
+            )*/
             throw e
         } catch (e: CancellationException) {
             // Don't notify the user about cancellation exceptions - these are to be expected at times

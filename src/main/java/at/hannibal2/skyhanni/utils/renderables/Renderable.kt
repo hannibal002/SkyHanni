@@ -390,10 +390,23 @@ interface Renderable {
         }
 
         /** Bottom Layer must be bigger then the top layer */
+
+        /**
+         * Render two renderables, one on top of the other.
+         * The {bottomLayer} must be bigger then the {topLayer}.
+         * @param bottomLayer The renderable that is rendered at the bottom
+         * @param topLayer The renderable that is rendered on top of the bottom layer
+         * @param blockBottomHover Prevents hovering over the bottom renderable if the top renderable is hovered
+         * @param forceBottomRenderFirst forces the bottom layer to be rendered before the top layer, regardless of hover state.
+         *  This is useful if the top layer has transparent parts, and you want the bottom layer to be visible through them.
+         *  Setting to true is also necessary for rendering items on top of one another, since all items are rendered on the same
+         *  frame layer.
+         */
         fun doubleLayered(
             bottomLayer: Renderable,
             topLayer: Renderable,
             blockBottomHover: Boolean = true,
+            forceBottomRenderFirst: Boolean = false,
         ) = object : Renderable {
             override val width = bottomLayer.width
             override val height = bottomLayer.height
@@ -401,14 +414,22 @@ interface Renderable {
             override val verticalAlign = bottomLayer.verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                val (x, y) = topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+                val (x, y) = if (forceBottomRenderFirst) {
+                    RenderableUtils.calculateAlignmentXOffset(topLayer, width) to
+                        RenderableUtils.calculateAlignmentYOffset(topLayer, height)
+                } else topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+
                 val topLayerHovered = topLayer.isHovered(mouseOffsetX + x, mouseOffsetY + y)
                 val (nMouseOffsetX, nMouseOffsetY) = if (topLayerHovered && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     mouseOffsetX to mouseOffsetY
                 }
+
                 bottomLayer.render(nMouseOffsetX, nMouseOffsetY)
+                if (forceBottomRenderFirst) {
+                    topLayer.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
+                }
             }
         }
 

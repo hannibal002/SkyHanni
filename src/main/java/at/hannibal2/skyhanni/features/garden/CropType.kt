@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTime
 import net.minecraft.world.item.ItemStack
@@ -19,20 +20,25 @@ enum class CropType(
     val farmingItem: FarmingItemType,
     val replenish: Boolean = false,
     val enchantName: String = cropName.lowercase(),
-    val eliteLbName: String = simpleName
+    val eliteLbName: String = simpleName,
+    val cropColor: LorenzColor = LorenzColor.GREEN,
+    val cropShortName: String = cropName.substring(0..1),
 ) {
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
         { ItemStack(Items.WHEAT).overrideId("WHEAT") }, "wheat", FarmingItemType.WHEAT,
+        cropColor = LorenzColor.GOLD,
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
         { ItemStack(Items.CARROT).overrideId("CARROT_ITEM") }, "carrot", FarmingItemType.CARROT, replenish = true,
+        cropColor = LorenzColor.GOLD,
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
         { ItemStack(Items.POTATO).overrideId("POTATO_ITEM") }, "potato", FarmingItemType.POTATO, replenish = true,
+        cropColor = LorenzColor.GOLD,
     ),
     NETHER_WART(
         "Nether Wart",
@@ -44,20 +50,24 @@ enum class CropType(
         FarmingItemType.NETHER_WART,
         replenish = true,
         enchantName = "warts",
-        eliteLbName = "netherwart"
+        eliteLbName = "netherwart",
+        cropColor = LorenzColor.RED,
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
         { ItemStack(Items.CARVED_PUMPKIN).overrideId("PUMPKIN") }, "pumpkin", FarmingItemType.PUMPKIN,
+        cropColor = LorenzColor.GOLD,
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
         { ItemStack(Items.MELON_SLICE).overrideId("MELON") }, "melon", FarmingItemType.MELON,
+        cropColor = LorenzColor.GREEN,
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
         { ItemStack(Items.COCOA_BEANS).overrideId("INK_SACK:3") }, "cocoa",
         FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco",
+        cropColor = LorenzColor.GOLD,
     ),
     SUGAR_CANE(
         "Sugar Cane",
@@ -68,16 +78,19 @@ enum class CropType(
         "cane",
         FarmingItemType.SUGAR_CANE,
         enchantName = "cane",
-        eliteLbName = "sugarcane"
+        eliteLbName = "sugarcane",
+        cropColor = LorenzColor.GREEN,
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
         { ItemStack(Items.CACTUS).overrideId("CACTUS") }, "cactus", FarmingItemType.CACTUS,
+        cropColor = LorenzColor.GREEN,
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
         { ItemStack(Items.RED_MUSHROOM_BLOCK).overrideId("HUGE_MUSHROOM_2") }, "mushroom", FarmingItemType.MUSHROOM,
         enchantName = "mushrooms",
+        cropColor = LorenzColor.RED,
     ),
     SUNFLOWER(
         "Sunflower",
@@ -88,6 +101,8 @@ enum class CropType(
         "sunflower",
         FarmingItemType.SUNFLOWER,
         replenish = true,
+        cropColor = LorenzColor.GOLD,
+        cropShortName = "Sf",
     ),
     MOONFLOWER(
         "Moonflower",
@@ -98,6 +113,8 @@ enum class CropType(
         "moonflower",
         FarmingItemType.MOONFLOWER,
         replenish = true,
+        cropColor = LorenzColor.AQUA,
+        cropShortName = "Mf",
     ),
     WILD_ROSE(
         "Wild Rose",
@@ -108,7 +125,9 @@ enum class CropType(
         "rose",
         FarmingItemType.WILD_ROSE,
         replenish = true,
-        eliteLbName = "wildrose"
+        eliteLbName = "wildrose",
+        cropColor = LorenzColor.RED,
+        cropShortName = "Wr",
     ),
     ;
 

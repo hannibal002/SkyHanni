@@ -130,25 +130,26 @@ class SpecificSeaCreatures(
 
     @Bind
     fun showLootshare() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/lootsharesphere.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("lootsharesphere")
     }
 
     @Bind
     fun showHealthDisp() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/healthdisplay.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("healthdisplay")
     }
 
     @Bind
     fun showShareParty() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/sharetoparty.xml")
-        XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
+        openXML("sharetoparty")
     }
 
     @Bind
     fun showKillTime() {
-        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/killtime.xml")
+        openXML("killtime")
+    }
+
+    private fun openXML(string: String) {
+        val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
         XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
     }
 
