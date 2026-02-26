@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -15,7 +16,7 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.item.ItemStackRenderState
+import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
@@ -25,6 +26,9 @@ import net.minecraft.world.phys.Vec3
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState
+import net.minecraft.world.item.ItemDisplayContext
+import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -316,32 +320,30 @@ object GuiRenderUtils {
         )
     }
 
-    private val itemRenderStateButCool by lazy { ItemStackRenderState() }
-
     private const val SKULL_SCALE = (5f / 4f)
 
+    /**
+     * Returns either the stable ID of the custom render (if used) or -1 if the item was
+     * rendered using the normal method (either is static, or 'small')
+     */
     @Suppress("unused")
     fun ItemStack.renderOnScreen(
         x: Float,
         y: Float,
-        scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         rescaleSkulls: Boolean = true,
-        rotationDegrees: Vec3? = null,
-    ) {
+        rotationVec: Vec3 = Vec3.ZERO,
+        translationVec: Vec3 = Vec3.ZERO,
+        stableRenderId: Int? = null,
+    ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
 
-        val rotX = ((rotationDegrees?.x ?: 0.0) % 360).toFloat()
-        val rotY = ((rotationDegrees?.y ?: 0.0) % 360).toFloat()
-        val rotZ = ((rotationDegrees?.z ?: 0.0) % 360).toFloat()
-
         val baseItemScale = if (isItemSkull) SKULL_SCALE else 1f
-
-
-        val finalItemScale = (baseItemScale * scaleMultiplier).toFloat()
+        val finalItemScale = (baseItemScale * scale)
 
         val (translateX, translateY) = if (isItemSkull) {
-            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
+            val skullDiff = (scale.toFloat() * 2.5f)
             x - skullDiff to y - skullDiff
         } else x to y
 
@@ -352,86 +354,57 @@ object GuiRenderUtils {
         val guiScaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
         val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
 
-        if (rotationDegrees != null || (totalItemScale > 1 && itemRenderStateButCool.usesBlockLight())) {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
-        } else {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale)
-        }
+        // Check if the model uses 3D lighting
+        val trackingState = TrackingItemStackRenderState()
+        Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
+
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
+            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+
+        /**
+         * This is used to render items that fit these criteria:
+         *  - Uses block light (mostly skulls)
+         *  - Has a rotation (either from the GUI editor or from the animation)
+         *  - Has animations (either animated skins/items, or a bounce animation from AnimatedItemStackRenderable)
+         *  - Needs to be rendered at a higher resolution (scale > 1)
+         *
+         *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
+         *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
+         *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         */
+        val guiRenderState = GuiItemRenderState(
+            this.item.name.toString(),
+            Matrix3x2f(DrawContextUtils.drawContext.pose()),
+            trackingState,
+            0,
+            0,
+            DrawContextUtils.drawContext.scissorStack.peek()
+        )
+        val newRenderState = SkyHanniGuiItemRenderState(
+            guiRenderState, x, y,
+            rotationVec, translationVec,
+            scale = scale.toFloat(),
+            adjustedScale = (scale * guiScaleX).toFloat(),
+            stableRenderId,
+        )
+        Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        return newRenderState.stableId
     }
 
-    /*// TODO: On 1.21.10+ it is completely broken
-    private fun ItemStack.customRenderOnScreen(
-        x: Float, y: Float, finalItemScale: Float,
-        rotX: Float, rotY: Float, rotZ: Float,
-    ) {
-        val client = Minecraft.getInstance()
-        val window = client.window
+    private fun ItemStack.normalRenderOnScreen(
+        translateX: Float,
+        translateY: Float,
+        scale: Float
+    ): Int = DrawContextUtils.pushPopResult {
+        DrawContextUtils.translate(translateX, translateY)
+        DrawContextUtils.scale(scale, scale)
 
-        // Thank Vixid for this -  I would have never figured out how to do this.
-        RenderSystem.backupProjectionMatrix()
-        val guiWidth = window.width.toFloat() / window.guiScale.toFloat()
-        val guiHeight = window.height.toFloat() / window.guiScale.toFloat()
-        val slice = projectionMatrix.getBuffer(guiWidth, guiHeight)
-        RenderSystem.setProjectionMatrix(slice, ProjectionType.ORTHOGRAPHIC)
-        RenderSystem.getModelViewStack().pushMatrix()
-        RenderSystem.getModelViewStack().identity()
-        val textureMatrixBackup = Matrix4f(RenderSystem.getTextureMatrix())
-        RenderSystem.resetTextureMatrix()
+        RenderSystem.assertOnRenderThread()
 
-        // We have to use our own MatrixStack, because the DrawContext matrices are a 2D matrix now
-        val matrices = PoseStack()
-        matrices.pushPose()
-        // TODO -1100f comes from projectionMatrix above, needs changing
-        matrices.translate(x, y, -1100f)
+        Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
 
-        // Because by default the item is rendered flipped in all directions (what the fuck, Mojang?),
-        // we need to translate all three ways before rendering the item, so we can flip it, and still
-        // have it 'end' in the right position.
-        val itemSize = 16f * finalItemScale
-        matrices.translate(itemSize, itemSize, 0f)
-        // These scales being negative is what does the "flipping back to normal viewing"
-        matrices.scale(-finalItemScale, -finalItemScale, -1f)
-
-        // Since we want to rotate the item around its center point, we translate half in, in each direction
-        // Matrices are pre-scaled, so we use the raw 8f values
-        matrices.translate(8f, 8f, 8f)
-
-        // 'planned' rotations are done now.
-        if (rotX != 0f) matrices.mulPose(Axis.XP.rotationDegrees(rotX))
-        if (rotY != 0f) matrices.mulPose(Axis.YP.rotationDegrees(rotY))
-        if (rotZ != 0f) matrices.mulPose(Axis.ZP.rotationDegrees(rotZ))
-
-        // With the ItemRenderer call, all blocks and skulls are rendered from a true side view, rather than
-        // the old "angled down" view. This rotation set re-creates the old view.
-        matrices.mulPose(Axis.XN.rotationDegrees(30f))
-        matrices.mulPose(Axis.YP.rotationDegrees(45f))
-
-        // We need to scale up before rendering - for some reason the default is 1 x 1 x 1
-        matrices.scale(16f, 16f, 16f)
-
-        client.gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-
-        val dispatcher = client.gameRenderer.featureRenderDispatcher
-        val consumers = dispatcher.submitNodeStorage
-        itemRenderStateButCool.submit(matrices, consumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
-        dispatcher.endFrame()
-        matrices.popPose()
-        RenderSystem.teardownOverlayColor()
-        RenderSystem.getModelViewStack().popMatrix()
-        RenderSystem.getTextureMatrix().set(textureMatrixBackup)
-        RenderSystem.restoreProjectionMatrix()
-    }*/
-
-    private fun ItemStack.normalRenderOnScreen(translateX: Float, translateY: Float, scale: Float) {
-        DrawContextUtils.pushPop {
-            DrawContextUtils.translate(translateX, translateY)
-            DrawContextUtils.scale(scale, scale)
-
-            RenderSystem.assertOnRenderThread()
-
-            Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-
-            DrawContextUtils.drawItem(this, 0, 0)
-        }
+        DrawContextUtils.drawItem(this, 0, 0)
+        return@pushPopResult -1
     }
 }

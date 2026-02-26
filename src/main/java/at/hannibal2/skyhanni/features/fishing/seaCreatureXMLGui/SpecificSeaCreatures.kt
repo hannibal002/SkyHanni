@@ -176,4 +176,5 @@ class SpecificSeaCreatures(
         val location = MyResourceLocation("skyhanni", "gui/seacreaturetoggles/$string.xml")
         XmlUtils.openXmlScreen(SpecificSeaCreatures(seaCreatures), location)
     }
+
 }

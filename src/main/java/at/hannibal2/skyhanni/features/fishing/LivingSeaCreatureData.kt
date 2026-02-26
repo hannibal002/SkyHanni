@@ -21,6 +21,7 @@ class LivingSeaCreatureData(
     val spawnTime: ServerTimeMark,
     var mob: Mob?,
 ) {
+
     /** This tracks the last position of the sea creature that the user was able to see. */
     var pos: LorenzVec?
         private set
@@ -92,10 +93,12 @@ class LivingSeaCreatureData(
         return canBeSeenCache
     }
 
+    @Suppress("HandleEventInspection")
     fun updateNonWorld() {
         lastUpdate = SimpleTimeMark.now()
         val mob = mob ?: return
         actualLastPos = mob.getLorenzVec()
+        if (!updateCanBeSeen()) return
     }
 
     @Suppress("HandleEventInspection")
@@ -105,16 +108,4 @@ class LivingSeaCreatureData(
         aabb = renderWorld.exactBoundingBoxExtraEntities(mob)
         pos = renderWorld.exactLocation(mob)
     }
-
-    override fun toString(): String = listOf(
-        "SeaCreatureData(",
-        "isOwn=$isOwn",
-        "seaCreature=$seaCreature",
-        "entityId=$entityId",
-        "spawnTime=$spawnTime",
-        "mob=$mob",
-        "pos=$pos",
-        "aabb=$aabb",
-        ')',
-    ).joinToString(", ", "SeaCreatureData(", ")")
 }
