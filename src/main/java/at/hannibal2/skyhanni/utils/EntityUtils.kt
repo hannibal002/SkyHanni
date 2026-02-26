@@ -236,4 +236,5 @@ object EntityUtils {
         get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
 
     inline val Entity.spawnTime: ServerTimeMark get() = ServerTimeMark.now() - tickCount.ticks
+
 }

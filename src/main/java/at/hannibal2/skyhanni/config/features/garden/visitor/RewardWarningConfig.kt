@@ -48,6 +48,7 @@ class RewardWarningConfig {
         VisitorReward.REPLENISH,
         VisitorReward.COPPER_DYE,
         VisitorReward.FARMING_EXP_BOOST_EPIC,
+        VisitorReward.DYE_WILD_STRAWBERRY,
     )
 
     @Expose

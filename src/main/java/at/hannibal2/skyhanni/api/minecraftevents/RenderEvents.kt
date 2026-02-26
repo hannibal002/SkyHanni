@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
+import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
@@ -21,6 +25,10 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
+        SpecialGuiElementRegistry.register { ctx ->
+            SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
+        }
+
         // makes the lines render weird idk
         /*WorldRenderEvents.END_MAIN.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
@@ -32,6 +40,11 @@ object RenderEvents {
                 Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
             ).post()
         }*/
+    }
+
+    @HandleEvent
+    fun onResourcePackReload() {
+        SkyHanniItemRenderCoordinator.invalidateAtlas()
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {

@@ -6,11 +6,15 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpLocationData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -207,21 +211,56 @@ object BurrowWarpHelper {
         }
     }
 
+    var warpLocationData: Map<String, WarpLocationData>? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val constant = event.getConstant<WarpsJson>("Warps")
+        warpLocationData = constant.warpLocation
+    }
+
     enum class WarpPoint(
-        val displayName: String,
-        val location: LorenzVec,
-        private val extraBlocks: Int,
         var unlocked: Boolean = true,
     ) {
-        HUB("Hub", LorenzVec(-3, 70, -70), 2),
-        CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15),
-        DA("Dark Auction", LorenzVec(91, 74, 173), 2),
-        MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5),
-        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5),
-        TAYLOR("taylor", LorenzVec(22.0, 71.0, -42.5), 2),
+        HUB,
+        CASTLE,
+        CRYPT,
+        DA,
+        MUSEUM,
+        WIZARD,
+        STONKS,
+        TAYLOR,
         ;
+
+        val displayName: String get() {
+            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+            for (entry in locationData) {
+                if (entry.key.equals(this.name, true)) {
+                    return entry.value.displayName
+                }
+            }
+            ErrorManager.skyHanniError("repo invalid for diana warp")
+        }
+
+        val location: LorenzVec get() {
+            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+            for (entry in locationData) {
+                if (entry.key.equals(this.name, true)) {
+                    return LorenzVec(entry.value.x, entry.value.y, entry.value.z)
+                }
+            }
+            ErrorManager.skyHanniError("repo invalid for diana warp")
+        }
+
+        private val extraBlocks: Int get() {
+            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+            for (entry in locationData) {
+                if (entry.key.equals(this.name, true)) {
+                    return entry.value.extraDianaWarpBlocks
+                }
+            }
+            ErrorManager.skyHanniError("repo invalid for diana warp")
+        }
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
 
