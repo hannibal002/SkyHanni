@@ -32,6 +32,8 @@ object ConfigUtils {
     }
 
     private fun KProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
+        // Java reflection is used because MoulConfig is relocated at build time, causing Kotlin reflection
+        // (this.javaField) to fail to resolve property descriptors in the production build.
         val receiver = (this as? CallableReference)?.boundReceiver
             ?.takeIf { it !== CallableReference.NO_RECEIVER }
             ?: return null
