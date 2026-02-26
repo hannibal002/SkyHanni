@@ -121,7 +121,7 @@ object MiningEventTracker {
     }
 
     @Suppress("InSkyBlockEarlyReturn")
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected() && !SkyBlockUtils.inSkyBlock) return
         if (!config.enabled) return
