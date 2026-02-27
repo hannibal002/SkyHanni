@@ -33,16 +33,17 @@ jobs:
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: assemble -x test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v7
                 name: Upload development build
                 with:
                     name: "Development Build"
                     path: build/libs/*.jar
+                    archive: false
             -   name: Test with Gradle w/retry
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: test
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v7
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
                 with:
@@ -83,9 +84,36 @@ jobs:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Fails Multi-Version'
 
-            -   name: Upload multi-version build
-                uses: actions/upload-artifact@v4
+            -   name: Stage JARs as transfer artifact
                 if: ${{ !cancelled() }}
+                uses: actions/upload-artifact@v4
                 with:
-                    name: "Multi-version Development Build"
+                    name: jars-transfer
                     path: build/libs/*.jar
+
+            -   name: List JARs for matrix
+                if: ${{ !cancelled() }}
+                id: list-jars
+                run: |
+                    matrix=$(ls build/libs/*.jar | xargs -I{} basename {} | jq -R . | jq -sc '{"jar": .}')
+                    echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+    upload-jars:
+        name: "Upload ${{ matrix.jar }}"
+        needs: preprocess
+        if: ${{ !cancelled() && needs.preprocess.outputs.jar-matrix != '' }}
+        runs-on: ubuntu-latest
+        strategy:
+            matrix: ${{ fromJSON(needs.preprocess.outputs.jar-matrix) }}
+        steps:
+            -   name: Download staged JARs
+                uses: actions/download-artifact@v4
+                with:
+                    name: jars-transfer
+
+            -   name: Upload ${{ matrix.jar }} unarchived
+                uses: actions/upload-artifact@v7
+                with:
+                    name: "Multi-version Development Build - ${{ matrix.jar }}"
+                    path: ${{ matrix.jar }}
+                    archive: false
