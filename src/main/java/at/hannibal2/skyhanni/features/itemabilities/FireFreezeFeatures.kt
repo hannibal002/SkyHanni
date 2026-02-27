@@ -41,6 +41,8 @@ object FireFreezeFeatures {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
 
+    private const val PARTICLE_OFFSET  = 3.921568568330258E-4
+
     private data class FireFreezeArea(
         val center: LorenzVec,
         val lastPitch: Float,
@@ -116,7 +118,7 @@ object FireFreezeFeatures {
     private fun LorenzVec.isInAnyFireFreeze(): Boolean = fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
 
     private fun ReceiveParticleEvent.isFreezeParticle(): Boolean {
-        return offset.x == 3.921568568330258E-4 && offset.y == 3.921568568330258E-4 && offset.z == 3.921568568330258E-4
+        return offset.x == PARTICLE_OFFSET && offset.y == PARTICLE_OFFSET && offset.z == PARTICLE_OFFSET
     }
 
     @HandleEvent(onlyOnSkyblock = true)
