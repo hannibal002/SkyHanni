@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.renderable
 
-import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
@@ -23,10 +22,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule(devOnly = true)
-object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRenderPostEvent>(
-    "items",
-    eventClass = GameOverlayRenderPostEvent::class,
-) {
+object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
 
     private val boxOfSeedsProvider = NeuItemStackProvider("BOX_OF_SEEDS".toInternalName())
     private val bambooProvider = NeuItemStackProvider("BAMBOO".toInternalName())
@@ -52,13 +48,14 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     }
 
     override fun renderable(): Renderable {
-        val scaleList = generateSequence(0.1) { it + 0.1 }.take(25).toList()
+        val scale = 0.1
+
+        val scaleList = generateSequence(scale) { it + 0.1 }.take(25).toList()
+
         val labels = scaleList.map { Renderable.text(it.roundTo(1).toString()) }
 
         val items = listOf(
-            ItemStack(Blocks.GLASS_PANE),
-            ItemStack(Items.DIAMOND_SWORD),
-            ItemStack(Items.PLAYER_HEAD),
+            ItemStack(Blocks.GLASS_PANE), ItemStack(Items.DIAMOND_SWORD), ItemStack(Items.PLAYER_HEAD),
             ItemStack(Blocks.MELON),
         ).map { item ->
             scaleList.map { Renderable.item(item, it, 0).renderBounds() }
@@ -79,7 +76,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                 horizontal(
                     spinningStacks.map { (axis, renderable) ->
                         vertical(
-                            text("${axis.name.uppercase()} Axis (#${renderable.getStableId()})"),
+                            text("${axis.name.uppercase()} Axis"),
                             renderable.renderBounds(),
                             spacing = 1,
                             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

@@ -105,10 +105,6 @@ class AnimatedItemStackRenderable private constructor(
     override val height = baseItemHeight + fullBounceHeight
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
-    private var stableRenderId: Int = -1
-    fun getStableId() = stableRenderId
-
-    private var currentTranslation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var currentRotation: Vec3 = initialRotation
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
         currentRotation.x + when (rotationDefinition.axis) {
@@ -148,17 +144,15 @@ class AnimatedItemStackRenderable private constructor(
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
-        currentTranslation = Vec3(0.0, bounceDefinition.calculateBounce(), 0.0)
+        val currentOffsetY = bounceDefinition.calculateBounce()
         tryMoveNextFrame(deltaTime.inPartialSeconds)
 
-        this.stableRenderId = stack.renderOnScreen(
+        stack.renderOnScreen(
             x = (xSpacing / 2f),
-            y = 0f,
-            scale = scale,
+            y = currentOffsetY.toFloat(),
+            scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
-            rotationVec = currentRotation,
-            translationVec = currentTranslation,
-            stableRenderId = this.stableRenderId,
+            rotationDegrees = currentRotation,
         )
     }
 

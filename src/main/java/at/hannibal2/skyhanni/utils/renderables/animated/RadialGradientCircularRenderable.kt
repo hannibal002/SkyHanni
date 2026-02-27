@@ -60,7 +60,6 @@ class RadialGradientCircularRenderable private constructor(
         )
     }
 
-    @Suppress("DEPRECATION")
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
 
     companion object {

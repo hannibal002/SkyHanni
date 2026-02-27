@@ -14,7 +14,7 @@ open class ItemStackRenderable protected constructor(
     private val stackGetter: () -> ItemStack,
     val scale: Double = NeuItems.ITEM_FONT_SIZE,
     val xSpacing: Int = 2,
-    val ySpacing: Int = 1,
+    ySpacing: Int = 1,
     val rescaleSkulls: Boolean = true,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
@@ -28,8 +28,8 @@ open class ItemStackRenderable protected constructor(
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         stack.renderOnScreen(
             xSpacing / 2f,
-            ySpacing / 2f,
-            scale = scale,
+            0f,
+            scaleMultiplier = scale,
             rescaleSkulls,
         )
     }
