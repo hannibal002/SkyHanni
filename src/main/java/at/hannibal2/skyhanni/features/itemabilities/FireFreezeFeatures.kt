@@ -40,8 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 object FireFreezeFeatures {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
-
-    private const val PARTICLE_OFFSET  = 3.921568568330258E-4
+    private const val PARTICLE_OFFSET = 3.921568568330258E-4
 
     private data class FireFreezeArea(
         val center: LorenzVec,
