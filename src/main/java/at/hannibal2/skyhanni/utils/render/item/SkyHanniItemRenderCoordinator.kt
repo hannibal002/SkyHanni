@@ -13,7 +13,7 @@ internal object SkyHanniItemRenderCoordinator {
 
     // items actively spinning re-render every frame, same as mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
-    private const val SETTLE_FRAMES = 4
+    // private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
         CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
     }
