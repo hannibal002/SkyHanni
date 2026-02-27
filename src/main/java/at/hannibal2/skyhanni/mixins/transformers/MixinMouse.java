@@ -46,9 +46,12 @@ public class MixinMouse {
             MouseCompat.INSTANCE.setButtonState(button, true);
             new KeyDownEvent(button).post();
             new KeyPressEvent(button).post();
-        } else if (action == 0) {
+        } else {
             new KeyPressEvent(button).post();
-            MouseCompat.INSTANCE.setButtonState(button, false);
+            DelayedRun.INSTANCE.runNextTickOld(() -> {
+                MouseCompat.INSTANCE.setButtonState(button, false);
+                return null;
+            });
         }
     }
 
