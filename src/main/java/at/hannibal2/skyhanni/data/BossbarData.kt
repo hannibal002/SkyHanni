@@ -20,6 +20,7 @@ object BossbarData {
         bossbar = null
     }
 
+
     @HandleEvent
     fun onTick() {
         var multipleBossBars = false
