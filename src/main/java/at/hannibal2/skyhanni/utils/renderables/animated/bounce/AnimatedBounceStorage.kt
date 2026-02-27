@@ -31,7 +31,7 @@ open class AnimatedBouncePropertyStorage(
 ) : AnimatedBounceStorage {
     override var currentBounce: SnappedVec3
         get() = propGetter().get().toSnapped(BOUNCE_SNAP)
-        set(value) = propGetter().set(value.toVec3())
+        set(value) = propGetter().set(value)
 }
 
 /**
@@ -40,7 +40,7 @@ open class AnimatedBouncePropertyStorage(
  *
  */
 data class AnimatedBounceDefinition(
-    private val axes: Map<Axis, AxisBounceDefinition> = emptyMap(),
+    private val axes: Map<Axis, AxisBounceDefinition> = emptyMap()
 ) : Map<Axis, AxisBounceDefinition> by axes {
     constructor(vararg pairs: Pair<Axis, AxisBounceDefinition>) : this(pairs.asList().associate { it.first to it.second })
 
@@ -50,7 +50,6 @@ data class AnimatedBounceDefinition(
 
     fun getBounceOffset(axis: Axis, sinTheta: Double): Double =
         axes[axis]?.getOffset(sinTheta) ?: 0.0
-
     fun getBouncePeriod(axis: Axis): Double = axes[axis]?.period ?: 1.0
 
     private val totalBounceHeightCache = mutableMapOf<Axis, Int>()
@@ -75,7 +74,6 @@ data class AxisBounceDefinition(
     val speed: Double = 0.0,
 ) {
     constructor(bounceOffset: Double, speed: Double) : this(bounceOffset, bounceOffset, speed)
-
     private val enabled get() = speed > 0.0 && bounceOffsetPositive + bounceOffsetNegative != 0.0
     fun isEnabled() = enabled
 
