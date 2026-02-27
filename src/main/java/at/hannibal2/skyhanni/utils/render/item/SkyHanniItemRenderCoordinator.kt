@@ -57,8 +57,11 @@ internal object SkyHanniItemRenderCoordinator {
             }
 
             // Items that haven't moved in 4+ frames (or are static) use fallback (direct rendering)
-            if (settle.framesStable >= SETTLE_FRAMES || !state.isAnimated()) animatedStates.add(state)
-            else animatedStates.add(state)
+            // TODO: Revisit when a better solution for custom item rendering is implemented
+            // if (settle.framesStable >= SETTLE_FRAMES || !state.isAnimated()) staticFallbackStates.add(state)
+            // else animatedStates.add(state)
+
+            animatedStates.add(state)
         }
 
         SkyHanniItemRenderContext(
