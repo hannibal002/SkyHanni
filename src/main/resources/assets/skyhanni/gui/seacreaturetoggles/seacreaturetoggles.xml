@@ -24,13 +24,6 @@
             </Center>
             <Center>
                 <Row>
-                    <Button onClick="@showShareParty">
-                        <Text text="Party Chat Share Settings"/>
-                    </Button>
-                </Row>
-            </Center>
-            <Center>
-                <Row>
                     <Button onClick="@showKillTime">
                         <Text text="Kill Time Settings"/>
                     </Button>
@@ -43,16 +36,21 @@
                     </Button>
                 </Row>
             </Center>
+            <Center>
+                <Button onClick = "@showOtherNotify">
+                    <Text text = "Title When Seeing"/>
+                </Button>
+            </Center>
             <Spacer height = "5"/>
-            <Center><Text text = "Title Notification Toggles"/></Center>
+            <Center><Text text = "On Hook Toggles"/></Center>
             <Center>
                 <Row>
                     <Button onClick="@showSelfNotify">
-                        <Text text = "Own Mobs"/>
+                        <Text text = "Show Title"/>
                     </Button>
                     <Spacer width = "10"/>
-                    <Button onClick = "@showOtherNotify">
-                        <Text text = "Other's Mobs"/>
+                    <Button onClick="@showShareParty">
+                        <Text text="Share in Party"/>
                     </Button>
                 </Row>
             </Center>
