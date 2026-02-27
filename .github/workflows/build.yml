@@ -84,10 +84,36 @@ jobs:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Fails Multi-Version'
 
-            -   name: Upload multi-version build
-                uses: actions/upload-artifact@v7
+            -   name: Stage JARs as transfer artifact
                 if: ${{ !cancelled() }}
+                uses: actions/upload-artifact@v4
                 with:
-                    name: "Multi-version Development Build"
+                    name: jars-transfer
                     path: build/libs/*.jar
+
+            -   name: List JARs for matrix
+                if: ${{ !cancelled() }}
+                id: list-jars
+                run: |
+                    matrix=$(ls build/libs/*.jar | xargs -I{} basename {} | jq -R . | jq -sc '{"jar": .}')
+                    echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+    upload-jars:
+        name: "Upload ${{ matrix.jar }}"
+        needs: preprocess
+        if: ${{ !cancelled() && needs.preprocess.outputs.jar-matrix != '' }}
+        runs-on: ubuntu-latest
+        strategy:
+            matrix: ${{ fromJson(needs.preprocess.outputs.jar-matrix) }}
+        steps:
+            -   name: Download staged JARs
+                uses: actions/download-artifact@v4
+                with:
+                    name: jars-transfer
+
+            -   name: Upload ${{ matrix.jar }} unarchived
+                uses: actions/upload-artifact@v7
+                with:
+                    name: "Multi-version Development Build - ${{ matrix.jar }}"
+                    path: ${{ matrix.jar }}
                     archive: false
