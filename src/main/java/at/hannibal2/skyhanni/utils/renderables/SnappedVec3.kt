@@ -10,11 +10,19 @@ data class SnappedVec3(
     private var snappedZ: Double = 0.0,
     val snapValue: Double = 1.0,
     val maxValue: Double = 360.0,
-) : Vec3(
-    snap(snappedX, snapValue),
-    snap(snappedY, snapValue),
-    snap(snappedZ, snapValue),
 ) {
+    val x get() = snap(snappedX, snapValue)
+    val y get() = snap(snappedY, snapValue)
+    val z get() = snap(snappedZ, snapValue)
+
+    operator fun get(axis: Axis): Double = when (axis) {
+        Axis.X -> x
+        Axis.Y -> y
+        Axis.Z -> z
+    }
+
+    fun toVec3(): Vec3 = Vec3(x, y, z)
+
     fun applyAxisValue(axis: Axis, value: Double): SnappedVec3 = when (axis) {
         Axis.X -> copy(snappedX = value % maxValue)
         Axis.Y -> copy(snappedY = value % maxValue)
@@ -27,7 +35,7 @@ data class SnappedVec3(
             Axis.X -> snappedX
             Axis.Y -> snappedY
             Axis.Z -> snappedZ
-        }
+        },
     )
 
     companion object {
