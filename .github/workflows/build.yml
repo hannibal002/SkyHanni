@@ -53,6 +53,8 @@ jobs:
     preprocess:
         runs-on: ubuntu-latest
         name: "Build multi version"
+        outputs:
+            jar-matrix: ${{ steps.list-jars.outputs.matrix }}
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
@@ -114,6 +116,19 @@ jobs:
             -   name: Upload ${{ matrix.jar }} unarchived
                 uses: actions/upload-artifact@v7
                 with:
-                    name: "Multi-version Development Build - ${{ matrix.jar }}"
                     path: ${{ matrix.jar }}
                     archive: false
+
+    cleanup:
+        name: "Delete transfer artifact"
+        needs: upload-jars
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Delete jars-transfer
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts \
+                        --jq '.artifacts[] | select(.name=="jars-transfer") | .id' \
+                    | xargs -I{} gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/{}
