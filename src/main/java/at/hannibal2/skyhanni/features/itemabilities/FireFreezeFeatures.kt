@@ -117,7 +117,7 @@ object FireFreezeFeatures {
     private fun LorenzVec.isInAnyFireFreeze(): Boolean = fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
 
     private fun ReceiveParticleEvent.isFreezeParticle(): Boolean {
-        return abs(offset.x) < 0.001 && abs(offset.y) < 0.001 && offset.z < 0.001
+        return offset.x == 3.921568568330258E-4 && offset.y == 3.921568568330258E-4 && offset.z == 3.921568568330258E-4
     }
 
     @HandleEvent(onlyOnSkyblock = true)
