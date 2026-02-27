@@ -106,6 +106,7 @@ jobs:
         if: ${{ !cancelled() && needs.preprocess.outputs.jar-matrix != '' }}
         runs-on: ubuntu-latest
         strategy:
+            fail-fast: false
             matrix: ${{ fromJSON(needs.preprocess.outputs.jar-matrix) }}
         steps:
             -   name: Download staged JARs
@@ -118,6 +119,7 @@ jobs:
                 with:
                     path: ${{ matrix.jar }}
                     archive: false
+                    overwrite: true
 
     cleanup:
         name: "Delete transfer artifact"
