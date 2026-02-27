@@ -8,14 +8,21 @@ object MouseCompat {
     var deltaMouseX = 0.0
     var scroll = 0.0
     var timeDelta = 0.0
-    var lastEventButton = -1
+    val buttonStates = BooleanArray(6) { false }
 
     private val mouse by lazy {
         Minecraft.getInstance().mouseHandler
     }
 
     fun isButtonDown(button: Int): Boolean {
-        return lastEventButton == button
+        if (button in 0..5) return buttonStates[button]
+        return false
+    }
+
+    fun setButtonState(button: Int, down: Boolean) {
+        if (button in 0..5) {
+            buttonStates[button] = down
+        }
     }
 
     fun getScrollDelta(): Int {
@@ -37,7 +44,7 @@ object MouseCompat {
     fun getEventX(): Int = getX()
     fun getEventY(): Int = getY()
 
-    fun getEventButtonState(): Boolean = lastEventButton != -1
+    fun getEventButtonState(): Boolean = buttonStates.any { it }
     fun getEventNanoseconds(): Long = timeDelta.toLong()
 
     fun getEventDY(): Int {
