@@ -33,16 +33,17 @@ jobs:
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: assemble -x test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v7
                 name: Upload development build
                 with:
                     name: "Development Build"
                     path: build/libs/*.jar
+                    archive: false
             -   name: Test with Gradle w/retry
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: test
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v7
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
                 with:
@@ -84,8 +85,9 @@ jobs:
                     labels: 'Fails Multi-Version'
 
             -   name: Upload multi-version build
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 if: ${{ !cancelled() }}
                 with:
                     name: "Multi-version Development Build"
                     path: build/libs/*.jar
+                    archive: false
