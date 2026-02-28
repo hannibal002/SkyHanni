@@ -50,7 +50,6 @@ object SeaCreatureFeatures {
         if (!isEnabled()) return
         val mob = event.mob
         val seaCreature = mob.seaCreature ?: return
-        val creature = seaCreature.seaCreature
         val entity = mob.baseEntity
         val shouldNotify = entity.id !in entityIds
         entityIds.addIfAbsent(entity.id)
@@ -58,8 +57,8 @@ object SeaCreatureFeatures {
 
         if (mob.name == "Water Hydra" && entity.findHealthReal() == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify && getSeaCreatureConfig(mob)?.shouldNotifyForNonOwn == true) {
-            val text = if (config.creatureName) "${creature.displayName} NEARBY!"
-            else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
+            val text = if (config.creatureName) "${seaCreature.displayName} NEARBY!"
+            else "${seaCreature.rarity.chatColorCode}RARE SEA CREATURE!"
             TitleManager.sendTitle(text, duration = 1.5.seconds)
             if (config.playSound) SoundUtils.playBeepSound()
         }

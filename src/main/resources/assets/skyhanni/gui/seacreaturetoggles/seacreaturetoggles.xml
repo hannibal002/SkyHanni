@@ -31,24 +31,26 @@
             </Center>
             <Center>
                 <Row>
-                    <Button onClick = "@showHighlight">
-                        <Text text = "Mobs To Highlight"/>
+                    <Button onClick="@showHighlight">
+                        <Text text="Mobs To Highlight"/>
                     </Button>
                 </Row>
             </Center>
             <Center>
-                <Button onClick = "@showOtherNotify">
-                    <Text text = "Title When Seeing"/>
+                <Button onClick="@showOtherNotify">
+                    <Text text="Title When Seeing"/>
                 </Button>
             </Center>
-            <Spacer height = "5"/>
-            <Center><Text text = "On Hook Toggles"/></Center>
+            <Spacer height="5"/>
+            <Center>
+                <Text text="On Hook Toggles"/>
+            </Center>
             <Center>
                 <Row>
                     <Button onClick="@showSelfNotify">
-                        <Text text = "Show Title"/>
+                        <Text text="Show Title"/>
                     </Button>
-                    <Spacer width = "10"/>
+                    <Spacer width="10"/>
                     <Button onClick="@showShareParty">
                         <Text text="Share in Party"/>
                     </Button>
