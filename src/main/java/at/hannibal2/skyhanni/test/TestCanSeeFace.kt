@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable

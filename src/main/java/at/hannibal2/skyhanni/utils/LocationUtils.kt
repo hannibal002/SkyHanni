@@ -133,8 +133,7 @@ object LocationUtils {
             // If the block could be seen from the center, it would have returned true already,
             // so we can assert that we can't see the block.
             false
-        }
-        else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset, resultLifespan)
+        }  else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset, resultLifespan)
     }
 
     private fun Direction.performStepping(
@@ -166,7 +165,7 @@ object LocationUtils {
                 val frac = step.toDouble() / (stepCount + 1)
                 val testPoint = faceCenter + dirVec * (boundaryDist * frac)
                 if (eye.distance(testPoint) > viewDistance.toDouble()) continue@stepLoop
-                val wrappedSuccess = pointFill.wrapCanSee(this, eye, testPoint, offset)
+                val wrappedSuccess = pointFill.wrapCanSee(this, eye, testPoint, offset, resultLifespan)
                 if (wrappedSuccess && pointFill == null) return true
             }
         }
