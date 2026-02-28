@@ -34,6 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 object SeaCreatureFeatures {
 
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
+    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
@@ -80,7 +81,7 @@ object SeaCreatureFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!event.seaCreature.rare) return
+        if (scSpecificConfig[event.seaCreature.name]?.shouldShareInChat == false) return
         if (config.alertOwnCatches) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"

@@ -5,6 +5,9 @@ import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniChromaUniform
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import com.mojang.blaze3d.buffers.GpuBufferSlice
@@ -12,8 +15,13 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.gui.render.state.GlyphRenderState
 import net.minecraft.client.gui.render.state.GuiElementRenderState
+import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()
@@ -60,6 +68,28 @@ object GuiRendererHook {
         }
 
         return original.call(state)
+    }
+
+    fun prepareSkyHanniItems(
+        pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
+        renderState: GuiRenderState,
+        bufferSource: MultiBufferSource.BufferSource,
+        featureRenderDispatcher: FeatureRenderDispatcher,
+        frameNumber: Int,
+    ) {
+        val renderer = pictureInPictureRenderers[SkyHanniGuiItemRenderState::class.java]
+        if (renderer !is SkyHanniPipCoordinatorRenderer) return
+
+        val pipCoordinatorStates = renderer.takePendingStates()
+        if (pipCoordinatorStates.isEmpty()) return
+
+        SkyHanniItemRenderCoordinator.prepare(
+            pipCoordinatorStates,
+            renderState,
+            bufferSource,
+            featureRenderDispatcher,
+            frameNumber
+        )
     }
 
 }

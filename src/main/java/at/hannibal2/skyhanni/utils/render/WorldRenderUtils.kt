@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
+import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -208,6 +210,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
@@ -227,6 +233,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
@@ -251,9 +261,11 @@ object WorldRenderUtils {
 
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y() + yOffset * adjustedScale).toFloat(),
+            (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation()).scale(adjustedScale, -adjustedScale, adjustedScale)
+        ).rotate(camera.rotation())
+            .translate(0f, -yOffset * adjustedScale, 0f)
+            .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.width(text) / 2f
 
@@ -278,6 +290,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
@@ -302,9 +318,11 @@ object WorldRenderUtils {
 
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y() + yOffset * adjustedScale).toFloat(),
+            (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation()).scale(adjustedScale, -adjustedScale, adjustedScale)
+        ).rotate(camera.rotation())
+            .translate(0f, -yOffset * adjustedScale, 0f)
+            .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.width(text) / 2f
 
@@ -323,10 +341,13 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
-        val entityLocation = exactLocation(entity)
-        val x = entityLocation.x
-        val y = entityLocation.y
-        val z = entityLocation.z
+        drawCircleWireframe(exactLocation(entity), rad, color)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(location: LorenzVec, rad: Double, color: Color) {
+        val x = location.x
+        val y = location.y
+        val z = location.z
 
         val segments = 64
         LineDrawer.draw3D(this, 5, false) {
@@ -597,6 +618,10 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
@@ -645,6 +670,10 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: Component,
         scaleMultiplier: Double,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
@@ -912,6 +941,8 @@ object WorldRenderUtils {
         return LorenzVec(x, y, z)
     }
 
+    fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
+
     fun exactLocation(camera: Camera): LorenzVec {
         val pos = camera.position
         return LorenzVec(pos.x, pos.y, pos.z)
@@ -932,6 +963,13 @@ object WorldRenderUtils {
         return entity.boundingBox.move(offset.x, offset.y, offset.z)
     }
 
+    fun SkyHanniRenderWorldEvent.exactBoundingBoxExtraEntities(mob: Mob): AABB {
+        val aabb = exactBoundingBox(mob.baseEntity)
+        return aabb.union(
+            mob.extraEntities.map { exactBoundingBox(it) },
+        ) ?: aabb
+    }
+
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
         val add = if (player.isShiftKeyDown) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player) + add
@@ -949,7 +987,7 @@ object WorldRenderUtils {
         j: Float,
         k: Float,
         l: Float,
-        m: Float
+        m: Float,
     ) {
         addChainedFilledBoxVertices(
             matrices,
@@ -963,7 +1001,7 @@ object WorldRenderUtils {
             j,
             k,
             l,
-            m
+            m,
         )
     }
 
@@ -979,7 +1017,7 @@ object WorldRenderUtils {
         l: Float,
         m: Float,
         n: Float,
-        o: Float
+        o: Float,
     ) {
         val matrix4f = matrices.last().pose()
         vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)

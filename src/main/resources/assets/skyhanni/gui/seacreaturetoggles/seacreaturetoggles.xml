@@ -1,0 +1,41 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Per Sea Creature Settings"/>
+                </Scale>
+            </Center>
+            <Spacer height="5"/>
+            <Center>
+                <Row>
+                    <Button onClick="@showLootshare">
+                        <Text text="Lootshare Sphere Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showHealthDisp">
+                        <Text text="Health Display Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showShareParty">
+                        <Text text="Party Chat Share Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showKillTime">
+                        <Text text="Kill Time Settings"/>
+                    </Button>
+                </Row>
+            </Center>
+        </Column>
+    </Gui>
+</Root>

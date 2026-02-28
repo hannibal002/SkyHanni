@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chroma
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.chroma.CHROMA_PREVIEW_COLOR_CODE
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ChromaConfig {
-    @ConfigOption(name = "Chroma Preview", desc = "§fPlease star SkyHanni on GitHub!")
+    @ConfigOption(name = "Chroma Preview", desc = "§" + CHROMA_PREVIEW_COLOR_CODE + "Please star SkyHanni on GitHub!")
     @ConfigEditorInfoText(infoTitle = "Only in SkyBlock")
     var chromaPreview: Boolean = false
 

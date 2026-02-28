@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.events.render
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.world.entity.Entity
 
-open class EntityRenderLayersEvent<T : Entity>(
+sealed class EntityRenderLayersEvent<T : Entity>(
     val entity: T,
 ) : GenericSkyHanniEvent<T>(entity.javaClass) {
 
