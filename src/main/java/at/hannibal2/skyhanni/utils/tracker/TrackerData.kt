@@ -9,7 +9,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 abstract class TrackerData<T : SessionUptime>(
-    private val uptimeClass: KClass<T>
+    private val uptimeClass: KClass<T>,
 ) : Resettable {
     @Expose
     private val sessionUptime: MutableMap<SessionUptime, Stopwatch> = mutableMapOf()
@@ -76,10 +76,16 @@ abstract class TrackerData<T : SessionUptime>(
     }
 
     private fun migrateData() {
+        migrated = true
+        // Old config versions may still hold null keys or values
+        @Suppress("SENSELESS_COMPARISON")
+        sessionUptime.entries.removeAll { it.key == null || it.value == null }
+
         when (uptimeClass) {
             SessionUptime.Normal::class -> {
                 filterAndRemove(uptimeClass, SessionUptime.Normal(NormalSession.NORMAL))
             }
+
             SessionUptime.Garden::class -> {
                 filterAndRemove(uptimeClass, SessionUptime.Garden(GardenSession.UNKNOWN))
             }
@@ -87,14 +93,13 @@ abstract class TrackerData<T : SessionUptime>(
     }
 
     private fun filterAndRemove(entryType: KClass<out SessionUptime>, migratedSessionType: SessionUptime) {
-        migrated = true
         val entries = sessionUptime.entries.filter { entry ->
             !entryType.isInstance(entry.key)
         }
         if (entries.isEmpty()) return
         entries.forEach { entry ->
             val unknown = sessionUptime.getOrPut(migratedSessionType) { Stopwatch() }
-            unknown.add(entry?.value?.getDuration() ?: Duration.ZERO)
+            unknown.add(entry.value.getDuration())
             sessionUptime.remove(entry.key)
         }
     }
