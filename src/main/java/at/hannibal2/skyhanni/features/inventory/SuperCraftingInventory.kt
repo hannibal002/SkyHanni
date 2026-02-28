@@ -91,6 +91,10 @@ object SuperCraftingInventory {
         val craftingAmount = getSuperCraftingCount(slots) ?: return
         val result = getResultItem(slots)
         val craftMultiplier = result.amount
+        if (craftMultiplier == 0) ErrorManager.skyHanniError(
+            "Result item amount is 0",
+            "item" to result,
+        )
         val profit = getProfit(slots, craftingAmount, craftMultiplier, result) ?: return
         val maxCraftingAmount = getSuperCraftingMaxCount(slots, craftingAmount, craftMultiplier)
         if (!blockWasteClick(profit, craftingAmount, maxCraftingAmount)) return
@@ -129,10 +133,6 @@ object SuperCraftingInventory {
 
     private fun getProfit(slots: List<Slot>, craftingAmount: Long, craftMultiplier: Int, resultItem: PrimitiveItemStack): Double? {
         val materials = getRecipeMaterials(slots)
-        if (craftMultiplier == 0) ErrorManager.skyHanniError(
-            "Result item amount is 0",
-            "item" to resultItem,
-        )
 
         val itemsPrice = materials.sumOf { material ->
             val totalAmount = material.amount * (craftingAmount / craftMultiplier)
