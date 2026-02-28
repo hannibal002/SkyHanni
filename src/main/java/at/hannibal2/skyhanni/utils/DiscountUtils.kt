@@ -15,6 +15,7 @@ import kotlin.collections.mutableMapOf
 
 @SkyHanniModule
 object DiscountUtils {
+    // TODO: Add Shifty Talismansm, Too complex for initial PR
 
     private var itemPriceCoinOnly = mutableMapOf<NeuInternalName, Int>()
     private var emissaryItems = mutableListOf<NeuInternalName>()
@@ -42,15 +43,19 @@ object DiscountUtils {
             .map { it.getRecipePrice(priceSource, pastRecipes + it) }
             .filter { it > 0 }
             .minOrNull() ?: return 0.0
-        if (!emissaryItems.contains(this)) {
-            val rep = ProfileStorageData.profileSpecific?.crimsonIsleReputation?.maxBy { it.value }?.value ?: 0
-            var itemDiscount = 1.0
-            emissaryScalingDiscounts.forEach { (reputation, discount) ->
-                if (rep > reputation) itemDiscount = (1.0 - discount)
-            }
-            val priceDecrease = itemPriceCoinOnly[this]?.times(itemDiscount) ?: 0.0
-            return lowestNPCPrice - priceDecrease
+        return when {
+            emissaryItems.contains(this) ->  this.getEmissaryDiscountedPrice(lowestNPCPrice)
+            else -> lowestNPCPrice
         }
-        return lowestNPCPrice
+    }
+
+    private fun NeuInternalName.getEmissaryDiscountedPrice(lowestNPCPrice: Double): Double {
+        val rep = ProfileStorageData.profileSpecific?.crimsonIsleReputation?.maxBy { it.value }?.value ?: 0
+        var itemDiscount = 1.0
+        emissaryScalingDiscounts.forEach { (reputation, discount) ->
+            if (rep > reputation) itemDiscount = (1.0 - discount)
+        }
+        val priceDecrease = itemPriceCoinOnly[this]?.times(itemDiscount) ?: 0.0
+        return lowestNPCPrice - priceDecrease
     }
 }
