@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.network.chat.Component
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.world.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -71,7 +72,6 @@ object VisitorRewardWarning {
             return
         }
 
-        // all but shift click types work for accepting visitor
         if (event.clickType == ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.REFUSED, "refused")
@@ -126,7 +126,7 @@ object VisitorRewardWarning {
         }
 
         blockedToolTip.add("")
-        val pricePerCopper = visitor.pricePerCopper?.let { it.shortFormat() }
+        val pricePerCopper = visitor.pricePerCopper?.shortFormat()
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
         val formattedLoss = loss.absoluteValue.shortFormat()

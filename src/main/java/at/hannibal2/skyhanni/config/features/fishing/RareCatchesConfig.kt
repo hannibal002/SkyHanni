@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class RareCatchesConfig {
@@ -41,6 +42,10 @@ class RareCatchesConfig {
     @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare sea creature alerts are displayed.")
     @ConfigEditorBoolean
     var playSound: Boolean = true
+
+    @ConfigOption(name = "Custom Party Chat List", desc = "This Feature can be customized under /shseacreatures!")
+    @ConfigEditorInfoText
+    var notice: String = ""
 
     @Expose
     @ConfigOption(name = "Highlight", desc = "Highlight nearby rare sea creatures.")

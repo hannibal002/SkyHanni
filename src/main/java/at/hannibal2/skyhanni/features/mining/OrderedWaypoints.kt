@@ -7,13 +7,16 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyHanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
@@ -226,6 +229,21 @@ object OrderedWaypoints {
         }
     }
 
+    @HandleEvent
+    fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
+        if (!config.autoLoadMatchingShaftRoute) return
+        if (storage?.routes?.get(event.type.name) == null) return
+        SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
+            load(event.type.name)
+        }
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.oldIsland == IslandType.MINESHAFT && config.autoUnloadWhenLeavingMineshaft) unload()
+        if (config.autoUnload) unload()
+    }
+
     private fun shouldRenderName(waypointIndice: Int) =
         config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
 
@@ -239,21 +257,22 @@ object OrderedWaypoints {
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
-        val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-        else storage?.routes?.get(name)?.let { it to "saved" } ?: return@launchIOCoroutine ChatUtils.userError(
-            "Route $name doesn't exist.\n" +
-                "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
-                "§cIf you would like to import a route from your clipboard, leave the route name blank.",
-        )
+    private fun setupLoadJob(name: String): Job =
+        SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
+            val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+            else storage?.routes?.get(name)?.let { it to "saved" } ?: return@launchIOCoroutine ChatUtils.userError(
+                "Route $name doesn't exist.\n" +
+                    "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
+                    "§cIf you would like to import a route from your clipboard, leave the route name blank.",
+            )
 
-        if (result == null) return@launchIOCoroutine ChatUtils.userError(
-            "There was an error parsing waypoints. " +
-                "Please make sure they are properly formatted and in a supported format.\n" +
-                "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
-        )
+            if (result == null) return@launchIOCoroutine ChatUtils.userError(
+                "There was an error parsing waypoints. " +
+                    "Please make sure they are properly formatted and in a supported format.\n" +
+                    "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
+            )
 
-        val (loadedRoute, formatName) = result
+            val (loadedRoute, formatName) = result
         orderedWaypointsList = loadedRoute.deepCopy()
         currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
         renderWaypoints.clear()
@@ -263,14 +282,14 @@ object OrderedWaypoints {
             config.enabled = true
             ChatUtils.chat("§eOrdered Waypoints was disabled, auto-enabled it.")
         }
-    }
+        }
 
     private fun unload() {
+        if (orderedWaypointsList.isNotEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
         orderedWaypointsList.clear()
         renderWaypoints.clear()
         currentOrderedWaypointIndex = 0
         lastCloser = 0
-        ChatUtils.chat("Unloaded ordered waypoints.")
     }
 
     private fun skip(amount: Int) {

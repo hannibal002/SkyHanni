@@ -79,5 +79,5 @@ object PestSpawnSound {
     }
 
     private fun PlaySoundEvent.isPestSpawnSound(): Boolean =
-        soundName == "note.bassattack" && distanceToPlayer < 2.0 && volume == 1.0f && pitch == 1.4920635f
+        soundName == "note.bassattack" && distanceToPlayer < 15.0 && volume == 1.0f && pitch == 1.4920635f
 }
