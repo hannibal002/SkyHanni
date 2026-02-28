@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.animated.TimeDependentRenderable
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrame
 import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecorator
 import net.minecraft.core.Direction.Axis
 import kotlin.math.sin
@@ -45,7 +46,7 @@ internal interface BouncingBehavior : AnimatedBounceStorage {
     }
 }
 
-class BouncingRenderable(
+class BouncingRenderable private constructor(
     override val root: Renderable,
     override val config: AnimatedItemRenderableConfig<*>,
 ) : RenderableDecorator, TimeDependentRenderable, BouncingBehavior {
@@ -58,5 +59,12 @@ class BouncingRenderable(
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         applyBounce()
+    }
+
+    companion object {
+        fun <C : AnimatedFrame> Renderable.Companion.bouncing(
+            root: Renderable,
+            config: AnimatedItemRenderableConfig<C>.() -> Unit = { }
+        ) = BouncingRenderable(root, AnimatedItemRenderableConfig<C>().apply(config))
     }
 }

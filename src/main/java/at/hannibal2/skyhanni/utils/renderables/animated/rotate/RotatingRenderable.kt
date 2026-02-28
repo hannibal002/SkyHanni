@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SnappedVec3
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.animated.TimeDependentRenderable
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrame
 import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
 import net.minecraft.core.Direction.Axis
 import kotlin.time.Duration
@@ -40,5 +41,12 @@ class RotatingRenderable private constructor(
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         applyRotation(deltaTime)
+    }
+
+    companion object {
+        fun <C : AnimatedFrame> Renderable.Companion.rotating(
+            root: Renderable,
+            config: AnimatedItemRenderableConfig<C>.() -> Unit = { }
+        ) = RotatingRenderable(root, AnimatedItemRenderableConfig<C>().apply(config))
     }
 }

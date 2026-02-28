@@ -44,8 +44,7 @@ data class AnimatedBounceDefinition(
 ) : Map<Axis, AxisBounceDefinition> by axes {
     constructor(vararg pairs: Pair<Axis, AxisBounceDefinition>) : this(pairs.asList().associate { it.first to it.second })
 
-    private val enabled get() = axes.values.any { it.isEnabled() }
-    fun isEnabled() = enabled
+    fun isEnabled() = axes.values.any { it.isEnabled() }
     fun isAxisEnabled(axis: Axis) = axes[axis]?.isEnabled() ?: false
 
     fun getBounceOffset(axis: Axis, sinTheta: Double): Double =
@@ -74,8 +73,7 @@ data class AxisBounceDefinition(
     val speed: Double = 0.0,
 ) {
     constructor(bounceOffset: Double, speed: Double) : this(bounceOffset, bounceOffset, speed)
-    private val enabled get() = speed > 0.0 && bounceOffsetPositive + bounceOffsetNegative != 0.0
-    fun isEnabled() = enabled
+    fun isEnabled() = speed > 0.0 && bounceOffsetPositive + bounceOffsetNegative != 0.0
 
     val period by lazy {
         (bounceOffsetNegative + bounceOffsetPositive * 2.0) / speed

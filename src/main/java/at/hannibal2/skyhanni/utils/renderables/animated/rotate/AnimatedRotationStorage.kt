@@ -66,8 +66,7 @@ open class AnimatedRotationPropertyStorage(
  * a negative rotation speed will rotate it clockwise, and a
  * rotation speed of 0.0 will make the item stationary.
  *
- * @param axis The axis around which the item stack will rotate.
- * @param rotationSpeed How many degrees the item should rotate per second.
+ * @param axes A map of axis to rotation definitions, defining the rotation behavior for each axis.
  */
 data class AnimatedRotationDefinition(
     private val axes: Map<Axis, AxisRotationDefinition> = mapOf(

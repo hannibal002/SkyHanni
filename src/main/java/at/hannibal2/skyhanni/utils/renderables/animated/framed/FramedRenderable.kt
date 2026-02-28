@@ -33,7 +33,7 @@ internal interface FramedBehavior<T : AnimatedFrame> : AnimatedFrameStorage<T> {
     }
 }
 
-class FramedRenderable<T : AnimatedFrame>(
+class FramedRenderable<T : AnimatedFrame> private constructor(
     override val root: Renderable,
     override val config: AnimatedItemRenderableConfig<T>,
 ) : RenderableDecorator, TimeDependentRenderable, FramedBehavior<T> {
@@ -48,5 +48,12 @@ class FramedRenderable<T : AnimatedFrame>(
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: kotlin.time.Duration) {
         tryMoveNextFrame(deltaTime.inPartialSeconds)
+    }
+
+    companion object {
+        fun <T : AnimatedFrame> Renderable.Companion.framed(
+            root: Renderable,
+            config: AnimatedItemRenderableConfig<T>.() -> Unit = { }
+        ) = FramedRenderable(root, AnimatedItemRenderableConfig<T>().apply(config))
     }
 }
