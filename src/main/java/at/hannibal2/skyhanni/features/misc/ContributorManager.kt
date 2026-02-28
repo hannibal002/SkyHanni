@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.compat.append
 import net.minecraft.world.entity.player.Player
@@ -25,23 +26,19 @@ object ContributorManager {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val map = event.getConstant<ContributorsJson>("ContributorList").contributors
 
-        val failedKeys = mutableMapOf<String, ContributorJsonEntry>()
-
         contributors = map.mapKeysNotNull {
             try {
                 UUID.fromString(it.key)
-            } catch (_: IllegalArgumentException) {
-                failedKeys[it.key] = it.value
+            } catch (e: IllegalArgumentException) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to parse contributor UUID",
+                    "key" to it.key, "value" to it.value
+                )
                 null
             }
         }
         contributorNames = map.values.mapNotNull { it.displayName }
-
-        if (failedKeys.isNotEmpty())
-            SkyHanniMod.logger.warn(
-                "Failed to parse ${failedKeys.keys.size} UUIDs in REPO file: ContributorList.json. Failed keys:\n" +
-                    failedKeys.entries.joinToString("\n") { "Key: ${it.key}, DisplayName: ${it.value.displayName}" }
-            )
     }
 
     @HandleEvent
