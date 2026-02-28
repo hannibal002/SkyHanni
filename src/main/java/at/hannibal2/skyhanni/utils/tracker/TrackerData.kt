@@ -94,7 +94,7 @@ abstract class TrackerData<T : SessionUptime>(
         if (entries.isEmpty()) return
         entries.forEach { entry ->
             val unknown = sessionUptime.getOrPut(migratedSessionType) { Stopwatch() }
-            unknown.add(entry.value.getDuration())
+            unknown.add(entry?.value?.getDuration() ?: Duration.ZERO)
             sessionUptime.remove(entry.key)
         }
     }
