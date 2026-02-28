@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.DelayedRun.runNextTickOld
 import net.minecraft.client.Minecraft
+import net.minecraft.client.input.MouseButtonInfo
 
 object MouseCompat {
     var deltaMouseY = 0.0
@@ -49,5 +53,19 @@ object MouseCompat {
 
     fun getEventDY(): Int {
         return deltaMouseY.toInt()
+    }
+
+    fun handleMouseButton(input: MouseButtonInfo, action: Int) {
+        val button: Int = input.button()
+        if (action == 1) {
+            setButtonState(button, true)
+            KeyDownEvent(button).post()
+            KeyPressEvent(button).post()
+        } else {
+            KeyPressEvent(button).post()
+            runNextTickOld {
+                setButtonState(button, false)
+            }
+        }
     }
 }
