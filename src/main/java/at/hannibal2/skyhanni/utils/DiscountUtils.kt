@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemDiscountsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -9,17 +8,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.mutableMapOf
 
 @SkyHanniModule
 object DiscountUtils {
     // TODO: Add Shifty Talismansm, Too complex for initial PR
 
-    private var itemPriceCoinOnly = mutableMapOf<NeuInternalName, Int>()
-    private var emissaryItems = mutableListOf<NeuInternalName>()
-    private var emissaryScalingDiscounts = mutableMapOf<Int, Double>()
+    private val itemPriceCoinOnly = mutableMapOf<NeuInternalName, Int>()
+    private val emissaryItems = mutableListOf<NeuInternalName>()
+    private val emissaryScalingDiscounts = mutableMapOf<Int, Double>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -44,7 +40,7 @@ object DiscountUtils {
             .filter { it > 0 }
             .minOrNull() ?: return 0.0
         return when {
-            emissaryItems.contains(this) ->  this.getEmissaryDiscountedPrice(lowestNPCPrice)
+            emissaryItems.contains(this) -> this.getEmissaryDiscountedPrice(lowestNPCPrice)
             else -> lowestNPCPrice
         }
     }

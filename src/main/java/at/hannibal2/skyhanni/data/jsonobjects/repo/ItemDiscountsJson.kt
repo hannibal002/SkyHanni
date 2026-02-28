@@ -5,14 +5,14 @@ import com.google.gson.annotations.SerializedName
 
 data class ItemDiscountsJson(
     @Expose @SerializedName("item_price_coin_only") val itemPriceCoinOnly: Map<String, Int>,
-    @Expose @SerializedName("items_to_discount_by_area") val itemsToDiscountByArea: itemsToDiscountByArea,
-    @Expose @SerializedName("scaling_discounts") val scalingDiscounts: scalingDiscounts
+    @Expose @SerializedName("items_to_discount_by_area") val itemsToDiscountByArea: ItemsToDiscountByArea,
+    @Expose @SerializedName("scaling_discounts") val scalingDiscounts: ScalingDiscounts
 )
 
-data class itemsToDiscountByArea(
+data class ItemsToDiscountByArea(
     @Expose val Emissary: List<String>
 )
 
-data class scalingDiscounts(
+data class ScalingDiscounts(
     @Expose val Emissary: Map<String, Double>
 )
