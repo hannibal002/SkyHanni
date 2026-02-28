@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.DelayedRun.runNextTickOld
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
 
@@ -63,7 +62,7 @@ object MouseCompat {
             KeyPressEvent(button).post()
         } else {
             KeyPressEvent(button).post()
-            runNextTickOld {
+            DelayedRun.runNextTickOld {
                 setButtonState(button, false)
             }
         }
