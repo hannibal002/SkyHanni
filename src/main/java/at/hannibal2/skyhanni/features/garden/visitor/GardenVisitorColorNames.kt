@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 object GardenVisitorColorNames {
 
     private val visitorColors = mutableMapOf<String, String>() // name -> color code
-    var visitorMap = mutableMapOf<String, GardenVisitor>() // why is this here
+    var visitorMap = mutableMapOf<String, GardenVisitor>() // TODO why is this here
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

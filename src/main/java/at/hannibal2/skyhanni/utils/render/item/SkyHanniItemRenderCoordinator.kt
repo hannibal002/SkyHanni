@@ -13,7 +13,7 @@ internal object SkyHanniItemRenderCoordinator {
 
     // items actively spinning re-render every frame, same as mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
-    private const val SETTLE_FRAMES = 4
+    // private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
         CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
     }
@@ -57,8 +57,11 @@ internal object SkyHanniItemRenderCoordinator {
             }
 
             // Items that haven't moved in 4+ frames (or are static) use fallback (direct rendering)
-            if (settle.framesStable >= SETTLE_FRAMES || !state.isAnimated()) staticFallbackStates.add(state)
-            else animatedStates.add(state)
+            // TODO: Revisit when a better solution for custom item rendering is implemented
+            // if (settle.framesStable >= SETTLE_FRAMES || !state.isAnimated()) staticFallbackStates.add(state)
+            // else animatedStates.add(state)
+
+            animatedStates.add(state)
         }
 
         SkyHanniItemRenderContext(
