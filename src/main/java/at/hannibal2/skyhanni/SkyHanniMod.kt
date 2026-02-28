@@ -79,7 +79,7 @@ object SkyHanniMod {
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         runtime.addShutdownHook(
-            RenderUtils.planOnRenderThread {
+            RenderUtils.threadOnRenderThread {
                 SkyHanniItemRenderCoordinator.closeAtlas()
             }
         )

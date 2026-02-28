@@ -48,10 +48,9 @@ object RenderUtils {
      * Runs a block on an asserted Render Thread.
      * @param block the block to run
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun runOnRenderThread(
+    fun runOnRenderThread(
         setupFor: Lighting.Entry? = null,
-        noinline block: () -> Unit,
+        block: () -> Unit,
     ) {
         RenderSystem.assertOnRenderThread()
         setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
@@ -62,10 +61,9 @@ object RenderUtils {
      * Plans to run a block on an asserted Render Thread, returning a Thread.
      * @param block the block to run
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun planOnRenderThread(
+    fun threadOnRenderThread(
         setupFor: Lighting.Entry? = null,
-        noinline block: () -> Unit,
+        block: () -> Unit,
     ) = Thread { runOnRenderThread(setupFor, block) }
 
     /**
