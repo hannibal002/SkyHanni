@@ -35,7 +35,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import java.awt.Color
-import kotlin.Boolean
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -899,14 +898,12 @@ object WorldRenderUtils {
         draw(corners[0], corners[1], corners[3], effectiveColor)
     }
 
-    @Suppress("unused")
     fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
         origin: LorenzVec,
         face: Direction,
         color: Color,
         length: Double = 0.5,
         thickness: Double = 0.02,
-        seeThroughBlock: Boolean = false,
     ) {
         val dir = LorenzVec(face.stepX.toDouble(), face.stepY.toDouble(), face.stepZ.toDouble())
         val end = origin + dir * length

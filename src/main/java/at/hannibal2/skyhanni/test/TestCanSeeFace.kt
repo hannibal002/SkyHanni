@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.FacePointEntry
+import at.hannibal2.skyhanni.utils.FacePointSet
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
 import at.hannibal2.skyhanni.utils.LocationUtils.minBox
@@ -39,10 +41,6 @@ import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-
-typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
-typealias FacePointEntry = Map.Entry<Direction, PointSet>
-typealias FacePointSet = MutableMap<Direction, PointSet>
 
 @SkyHanniModule
 object TestCanSeeFace {
@@ -240,6 +238,7 @@ object TestCanSeeFace {
         regenDebugRenderable(calculationEndTime - calculationStartTime)
         faceCheckContext.finished = true
         DelayedRun.runDelayed(config.refreshInterval.get().seconds) {
+            if (!enabled) return@runDelayed
             recalcContext(true)
         }
     }
@@ -277,7 +276,6 @@ object TestCanSeeFace {
                 color = pointColor.toColor(),
                 length = rayConfig.length.get().toDouble(),
                 thickness = rayConfig.thickness.get().toDouble(),
-                seeThroughBlock = true
             )
         }
     }
@@ -291,7 +289,7 @@ object TestCanSeeFace {
         val vec2 = context.vec2 ?: return
         val points = context.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
-        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else rayConfig.unSeenColor.get()
+        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else faceHighlightConfig.unSeenColor.get()
         val aabb = AABB(
             vec1.x, vec1.y, vec1.z,
             vec2.x, vec2.y, vec2.z,
