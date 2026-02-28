@@ -7,11 +7,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
 
 object MouseCompat {
+    private const val NUMBER_OF_MOUSE_BUTTONS = 6
+
     var deltaMouseY = 0.0
     var deltaMouseX = 0.0
     var scroll = 0.0
     var timeDelta = 0.0
-    val buttonStates = BooleanArray(6) { false }
+    private val buttonStates = BooleanArray(NUMBER_OF_MOUSE_BUTTONS)
 
     private val mouse by lazy {
         Minecraft.getInstance().mouseHandler
