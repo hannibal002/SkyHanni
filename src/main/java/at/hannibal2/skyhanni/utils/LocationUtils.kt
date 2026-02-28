@@ -133,7 +133,7 @@ object LocationUtils {
             // If the block could be seen from the center, it would have returned true already,
             // so we can assert that we can't see the block.
             false
-        }  else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset, resultLifespan)
+        } else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset, resultLifespan)
     }
 
     private fun Direction.performStepping(
