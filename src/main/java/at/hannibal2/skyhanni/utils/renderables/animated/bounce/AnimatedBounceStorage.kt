@@ -38,6 +38,7 @@ open class AnimatedBouncePropertyStorage(
  * A data class that defines the bouncing behavior of an item stack.
  * The render will start in the 'middle' and will move up/down relative to that position.
  *
+ * @param axes A map of axis to their bounce definitions. If an axis is not present, it will not be bounced.
  */
 data class AnimatedBounceDefinition(
     private val axes: Map<Axis, AxisBounceDefinition> = emptyMap()
@@ -45,17 +46,19 @@ data class AnimatedBounceDefinition(
     constructor(vararg pairs: Pair<Axis, AxisBounceDefinition>) : this(pairs.asList().associate { it.first to it.second })
 
     fun isEnabled() = axes.values.any { it.isEnabled() }
-    fun isAxisEnabled(axis: Axis) = axes[axis]?.isEnabled() ?: false
-
+    fun isAxisEnabled(axis: Axis) =
+        axes[axis]?.isEnabled() ?: false
     fun getBounceOffset(axis: Axis, sinTheta: Double): Double =
         axes[axis]?.getOffset(sinTheta) ?: 0.0
-    fun getBouncePeriod(axis: Axis): Double = axes[axis]?.period ?: 1.0
+    fun getBouncePeriod(axis: Axis): Double =
+        axes[axis]?.period ?: 1.0
+    fun getTotalBounceOffset(axis: Axis): Int =
+        totalBounceHeightCache[axis] ?: 0
 
-    private val totalBounceHeightCache = mutableMapOf<Axis, Int>()
-    fun getTotalBounceOffset(axis: Axis): Int = totalBounceHeightCache.getOrPut(axis) {
-        axes[axis]?.let {
-            it.bounceOffsetPositive + it.bounceOffsetNegative
-        }?.toInt() ?: 0
+    private val totalBounceHeightCache: Map<Axis, Int> by lazy {
+        Axis.entries.associateWith { axis ->
+            axes[axis]?.totalOffset?.toInt() ?: 0
+        }
     }
 }
 
@@ -68,13 +71,14 @@ data class AnimatedBounceDefinition(
  * @param speed How many pixels the item should move per second.
  */
 data class AxisBounceDefinition(
-    val bounceOffsetPositive: Double = 0.0,
-    val bounceOffsetNegative: Double = 0.0,
+    private val bounceOffsetPositive: Double = 0.0,
+    private val bounceOffsetNegative: Double = 0.0,
     val speed: Double = 0.0,
 ) {
     constructor(bounceOffset: Double, speed: Double) : this(bounceOffset, bounceOffset, speed)
     fun isEnabled() = speed > 0.0 && bounceOffsetPositive + bounceOffsetNegative != 0.0
 
+    val totalOffset by lazy { bounceOffsetPositive + bounceOffsetNegative }
     val period by lazy {
         (bounceOffsetNegative + bounceOffsetPositive * 2.0) / speed
     }
