@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -546,24 +547,31 @@ object ComposterOverlay {
             return
         }
 
-        val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
-            // TODO Add sack type repo data
+        val havingInSacks: Int
+        if (internalName.isMissingSackItem()) {
+            // sunflower oil doesnt go into sacks so have to do this
+            havingInSacks = 0
+        } else {
+            havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
+                GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
+                // TODO Add sack type repo data
 
-            val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
-            val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
-            ChatUtils.clickableChat(
-                "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                onClick = { HypixelCommands.sacks() },
-                "§eClick to run /sax!",
-                replaceSameMessage = true,
-            )
-            return
+                val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
+                val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
+                ChatUtils.clickableChat(
+                    "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                    onClick = { HypixelCommands.sacks() },
+                    "§eClick to run /sax!",
+                    replaceSameMessage = true,
+                )
+                return
+            }
         }
         if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
             if (SkyBlockUtils.noTradeMode) {
-                ChatUtils.chat("No $itemName §efound in sacks.")
+                ChatUtils.chat("No $itemName §efound in sacks. Opening recipe.")
+                HypixelCommands.recipe(itemName)
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded)

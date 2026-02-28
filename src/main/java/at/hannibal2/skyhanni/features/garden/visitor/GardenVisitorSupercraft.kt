@@ -39,8 +39,8 @@ object GardenVisitorSupercraft {
         )
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         if (hasIngredients) {
             hasIngredients = false
         }

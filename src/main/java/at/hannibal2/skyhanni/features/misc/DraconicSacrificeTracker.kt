@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.world.phys.AABB
@@ -66,7 +67,7 @@ object DraconicSacrificeTracker {
     data class Data(
         @Expose var itemsSacrificed: Long = 0L,
         @Expose var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf(),
-    ) : ItemTrackerData() {
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / itemsSacrificed
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()

@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
@@ -11,6 +14,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -19,8 +23,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.json.addElementsAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
@@ -52,7 +59,6 @@ object VisitorApi {
     fun getVisitorsMap() = visitors
     fun getVisitors() = visitors.values
     fun getVisitor(id: Int) = visitors.map { it.value }.find { it.entityId == id }
-    fun getVisitor(name: String) = visitors[name]
 
     fun reset() {
         visitors = emptyMap()
@@ -226,5 +232,89 @@ object VisitorApi {
         EXPENSIVE_COPPER("§cExpensive copper", false),
         LOW_LOSS("§aLow Loss", true),
         HIGH_LOSS("§cHigh Loss", false)
+    }
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Garden Visitor Stats")
+
+        if (!GardenApi.inGarden()) {
+            event.addIrrelevant("not in garden")
+            return
+        }
+
+        event.addIrrelevant {
+            val visitors = getVisitors()
+
+            add("visitors: ${visitors.size}")
+
+            for (visitor in visitors) {
+                add(" ")
+                add("visitorName: '${visitor.visitorName}'")
+                add("status: '${visitor.status}'")
+                if (visitor.shoppingList.isNotEmpty()) {
+                    add("shoppingList: '${visitor.shoppingList}'")
+                }
+                visitor.offer?.offerItem?.getInternalName()?.let {
+                    add("offer: '$it'")
+                }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(3, "garden.visitorNeedsDisplay", "garden.visitors.needs.display")
+        event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")
+        event.move(3, "garden.visitorNeedsOnlyWhenClose", "garden.visitors.needs.onlyWhenClose")
+        event.move(3, "garden.visitorNeedsInBazaarAlley", "garden.visitors.needs.inBazaarAlley")
+        event.move(3, "garden.visitorNeedsShowPrice", "garden.visitors.needs.showPrice")
+        event.move(3, "garden.visitorItemPreview", "garden.visitors.needs.itemPreview")
+        event.move(3, "garden.visitorShowPrice", "garden.visitors.inventory.showPrice")
+        event.move(3, "garden.visitorExactAmountAndTime", "garden.visitors.inventory.exactAmountAndTime")
+        event.move(3, "garden.visitorCopperPrice", "garden.visitors.inventory.copperPrice")
+        event.move(3, "garden.visitorCopperTime", "garden.visitors.inventory.copperTime")
+        event.move(3, "garden.visitorExperiencePrice", "garden.visitors.inventory.experiencePrice")
+        event.move(3, "garden.visitorRewardWarning.notifyInChat", "garden.visitors.rewardWarning.notifyInChat")
+        event.move(3, "garden.visitorRewardWarning.showOverName", "garden.visitors.rewardWarning.showOverName")
+        event.move(
+            3,
+            "garden.visitorRewardWarning.preventRefusing",
+            "garden.visitors.rewardWarning.preventRefusing",
+        )
+        event.move(3, "garden.visitorRewardWarning.bypassKey", "garden.visitors.rewardWarning.bypassKey")
+        event.move(3, "garden.visitorRewardWarning.drops", "garden.visitors.rewardWarning.drops")
+        event.move(3, "garden.visitorNotificationChat", "garden.visitors.notificationChat")
+        event.move(3, "garden.visitorNotificationTitle", "garden.visitors.notificationTitle")
+        event.move(3, "garden.visitorHighlightStatus", "garden.visitors.highlightStatus")
+        event.move(3, "garden.visitorColoredName", "garden.visitors.coloredName")
+        event.move(3, "garden.visitorHypixelArrivedMessage", "garden.visitors.hypixelArrivedMessage")
+        event.move(3, "garden.visitorHideChat", "garden.visitors.hideChat")
+
+        event.transform(12, "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (jsonElement in element.asJsonArray) {
+                val old = jsonElement.asString
+                val new = VisitorReward.entries.firstOrNull { old.startsWith(it.name) }
+                if (new == null) {
+                    println("error with migrating old VisitorReward entity: '$old'")
+                    continue
+                }
+                drops.add(JsonPrimitive(new.name))
+            }
+
+            drops
+        }
+        event.transform(54, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(arrayOf(VisitorReward.COPPER_DYE))
+        }
+        event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
+        }
+
+        event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
+
+        event.move(87, "garden.visitors.shoppingList.display", "garden.visitors.shoppingList.enabled")
+        event.move(87, "garden.visitors.shoppingList.pos", "garden.visitors.shoppingList.position")
     }
 }
