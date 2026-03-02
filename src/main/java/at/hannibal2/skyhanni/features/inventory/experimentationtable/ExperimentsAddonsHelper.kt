@@ -342,6 +342,7 @@ object ExperimentsAddonsHelper {
                     if (ExperimentationTableApi.inChronomatron) {
                         addString("Current Round: $currentChronomatronRound")
                         addString("Current Sequence Index: $chronomatronSequenceIndex")
+                        addString("chronHasBeenEmpty: $chronHasBeenEmpty")
                         add(Renderable.emptyText())
                         addString("Hypixel Data:")
                         addString(formatColorSet(hypixelChronomatronData))
