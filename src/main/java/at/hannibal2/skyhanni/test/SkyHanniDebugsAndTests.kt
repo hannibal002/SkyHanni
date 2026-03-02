@@ -81,7 +81,7 @@ object SkyHanniDebugsAndTests {
     private val debugConfig get() = config.debug
 
     var displayLine: String? = null
-    private var displayList = listOf<Renderable>()
+    private var displayList = emptyList<Renderable>()
 
     init {
         registerDebugScreenEntry("current_area", SkyBlockUtils::inSkyBlock) {
@@ -216,7 +216,7 @@ object SkyHanniDebugsAndTests {
 
     private fun testGardenVisitors() {
         if (displayList.isNotEmpty()) {
-            displayList = listOf()
+            displayList = emptyList()
             return
         }
 
