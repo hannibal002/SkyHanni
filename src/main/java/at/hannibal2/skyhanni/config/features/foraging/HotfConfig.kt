@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.foraging
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.hotx.CurrencyPerHotxPerk.CurrencySpentDesign
-import at.hannibal2.skyhanni.features.mining.HotxFeatures.LotteryDisplayVisibility
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -27,7 +26,7 @@ class HotfConfig {
 
     @Expose
     @ConfigLink(owner = HotfConfig::class, field = "lotteryDisplay")
-    val lotteryPosition: Position = Position(100, 100)
+    val lotteryPosition: Position = Position(100, 120)
 
     @Expose
     @ConfigOption(name = "Level Stack", desc = "Show the level of a perk as item stacks.")
@@ -69,4 +68,12 @@ class HotfConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var currentWhispers: Boolean = true
+
+    enum class LotteryDisplayVisibility(val display: String) {
+        OFF("Off"),
+        FORAGING_ONLY("Foraging Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }

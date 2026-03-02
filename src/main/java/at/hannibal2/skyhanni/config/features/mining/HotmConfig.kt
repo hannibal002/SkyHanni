@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.mining
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.hotx.CurrencyPerHotxPerk.CurrencySpentDesign
-import at.hannibal2.skyhanni.features.mining.HotxFeatures.SkyMallDisplayVisibility
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -71,4 +70,12 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var currentPowder: Boolean = true
+
+    enum class SkyMallDisplayVisibility(val display: String) {
+        OFF("Off"),
+        MINING_ONLY("Mining Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }

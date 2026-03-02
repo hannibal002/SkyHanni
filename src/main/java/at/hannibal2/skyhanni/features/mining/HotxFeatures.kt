@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.foraging.HotfConfig.LotteryDisplayVisibility
+import at.hannibal2.skyhanni.config.features.mining.HotmConfig.SkyMallDisplayVisibility
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxHandler
@@ -27,15 +30,16 @@ object HotxFeatures {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        val (handler, configPos) = when {
-            configHotm.skyMallDisplay.let { vis ->
-                vis != SkyMallDisplayVisibility.OFF && (vis == SkyMallDisplayVisibility.EVERYWHERE || HotmData.inApplicableIsland)
-            } -> Pair(HotmData, configHotm.skyMallPosition)
-            configHotf.lotteryDisplay.let { vis ->
-                vis != LotteryDisplayVisibility.OFF && (vis == LotteryDisplayVisibility.EVERYWHERE || HotfData.inApplicableIsland)
-            } -> Pair(HotfData, configHotf.lotteryPosition)
-            else -> return
-        }
+        if (configHotm.skyMallDisplay != SkyMallDisplayVisibility.OFF &&
+            (configHotm.skyMallDisplay == SkyMallDisplayVisibility.EVERYWHERE || HotmData.inApplicableIsland)
+        ) renderOverlay(HotmData, configHotm.skyMallPosition)
+
+        if (configHotf.lotteryDisplay != LotteryDisplayVisibility.OFF &&
+            (configHotf.lotteryDisplay == LotteryDisplayVisibility.EVERYWHERE || HotfData.inApplicableIsland)
+        ) renderOverlay(HotfData, configHotf.lotteryPosition)
+    }
+
+    private fun renderOverlay(handler: HotxHandler<*, *, *>, configPos: Position) {
         val rotatingPerkEntry = handler.rotatingPerkEntry
         if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
         val currentPerk = handler.currentRotPerk
@@ -122,21 +126,5 @@ object HotxFeatures {
         event.transform(125, "foraging.hotf.lotteryDisplay") {
             ConfigUtils.migrateBooleanToEnum(it, LotteryDisplayVisibility.FORAGING_ONLY, LotteryDisplayVisibility.OFF)
         }
-    }
-
-    enum class SkyMallDisplayVisibility(val display: String) {
-        OFF("Off"),
-        MINING_ONLY("Mining Islands Only"),
-        EVERYWHERE("Everywhere");
-
-        override fun toString() = display
-    }
-
-    enum class LotteryDisplayVisibility(val display: String) {
-        OFF("Off"),
-        FORAGING_ONLY("Foraging Islands Only"),
-        EVERYWHERE("Everywhere");
-
-        override fun toString() = display
     }
 }
