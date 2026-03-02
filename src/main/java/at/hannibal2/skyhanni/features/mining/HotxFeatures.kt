@@ -31,7 +31,9 @@ object HotxFeatures {
             configHotm.skyMallDisplay.let { vis ->
                 vis != SkyMallDisplayVisibility.OFF && (vis == SkyMallDisplayVisibility.EVERYWHERE || HotmData.inApplicableIsland)
             } -> Pair(HotmData, configHotm.skyMallPosition)
-            HotfData.inApplicableIsland && configHotf.lotteryDisplay -> Pair(HotfData, configHotf.lotteryPosition)
+            configHotf.lotteryDisplay.let { vis ->
+                vis != LotteryDisplayVisibility.OFF && (vis == LotteryDisplayVisibility.EVERYWHERE || HotfData.inApplicableIsland)
+            } -> Pair(HotfData, configHotf.lotteryPosition)
             else -> return
         }
         val rotatingPerkEntry = handler.rotatingPerkEntry
@@ -117,11 +119,22 @@ object HotxFeatures {
         event.transform(125, "mining.hotm.skyMallDisplay") {
             ConfigUtils.migrateBooleanToEnum(it, SkyMallDisplayVisibility.MINING_ONLY, SkyMallDisplayVisibility.OFF)
         }
+        event.transform(125, "foraging.hotf.lotteryDisplay") {
+            ConfigUtils.migrateBooleanToEnum(it, LotteryDisplayVisibility.FORAGING_ONLY, LotteryDisplayVisibility.OFF)
+        }
     }
 
     enum class SkyMallDisplayVisibility(val display: String) {
         OFF("Off"),
         MINING_ONLY("Mining Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
+
+    enum class LotteryDisplayVisibility(val display: String) {
+        OFF("Off"),
+        FORAGING_ONLY("Foraging Islands Only"),
         EVERYWHERE("Everywhere");
 
         override fun toString() = display
