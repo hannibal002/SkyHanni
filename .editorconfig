@@ -63,6 +63,7 @@ ktlint_standard_function-expression-body = disabled
 
 # Additional Kotlin-specific formatting for conditions and continuation
 ij_kotlin_continuation_indent_size = 4
+ij_kotlin_indent_before_arrow_on_new_line = false
 ij_kotlin_binary_expression_wrap = if_long
 ij_kotlin_keep_line_breaks = true
 ij_kotlin_annotations_new_line_after_suppress = true

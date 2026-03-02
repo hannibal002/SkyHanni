@@ -42,6 +42,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     }
 
     // Todo: Remove this when enum names of this and DropsStatisticsTextEntry are in sync
+    // TODO never hide an error entirely
     fun toStatsTextEntryOrNull() = when (this) {
         DEDICATION -> StatsEntry.DEDICATION_IV
         MUSIC_RUNE -> StatsEntry.MUSIC_RUNE_I
@@ -50,7 +51,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
         else -> {
             try {
                 StatsEntry.valueOf(name)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 null
             }
         }

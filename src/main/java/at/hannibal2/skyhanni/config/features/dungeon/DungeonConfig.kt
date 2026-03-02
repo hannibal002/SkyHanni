@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class DungeonConfig {
     @Expose
@@ -210,4 +211,14 @@ class DungeonConfig {
     )
     @ConfigEditorButton(buttonText = "Go")
     val chestOverlayRunnable = Runnable { SkyHanniMod.feature.combat.instanceChestProfit::enabled.jumpToEditor() }
+
+    @Expose
+    @ConfigOption(
+        name = "Blood Camp Move",
+        desc = "Predicts when to kill blood mobs during Blood Camp to skip the Watcher dialogue"
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    @SearchTag("Dialogue Message Title")
+    var bloodCampTimer: Boolean = false
 }

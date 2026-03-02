@@ -10,9 +10,12 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.time.Duration
 
-enum class OrbitDirection {
-    CLOCKWISE,
-    COUNTER_CLOCKWISE
+enum class OrbitDirection(private val displayName: String, val dirFactor: Int) {
+    CLOCKWISE("Clockwise", 1),
+    COUNTER_CLOCKWISE("Counter-Clockwise", -1),
+    ;
+
+    override fun toString() = displayName
 }
 
 // A renderable that has other renderables orbiting it, configurable.
@@ -28,7 +31,7 @@ class OrbitSystemRenderable private constructor(
      */
     private val orbitSpeed: Int = 10,
     private val orbitDirection: OrbitDirection = OrbitDirection.CLOCKWISE,
-    val subBodies: Collection<Renderable>,
+    private val subBodies: Collection<Renderable>,
 ) : TimeDependentRenderable {
 
     private val subBodyW = (subBodies.maxOfOrNull { it.width } ?: 0)
@@ -47,8 +50,8 @@ class OrbitSystemRenderable private constructor(
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
 
-        val dirFactor = if (orbitDirection == OrbitDirection.CLOCKWISE) 1 else -1
-        currentAngle = (currentAngle + orbitSpeed * deltaTime.inPartialSeconds * dirFactor).toFloat() % 360f
+        val angleDelta = orbitSpeed * deltaTime.inPartialSeconds * orbitDirection.dirFactor
+        currentAngle = (currentAngle + angleDelta).toFloat() % 360f
         mainBody.renderXYAligned(mouseOffsetX, mouseOffsetY, width, height)
 
         if (subBodies.isEmpty()) return

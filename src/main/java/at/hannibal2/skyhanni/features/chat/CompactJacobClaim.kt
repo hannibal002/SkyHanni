@@ -11,9 +11,10 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
@@ -26,58 +27,78 @@ object CompactJacobClaim {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST:   §r§6§lFARMING CONTEST REWARDS CLAIMED
+     * REGEX-TEST:   FARMING CONTEST REWARDS CLAIMED
      */
     private val openingPattern by patternGroup.pattern(
-        "opening",
-        " {2}§r§6§lFARMING CONTEST REWARDS CLAIMED",
+        "opening.colorless",
+        " {2}FARMING CONTEST REWARDS CLAIMED",
     )
 
     /**
-     * REGEX-TEST:   §r§a§lREWARDS
+     * REGEX-TEST:    » Sunflower Contest on Autumn 31st, Year 472
+     * REGEX-TEST:    » Melon Slice Contest on Early Spring 17th, Year 473
      */
-    private val rewardsPattern by patternGroup.pattern(
-        "rewards",
-        " {2}§r§a§lREWARDS",
+    private val specificContestLine by patternGroup.pattern(
+        "contest.specific",
+        " {3}» (?<crop>[\\w ]+) Contest on (?<season>[\\w ]+) (?<day>\\d+[stndh]{2,3}), Year (?<year>\\d+)",
     )
 
     /**
-     * REGEX-TEST:     §r§7§aJacob's Ticket §8x271
-     * REGEX-TEST:     §r§7§aCarnival Ticket §8x21
+     * REGEX-TEST:   REWARDS
+     */
+    private val rewardsHeaderPattern by patternGroup.pattern(
+        "rewards.colorless",
+        " {2}REWARDS",
+    )
+
+    /**
+     * REGEX-TEST:     Jacob's Ticket x271
+     * REGEX-TEST:     Carnival Ticket x21
+     * REGEX-TEST:     Carnival Ticket
      */
     private val ticketPattern by patternGroup.pattern(
-        "tickets",
-        " {4}§r§7§a(?<type>Jacob's|Carnival) Ticket §8x(?<amount>[\\d,]+)",
+        "tickets.colorless",
+        " {4}(?<type>Jacob's|Carnival) Ticket(?: x(?<amount>[\\d,]+))?",
     )
 
     /**
-     * REGEX-TEST:     §r§7§81x §9Turbo-Cacti I Book
-     * REGEX-TEST:     §r§7§81x §9Turbo-Pumpkin I Book
-     * REGEX-TEST:     §r§7§84x §9Turbo-Wheat I Book
-     * REGEX-TEST:     §r§7§86x §9Turbo-Mushrooms I Book
-     * REGEX-TEST:     §r§7§81x §9Turbo-Warts I Book
+     * REGEX-TEST:     1x Turbo-Cacti I Book
+     * REGEX-TEST:     1x Turbo-Pumpkin I Book
+     * REGEX-TEST:     4x Turbo-Wheat I Book
+     * REGEX-TEST:     6x Turbo-Mushrooms I Book
+     * REGEX-TEST:     1x Turbo-Warts I Book
+     * REGEX-TEST:     1x Turbo-Sunflower I Book
      */
     private val bookPattern by patternGroup.pattern(
-        "book",
-        " {4}§r§7§8(?<amount>[\\d,]+)x §9Turbo-(?<crop>[^ ]+) I Book",
+        "book.colorless",
+        " {4}(?<amount>[\\d,]+)x Turbo-(?<crop>[^ ]+) I Book",
     )
 
     /**
-     * REGEX-TEST:     §r§7§8+§e8 §7gold medals
-     * REGEX-TEST:     §r§7§8+§e7 §7silver medals
-     * REGEX-TEST:     §r§7§8+§e5 §7bronze medals
+     * REGEX-TEST:     +8 gold medals
+     * REGEX-TEST:     +7 silver medals
+     * REGEX-TEST:     +5 bronze medals
+     * REGEX-TEST:     +1 gold medal
      */
     private val medalsPattern by patternGroup.pattern(
-        "medals",
-        " {4}§r§7§8\\+§e(?<amount>[\\d,]+) §7(?<type>[^ ]+) medals?",
+        "medals.colorless",
+        " {4}\\+(?<amount>[\\d,]+) (?<type>[^ ]+) medals?",
     )
 
     /**
-     * REGEX-TEST:     §r§8+§r§b2,293 Bits
+     * REGEX-TEST:     +2,293 Bits
      */
     private val bitsPattern by patternGroup.pattern(
-        "bits",
-        " {4}§r§8\\+§r§b(?<amount>[\\d,]+) Bits",
+        "bits.colorless",
+        " {4}\\+(?<amount>[\\d,]+) Bits",
+    )
+
+    /**
+     * REGEX-TEST:     Overclocker 3000
+     */
+    private val overclockerPattern by patternGroup.pattern(
+        "overclocker",
+        " {4}Overclocker 3000",
     )
     // </editor-fold>
 
@@ -91,26 +112,9 @@ object CompactJacobClaim {
         messageSet.clear()
     }
 
-    private val shorteningMap: Map<CropType, Pair<LorenzColor, String>> = mapOf(
-        CropType.CACTUS to Pair(LorenzColor.GREEN, "Ca"),
-        CropType.SUGAR_CANE to Pair(LorenzColor.GREEN, "Su"),
-        CropType.MELON to Pair(LorenzColor.GREEN, "Me"),
-
-        CropType.MUSHROOM to Pair(LorenzColor.RED, "Mu"),
-        CropType.NETHER_WART to Pair(LorenzColor.RED, "Ne"),
-        CropType.WILD_ROSE to Pair(LorenzColor.RED, "Wr"),
-
-        CropType.CARROT to Pair(LorenzColor.GOLD, "Ca"),
-        CropType.COCOA_BEANS to Pair(LorenzColor.GOLD, "Co"),
-        CropType.POTATO to Pair(LorenzColor.GOLD, "Po"),
-        CropType.PUMPKIN to Pair(LorenzColor.GOLD, "Pu"),
-        CropType.WHEAT to Pair(LorenzColor.GOLD, "Wh"),
-        CropType.SUNFLOWER to Pair(LorenzColor.GOLD, "Sf"),
-
-        CropType.MOONFLOWER to Pair(LorenzColor.AQUA, "Mf"),
-    )
-
     private fun SkyHanniChatEvent.Allow.block(reason: String) {
+        // We need the message with color for the hover
+        @Suppress("DEPRECATION")
         messageSet.add(message)
         blockedReason = reason
     }
@@ -118,7 +122,7 @@ object CompactJacobClaim {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.compactJacobClaim) return
-        val message = event.message
+        val message = event.cleanMessage
         var eventDelay = 300.milliseconds
 
         openingPattern.matchMatcher(message) {
@@ -128,7 +132,11 @@ object CompactJacobClaim {
 
         if (!inLoop) return
 
-        rewardsPattern.matchMatcher(message) {
+        specificContestLine.matchMatcher(message) {
+            return event.block("compact_jacob_bulk_claim")
+        }
+
+        rewardsHeaderPattern.matchMatcher(message) {
             return event.block("compact_jacob_bulk_claim")
         }
 
@@ -136,11 +144,15 @@ object CompactJacobClaim {
         val startingHash = rewardSet.hashCode()
 
         ticketPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
             when (group("type")) {
                 "Jacob's" -> rewardSet.jacobTickets += amount
                 "Carnival" -> rewardSet.carnivalTickets += amount
             }
+        }
+
+        overclockerPattern.matchMatcher(message) {
+            rewardSet.overclockers++
         }
 
         bookPattern.matchMatcher(message) {
@@ -172,10 +184,9 @@ object CompactJacobClaim {
 
         val hashNow = rewardSet.hashCode()
         DelayedRun.runDelayed(eventDelay) {
-            if (rewardSet.hashCode() == hashNow) {
-                inLoop = false
-                publishEvent()
-            }
+            if (rewardSet.hashCode() != hashNow) return@runDelayed
+            inLoop = false
+            publishEvent()
         }
     }
 
@@ -192,6 +203,7 @@ object CompactJacobClaim {
             getBooksFormat(),
             getMedalsFormat(),
             getBitsFormat(),
+            getOverclockersFormat(),
         ).filterNot {
             it.isEmpty()
         }.joinToString(separator = " §8§l| §r"),
@@ -209,24 +221,29 @@ object CompactJacobClaim {
     }
 
     private fun ContestRewardsClaimedEvent.getBooksFormat() = buildString {
-        val books = rewards.books.takeIf { it.isNotEmpty() } ?: return@buildString
+        val books = rewards.books.filter { it.value > 0 }.takeIf { it.isNotEmpty() } ?: return@buildString
         val bookList = books.map { (crop, amount) ->
-            val (color, shortName) = shorteningMap[crop] ?: error("unknown crop type $crop")
-            "${color.getChatColor()}$amount $shortName".takeIf { amount > 0 }.orEmpty()
-        }.filterNot { it.isEmpty() }.sortedBy { it.removeColor() }
+            "${crop.cropColor.getChatColor()}$amount ${crop.cropShortName}"
+        }.sortedBy { it.removeColor() }
         append("Books: " + bookList.joinToString(separator = "§7, ") { it })
     }
 
     private fun ContestRewardsClaimedEvent.getMedalsFormat() = buildString {
-        val medals = rewards.medals.takeIf { it.isNotEmpty() } ?: return@buildString
+        val medals = rewards.medals.filter { it.value > 0 }.takeIf { it.isNotEmpty() } ?: return@buildString
         val medalList = medals.toSortedMap(compareBy { it.ordinal }).map { (medalType, amount) ->
-            "${medalType.color.getChatColor()}$amount".takeIf { amount > 0 }.orEmpty()
-        }.filterNot { it.isEmpty() }
+            "${medalType.color.getChatColor()}$amount"
+        }
         append("Medals: " + medalList.joinToString(separator = "§7, ") { it })
     }
 
     private fun ContestRewardsClaimedEvent.getBitsFormat() = buildString {
         if (rewards.bits == 0) return@buildString
         append("Bits: §b${rewards.bits}")
+    }
+
+    private fun ContestRewardsClaimedEvent.getOverclockersFormat() = buildString {
+        val ocCount = rewards.overclockers.takeIf { it > 0 } ?: return@buildString
+        val ocFormat = StringUtils.pluralize(ocCount, "Overclocker")
+        append("$ocFormat: §6$ocCount")
     }
 }

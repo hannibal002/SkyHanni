@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.slayer
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
 import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
@@ -12,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -62,6 +64,26 @@ class SlayerConfig {
     @ConfigOption(name = "Boss Spawn Warning", desc = "")
     @Accordion
     val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills", desc = "Display the names and remaining amount of mob kills needed until the boss spawns.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var remainingKills: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Level", desc = "Include the mob Level in the Remaining Kills display")
+    @ConfigEditorBoolean
+    var remainingKillsLevel: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Health", desc = "Include the mob Health in the Remaining Kills display")
+    @ConfigEditorBoolean
+    var remainingKillsHealth: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = SlayerConfig::class, field = "remainingKills")
+    val remainingKillsPosition: Position = Position(410, 110)
 
     @Expose
     @ConfigOption(name = "Active Boss Transparency", desc = "")

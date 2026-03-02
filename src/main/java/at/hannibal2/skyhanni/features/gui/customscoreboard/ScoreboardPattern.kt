@@ -864,10 +864,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §eCarnival§f 85:33:57
+     * REGEX-TEST: §eCarnival§f 118:41:05
      */
     val carnivalPattern by carnivalSB.pattern(
         "carnival",
-        "§eCarnival§f (?:\\d+:?)*",
+        "§eCarnival§f \\d+(?::\\d+)*",
     )
 
     /**
