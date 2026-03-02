@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -519,7 +520,7 @@ object IslandGraphs {
     }
 
     /**
-     * Activates pathfinding to a location in the island.
+     * Activates pathfinding to a location on the current island.
      *
      * @param location The goal of the pathfinder.
      * @param label The name of the navigation goal in chat. Cannot be empty.
@@ -541,6 +542,9 @@ object IslandGraphs {
         shouldAllowRerouting = false
         pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
+
+    fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
+        currentIslandGraph?.getClosestNode(nodeName, nodeTag) ?: error("node not found: name:$nodeName, tag: $nodeTag")
 
     private fun pathFind0(
         location: LorenzVec,
