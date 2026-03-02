@@ -20,11 +20,10 @@ import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -68,7 +67,7 @@ object CarnivalZombieShootout {
     )
 
     /**
-     * REGEX-TEST:                              Zombie Shootout
+     * WRAPPED-REGEX-TEST: "                             Zombie Shootout"
      */
     private val endPattern by patternGroup.pattern(
         "shootout.end",
@@ -130,7 +129,6 @@ object CarnivalZombieShootout {
 
         for ((zombie, type) in drawZombies) {
             val entity = EntityUtils.getEntityByID(zombie.id) ?: continue
-            val isSmall = (entity as? Zombie)?.isBaby ?: false
 
             val boundingBox = entity.boundingBox
 
@@ -144,8 +142,7 @@ object CarnivalZombieShootout {
     }
 
     private fun SkyHanniRenderWorldEvent.renderLines() = lamp?.let {
-        draw3DLine(
-            exactPlayerEyeLocation(),
+        drawLineToEye(
             it.pos.add(0.5, 0.5, 0.5),
             Color.RED,
             3,
@@ -153,8 +150,8 @@ object CarnivalZombieShootout {
         )
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
@@ -162,7 +159,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent(ServerBlockChangeEvent::class)
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!isEnabled() || !started) return
+        if (!isEnabled()) return
 
         val blockOld = event.old
         val blockNew = event.new
