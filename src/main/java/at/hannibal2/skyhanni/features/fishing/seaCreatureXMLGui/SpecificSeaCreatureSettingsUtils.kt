@@ -10,11 +10,12 @@ object SpecificSeaCreatureSettingsUtils {
 
     private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
-    fun getSeaCreatureConfig(mob: Mob): SpecificSeaCreatureSettings? {
-        return getSeaCreatureConfig(mob.seaCreature ?: return null)
+    fun getSeaCreatureConfig(mob: Mob): SpecificSeaCreatureSettings? = mob.seaCreature?.let {
+        getSeaCreatureConfig(it)
     }
 
-    fun getSeaCreatureConfig(seaCreatureData: LivingSeaCreatureData): SpecificSeaCreatureSettings? = getSeaCreatureConfig(seaCreatureData.seaCreature)
+    fun getSeaCreatureConfig(seaCreatureData: LivingSeaCreatureData): SpecificSeaCreatureSettings? =
+        getSeaCreatureConfig(seaCreatureData.seaCreature)
 
     fun getSeaCreatureConfig(seaCreature: SeaCreature): SpecificSeaCreatureSettings? = getSeaCreatureConfig(seaCreature.name)
 
