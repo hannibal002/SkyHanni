@@ -10,7 +10,7 @@ class ConnectionRetryHelper(private val retryDelays: List<Duration>) {
     val currentRetry: Int get() = retryCount
     val maxRetries: Int get() = retryDelays.size
 
-    val retriesLabel get() = "(${currentRetry} / ${maxRetries})"
+    val retriesLabel get() = "($currentRetry / $maxRetries)"
 
     /**
      * Schedules the next retry and returns its delay, or null if all retries
