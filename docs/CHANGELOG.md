@@ -1,5 +1,75 @@
 # SkyHanni - Change Log
 
+## Version 8.0.0
+
+### New Features
+
+#### Dungeon
+
++ Added Blood Move Message for Dungeon Blood Camp. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/5276)
+
+#### Item Abilities
+
++ Added Fire Freeze Features. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5224)
+    + Timer/Box on Mobs for Freeze Timer.
+    + Timer until Freeze Activation.
+    + Particle Replacer with Circular Line.
+
+#### Fishing
+
++ Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Sea Creature Kill Time. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Sea Creature Lootshare Sphere. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
+
+#### GUI
+
++ Added the ability to move and scale the Action Bar in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
++ Added the ability to move and scale the Held Item Tooltip in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
+
+### Fixes
+
+#### Misc
+
++ Fixed Chroma preview text always displaying as white. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5278)
++ Fixed game crash when clicking some buttons in the configuration UI. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5280)
+
+#### Garden
+
++ Fixed Compact Jacob Claim missing single Carnival/Jacob tickets. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5235)
++ Fixed Compact Jacob Claim missing some lines when claiming single contests. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5235)
++ Fixed pest spawn sounds sometimes not being muted. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5281)
+
+#### Combat
+
++ Fixed Corleone, Arachne, and Zealot-related highlight features not working. - Empa & MTOnline (https://github.com/hannibal002/SkyHanni/pull/5185)
++ Fixed Damage Indicator text rendering too low on mobs, especially at close range. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5279)
++ Fixed Line to Arachne not working. - Empa & MTOnline (https://github.com/hannibal002/SkyHanni/pull/5185)
+
+#### GUI
+
++ Fixed GUI Editor opening while typing in REI search box. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5225)
+
+#### Item Ability
+
++ Fixed Overclockers not being detected when claiming Jacob Contest rewards. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5235)
+
+### Technical Details
+
++ Added `renderState` and `bufferSource` to the Mixin for `GuiRenderer`. - Daveed + Vixid (https://github.com/hannibal002/SkyHanni/pull/5262)
+    + Allows for direct interfacing with render pipelines.
++ Added higher-quality item rendering. - Daveed + Vixid (https://github.com/hannibal002/SkyHanni/pull/5262)
++ Added SkyHanni Picture-in-Picture render handler. - Daveed + Vixid (https://github.com/hannibal002/SkyHanni/pull/5262)
++ Changed some events to be sealed instead of open classes. - Empa (https://github.com/hannibal002/SkyHanni/pull/5243)
++ Cleaned up some code. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3600)
++ Fixed `AnimatedItemStackRenderable` not being animated. - Daveed + Vixid (https://github.com/hannibal002/SkyHanni/pull/5262)
++ Graph Editor: Preserved original node IDs in compiled graph output for minimal JSON diffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5242)
++ Refactored GardenVisitorFeatures. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5033)
++ Refactored MobHighlight to use Mob Detection. - Empa & MTOnline (https://github.com/hannibal002/SkyHanni/pull/5185)
+    + With the exception of Zealot-related highlights.
++ Refactored TestRenderableSuite to optionally take an event type. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5262)
+    + Needed as our new item renderer needs to run on a specific render event.
+    + If type is not specified, GuiRenderEvent.GuiOnTopRenderEvent is inferred.
+
 ## Version 7.0.0
 
 ### New Features

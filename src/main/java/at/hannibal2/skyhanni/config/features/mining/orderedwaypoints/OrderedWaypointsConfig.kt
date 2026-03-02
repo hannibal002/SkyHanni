@@ -125,4 +125,28 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "All Waypoint Color", desc = "Color used for waypoints when using show all mode.")
     @ConfigEditorColour
     var showAllWaypointColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 102)
+
+    @Expose
+    @ConfigOption(
+        name = "Auto Unload",
+        desc = "Automatically unloads route when changing Islands (Including Mineshafts)."
+    )
+    @ConfigEditorBoolean
+    var autoUnload: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-Load Shaft Routes",
+        desc = "Automatically loads a matching route if found when entering a Mineshaft. (format is from the Scoreboard e.g. Jasp_1/Peri_C)"
+    )
+    @ConfigEditorBoolean
+    var autoLoadMatchingShaftRoute: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto unload Mineshaft",
+        desc = "Automatically unloads SHO route when leaving mineshafts."
+    )
+    @ConfigEditorBoolean
+    var autoUnloadWhenLeavingMineshaft: Boolean = false
 }

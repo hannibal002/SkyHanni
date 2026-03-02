@@ -33,7 +33,6 @@ import net.minecraft.core.Rotations
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,6 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 object FireFreezeFeatures {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
+    private const val PARTICLE_OFFSET = 3.921568568330258E-4
 
     private data class FireFreezeArea(
         val center: LorenzVec,
@@ -117,7 +117,7 @@ object FireFreezeFeatures {
     private fun LorenzVec.isInAnyFireFreeze(): Boolean = fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
 
     private fun ReceiveParticleEvent.isFreezeParticle(): Boolean {
-        return abs(offset.x) < 0.001 && abs(offset.y) < 0.001 && offset.z < 0.001
+        return offset.x == PARTICLE_OFFSET && offset.y == PARTICLE_OFFSET && offset.z == PARTICLE_OFFSET
     }
 
     @HandleEvent(onlyOnSkyblock = true)

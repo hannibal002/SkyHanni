@@ -257,7 +257,8 @@ object GraphEditorInput {
             ChatUtils.chat("No Path found")
         }
 
-        val inGraph = path.map { newState.nodes[it.id] }
+        val nodeById = newState.nodes.associateBy { it.id }
+        val inGraph = path.map { nodeById[it.id] ?: error("Node ${it.id} not found in graph editor") }
         newState.highlightedNodes.addAll(inGraph)
 
         newState.highlightedEdges.addAll(

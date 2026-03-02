@@ -67,6 +67,9 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldSelfNotifyOnCatch = seaCreature.rare,
+                            shouldNotifyForNonOwn = seaCreature.rare,
+                            shouldHighlight = seaCreature.rare,
                             shouldShareCocoonInChat = seaCreature.rare,
                             shouldWarnWhenCocooned = seaCreature.rare,
                         ),
@@ -89,6 +92,9 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldSelfNotifyOnCatch = seaCreature.rare,
+                            shouldNotifyForNonOwn = seaCreature.rare,
+                            shouldHighlight = seaCreature.rare,
                             shouldShareCocoonInChat = seaCreature.rare,
                             shouldWarnWhenCocooned = seaCreature.rare,
                         ),
@@ -101,7 +107,7 @@ class SpecificSeaCreatures(
             return existingSettings
         }
 
-        fun save(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
+        fun saveSeaCreatures(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
             for (seaCreature in seaCreatures) {
                 SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] =
                     SpecificSeaCreatureSettings(
@@ -110,6 +116,9 @@ class SpecificSeaCreatures(
                         seaCreature.shouldShowHealthOverlay,
                         seaCreature.shouldShareInChat,
                         seaCreature.shouldShowKillTime,
+                        seaCreature.shouldSelfNotifyOnCatch,
+                        seaCreature.shouldNotifyForNonOwn,
+                        seaCreature.shouldHighlight,
                         seaCreature.shouldShareCocoonInChat,
                         seaCreature.shouldWarnWhenCocooned,
                     )
@@ -121,7 +130,7 @@ class SpecificSeaCreatures(
 
     @Bind
     fun afterClose() {
-        save(seaCreatures)
+        saveSeaCreatures(seaCreatures)
     }
 
     @Bind
@@ -152,6 +161,21 @@ class SpecificSeaCreatures(
     @Bind
     fun showKillTime() {
         openXML("killtime")
+    }
+
+    @Bind
+    fun showSelfNotify() {
+        openXML("selfnotify")
+    }
+
+    @Bind
+    fun showOtherNotify() {
+        openXML("notifynonown")
+    }
+
+    @Bind
+    fun showHighlight() {
+        openXML("shouldhighlight")
     }
 
     @Bind

@@ -24,6 +24,15 @@ class SpecificSeaCreatureStorageXMLHelper(
     var shouldShowKillTime: Boolean? = from.shouldShowKillTime
 
     @field:Bind
+    var shouldSelfNotifyOnCatch: Boolean? = from.shouldSelfNotifyOnCatch
+
+    @field:Bind
+    var shouldNotifyForNonOwn: Boolean? = from.shouldNotifyForNonOwn
+
+    @field:Bind
+    var shouldHighlight: Boolean? = from.shouldHighlight
+
+    @field:Bind
     var shouldShareCocoonInChat: Boolean? = from.shouldShareCocoonInChat
 
     @field:Bind
