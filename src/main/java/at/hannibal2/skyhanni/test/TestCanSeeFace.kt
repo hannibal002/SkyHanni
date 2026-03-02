@@ -161,6 +161,12 @@ object TestCanSeeFace {
         }
     }
 
+    @HandleEvent
+    fun onWorldChange() {
+        lastRenderable = null
+        faceCheckContext.reset()
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!enabled || !event.isLocalPlayer) return
