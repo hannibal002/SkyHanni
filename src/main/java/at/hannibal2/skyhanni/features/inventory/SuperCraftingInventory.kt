@@ -89,8 +89,14 @@ object SuperCraftingInventory {
         if (event.slotId != PICKAXE_SLOT) return
         val slots = InventoryUtils.getItemsInOpenChestWithNull()
         val craftingAmount = getSuperCraftingCount(slots) ?: return
-        val profit = getProfit(slots, craftingAmount) ?: return
-        val maxCraftingAmount = getSuperCraftingMaxCount(slots, craftingAmount)
+        val result = getResultItem(slots)
+        val craftMultiplier = result.amount
+        if (craftMultiplier == 0) ErrorManager.skyHanniError(
+            "Result item amount is 0",
+            "item" to result,
+        )
+        val profit = getProfit(slots, craftingAmount, craftMultiplier, result) ?: return
+        val maxCraftingAmount = getSuperCraftingMaxCount(slots, craftingAmount, craftMultiplier)
         if (!blockWasteClick(profit, craftingAmount, maxCraftingAmount)) return
         SoundUtils.playErrorSound()
         val diff = (-profit).formatChatCoins()
@@ -108,34 +114,28 @@ object SuperCraftingInventory {
         event.cancel()
     }
 
-    private fun getSuperCraftingMaxCount(slots: List<Slot>, craftingAmount: Long) = slots[PICKAXE_SLOT].item.getLore()
-        .mapNotNull { calculateMaxPossible(it, craftingAmount) }
+    private fun getSuperCraftingMaxCount(slots: List<Slot>, craftingAmount: Long, craftMultiplier: Int) = slots[PICKAXE_SLOT].item.getLore()
+        .mapNotNull { calculateMaxPossible(it, craftingAmount, craftMultiplier) }
         .minOrNull() ?: ErrorManager.skyHanniError(
         "Super Crafting resource line not found",
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
 
-    private fun calculateMaxPossible(string: String, craftingAmount: Long) = craftingResourcePattern.matchMatcher(string.removeColor()) {
-        val owned = groupOrNull("owned")?.formatLongOrNull() ?: return null
-        val used = groupOrNull("used")?.formatLongOrNull() ?: return null
-        if (used == 0L || owned == 0L) return null
-        val matsPerCraft = used / craftingAmount
-        if (matsPerCraft == 0L) return null
-        owned / matsPerCraft
-    }
+    private fun calculateMaxPossible(string: String, craftingAmount: Long, craftMultiplier: Int) =
+        craftingResourcePattern.matchMatcher(string.removeColor()) {
+            val owned = groupOrNull("owned")?.formatLongOrNull() ?: return null
+            val used = groupOrNull("used")?.formatLongOrNull() ?: return null
+            if (used == 0L || owned == 0L) return null
+            val matsPerCraft = used / (craftingAmount / craftMultiplier)
+            if (matsPerCraft == 0L) return null
+            owned / matsPerCraft
+        }
 
-    private fun getProfit(slots: List<Slot>, craftingAmount: Long): Double? {
+    private fun getProfit(slots: List<Slot>, craftingAmount: Long, craftMultiplier: Int, resultItem: PrimitiveItemStack): Double? {
         val materials = getRecipeMaterials(slots)
-        val resultItem = getResultItem(slots)
-
-        val recipeMultiplier = resultItem.amount
-        if (recipeMultiplier == 0) ErrorManager.skyHanniError(
-            "Result item amount is 0",
-            "item" to resultItem,
-        )
 
         val itemsPrice = materials.sumOf { material ->
-            val totalAmount = material.amount * (craftingAmount / recipeMultiplier)
+            val totalAmount = material.amount * (craftingAmount / craftMultiplier)
             BazaarApi.calculatePriceOfAvailableOrders(
                 material.internalName, totalAmount, BazaarApi.SimpleTransactionType.BUY_ORDER,
             ) ?: return null

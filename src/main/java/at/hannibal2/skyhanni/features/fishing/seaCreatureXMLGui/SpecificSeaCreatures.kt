@@ -97,7 +97,7 @@ class SpecificSeaCreatures(
             return existingSettings
         }
 
-        fun save(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
+        fun saveSeaCreatures(seaCreatures: ObservableList<SpecificSeaCreatureStorageXMLHelper>) {
             for (seaCreature in seaCreatures) {
                 SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage[seaCreature.name] =
                     SpecificSeaCreatureSettings(
@@ -115,7 +115,7 @@ class SpecificSeaCreatures(
 
     @Bind
     fun afterClose() {
-        save(seaCreatures)
+        saveSeaCreatures(seaCreatures)
     }
 
     @Bind
