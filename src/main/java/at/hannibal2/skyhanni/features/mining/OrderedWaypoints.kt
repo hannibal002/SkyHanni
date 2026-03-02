@@ -253,26 +253,27 @@ object OrderedWaypoints {
         if (loadJob?.isActive == true) {
             return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
         }
-        loadJob = setupLoadJob(name)
+        loadJob = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
+            setupLoadJob(name)
+        }
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String): Job =
-        SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
-            val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-            else storage?.routes?.get(name)?.let { it to "saved" } ?: return@launchIOCoroutine ChatUtils.userError(
-                "Route $name doesn't exist.\n" +
-                    "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
-                    "§cIf you would like to import a route from your clipboard, leave the route name blank.",
-            )
+    private fun setupLoadJob(name: String) {
+        val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+        else storage?.routes?.get(name)?.let { it to "saved" } ?: return ChatUtils.userError(
+            "Route $name doesn't exist.\n" +
+                "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
+                "§cIf you would like to import a route from your clipboard, leave the route name blank.",
+        )
 
-            if (result == null) return@launchIOCoroutine ChatUtils.userError(
-                "There was an error parsing waypoints. " +
-                    "Please make sure they are properly formatted and in a supported format.\n" +
-                    "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
-            )
+        if (result == null) return ChatUtils.userError(
+            "There was an error parsing waypoints. " +
+                "Please make sure they are properly formatted and in a supported format.\n" +
+                "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
+        )
 
-            val (loadedRoute, formatName) = result
+        val (loadedRoute, formatName) = result
         orderedWaypointsList = loadedRoute.deepCopy()
         currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
         renderWaypoints.clear()
@@ -282,7 +283,7 @@ object OrderedWaypoints {
             config.enabled = true
             ChatUtils.chat("§eOrdered Waypoints was disabled, auto-enabled it.")
         }
-        }
+    }
 
     private fun unload() {
         if (orderedWaypointsList.isNotEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
