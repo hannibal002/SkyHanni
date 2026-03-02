@@ -482,8 +482,6 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
         event.move(103, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
-        event.move(111, "dev.debug.currentAreaDebug", "dev.debugScreen.currentArea")
-        event.move(111, "dev.debug.rayTracedOreBlock", "dev.debugScreen.rayTracedOreBlock")
     }
 
     @Suppress("LongMethod")
