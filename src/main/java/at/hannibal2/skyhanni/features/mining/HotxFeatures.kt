@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxHandler
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -26,7 +28,9 @@ object HotxFeatures {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         val (handler, configPos) = when {
-            HotmData.inApplicableIsland && configHotm.skyMallDisplay -> Pair(HotmData, configHotm.skyMallPosition)
+            configHotm.skyMallDisplay.let { vis ->
+                vis != SkyMallDisplayVisibility.OFF && (vis == SkyMallDisplayVisibility.EVERYWHERE || HotmData.inApplicableIsland)
+            } -> Pair(HotmData, configHotm.skyMallPosition)
             HotfData.inApplicableIsland && configHotf.lotteryDisplay -> Pair(HotfData, configHotf.lotteryPosition)
             else -> return
         }
@@ -108,4 +112,18 @@ object HotxFeatures {
         event.stackTip = handler.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(125, "mining.hotm.skyMallDisplay") {
+            ConfigUtils.migrateBooleanToEnum(it, SkyMallDisplayVisibility.MINING_ONLY, SkyMallDisplayVisibility.OFF)
+        }
+    }
+
+    enum class SkyMallDisplayVisibility(val display: String) {
+        OFF("Off"),
+        MINING_ONLY("Mining Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }
