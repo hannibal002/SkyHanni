@@ -10,4 +10,7 @@ data class SpecificSeaCreatureSettings(
     @Expose var shouldShowHealthOverlay: Boolean?,
     @Expose var shouldShareInChat: Boolean?,
     @Expose var shouldShowKillTime: Boolean?,
+    @Expose var shouldSelfNotifyOnCatch: Boolean?,
+    @Expose var shouldNotifyForNonOwn: Boolean?,
+    @Expose var shouldHighlight: Boolean?,
 )

@@ -243,7 +243,7 @@ object SeaCreatureDetectionApi {
 
     @HandleEvent
     fun onCommand(event: CommandRegistrationEvent) {
-        event.registerBrigadier("skyhanniresetlivingseacreaturedata") {
+        event.registerBrigadier("shresetlivingseacreaturedata") {
             this.aliases = listOf("shresetscdata")
             this.description = "Resets Living Sea Creature Data"
             this.category = CommandCategory.DEVELOPER_TEST

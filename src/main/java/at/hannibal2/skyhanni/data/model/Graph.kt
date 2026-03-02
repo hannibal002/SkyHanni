@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
@@ -43,6 +44,10 @@ value class Graph(
 
     fun getNodesWithTags(vararg tag: GraphNodeTag): List<GraphNode> = nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getNodesWithName(name: String): List<GraphNode> = nodes.filter { it.name == name }
+    fun getNodesWithNameAndTags(name: String, tag: GraphNodeTag): List<GraphNode> = getNodesWithTags(tag).filter { it.name == name }
+
+    fun getClosestNode(nodeName: String, tag: GraphNodeTag): GraphNode? =
+        getNodesWithNameAndTags(nodeName, tag).minByOrNull { it.position.distanceToPlayer() }
 
     fun getNearestNode(
         location: LorenzVec = GraphUtils.playerPosition,
