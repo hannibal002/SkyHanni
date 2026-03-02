@@ -880,7 +880,7 @@ object WorldRenderUtils {
         color: Color,
         alpha: Float = 1f,
         renderRelativeToCamera: Boolean = false,
-        epsilon: Double = 0.05,
+        epsilon: Double = 0.025,
     ) = QuadDrawer.draw3D(this) {
         val effectiveAABB = if (!renderRelativeToCamera) AABB(
             aabb.minX - epsilon, aabb.minY - epsilon, aabb.minZ - epsilon,

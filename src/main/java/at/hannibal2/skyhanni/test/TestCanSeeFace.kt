@@ -46,8 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 object TestCanSeeFace {
 
     data class FaceCheckContext(
-        var vec1: LorenzVec? = null,
-        var vec2: LorenzVec? = null,
+        var aabbs: List<AABB> = emptyList(),
         var waitingForPunch: Boolean = false,
         var pointSet: FacePointSet = mutableMapOf(),
         var finished: Boolean = false,
@@ -56,19 +55,20 @@ object TestCanSeeFace {
         fun resetFromClickedBlock(event: BlockClickEvent) {
             this.reset()
             val base = event.position.floor()
+            val blockPos = base.toBlockPos()
             val shape = Minecraft.getInstance().level?.let {
-                event.getBlockState.getShape(it, base.toBlockPos())
+                event.getBlockState.getShape(it, blockPos)
             }
-            val aabb = if (shape != null && !shape.isEmpty) {
-                val bounds = shape.bounds()
-                AABB(
-                    base.x + bounds.minX, base.y + bounds.minY, base.z + bounds.minZ,
-                    base.x + bounds.maxX, base.y + bounds.maxY, base.z + bounds.maxZ,
-                )
-            } else base.boundingToOffset(1.0, 1.0, 1.0)
-
-            vec1 = aabb.minBox()
-            vec2 = aabb.maxBox()
+            aabbs = if (shape != null && !shape.isEmpty) {
+                shape.toAabbs().map { bounds ->
+                    AABB(
+                        base.x + bounds.minX, base.y + bounds.minY, base.z + bounds.minZ,
+                        base.x + bounds.maxX, base.y + bounds.maxY, base.z + bounds.maxZ,
+                    )
+                }
+            } else {
+                listOf(base.boundingToOffset(1.0, 1.0, 1.0))
+            }
         }
 
         fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical(
@@ -216,9 +216,9 @@ object TestCanSeeFace {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
         val pointSet = faceCheckContext.pointSet.takeIfNotEmpty() ?: return
-        for ((face, points) in pointSet) {
+        for ((face, _) in pointSet) {
             event.tryHighlightFace(faceCheckContext, face)
-            event.drawRaysFromFacePoints(face, points)
+            event.drawRaysFromFacePoints(face, pointSet[face] ?: continue)
         }
     }
 
@@ -232,17 +232,18 @@ object TestCanSeeFace {
 
     private fun recalcContext(force: Boolean = false) {
         val calculationStartTime = SimpleTimeMark.now()
-        val vec1 = faceCheckContext.vec1 ?: return
-        val vec2 = faceCheckContext.vec2 ?: return
+        if (faceCheckContext.aabbs.isEmpty()) return
         if (!force && faceCheckContext.finished) return
         faceCheckContext.pointSet.clear()
-        LocationUtils.canSeeAnyFace(
-            min = vec1,
-            max = vec2,
-            stepCount = config.stepCount.get(),
-            stepDensity = config.stepDensity.get(),
-            pointFill = faceCheckContext.pointSet,
-        )
+        for (aabb in faceCheckContext.aabbs) {
+            LocationUtils.canSeeAnyFace(
+                min = aabb.minBox(),
+                max = aabb.maxBox(),
+                stepCount = config.stepCount.get(),
+                stepDensity = config.stepDensity.get(),
+                pointFill = faceCheckContext.pointSet,
+            )
+        }
         val calculationEndTime = SimpleTimeMark.now()
         regenDebugRenderable(calculationEndTime - calculationStartTime)
         faceCheckContext.finished = true
@@ -294,16 +295,12 @@ object TestCanSeeFace {
         face: Direction,
     ) {
         if (!faceHighlightConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
-        val vec1 = context.vec1 ?: return
-        val vec2 = context.vec2 ?: return
         val points = context.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
         val color = if (faceSeen) faceHighlightConfig.seenColor.get() else faceHighlightConfig.unseenColor.get()
-        val aabb = AABB(
-            vec1.x, vec1.y, vec1.z,
-            vec2.x, vec2.y, vec2.z,
-        )
-        fillFace(aabb, face, color.toColor(), alpha = 1f)
+        for (aabb in context.aabbs) {
+            fillFace(aabb, face, color.toColor(), alpha = 1f)
+        }
     }
 
 }
