@@ -60,9 +60,5 @@ object CarnivalQuickStart {
         lastChat = SimpleTimeMark.now()
     }
 
-    fun isEnabled() =
-        config &&
-            Perk.CHIVALROUS_CARNIVAL.isActive &&
-            SkyBlockUtils.graphArea == "Carnival"
-    //fun isEnabled() = SkyBlockUtils.inSkyBlock && config && CarnivalAPI.inCarnivalArea
+    private fun isEnabled() =  config && CarnivalAPI.inCarnivalArea
 }
