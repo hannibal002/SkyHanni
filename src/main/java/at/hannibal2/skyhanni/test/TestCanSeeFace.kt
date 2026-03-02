@@ -47,28 +47,38 @@ object TestCanSeeFace {
 
     data class FaceCheckContext(
         var aabbs: List<AABB> = emptyList(),
+        var blockPos: LorenzVec? = null,
         var waitingForPunch: Boolean = false,
         var pointSet: FacePointSet = mutableMapOf(),
         var finished: Boolean = false,
         var debugRenderable: Renderable? = null,
+        var lastBlockStateHash: Int = 0,
     ) : Resettable {
+
+        fun refreshAABBsFromBlockState() {
+            val blockPos = blockPos ?: return
+            val level = Minecraft.getInstance().level ?: return
+
+            val mcBlockPos = blockPos.toBlockPos()
+            val currentState = level.getBlockState(mcBlockPos)
+            val shape = currentState.getShape(level, mcBlockPos)
+            val rawAabbs = shape.toAabbs()
+            val currentHash = rawAabbs.hashCode()
+            if (currentHash != lastBlockStateHash) {
+                lastBlockStateHash = currentHash
+                aabbs = if (!shape.isEmpty) rawAabbs.map { bounds ->
+                    AABB(
+                        blockPos.x + bounds.minX, blockPos.y + bounds.minY, blockPos.z + bounds.minZ,
+                        blockPos.x + bounds.maxX, blockPos.y + bounds.maxY, blockPos.z + bounds.maxZ,
+                    )
+                } else listOf(blockPos.boundingToOffset(1.0, 1.0, 1.0))
+            }
+        }
+
         fun resetFromClickedBlock(event: BlockClickEvent) {
             this.reset()
-            val base = event.position.floor()
-            val blockPos = base.toBlockPos()
-            val shape = Minecraft.getInstance().level?.let {
-                event.getBlockState.getShape(it, blockPos)
-            }
-            aabbs = if (shape != null && !shape.isEmpty) {
-                shape.toAabbs().map { bounds ->
-                    AABB(
-                        base.x + bounds.minX, base.y + bounds.minY, base.z + bounds.minZ,
-                        base.x + bounds.maxX, base.y + bounds.maxY, base.z + bounds.maxZ,
-                    )
-                }
-            } else {
-                listOf(base.boundingToOffset(1.0, 1.0, 1.0))
-            }
+            blockPos = event.position.floor()
+            refreshAABBsFromBlockState()
         }
 
         fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical(
@@ -240,6 +250,7 @@ object TestCanSeeFace {
         val calculationStartTime = SimpleTimeMark.now()
         if (faceCheckContext.aabbs.isEmpty()) return
         if (!force && faceCheckContext.finished) return
+        faceCheckContext.refreshAABBsFromBlockState()
         faceCheckContext.pointSet.clear()
         for (aabb in faceCheckContext.aabbs) {
             LocationUtils.canSeeAnyFace(
@@ -308,5 +319,4 @@ object TestCanSeeFace {
             fillFace(aabb, face, color.toColor(), alpha = 1f)
         }
     }
-
 }
