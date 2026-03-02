@@ -330,12 +330,13 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun registerDebugScreenEntry(
-        id: String,
+        name: String,
         condition: () -> Boolean = { true },
         lineBuilder: MutableList<String>.() -> Unit,
     ) {
+        val id = Identifier.fromNamespaceAndPath("skyhanni", name)
         DebugScreenEntries.register(
-            Identifier.fromNamespaceAndPath("skyhanni", id),
+            id,
             object : DebugScreenEntry {
                 override fun display(
                     displayer: DebugScreenDisplayer,
@@ -344,7 +345,7 @@ object SkyHanniDebugsAndTests {
                     serverChunk: LevelChunk?,
                 ) {
                     if (level == null || !condition()) return
-                    buildList(lineBuilder).forEach(displayer::addLine)
+                    displayer.addToGroup(id, buildList(lineBuilder))
                 }
 
                 override fun isAllowed(reducedDebugInfo: Boolean) = true
