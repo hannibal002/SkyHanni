@@ -60,5 +60,5 @@ object CarnivalQuickStart {
         lastChat = SimpleTimeMark.now()
     }
 
-    private fun isEnabled() =  config && CarnivalAPI.inCarnivalArea
+    private fun isEnabled() = config && CarnivalAPI.inCarnivalArea
 }

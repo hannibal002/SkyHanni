@@ -17,6 +17,7 @@ import com.google.gson.stream.JsonWriter
 
 // TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
+@Suppress("TooManyFunctions")
 value class Graph(
     @Expose private val nodes: List<GraphNode>,
 ) : List<GraphNode> {
