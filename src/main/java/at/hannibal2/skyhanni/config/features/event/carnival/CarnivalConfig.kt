@@ -17,14 +17,14 @@ class CarnivalConfig {
     @Expose
     @ConfigOption(
         name = "Reminder Daily Tickets",
-        desc = "Reminds you when tickets can be claimed from the carnival leader."
+        desc = "Reminds you when tickets can be claimed from the Carnival Leader."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var reminderDailyTickets: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show Goals", desc = "Displays the goals for this carnival event.")
+    @ConfigOption(name = "Show Goals", desc = "Displays the remaining goals for this Carnival event.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showGoals: Boolean = true
@@ -36,7 +36,7 @@ class CarnivalConfig {
     @Expose
     @ConfigOption(
         name = "Double Click to Start",
-        desc = "Clicking the npc again after the npc finishes talking to start game."
+        desc = "Click the NPC again after it finishes talking to start the game."
     )
     @ConfigEditorBoolean
     @FeatureToggle

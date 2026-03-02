@@ -187,6 +187,7 @@ object GraphEditorInput {
                 Minecraft.getInstance().execute {
                     GraphEditorHistory.save("load from clipboard")
                     GraphEditor.state = newState
+                    GraphEditorNetworks.recalculate()
                     ChatUtils.chat("Loaded Graph from clipboard.")
                 }
             } catch (e: Exception) {
