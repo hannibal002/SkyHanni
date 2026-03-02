@@ -68,7 +68,7 @@ class TestCanSeeFaceConfig {
         @Expose
         @ConfigOption(name = "Not Seen Color", desc = "Color of rays that are not seen by the face.")
         @ConfigEditorColour
-        val unSeenColor: Property<ChromaColour> = Property.of(LorenzColor.RED.toChromaColor(220))
+        val unseenColor: Property<ChromaColour> = Property.of(LorenzColor.RED.toChromaColor(220))
     }
 
     @Expose
@@ -90,7 +90,7 @@ class TestCanSeeFaceConfig {
         @Expose
         @ConfigOption(name = "Not Seen Color", desc = "Color of block faces that are not seen by the face.")
         @ConfigEditorColour
-        val unSeenColor: Property<ChromaColour> = Property.of(LorenzColor.RED.toChromaColor(120))
+        val unseenColor: Property<ChromaColour> = Property.of(LorenzColor.RED.toChromaColor(120))
     }
 
     @Expose

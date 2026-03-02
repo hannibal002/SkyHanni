@@ -151,7 +151,7 @@ object LocationUtils {
         val halfY = (aabb.maxY - aabb.minY) / 2
         val halfZ = (aabb.maxZ - aabb.minZ) / 2
         val (axis1, axis2, ext1, ext2) = getFaceRayConfig(halfX, halfY, halfZ) ?: return false
-        densityLoop@for (densityIncrement in 0 until stepDensity) {
+        for (densityIncrement in 0 until stepDensity) {
             val angle = 2 * PI * densityIncrement / stepDensity
             val dx = cos(angle)
             val dy = sin(angle)

@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
@@ -49,15 +50,23 @@ object TestCanSeeFace {
         var vec2: LorenzVec? = null,
         var waitingForPunch: Boolean = false,
         var pointSet: FacePointSet = mutableMapOf(),
-        var generallySeen: Boolean = false,
         var finished: Boolean = false,
         var debugRenderable: Renderable? = null,
     ) : Resettable {
-        fun resetFromBlockVec(blockVec: LorenzVec) {
+        fun resetFromClickedBlock(event: BlockClickEvent) {
             this.reset()
-            val base = blockVec.floor()
-            // Todo account for variable block sizes?
-            val aabb = base.boundingToOffset(1.0, 1.0, 1.0)
+            val base = event.position.floor()
+            val shape = Minecraft.getInstance().level?.let {
+                event.getBlockState.getShape(it, base.toBlockPos())
+            }
+            val aabb = if (shape != null && !shape.isEmpty) {
+                val bounds = shape.bounds()
+                AABB(
+                    base.x + bounds.minX, base.y + bounds.minY, base.z + bounds.minZ,
+                    base.x + bounds.maxX, base.y + bounds.maxY, base.z + bounds.maxZ,
+                )
+            } else base.boundingToOffset(1.0, 1.0, 1.0)
+
             vec1 = aabb.minBox()
             vec2 = aabb.maxBox()
         }
@@ -183,6 +192,7 @@ object TestCanSeeFace {
             literalCallback("stop") {
                 faceCheckContext.reset()
                 lastRenderable = null
+                ChatUtils.chat("Stopped face check, and cleared debug info.", replaceSameMessage = true)
             }
         }
     }
@@ -191,7 +201,7 @@ object TestCanSeeFace {
     fun onBlockClick(event: BlockClickEvent) {
         if (!enabled || event.clickType != ClickType.LEFT_CLICK) return
         if (!faceCheckContext.waitingForPunch) return
-        faceCheckContext.resetFromBlockVec(event.position)
+        faceCheckContext.resetFromClickedBlock(event)
         ChatUtils.chat("Starting face check for block at ${event.position}.", replaceSameMessage = true)
         recalcContext(force = true)
     }
@@ -226,7 +236,7 @@ object TestCanSeeFace {
         val vec2 = faceCheckContext.vec2 ?: return
         if (!force && faceCheckContext.finished) return
         faceCheckContext.pointSet.clear()
-        faceCheckContext.generallySeen = LocationUtils.canSeeAnyFace(
+        LocationUtils.canSeeAnyFace(
             min = vec1,
             max = vec2,
             stepCount = config.stepCount.get(),
@@ -268,7 +278,7 @@ object TestCanSeeFace {
         if (!rayConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
         for ((point, isSeen) in points) {
             if (currentVisibilityState == RayVisibilityState.SEEN && !isSeen) continue
-            val pointColor = if (isSeen) rayConfig.seenColor.get() else rayConfig.unSeenColor.get()
+            val pointColor = if (isSeen) rayConfig.seenColor.get() else rayConfig.unseenColor.get()
             drawFaceRayWorld(
                 origin = point,
                 face = face,
@@ -288,7 +298,7 @@ object TestCanSeeFace {
         val vec2 = context.vec2 ?: return
         val points = context.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
-        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else faceHighlightConfig.unSeenColor.get()
+        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else faceHighlightConfig.unseenColor.get()
         val aabb = AABB(
             vec1.x, vec1.y, vec1.z,
             vec2.x, vec2.y, vec2.z,
