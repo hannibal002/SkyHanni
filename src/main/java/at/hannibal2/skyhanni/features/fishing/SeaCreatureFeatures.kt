@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
-import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatureSettingsUtils.getSeaCreatureConfig
+import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -42,7 +42,7 @@ object SeaCreatureFeatures {
 
         if (!config.highlight) return
 
-        if (getSeaCreatureConfig(mob)?.shouldHighlight == true) mob.highlight(LorenzColor.GREEN.toChromaColor())
+        if (SeaCreatureSettings.getConfig(mob)?.shouldHighlight == true) mob.highlight(LorenzColor.GREEN.toChromaColor())
     }
 
     @HandleEvent
@@ -56,7 +56,7 @@ object SeaCreatureFeatures {
         if (seaCreature.isOwn) return
 
         if (mob.name == "Water Hydra" && entity.findHealthReal() == (entity.baseMaxHealth.toFloat() / 2)) return
-        if (config.alertOtherCatches && shouldNotify && getSeaCreatureConfig(mob)?.shouldNotifyForNonOwn == true) {
+        if (config.alertOtherCatches && shouldNotify && SeaCreatureSettings.getConfig(mob)?.shouldNotifyForNonOwn == true) {
             val text = if (config.creatureName) "${seaCreature.displayName} NEARBY!"
             else "${seaCreature.rarity.chatColorCode}RARE SEA CREATURE!"
             TitleManager.sendTitle(text, duration = 1.5.seconds)
@@ -66,7 +66,7 @@ object SeaCreatureFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        val fishedSCSettings = getSeaCreatureConfig(event.seaCreature) ?: return
+        val fishedSCSettings = SeaCreatureSettings.getConfig(event.seaCreature) ?: return
         if (config.alertOwnCatches && fishedSCSettings.shouldSelfNotifyOnCatch == true) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
@@ -104,7 +104,7 @@ object SeaCreatureFeatures {
 
     private val getEntityOutlineColor: (entity: Entity) -> Color? = { entity ->
         (entity as? LivingEntity)?.mob?.let { mob ->
-            if (getSeaCreatureConfig(mob)?.shouldHighlight == true && entity.distanceToPlayer() < 30) {
+            if (SeaCreatureSettings.getConfig(mob)?.shouldHighlight == true && entity.distanceToPlayer() < 30) {
                 LorenzColor.GREEN.toColor()
             } else null
         }

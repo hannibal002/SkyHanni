@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatureSettingsUtils.getSeaCreatureConfig
+import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -47,6 +47,6 @@ object SeaCreatureLootshareSphere {
     }
 
     private fun addMob(seaCreature: LivingSeaCreatureData) {
-        if (getSeaCreatureConfig(seaCreature)?.shouldRenderLootshare == true) seaCreatures.add(seaCreature)
+        if (SeaCreatureSettings.getConfig(seaCreature)?.shouldRenderLootshare == true) seaCreatures.add(seaCreature)
     }
 }
