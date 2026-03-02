@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatures
-import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatures.Companion.saveSeaCreatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -138,7 +137,7 @@ object SeaCreatureManager {
         }
         SeaCreatureManager.allFishingMobs = allFishingMobs
         allVariants = variants
-        saveSeaCreatures(SpecificSeaCreatures.updateList())
+        SpecificSeaCreatures.saveSeaCreatures(SpecificSeaCreatures.updateList())
     }
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
