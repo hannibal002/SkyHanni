@@ -11,5 +11,5 @@ data class ContributorJsonEntry(
     @Expose val suffix: String = "§c:O",
     @Expose val spinny: Boolean = false,
     @Expose val upsideDown: Boolean = false,
-    @Expose @SerializedName("external_mod") val externalMod: String? = null,
+    @Expose @SerializedName("display_name") val displayName: String? = null,
 )

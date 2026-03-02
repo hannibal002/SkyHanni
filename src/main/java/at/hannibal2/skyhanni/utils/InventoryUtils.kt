@@ -116,6 +116,7 @@ object InventoryUtils {
     fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem
 
     fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
+    fun getArmorInternalNames(): Set<NeuInternalName> = getArmor().mapNotNull { it?.getInternalNameOrNull() }.toSet()
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
