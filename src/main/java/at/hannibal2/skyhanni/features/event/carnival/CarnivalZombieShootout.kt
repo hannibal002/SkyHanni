@@ -179,7 +179,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
+        if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
 
@@ -263,5 +263,5 @@ object CarnivalZombieShootout {
 
     private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && HypixelData.skyBlockArea == "Carnival" && started
+    private fun isEnabled() = config.enabled && CarnivalAPI.inCarnivalArea && started
 }

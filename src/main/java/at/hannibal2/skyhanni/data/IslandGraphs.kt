@@ -542,6 +542,12 @@ object IslandGraphs {
         pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
 
+    fun nodes(nodeName: String, nodeTag: GraphNodeTag): Set<GraphNode> =
+        currentIslandGraph?.getNodesWithNameAndTags(nodeName, nodeTag)?.toSet() ?: emptySet()
+
+    fun nodesAround(node: GraphNode, condition: (GraphNode) -> Boolean): Set<GraphNode> =
+        currentIslandGraph?.nodesAround(node, condition) ?: emptySet()
+
     private fun pathFind0(
         location: LorenzVec,
         label: String,
@@ -557,7 +563,7 @@ object IslandGraphs {
         this.onManualCancel = onManualCancel
         this.condition = condition
         val graph = currentIslandGraph ?: return
-        goal = graph.minBy { it.position.distance(currentTarget!!) }
+        goal = graph.minByActive { it.position.distance(currentTarget!!) }
         updateFeedback()
     }
 
@@ -748,5 +754,4 @@ object IslandGraphs {
             extraData = data.map { it.key to it.value }.normalizeAsArray(),
         )
     }
-
 }

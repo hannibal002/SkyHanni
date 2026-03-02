@@ -44,12 +44,30 @@ value class Graph(
     fun getNodesWithTags(vararg tag: GraphNodeTag): List<GraphNode> = nodes.filter { node -> tag.all { node.hasTag(it) } }
     fun getNodesWithName(name: String): List<GraphNode> = nodes.filter { it.name == name }
 
+    fun nodesAround(node: GraphNode, condition: (GraphNode) -> Boolean): Set<GraphNode> {
+        val visited = mutableSetOf<GraphNode>()
+        val queue = ArrayDeque<GraphNode>()
+        queue.add(node)
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+            for (neighbour in current.neighbours.keys) {
+                if (!condition(neighbour) || neighbour in visited) continue
+                visited.add(neighbour)
+                queue.add(neighbour)
+            }
+        }
+        return visited
+    }
+
+    fun minByActive(selector: (GraphNode) -> Double): GraphNode = nodes.filter { it.enabled }.minBy(selector)
+
+    fun filterByActive(predicate: (GraphNode) -> Boolean): List<GraphNode> = asSequence().filter(predicate).filter { it.enabled }.toList()
+
     fun getNearestNode(
         location: LorenzVec = GraphUtils.playerPosition,
         condition: (GraphNode) -> Boolean = { true },
-    ): GraphNode = asSequence()
-        .filter(condition)
-        .minBy { it.position.distanceSq(location) }
+    ): GraphNode =
+        filterByActive(condition).minBy { it.position.distanceSq(location) }
 
     constructor() : this(emptyList())
 

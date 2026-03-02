@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ForcedRepoPerksJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.MayorChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -248,8 +249,10 @@ object ElectionApi {
             val currentMayorName = mayor.name
             if (lastMayor?.name != currentMayorName) {
                 Perk.resetPerks()
+                val oldMayor = currentMayor
                 currentMayor = setAssumeMayorJson(currentMayorName, mayor.perks)
                 currentMinister = mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
+                MayorChangeEvent(oldMayor, currentMayor).post()
             }
         }
     }
@@ -268,11 +271,16 @@ object ElectionApi {
         if (shouldAssumeMayor()) currentMayor = assumeMayorConfig.get().addAllPerks()
         assumeMayorConfig.onToggle {
             val mayor = assumeMayorConfig.get()
+            for (perk in Perk.entries) {
+                perk.isActive = false
+            }
 
+            val oldMayor = currentMayor
             if (!shouldAssumeMayor()) {
                 checkHypixelApi(forceReload = true)
             } else {
                 currentMayor = mayor.addAllPerks()
+                MayorChangeEvent(oldMayor, currentMayor, debug = true).post()
             }
         }
     }
