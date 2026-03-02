@@ -69,6 +69,7 @@ object CarrolynHelper {
     }
 
     private fun startPathfind() {
+
         IslandGraphs.pathFind(carrolynLocation, "§5Carrolyn", condition = { isEnabled() })
     }
 
