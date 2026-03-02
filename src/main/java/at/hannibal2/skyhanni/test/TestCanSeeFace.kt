@@ -81,12 +81,10 @@ object TestCanSeeFace {
             refreshAABBsFromBlockState()
         }
 
-        fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical(
-            renderables = buildList {
-                addString("§7Generated in §b${duration?.format() ?: "?"}§7.")
-                pointSet.forEach { addFacePointDisplay(it) }
-            }
-        )
+        fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical {
+            addString("§7Generated in §b${duration?.format() ?: "?"}§7.")
+            pointSet.forEach { addFacePointDisplay(it) }
+        }
     }
 
     private fun MutableList<Renderable>.addFacePointDisplay(fpe: FacePointEntry) {
@@ -190,17 +188,14 @@ object TestCanSeeFace {
             description = "Test if you can see certain faces of a block."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!enabled) {
-                    ChatUtils.clickableChat(
-                        "The /shtestcanseeface command is disabled. Click here to enable it in the dev tool config!",
-                        onClick = {
-                            config::enabled.jumpToEditor()
-                        },
-                        hover = "Click to open the dev tool config",
-                        replaceSameMessage = true
-                    )
-                    return@simpleCallback
-                }
+                if (!enabled) return@simpleCallback ChatUtils.clickableChat(
+                    "The /shtestcanseeface command is disabled. Click here to enable it in the dev tool config!",
+                    onClick = {
+                        config::enabled.jumpToEditor()
+                    },
+                    hover = "Click to open the dev tool config",
+                    replaceSameMessage = true
+                )
                 faceCheckContext.reset()
                 faceCheckContext.waitingForPunch = true
                 ChatUtils.chat("The next block you punch will be used for the face check.", replaceSameMessage = true)
@@ -275,19 +270,17 @@ object TestCanSeeFace {
         faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable(duration).wrapWithOtherToggles()
     }
 
-    private fun Renderable.wrapWithOtherToggles() = Renderable.vertical(
-        buildList {
-            addRenderableButton(
-                label = "Ray Visibility",
-                current = currentVisibilityState,
-                onChange = {
-                    currentVisibilityState = it
-                    regenDebugRenderable()
-                },
-            )
-            add(this@wrapWithOtherToggles)
-        }
-    )
+    private fun Renderable.wrapWithOtherToggles() = Renderable.vertical {
+        addRenderableButton(
+            label = "Ray Visibility",
+            current = currentVisibilityState,
+            onChange = {
+                currentVisibilityState = it
+                regenDebugRenderable()
+            },
+        )
+        add(this@wrapWithOtherToggles)
+    }
 
     private fun SkyHanniRenderWorldEvent.drawRaysFromFacePoints(
         face: Direction,
