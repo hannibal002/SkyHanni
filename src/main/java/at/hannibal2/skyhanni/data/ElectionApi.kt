@@ -307,9 +307,19 @@ object ElectionApi {
     val isDerpy get() = Perk.DOUBLE_MOBS_HP.isActive
     val isAura get() = Perk.WORK_HARDER.isActive
 
-    fun Int.derpy() = if (isDerpy) this / 2 else if (isAura) (this / 11 * 10) else this
+    fun Int.derpy(): Int {
+        var health = this
+        if (isDerpy) health /= 2
+        if (isAura) (health / 11 * 10)
+        return health
+    }
 
-    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else if (isAura) (this * 1.1).toInt() else this
+    fun Int.ignoreDerpy(): Int {
+        var health = this
+        if (isDerpy) health *= 2
+        if (isAura) health = (health * 1.1).toInt()
+        return health
+    }
 
     var repoPerks: List<Perk>? = null
 
