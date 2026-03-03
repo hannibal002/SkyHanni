@@ -96,12 +96,10 @@ object ConditionalUtils {
 
         val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
         for (prop in nonTransientProps) {
-            val getter = runCatching { prop.javaGetter }.getOrNull()
-            val getterNull = (prop.javaField == null && getter == null)
-            if (getterNull) continue
-            val failedAccessible = runCatching { prop.isAccessible = true }.isFailure
-            val value = runCatching { prop.getter.call(current) }.getOrNull()
-            if (failedAccessible || value == null) continue
+            if (prop.javaField == null) continue
+            runCatching { prop.javaGetter }.getOrNull() ?: continue
+            if (runCatching { prop.isAccessible = true }.isFailure) continue
+            val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
             when (value) {
                 is Property<*> -> add(value)
                 else -> addAll(
