@@ -30,7 +30,7 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
     private var needsGrowing = false
     private val positions = HashMap<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>()
 
-    val usage = GpuTexture.USAGE_RENDER_ATTACHMENT or
+    private val usage = GpuTexture.USAGE_RENDER_ATTACHMENT or
         GpuTexture.USAGE_TEXTURE_BINDING or
         GpuTexture.USAGE_COPY_SRC
 
@@ -60,22 +60,6 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
         packer = SkyHanniAtlasBinPacker(size)
         @Suppress("UnsafeCallOnNullableType")
         renderer = SkyHanniItemAtlasRenderer(size, textureView!!, depthTextureView!!, texture!!, depthTexture!!)
-    }
-
-    /**
-     * Runs after rendering finishes.
-     */
-    private fun tryGrow() {
-        if (!needsGrowing) return
-        val newSize = (sizePixels * 2).coerceAtMost(RenderSystem.getDevice().maxTextureSize)
-        if (newSize == sizePixels) {
-            ErrorManager.crashInDevEnv("SkyHanni item atlas is full and cannot grow further")
-            return
-        }
-        positions.clear()
-        close()
-        allocate(newSize)
-        needsGrowing = false
     }
 
     private fun pruneFrames(currentFrame: Int, olderThanLastRenderedFrames: Int = 2) {
