@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -12,7 +13,13 @@ abstract class TrackerData<T : SessionUptime>(
     private val uptimeClass: KClass<T>,
 ) : Resettable {
     @Expose
-    private val sessionUptime: MutableMap<SessionUptime, Stopwatch> = mutableMapOf()
+    @SerializedName("sessionUptime")
+    private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
+
+    @Suppress("UNCHECKED_CAST")
+    private val sessionUptime: MutableMap<SessionUptime, Stopwatch> get() {
+        return sessionUptimeInternal as MutableMap<SessionUptime, Stopwatch>
+    }
 
     private var migrated = false
 
@@ -78,8 +85,7 @@ abstract class TrackerData<T : SessionUptime>(
     private fun migrateData() {
         migrated = true
         // Old config versions may still hold null keys or values
-        @Suppress("SENSELESS_COMPARISON")
-        sessionUptime.entries.removeAll { it.key == null || it.value == null }
+        sessionUptimeInternal.entries.removeAll { it.key == null || it.value == null }
 
         when (uptimeClass) {
             SessionUptime.Normal::class -> {
