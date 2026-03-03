@@ -118,10 +118,8 @@ object StewHelper {
         val color = if (amountInSacks >= amountNeeded) "§a" else "§e"
 
         val nameRenderable = Renderable.hoverTips(
-            Renderable.text(
-                " §7- §a${itemName.removeColor()} $color$amountInSacks/$amountNeeded"
-            ),
-            tips = tooltip
+            content = Renderable.text(" §7- §a${itemName.removeColor()} $color$amountInSacks/$amountNeeded"),
+            tips = tooltip,
         )
 
         val container = Renderable.horizontal(stackRenderable, nameRenderable).toSearchable(itemName.removeColor())
@@ -152,5 +150,4 @@ object StewHelper {
         HAS_ENOUGH(LorenzColor.YELLOW),
         HAS_EATEN(LorenzColor.GREEN)
     }
-
 }
