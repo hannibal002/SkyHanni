@@ -20,17 +20,21 @@ open class ItemStackRenderable protected constructor(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) : Renderable {
 
+    private var stableRenderId: Int = -1
+    open fun getStableId() = stableRenderId
+
     open val stack: ItemStack get() = stackGetter()
 
     override val width = (15.5 * scale + 0.5).toInt() + xSpacing
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        stack.renderOnScreen(
+        this.stableRenderId = stack.renderOnScreen(
             xSpacing / 2f,
             ySpacing / 2f,
             scale = scale,
             rescaleSkulls,
+            stableRenderId = stableRenderId,
         )
     }
 

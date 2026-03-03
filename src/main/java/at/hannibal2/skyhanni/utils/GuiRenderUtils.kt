@@ -335,6 +335,7 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
+        frameNumber: Int? = null,
     ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -383,11 +384,14 @@ object GuiRenderUtils {
         )
         val newRenderState = SkyHanniGuiItemRenderState(
             itemStack = this,
-            guiItemRenderState, x, y,
+            guiItemRenderState,
+            x,
+            y,
             rotationVec, translationVec,
             scale = scale.toFloat(),
             adjustedScale = (scale * guiScaleX).toFloat(),
             stableRenderId,
+            frameNumber = frameNumber,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId

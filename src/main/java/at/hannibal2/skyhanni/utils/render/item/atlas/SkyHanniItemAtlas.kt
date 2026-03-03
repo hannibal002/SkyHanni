@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.platform.TextureUtil
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
@@ -16,26 +18,51 @@ import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.texture.AbstractTexture
+import net.minecraft.client.renderer.texture.Dumpable
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.resources.Identifier
 import net.minecraft.util.Mth
+import java.nio.file.Path
 
-internal class SkyHanniItemAtlas : AutoCloseable {
+internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
 
-    private var texture: GpuTexture? = null
-    private var textureView: GpuTextureView? = null
+    companion object {
+        private val identifier = Identifier.fromNamespaceAndPath("skyhanni", "item_atlas")
+    }
+
+    init {
+        Minecraft.getInstance().textureManager.register(identifier, this)
+    }
+
     private var depthTexture: GpuTexture? = null
     private var depthTextureView: GpuTextureView? = null
 
     private var sizePixels = 0
     private var slotSize = 0
 
+    private val freeSlots = ArrayDeque<Pair<Int, Int>>()
     private val positions = HashMap<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>()
-    private val animatedFrames = HashMap<SkyHanniAnimatedAtlasKey, SkyHanniAnimatedItemAtlasEntry>()
 
     private var cursorX = 0
     private var cursorY = 0
 
     private var needsGrowing = false
+
+    override fun dumpContents(id: Identifier, path: Path) {
+        val texture = this.texture ?: return
+        val string = id.toDebugFileName()
+        try {
+            TextureUtil.writeAsPNG(path, string, texture, 0) { i -> i }
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to dump atlas texture",
+                "id" to id.toString(),
+                    "path" to path.toString()
+            )
+        }
+    }
 
     /**
      * Runs after rendering finishes.
@@ -47,7 +74,6 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         if (newSize == sizePixels) return // Already at max size, nothing we can do
 
         positions.clear()
-        animatedFrames.clear()
         close()
         cursorX = 0
         cursorY = 0
@@ -56,14 +82,17 @@ internal class SkyHanniItemAtlas : AutoCloseable {
     }
 
     private fun pruneFrames(currentFrame: Int, olderThanLastRenderedFrames: Int = 2) {
-        animatedFrames.entries.removeIf { (_, pos) -> currentFrame - pos.lastRenderedFrame > olderThanLastRenderedFrames }
+        positions.entries.removeIf { (key, pos) ->
+            key is SkyHanniAnimatedAtlasKey &&  pos is SkyHanniAnimatedItemAtlasEntry &&
+                currentFrame - pos.lastRenderedFrame > olderThanLastRenderedFrames
+        }
     }
 
     private fun SkyHanniAnimatedAtlasKey.clearPreviousFrame() {
         val previousKey = this.copy(frameNumber = frameNumber - 1)
         clearSlot(
-            animatedFrames[previousKey]?.x ?: return,
-            animatedFrames[previousKey]?.y ?: return,
+            positions[previousKey]?.x ?: return,
+            positions[previousKey]?.y ?: return,
             slotSize
         )
     }
@@ -83,11 +112,13 @@ internal class SkyHanniItemAtlas : AutoCloseable {
     private fun recordPosition(key: SkyHanniAtlasKey, slotX: Int, slotY: Int): SkyHanniItemAtlasEntry {
         val u = slotX.toFloat() / sizePixels.toFloat()
         val v = (sizePixels - slotY).toFloat() / sizePixels.toFloat()
-        return if (key is SkyHanniAnimatedAtlasKey) {
-            SkyHanniAnimatedItemAtlasEntry(slotX, slotY, u, v, key.frameNumber).also { animatedFrames[key] = it }
+        val recordedPosition = if (key is SkyHanniAnimatedAtlasKey) {
+            SkyHanniAnimatedItemAtlasEntry(slotX, slotY, u, v, key.frameNumber)
         } else {
-            SkyHanniItemAtlasEntry(slotX, slotY, u, v).also { positions[key] = it }
+            SkyHanniItemAtlasEntry(slotX, slotY, u, v)
         }
+        positions[key] = recordedPosition
+        return recordedPosition
     }
 
     fun SkyHanniItemRenderContext.setupAtlasRendering(
@@ -100,9 +131,9 @@ internal class SkyHanniItemAtlas : AutoCloseable {
 
         render(projectionBuffer) {
             atlasStates.forEach { state ->
-                val stateKey = state.getAtlasKey(guiScale) ?: return@forEach
+                val stateKey = state.atlasKey
                 val (slotX, slotY) = stateKey.getCursorPosition {
-                    fallbackStates.add(state)
+                    realtimeStates.add(state)
                 } ?: return@forEach
 
                 renderItemToAtlas(state, slotX, slotY)
@@ -113,18 +144,14 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         }
     }
 
-    private fun SkyHanniAtlasKey.getCursorPosition(onAtlasMiss: () -> Unit): Pair<Int, Int>? {
-        val existing = if (this is SkyHanniAnimatedAtlasKey) animatedFrames[this]
-        else positions[this]
-        return if (existing != null) {
-            if (this is SkyHanniAnimatedAtlasKey) clearPreviousFrame()
-            existing.x to existing.y
-        } else if (checkRowFull() || checkFull()) {
-            onAtlasMiss()
-            null
-        } else (cursorX to cursorY).also {
-            cursorX += slotSize
-        }
+    private fun SkyHanniAtlasKey.getCursorPosition(onAtlasMiss: () -> Unit): Pair<Int, Int>? = positions[this]?.let {
+        if (this is SkyHanniAnimatedAtlasKey) clearPreviousFrame()
+        it.x to it.y
+    } ?: if (checkRowFull() || checkFull()) {
+        onAtlasMiss()
+        null
+    } else (cursorX to cursorY).also {
+        cursorX += slotSize
     }
 
     // Called once per frame. Only creates or grows the atlas; never shrinks or resets it.
@@ -149,26 +176,27 @@ internal class SkyHanniItemAtlas : AutoCloseable {
 
     fun invalidate() {
         positions.clear()
-        animatedFrames.clear()
         cursorX = 0
         cursorY = 0
         slotSize = 0
         close()
     }
 
+    val usage = GpuTexture.USAGE_RENDER_ATTACHMENT or
+        GpuTexture.USAGE_TEXTURE_BINDING or
+        GpuTexture.USAGE_COPY_SRC
+
     private fun allocate(size: Int) {
         sizePixels = size
         val device = RenderSystem.getDevice()
-        texture = device.createTexture("SkyHanni item atlas", 12, TextureFormat.RGBA8, size, size, 1, 1)
+        texture = device.createTexture("SkyHanni item atlas", usage, TextureFormat.RGBA8, size, size, 1, 1)
             //? if < 1.21.11 {
             .also { it.setTextureFilter(FilterMode.NEAREST, false) }
         //?}
-        val texture = texture ?: throw IllegalStateException("Failed to create atlas texture")
-        textureView = device.createTextureView(texture)
+        textureView = device.createTextureView(texture!!)
         depthTexture = device.createTexture("SkyHanni item atlas depth", 8, TextureFormat.DEPTH32, size, size, 1, 1)
-        val depthTexture = depthTexture ?: throw IllegalStateException("Failed to create atlas depth texture")
-        depthTextureView = device.createTextureView(depthTexture)
-        device.createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
+        depthTextureView = device.createTextureView(depthTexture!!)
+        device.createCommandEncoder().clearColorAndDepthTextures(texture!!, 0, depthTexture!!, 1.0)
     }
 
     override fun close() {

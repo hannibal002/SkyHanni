@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 
 internal open class SkyHanniItemRenderContext(
     open val atlasStates: List<SkyHanniGuiItemRenderState>,
-    open val fallbackStates: MutableList<SkyHanniGuiItemRenderState>,
+    open val realtimeStates: MutableList<SkyHanniGuiItemRenderState>,
     open val guiRenderState: GuiRenderState,
     open val bufferSource: BufferSource,
     open val featureRenderDispatcher: FeatureRenderDispatcher,

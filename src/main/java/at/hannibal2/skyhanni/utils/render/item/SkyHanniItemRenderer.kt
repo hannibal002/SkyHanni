@@ -14,7 +14,7 @@ class SkyHanniItemRenderer(
 ) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(bufferSource) {
 
     private var usedOnThisFrame = false
-    private var modelOnTextureIdentity: Any? = null
+    private var modelOnTextureIdentity: List<*> = listOf<Any>()
 
     override fun getRenderStateClass() = SkyHanniGuiItemRenderState::class.java
 
@@ -64,14 +64,20 @@ class SkyHanniItemRenderer(
     }
 
     override fun textureIsReadyToBlit(shItemRenderState: SkyHanniGuiItemRenderState): Boolean {
-        return !shItemRenderState.isAnimated() && shItemRenderState.getModelIdentity()?.equals(this.modelOnTextureIdentity) ?: false
+        return shItemRenderState.getModelIdentity() == this.modelOnTextureIdentity
     }
 
     override fun getTranslateY(i: Int, j: Int): Float {
         return i / 2.0f
     }
 
-    override fun getTextureLabel(): String {
-        return "skyhanni_item_renderer"
+    override fun getTextureLabel(): String = getNextTextureLabel()
+
+    companion object {
+        var counter = 0
+        fun getNextTextureLabel(): String {
+            counter++
+            return "skyhanni_item_renderer_test_$counter"
+        }
     }
 }
