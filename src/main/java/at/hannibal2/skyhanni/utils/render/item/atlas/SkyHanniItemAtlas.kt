@@ -127,7 +127,7 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
     ) {
         pruneFrames(frameNumber)
         if (atlasStates.isEmpty()) return
-        ensureCapacity(guiScale, atlasStates.maxOf { it.scale })
+        ensureCapacity(guiScale, atlasStates.maxOf { it.adjustedScale })
 
         render(projectionBuffer) {
             atlasStates.forEach { state ->
@@ -160,8 +160,10 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
     private fun ensureCapacity(guiScale: Int, maxScale: Float) {
         val newSlotSize = (16 * guiScale * maxScale).toInt()
 
-        // If slotSize changes the entire atlas is invalid since all cached positions used the old size.
-        if (newSlotSize != slotSize) {
+        // Only invalidate when slots need to grow. Cached positions rendered at a larger
+        // slotSize are still valid; items simply get rendered at higher resolution than
+        // strictly necessary, which is fine.
+        if (newSlotSize > slotSize) {
             invalidate()
             slotSize = newSlotSize
         }
