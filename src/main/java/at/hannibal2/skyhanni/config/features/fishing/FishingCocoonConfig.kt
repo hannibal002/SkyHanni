@@ -14,7 +14,7 @@ class FishingCocoonConfig {
     var shareInPartyChat: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show the Cocooned mob as a Title to Warn When Cocooning X mob.")
+    @ConfigOption(name = "Send Title", desc = "Show the Cocooned mob as a Title to Warn When Cocooning X mob.")
     @ConfigEditorBoolean
     @FeatureToggle
     var warnWhenCocooned: Boolean = false

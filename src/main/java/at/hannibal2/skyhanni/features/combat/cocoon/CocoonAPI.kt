@@ -64,8 +64,9 @@ object CocoonAPI {
         val mob = getCocoonMob(position) ?: return
         val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
         existingCocoons.add(cocoon)
-        ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
-        logger.log("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+        val debug = "${cocoon.mob.name}, CocoonID (${cocoon.cocoonID}) Entered List"
+        ChatUtils.debug(debug)
+        logger.log(debug)
         CocoonSpawnEvent(cocoon).post()
     }
 

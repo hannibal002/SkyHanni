@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatureSettingsUtils.getSeaCreatureConfig
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -22,8 +23,11 @@ object SeaCreatureCocoonWarning {
         if (mob.seaCreature == null) return
         if (!mob.seaCreature.isOwn) return
         val name = mob.seaCreature.name
-        if (getSeaCreatureConfig(name)?.shouldWarnWhenCocooned == true && config.warnWhenCocooned) {
-            TitleManager.sendTitle("§c$name Has Been Cocooned")
+        if (!config.warnWhenCocooned) return
+        if (getSeaCreatureConfig(name)?.shouldWarnWhenCocooned == true) {
+            val msg = "§c$name§c Has Been Cocooned"
+            ChatUtils.notifyOrDisable(msg, config::warnWhenCocooned)
+            TitleManager.sendTitle(msg)
             SoundUtils.repeatSound(
                 1,
                 repeat = 5,

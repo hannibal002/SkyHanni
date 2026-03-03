@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class RareCatchesConfig {
     @Expose
@@ -14,6 +15,7 @@ class RareCatchesConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("Title")
     var alertOwnCatches: Boolean = true
 
     @Expose
