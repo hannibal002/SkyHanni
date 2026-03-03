@@ -45,7 +45,7 @@ import net.minecraft.world.entity.npc.villager.Villager
 import org.lwjgl.opengl.GL11
 
 /**
- * Utility for creating fake entities without an associated world in order to avoid contaminating the world state.
+ * Utility for creating fake entities without an associated world to avoid contaminating the world state.
  */
 object HolographicEntities {
 
@@ -149,7 +149,7 @@ object HolographicEntities {
     }
 
     /**
-     * Render a fake [HolographicEntity]. In order to render a fully opaque entity, set [holographicness] to `1F`.
+     * Render a fake [HolographicEntity]. To render a fully opaque entity, set [holographicness] to `1F`.
      */
     fun <T : LivingEntity> SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,

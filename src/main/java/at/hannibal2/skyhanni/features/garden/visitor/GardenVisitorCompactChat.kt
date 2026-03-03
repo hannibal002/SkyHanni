@@ -95,10 +95,8 @@ object GardenVisitorCompactChat {
             visitorNameFormatted = "$visitorColor$visitorName"
         }
 
-        // If visitor name has not yet been matched, we aren't looking at a visitor accept message, and can ignore this.
         if (visitorNameFormatted.isBlank()) return
 
-        // Match rewards and transform
         visitorRewardPattern.matchMatcher(transformedMessage) {
             val rewardColor = groupOrNull("rewardcolor")
             val amountColor = groupOrNull("amountcolor")
@@ -112,7 +110,7 @@ object GardenVisitorCompactChat {
             } else rewardColor
 
             val amountString = if (amount != null) {
-                if (discardRewardNamePattern.matcher(reward).matches()) "$amount"
+                if (discardRewardNamePattern.matcher(reward).matches()) amount
                 else "$amount "
             } else {
                 if (altAmount == null) "" else "$altAmount "
