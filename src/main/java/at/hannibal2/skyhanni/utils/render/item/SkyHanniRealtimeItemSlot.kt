@@ -2,38 +2,18 @@ package at.hannibal2.skyhanni.utils.render.item
 
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.FilterMode
-import com.mojang.blaze3d.textures.GpuTexture
-import com.mojang.blaze3d.textures.GpuTextureView
-import com.mojang.blaze3d.textures.TextureFormat
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 
-internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
-
-    private var texture: GpuTexture? = null
-    private var textureView: GpuTextureView? = null
-    private var depthTexture: GpuTexture? = null
-    private var depthTextureView: GpuTextureView? = null
+internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
     init { allocate(slotSize) }
 
-    @Suppress("UnsafeCallOnNullableType")
     private fun allocate(size: Int) {
-        val device = RenderSystem.getDevice()
-        texture = device.createTexture("SkyHanni realtime item", 12, TextureFormat.RGBA8, size, size, 1, 1)
-            //? if < 1.21.11 {
-            .also { it.setTextureFilter(FilterMode.NEAREST, false) }
-        //?}
-        val texture = texture!!
-        textureView = device.createTextureView(texture)
-        depthTexture = device.createTexture("SkyHanni realtime item depth", 8, TextureFormat.DEPTH32, size, size, 1, 1)
-        val depthTexture = depthTexture!!
-        depthTextureView = device.createTextureView(depthTexture)
-        device.createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
+        allocateTextures(size, "SkyHanni realtime item", "SkyHanni realtime item depth", 12)
     }
 
     fun render(
@@ -44,11 +24,12 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
     ) {
         val texture = texture ?: return
         val textureView = textureView ?: return
+        val depthTexture = depthTexture ?: return
         val depthTextureView = depthTextureView ?: return
 
         // Clear before rendering
         RenderSystem.getDevice().createCommandEncoder()
-            .clearColorAndDepthTextures(texture, 0, depthTexture!!, 1.0)
+            .clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
 
         val bufferSlice = projectionBuffer.getBuffer(slotSize.toFloat(), slotSize.toFloat())
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
@@ -92,12 +73,5 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
                 state.scissorArea(),
             )
         )
-    }
-
-    override fun close() {
-        textureView?.close(); textureView = null
-        texture?.close(); texture = null
-        depthTextureView?.close(); depthTextureView = null
-        depthTexture?.close(); depthTexture = null
     }
 }
