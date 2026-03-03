@@ -310,7 +310,7 @@ object ElectionApi {
     fun Int.derpy(): Int {
         var health = this
         if (isDerpy) health /= 2
-        if (isAura) (health / 11 * 10)
+        if (isAura) health = (health / 11 * 10)
         return health
     }
 
