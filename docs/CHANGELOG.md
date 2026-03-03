@@ -32,6 +32,14 @@
     + Shows the names and remaining number of mob kills needed until the boss spawns.
     + Option to show mob level and health.
 
+#### Farming
+
++ Added ability to show the radius given by Talbot's Theodolite. - Maxwell Zhao (https://github.com/hannibal002/SkyHanni/pull/5293)
+
+#### Event
+
++ Added Year of the Witch Stew Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/5315)
+
 ### Improvements
 
 #### Fishing
@@ -40,6 +48,15 @@
     + Rare Sea Creature Highlight.
     + Seen Rare Sea Creature Ding/Title.
     + Self Notify Upon Seeing.
+
+#### Misc
+
++ Added Skytils waypoint format support for ordered waypoints import/export. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5219)
++ Improved ordered waypoints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5219)
+    + Skip forward when reaching a waypoint further down in the route.
+    + Option to enable/disable, disabled by default.
+    + Auto-enable the feature when it was disabled.
+    + Loading to show the waypoint count and detected format name.
 
 ### Fixes
 
@@ -57,6 +74,7 @@
 + Fixed Compact Jacob Claim missing some lines when claiming single contests. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5235)
 + Fixed pest spawn sounds sometimes not being muted. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5281)
 + Fixed Pest Prediction Waypoint inaccuracy when used too rapidly. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5310)
++ Fixed some Garden displays not rendering if you downgraded the mod. - nopo (https://github.com/hannibal002/SkyHanni/pull/5295)
 
 #### Combat
 
@@ -80,6 +98,7 @@
 + Fixed Colored Line for Zombie Shootout not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5303)
 + Fixed Double Click to Start option for Carnival not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5302)
 + Fixed rabbits bought from Hoppity via Abiphone not compacting/tracking. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5309)
++ Fixed `/shnavigate` to no longer show Carnival info while Carnival is not active. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5300)
 
 #### Fishing
 
@@ -90,6 +109,7 @@
 
 + Fixed Super Crafting Anti Waste not working for recipes that craft multiple items. - Hype_the_Time (https://github.com/hannibal002/SkyHanni/pull/5174)
     + Also covers coin waste for multi-craft recipes like 16x bait.
++ Fixed mis-scaled and improper items in displays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5313)
 
 ### Technical Details
 
@@ -119,6 +139,12 @@
 + Graph Editor: Automatically bridged disconnected networks for pathfinding. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5231)
 + Improved Contributor Manager to use UUIDs instead of plain names. - Marie (https://github.com/hannibal002/SkyHanni/pull/5248)
 + Included armor slots in `OwnInventoryData.getCurrentItems()` item tracking. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5294)
++ Accepted more location formattings for debug commands. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5305)
++ Added `LocationUtils` functions for checking LOS to block faces. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4234)
+    + Can specify one specific face (by `EnumFacing`/`Direction`), or any face.
+    + Enable in `/sh dev tools`, and `/shtestcanseeface`.
++ Added and used `ConnectionRetryHelper`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5301)
++ Added functions to draw directional rays/highlight block faces in `WorldRenderUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4234)
 
 ## Version 7.0.0
 

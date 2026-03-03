@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -176,7 +175,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
+        if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
 
@@ -260,5 +259,5 @@ object CarnivalZombieShootout {
 
     private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && HypixelData.skyBlockArea == "Carnival" && started
+    private fun isEnabled() = config.enabled && CarnivalAPI.inCarnivalArea && started
 }

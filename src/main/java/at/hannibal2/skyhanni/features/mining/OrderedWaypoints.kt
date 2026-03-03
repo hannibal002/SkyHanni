@@ -253,30 +253,37 @@ object OrderedWaypoints {
         if (loadJob?.isActive == true) {
             return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
         }
-        loadJob = setupLoadJob(name)
+        loadJob = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
+            setupLoadJob(name)
+        }
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String): Job =
-        SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
-            val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-            else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
-                "Route $name doesn't exist.\n" +
-                    "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
-                    "§cIf you would like to import a route from your clipboard, leave the route name blank.",
-            )
+    private fun setupLoadJob(name: String) {
+        val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+        else storage?.routes?.get(name)?.let { it to "saved" } ?: return ChatUtils.userError(
+            "Route $name doesn't exist.\n" +
+                "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
+                "§cIf you would like to import a route from your clipboard, leave the route name blank.",
+        )
 
-            if (loadedRoute == null) return@launchIOCoroutine ChatUtils.userError(
-                "There was an error parsing waypoints. " +
-                    "Please make sure they are properly formatted and in a supported format.\n" +
-                    "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
-            )
+        if (result == null) return ChatUtils.userError(
+            "There was an error parsing waypoints. " +
+                "Please make sure they are properly formatted and in a supported format.\n" +
+                "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
+        )
 
-            orderedWaypointsList = loadedRoute.deepCopy()
-            currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
-            renderWaypoints.clear()
-            ChatUtils.chat("Loaded ordered waypoints!")
+        val (loadedRoute, formatName) = result
+        orderedWaypointsList = loadedRoute.deepCopy()
+        currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
+        renderWaypoints.clear()
+        ChatUtils.chat("Loaded ${orderedWaypointsList.size} ordered waypoints! (§e$formatName§r)")
+
+        if (!config.enabled) {
+            config.enabled = true
+            ChatUtils.chat("§eOrdered Waypoints was disabled, auto-enabled it.")
         }
+    }
 
     private fun unload() {
         if (orderedWaypointsList.isNotEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
@@ -399,6 +406,18 @@ object OrderedWaypoints {
         renderWaypoints.clear()
         if (orderedWaypointsList.isEmpty()) return
 
+        if (config.autoSkipForward) {
+            val closestInRange = orderedWaypointsList
+                .filter { it.location.distanceToPlayer() < config.waypointRange }
+                .minByOrNull { it.location.distanceToPlayer() }
+
+            if (closestInRange != null && closestInRange.number - 1 > currentOrderedWaypointIndex) {
+                currentOrderedWaypointIndex = closestInRange.number - 1
+                lastCloser = currentOrderedWaypointIndex
+                return
+            }
+        }
+
         val beforeWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex - 1)
             ?: orderedWaypointsList.last()
         renderWaypoints.add(beforeWaypoint.number - 1)
@@ -451,11 +470,9 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyHanniWaypoint>? {
-        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
-            it.load(data)
-        }?.let {
-            Waypoints(it.toMutableList())
+    private fun loadWaypoints(data: String): Pair<Waypoints<SkyHanniWaypoint>, String>? {
+        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull { format ->
+            format.load(data)?.let { it to format.name }
         }
     }
 
