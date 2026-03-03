@@ -126,7 +126,10 @@ internal object SkyHanniItemRenderCoordinator {
         lastEvictFrame = frameNumber
         realtimeSlots.entries.removeIf { (id, slot) ->
             val stale = realtimeSlotLastSeen.getOrDefault(id, -1) < frameNumber - 1
-            if (stale) slot.close()
+            if (stale) {
+                slot.close()
+                realtimeSlotLastSeen.remove(id)
+            }
             stale
         }
     }
