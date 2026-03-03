@@ -31,7 +31,6 @@ data class PetDataStorage(
 }
 
 @KSerializable
-@Suppress("DEPRECATION")
 data class PetData(
     @Expose private val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
@@ -41,7 +40,7 @@ data class PetData(
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     constructor(petInfo: SkyBlockItemModifierUtils.PetInfo) : this(
-        petInfo._internalName,
+        petInfo.let { "${it.type};${it.tier.id}".toInternalName() },
         petInfo.properSkinItem,
         petInfo.getSkinVariantIndex(),
         petInfo.heldItem,
