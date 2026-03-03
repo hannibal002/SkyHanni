@@ -25,7 +25,6 @@ import kotlin.time.Duration.Companion.minutes
  * Q: Why is this file in the shader package?
  * A: Why are you looking in the shader package right now? Go look at config or features package and be productive :P
  */
-@Suppress("SpellCheckingInspection")
 @SkyHanniModule
 object RobloxReminder {
 
@@ -89,7 +88,7 @@ object RobloxReminder {
     }
 
     // Tech-savvy ppl who have debug enabled should have fun as well :)
-    private fun isContributor() = PlayerUtils.getName() in ContributorManager.contributorNames || SkyBlockUtils.debug
+    private fun isContributor() = PlayerUtils.getRawUuid() in ContributorManager.contributors || SkyBlockUtils.debug
 
     private fun robuxError() {
         if (!TimeUtils.isAprilFoolsDay) return

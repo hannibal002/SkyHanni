@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.FacePointSet
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
-import kotlin.collections.getOrPut
-import kotlin.getValue
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -19,6 +16,10 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+
+typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
+typealias FacePointEntry = Map.Entry<Direction, PointSet>
+typealias FacePointSet = MutableMap<Direction, PointSet>
 
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
@@ -74,11 +75,12 @@ object LocationUtils {
         stepDensity: Int = 4,
         pointFill: FacePointSet? = null,
         offset: Double? = null,
+        resultLifespan: Duration = 5.seconds,
         vararg ignoreFaces: Direction,
     ): Boolean {
         for (face in Direction.entries) {
             if (ignoreFaces.contains(face)) continue
-            val faceResult = canSeeFace(face, min, max, viewDistance, stepCount, stepDensity, pointFill, offset)
+            val faceResult = canSeeFace(face, min, max, viewDistance, stepCount, stepDensity, pointFill, offset, resultLifespan)
             if (faceResult && pointFill == null) return true
         }
         return pointFill?.values?.any { facedFill ->
@@ -103,6 +105,7 @@ object LocationUtils {
      * @param stepDensity The number of contour rays to cast from the center of each face towards the nearest corner.
      * @param pointFill If provided, this map will be filled with points that can be seen (true) or not (false).
      * @param offset An optional vertical offset to apply to the face corners.
+     * @param resultLifespan How long the results should be stored in the [pointFill] map, if provided. Default is 5 seconds.
      * @return True if the player can see the specified face, false otherwise.
      */
     fun canSeeFace(
@@ -114,6 +117,7 @@ object LocationUtils {
         stepDensity: Int = 4,
         pointFill: FacePointSet? = null,
         offset: Double? = null,
+        resultLifespan: Duration = 5.seconds,
     ): Boolean {
         val aabb = AABB(min.x, min.y, min.z, max.x, max.y, max.z)
         val eye = playerEyeLocation()
@@ -121,11 +125,15 @@ object LocationUtils {
         val faceCenter = face.getCenterPos(center, aabb)
 
         if (eye.distance(faceCenter) > viewDistance.toDouble()) return false
-        val wrappedSuccess = pointFill.wrapCanSee(face, eye, faceCenter, offset)
+        val wrappedSuccess = pointFill.wrapCanSee(face, eye, faceCenter, offset, resultLifespan)
 
         return if (wrappedSuccess && pointFill == null) true
-        else if (stepCount == 0) false
-        else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset)
+        else if (stepCount == 0) {
+            // If stepCount is 0, we only check the center point.
+            // If the block could be seen from the center, it would have returned true already,
+            // so we can assert that we can't see the block.
+            false
+        } else face.performStepping(aabb, faceCenter, eye, viewDistance, stepCount, stepDensity, pointFill, offset, resultLifespan)
     }
 
     private fun Direction.performStepping(
@@ -137,12 +145,13 @@ object LocationUtils {
         stepDensity: Int,
         pointFill: FacePointSet?,
         offset: Double? = null,
+        resultLifespan: Duration = 5.seconds,
     ): Boolean {
         val halfX = (aabb.maxX - aabb.minX) / 2
         val halfY = (aabb.maxY - aabb.minY) / 2
         val halfZ = (aabb.maxZ - aabb.minZ) / 2
         val (axis1, axis2, ext1, ext2) = getFaceRayConfig(halfX, halfY, halfZ) ?: return false
-        densityLoop@for (densityIncrement in 0 until stepDensity) {
+        for (densityIncrement in 0 until stepDensity) {
             val angle = 2 * PI * densityIncrement / stepDensity
             val dx = cos(angle)
             val dy = sin(angle)
@@ -156,16 +165,22 @@ object LocationUtils {
                 val frac = step.toDouble() / (stepCount + 1)
                 val testPoint = faceCenter + dirVec * (boundaryDist * frac)
                 if (eye.distance(testPoint) > viewDistance.toDouble()) continue@stepLoop
-                val wrappedSuccess = pointFill.wrapCanSee(this, eye, testPoint, offset)
+                val wrappedSuccess = pointFill.wrapCanSee(this, eye, testPoint, offset, resultLifespan)
                 if (wrappedSuccess && pointFill == null) return true
             }
         }
         return false
     }
 
-    private fun FacePointSet?.wrapCanSee(face: Direction, a: LorenzVec, b: LorenzVec, offset: Double?): Boolean {
+    private fun FacePointSet?.wrapCanSee(
+        face: Direction,
+        a: LorenzVec,
+        b: LorenzVec,
+        offset: Double?,
+        resultLifespan: Duration = 5.seconds,
+    ): Boolean {
         val canSeeResult = canSee(a, b, offset)
-        this?.getOrPut(face) { TimeLimitedSet(5.seconds) }?.add(b to canSeeResult)
+        this?.getOrPut(face) { TimeLimitedSet(resultLifespan) }?.add(b to canSeeResult)
         return canSeeResult
     }
 

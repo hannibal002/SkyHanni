@@ -65,8 +65,8 @@ object HighlightVisitorsOutsideOfGarden {
 
     // TODO: optimize to not get entities every second
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!config.highlightVisitors) return
         val color = LorenzColor.DARK_RED.toColor().addAlpha(50)
         EntityUtils.getEntities<LivingEntity>()

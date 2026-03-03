@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
+import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -21,7 +22,6 @@ import net.minecraft.network.chat.Component
 object MobHealthDisplay {
 
     private val config get() = SkyHanniMod.feature.fishing.healthDisplay
-    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
     private val healthMap = mutableMapOf<LivingSeaCreatureData, Int>()
 
@@ -77,7 +77,7 @@ object MobHealthDisplay {
     }
 
     private fun addMob(seaCreature: LivingSeaCreatureData) {
-        if (scSpecificConfig[seaCreature.name]?.shouldShowHealthOverlay == true) {
+        if (SeaCreatureSettings.getConfig(seaCreature)?.shouldShowHealthOverlay == true) {
             val value = if (seaCreature.canBeSeen()) seaCreature.health else null
             healthMap[seaCreature] = value ?: -1
         }

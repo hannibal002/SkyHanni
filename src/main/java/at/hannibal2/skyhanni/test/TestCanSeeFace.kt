@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.FacePointEntry
+import at.hannibal2.skyhanni.utils.FacePointSet
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
 import at.hannibal2.skyhanni.utils.LocationUtils.minBox
@@ -25,52 +27,63 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
-typealias FacePointEntry = Map.Entry<Direction, PointSet>
-typealias FacePointSet = MutableMap<Direction, PointSet>
-
 @SkyHanniModule
 object TestCanSeeFace {
 
     data class FaceCheckContext(
-        var vec1: LorenzVec? = null,
-        var vec2: LorenzVec? = null,
+        var aabbs: List<AABB> = emptyList(),
+        var blockPos: LorenzVec? = null,
         var waitingForPunch: Boolean = false,
         var pointSet: FacePointSet = mutableMapOf(),
-        var generallySeen: Boolean = false,
         var finished: Boolean = false,
         var debugRenderable: Renderable? = null,
+        var lastBlockStateHash: Int = 0,
     ) : Resettable {
-        fun resetFromBlockVec(blockVec: LorenzVec) {
-            this.reset()
-            val base = blockVec.floor()
-            // Todo account for variable block sizes?
-            val aabb = base.boundingToOffset(1.0, 1.0, 1.0)
-            vec1 = aabb.minBox()
-            vec2 = aabb.maxBox()
+
+        fun refreshAABBsFromBlockState() {
+            val blockPos = blockPos ?: return
+            val level = Minecraft.getInstance().level ?: return
+
+            val mcBlockPos = blockPos.toBlockPos()
+            val currentState = level.getBlockState(mcBlockPos)
+            val shape = currentState.getShape(level, mcBlockPos)
+            val rawAabbs = shape.toAabbs()
+            val currentHash = rawAabbs.hashCode()
+            if (currentHash != lastBlockStateHash) {
+                lastBlockStateHash = currentHash
+                aabbs = if (!shape.isEmpty) rawAabbs.map { bounds ->
+                    AABB(
+                        blockPos.x + bounds.minX, blockPos.y + bounds.minY, blockPos.z + bounds.minZ,
+                        blockPos.x + bounds.maxX, blockPos.y + bounds.maxY, blockPos.z + bounds.maxZ,
+                    )
+                } else listOf(blockPos.boundingToOffset(1.0, 1.0, 1.0))
+            }
         }
 
-        fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical(
-            renderables = buildList {
-                addString("§7Generated in §b${duration?.format() ?: "?"}§7.")
-                pointSet.forEach { addFacePointDisplay(it) }
-            }
-        )
+        fun resetFromClickedBlock(event: BlockClickEvent) {
+            this.reset()
+            blockPos = event.position.floor()
+            refreshAABBsFromBlockState()
+        }
+
+        fun buildSummaryRenderable(duration: Duration?) = Renderable.vertical {
+            addString("§7Generated in §b${duration?.format() ?: "?"}§7.")
+            pointSet.forEach { addFacePointDisplay(it) }
+        }
     }
 
     private fun MutableList<Renderable>.addFacePointDisplay(fpe: FacePointEntry) {
@@ -100,7 +113,7 @@ object TestCanSeeFace {
                 val format = if (isSeen) "§a§l✓§r" else "§c§l✗§r"
                 val vecFormat = point.shortFormatVec()
                 Renderable.text(" Point $index: $vecFormat $format")
-            }
+            },
         )
     }
 
@@ -155,6 +168,12 @@ object TestCanSeeFace {
         }
     }
 
+    @HandleEvent
+    fun onWorldChange() {
+        lastRenderable = null
+        faceCheckContext.reset()
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!enabled || !event.isLocalPlayer) return
@@ -168,17 +187,14 @@ object TestCanSeeFace {
             description = "Test if you can see certain faces of a block."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                if (!enabled) {
-                    ChatUtils.clickableChat(
-                        "The /shtestcanseeface command is disabled. Click here to enable it in the dev tool config!",
-                        onClick = {
-                            config::enabled.jumpToEditor()
-                        },
-                        hover = "Click to open the dev tool config",
-                        replaceSameMessage = true
-                    )
-                    return@simpleCallback
-                }
+                if (!enabled) return@simpleCallback ChatUtils.clickableChat(
+                    "The /shtestcanseeface command is disabled. Click here to enable it in the dev tool config!",
+                    onClick = {
+                        config::enabled.jumpToEditor()
+                    },
+                    hover = "Click to open the dev tool config",
+                    replaceSameMessage = true,
+                )
                 faceCheckContext.reset()
                 faceCheckContext.waitingForPunch = true
                 ChatUtils.chat("The next block you punch will be used for the face check.", replaceSameMessage = true)
@@ -186,6 +202,7 @@ object TestCanSeeFace {
             literalCallback("stop") {
                 faceCheckContext.reset()
                 lastRenderable = null
+                ChatUtils.chat("Stopped face check, and cleared debug info.", replaceSameMessage = true)
             }
         }
     }
@@ -194,7 +211,7 @@ object TestCanSeeFace {
     fun onBlockClick(event: BlockClickEvent) {
         if (!enabled || event.clickType != ClickType.LEFT_CLICK) return
         if (!faceCheckContext.waitingForPunch) return
-        faceCheckContext.resetFromBlockVec(event.position)
+        faceCheckContext.resetFromClickedBlock(event)
         ChatUtils.chat("Starting face check for block at ${event.position}.", replaceSameMessage = true)
         recalcContext(force = true)
     }
@@ -208,15 +225,14 @@ object TestCanSeeFace {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
-        val pointSet = faceCheckContext.pointSet.takeIfNotEmpty() ?: return
-        for ((face, points) in pointSet) {
-            event.tryHighlightFace(faceCheckContext, face)
+        for ((face, points) in faceCheckContext.pointSet) {
+            event.tryHighlightFace(face)
             event.drawRaysFromFacePoints(face, points)
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class)
+    fun onRenderOverlay() {
         if (!enabled || !debugEnabled) return
         val renderable = faceCheckContext.debugRenderable ?: lastRenderable ?: return
         lastRenderable = renderable
@@ -225,21 +241,24 @@ object TestCanSeeFace {
 
     private fun recalcContext(force: Boolean = false) {
         val calculationStartTime = SimpleTimeMark.now()
-        val vec1 = faceCheckContext.vec1 ?: return
-        val vec2 = faceCheckContext.vec2 ?: return
+        if (faceCheckContext.aabbs.isEmpty()) return
         if (!force && faceCheckContext.finished) return
+        faceCheckContext.refreshAABBsFromBlockState()
         faceCheckContext.pointSet.clear()
-        faceCheckContext.generallySeen = LocationUtils.canSeeAnyFace(
-            min = vec1,
-            max = vec2,
-            stepCount = config.stepCount.get(),
-            stepDensity = config.stepDensity.get(),
-            pointFill = faceCheckContext.pointSet,
-        )
+        for (aabb in faceCheckContext.aabbs) {
+            LocationUtils.canSeeAnyFace(
+                min = aabb.minBox(),
+                max = aabb.maxBox(),
+                stepCount = config.stepCount.get(),
+                stepDensity = config.stepDensity.get(),
+                pointFill = faceCheckContext.pointSet,
+            )
+        }
         val calculationEndTime = SimpleTimeMark.now()
         regenDebugRenderable(calculationEndTime - calculationStartTime)
         faceCheckContext.finished = true
         DelayedRun.runDelayed(config.refreshInterval.get().seconds) {
+            if (!enabled) return@runDelayed
             recalcContext(true)
         }
     }
@@ -249,19 +268,17 @@ object TestCanSeeFace {
         faceCheckContext.debugRenderable = faceCheckContext.buildSummaryRenderable(duration).wrapWithOtherToggles()
     }
 
-    private fun Renderable.wrapWithOtherToggles() = Renderable.vertical(
-        buildList {
-            addRenderableButton(
-                label = "Ray Visibility",
-                current = currentVisibilityState,
-                onChange = {
-                    currentVisibilityState = it
-                    regenDebugRenderable()
-                },
-            )
-            add(this@wrapWithOtherToggles)
-        }
-    )
+    private fun Renderable.wrapWithOtherToggles() = Renderable.vertical {
+        addRenderableButton(
+            label = "Ray Visibility",
+            current = currentVisibilityState,
+            onChange = {
+                currentVisibilityState = it
+                regenDebugRenderable()
+            },
+        )
+        add(this@wrapWithOtherToggles)
+    }
 
     private fun SkyHanniRenderWorldEvent.drawRaysFromFacePoints(
         face: Direction,
@@ -270,33 +287,24 @@ object TestCanSeeFace {
         if (!rayConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
         for ((point, isSeen) in points) {
             if (currentVisibilityState == RayVisibilityState.SEEN && !isSeen) continue
-            val pointColor = if (isSeen) rayConfig.seenColor.get() else rayConfig.unSeenColor.get()
+            val pointColor = if (isSeen) rayConfig.seenColor.get() else rayConfig.unseenColor.get()
             drawFaceRayWorld(
                 origin = point,
                 face = face,
                 color = pointColor.toColor(),
                 length = rayConfig.length.get().toDouble(),
                 thickness = rayConfig.thickness.get().toDouble(),
-                seeThroughBlock = true
             )
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.tryHighlightFace(
-        context: FaceCheckContext,
-        face: Direction,
-    ) {
+    private fun SkyHanniRenderWorldEvent.tryHighlightFace(face: Direction) {
         if (!faceHighlightConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
-        val vec1 = context.vec1 ?: return
-        val vec2 = context.vec2 ?: return
-        val points = context.pointSet[face] ?: return
+        val points = faceCheckContext.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
-        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else rayConfig.unSeenColor.get()
-        val aabb = AABB(
-            vec1.x, vec1.y, vec1.z,
-            vec2.x, vec2.y, vec2.z,
-        )
-        fillFace(aabb, face, color.toColor(), alpha = 1f)
+        val color = if (faceSeen) faceHighlightConfig.seenColor.get() else faceHighlightConfig.unseenColor.get()
+        for (aabb in faceCheckContext.aabbs) {
+            fillFace(aabb, face, color.toColor(), alpha = 1f)
+        }
     }
-
 }

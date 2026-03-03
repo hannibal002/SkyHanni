@@ -35,7 +35,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import java.awt.Color
-import kotlin.Boolean
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -214,6 +213,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
@@ -233,6 +236,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
@@ -257,9 +264,11 @@ object WorldRenderUtils {
 
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y() + yOffset * adjustedScale).toFloat(),
+            (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation()).scale(adjustedScale, -adjustedScale, adjustedScale)
+        ).rotate(camera.rotation())
+            .translate(0f, -yOffset * adjustedScale, 0f)
+            .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.width(text) / 2f
 
@@ -284,6 +293,10 @@ object WorldRenderUtils {
         color: Color? = null,
         scale: Double = 0.53333333,
         shadow: Boolean = false,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOffset: Float = 0f,
         backGroundColor: Int = LorenzColor.BLACK.toColor().addAlpha(63).rgb,
     ) {
@@ -308,9 +321,11 @@ object WorldRenderUtils {
 
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y() + yOffset * adjustedScale).toFloat(),
+            (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation()).scale(adjustedScale, -adjustedScale, adjustedScale)
+        ).rotate(camera.rotation())
+            .translate(0f, -yOffset * adjustedScale, 0f)
+            .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.width(text) / 2f
 
@@ -606,6 +621,10 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
@@ -654,6 +673,10 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: Component,
         scaleMultiplier: Double,
+        /**
+         * Screen-space vertical offset applied after camera-facing rotation.
+         * Positive values move text up on screen, independent of camera angle.
+         */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
@@ -861,7 +884,7 @@ object WorldRenderUtils {
         color: Color,
         alpha: Float = 1f,
         renderRelativeToCamera: Boolean = false,
-        epsilon: Double = 0.05,
+        epsilon: Double = 0.001,
     ) = QuadDrawer.draw3D(this) {
         val effectiveAABB = if (!renderRelativeToCamera) AABB(
             aabb.minX - epsilon, aabb.minY - epsilon, aabb.minZ - epsilon,
@@ -879,14 +902,12 @@ object WorldRenderUtils {
         draw(corners[0], corners[1], corners[3], effectiveColor)
     }
 
-    @Suppress("unused")
     fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
         origin: LorenzVec,
         face: Direction,
         color: Color,
         length: Double = 0.5,
         thickness: Double = 0.02,
-        seeThroughBlock: Boolean = false,
     ) {
         val dir = LorenzVec(face.stepX.toDouble(), face.stepY.toDouble(), face.stepZ.toDouble())
         val end = origin + dir * length
@@ -967,7 +988,7 @@ object WorldRenderUtils {
         j: Float,
         k: Float,
         l: Float,
-        m: Float
+        m: Float,
     ) {
         addChainedFilledBoxVertices(
             matrices,
@@ -981,7 +1002,7 @@ object WorldRenderUtils {
             j,
             k,
             l,
-            m
+            m,
         )
     }
 
@@ -997,7 +1018,7 @@ object WorldRenderUtils {
         l: Float,
         m: Float,
         n: Float,
-        o: Float
+        o: Float,
     ) {
         val matrix4f = matrices.last().pose()
         vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)

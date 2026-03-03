@@ -24,6 +24,7 @@ class MineshaftDetectionConfig {
         desc = "Sends the type of mineshaft you entered to party chat."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var sendTypeToPartyChat: Boolean = true
 
     @Expose

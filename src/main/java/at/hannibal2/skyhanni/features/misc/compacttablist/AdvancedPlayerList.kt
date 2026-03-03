@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
 import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
@@ -203,8 +204,13 @@ object AdvancedPlayerList {
         if (config.markSpecialPersons) {
             suffix += " ${getSocialIcon(data.name).icon()}"
         }
-        ContributorManager.getSuffix(data.name)?.let {
-            suffix += " $it"
+
+        if (SkyHanniMod.feature.dev.fancyContributors) {
+            Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
+                ContributorManager.getSuffix(playerInfo.profile.id)?.let {
+                    suffix += " $it"
+                }
+            }
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
