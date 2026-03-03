@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi.getLevel
@@ -78,6 +80,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
+    private var lastWidgetHash: Int = 0
     private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
@@ -121,9 +124,14 @@ object ComposterOverlay {
     private val VOLTA = "VOLTA".toInternalName()
     private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @HandleEvent(TabListUpdateComponentEvent::class, priority = HandleEvent.LOW)
-    fun onTabListUpdate() {
-        if (inInventory) displayDirty = true
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!isEnabled() || !event.isWidget(TabWidget.COMPOSTER)) return
+        val newComposterHash = event.widget.hashCode()
+        if (newComposterHash != lastWidgetHash) {
+            lastWidgetHash = newComposterHash
+            displayDirty = true
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
