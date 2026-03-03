@@ -38,7 +38,6 @@ class SpecificSeaCreatureStorageXMLHelper(
     @field:Bind
     var shouldWarnWhenCocooned: Boolean? = from.shouldWarnWhenCocooned
 
-
     @Bind
     fun getName(): StructuredText {
         return name.asStructuredText()
