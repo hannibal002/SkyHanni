@@ -81,7 +81,6 @@ data class SkyHanniGuiItemRenderState(
         )
     }
 
-    fun getModelIdentity(): List<*> = trackingState.modelIdentity as List<*>
     fun usesBlockLight(): Boolean = trackingState.usesBlockLight()
     fun isAnimated(): Boolean = trackingState.isAnimated
     fun setAnimated() = trackingState.setAnimated()

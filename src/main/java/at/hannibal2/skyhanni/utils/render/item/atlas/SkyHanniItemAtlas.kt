@@ -16,6 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
+import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.texture.AbstractTexture
@@ -112,7 +113,7 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
         clearSlot(prevEntry.x, prevEntry.y, prevEntry.pixelSize)
     }
 
-    private fun recordPosition(key: SkyHanniAtlasKey, slotX: Int, slotY: Int, pixelSize: Int): SkyHanniItemAtlasEntry {
+    private fun recordPosition(key: SkyHanniAtlasKey, slotX: Int, slotY: Int, pixelSize: Int) {
         val u = slotX.toFloat() / sizePixels.toFloat()
         val v = (sizePixels - slotY).toFloat() / sizePixels.toFloat()
         val entry = if (key is SkyHanniAnimatedAtlasKey) {
@@ -121,7 +122,6 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
             SkyHanniItemAtlasEntry(slotX, slotY, u, v, pixelSize)
         }
         positions[key] = entry
-        return entry
     }
 
     private fun ensureAllocated() {
@@ -132,7 +132,6 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
     private data class AtlasRenderJob(
         val key: SkyHanniAtlasKey,
         val representative: SkyHanniGuiItemRenderState,
-        val states: List<SkyHanniGuiItemRenderState>,
         val node: Node,
         val pixelSize: Int,
     )
@@ -145,46 +144,37 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
         if (atlasStates.isEmpty()) return
         ensureAllocated()
 
-        // Group all states by their scale-independent key.
-        // Each unique item is rendered once — at the highest scale requested this frame.
         val groups = LinkedHashMap<SkyHanniAtlasKey, MutableList<SkyHanniGuiItemRenderState>>()
         for (state in atlasStates) groups.getOrPut(state.atlasKey) { mutableListOf() }.add(state)
 
         val renderJobs = mutableListOf<AtlasRenderJob>()
-        val reuseJobs = mutableListOf<Pair<SkyHanniItemAtlasEntry, List<SkyHanniGuiItemRenderState>>>()
 
         for ((key, states) in groups) {
             val neededPixels = states.maxOf { (16 * guiScale * it.adjustedScale).toInt() }
             val existing = positions[key]
 
             if (existing != null && existing.pixelSize >= neededPixels) {
-                // Cache hit: stored at equal or higher resolution — safe to downscale at blit
                 if (key is SkyHanniAnimatedAtlasKey) key.clearPreviousFrame()
-                reuseJobs.add(existing to states)
+                // Cache hit, no render job needed, blit submitted later per-item
                 continue
             }
 
             val node = root?.insert(neededPixels) ?: run {
-                // Atlas full this frame — overflow to realtime, grow after render
                 needsGrowing = true
-                realtimeStates.addAll(states)
+                // Overflow, submitBlitForState will return false and fall back to realtime
                 continue
             }
 
             val representative = states.maxByOrNull { it.adjustedScale }!!
-            renderJobs.add(AtlasRenderJob(key, representative, states, node, neededPixels))
+            renderJobs.add(AtlasRenderJob(key, representative, node, neededPixels))
         }
 
-        if (renderJobs.isEmpty() && reuseJobs.isEmpty()) return
+        if (renderJobs.isEmpty()) return
 
         render(projectionBuffer) {
-            for ((key, representative, states, node, pixelSize) in renderJobs) {
+            for ((key, representative, node, pixelSize) in renderJobs) {
                 renderItemToAtlas(representative, node.x, node.y, pixelSize)
-                val entry = recordPosition(key, node.x, node.y, pixelSize)
-                for (state in states) submitBlitRenderState(state, entry.u, entry.v, entry.pixelSize)
-            }
-            for ((entry, states) in reuseJobs) {
-                for (state in states) submitBlitRenderState(state, entry.u, entry.v, entry.pixelSize)
+                recordPosition(key, node.x, node.y, pixelSize)
             }
             bufferSource.endBatch()
         }
@@ -267,11 +257,28 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
         RenderSystem.disableScissorForRenderTypeDraws()
     }
 
-    private fun SkyHanniItemRenderContext.submitBlitRenderState(
+    // Returns false if no atlas entry exists (overflow/not yet settled), caller falls back to realtime
+    fun submitBlitForState(
+        state: SkyHanniGuiItemRenderState,
+        guiRenderState: GuiRenderState,
+        frameNumber: Int,
+    ): Boolean {
+        val entry = positions[state.atlasKey] ?: return false
+        if (entry is SkyHanniAnimatedItemAtlasEntry) {
+            positions[state.atlasKey] = SkyHanniAnimatedItemAtlasEntry(
+                entry.x, entry.y, entry.u, entry.v, entry.pixelSize, frameNumber
+            )
+        }
+        submitBlitRenderState(state, entry.u, entry.v, entry.pixelSize, guiRenderState)
+        return true
+    }
+
+    private fun submitBlitRenderState(
         shState: SkyHanniGuiItemRenderState,
         u: Float,
         v: Float,
         pixelSize: Int,
+        guiRenderState: GuiRenderState,
     ) {
         val textureView = this@SkyHanniItemAtlas.textureView ?: throw IllegalStateException("Atlas not allocated")
         val size = sizePixels.toFloat()

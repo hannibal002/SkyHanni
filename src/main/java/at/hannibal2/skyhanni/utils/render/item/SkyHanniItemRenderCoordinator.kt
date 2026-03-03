@@ -7,8 +7,16 @@ import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.world.phys.Vec3
+import kotlin.math.abs
 
 internal object SkyHanniItemRenderCoordinator {
+
+    private data class FrameRenderResources(
+        val bufferSource: BufferSource,
+        val featureRenderDispatcher: FeatureRenderDispatcher,
+        val guiScale: Int,
+    )
+    private var frameResources: FrameRenderResources? = null
 
     // items actively spinning re-render every frame, same as mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
@@ -36,60 +44,91 @@ internal object SkyHanniItemRenderCoordinator {
         realtimeSlots.clear()
     }
 
-    private data class SettleEntry(var rotationVec: Vec3, var framesStable: Int)
-
-    fun prepare(
+    // Called once per frame at HEAD of preparePictureInPicture.
+    // Renders all items to the atlas. Does NOT submit any blits.
+    fun preRenderAtlas(
         pipStates: List<SkyHanniGuiItemRenderState>,
-        guiRenderState: GuiRenderState,
         bufferSource: BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
         if (pipStates.isEmpty()) return
-
-        // Evict stale realtime slots once per frame, not once per item
-        if (frameNumber != lastEvictFrame) {
-            lastEvictFrame = frameNumber
-            realtimeSlots.entries.removeIf { (id, slot) ->
-                val stale = realtimeSlotLastSeen.getOrDefault(id, -1) < frameNumber - 1
-                if (stale) slot.close()
-                stale
-            }
-        }
+        handleEviction(frameNumber)
 
         val guiScale = Minecraft.getInstance().window.guiScale
+        frameResources = FrameRenderResources(bufferSource, featureRenderDispatcher, guiScale)
         val atlasStates = ArrayList<SkyHanniGuiItemRenderState>(pipStates.size)
-        val realtimeStates = ArrayList<SkyHanniGuiItemRenderState>(pipStates.size)
 
         for (state in pipStates) {
-            // Key settle tracker by stableId so spinning items don't create new entries every frame
-            val settle = settleTracker.getOrPut(state.stableId) { SettleEntry(state.rotationVector, 0) }
-            if (settle.rotationVec == state.rotationVector) settle.framesStable++
+            val settle = settleTracker.getOrPut(state.stableId) {
+                SettleEntry(state.rotationVector, state.adjustedScale, 0)
+            }
+            val stable = settle.rotationVec == state.rotationVector &&
+                abs(settle.lastScale - state.adjustedScale) < 0.01f
+            if (stable) settle.framesStable++
             else {
                 settle.rotationVec = state.rotationVector
+                settle.lastScale = state.adjustedScale
                 settle.framesStable = 0
             }
-
-            if (settle.framesStable >= SETTLE_FRAMES || !state.isAnimated()) atlasStates.add(state)
-            else realtimeStates.add(state)
+            if (settle.framesStable >= SETTLE_FRAMES || (!state.isAnimated() && stable))
+                atlasStates.add(state)
         }
+
+        if (atlasStates.isEmpty()) return
 
         val renderContext = SkyHanniItemRenderContext(
-            atlasStates, realtimeStates, guiRenderState,
-            bufferSource, featureRenderDispatcher, frameNumber, guiScale,
+            atlasStates, bufferSource, featureRenderDispatcher, frameNumber, guiScale,
         )
 
-        if (atlasStates.isNotEmpty()) with(atlas) {
-            renderContext.setupAtlasRendering(frameNumber, projectionBuffer)
+        with(atlas) { renderContext.setupAtlasRendering(frameNumber, projectionBuffer) }
+    }
+
+    // Called per-item at TAIL of preparePictureInPictureState.
+    // Atlas is already populated; just look up entry and submit blit, or fall back to realtime.
+    fun submitBlit(
+        state: SkyHanniGuiItemRenderState,
+        guiRenderState: GuiRenderState,
+        frameNumber: Int,
+    ) {
+        val resources = frameResources ?: return
+        val settle = settleTracker[state.stableId]
+        val isSettled = settle != null && (settle.framesStable >= SETTLE_FRAMES ||
+            (!state.isAnimated() && abs(settle.lastScale - state.adjustedScale) < 0.01f))
+
+        if (isSettled) {
+            val blitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
+            if (blitted) return
+            // Atlas miss (overflow or not yet allocated) — fall through to realtime
         }
 
-        realtimeStates.forEach { state ->
-            realtimeSlotLastSeen[state.stableId] = frameNumber
-            val slotSize = (16 * guiScale * state.adjustedScale).toInt()
-            val slot = realtimeSlots.getOrPut(state.stableId) {
-                SkyHanniRealtimeItemSlot(slotSize)
-            }
-            slot.render(renderContext, state, projectionBuffer)
+        realtimeSlotLastSeen[state.stableId] = frameNumber
+        val slotSize = (16 * resources.guiScale * state.adjustedScale).toInt()
+        val existing = realtimeSlots[state.stableId]
+        val slot = if (existing != null && existing.slotSize == slotSize) existing
+        else {
+            existing?.close()
+            SkyHanniRealtimeItemSlot(slotSize).also { realtimeSlots[state.stableId] = it }
+        }
+        val renderContext = SkyHanniItemRenderContext(
+            atlasStates = emptyList(),
+            resources.bufferSource,
+            resources.featureRenderDispatcher,
+            frameNumber,
+            resources.guiScale,
+        )
+        slot.render(renderContext, state, guiRenderState, projectionBuffer)
+    }
+
+    private fun handleEviction(frameNumber: Int) {
+        if (frameNumber == lastEvictFrame) return
+        lastEvictFrame = frameNumber
+        realtimeSlots.entries.removeIf { (id, slot) ->
+            val stale = realtimeSlotLastSeen.getOrDefault(id, -1) < frameNumber - 1
+            if (stale) slot.close()
+            stale
         }
     }
+
+    private data class SettleEntry(var rotationVec: Vec3, var lastScale: Float, var framesStable: Int)
 }

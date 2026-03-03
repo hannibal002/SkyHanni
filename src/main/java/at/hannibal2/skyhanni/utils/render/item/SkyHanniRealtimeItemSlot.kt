@@ -12,6 +12,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
+import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.texture.OverlayTexture
@@ -42,6 +43,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
     fun render(
         context: SkyHanniItemRenderContext,
         state: SkyHanniGuiItemRenderState,
+        guiRenderState: GuiRenderState,
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
     ) {
         val texture = texture ?: return
@@ -80,13 +82,16 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
         RenderSystem.outputDepthTextureOverride = null
 
         // Blit is submitted AFTER the texture override is cleared
-        submitBlit(context, state)
+        submitBlit(state, guiRenderState)
     }
 
-    private fun submitBlit(context: SkyHanniItemRenderContext, state: SkyHanniGuiItemRenderState) {
+    private fun submitBlit(
+        state: SkyHanniGuiItemRenderState,
+        guiRenderState: GuiRenderState,
+    ) {
         val textureView = textureView ?: return
         // u/v: full slot occupies [0,1] x [0,1] in the per-item texture
-        context.guiRenderState.submitBlitToCurrentLayer(
+        guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
                 //? if < 1.21.11 {
