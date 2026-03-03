@@ -58,6 +58,7 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
         sizePixels = size
         allocateTextures(size, "SkyHanni item atlas", "SkyHanni item atlas depth", usage)
         packer = SkyHanniAtlasBinPacker(size)
+        @Suppress("UnsafeCallOnNullableType")
         renderer = SkyHanniItemAtlasRenderer(size, textureView!!, depthTextureView!!, texture!!, depthTexture!!)
     }
 

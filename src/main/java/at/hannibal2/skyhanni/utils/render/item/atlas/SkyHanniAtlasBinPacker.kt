@@ -6,7 +6,7 @@ internal class SkyHanniAtlasBinPacker(size: Int) {
         private const val PADDING = 1
     }
 
-    private var root: Node = Node(0, 0, size, size)
+    private val root: Node = Node(0, 0, size, size)
 
     data class PackedNode(val x: Int, val y: Int)
 

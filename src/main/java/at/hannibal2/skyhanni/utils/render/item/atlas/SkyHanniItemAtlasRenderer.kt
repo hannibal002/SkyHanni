@@ -12,6 +12,8 @@ import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+//? if > 1.21.10
+// import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
