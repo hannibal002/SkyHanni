@@ -28,34 +28,24 @@ object HotxFeatures {
     private val configHotm get() = SkyHanniMod.feature.mining.hotm
     private val configHotf get() = SkyHanniMod.feature.foraging.hotf
 
+    private val handlers = listOf(HotmData, HotfData)
+
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
-        if (configHotm.skyMallDisplay.isActive()) renderOverlay(HotmData, configHotm.skyMallPosition)
-        if (configHotf.lotteryDisplay.isActive()) renderOverlay(HotfData, configHotf.lotteryPosition)
+        handlers.forEach { it.renderOverlay() }
     }
 
-    private fun SkyMallDisplayVisibility.isActive() = when (this) {
-        SkyMallDisplayVisibility.OFF -> false
-        SkyMallDisplayVisibility.MINING_ONLY -> HotmData.inApplicableIsland
-        SkyMallDisplayVisibility.EVERYWHERE -> true
-    }
-
-    private fun LotteryDisplayVisibility.isActive() = when (this) {
-        LotteryDisplayVisibility.OFF -> false
-        LotteryDisplayVisibility.FORAGING_ONLY -> HotfData.inApplicableIsland
-        LotteryDisplayVisibility.EVERYWHERE -> true
-    }
-
-    private fun renderOverlay(handler: HotxHandler<*, *, *>, configPos: Position) {
-        val rotatingPerkEntry = handler.rotatingPerkEntry
+    private fun HotxHandler<*, *, *>.renderOverlay() {
+        if (!shouldShowDisplay) return
+        val rotatingPerkEntry = rotatingPerkEntry
         if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
-        val currentPerk = handler.currentRotPerk
+        val currentPerk = currentRotPerk
 
         val perkDescriptionFormat = currentPerk?.perkDescription
-            ?: "§cUnknown! Run ${"§b/${handler.name.lowercase()}"} §cto fix this."
+            ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
         val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
 
-        configPos.renderRenderable(
+        position.renderRenderable(
             Renderable.text(finalFormat),
             posLabel = "${rotatingPerkEntry.guiName} Display",
         )
