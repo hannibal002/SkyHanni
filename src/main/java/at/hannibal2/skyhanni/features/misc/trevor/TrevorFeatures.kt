@@ -380,7 +380,7 @@ object TrevorFeatures {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcleartalbotcircles") {
-            description = "Clears talbot circles"
+            description = "Clears Talbot circles"
             category = CommandCategory.USERS_RESET
             simpleCallback { TalbotCircles.resetCircles() }
         }
