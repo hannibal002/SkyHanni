@@ -67,6 +67,9 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldSelfNotifyOnCatch = seaCreature.rare,
+                            shouldNotifyForNonOwn = seaCreature.rare,
+                            shouldHighlight = seaCreature.rare,
                         ),
                     ),
                 )
@@ -87,6 +90,9 @@ class SpecificSeaCreatures(
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
+                            shouldSelfNotifyOnCatch = seaCreature.rare,
+                            shouldNotifyForNonOwn = seaCreature.rare,
+                            shouldHighlight = seaCreature.rare,
                         ),
                     ),
                 )
@@ -106,6 +112,9 @@ class SpecificSeaCreatures(
                         seaCreature.shouldShowHealthOverlay,
                         seaCreature.shouldShareInChat,
                         seaCreature.shouldShowKillTime,
+                        seaCreature.shouldSelfNotifyOnCatch,
+                        seaCreature.shouldNotifyForNonOwn,
+                        seaCreature.shouldHighlight,
                     )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
@@ -146,6 +155,21 @@ class SpecificSeaCreatures(
     @Bind
     fun showKillTime() {
         openXML("killtime")
+    }
+
+    @Bind
+    fun showSelfNotify() {
+        openXML("selfnotify")
+    }
+
+    @Bind
+    fun showOtherNotify() {
+        openXML("notifynonown")
+    }
+
+    @Bind
+    fun showHighlight() {
+        openXML("shouldhighlight")
     }
 
     private fun openXML(string: String) {

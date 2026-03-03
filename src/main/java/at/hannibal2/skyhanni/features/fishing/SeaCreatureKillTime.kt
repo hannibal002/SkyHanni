@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
+import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -14,12 +15,11 @@ import net.minecraft.ChatFormatting
 @SkyHanniModule
 object SeaCreatureKillTime {
     private val config get() = SkyHanniMod.feature.fishing
-    private val scSpecificConfig get() = SkyHanniMod.seaCreatureStorage.specificSeaCreatureConfigStorage
 
     @HandleEvent
     fun onSeaCreatureDeath(event: SeaCreatureEvent.Death) {
         if (!config.seaCreatureKillTimer) return
-        if (scSpecificConfig[event.name]?.shouldShowKillTime == false) return
+        if (SeaCreatureSettings.getConfig(event.name)?.shouldShowKillTime != true) return
         if (!event.seaCreature.isOwn && config.seaCreatureKillTimerOwnMobsOnly) return
         val seaCreature = event.seaCreature
         val time = seaCreature.spawnTime.passedSince()
