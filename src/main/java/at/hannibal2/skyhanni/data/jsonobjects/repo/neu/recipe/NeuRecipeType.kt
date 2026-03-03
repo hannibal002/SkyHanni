@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
+// Todo, possibly add other recipe types that are not item `recipes`/`recipe` entries,
+//  e.g., essence upgrades.
 enum class NeuRecipeType(
     val neuRepoId: String? = null,
     val useForCraftCost: Boolean = true,

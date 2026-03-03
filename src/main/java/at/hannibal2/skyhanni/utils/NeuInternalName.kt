@@ -28,6 +28,11 @@ value class NeuInternalName private constructor(private val internalName: String
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
 
+    fun isArmor(): Boolean = internalName.endsWith("_BOOTS") ||
+        internalName.endsWith("_HELMET") ||
+        internalName.endsWith("_CHESTPLATE") ||
+        internalName.endsWith("_LEGGINGS")
+
     fun getItemCategoryOrNull(): ItemCategory? =
         categoryCache.getOrPut(this) { getItemStackOrNull()?.getItemCategoryOrNull() ?: return null }
 

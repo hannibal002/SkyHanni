@@ -353,7 +353,7 @@ class ItemResolutionQuery {
         } else if (guiName == "Confirm Fusion") {
             compound.getLore().firstOrNull()?.let {
                 shardPattern.matchMatcher(it) {
-                    return@matchMatcher resolveItemInHuntingBoxMenu(
+                    resolveItemInHuntingBoxMenu(
                         group("name")
                     )
                 }

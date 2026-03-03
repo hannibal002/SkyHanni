@@ -651,21 +651,13 @@ object ComposterOverlay {
         "SIMPLE_CARROT_CANDY",
     ).map { it.toInternalName() }
 
-    private fun isBlockedArmor(internalName: NeuInternalName): Boolean {
-        val asString = internalName.asString()
-        return asString.endsWith("_BOOTS") ||
-            asString.endsWith("_HELMET") ||
-            asString.endsWith("_CHESTPLATE") ||
-            asString.endsWith("_LEGGINGS")
-    }
-
     private val HUGE_MUSHROOM_1 = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
     private val HUGE_MUSHROOM_2 = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
 
     private fun updateOrganicMatterFactors(baseValues: Map<NeuInternalName, Double>): Map<NeuInternalName, Double> {
         val map = mutableMapOf<NeuInternalName, Double>()
         for (internalName in NeuItems.allNeuRepoInternalNames()) {
-            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
+            if (blockedItems.contains(internalName) || internalName.isArmor()) continue
 
             var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
             if (internalName == HUGE_MUSHROOM_1 || internalName == HUGE_MUSHROOM_2) {

@@ -165,12 +165,13 @@ object EnoughUpdatesManager {
             }
         }
         return itemJson
-    }.getOrNull()
+    }.getOrThrow()
 
     fun getItemById(id: String): NeuItemJson? = itemMap[id.toInternalName()]
     fun getItemById(internalName: NeuInternalName): NeuItemJson? = itemMap[internalName]
 
     fun stackToJson(stack: ItemStack): JsonObject {
+        @Suppress("DEPRECATION")
         val lore = stack.getLore()
 
         val json = JsonObject()
@@ -200,12 +201,12 @@ object EnoughUpdatesManager {
         if (usingCache) itemStackCache[internalName]?.let { return it.copy() }
 
         val defaultStack = ItemStack(Blocks.AIR.asItem())
-        val baseItem = itemId.getVanillaItem() ?: return defaultStack
+        val convertedItem = ComponentUtils.convertMinecraftIdToModern(itemId, damage ?: 0)
+        val baseItem = convertedItem.getVanillaItem() ?: return defaultStack
         val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return defaultStack
 
         count?.let { stack.count = it }
-        damage?.let { stack.damageValue }
-        nbtTag.let { ComponentUtils.convertToComponents(stack, neuNbt) }
+        ComponentUtils.convertToComponents(stack, neuNbt)
 
         var replacements = mapOf<String, String>()
         if (useReplacements) {

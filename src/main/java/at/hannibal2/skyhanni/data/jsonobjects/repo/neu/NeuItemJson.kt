@@ -22,6 +22,12 @@ import java.util.Base64
 data class NeuItemJson(
     @Expose @SerializedName("itemid") var itemId: String,
     @Expose @SerializedName("displayname") val displayName: String? = null,
+    /**
+     * From the NEU repo, this can be either a JSON object, or an NBT tag string.
+     * We have to accept any from 'nbttag' since we don't have a type guarantee,
+     * and perform further conversion ourselves. Don't use this field.
+     */
+    @Deprecated("Use neuNbt or nbtTag instead", ReplaceWith("neuNbt or nbtTag"))
     @Expose @SerializedName("nbttag") private val nbtTagAny: Any,
     @Expose val damage: Int? = null,
     @Expose val lore: List<String> = emptyList(),
@@ -42,6 +48,7 @@ data class NeuItemJson(
     }
 
     private val fixedNbtTagString by lazy {
+        @Suppress("DEPRECATION")
         when (nbtTagAny) {
             is String -> nbtTagAny
             is JsonObject -> nbtTagAny["nbttag"]?.asString.orEmpty()
