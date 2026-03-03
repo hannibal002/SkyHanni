@@ -47,6 +47,7 @@ object StewHelper {
 
     private val inventoryDetector = InventoryDetector(
         checkInventoryName = { it == "Witches Stew" },
+        // TODO use InventoryUpdatedEvent, either in this file, or in InventoryDetector
         onOpenInventory = { DelayedRun.runNextTick { checkSlots() } },
     )
 
@@ -62,7 +63,7 @@ object StewHelper {
         for (slot in event.container.slots) {
             val stack = slot.item
             if (stack.item != Items.PLAYER_HEAD) continue
-            val status = getStewStatus(stack)
+            val status = getStewStatus(stack) ?: continue
             status.color?.let { slot.highlight(it) }
         }
     }
@@ -129,8 +130,9 @@ object StewHelper {
         display = emptyList()
     }
 
-    private fun getStewStatus(stack: ItemStack): StewStatus {
-        val lastLine = stack.getLoreComponent().last().string
+    // TODO repo patterns for the two lastLine
+    private fun getStewStatus(stack: ItemStack): StewStatus? {
+        val lastLine = stack.getLoreComponent().lastOrNull()?.string ?: return null
         if (lastLine == "You've already eaten this stew!") return StewStatus.HAS_EATEN
         if (lastLine == "Click to give ingredients!") return StewStatus.HAS_ENOUGH
         return StewStatus.MISSING_INGREDIENTS
