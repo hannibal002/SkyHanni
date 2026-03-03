@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.dwarves.DarkMonolithConfig
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -76,25 +77,21 @@ object DarkMonolithFeatures {
         "§5§lMONOLITH! §r§aYou.*§r§aand were rewarded ?(?:(?:§.)+(?<coins>[\\d,]+) Coins ?(?:§.)+)?(?:!|and )?(?:(?:§.)+(?<powder>[\\d,]+) ᠅ Mithril Powder§r§a!)?",
     )
 
-    private var knownEggs: Set<LorenzVec> = setOf()
-    private var foundEggVec: LorenzVec? = null
-    private var lastFoundEggVec: LorenzVec? = null
-    private var renderBox: AABB? = null
-    private var nextBlockCheck: SimpleTimeMark = SimpleTimeMark.farPast()
-
-    private fun reset() {
-        knownEggs = setOf()
-        foundEggVec = null
-        lastFoundEggVec = null
-        renderBox = null
-        nextBlockCheck = SimpleTimeMark.farPast()
-    }
+    private data class DarkMonolithData(
+        var knownEggs: Set<LorenzVec> = setOf(),
+        var foundEggVec: LorenzVec? = null,
+        var lastFoundEggVec: LorenzVec? = null,
+        var renderBox: AABB? = null,
+        var nextBlockCheck: SimpleTimeMark = SimpleTimeMark.farPast(),
+    ) : Resettable
+    private val data = DarkMonolithData()
 
     init {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.tracker && IslandType.DWARVEN_MINES.isCurrent() },
+            condition = { config.tracker },
+            onlyOnIsland = IslandType.DWARVEN_MINES,
             onRender = {
                 tracker.renderDisplay(config.trackerPosition)
             },
@@ -104,7 +101,7 @@ object DarkMonolithFeatures {
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         dropPattern.matchMatcher(event.message) {
-            DarkMonolithFeatures.reset()
+            data.reset()
             groupOrNull("coins")?.let {
                 tracker.addCoins(it.formatInt(), false)
             }
@@ -122,7 +119,7 @@ object DarkMonolithFeatures {
 
     @HandleEvent
     fun onWorldChange(event: IslandChangeEvent) {
-        reset()
+        data.reset()
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
@@ -131,7 +128,7 @@ object DarkMonolithFeatures {
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onSecondPassed() {
         if (!anyEnabled()) return
-        knownEggs = BlockUtils.nearbyBlocks(
+        data.knownEggs = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
             distance = 40,
             filter = DRAGON_EGG,
@@ -141,10 +138,10 @@ object DarkMonolithFeatures {
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onTick() {
         if (!anyEnabled()) return
-        updateKnownEggs()
-        val knownEggVec = foundEggVec ?: return
+        data.updateKnownEggs()
+        val knownEggVec = data.foundEggVec ?: return
         with(WorldRenderUtils) {
-            renderBox = knownEggVec.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
+            data.renderBox = knownEggVec.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
         }
     }
 
@@ -158,14 +155,14 @@ object DarkMonolithFeatures {
         )
     }
 
-    private fun updateKnownEggs() {
+    private fun DarkMonolithData.updateKnownEggs() {
         if (nextBlockCheck.isInFuture()) return
         foundEggVec = knownEggs.firstOrNull(::canSeeFaces)
         checkTitle()
         nextBlockCheck = SimpleTimeMark.now().plus(500.milliseconds)
     }
 
-    private fun checkTitle() {
+    private fun DarkMonolithData.checkTitle() {
         if (foundEggVec == null || foundEggVec == lastFoundEggVec) return
         lastFoundEggVec = foundEggVec
         if (!config.title.enabled) return
@@ -192,7 +189,7 @@ object DarkMonolithFeatures {
 
     private fun SkyHanniRenderWorldEvent.tryBeacon() {
         if (!config.beacon.enabled) return
-        val foundVec = foundEggVec ?: return
+        val foundVec = data.foundEggVec ?: return
         with(WorldRenderUtils) {
             renderBeaconBeam(foundVec, config.beacon.color.toColor())
         }
@@ -200,7 +197,7 @@ object DarkMonolithFeatures {
 
     private fun SkyHanniRenderWorldEvent.tryHighlight() {
         if (!config.highlight.enabled) return
-        val axis = renderBox ?: return
+        val axis = data.renderBox ?: return
         with(WorldRenderUtils) {
             drawFilledBoundingBox(axis, config.highlight.color.toColor())
         }
@@ -210,11 +207,11 @@ object DarkMonolithFeatures {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Dark Monolith")
         event.addIrrelevant {
-            add("knownEggs: ${knownEggs.size}")
-            add("knownEggs can be seen: ${knownEggs.count(::canSeeFaces)}")
-            add("foundEggVec: $foundEggVec")
-            add("lastFoundEggVec: $lastFoundEggVec")
-            add("renderBox: $renderBox")
+            add("knownEggs: ${data.knownEggs.size}")
+            add("knownEggs can be seen: ${data.knownEggs.count(::canSeeFaces)}")
+            add("foundEggVec: ${data.foundEggVec}")
+            add("lastFoundEggVec: ${data.lastFoundEggVec}")
+            add("renderBox: ${data.renderBox}")
         }
     }
 
