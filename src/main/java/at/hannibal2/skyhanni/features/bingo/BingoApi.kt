@@ -34,8 +34,15 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object BingoApi {
 
+    // TODO replace with dynamic detection once we have secret bingo detection (maybe via repo?)
+    private val BINGO_EVENT_DURATION = 7.days
+    private val BINGO_NPC_OFFSET = 3.days
+
     private var ranks = mapOf<String, Int>()
     private var data: Map<String, BingoData> = emptyMap()
+
+    private var bingoNpcHidden = false
+    private var alixerHidden = false
 
     val bingoGoals get() = bingoStorage.goals
     val personalGoals get() = bingoGoals.values.filter { it.type == GoalType.PERSONAL }
@@ -145,13 +152,6 @@ object BingoApi {
             rankIcon
         }
     }
-
-    // TODO replace with dynamic detection once we have secret bingo detection (maybe via repo?)
-    private val BINGO_EVENT_DURATION = 7.days
-    private val BINGO_NPC_OFFSET = 3.days
-
-    private var bingoNpcHidden = false
-    private var alixerHidden = false
 
     @HandleEvent(IslandGraphReloadEvent::class)
     fun onIslandGraphReload() {
