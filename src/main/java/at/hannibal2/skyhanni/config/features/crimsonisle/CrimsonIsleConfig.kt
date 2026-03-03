@@ -96,8 +96,8 @@ class CrimsonIsleConfig {
     var magmaBossDisplay: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Vanquisher Waypoint", desc = "Vanquisher Waypoint Settings")
+    @ConfigOption(name = "Vanquisher Waypoint", desc = "")
     @Accordion
-    var vanquisherSharing = VanquisherWaypointShareConfig()
+    var vanquisherShare = VanquisherWaypointShareConfig()
 
 }

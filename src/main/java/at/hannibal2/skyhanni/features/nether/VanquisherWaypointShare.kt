@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.util.concurrent.ConcurrentHashMap
-import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
@@ -34,18 +33,29 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import net.minecraft.world.entity.boss.wither.WitherBoss
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import java.awt.Color
 
 
 @SkyHanniModule
 object VanquisherWaypointShare {
 
-    private val config get() = SkyHanniMod.feature.crimsonIsle.vanquisherSharing
+    private val config get() = SkyHanniMod.feature.crimsonIsle.vanquisherShare
     private val patternGroup = RepoPattern.group("vanquisher.waypoint")
 
     /**
-     * REGEX-TEST: §9Party §8> User Name§f: Vanquisher dead!
-     * REGEX-TEST: §b[MVP§9+§b] itsseth3§f: Vanquisher dead!
+     * REGEX-TEST: Party > [MVP+] itsseth3: x: 100 y: 90 z: 10 | Vanquisher
+     * REGEX-TEST: [MVP+] itsseth3: x: -10 y: 30 z: 22 | Vanquisher
+     */
+    @Suppress("MaxLineLength")
+    private val vanquisherSharedPattern by patternGroup.list(
+        "vanquisher.waypoint.share",
+        "^(?:Party > |Guild > |Officer > )?([^:]+):.*?x:\\s*(-?[\\d.]+).*?y:\\s*(-?[\\d.]+).*?z:\\s*(-?[\\d.]+).*?Vanquisher.*",
+    )
+
+    /**
+     * REGEX-TEST: Party > [MVP+] itsseth3: Vanquisher dead!
+     * REGEX-TEST: [MVP+] itsseth3: Vanquisher dead!
      */
 
     private val vanquisherDiedPattern by patternGroup.pattern(
@@ -62,7 +72,7 @@ object VanquisherWaypointShare {
         ".*A Vanquisher is spawning nearby!"
     )
 
-    private var myVanquisherId = -1
+    private var myVanquisherId: Int? = null
 
     private var lastShareTime = SimpleTimeMark.farPast()
 
@@ -110,7 +120,7 @@ object VanquisherWaypointShare {
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
-        if (myVanquisherId == -1) {
+        if (myVanquisherId == null) {
             val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
             if (closestId != null) {
                 myVanquisherId = closestId.id
@@ -120,7 +130,7 @@ object VanquisherWaypointShare {
             }
         }
 
-        val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId)
+        val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId!!)
 
         if (entity == null || entity.deceased) {
             ChatUtils.chat("§cRare Mob is dead")
@@ -141,9 +151,9 @@ object VanquisherWaypointShare {
     private fun sendVanquisherDeath() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 2.seconds) return
-        if (myVanquisherId == -1) return
+        if (myVanquisherId == null) return
 
-        myVanquisherId = -1
+        myVanquisherId = null
         if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("Vanquisher dead!")
         } else {
@@ -153,24 +163,23 @@ object VanquisherWaypointShare {
 
     private fun isEnabled() = config.enabled
 
-    private fun Matcher.block(): Boolean = !hasGroup("party") && !config.readGlobalChat
-
     @HandleEvent
-    fun whenChangeWorld(event: WorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         sharedWaypoints.clear()
         vanquisherNearby.clear()
-        myVanquisherId = -1
+        myVanquisherId = null
+
     }
 
     @HandleEvent
-    fun keyPressEvent(event: KeyPressEvent) {
+    fun onKeyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getInstance().screen != null) return
         if (event.keyCode == config.keybindSharing) sendVanquisher()
     }
 
     @HandleEvent
-    fun checkVanquisherHealth(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
         if (event.health > 0) return
 
@@ -182,46 +191,38 @@ object VanquisherWaypointShare {
     }
 
     @HandleEvent
-    fun checkSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-
-        sharedWaypoints.values.removeIf { it.spawnTime.passedSince() > 60.seconds }
-
         if (event.repeatSeconds(3)) {
+            sharedWaypoints.values.removeIf { it.spawnTime.passedSince() > 60.seconds }
             vanquisherNearby.values.removeIf { it.deceased || !it.isAlive }
+
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true)
-    fun readChat(event: SkyHanniChatEvent.Allow) {
+    fun onReadChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.cleanMessage
 
         if (vanquisherSpawnedPattern.matches(message)) {
-            if (myVanquisherId == -1) {
+            if (myVanquisherId == null) {
                 val closestId = vanquisherNearby.values.minByOrNull {
                     it.distanceToPlayer()
                 }
                 if (closestId != null) { foundVanquisher(closestId.id) }
             }
         }
-
-        val customRegex = Regex(
-            "^(?:Party > |Guild > |Officer > )?([^:]+):.*?x:\\s*(-?[\\d.]+).*?y:\\s*(-?[\\d.]+).*?z:\\s*(-?[\\d.]+).*?Vanquisher.*",
-            RegexOption.IGNORE_CASE
-        )
-        val match = customRegex.find(message)
-
-        if (match != null) {
-            val rawName = match.groupValues[1].trim()
-            val x = match.groupValues[2].toDoubleOrNull() ?: return
-            val y = match.groupValues[3].toDoubleOrNull() ?: return
-            val z = match.groupValues[4].toDoubleOrNull() ?: return
+        vanquisherSharedPattern.matchMatchers(message) {
+            val rawName = group("playerName").trim()
+            val x = group("x").toDoubleOrNull() ?: return@matchMatchers
+            val y = group("y").toDoubleOrNull() ?: return@matchMatchers
+            val z = group("z").toDoubleOrNull() ?: return@matchMatchers
 
             val name = rawName.cleanPlayerName()
             val playerDisplayName = rawName.cleanPlayerName(displayName = true)
 
-            val yourName = Minecraft.getInstance().player?.name?.string.orEmpty()
+            val yourName = PlayerUtils.getName()
             val playerIsYou = name.equals(yourName, ignoreCase = true)
 
             val location = LorenzVec(x, y, z)
@@ -236,9 +237,7 @@ object VanquisherWaypointShare {
 
                 event.blockedReason = "vanquisher_waypoint"
             }
-            return
         }
-
         vanquisherDiedPattern.matchMatcher(message) {
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
@@ -251,11 +250,10 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
         val entity = event.entity
 
-        if (entity.name.string.equals("Wither", ignoreCase = true) || entity.name.string.contains("Vanquisher", ignoreCase = true)) {
+        if (entity.name.string.equals("Wither", ignoreCase = true)) {
             vanquisherNearby[entity.id] = entity
 
-            val player = Minecraft.getInstance().player ?: return
-            if (entity.distanceTo(player) < 15.0) {
+            if (entity.distanceToPlayer() < 15.0) {
                 if (myVanquisherId != entity.id) {
                     foundVanquisher(entity.id)
                 }
