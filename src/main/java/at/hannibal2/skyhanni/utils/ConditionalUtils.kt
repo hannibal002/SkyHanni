@@ -96,8 +96,8 @@ object ConditionalUtils {
 
         val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
         for (prop in nonTransientProps) {
-            if (prop.javaField == null) continue
-            runCatching { prop.javaGetter }.getOrNull() ?: continue
+            val getter = runCatching { prop.javaGetter }.getOrNull()
+            if (prop.javaField == null && getter == null) continue
             if (runCatching { prop.isAccessible = true }.isFailure) continue
             val value = runCatching { prop.getter.call(current) }.getOrNull() ?: continue
             when (value) {
@@ -108,5 +108,4 @@ object ConditionalUtils {
             }
         }
     }
-
 }
