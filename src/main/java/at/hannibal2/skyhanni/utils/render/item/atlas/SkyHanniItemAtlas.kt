@@ -209,7 +209,7 @@ internal class SkyHanniItemAtlas : AutoCloseable {
         ps.scale(f, -f, f)
 
         ps.scale(rotationPadding, rotationPadding, rotationPadding)
-        val rotated = ps.mulPose(shState.rotationVec)
+        val rotated = ps.mulPose(shState.rotationVector)
         ps.translate(0.0f, 0.03f, 0.125f)
 
         val gameRenderer = Minecraft.getInstance().gameRenderer

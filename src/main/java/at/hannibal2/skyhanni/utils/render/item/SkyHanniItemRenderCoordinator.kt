@@ -49,10 +49,10 @@ internal object SkyHanniItemRenderCoordinator {
             val stateKey = state.getAtlasKey(guiScale) ?: continue
 
             // Track rotation stability
-            val settle = settleTracker.getOrPut(stateKey) { SettleEntry(state.rotationVec, 0) }
-            if (settle.rotationVec == state.rotationVec) settle.framesStable++
+            val settle = settleTracker.getOrPut(stateKey) { SettleEntry(state.rotationVector, 0) }
+            if (settle.rotationVec == state.rotationVector) settle.framesStable++
             else {
-                settle.rotationVec = state.rotationVec
+                settle.rotationVec = state.rotationVector
                 settle.framesStable = 0
             }
 

@@ -7,14 +7,16 @@ import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
 data class SkyHanniGuiItemRenderState(
+    val itemStack: ItemStack,
     val guiItemRenderState: GuiItemRenderState,
     val x: Float,
     val y: Float,
-    val rotationVec: Vec3,
+    val rotationVector: Vec3,
     private val translationVec: Vec3,
     val scale: Float = 1f,
     // Adjusted scale must account for the GUI Scale from SH editor
@@ -26,14 +28,15 @@ data class SkyHanniGuiItemRenderState(
         fun nextStableId() = counter++
     }
 
-    private val trackingState: TrackingItemStackRenderState? by lazy { guiItemRenderState.itemStackRenderState() }
-    val stableId = passedStableId?.takeIf { it >= 0 } ?: nextStableId()
+    val stableId: Int = passedStableId?.takeIf { it >= 0 } ?: nextStableId()
+    private val trackingState: TrackingItemStackRenderState = guiItemRenderState.itemStackRenderState()
+    private val _atlasKey = SkyHanniAtlasKey(trackingState.modelIdentity, scale, adjustedScale, stableId, rotationVector)
+    val atlasKey get() = _atlasKey
+    val modelIdentity: Any = trackingState.modelIdentity.let {
 
-    fun getAtlasKey(guiScale: Int): SkyHanniAtlasKey? = trackingState?.let {
-        SkyHanniAtlasKey(it.modelIdentity, scale, guiScale, stableId, rotationVec)
     }
 
-    private val x0 = x.toInt()
+        private val x0 = x.toInt()
     private val x1 = (x + (scale * 16)).toInt()
     private val y0 = y.toInt()
     private val y1 = (y + (scale * 16)).toInt()

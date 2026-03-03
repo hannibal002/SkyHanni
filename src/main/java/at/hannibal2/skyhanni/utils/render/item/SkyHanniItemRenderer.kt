@@ -38,7 +38,7 @@ class SkyHanniItemRenderer(
         identityPoseStack.scale(1.0f, -1.0f, -1.0f)
 
         // Rotation
-        val rotated = identityPoseStack.mulPose(shItemRenderState.rotationVec)
+        val rotated = identityPoseStack.mulPose(shItemRenderState.rotationVector)
         identityPoseStack.translate(0.0f, 0.03f, 0.125f)
 
         val gameRenderer = Minecraft.getInstance().gameRenderer
@@ -63,8 +63,8 @@ class SkyHanniItemRenderer(
         this.usedOnThisFrame = true
     }
 
-    override fun textureIsReadyToBlit(itemRenderState: SkyHanniGuiItemRenderState): Boolean {
-        return !itemRenderState.isAnimated() && itemRenderState.getModelIdentity() == this.modelOnTextureIdentity
+    override fun textureIsReadyToBlit(shItemRenderState: SkyHanniGuiItemRenderState): Boolean {
+        return !shItemRenderState.isAnimated() && shItemRenderState.getModelIdentity()?.equals(this.modelOnTextureIdentity) ?: false
     }
 
     override fun getTranslateY(i: Int, j: Int): Float {
