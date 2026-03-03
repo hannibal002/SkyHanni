@@ -358,9 +358,11 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
+        // Todo, uncomment when modern item rendering is fixed
+        /* if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight())) */
             return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
+        /*
         /**
          * This is used to render items that fit these criteria:
          *  - Uses block light (mostly skulls)
@@ -390,6 +392,7 @@ object GuiRenderUtils {
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId
+        */
     }
 
     private fun ItemStack.normalRenderOnScreen(
