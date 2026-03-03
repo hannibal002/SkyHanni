@@ -677,7 +677,10 @@ object ComposterOverlay {
     fun onBackgroundDraw() {
         if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
-        if (displayDirty) update()
+        if (displayDirty) {
+            update()
+            displayDirty = false
+        }
 
         config.overlayOrganicMatterPos.renderRenderable(
             organicMatterDisplay,
