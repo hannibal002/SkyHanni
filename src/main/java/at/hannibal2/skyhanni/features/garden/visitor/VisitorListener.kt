@@ -41,8 +41,6 @@ object VisitorListener {
 
     private val config get() = VisitorApi.config
 
-    private val logger = LorenzLogger("garden/visitors/listener")
-
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
         VisitorApi.reset()
