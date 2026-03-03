@@ -124,11 +124,6 @@ class DevConfig {
     var rotateContributors: Boolean = false
 
     @Expose
-    @ConfigOption(name = "SBA Contributors", desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
-    @ConfigEditorBoolean
-    var fancySbaContributors: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Number Format Override", desc = "Forces the number format to use the en_US locale.")
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false

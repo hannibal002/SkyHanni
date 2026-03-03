@@ -20,15 +20,19 @@ object CarnivalQuickStart {
 
     private val config get() = SkyHanniMod.feature.event.carnival.doubleClickToStart
 
-    /** REGEX-TEST: §eSelect an option: §r\n§e ➜ §a[Sure thing, partner!] §r\n§e ➜ §b[Could ya tell me the rules again?] §r\n§e ➜ §c[I'd like to do somthin' else fer now.]
-     * */
-    private val chatPattern by RepoPattern.pattern("carnival.select.option.chat", "§eSelect an option:.*")
+    private val patternGroup = RepoPattern.group("carnival")
 
-    private val patternGroup = RepoPattern.group("carnival.npcs")
-
-    private val pirate by patternGroup.pattern("pirate", "Carnival Pirateman")
-    private val fisher by patternGroup.pattern("fisher", "Carnival Fisherman")
-    private val cowboy by patternGroup.pattern("cowboy", "Carnival Cowboy")
+    /**
+     * WRAPPED-REGEX-TEST: "Select an option: \n  ➜ [Sure thing, partner!] \n  ➜ [Could ya tell me the rules again?] \n  ➜ [I'd like to do somthin' else fer now.] "
+     */
+    private val chatPattern by patternGroup.pattern(
+        "select.option.chat-nocolor",
+        // NOTE: Do not use .* here, it doesn't match newlines.
+        "Select an option:[\\s\\S]*",
+    )
+    private val pirate by patternGroup.pattern("npcs.pirate", "Carnival Pirateman")
+    private val fisher by patternGroup.pattern("npcs.fisher", "Carnival Fisherman")
+    private val cowboy by patternGroup.pattern("npcs.cowboy", "Carnival Cowboy")
 
     private var lastChat = SimpleTimeMark.farPast()
     private var lastClicked = SimpleTimeMark.farPast()
@@ -53,10 +57,12 @@ object CarnivalQuickStart {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        // IDK what is wrong here, but it does not work with event.message
-        if (!chatPattern.matches(event.chatComponent)) return
+        if (!chatPattern.matches(event.cleanMessage)) return
         lastChat = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config && Perk.CHIVALROUS_CARNIVAL.isActive && SkyBlockUtils.graphArea == "Carnival"
+    fun isEnabled() =
+        config &&
+            Perk.CHIVALROUS_CARNIVAL.isActive &&
+            SkyBlockUtils.graphArea == "Carnival"
 }

@@ -35,9 +35,15 @@ for (i in 1..maxAttempts) {
     val proc = ProcessBuilder(cmd)
         .redirectErrorStream(true)
         .start()
-    val output = proc.inputStream.bufferedReader().readText()
+
+    val outputLines = mutableListOf<String>()
+    proc.inputStream.bufferedReader().forEachLine { line ->
+        println(line)
+        outputLines.add(line)
+    }
     proc.waitFor()
-    print(output)
+
+    val output = outputLines.joinToString("\n")
 
     if (proc.exitValue() == 0) {
         println("✅ Build succeeded on attempt #$i")
