@@ -155,8 +155,6 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
 
     fun invalidate() {
         positions.clear()
-        packer = null
-        renderer = null
         close()
     }
 
