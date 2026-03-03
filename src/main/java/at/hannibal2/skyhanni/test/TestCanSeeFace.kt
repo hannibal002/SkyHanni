@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
@@ -114,7 +113,7 @@ object TestCanSeeFace {
                 val format = if (isSeen) "§a§l✓§r" else "§c§l✗§r"
                 val vecFormat = point.shortFormatVec()
                 Renderable.text(" Point $index: $vecFormat $format")
-            }
+            },
         )
     }
 
@@ -194,7 +193,7 @@ object TestCanSeeFace {
                         config::enabled.jumpToEditor()
                     },
                     hover = "Click to open the dev tool config",
-                    replaceSameMessage = true
+                    replaceSameMessage = true,
                 )
                 faceCheckContext.reset()
                 faceCheckContext.waitingForPunch = true
@@ -226,15 +225,14 @@ object TestCanSeeFace {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
-        val pointSet = faceCheckContext.pointSet.takeIfNotEmpty() ?: return
-        for ((face, _) in pointSet) {
-            event.tryHighlightFace(faceCheckContext, face)
-            event.drawRaysFromFacePoints(face, pointSet[face] ?: continue)
+        for ((face, points) in faceCheckContext.pointSet) {
+            event.tryHighlightFace(face)
+            event.drawRaysFromFacePoints(face, points)
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class)
+    fun onRenderOverlay() {
         if (!enabled || !debugEnabled) return
         val renderable = faceCheckContext.debugRenderable ?: lastRenderable ?: return
         lastRenderable = renderable
@@ -300,15 +298,12 @@ object TestCanSeeFace {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.tryHighlightFace(
-        context: FaceCheckContext,
-        face: Direction,
-    ) {
+    private fun SkyHanniRenderWorldEvent.tryHighlightFace(face: Direction) {
         if (!faceHighlightConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
-        val points = context.pointSet[face] ?: return
+        val points = faceCheckContext.pointSet[face] ?: return
         val faceSeen = points.any { it.second }
         val color = if (faceSeen) faceHighlightConfig.seenColor.get() else faceHighlightConfig.unseenColor.get()
-        for (aabb in context.aabbs) {
+        for (aabb in faceCheckContext.aabbs) {
             fillFace(aabb, face, color.toColor(), alpha = 1f)
         }
     }
