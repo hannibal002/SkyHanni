@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight.getActiveSparks
+import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -87,7 +87,6 @@ object FireFreezeFeatures {
 
     private const val RADIUS = 5.0
     private val freezeDuration = 10.seconds
-    private val log = LorenzLogger("particles/fire_freeze")
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
@@ -103,7 +102,7 @@ object FireFreezeFeatures {
         val pitch = event.pitch
         if (pitch !in 0.0..2.0) return
         val fireFreeze = fireFreezes[pos]
-        if (getActiveSparks().any { it.distanceTo(pos) < 2 }) return
+        if (ThunderSparksHighlight.getActiveSparks().any { it.distanceTo(pos) < 2 }) return
         if (fireFreeze == null) {
             fireFreezes[pos] = FireFreezeArea(pos, pitch)
             return
@@ -129,7 +128,6 @@ object FireFreezeFeatures {
     fun onParticle(event: ReceiveParticleEvent) {
         if (event.type != ParticleTypes.DUST) return
         if (event.count != 0 || event.speed != 1.0f || !event.isFreezeParticle()) return
-        log.log("${event.offset} ${event.type} ${event.distanceToPlayer}")
         if (!config.customCircle) return
         if (event.location.isInAnyFireFreeze()) event.cancel()
     }
