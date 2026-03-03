@@ -92,9 +92,10 @@ internal object SkyHanniItemRenderCoordinator {
         frameNumber: Int,
     ) {
         val resources = frameResources ?: return
-        val settle = settleTracker[state.stableId]
-        val isSettled = settle != null && (settle.framesStable >= SETTLE_FRAMES ||
-            (!state.isAnimated() && abs(settle.lastScale - state.adjustedScale) < 0.01f))
+        val isSettled = settleTracker[state.stableId]?.let {
+            val smallChange = !state.isAnimated() && abs(it.lastScale - state.adjustedScale) < 0.01f
+            it.framesStable >= SETTLE_FRAMES || smallChange
+        } ?: false
 
         if (isSettled) {
             val blitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }

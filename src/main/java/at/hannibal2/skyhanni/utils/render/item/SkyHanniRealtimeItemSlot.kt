@@ -21,6 +21,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
 
     init { allocate(slotSize) }
 
+    @Suppress("UnsafeCallOnNullableType")
     private fun allocate(size: Int) {
         val device = RenderSystem.getDevice()
         texture = device.createTexture("SkyHanni realtime item", 12, TextureFormat.RGBA8, size, size, 1, 1)
@@ -83,8 +84,10 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
                 // TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 state.pose(),
                 state.x0(), state.y0(), state.x1(), state.y1(),
-                0f, 1f,   // u0, u1
-                1f, 0f,   // v0, v1  (flipped: rendered bottom-up)
+                0f,
+                1f,
+                1f,
+                0f,
                 -1,
                 state.scissorArea(),
             )

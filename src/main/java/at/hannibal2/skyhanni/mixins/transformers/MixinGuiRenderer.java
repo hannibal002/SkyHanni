@@ -95,7 +95,6 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.preRenderAtlas(
             pictureInPictureRenderers,
             getBufferSource(),
-            renderState,
             featureRenderDispatcher,
             frameNumber
         );

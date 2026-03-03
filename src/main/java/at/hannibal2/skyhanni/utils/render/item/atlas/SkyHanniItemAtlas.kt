@@ -51,7 +51,10 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
         fun insert(size: Int): Node? {
             if (left != null || right != null) return left?.insert(size) ?: right?.insert(size)
             if (occupied || size > width || size > height) return null
-            if (size == width && size == height) { occupied = true; return this }
+            if (size == width && size == height) {
+                occupied = true
+                return this
+            }
 
             val dw = width - size
             val dh = height - size
@@ -62,7 +65,7 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
                 left = Node(x, y, width, size)
                 right = Node(x, y + size + PADDING, width, height - size - PADDING)
             }
-            return left!!.insert(size)
+            return left?.insert(size)
         }
     }
 
@@ -76,7 +79,7 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
                 e,
                 "Failed to dump atlas texture",
                 "id" to id.toString(),
-                    "path" to path.toString()
+                "path" to path.toString()
             )
         }
     }
@@ -186,6 +189,7 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
         GpuTexture.USAGE_TEXTURE_BINDING or
         GpuTexture.USAGE_COPY_SRC
 
+    @Suppress("UnsafeCallOnNullableType")
     private fun allocate(size: Int) {
         sizePixels = size
         root = Node(0, 0, size, size)

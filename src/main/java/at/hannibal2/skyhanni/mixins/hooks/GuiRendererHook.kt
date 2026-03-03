@@ -73,7 +73,6 @@ object GuiRendererHook {
     fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
         bufferSource: MultiBufferSource.BufferSource,
-        guiRenderState: GuiRenderState,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
