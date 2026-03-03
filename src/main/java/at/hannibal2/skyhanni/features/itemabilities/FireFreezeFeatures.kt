@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
+import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight.getActiveSparks
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -103,7 +103,7 @@ object FireFreezeFeatures {
         val pitch = event.pitch
         if (pitch !in 0.0..2.0) return
         val fireFreeze = fireFreezes[pos]
-        if (ThunderSparksHighlight.sparks.any { it.distanceTo(pos) < 2 }) return
+        if (getActiveSparks().any { it.distanceTo(pos) < 2 }) return
         if (fireFreeze == null) {
             fireFreezes[pos] = FireFreezeArea(pos, pitch)
             return

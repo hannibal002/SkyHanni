@@ -25,7 +25,7 @@ object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
     private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
-    val sparks = mutableSetOf<ArmorStand>()
+    private val sparks = mutableSetOf<ArmorStand>()
 
     @HandleEvent
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
@@ -72,4 +72,6 @@ object ThunderSparksHighlight {
         event.move(3, "fishing.thunderSparkHighlight", "fishing.thunderSpark.highlight")
         event.move(3, "fishing.thunderSparkColor", "fishing.thunderSpark.color")
     }
+
+    fun getActiveSparks(): MutableSet<ArmorStand> = sparks
 }
