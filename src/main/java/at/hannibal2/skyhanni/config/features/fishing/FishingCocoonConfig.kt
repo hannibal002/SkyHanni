@@ -19,7 +19,7 @@ class FishingCocoonConfig {
     @FeatureToggle
     var warnWhenCocooned: Boolean = false
 
-    @ConfigOption(name = "Custom Cocoon Settings", desc = "Both Above Features can be customized under shSpecificSeaCreatureSettings!")
+    @ConfigOption(name = "Custom Cocoon Settings", desc = "Both Above Features can be customized under /shseacreatures!")
     @ConfigEditorInfoText
     var notice: String = ""
 }

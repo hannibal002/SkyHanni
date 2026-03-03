@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("MaxLineLength")
 @SkyHanniModule
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
@@ -59,7 +58,7 @@ object CocoonAPI {
         if (IslandType.THE_RIFT.isCurrent()) return
         if (!event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val entity = event.entity
-        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == event.entity.id) }) return
+        if (isSameCocoonGroup(entity.getLorenzVec(), event.entity.id)) return
         val position = entity.getLorenzVec()
         val mob = getCocoonMob(position) ?: return
         val id = entity.id
@@ -89,6 +88,10 @@ object CocoonAPI {
         val mob = skyblockMobs.minByOrNull { it.baseEntity.getLorenzVec().distanceIgnoreY(cocoonVector) } ?: return null
         if (mob.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
         return mob
+    }
+
+    private fun isSameCocoonGroup(currentPos: LorenzVec, currentID: Int): Boolean {
+        return existingCocoons.any { it.coordinates.distanceSqIgnoreY(currentPos) < 0.5 || it.cocoonID == currentID }
     }
 
 }
