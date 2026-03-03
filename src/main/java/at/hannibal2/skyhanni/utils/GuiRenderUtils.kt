@@ -386,11 +386,11 @@ object GuiRenderUtils {
         val newRenderState = SkyHanniGuiItemRenderState(
             itemStack = this,
             guiItemRenderState,
-            x,
-            y,
+            translateX,
+            translateY,
             rotationVec, translationVec,
-            scale = scale.toFloat(),
-            adjustedScale = (scale * guiScaleX).toFloat(),
+            scale = finalItemScale.toFloat(),
+            adjustedScale = (finalItemScale * guiScaleX).toFloat(),
             stableRenderId,
             frameNumber = frameNumber,
         )

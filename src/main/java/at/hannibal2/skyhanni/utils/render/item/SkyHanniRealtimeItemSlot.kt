@@ -1,21 +1,16 @@
 package at.hannibal2.skyhanni.utils.render.item
 
-import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import com.mojang.blaze3d.ProjectionType
-import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.textures.TextureFormat
-import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.client.renderer.texture.OverlayTexture
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
 
@@ -59,24 +54,12 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
 
-        with(context) {
-            val ps = PoseStack()
-            ps.translate(slotSize / 2.0f, slotSize / 2.0f, 0.0f)
-            val f = slotSize.toFloat()
-            ps.scale(f, -f, f)
-            ps.scale(1.0f / 1.42f, 1.0f / 1.42f, 1.0f / 1.42f)
-            val rotated = ps.mulPose(state.rotationVector)
-            ps.translate(0.0f, 0.03f, 0.125f)
-
-            Minecraft.getInstance().gameRenderer.lighting.setupFor(
-                if (state.usesBlockLight()) Lighting.Entry.ITEMS_3D else Lighting.Entry.ITEMS_FLAT
-            )
-            if (rotated) state.setAnimated()
-
-            state.submit(ps, featureRenderDispatcher.submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
-            featureRenderDispatcher.renderAllFeatures()
-            bufferSource.endBatch()
-        }
+        state.renderItemToTexture(
+            context.bufferSource, context.featureRenderDispatcher,
+            centerX = slotSize / 2.0f,
+            centerY = slotSize / 2.0f,
+            pixelSize = slotSize,
+        )
 
         RenderSystem.outputColorTextureOverride = null
         RenderSystem.outputDepthTextureOverride = null

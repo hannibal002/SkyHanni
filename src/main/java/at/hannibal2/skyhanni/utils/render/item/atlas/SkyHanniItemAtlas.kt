@@ -1,18 +1,15 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
 import com.mojang.blaze3d.ProjectionType
-import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.platform.TextureUtil
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.textures.TextureFormat
-import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
@@ -21,7 +18,6 @@ import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.texture.AbstractTexture
 import net.minecraft.client.renderer.texture.Dumpable
-import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.resources.Identifier
 import java.nio.file.Path
 
@@ -232,28 +228,15 @@ internal class SkyHanniItemAtlas : AbstractTexture(), AutoCloseable, Dumpable {
         slotY: Int,
         pixelSize: Int,
     ) {
-        val ps = PoseStack()
-        ps.translate(slotX.toFloat() + pixelSize / 2.0f, slotY.toFloat() + pixelSize / 2.0f, 0.0f)
-
-        val rotationPadding = 1.0f / 1.42f
-        val f = pixelSize.toFloat()
-        ps.scale(f, -f, f)
-        ps.scale(rotationPadding, rotationPadding, rotationPadding)
-        val rotated = ps.mulPose(shState.rotationVector)
-        ps.translate(0.0f, 0.03f, 0.125f)
-
-        val gameRenderer = Minecraft.getInstance().gameRenderer
-        gameRenderer.lighting.setupFor(
-            if (shState.usesBlockLight()) Lighting.Entry.ITEMS_3D else Lighting.Entry.ITEMS_FLAT,
-        )
-        if (rotated) shState.setAnimated()
-
         RenderSystem.enableScissorForRenderTypeDraws(
             slotX, sizePixels - slotY - pixelSize, pixelSize, pixelSize,
         )
-        shState.submit(ps, featureRenderDispatcher.submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
-        featureRenderDispatcher.renderAllFeatures()
-        bufferSource.endBatch()
+        shState.renderItemToTexture(
+            bufferSource, featureRenderDispatcher,
+            centerX = slotX.toFloat() + pixelSize / 2.0f,
+            centerY = slotY.toFloat() + pixelSize / 2.0f,
+            pixelSize = pixelSize,
+        )
         RenderSystem.disableScissorForRenderTypeDraws()
     }
 
