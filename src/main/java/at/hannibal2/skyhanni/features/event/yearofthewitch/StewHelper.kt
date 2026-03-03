@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -66,7 +67,6 @@ object StewHelper {
         }
     }
 
-    @Suppress("LoopWithTooManyJumpStatements")
     private fun checkSlots() {
         if (!config.stewHelper) return
         val items = InventoryUtils.getItemsInOpenChest().map { it.item }
@@ -74,19 +74,10 @@ object StewHelper {
         for (stack in items) {
             if (stack.item != Items.PLAYER_HEAD) continue
             if (getStewStatus(stack) == StewStatus.HAS_EATEN) continue
-            var foundLine = false
-            loop@ for (component in stack.getLoreComponent()) {
-                val line = component.string
-                if (line == "Requires:") {
-                    foundLine = true
-                    continue
-                }
-                if (!foundLine) continue
-                stewItemNamePattern.matchMatcher(line) {
-                    val id = NeuInternalName.fromItemNameOrNull(group("item")) ?: continue@loop
-                    requiredItems[id] = group("amount").toInt()
-                }
-                break
+            val ingredientLine = stack.getLoreComponent().map { it.string }.nextAfter("Requires:") ?: continue
+            stewItemNamePattern.matchMatcher(ingredientLine) {
+                val id = NeuInternalName.fromItemNameOrNull(group("item")) ?: return@matchMatcher
+                requiredItems[id] = group("amount").toInt()
             }
         }
         constructDisplay(requiredItems)
