@@ -28,15 +28,22 @@ object HotxFeatures {
     private val configHotm get() = SkyHanniMod.feature.mining.hotm
     private val configHotf get() = SkyHanniMod.feature.foraging.hotf
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (configHotm.skyMallDisplay != SkyMallDisplayVisibility.OFF &&
-            (configHotm.skyMallDisplay == SkyMallDisplayVisibility.EVERYWHERE || HotmData.inApplicableIsland)
-        ) renderOverlay(HotmData, configHotm.skyMallPosition)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
+        if (configHotm.skyMallDisplay.isActive()) renderOverlay(HotmData, configHotm.skyMallPosition)
+        if (configHotf.lotteryDisplay.isActive()) renderOverlay(HotfData, configHotf.lotteryPosition)
+    }
 
-        if (configHotf.lotteryDisplay != LotteryDisplayVisibility.OFF &&
-            (configHotf.lotteryDisplay == LotteryDisplayVisibility.EVERYWHERE || HotfData.inApplicableIsland)
-        ) renderOverlay(HotfData, configHotf.lotteryPosition)
+    private fun SkyMallDisplayVisibility.isActive() = when (this) {
+        SkyMallDisplayVisibility.OFF -> false
+        SkyMallDisplayVisibility.MINING_ONLY -> HotmData.inApplicableIsland
+        SkyMallDisplayVisibility.EVERYWHERE -> true
+    }
+
+    private fun LotteryDisplayVisibility.isActive() = when (this) {
+        LotteryDisplayVisibility.OFF -> false
+        LotteryDisplayVisibility.FORAGING_ONLY -> HotfData.inApplicableIsland
+        LotteryDisplayVisibility.EVERYWHERE -> true
     }
 
     private fun renderOverlay(handler: HotxHandler<*, *, *>, configPos: Position) {
@@ -69,13 +76,13 @@ object HotxFeatures {
 
         ErrorManager.logErrorStateWithData(
             "Could not read the rotating effect from chat",
-            "no hotxhandler claimed the event",
-            "chat" to event.message,
+            "no HotxHandler claimed the event",
+            "chat" to event.cleanMessage,
         )
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
+    fun onBackgroundDrawn() {
         val handler: HotxHandler<*, *, *> = when {
             HotmData.inInventory && configHotm.highlightEnabledPerks -> HotmData
             HotfData.inInventory && configHotf.highlightEnabledPerks -> HotfData
