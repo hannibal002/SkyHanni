@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.entity.Entity
@@ -303,4 +304,6 @@ class Mob(
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 
     val isAlive: Boolean get() = baseEntity.isAlive
+
+    fun getLorenzVec() = baseEntity.getLorenzVec()
 }

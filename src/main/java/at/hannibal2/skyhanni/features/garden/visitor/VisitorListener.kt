@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 
-// Todo combine with VisitorApi
 @SkyHanniModule
 object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
@@ -42,8 +41,10 @@ object VisitorListener {
 
     private val config get() = VisitorApi.config
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    private val logger = LorenzLogger("garden/visitors/listener")
+
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         VisitorApi.reset()
     }
 
@@ -85,13 +86,13 @@ object VisitorListener {
         VisitorOpenEvent(visitor).post()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         VisitorApi.inInventory = false
     }
 
-    @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onKeybind() {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
         InventoryUtils.mouseClickSlot(29)
@@ -102,7 +103,8 @@ object VisitorListener {
         if (!GardenApi.onBarnPlot) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
+
+        GardenVisitorTooltip.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

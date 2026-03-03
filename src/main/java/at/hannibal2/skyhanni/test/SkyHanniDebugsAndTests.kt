@@ -312,6 +312,7 @@ object SkyHanniDebugsAndTests {
     private fun formatLocation(x: Double, y: Double, z: Double, parameter: String?): Pair<String, String> = when (parameter) {
         "json" -> "$x:$y:$z" to "json"
         "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
+        "navigate" -> "`/shnavigate $x $y $z`" to "navigate"
         else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
     }
 
@@ -557,6 +558,9 @@ object SkyHanniDebugsAndTests {
             }
             literalCallback("pathfind") {
                 copyLocation("pathfind")
+            }
+            literalCallback("navigate") {
+                copyLocation("navigate")
             }
             simpleCallback {
                 copyLocation()

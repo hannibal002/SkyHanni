@@ -102,6 +102,33 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback { GraphEditorIO.loadThisIsland() }
         }
+        event.registerBrigadier("shgraphcopynetwork") {
+            description = "Copies the closest network to the clipboard."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { GraphEditorNetworks.copyClosestNetwork() }
+        }
+        event.registerBrigadier("shgraphmerge") {
+            description = "Merges graph data from the clipboard into the current graph."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                if (!isEnabled()) {
+                    ChatUtils.userError("Graph Editor is not active!")
+                    return@simpleCallback
+                }
+                GraphEditorIO.mergeFromClipboard()
+            }
+        }
+        event.registerBrigadier("shgraphfindnetwork") {
+            description = "Lists all networks and allows navigation between them."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                if (!isEnabled()) {
+                    ChatUtils.userError("Graph Editor is not active!")
+                    return@simpleCallback
+                }
+                GraphEditorNetworks.findNetworks()
+            }
+        }
     }
 
     var bypassTempRemoveTimer = SimpleTimeMark.farPast()

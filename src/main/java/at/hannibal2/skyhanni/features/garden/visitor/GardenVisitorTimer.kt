@@ -29,13 +29,92 @@ object GardenVisitorTimer {
     private val config get() = VisitorApi.config.timer
 
     private var display: Renderable? = null
-    private var nextArrivalMark: SimpleTimeMark? = null
-    private var lastSixthVisitorWarning: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastMillis = 0.seconds
+    private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
+    private var visitorJustArrived = false
+    private var lastSixthVisitorWarning = SimpleTimeMark.farPast()
+    private var lastTimerValue = ""
+    private var lastTimerUpdate = SimpleTimeMark.farPast()
+    private var lastVisitors: Int = -1
+
+    // TODO do this some day: private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    private var visitorInterval: Duration?
+        get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
+        set(value) {
+            value?.let {
+                GardenApi.storage?.visitorInterval = it.inWholeMilliseconds
+            }
+        }
+
+    @HandleEvent(VisitorArrivalEvent::class)
+    fun onVisitorArrival() {
+        visitorJustArrived = true
+    }
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
         display = null
     }
+
+    // TODO split up into multiple smaller functions
+    @Suppress("CyclomaticComplexMethod")
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
+        var visitorsAmount = VisitorApi.visitorsInTabList(TabListDataComponent.getTabList()).size
+        var visitorInterval = visitorInterval ?: return
+        var millis = visitorInterval
+        var queueFull = false
+
+        timePattern.firstMatcher(TabListData.getTabList()) {
+            val timeInfo = group("info").removeColor()
+            if (timeInfo == "Not Unlocked!") {
+                display = Renderable.text("§cVisitors not unlocked!")
+                return
+            }
+            if (timeInfo == "Queue Full!") {
+                queueFull = true
+            } else {
+                if (lastTimerValue != timeInfo) {
+                    lastTimerUpdate = SimpleTimeMark.now()
+                    lastTimerValue = timeInfo
+                }
+                millis = TimeUtils.getDuration(timeInfo)
+            }
+        } ?: run {
+            display = createDisplayText("§cVisitor time info not in tab list")
+            return
+        }
+
+        if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
+            if (!queueFull) {
+                visitorInterval = millis
+                this.visitorInterval = visitorInterval
+            } else {
+                updateSixthVisitorArrivalTime()
+            }
+        }
+
+        if (queueFull) {
+            if (visitorJustArrived && visitorsAmount - lastVisitors == 1) {
+                updateSixthVisitorArrivalTime()
+                visitorJustArrived = false
+            }
+            millis = sixthVisitorArrivalTime.timeUntil()
+
+            val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
+            GardenApi.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
+            if (millis.isNegative()) {
+                visitorsAmount++
+                if (config.sixthVisitorWarning) {
+                    warn6thVisitor()
+                }
+            }
+        }
+        val sinceLastTimerUpdate = lastTimerUpdate.passedSince() - 100.milliseconds
+        val guessTime = visitorsAmount < 5 && sinceLastTimerUpdate in 500.milliseconds..60.seconds
+        if (guessTime) {
+            millis -= sinceLastTimerUpdate
+        }
 
     @HandleEvent
     fun onVisitorCountChange(event: VisitorCountChangeEvent) {
@@ -93,6 +172,46 @@ object GardenVisitorTimer {
             config.position.renderRenderable(display, posLabel = "Garden Visitor Timer")
         }
     }
+
+    @HandleEvent
+    fun onWorldChange() {
+        lastVisitors = -1
+        GardenApi.storage?.nextSixthVisitorArrival?.let {
+            if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {
+                sixthVisitorArrivalTime = it
+            }
+        }
+        lastMillis = sixthVisitorArrivalTime.timeUntil()
+    }
+
+    @HandleEvent(CropClickEvent::class)
+    fun onCropClick() {
+        if (!isEnabled()) return
+        sixthVisitorArrivalTime -= 100.milliseconds
+
+        // We only need manually retracting the time when hypixel shows 6 minutes or above
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 100.milliseconds
+        }
+    }
+
+    @HandleEvent(PestKillEvent::class)
+    fun onPestKill() {
+        if (!isEnabled()) return
+        sixthVisitorArrivalTime -= 30.seconds
+
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 30.seconds
+        }
+    }
+
+    private fun updateSixthVisitorArrivalTime() {
+        visitorInterval?.let {
+            sixthVisitorArrivalTime = SimpleTimeMark.now() + it
+        }
+    }
+
+    private fun isEnabled() = GardenApi.inGarden() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

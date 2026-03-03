@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
+import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
@@ -21,6 +25,10 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
+        SpecialGuiElementRegistry.register { ctx ->
+            SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
+        }
+
         // makes the lines render weird idk
         /*WorldRenderEvents.END_MAIN.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
@@ -32,6 +40,11 @@ object RenderEvents {
                 Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
             ).post()
         }*/
+    }
+
+    @HandleEvent
+    fun onResourcePackReload() {
+        SkyHanniItemRenderCoordinator.invalidateAtlas()
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {
@@ -77,6 +90,26 @@ object RenderEvents {
     fun postExperienceNumberLayerEventPost(context: GuiGraphics) {
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
+
+    @JvmStatic
+    fun postHeldItemTooltipLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
+    }
+
+    @JvmStatic
+    fun postHeldItemTooltipLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
+    }
+
+    @JvmStatic
+    fun postActionBarLayerEventPre(context: GuiGraphics): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.ACTION_BAR).post()
+    }
+
+    @JvmStatic
+    fun postActionBarLayerEventPost(context: GuiGraphics) {
+        GameOverlayRenderPostEvent(context, RenderLayer.ACTION_BAR).post()
+    }
 }
 
 enum class RenderLayer {
@@ -97,6 +130,8 @@ enum class RenderLayer {
     CHAT,
     PLAYER_LIST,
     DEBUG,
+    HELD_ITEM_TOOLTIP,
+    ACTION_BAR,
 
     // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,

@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
@@ -46,7 +47,7 @@ object HuntingProfitTracker {
     data class Data(
         @Expose var totalMobsCaught: Long = 0,
         @Expose var totalShardsGained: Long = 0
-    ) : ItemTrackerData() {
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
 
         override fun getDescription(item: TrackedItem): List<String> {
             val timesCaught = item.timesCaught

@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -72,6 +73,11 @@ class FishingConfig {
     val lavaReplacement: LavaReplacementConfig = LavaReplacementConfig()
 
     @Expose
+    @ConfigOption(name = "Health Display", desc = "")
+    @Accordion
+    val healthDisplay: SeaCreatureHealthDisplayConfig = SeaCreatureHealthDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -129,4 +135,40 @@ class FishingConfig {
     @ConfigOption(name = "Flay/Whip Hider", desc = "Hides Flaming Flay/Soul Whip particles that are within this Distance of you")
     @ConfigEditorSlider(minValue = 0.0f, maxValue = 15.0f, minStep = 1f)
     var flayHideDistance: Float = 2.0f
+
+    @Expose
+    @ConfigOption(
+        name = "Sea Creature Kill Time",
+        desc = "Sends a chat message that shows how much time it took to kill a specific sea creature."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var seaCreatureKillTimer: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Only on Own Mobs",
+        desc = "Only send the Kill Time for mobs detected as your own."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var seaCreatureKillTimerOwnMobsOnly: Boolean = true
+
+    @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under /shseacreatures!")
+    @ConfigEditorInfoText
+    var notice1: String = ""
+
+    @Expose
+    @ConfigOption(
+        name = "Lootshare Range",
+        desc = "Shows the range at which you can lootshare. The range is §aGreen §7when the mob is your own or" +
+            "when inside the lootshare range."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var lootshareRange = false
+
+    @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under /shseacreatures!")
+    @ConfigEditorInfoText
+    var notice: String = ""
 }
