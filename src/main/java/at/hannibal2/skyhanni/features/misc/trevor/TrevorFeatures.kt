@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.misc.trevor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -134,6 +136,7 @@ object TrevorFeatures {
 
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
+            TalbotCircles.resetCircles()
             if (config.mobDiedMessage) {
                 lastTitle?.stop()
                 lastTitle = TitleManager.sendTitle("§2Mob Died")
@@ -163,11 +166,15 @@ object TrevorFeatures {
 
         talbotPatternAbove.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
+            val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, true)
+            TalbotCircles.addResult(height, angle)
         }
         talbotPatternBelow.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
+            val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, false)
+            TalbotCircles.addResult(-height, angle)
         }
         talbotPatternAt.matchMatcher(formattedMessage) {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
@@ -275,6 +282,8 @@ object TrevorFeatures {
             }
         }
 
+        var mobFound = false
+
         if (config.solver) {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
@@ -282,6 +291,7 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
+                mobFound = true
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
@@ -290,6 +300,10 @@ object TrevorFeatures {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
             }
+        }
+
+        if (config.talbotCircles && !mobFound) {
+            TalbotCircles.drawCircles(event)
         }
     }
 
@@ -324,6 +338,7 @@ object TrevorFeatures {
 
     private fun resetTrapper() {
         TrevorSolver.resetLocation()
+        TalbotCircles.resetCircles()
         currentStatus = TrapperStatus.READY
         currentLabel = "§2Ready"
         questActive = false
@@ -360,5 +375,14 @@ object TrevorFeatures {
         event.move(95, "$base.trapperReadyTitle", "$base.readyTitle")
         event.move(95, "$base.trapperCooldownGui", "$base.cooldownGui")
         event.move(95, "$base.trapperCooldownGuiPosition", "$base.cooldownGuiPosition")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcleartalbotcircles") {
+            description = "Clears Talbot circles"
+            category = CommandCategory.USERS_RESET
+            simpleCallback { TalbotCircles.resetCircles() }
+        }
     }
 }

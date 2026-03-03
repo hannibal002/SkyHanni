@@ -149,4 +149,12 @@ class OrderedWaypointsConfig {
     )
     @ConfigEditorBoolean
     var autoUnloadWhenLeavingMineshaft: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-Skip Forward",
+        desc = "Automatically skip forward when reaching a waypoint further down in the route.",
+    )
+    @ConfigEditorBoolean
+    var autoSkipForward: Boolean = false
 }
