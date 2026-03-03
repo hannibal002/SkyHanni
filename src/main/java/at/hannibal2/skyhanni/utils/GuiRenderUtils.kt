@@ -420,10 +420,10 @@ object GuiRenderUtils {
         translateX: Float,
         translateY: Float,
         scale: Float
-    ): Int? = RenderUtils.runOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
+    ): Int? = RenderUtils.scheduleOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
         DrawContextUtils.translatedPushPopResult(translateX, translateY, postTranslateScale = scale) {
             DrawContextUtils.drawItem(this, 0, 0)
         }
-        return@runOnRenderThread null
-    }
+        return@scheduleOnRenderThread null
+    }.get()
 }
