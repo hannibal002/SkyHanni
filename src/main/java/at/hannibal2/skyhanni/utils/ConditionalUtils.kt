@@ -92,15 +92,16 @@ object ConditionalUtils {
         visited: MutableSet<Any>,
     ): List<Property<*>> = buildList {
         if (current.javaClass.isArray || current.javaClass.isSynthetic) return@buildList
-        if (!visited.add(current)) return emptyList()
+        if (!visited.add(current)) return@buildList
 
         val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
         for (prop in nonTransientProps) {
             val getter = runCatching { prop.javaGetter }.getOrNull()
             val failedAccessible = runCatching { prop.isAccessible = true }.isFailure
             val getterNull = (prop.javaField == null && getter == null)
+            if (getterNull) continue
             val value = runCatching { prop.getter.call(current) }.getOrNull()
-            if (getterNull || failedAccessible || value == null) continue
+            if (failedAccessible || value == null) continue
             when (value) {
                 is Property<*> -> add(value)
                 else -> addAll(
