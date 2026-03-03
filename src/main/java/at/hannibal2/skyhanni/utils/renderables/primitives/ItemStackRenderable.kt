@@ -17,16 +17,23 @@ open class ItemStackRenderable internal constructor(
     open val config: ItemRenderableConfig,
     private val stackGetter: () -> ItemStack = { ItemStack.EMPTY },
 ) : Renderable {
-    override val horizontalAlign get() = config.horizontalAlign
-    override val verticalAlign get() = config.verticalAlign
+
     private val scaledSize get() = (15.5 * config.scale + 0.5).toInt()
     override val width: Int get() = scaledSize + config.xSpacing
     override val height: Int get() = scaledSize + config.ySpacing
+    override val horizontalAlign get() = config.horizontalAlign
+    override val verticalAlign get() = config.verticalAlign
 
     open val stack: ItemStack get() = stackGetter()
+    private var stableRenderId: Int? = null
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-        stack.renderOnScreen(config.xSpacing / 2f, config.ySpacing / 2f, config)
+        this.stableRenderId = stack.renderOnScreen(
+            this.config.xSpacing / 2f,
+            this.config.ySpacing / 2f,
+            this.config,
+            stableRenderId = this.stableRenderId,
+        )
     }
 
     fun withTip(advancedTooltipCompat: Boolean = false) = Renderable.hoverTips(

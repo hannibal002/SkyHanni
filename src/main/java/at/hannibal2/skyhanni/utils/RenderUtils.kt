@@ -48,13 +48,13 @@ object RenderUtils {
      * Runs a block on an asserted Render Thread.
      * @param block the block to run
      */
-    fun runOnRenderThread(
+    fun <T> runOnRenderThread(
         setupFor: Lighting.Entry? = null,
-        block: () -> Unit,
-    ) {
+        block: () -> T,
+    ): T {
         RenderSystem.assertOnRenderThread()
         setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
-        block()
+        return block()
     }
 
     /**
@@ -63,7 +63,7 @@ object RenderUtils {
      */
     fun threadOnRenderThread(
         setupFor: Lighting.Entry? = null,
-        block: () -> Unit,
+        block: () -> Any,
     ) = Thread { runOnRenderThread(setupFor, block) }
 
     /**
