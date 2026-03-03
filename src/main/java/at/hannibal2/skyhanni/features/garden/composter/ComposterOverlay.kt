@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -77,6 +78,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
+    private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
     private var organicMatter: Map<NeuInternalName, Double> = emptyMap()
@@ -119,26 +121,22 @@ object ComposterOverlay {
     private val VOLTA = "VOLTA".toInternalName()
     private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @HandleEvent(TabListUpdateEvent::class, priority = HandleEvent.LOW)
+    @HandleEvent(TabListUpdateComponentEvent::class, priority = HandleEvent.LOW)
     fun onTabListUpdate() {
-        if (inInventory) {
-            update()
-        }
+        if (inInventory) displayDirty = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
         if (composterUpgradesInventory.isInside() && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
             extraComposterUpgrade = null
-            update()
+            displayDirty = true
         }
     }
 
     @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened() {
-        if (inInventory) {
-            update()
-        }
+        if (inInventory) displayDirty = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -151,7 +149,7 @@ object ComposterOverlay {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
                 } == 25
                 extraComposterUpgrade = upgrade
-                update()
+                displayDirty = true
                 return
             }
         }
@@ -159,7 +157,7 @@ object ComposterOverlay {
             extraComposterUpgrade = null
             maxLevel = false
         }
-        update()
+        displayDirty = true
     }
 
     private fun update() {
@@ -276,11 +274,11 @@ object ComposterOverlay {
             addString("§7Items needed to fill §eOrganic Matter")
             val fillList = fillList(organicMatterFactors, missingOrganicMatter, testOffset) {
                 currentOrganicMatterItem = it
-                update()
+                displayDirty = true
             }
             if (currentOrganicMatterItem == NONE) {
                 currentOrganicMatterItem = fillList
-                update()
+                displayDirty = true
             }
         }
     }
@@ -294,11 +292,11 @@ object ComposterOverlay {
         val missingFuel = (maxFuel - currentFuel).toDouble()
         val fillList = fillList(fuelFactors, missingFuel) {
             currentFuelItem = it
-            update()
+            displayDirty = true
         }
         if (currentFuelItem == NONE) {
             currentFuelItem = fillList
-            update()
+            displayDirty = true
         }
     }
 
@@ -368,7 +366,7 @@ object ComposterOverlay {
                 current = currentTimeType,
                 onChange = {
                     currentTimeType = it
-                    update()
+                    displayDirty = true
                 },
             )
 
@@ -429,7 +427,7 @@ object ComposterOverlay {
 
         val testOffset = if (testOffsetRec > map.size) {
             ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
-            ComposterOverlay.testOffset = 0
+            testOffset = 0
             0
         } else testOffsetRec
 
@@ -438,7 +436,7 @@ object ComposterOverlay {
             add(
                 Renderable.link("testOffset = $testOffset") {
                     ComposterOverlay.testOffset = 0
-                    update()
+                    displayDirty = true
                 },
             )
         }
@@ -679,6 +677,7 @@ object ComposterOverlay {
     fun onBackgroundDraw() {
         if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
+        if (displayDirty) update()
 
         config.overlayOrganicMatterPos.renderRenderable(
             organicMatterDisplay,
