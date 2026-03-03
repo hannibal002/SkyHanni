@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.yearofthewitch
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -67,6 +66,7 @@ object StewHelper {
         }
     }
 
+    @Suppress("LoopWithTooManyJumpStatements")
     private fun checkSlots() {
         if (!config.stewHelper) return
         val items = InventoryUtils.getItemsInOpenChest().map { it.item }
