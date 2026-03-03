@@ -56,12 +56,12 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEquipmentChangeEvent(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (IslandType.THE_RIFT.isCurrent()) return
-        if (!event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val entity = event.entity
-        if (isSameCocoonGroup(entity.getLorenzVec(), event.entity.id)) return
+        if (!entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val position = entity.getLorenzVec()
-        val mob = getCocoonMob(position) ?: return
         val id = entity.id
+        if (isSameCocoonGroup(position, id)) return
+        val mob = getCocoonMob(position) ?: return
         val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
         existingCocoons.add(cocoon)
         ChatUtils.debug("${cocoon.mob.name} Cocoon (${cocoon.cocoonID} Entered List")
