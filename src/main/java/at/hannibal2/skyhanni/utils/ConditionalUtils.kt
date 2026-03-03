@@ -89,18 +89,14 @@ object ConditionalUtils {
 
     private fun collectProperties(
         current: Any,
-        visited: MutableSet<Any>
+        visited: MutableSet<Any>,
     ): List<Property<*>> = buildList {
         if (current.javaClass.isArray || current.javaClass.isSynthetic) return@buildList
         if (!visited.add(current)) return emptyList()
 
         val nonTransientProps = current::class.memberProperties.filter { !it.hasAnnotation<Transient>() }
         for (prop in nonTransientProps) {
-            val getter = try {
-                prop.javaGetter
-            } catch (e: Throwable) {
-                null
-            }
+            val getter = runCatching { prop.javaGetter }.getOrNull()
             val failedAccessible = runCatching { prop.isAccessible = true }.isFailure
             val getterNull = (prop.javaField == null && getter == null)
             val value = runCatching { prop.getter.call(current) }.getOrNull()
@@ -108,7 +104,7 @@ object ConditionalUtils {
             when (value) {
                 is Property<*> -> add(value)
                 else -> addAll(
-                    collectProperties(value, visited)
+                    collectProperties(value, visited),
                 )
             }
         }
