@@ -27,7 +27,6 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
     private var sizePixels = 0
     private var packer: SkyHanniAtlasBinPacker? = null
     private var renderer: SkyHanniItemAtlasRenderer? = null
-    private var needsGrowing = false
     private val positions = HashMap<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>()
 
     private val usage = GpuTexture.USAGE_RENDER_ATTACHMENT or
@@ -116,11 +115,8 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
                 continue
             }
 
-            val node = packer.insert(neededPixels) ?: run {
-                needsGrowing = true
-                // Overflow, submitBlitForState will return false and fall back to realtime
-                continue
-            }
+            // Overflow, submitBlitForState will return false and fall back to realtime
+            val node = packer.insert(neededPixels) ?: continue
 
             val representative = states.maxByOrNull { it.adjustedScale }!!
             renderJobs.add(AtlasRenderJob(key, representative, node, neededPixels))
