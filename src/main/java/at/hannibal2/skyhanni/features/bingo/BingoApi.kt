@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object BingoApi {
@@ -115,13 +117,16 @@ object BingoApi {
 
     val bingoStorage: BingoSession by lazy {
         val playerSpecific = ProfileStorageData.playerSpecific ?: error("playerSpecific is null")
-        playerSpecific.bingoSessions.getOrPut(getStartOfMonthInMillis()) { BingoSession() }
+        // we currently use seconds as key
+        // TODO change the seconds entry to SimpleTimeMark, use a config migration
+        val seconds = getStartOfMonth().toMillis() / 1000
+        playerSpecific.bingoSessions.getOrPut(seconds) { BingoSession() }
     }
 
-    private fun getStartOfMonthInMillis() = OffsetDateTime.of(
+    private fun getStartOfMonth() = OffsetDateTime.of(
         TimeUtils.getCurrentLocalDate().plusDays(5).withDayOfMonth(1),
         LocalTime.MIDNIGHT, ZoneOffset.UTC,
-    ).toEpochSecond()
+    ).asTimeMark()
 
     fun getCommunityPercentageColor(percentage: Double): String = when {
         percentage < 0.01 -> "§a"
@@ -141,18 +146,25 @@ object BingoApi {
         }
     }
 
-    private var bingoNpcsHidden = false
+    // TODO replace with dynamic detection once we have secret bingo detection (maybe via repo?)
+    private val BINGO_EVENT_DURATION = 7.days
+    private val BINGO_NPC_OFFSET = 3.days
+
+    private var bingoNpcHidden = false
+    private var alixerHidden = false
 
     @HandleEvent(IslandGraphReloadEvent::class)
     fun onIslandGraphReload() {
-        bingoNpcsHidden = false
+        bingoNpcHidden = false
+        alixerHidden = false
         checkBingoNpcs()
     }
 
     // Reset state on every island change in case IslandGraphReloadEvent does not fire for this island (private island, garden)
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
-        bingoNpcsHidden = false
+        bingoNpcHidden = false
+        alixerHidden = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -161,15 +173,27 @@ object BingoApi {
         checkBingoNpcs()
     }
 
+    private fun isInBingoEventWindow(): Boolean {
+        val eventStart = getStartOfMonth()
+        val now = OffsetDateTime.now(ZoneOffset.UTC).asTimeMark()
+        val windowStart = eventStart - BINGO_NPC_OFFSET
+        val windowEnd = eventStart + BINGO_EVENT_DURATION + BINGO_NPC_OFFSET
+        return now in windowStart..windowEnd
+    }
+
     private fun checkBingoNpcs() {
         if (!IslandType.HUB.isCurrent()) return
-        val shouldHideBingoNpcs = !SkyBlockUtils.isBingoProfile
-        if (shouldHideBingoNpcs == bingoNpcsHidden) return
 
-        bingoNpcsHidden = shouldHideBingoNpcs
-        val npcs = setOf(IslandGraphs.node("Alixer", GraphNodeTag.NPC), IslandGraphs.node("Bingo", GraphNodeTag.NPC))
-        for (node in npcs) {
-            node.enabled = !shouldHideBingoNpcs
+        val shouldHideAlixer = !SkyBlockUtils.isBingoProfile
+        if (shouldHideAlixer != alixerHidden) {
+            alixerHidden = shouldHideAlixer
+            IslandGraphs.node("Alixer", GraphNodeTag.NPC).enabled = !shouldHideAlixer
+        }
+
+        val shouldHideBingoNpc = !isInBingoEventWindow()
+        if (shouldHideBingoNpc != bingoNpcHidden) {
+            bingoNpcHidden = shouldHideBingoNpc
+            IslandGraphs.node("Bingo", GraphNodeTag.NPC).enabled = !shouldHideBingoNpc
         }
     }
 }
