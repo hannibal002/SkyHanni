@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.texture.OverlayTexture
 
-internal class SkyHanniRealtimeItemSlot(private val slotSize: Int) : AutoCloseable {
+internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : AutoCloseable {
 
     private var texture: GpuTexture? = null
     private var textureView: GpuTextureView? = null

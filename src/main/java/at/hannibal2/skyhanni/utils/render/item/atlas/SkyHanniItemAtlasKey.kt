@@ -6,8 +6,6 @@ import java.util.Objects
 open class SkyHanniAtlasKey(
     open val item: String,
     open val modelIdentity: Any,
-    open val scale: Float,
-    open val adjustedScale: Float,
     open val rotationVector: Vec3,
 ) {
     open val rotationSnapDegrees: Float = 2f
@@ -29,32 +27,26 @@ open class SkyHanniAtlasKey(
         else if (this === other) true
         else item == other.item &&
             modelIdentity == other.modelIdentity &&
-            quantizedRotationVector == other.quantizedRotationVector &&
-            scale == other.scale &&
-            adjustedScale == other.adjustedScale
+            quantizedRotationVector == other.quantizedRotationVector
 
     /**
      * We intentionally do not include stable ID in the hashcode.
      * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
      */
-    override fun hashCode(): Int = Objects.hash(item, modelIdentity, quantizedRotationVector, scale, adjustedScale)
+    override fun hashCode(): Int = Objects.hash(item, modelIdentity, quantizedRotationVector)
 }
 
 data class SkyHanniAnimatedAtlasKey(
     override val item: String,
     override val modelIdentity: Any,
-    override val scale: Float,
-    override val adjustedScale: Float,
     override val rotationVector: Vec3,
     val frameNumber: Int,
-) : SkyHanniAtlasKey(item, modelIdentity, scale, adjustedScale, rotationVector) {
+) : SkyHanniAtlasKey(item, modelIdentity, rotationVector) {
     override val rotationSnapDegrees: Float = 0.125f
 
     constructor(baseKey: SkyHanniAtlasKey, frameNumber: Int) : this(
         item = baseKey.item,
         modelIdentity = baseKey.modelIdentity,
-        scale = baseKey.scale,
-        adjustedScale = baseKey.adjustedScale,
         rotationVector = baseKey.rotationVector,
         frameNumber = frameNumber,
     )

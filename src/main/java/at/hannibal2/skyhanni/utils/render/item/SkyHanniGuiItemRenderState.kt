@@ -37,8 +37,6 @@ data class SkyHanniGuiItemRenderState(
         val itemStack = this@SkyHanniGuiItemRenderState.itemStack
         itemStack.getSkullTexture()?.let { appendModelIdentityElement(it) }
         itemStack.getSkullOwner()?.let { appendModelIdentityElement(it) }
-        appendModelIdentityElement(scale.roundTo(3))
-        appendModelIdentityElement(adjustedScale.roundTo(3))
         appendModelIdentityElement(rotationVector)
         // stableId intentionally NOT in modelIdentity. atlas key equality already excludes it,
         // and including it here prevents cache hits for static items across frames.
@@ -49,8 +47,6 @@ data class SkyHanniGuiItemRenderState(
         val baseKey = SkyHanniAtlasKey(
             item = itemStack.item.toString(),
             modelIdentity = trackingState.modelIdentity,
-            scale = scale,
-            adjustedScale = adjustedScale,
             rotationVector = rotationVector,
         )
         if (trackingState.isAnimated) SkyHanniAnimatedAtlasKey(baseKey, frameNumber ?: 0)
