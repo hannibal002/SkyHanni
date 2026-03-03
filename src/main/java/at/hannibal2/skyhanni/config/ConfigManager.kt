@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -277,6 +278,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
+    SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

@@ -310,7 +310,7 @@ object PetStorageApi {
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
                 uuid = petInfo.uniqueId,
-                skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
+                skinVariantIndex = petInfo.getSkinVariantIndex(),
             )
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
@@ -336,7 +336,7 @@ object PetStorageApi {
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
             uuid = petInfo.uniqueId,
-            skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
+            skinVariantIndex = petInfo.getSkinVariantIndex(),
         )
 
         petStorage.pets.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {

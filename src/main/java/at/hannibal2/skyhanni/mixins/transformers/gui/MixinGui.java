@@ -104,4 +104,27 @@ public class MixinGui {
         }
     }
 
+    @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
+    public void renderSelectedItemNamePre(GuiGraphics context, CallbackInfo ci) {
+        if (RenderEvents.postHeldItemTooltipLayerEventPre(context)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderSelectedItemName", at = @At("TAIL"))
+    public void renderSelectedItemNamePost(GuiGraphics context, CallbackInfo ci) {
+        RenderEvents.postHeldItemTooltipLayerEventPost(context);
+    }
+
+    @Inject(method = "renderOverlayMessage", at = @At("HEAD"), cancellable = true)
+    public void renderOverlayMessagePre(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (RenderEvents.postActionBarLayerEventPre(context)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderOverlayMessage", at = @At("TAIL"))
+    public void renderOverlayMessagePost(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
+        RenderEvents.postActionBarLayerEventPost(context);
+    }
 }

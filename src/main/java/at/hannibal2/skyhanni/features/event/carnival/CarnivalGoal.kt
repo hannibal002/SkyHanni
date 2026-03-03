@@ -2,13 +2,11 @@ package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -196,7 +194,6 @@ enum class CarnivalGoal(
         }
 
         private var display = emptyList<Renderable>()
-        private var inCarnival = false
 
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -210,13 +207,7 @@ enum class CarnivalGoal(
             config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
         }
 
-        @HandleEvent
-        fun onAreaChange(event: GraphAreaChangeEvent) {
-            inCarnival = event.area == "Carnival"
-        }
-
-        fun isEnabled() =
-            SkyBlockUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
+        fun isEnabled() = SkyBlockUtils.inSkyBlock && config.showGoals && CarnivalAPI.inCarnivalArea
 
         private enum class GoalType(val item: Item, display: String) {
             FRUIT_DIGGING(Item.byBlock(Blocks.SAND), "§6Fruit Digging"),
