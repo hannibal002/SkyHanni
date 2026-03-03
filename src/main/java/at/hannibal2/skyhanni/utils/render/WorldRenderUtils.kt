@@ -29,6 +29,7 @@ import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
+import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
@@ -839,6 +840,86 @@ object WorldRenderUtils {
             val last = path.last()
             drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
         }
+    }
+
+    fun AABB.getFaceCorners(face: Direction): List<LorenzVec> = when (face) {
+        Direction.UP -> getCornersAtHeight(maxY)
+        Direction.DOWN -> getCornersAtHeight(minY).asReversed()
+        Direction.NORTH -> listOf(
+            LorenzVec(minX, minY, minZ),
+            LorenzVec(maxX, minY, minZ),
+            LorenzVec(maxX, maxY, minZ),
+            LorenzVec(minX, maxY, minZ),
+        )
+
+        Direction.SOUTH -> listOf(
+            LorenzVec(maxX, minY, maxZ),
+            LorenzVec(minX, minY, maxZ),
+            LorenzVec(minX, maxY, maxZ),
+            LorenzVec(maxX, maxY, maxZ),
+        )
+
+        Direction.WEST -> listOf(
+            LorenzVec(minX, minY, maxZ),
+            LorenzVec(minX, minY, minZ),
+            LorenzVec(minX, maxY, minZ),
+            LorenzVec(minX, maxY, maxZ),
+        )
+
+        Direction.EAST -> listOf(
+            LorenzVec(maxX, minY, minZ),
+            LorenzVec(maxX, minY, maxZ),
+            LorenzVec(maxX, maxY, maxZ),
+            LorenzVec(maxX, maxY, minZ),
+        )
+    }
+
+    fun SkyHanniRenderWorldEvent.fillFace(
+        aabb: AABB,
+        face: Direction,
+        color: Color,
+        alpha: Float = 1f,
+        renderRelativeToCamera: Boolean = false,
+        epsilon: Double = 0.001,
+    ) = QuadDrawer.draw3D(this) {
+        val effectiveAABB = if (!renderRelativeToCamera) AABB(
+            aabb.minX - epsilon, aabb.minY - epsilon, aabb.minZ - epsilon,
+            aabb.maxX + epsilon, aabb.maxY + epsilon, aabb.maxZ + epsilon,
+        ) else getViewerPos().let { vp ->
+            AABB(
+                aabb.minX + vp.x - epsilon, aabb.minY + vp.y - epsilon, aabb.minZ + vp.z - epsilon,
+                aabb.maxX + vp.x + epsilon, aabb.maxY + vp.y + epsilon, aabb.maxZ + vp.z + epsilon,
+            )
+        }
+
+        val corners = effectiveAABB.getFaceCorners(face)
+        val effectiveAlpha = ((color.alpha / 255f) * alpha * 255).toInt().coerceIn(0, 255)
+        val effectiveColor = Color(color.red, color.green, color.blue, effectiveAlpha)
+        draw(corners[0], corners[1], corners[3], effectiveColor)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
+        origin: LorenzVec,
+        face: Direction,
+        color: Color,
+        length: Double = 0.5,
+        thickness: Double = 0.02,
+    ) {
+        val dir = LorenzVec(face.stepX.toDouble(), face.stepY.toDouble(), face.stepZ.toDouble())
+        val end = origin + dir * length
+        val minX = minOf(origin.x, end.x) - thickness
+        val minY = minOf(origin.y, end.y) - thickness
+        val minZ = minOf(origin.z, end.z) - thickness
+        val maxX = maxOf(origin.x, end.x) + thickness
+        val maxY = maxOf(origin.y, end.y) + thickness
+        val maxZ = maxOf(origin.z, end.z) + thickness
+
+        drawFilledBoundingBox(
+            AABB(minX, minY, minZ, maxX, maxY, maxZ),
+            color,
+            alphaMultiplier = 1f,
+            renderRelativeToCamera = false,
+        )
     }
 
     fun getViewerPos(ignored: Float) = getViewerPos()

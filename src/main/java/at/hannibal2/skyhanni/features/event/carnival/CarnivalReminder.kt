@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -110,5 +109,5 @@ object CarnivalReminder {
         nextCheckTime = 5.0.minutes.fromNow()
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.reminderDailyTickets && Perk.CHIVALROUS_CARNIVAL.isActive
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.reminderDailyTickets && CarnivalAPI.isActive
 }
