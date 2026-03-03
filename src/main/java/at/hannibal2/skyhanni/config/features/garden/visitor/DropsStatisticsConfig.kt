@@ -86,12 +86,16 @@ class DropsStatisticsConfig {
         HYPERCHARGE_CHIP("§b3 §9Hypercharge Chip"),
         QUICKDRAW_CHIP("§b7 §9Quickdraw Chip"),
         FARMING_EXP_BOOST_EPIC("§b1 §5Farming Exp Boost"),
-        UNFULFILLED_JERRYSEED("§aUnfulfilled Jerryseed"),
-        VOTER_BADGE("§fVoter's Badge"),
-        VOTER_BADGE_VIP("§aVIP Voter's Badge"),
-        VOTER_BADGE_ELITE("§9Elite Voter's Badge"),
-        VOTER_BADGE_SUPREME("§5Supreme Voter's Badge"),
-        DYE_WILD_STRAWBERRY("§dWild Strawberry Dye"),
+        UNFULFILLED_JERRYSEED("§b1 §aUnfulfilled Jerryseed"),
+        VOTER_BADGE("§b1 §fVoter's Badge"),
+        VOTER_BADGE_VIP("§b1 §aVIP Voter's Badge"),
+        VOTER_BADGE_ELITE("§b1 §9Elite Voter's Badge"),
+        VOTER_BADGE_SUPREME("§b1 §5Supreme Voter's Badge"),
+        DYE_WILD_STRAWBERRY("§b1 §dWild Strawberry Dye"),
+        VELVET_TOP_HAT("§b1 §9Velvet Top Hat"),
+        CASHMERE_JACKET("§b1 §9Cashmere Jacket"),
+        SATIN_TROUSERS("§b1 §9Satin Trousers"),
+        OXFORD_SHOES("§b1 §9Oxford Shoes"),
         ;
 
         override fun toString() = displayName
