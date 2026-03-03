@@ -158,7 +158,7 @@ object GraphEditorRenderer {
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
             edge in highlightedEdges -> edgeDijkstraColor
-            else -> edgeColor
+            else -> edge.networkColor ?: edgeColor
         }
 
         draw3DLine(

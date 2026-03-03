@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -58,11 +60,13 @@ import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import com.mojang.authlib.properties.PropertyMap
 import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
@@ -83,8 +87,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import com.google.common.collect.ImmutableMultimap
-import com.mojang.authlib.properties.PropertyMap
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -268,6 +270,29 @@ object ItemUtils {
         val internalName = grabInternalNameOrNull()
         data.lastInternalName = internalName
         data.lastInternalNameFetchTime = SimpleTimeMark.now()
+        return internalName
+    }
+
+    /*
+    This will cause errors if used with basically anything EXCEPT getPrice
+    since PENGUIN;4+100 or GOLDEN_DRAGON;4+200 aren't real internal names.
+     */
+    fun ItemStack.getPetInternalNameWithLevel(): NeuInternalName = getPetInternalNameWithLevelOrNull() ?: NeuInternalName.NONE
+
+    fun ItemStack.getPetInternalNameWithLevelOrNull(): NeuInternalName? {
+        var internalName = getInternalNameOrNull()
+        if (internalName != null) {
+            val maxLevel = getMaxLevel(internalName)
+
+            if (this.getPetLevel() == 100) {
+                internalName = "${internalName.asString()}+100".toInternalName()
+            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
+                // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
+                internalName = "${internalName.asString()}+200".toInternalName()
+            } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
+                internalName = "${internalName.asString()}+100".toInternalName()
+            }
+        }
         return internalName
     }
 
@@ -506,7 +531,7 @@ object ItemUtils {
      */
     private val enchantedBookPattern by RepoPattern.pattern(
         "item.enchantedbook",
-        "(?:§f)?Enchanted Book \\((?<item>.+)\\)"
+        "(?:§f)?Enchanted Book \\((?<item>.+)\\)",
     )
 
     fun readBookTypeStrippedColor(input: String): String? = readBookType(input)?.removeColor()

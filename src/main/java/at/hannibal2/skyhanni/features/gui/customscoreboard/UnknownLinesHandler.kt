@@ -28,7 +28,11 @@ internal class UnknownLine(val line: String) {
 
 object UnknownLinesHandler {
 
-    internal lateinit var remoteOnlyPatterns: Array<Pattern>
+    private var remoteOnlyPatterns: Array<Pattern>? = null
+
+    internal fun invalidateRemoteOnlyPatterns() {
+        remoteOnlyPatterns = null
+    }
 
     /**
      * Remove known lines with patterns
@@ -40,9 +44,10 @@ object UnknownLinesHandler {
 
         val patternsToExclude = CustomScoreboard.activePatterns.toMutableList()
 
-        if (::remoteOnlyPatterns.isInitialized) {
-            patternsToExclude.addAll(remoteOnlyPatterns)
-        }
+        val remotePatterns = remoteOnlyPatterns
+            ?: SBPattern.computeRemoteOnlyPatterns().also { remoteOnlyPatterns = it }
+        patternsToExclude.addAll(remotePatterns)
+
         unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }

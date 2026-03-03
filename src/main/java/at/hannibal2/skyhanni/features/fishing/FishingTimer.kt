@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi.babySlugName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -90,7 +91,7 @@ object FishingTimer {
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        if (mob.name == "Baby Magma Slug") {
+        if (mob.name == babySlugName) {
             recentBabyMagmaSlugs += mob
             DelayedRun.runNextTick {
                 handleBabySlugs()

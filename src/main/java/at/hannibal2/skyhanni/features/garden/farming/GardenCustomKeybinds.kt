@@ -3,16 +3,13 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -20,19 +17,15 @@ import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenCustomKeybinds {
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
-    private val versionAllowsDuplicateKeybinds by lazy { PlatformUtils.isMcBelow("1.21.9") }
 
     private var map: Map<KeyMapping, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
-    private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-    private var hasDisallowedDuplicateKeybinds = false
 
     @JvmStatic
     fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
@@ -67,17 +60,6 @@ object GardenCustomKeybinds {
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
-        if (!isEnabled()) return
-        if (!hasDisallowedDuplicateKeybinds || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
-        ChatUtils.chatAndOpenConfig(
-            "Duplicate Custom Keybinds aren't allowed!",
-            GardenApi.config::keyBind,
-        )
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
-    }
-
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         with(config) {
@@ -106,16 +88,7 @@ object GardenCustomKeybinds {
                 }
             }
         }
-        checkDuplicateKeybinds()
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
         KeyMapping.releaseAll()
-    }
-
-    private fun checkDuplicateKeybinds() {
-        hasDisallowedDuplicateKeybinds = !versionAllowsDuplicateKeybinds &&
-            map.values
-                .filter { it != GLFW.GLFW_KEY_UNKNOWN }
-                .let { values -> values.size != values.toSet().size }
     }
 
     private fun isEnabled(): Boolean =
@@ -126,7 +99,6 @@ object GardenCustomKeybinds {
     private fun isActive(): Boolean =
         isEnabled() &&
             GardenApi.toolInHand != null &&
-            !hasDisallowedDuplicateKeybinds &&
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 

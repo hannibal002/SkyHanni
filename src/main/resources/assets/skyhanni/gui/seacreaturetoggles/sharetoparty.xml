@@ -1,0 +1,28 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig">
+    <Gui>
+        <Column>
+            <Meta afterClose="@afterClose"/>
+            <Center>
+                <Scale scale="2">
+                    <Text text="Share To Party Chat"/>
+                </Scale>
+            </Center>
+            <Center>
+                <Row>
+                    <Text text="Search: "/>
+                    <TextField value="@search"/>
+                    <Text text="@poll"/>
+                </Row>
+            </Center>
+            <Spacer height="5"/>
+            <ScrollPanel width="350" height="200">
+                <Array data="@searchResults">
+                    <Row>
+                        <Text text="@getName" width="300"/>
+                        <Switch value="@shouldShareInChat"/>
+                    </Row>
+                </Array>
+            </ScrollPanel>
+        </Column>
+    </Gui>
+</Root>
