@@ -45,7 +45,7 @@ object StewHelper {
     )
 
     private val inventoryDetector = InventoryDetector(
-        checkInventoryName = { it == "Witches Stew"},
+        checkInventoryName = { it == "Witches Stew" },
         onOpenInventory = { DelayedRun.runNextTick { checkSlots() } },
     )
 
