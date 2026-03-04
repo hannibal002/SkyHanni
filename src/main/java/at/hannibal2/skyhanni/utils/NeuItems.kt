@@ -232,8 +232,7 @@ object NeuItems {
             if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NeuInternalName, Int>()
-            for (ingredient in recipe.ingredients.toPrimitiveItemStacks()) {
-                val amount = ingredient.amount
+            for (ingredient in recipe.ingredients) {
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
                 if (internalName == "ENCHANTED_CACTUS_GREEN".toInternalName() && internalItemId == "INK_SACK-2".toInternalName()) {
@@ -245,7 +244,7 @@ object NeuItems {
                     continue
                 }
 
-                map.addOrPut(internalItemId, amount)
+                map.addOrPut(internalItemId, ingredient.count.toInt())
             }
             if (map.size != 1) continue
             val current = map.iterator().next().toPair()

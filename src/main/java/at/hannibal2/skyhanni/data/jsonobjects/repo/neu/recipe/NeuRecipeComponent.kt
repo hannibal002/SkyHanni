@@ -9,6 +9,7 @@ data class NeuRecipeComponent(val internalName: NeuInternalName?, val count: Int
 
     companion object {
         fun fromJsonStringOrNull(component: String): NeuRecipeComponent? {
+            if (component.isEmpty()) return null
             val parts = component.split(":")
             val internalName = parts.firstOrNull()?.toInternalName() ?: return null
             val quantity = parts.getOrNull(1)?.toIntOrNull() ?: 1
