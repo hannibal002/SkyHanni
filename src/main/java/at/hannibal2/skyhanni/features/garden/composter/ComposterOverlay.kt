@@ -78,7 +78,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
-    private var lastWidgetHash: Int = 0
     private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
@@ -125,11 +124,7 @@ object ComposterOverlay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled() || !event.isWidget(TabWidget.COMPOSTER)) return
-        val newComposterHash = event.widget.hashCode()
-        if (newComposterHash != lastWidgetHash) {
-            lastWidgetHash = newComposterHash
-            displayDirty = true
-        }
+        displayDirty = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
