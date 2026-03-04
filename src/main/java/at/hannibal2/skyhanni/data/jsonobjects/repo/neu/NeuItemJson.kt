@@ -27,8 +27,10 @@ data class NeuItemJson(
      * We have to accept any from 'nbttag' since we don't have a type guarantee,
      * and perform further conversion ourselves. Don't use this field.
      */
+    @Expose
     @Deprecated("Use neuNbt or nbtTag instead", ReplaceWith("neuNbt or nbtTag"))
-    @Expose @SerializedName("nbttag") private val nbtTagAny: Any,
+    @SerializedName("nbttag")
+    private val nbtTagAny: Any,
     @Expose val damage: Int? = null,
     @Expose val lore: List<String> = emptyList(),
     @Expose @SerializedName("internalname") val internalName: NeuInternalName,
