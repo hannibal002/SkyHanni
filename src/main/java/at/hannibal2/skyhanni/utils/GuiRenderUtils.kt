@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -15,6 +16,7 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
@@ -26,6 +28,7 @@ import kotlin.math.min
 import kotlin.math.sqrt
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.world.item.ItemDisplayContext
+import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -332,6 +335,7 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
+        frameNumber: Int? = null,
     ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -355,11 +359,9 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        // Todo, uncomment when modern item rendering is fixed
-        /* if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight())) */
-        return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
+            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
-        /*
         /**
          * This is used to render items that fit these criteria:
          *  - Uses block light (mostly skulls)
@@ -369,10 +371,10 @@ object GuiRenderUtils {
          *
          *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
          *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
-         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
-         *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config.
+         *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
-        val guiRenderState = GuiItemRenderState(
+        val guiItemRenderState = GuiItemRenderState(
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
@@ -381,15 +383,18 @@ object GuiRenderUtils {
             DrawContextUtils.drawContext.scissorStack.peek()
         )
         val newRenderState = SkyHanniGuiItemRenderState(
-            guiRenderState, x, y,
+            itemStack = this,
+            guiItemRenderState,
+            translateX,
+            translateY,
             rotationVec, translationVec,
-            scale = scale.toFloat(),
-            adjustedScale = (scale * guiScaleX).toFloat(),
+            scale = finalItemScale.toFloat(),
+            adjustedScale = (finalItemScale * guiScaleX).toFloat(),
             stableRenderId,
+            frameNumber = frameNumber,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId
-        */
     }
 
     private fun ItemStack.normalRenderOnScreen(
