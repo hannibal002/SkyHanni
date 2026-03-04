@@ -42,13 +42,11 @@ object IrisCompat {
                 RenderPipeline::class.java,
                 irisProgramEnum
             ) ?: return
-            val programMap: Map<IrisProgram, Any> = IrisProgram.entries.associateWith { it.asJavaEnum() }
 
             // Assign our custom pipelines by their program
             SkyHanniRenderPipeline.entries.forEach { shPipeline ->
-                val irisProgram = programMap[shPipeline.irisProgram] ?: return@forEach
                 try {
-                    pipelineMethod.invoke(irisInstance, shPipeline, irisProgram)
+                    pipelineMethod.invoke(irisInstance, shPipeline, shPipeline.irisProgram.asJavaEnum())
                 } catch (exception: Exception) {
                     ErrorManager.logErrorWithData(exception, "Failed to assign Iris pipeline!")
                 }
