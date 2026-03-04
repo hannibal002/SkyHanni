@@ -21,7 +21,7 @@ data class NeuForgeRecipeJson(
     override fun getPrimitiveInputs(itemJson: NeuItemJson): List<PrimitiveIngredient> =
         inputs.mapNotNull { it.toPrimitiveIngredientOrNull() }
 
-    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(
+    override fun getOutputOverride() = NeuOverrideProvider(
         overrideItem = overrideOutputId,
         overrideCount = count,
     )

@@ -24,5 +24,5 @@ data class NeuKatUpgradeRecipeJson(
         add(PrimitiveIngredient.coinIngredient(coins))
     }
 
-    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(output)
+    override fun getOutputOverride() = NeuOverrideProvider(output)
 }

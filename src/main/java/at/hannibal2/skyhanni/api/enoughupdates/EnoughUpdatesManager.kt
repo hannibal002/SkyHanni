@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetData
@@ -127,17 +128,18 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun NeuAbstractRecipe.loadAndRegister(itemJson: NeuItemJson) {
+    private fun <R : NeuAbstractRecipe> R.loadAndRegister(itemJson: NeuItemJson) {
         val ingredients = this.getPrimitiveInputs(itemJson).toSet()
         val outputs = this.getPrimitiveOutputs(itemJson).toSet()
+        SkyHanniMod.logger.info("Loaded outputs ${outputs.joinToString { it.internalName.asString() }} for item ${itemJson.internalName.asString()} with recipe type ${this.type}")
         val recipe = PrimitiveRecipe(
             ingredients,
             outputs,
             recipeType = this.type,
             shouldUseForCraftCost = this.type.useForCraftCost,
         )
-        for (internalName in recipe.outputs) {
-            val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
+        for (primitives in outputs) {
+            val recipeSet = recipesMap.getOrPut(primitives.internalName) { mutableSetOf() }
             recipeSet.add(recipe)
         }
     }
