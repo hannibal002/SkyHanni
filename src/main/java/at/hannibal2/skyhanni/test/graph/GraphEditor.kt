@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,6 +31,7 @@ object GraphEditor {
             field = value
             updateRender()
             GraphNodeEditor.updateNodeNames()
+            flagDisabledDirty()
         }
 
     fun isEnabled(): Boolean = config.enabled
@@ -37,6 +39,14 @@ object GraphEditor {
     private val nodes get() = state.nodes
     private val inTutorialMode get() = state.inTutorialMode
     private val inEditMode get() = state.inEditMode
+    private var disabledDirty = false
+    var hideDisabled = false
+        private set
+
+    fun flagDisabledDirty() {
+        ChatUtils.debug("flagDisabledDirty")
+        disabledDirty = true
+    }
 
     fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
@@ -47,6 +57,7 @@ object GraphEditor {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
+        handleDisabled()
         GraphEditorInput.input()
         if (event.isMod(5)) {
             updateRender()
@@ -61,6 +72,14 @@ object GraphEditor {
         state.closestNode = state.cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() }
 
         GraphEditorNodeFinder.handleAllNodeFind()
+    }
+
+    private fun handleDisabled() {
+        if (!disabledDirty) return
+        ChatUtils.debug("handleDisabled 1")
+        val graph = IslandGraphs.currentIslandGraph ?: return
+        disabledDirty = false
+        GraphNodeEditor.handleDisabled(graph)
     }
 
     @HandleEvent
@@ -129,6 +148,19 @@ object GraphEditor {
                 GraphEditorNetworks.findNetworks()
             }
         }
+        event.registerBrigadier("shgraphtoggledisabled") {
+            description = "Show or hide disabled nodes."
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                toggleDisabledVisibility()
+            }
+        }
+    }
+
+    fun toggleDisabledVisibility() {
+        hideDisabled = !hideDisabled
+        val label = if (hideDisabled) "hides" else "shows"
+        ChatUtils.chat("Graph Editor now $label disabled nodes")
     }
 
     var bypassTempRemoveTimer = SimpleTimeMark.farPast()

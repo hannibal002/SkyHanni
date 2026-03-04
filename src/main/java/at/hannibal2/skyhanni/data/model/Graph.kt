@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
+import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -234,6 +235,10 @@ class GraphNode(val id: Int, override val position: LorenzVec, val name: String?
     }
 
     var enabled = true
+        set(value) {
+            field = value
+            GraphEditor.flagDisabledDirty()
+        }
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
     lateinit var neighbours: Map<GraphNode, Double>

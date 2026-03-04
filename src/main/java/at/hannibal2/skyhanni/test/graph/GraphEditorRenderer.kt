@@ -64,6 +64,9 @@ object GraphEditorRenderer {
     }
 
     private fun buildDisplay(): List<Renderable> = buildList {
+        if (GraphEditor.hideDisabled) {
+            add("§cDisabled nodes are hidden!")
+        }
         add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
@@ -110,6 +113,7 @@ object GraphEditorRenderer {
 
     private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
         if (!node.rendering) return
+        if (GraphEditor.hideDisabled && !node.enabled) return
         this.drawWaypointFilled(
             node.position,
             node.getNodeColor(),
@@ -120,37 +124,36 @@ object GraphEditorRenderer {
 
         val showTextAlways = seeThroughBlocks || node.distanceSqToPlayer() < 100
 
+        fun draw(text: String, yOff: Float) {
+            this.drawDynamicText(
+                node.position,
+                text,
+                scaleMultiplier = 0.8,
+                seeThroughBlocks = showTextAlways,
+                smallestDistanceVew = 12.0,
+                ignoreY = true,
+                yOff = yOff,
+                maxDistance = 80,
+            )
+        }
+
+        if (!node.enabled) {
+            draw("§cDisabled", yOff = -30f)
+        }
+
         val nodeName = if (inTextMode && node == activeNode) {
             textBox.finalText().ifEmpty { null }
         } else {
             node.name
         }
         if (nodeName != null) {
-            this.drawDynamicText(
-                node.position,
-                nodeName,
-                0.8,
-                seeThroughBlocks = showTextAlways,
-                smallestDistanceVew = 12.0,
-                ignoreY = true,
-                yOff = -15f,
-                maxDistance = 80,
-            )
+            draw(nodeName, yOff = -15f)
         }
 
         val tags = node.tags
         if (tags.isEmpty()) return
         val tagText = tags.joinToString(" §f+ ") { it.displayName }
-        this.drawDynamicText(
-            node.position,
-            tagText,
-            0.8,
-            seeThroughBlocks = showTextAlways,
-            smallestDistanceVew = 12.0,
-            ignoreY = true,
-            yOff = 0f,
-            maxDistance = 80,
-        )
+        draw(tagText, yOff = 0f)
     }
 
     private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {

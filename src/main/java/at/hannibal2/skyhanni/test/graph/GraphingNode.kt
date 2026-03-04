@@ -13,6 +13,7 @@ class GraphingNode(
 ) : GraphUtils.GenericNode {
 
     var rendering = true
+    var enabled = true
 
     override fun hashCode(): Int {
         return id
