@@ -70,6 +70,8 @@ class SpecificSeaCreatures(
                             shouldSelfNotifyOnCatch = seaCreature.rare,
                             shouldNotifyForNonOwn = seaCreature.rare,
                             shouldHighlight = seaCreature.rare,
+                            shouldShareCocoonInChat = seaCreature.rare,
+                            shouldWarnWhenCocooned = seaCreature.rare,
                         ),
                     ),
                 )
@@ -93,6 +95,8 @@ class SpecificSeaCreatures(
                             shouldSelfNotifyOnCatch = seaCreature.rare,
                             shouldNotifyForNonOwn = seaCreature.rare,
                             shouldHighlight = seaCreature.rare,
+                            shouldShareCocoonInChat = seaCreature.rare,
+                            shouldWarnWhenCocooned = seaCreature.rare,
                         ),
                     ),
                 )
@@ -115,6 +119,8 @@ class SpecificSeaCreatures(
                         seaCreature.shouldSelfNotifyOnCatch,
                         seaCreature.shouldNotifyForNonOwn,
                         seaCreature.shouldHighlight,
+                        seaCreature.shouldShareCocoonInChat,
+                        seaCreature.shouldWarnWhenCocooned,
                     )
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.SEA_CREATURES, "save file")
@@ -170,6 +176,16 @@ class SpecificSeaCreatures(
     @Bind
     fun showHighlight() {
         openXML("shouldhighlight")
+    }
+
+    @Bind
+    fun showCocoonChatSettings() {
+        openXML("sharecocoontoparty")
+    }
+
+    @Bind
+    fun showCocoonWarnSettings() {
+        openXML("warnwhencocooned")
     }
 
     private fun openXML(string: String) {

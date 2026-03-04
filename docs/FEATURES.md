@@ -623,6 +623,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a large display with a timer when the Fire Pillar is about to explode.
     + Also displays for other players' bosses.
 + Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
++ Added Remaining Slayer Kills Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4818)
+    + Shows the names and remaining number of mob kills needed until the boss spawns.
+    + Option to show mob level and health.
 
 </details>
 <details open><summary>
@@ -1345,6 +1348,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Line to Jerry. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3388)
     + Shows a line to your spawned Jerry from Jerrypocalypse.
 
+#### Year of the Witch
+
++ Added Year of the Witch Stew Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/5315)
+
 </details>
 <details open><summary>
 
@@ -1586,6 +1593,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
         + Animals killed vs. animals that kill themselves
         + Pelts per hour
     + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
++ Added ability to show the radius given by Talbot's Theodolite. - Maxwell Zhao (https://github.com/hannibal002/SkyHanni/pull/5293)
 + **GUI Scale**: - nea
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
