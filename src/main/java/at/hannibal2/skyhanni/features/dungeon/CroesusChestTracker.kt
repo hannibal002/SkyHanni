@@ -173,12 +173,16 @@ object CroesusChestTracker {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED
                 unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
-                else -> ErrorManager.logErrorStateWithData(
-                    "Croesus Chest couldn't be read correctly.",
-                    "Open state check failed for chest.",
-                    "run" to run,
-                    "lore" to lore,
-                ).run { null }
+                kuudraPattern.anyMatches(lore) -> OpenedState.UNOPENED
+                // Kuudra doesn't have an unopened, but it DOES have opened, this has to be after opened in when branch.
+                else -> {
+                    ErrorManager.logErrorStateWithData(
+                        "Croesus Chest couldn't be read correctly.",
+                        "Open state check failed for chest.",
+                        "run" to run,
+                        "lore" to lore,
+                    ).run { null }
+                }
             }
         }
     }
@@ -239,7 +243,7 @@ object CroesusChestTracker {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
-        val run = croesusSlotMapToRun(event.slot.containerSlot) ?: return
+        croesusSlotMapToRun(event.slot.containerSlot) ?: return
         if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getLore())) return
         event.offsetY = -1
         event.offsetX = -9
