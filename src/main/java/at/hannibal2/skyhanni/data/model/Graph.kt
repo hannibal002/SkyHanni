@@ -236,8 +236,10 @@ class GraphNode(val id: Int, override val position: LorenzVec, val name: String?
 
     var enabled = true
         set(value) {
+            if (value != field) {
+                GraphEditor.flagDisabledDirty()
+            }
             field = value
-            GraphEditor.flagDisabledDirty()
         }
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
