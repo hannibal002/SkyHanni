@@ -262,14 +262,12 @@ object GraphNodeEditor {
     private var disabledLocations = setOf<LorenzVec>()
 
     fun handleDisabled(graph: Graph) {
-        ChatUtils.debug("handleDisabled 2")
         val newDisabled = mutableSetOf<LorenzVec>()
         for (node in graph) {
             if (!node.enabled) {
                 newDisabled.add(node.position)
             }
         }
-        ChatUtils.debug("disabledLocations: ${disabledLocations.size}")
 
         disabledLocations = newDisabled
         updateDisabledNames()

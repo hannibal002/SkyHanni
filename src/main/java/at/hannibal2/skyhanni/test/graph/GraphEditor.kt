@@ -44,7 +44,6 @@ object GraphEditor {
         private set
 
     fun flagDisabledDirty() {
-        ChatUtils.debug("flagDisabledDirty")
         disabledDirty = true
     }
 
@@ -76,7 +75,6 @@ object GraphEditor {
 
     private fun handleDisabled() {
         if (!disabledDirty) return
-        ChatUtils.debug("handleDisabled 1")
         val graph = IslandGraphs.currentIslandGraph ?: return
         disabledDirty = false
         GraphNodeEditor.handleDisabled(graph)
