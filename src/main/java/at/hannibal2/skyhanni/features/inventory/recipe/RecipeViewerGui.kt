@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
@@ -113,22 +114,21 @@ object RecipeViewerGui {
             horizontalAlign = HA.CENTER,
         )
 
-        return Renderable.drawInsideRoundedRectWithOutline(
+        return Renderable.drawInsideFloatingRectWithBorder(
             inner,
-            color = COLOR_BG.toColor(),
+            backgroundColor = COLOR_BG,
+            lightColor = COLOR_OUTLINE_TOP,
+            darkColor = COLOR_OUTLINE_BOT,
             padding = PANEL_PADDING,
             radius = 12,
             smoothness = 2,
-            topOutlineColor = COLOR_OUTLINE_TOP.toColor().rgb,
-            bottomOutlineColor = COLOR_OUTLINE_BOT.toColor().rgb,
-            borderOutlineThickness = 2,
+            borderThickness = 2,
         )
     }
 
     private fun buildHeaderRow(internalName: NeuInternalName): Renderable {
-        val displayName = EnoughUpdatesManager.getDisplayName(internalName)
         val texts = Renderable.vertical(spacing = 2, horizontalAlign = HA.CENTER) {
-            add(Renderable.text(displayName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
+            add(Renderable.text(internalName.repoItemName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
             val internalFormat = "§7${internalName.asString()}"
             add(Renderable.text(internalFormat, scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
         }
@@ -158,11 +158,11 @@ object RecipeViewerGui {
             screen.rebuildDisplay()
         }
 
-        val recipeTypeName = recipes[currentIndex].recipeType.name.lowercase().replaceFirstChar { it.uppercase() }
+        val currentType = recipes[currentIndex].recipeType
         val label = Renderable.vertical(
             listOf(
                 Renderable.text("Recipe ${currentIndex + 1} / $total", color = Color.WHITE, horizontalAlign = HA.CENTER),
-                Renderable.text("§7$recipeTypeName", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER),
+                Renderable.text("§7$currentType", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER),
             ),
             spacing = 1,
             horizontalAlign = HA.CENTER,
@@ -238,7 +238,7 @@ object RecipeViewerGui {
                 Renderable.placeholder(SLOT_SIZE, SLOT_SIZE),
                 COLOR_SLOT_EMPTY.toColor(),
                 padding = 0,
-                radius = 4,
+                radius = (4 * ITEM_SCALE).toInt(),
             )
         }
 
@@ -249,7 +249,7 @@ object RecipeViewerGui {
     }
 
     private fun buildIngredientRow(ingredient: PrimitiveIngredient): Renderable {
-        val name = EnoughUpdatesManager.getDisplayName(ingredient.internalName)
+        val name = ingredient.internalName.repoItemName
         val label = Renderable.text("$name §7×${ingredient.count.toInt().addSeparators()}", scale = 0.9, color = Color.WHITE)
         return Renderable.horizontal(listOf(buildItemSlot(ingredient), label), spacing = 4, verticalAlign = VA.CENTER)
     }
@@ -277,4 +277,3 @@ object RecipeViewerGui {
         )
     }
 }
-

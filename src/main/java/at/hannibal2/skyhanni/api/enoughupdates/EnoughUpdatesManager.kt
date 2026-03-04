@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
@@ -131,7 +132,6 @@ object EnoughUpdatesManager {
     private fun <R : NeuAbstractRecipe> R.loadAndRegister(itemJson: NeuItemJson) {
         val ingredients = this.getPrimitiveInputs(itemJson).toSet()
         val outputs = this.getPrimitiveOutputs(itemJson).toSet()
-        SkyHanniMod.logger.info("Loaded outputs ${outputs.joinToString { it.internalName.asString() }} for item ${itemJson.internalName.asString()} with recipe type ${this.type}")
         val recipe = PrimitiveRecipe(
             ingredients,
             outputs,
@@ -189,12 +189,12 @@ object EnoughUpdatesManager {
         return json
     }
 
-    fun neuItemToStack(neuItem: NeuItemJson, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack =
+    fun neuItemToStack(neuItem: NeuItemJson, useCache: Boolean = true, useReplacements: Boolean = true): ItemStack =
         neuItem.toStack(useCache, useReplacements)
 
     private fun NeuItemJson?.toStack(
         useCache: Boolean = true,
-        useReplacements: Boolean = false
+        useReplacements: Boolean = true
     ): ItemStack {
         this ?: return ItemStack(Items.PAINTING)
 
@@ -210,16 +210,13 @@ object EnoughUpdatesManager {
         count?.let { stack.count = it }
         ComponentUtils.convertToComponents(stack, neuNbt)
 
-        var replacements = mapOf<String, String>()
-        if (useReplacements) {
-            replacements = stack.getPetLoreReplacements()
-            displayName?.let {
-                var name = it
-                for ((key, value) in replacements) {
-                    name = name.replace("{$key}", value)
-                }
-                stack.setCustomItemName(name)
+        val replacements =  if (useReplacements) stack.getPetLoreReplacements() else emptyMap()
+        if (useReplacements) displayName?.let {
+            var name = it
+            for ((key, value) in replacements) {
+                name = name.replace("{$key}", value)
             }
+            stack.setCustomItemName(name)
         }
 
         lore.takeIfNotEmpty()?.let {
@@ -232,7 +229,7 @@ object EnoughUpdatesManager {
     }
 
     private fun ItemStack?.getPetLoreReplacements(): Map<String, String> {
-        val petInfo = this?.getPetInfo() ?: return emptyMap()
+        val petInfo = this?.getPetInfo(useDefaultForRepo = true) ?: return emptyMap()
         val properInternalName = petInfo.type
         // We let PetData do the heavy lifting of parsing the pet info
         val petData = PetData(petInfo)

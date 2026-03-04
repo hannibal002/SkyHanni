@@ -5,12 +5,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.input.KeyEvent
-import net.minecraft.client.input.MouseButtonEvent
-import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 
 /**
@@ -45,6 +40,7 @@ class RecipeViewerScreen(
         val startX = (width - renderable.width) / 2
         val startY = (height - renderable.height) / 2
 
+        DrawContextUtils.nextStratum()
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(startX.toFloat(), startY.toFloat())
             Renderable.withMousePosition(mouseX - startX, mouseY - startY) {

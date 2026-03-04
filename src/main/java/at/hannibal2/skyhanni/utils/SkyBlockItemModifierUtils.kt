@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -8,6 +9,7 @@ import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -102,8 +104,8 @@ object SkyBlockItemModifierUtils {
         @Expose val hideRightClick: Boolean? = null,
         @Expose val noMove: Boolean? = null,
         @Expose val extraData: JsonObject? = null,
+        val properSkinItem: NeuInternalName? = skin?.let { "PET_SKIN_$skin".toInternalName() },
     ) {
-        val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
         fun getSkinVariantIndex() = extraData?.let { PetUtils.getVariantIndexOrNull(it) }
     }
 
@@ -142,10 +144,16 @@ object SkyBlockItemModifierUtils {
     private val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
     private var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    fun ItemStack.getPetInfo(): PetInfo? {
+    fun ItemStack.getPetInfo(useDefaultForRepo: Boolean = false): PetInfo? {
         val colorlessName = hoverName.string.removeColor()
-        // Repo pets will always return null for PetInfo, don't even attempt to parse it
-        if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) return null
+        // Repo pets will always return null for PetInfo, unless the param is specified as true
+        if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) {
+            if (!useDefaultForRepo) return null
+            // Set up a "default fallback" pet info for repo pets, for a level 1 pet with no experience
+            val internalName = this.getInternalNameOrNull() ?: return null
+            if (!PetUtils.isKnownPetInternalName(internalName)) return null
+            return PetData(internalName).petInfo
+        }
         val petInfoJson = getExtraAttributes()?.takeIf {
             it.contains("petInfo")
         }?.getStringOrDefault("petInfo")?.takeIf {
