@@ -94,6 +94,7 @@ object VanquisherWaypointShare {
         myVanquisherId = entityId
 
         TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
+        ChatUtils.chat("You Spawned a Vanquisher")
 
         val entity = vanquisherNearby[entityId] ?: EntityUtils.getEntityByID(entityId)
         if (entity != null) {
@@ -195,7 +196,7 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
         if (event.repeatSeconds(3)) {
             sharedWaypoints.values.removeIf { it.spawnTime.passedSince() > 60.seconds }
-            vanquisherNearby.values.removeIf { it.deceased || !it.isAlive }
+            vanquisherNearby.values.removeIf { it.deceased }
 
         }
     }
