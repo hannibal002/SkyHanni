@@ -104,6 +104,10 @@ value class Graph(
                     out.endArray()
                 }
 
+                if (graphNode.extraWeight != 0) {
+                    out.name("ExtraWeight").value(graphNode.extraWeight)
+                }
+
                 out.name("Neighbours")
                 out.beginObject()
                 for ((node, weight) in graphNode.neighbours) {
@@ -145,7 +149,7 @@ value class Graph(
                 reader.endObject()
 
                 nodeData.position?.let { pos ->
-                    val node = GraphNode(id, pos, nodeData.name, nodeData.tags)
+                    val node = GraphNode(id, pos, nodeData.name, nodeData.tags, nodeData.extraWeight)
                     list.add(node)
                     neighbourMap[node] = nodeData.neighbors
                 }
@@ -159,6 +163,7 @@ value class Graph(
             var name: String? = null,
             var tags: List<String> = emptyList(),
             val neighbors: MutableList<Pair<Int, Double>> = mutableListOf(),
+            var extraWeight: Int = 0,
         )
 
         private fun parseNodeData(reader: JsonReader): NodeData {
@@ -177,6 +182,7 @@ value class Graph(
                         }
                     }
 
+                    "ExtraWeight" -> data.extraWeight = reader.nextInt()
                     "Neighbours" -> parseNeighbours(reader, data.neighbors)
                     "Name" -> data.name = reader.nextString()
                     "Tags" -> data.tags = parseTags(reader)
@@ -227,7 +233,13 @@ value class Graph(
 }
 
 // The node object that gets parsed from/to JSON
-class GraphNode(val id: Int, override val position: LorenzVec, val name: String? = null, val tagNames: List<String> = emptyList()) :
+class GraphNode(
+    val id: Int,
+    override val position: LorenzVec,
+    val name: String? = null,
+    val tagNames: List<String> = emptyList(),
+    val extraWeight: Int = 0,
+) :
     GraphUtils.GenericNode {
 
     val tags: List<GraphNodeTag> by lazy {

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -151,6 +152,27 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
                 toggleDisabledVisibility()
+            }
+        }
+
+        event.registerBrigadier("shgraphweight") {
+            description = "Get or set the extra weight of the active node."
+            category = CommandCategory.DEVELOPER_TEST
+            arg("weight", BrigadierArguments.integer()) { weight ->
+                callback {
+                    if (!isEnabled()) {
+                        ChatUtils.userError("Graph Editor is not active!")
+                        return@callback
+                    }
+                    GraphNodeEditor.setWeight(getArg(weight))
+                }
+            }
+            simpleCallback {
+                if (!isEnabled()) {
+                    ChatUtils.userError("Graph Editor is not active!")
+                    return@simpleCallback
+                }
+                GraphNodeEditor.getWeight()
             }
         }
     }

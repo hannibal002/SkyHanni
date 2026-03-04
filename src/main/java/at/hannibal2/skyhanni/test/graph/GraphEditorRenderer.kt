@@ -137,6 +137,11 @@ object GraphEditorRenderer {
             )
         }
 
+        if (node.extraWeight != 0) {
+            val sign = if (node.extraWeight > 0) "+" else ""
+            draw("§eWeight: $sign${node.extraWeight}", yOff = -45f)
+        }
+
         if (!node.enabled) {
             draw("§cDisabled", yOff = -30f)
         }

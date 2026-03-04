@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -276,6 +277,24 @@ object GraphNodeEditor {
         for (node in state.nodes) {
             node.enabled = node.position !in disabledLocations
         }
+    }
+
+    fun getWeight() {
+        val node = state.activeNode ?: run {
+            ChatUtils.userError("No node selected!")
+            return
+        }
+        ChatUtils.chat("Extra weight of this node: §e${node.extraWeight}")
+    }
+
+    fun setWeight(weight: Int) {
+        val node = state.activeNode ?: run {
+            ChatUtils.userError("No node selected!")
+            return
+        }
+        GraphEditorHistory.save("set weight ${node.id}")
+        node.extraWeight = weight
+        ChatUtils.chat("Set extra weight to §e$weight§e.")
     }
 
     private fun isEnabled() = GraphEditor.isEnabled()
