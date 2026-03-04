@@ -116,8 +116,8 @@ object SkyHanniTypeAdapters {
     val NEU_RECIPE_COMPONENT: TypeAdapter<NeuRecipeComponent> = SimpleStringTypeAdapter(
         { this.toJsonString() },
         {
-            NeuRecipeComponent.fromJsonStringOrNull(this) ?:
-                throw IllegalArgumentException("Invalid NeuRecipeComponent string: '$this'")
+            NeuRecipeComponent.fromJsonStringOrNull(this)
+                ?: throw IllegalArgumentException("Invalid NeuRecipeComponent string: '$this'")
         }
     )
 
