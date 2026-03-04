@@ -347,4 +347,13 @@ object EnoughUpdatesManager {
         }
         ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
+
+    fun reportRecipeStatus() {
+        val loadedRecipes = recipesMap.values.sumOf { it.size }
+        val status = when {
+            loadedRecipes == 0 -> "§cNo recipes loaded!"
+            else -> "§aLoaded $loadedRecipes recipes!"
+        }
+        ChatUtils.chat("  §aNEU Repo Recipe Status:\n  $status", prefix = false)
+    }
 }
