@@ -107,7 +107,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
     // Will be invoked by the implementation of this class
-    @Suppress("HandleEventInspection")
     fun registerCommands(event: CommandRegistrationEvent) {
         event.registerBrigadier(updateCommand) {
             description = "Remove and re-download the $commonName repo"
@@ -123,7 +122,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             category = CommandCategory.USERS_BUG_FIX
             coroutineSimpleCallback {
                 val progress = progressCategory.start("showing status via /$statusCommand")
-                displayRepoStatus(progress, joinEvent = true, command = true)
+                displayRepoStatus(progress, joinEvent = false, command = true)
                 progress.end("done showing status")
             }
         }
