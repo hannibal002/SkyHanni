@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
@@ -15,8 +16,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault
 import at.hannibal2.skyhanni.utils.compat.getByteOrDefault
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -24,6 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getLongOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.core.component.DataComponents
@@ -38,7 +41,10 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
+@SkyHanniModule
 object SkyBlockItemModifierUtils {
+
+    private val patternGroup = RepoPattern.group("misc.itemmodifiers")
 
     fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
 
@@ -144,35 +150,42 @@ object SkyBlockItemModifierUtils {
     private val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
     private var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    /**
+     * REGEX-TEST: §7[Lvl {LVL}] §dRabbit
+     * REGEX-TEST: [Lvl 1 → 100] Witch
+     */
+    private val repoPetPattern by patternGroup.pattern(
+        "pet.repo",
+        "^.*(?:[→➡]|\\{LVL}).*$"
+    )
+
     fun ItemStack.getPetInfo(useDefaultForRepo: Boolean = false): PetInfo? {
         val colorlessName = hoverName.string.removeColor()
-        // Repo pets will always return null for PetInfo, unless the param is specified as true
-        if (colorlessName.contains("→") || colorlessName.contains("{LVL}")) {
-            if (!useDefaultForRepo) return null
+        return if (repoPetPattern.matches(colorlessName)) {
+            val internalName = this.getInternalNameOrNull()?.takeIf {
+                PetUtils.isKnownPetInternalName(it)
+            } ?: return null
+            // Repo pets will always return null for PetInfo, unless the param is specified as true
+            if (!useDefaultForRepo) null
             // Set up a "default fallback" pet info for repo pets, for a level 1 pet with no experience
-            val internalName = this.getInternalNameOrNull() ?: return null
-            if (!PetUtils.isKnownPetInternalName(internalName)) return null
-            return PetData(internalName).petInfo
+            else PetData(internalName).petInfo
+        } else getExtraAttributes()?.getStringOrDefault("petInfo")?.takeIfNotEmpty()?.let {
+            parsePetInfoJson(it, colorlessName, extraAttributes)
         }
-        val petInfoJson = getExtraAttributes()?.takeIf {
-            it.contains("petInfo")
-        }?.getStringOrDefault("petInfo")?.takeIf {
-            it.isNotEmpty()
-        } ?: return null
+    }
 
-        return try {
-            ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
-        } catch (e: Exception) {
-            val added = warnedAboutPetParseFailure.add(colorlessName)
-            if (!added || lastWarnedParseFailure.passedSince() <= 1.minutes) return null
-            lastWarnedParseFailure = SimpleTimeMark.now()
-            ErrorManager.skyHanniError(
-                "Failed to parse pet info for item: $colorlessName",
-                "exception" to e.message,
-                "extraAttributes" to extraAttributes.toString(),
-                "petInfoJson" to petInfoJson,
-            )
-        }
+    private fun parsePetInfoJson(json: String, colorlessName: String, extraAttributes: CompoundTag): PetInfo? = runCatching {
+        ConfigManager.gson.fromJson(json, PetInfo::class.java)
+    }.getOrElse { e ->
+        val added = warnedAboutPetParseFailure.add(colorlessName)
+        if (!added || lastWarnedParseFailure.passedSince() <= 1.minutes) return null
+        lastWarnedParseFailure = SimpleTimeMark.now()
+        ErrorManager.skyHanniError(
+            "Failed to parse pet info for item: $colorlessName",
+            "exception" to e.message,
+            "extraAttributes" to extraAttributes.toString(),
+            "petInfoJson" to json,
+        )
     }
 
     fun ItemStack.getPetLevel(): Int = getPetInfo()?.let(PetUtils::xpToLevel) ?: 1
@@ -397,7 +410,7 @@ object SkyBlockItemModifierUtils {
 
         companion object {
 
-            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.lowercase() == name.lowercase() }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
         }
     }
 

@@ -26,7 +26,7 @@ data class NeuMobDropsRecipeJson(
     ) = super.getPrimitiveOutputs(itemJson).toMutableList().apply {
         drops.mapNotNull {
             it.id.toPrimitiveIngredientOrNull()
-        }.let { addAll(it ) }
+        }.let { addAll(it) }
     }
 }
 

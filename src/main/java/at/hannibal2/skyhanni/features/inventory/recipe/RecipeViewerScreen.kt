@@ -50,7 +50,7 @@ class RecipeViewerScreen(
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        val keyCode = keyCode ?: return
+        keyCode ?: return
         if (keyCode == GLFW.GLFW_KEY_ESCAPE || KeyboardManager.checkIsInventoryClosure(keyCode)) onClose()
     }
 

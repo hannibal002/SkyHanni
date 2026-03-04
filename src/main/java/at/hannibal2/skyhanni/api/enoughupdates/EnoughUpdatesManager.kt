@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetData
@@ -21,7 +20,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
@@ -210,7 +208,7 @@ object EnoughUpdatesManager {
         count?.let { stack.count = it }
         ComponentUtils.convertToComponents(stack, neuNbt)
 
-        val replacements =  if (useReplacements) stack.getPetLoreReplacements() else emptyMap()
+        val replacements = if (useReplacements) stack.getPetLoreReplacements() else emptyMap()
         if (useReplacements) displayName?.let {
             var name = it
             for ((key, value) in replacements) {

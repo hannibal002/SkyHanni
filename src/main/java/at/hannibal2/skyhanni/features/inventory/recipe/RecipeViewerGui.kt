@@ -40,7 +40,7 @@ object RecipeViewerGui {
     private const val ITEM_SCALE = 2.5
     private fun scaledItem(internalName: NeuInternalName, withTip: Boolean = true) = Renderable.item(
         provider = NeuItemStackProvider(internalName),
-        scale =  ITEM_SCALE
+        scale = ITEM_SCALE
     ).let { if (withTip) it.withTip() else it }
 
     // Derive slot size from the actual rendered item dimensions so empty and filled slots always match.
