@@ -132,7 +132,7 @@ object SkyHanniTypeAdapters {
         }
 
         override fun read(reader: JsonReader): NeuAbstractRecipe {
-            val obj = JsonParser().parse(reader).asJsonObject
+            val obj = JsonParser.parseReader(reader).asJsonObject
             val typeId = obj.get("type").asString
             val recipeType = NeuRecipeType.fromNeuIdOrNull(typeId)
                 ?: throw IllegalArgumentException("Unknown recipe type: $typeId")
@@ -146,7 +146,7 @@ object SkyHanniTypeAdapters {
         }
 
         override fun read(reader: JsonReader?): NEURaritySpecificPetNums {
-            val obj = JsonParser().parse(reader).asJsonObject
+            val obj = JsonParser.parseReader(reader).asJsonObject
             val neuPetNumsAdapter = ConfigManager.gson.getAdapter(NeuPetNums::class.java)
             val min = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("1"))
             val max = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("100"))
