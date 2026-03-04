@@ -8,6 +8,8 @@ data class NeuRecipeComponent(val internalName: NeuInternalName?, val count: Int
     fun toJsonString() = internalName?.let { "$it:$count" }.orEmpty()
 
     companion object {
+        val EMPTY = NeuRecipeComponent(null, 0)
+
         fun fromJsonStringOrNull(component: String): NeuRecipeComponent? {
             if (component.isEmpty()) return null
             val parts = component.split(":")

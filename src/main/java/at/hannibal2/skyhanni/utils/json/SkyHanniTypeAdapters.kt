@@ -117,7 +117,7 @@ object SkyHanniTypeAdapters {
         { this.toJsonString() },
         {
             NeuRecipeComponent.fromJsonStringOrNull(this)
-                ?: throw IllegalArgumentException("Invalid NeuRecipeComponent string: '$this'")
+                ?: NeuRecipeComponent.EMPTY
         }
     )
 
