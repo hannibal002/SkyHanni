@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -125,15 +125,15 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
-     * REGEX-TEST: §8[§r§5393§r§8] §r§c[§r§fYOUTUBE§r§c] Remittal§r§f §r§7Σ§r§7♲ §r§f(§r§dMage XL§r§f)
-     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dMage XXXVI§r§f)
-     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dDEAD§r§f)
+     * REGEX-TEST: [319] Empa_ α (Mage XXXIV)
+     * REGEX-TEST: [393] [YOUTUBE] Remittal Σ♲ (Mage XL)
+     * REGEX-TEST: [273] Ovi_1 Ӄ (Mage XXXVI)
+     * REGEX-TEST: [273] Ovi_1 Ӄ (DEAD)
      */
     @Suppress("MaxLineLength")
     val playerDungeonTeamPattern by patternGroup.pattern(
-        "tablist.playerteam",
-        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) §r§f\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
+        "tablist.playerteam.colorless",
+        "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -227,11 +227,11 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTablistChange(event: TabListUpdateEvent) {
+    fun onTablistChange(event: TabListUpdateComponentEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
-        val playerTeam = event.tabList.find { it.contains(PlayerUtils.getName()) }?.removeColor() ?: return
+        val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string ?: return
         for (dungeonClass in DungeonClass.entries) {
             if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
@@ -457,10 +457,10 @@ object DungeonApi {
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
     @HandleEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    fun onTabUpdate(event: TabListUpdateComponentEvent) {
         if (!inDungeon() || !started || completed) return
 
-        playerDungeonTeamPattern.matchAll(event.tabList) {
+        playerDungeonTeamPattern.matchAllComponents(event.tabList) {
             val username = group("playerName").removeColor()
             val playerDead = group("playerDead") == "DEAD"
 

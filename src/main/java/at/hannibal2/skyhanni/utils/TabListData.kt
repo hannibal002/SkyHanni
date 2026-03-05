@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,7 +23,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.world.level.GameType
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TabListData {
@@ -132,26 +130,11 @@ object TabListData {
         dirty = false
 
         val tabList = readTabList() ?: return
-        if (tablistCache != tabList) {
-            tablistCache = tabList
-            TabListUpdateEvent(getTabList()).post()
-            if (!SkyBlockUtils.onHypixel) {
-                workaroundDelayedTabListUpdateAgain()
-            }
-        }
+        if (tablistCache != tabList) tablistCache = tabList
 
         val tabListOverlay = Minecraft.getInstance().gui.tabList
-
         header = tabListOverlay.header?.formattedTextCompat().orEmpty()
-    }
-
-    private fun workaroundDelayedTabListUpdateAgain() {
-        DelayedRun.runDelayed(2.seconds) {
-            if (SkyBlockUtils.onHypixel) {
-                println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).post()
-            }
-        }
+        footer = tabListOverlay.footer?.formattedTextCompat().orEmpty()
     }
 
     @HandleEvent
