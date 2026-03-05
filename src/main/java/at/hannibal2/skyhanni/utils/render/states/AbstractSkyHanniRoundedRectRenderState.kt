@@ -30,10 +30,10 @@ abstract class AbstractSkyHanniRoundedRectRenderState(
 
     override fun buildVertices(consumer: VertexConsumer) {
         val p = padding.toFloat()
-        writeVertex(consumer, (x - p) , (y - p) , isTop = true)
-        writeVertex(consumer, (x - p) , (y + height + p) , isTop = false)
-        writeVertex(consumer, (x + width + p) , (y + height + p) , isTop = false)
-        writeVertex(consumer, (x + width + p) , (y - p) , isTop = true)
+        writeVertex(consumer, (x - p), (y - p), isTop = true)
+        writeVertex(consumer, (x - p), (y + height + p), isTop = false)
+        writeVertex(consumer, (x + width + p), (y + height + p), isTop = false)
+        writeVertex(consumer, (x + width + p), (y - p), isTop = true)
     }
 
     protected abstract fun writeVertex(consumer: VertexConsumer, vx: Float, vy: Float, isTop: Boolean)
