@@ -50,7 +50,7 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "vanquisher.waypoint.share",
-        "^(?:Party > |Guild > |Officer > )?([^:]+):.*?x:\\s*(-?[\\d.]+).*?y:\\s*(-?[\\d.]+).*?z:\\s*(-?[\\d.]+).*?Vanquisher.*",
+        "^(?:Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*",
     )
 
     /**
@@ -82,7 +82,7 @@ object VanquisherWaypointShare {
 
     private val waypoints: Map<String, SharedVanquisher> get() = sharedWaypoints
 
-    private var maxDistance = 15
+    private const val maxDistance = 15
 
     data class SharedVanquisher(
         val playerName: String,
@@ -94,7 +94,7 @@ object VanquisherWaypointShare {
         lastShareTime = SimpleTimeMark.farPast()
         myVanquisherId = entityId
         TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
-        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled, false )
+        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled, false)
 
         val entity = vanquisherNearby[entityId] ?: EntityUtils.getEntityByID(entityId)
         if (entity != null) {
@@ -129,8 +129,8 @@ object VanquisherWaypointShare {
                 return
             }
         }
-
-        val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId!!)
+        val safeId = myVanquisherId ?: return
+        val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(safeId)
 
         if (entity == null || entity.deceased) {
             ChatUtils.chat("No Vanquisher found")
