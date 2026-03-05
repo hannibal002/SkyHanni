@@ -4,10 +4,8 @@ import net.minecraft.world.phys.Vec3
 import java.util.Objects
 
 open class SkyHanniAtlasKey(
+    open val item: String,
     open val modelIdentity: Any,
-    open val scale: Float,
-    open val guiScale: Int,
-    open val stableId: Int,
     open val rotationVector: Vec3,
 ) {
     open val rotationSnapDegrees: Float = 2f
@@ -27,40 +25,36 @@ open class SkyHanniAtlasKey(
     override fun equals(other: Any?): Boolean =
         if (other !is SkyHanniAtlasKey) false
         else if (this === other) true
-        else modelIdentity == other.modelIdentity &&
-            quantizedRotationVector == other.quantizedRotationVector &&
-            scale == other.scale &&
-            guiScale == other.guiScale
+        else item == other.item &&
+            modelIdentity == other.modelIdentity &&
+            quantizedRotationVector == other.quantizedRotationVector
 
     /**
      * We intentionally do not include stable ID in the hashcode.
      * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
      */
-    override fun hashCode(): Int = Objects.hash(modelIdentity, quantizedRotationVector, scale, guiScale)
+    override fun hashCode(): Int = Objects.hash(item, modelIdentity, quantizedRotationVector)
 }
 
 data class SkyHanniAnimatedAtlasKey(
+    override val item: String,
     override val modelIdentity: Any,
-    override val scale: Float,
-    override val guiScale: Int,
-    override val stableId: Int,
     override val rotationVector: Vec3,
     val frameNumber: Int,
-) : SkyHanniAtlasKey(modelIdentity, scale, guiScale, stableId, rotationVector) {
+) : SkyHanniAtlasKey(item, modelIdentity, rotationVector) {
     override val rotationSnapDegrees: Float = 0.125f
 
-    /**
-     * We intentionally do not include stable ID in the equals.
-     * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
-     */
+    constructor(baseKey: SkyHanniAtlasKey, frameNumber: Int) : this(
+        item = baseKey.item,
+        modelIdentity = baseKey.modelIdentity,
+        rotationVector = baseKey.rotationVector,
+        frameNumber = frameNumber,
+    )
+
     override fun equals(other: Any?): Boolean =
         if (this === other) true
         else if (other !is SkyHanniAnimatedAtlasKey) false
         else super.equals(other) && frameNumber == other.frameNumber
 
-    /**
-     * We intentionally do not include stable ID in the hashcode.
-     * If two separate renderables generate the same atlas key except for stable ID, we want them to share an atlas space.
-     */
     override fun hashCode(): Int = Objects.hash(super.hashCode(), frameNumber)
 }

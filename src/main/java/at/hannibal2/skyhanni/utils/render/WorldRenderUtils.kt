@@ -48,6 +48,10 @@ object WorldRenderUtils {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
     }
 
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, color: Color) {
+        this.renderBeaconBeam(vec.x, vec.y, vec.z, color.rgb)
+    }
+
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
