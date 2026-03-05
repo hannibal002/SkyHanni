@@ -46,7 +46,7 @@ object SkyHanniVertexFormats {
         usage: VFEUsage = VFEUsage.GENERIC,
         count: Int = 4,
     ): VertexFormatElement {
-        val id = (desiredId until VertexFormatElement.MAX_COUNT).first {VertexFormatElement.byId(it) == null }
+        val id = (desiredId until VertexFormatElement.MAX_COUNT).first { VertexFormatElement.byId(it) == null }
         if (id != desiredId) ErrorManager.logErrorWithData(
             IllegalStateException("VertexFormatElement ID $desiredId was already taken, using $id instead"),
             "SkyHanni vertex format element ID conflict — desired ID $desiredId was already registered",
