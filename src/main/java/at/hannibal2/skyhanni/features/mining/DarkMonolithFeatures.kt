@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
@@ -66,15 +67,14 @@ object DarkMonolithFeatures {
 
     // Todo: need chat pattern for rock the fish drop
     /**
-     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§650,000 Coins§r§a!
-     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§62,500 Coins §r§aand §r§21,000 ᠅ Mithril Powder§r§a!
-     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§2100 ᠅ Mithril Powder§r§a!
-     * REGEX-TEST: §5§lMONOLITH! §r§aYou found a mysterious §r§5Dark Monolith §r§aand were rewarded §r§23,000 ᠅ Mithril Powder§r§a!
+     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 50,000 Coins!
+     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 2,500 Coins and 1,000 ᠅ Mithril Powder!
+     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 100 ᠅ Mithril Powder!
+     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 3,000 ᠅ Mithril Powder!
      */
-    @Suppress("MaxLineLength")
     private val dropPattern by patternGroup.pattern(
-        "drop",
-        "§5§lMONOLITH! §r§aYou.*§r§aand were rewarded ?(?:(?:§.)+(?<coins>[\\d,]+) Coins ?(?:§.)+)?(?:!|and )?(?:(?:§.)+(?<powder>[\\d,]+) ᠅ Mithril Powder§r§a!)?",
+        "drop.chat.colorless",
+        "MONOLITH! You.*and were rewarded ?(?:(?<coins>[\\d,]+) Coins ?)?(?:!|and )?(?:(?<powder>[\\d,]+) ᠅ Mithril Powder!)?",
     )
 
     private data class DarkMonolithData(
@@ -100,7 +100,7 @@ object DarkMonolithFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        dropPattern.matchMatcher(event.message) {
+        dropPattern.matchMatcher(event.chatComponent) {
             data.reset()
             groupOrNull("coins")?.let {
                 tracker.addCoins(it.formatInt(), false)
@@ -169,10 +169,11 @@ object DarkMonolithFeatures {
         val titleText = config.title.text.takeIf { it.isNotEmpty() }
             ?: DarkMonolithConfig.DEFAULT_TITLE
         TitleManager.sendTitle(titleText, duration = 3.seconds)
+        ChatUtils.notifyOrDisable(titleText, config::title)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
-        addSearchString("§5§lDark Monolith Tracker")
+        addSearchString("Dark Monolith Tracker")
         val profit = tracker.drawItems(data, { true }, this)
         add(Renderable.text("§7Monoliths looted: §d${data.monolithsLooted}").toSearchable())
         addAll(
@@ -215,5 +216,7 @@ object DarkMonolithFeatures {
         }
     }
 
-    private fun anyEnabled() = config.tracker || config.highlight.enabled || config.title.enabled
+    private fun anyEnabled() = with(config) {
+        beacon.enabled || tracker || highlight.enabled || title.enabled
+    }
 }

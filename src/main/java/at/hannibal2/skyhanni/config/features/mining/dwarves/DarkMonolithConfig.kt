@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining.dwarves
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
@@ -19,6 +20,7 @@ class DarkMonolithConfig {
         desc = "Track mithril powder, coins, and Rock the Fish drops obtained from collecting Dark Monoliths."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var tracker: Boolean = false
 
     @Expose
@@ -34,6 +36,7 @@ class DarkMonolithConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show a beacon at the location of the Dark Monolith.")
         @ConfigEditorBoolean
+        @FeatureToggle
         var enabled: Boolean = false
 
         @Expose
@@ -51,6 +54,7 @@ class DarkMonolithConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Highlight the dragon egg when in line of sight.")
         @ConfigEditorBoolean
+        @FeatureToggle
         var enabled: Boolean = false
 
         @Expose
@@ -69,6 +73,7 @@ class DarkMonolithConfig {
         @Expose
         @ConfigOption(name = "Enabled", desc = "Show a title when coming into line of sight with a dragon egg.")
         @ConfigEditorBoolean
+        @FeatureToggle
         var enabled: Boolean = false
 
         @Expose
@@ -87,8 +92,6 @@ class DarkMonolithConfig {
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     companion object {
-        @Suppress("StorageVarOrVal")
-        @Transient
-        const val DEFAULT_TITLE: String = "§5§lDark Monolith"
+        internal const val DEFAULT_TITLE: String = "§5§lDark Monolith"
     }
 }
