@@ -122,6 +122,7 @@ object TabListReader {
     }.toMutableList()
 
     private fun parseComponentColumns(components: List<Component>): MutableList<TabColumn> {
+        if (components.isEmpty()) return mutableListOf()
         val columns = mutableListOf<TabColumn>()
         val fullTabComponents = AdvancedPlayerList.newSorting(components)
 
