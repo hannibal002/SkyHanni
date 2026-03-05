@@ -32,7 +32,7 @@ object SkyHanniVertexFormats {
 
     // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
     val ROUNDED_PARAMS_0: VertexFormatElement = safeRegister(6)
-    // id=7: {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
+    // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
     val ROUNDED_PARAMS_1: VertexFormatElement = safeRegister(7)
 
     val POSITION_COLOR_ROUNDED: VertexFormat = VertexFormat.builder()
@@ -42,17 +42,8 @@ object SkyHanniVertexFormats {
         .add("RoundedParams1", ROUNDED_PARAMS_1)
         .build()
 
-    fun BufferBuilder.writeParams0(x: Float, y: Float, z: Float, w: Float) {
-        val ptr = beginElementAccess(ROUNDED_PARAMS_0)
-        if (ptr == -1L) return
-        MemoryUtil.memPutFloat(ptr, x)
-        MemoryUtil.memPutFloat(ptr + 4L, y)
-        MemoryUtil.memPutFloat(ptr + 8L, z)
-        MemoryUtil.memPutFloat(ptr + 12L, w)
-    }
-
-    fun BufferBuilder.writeParams1(x: Float, y: Float, z: Float, w: Float) {
-        val ptr = beginElementAccess(ROUNDED_PARAMS_1)
+    fun BufferBuilder.writeParams(x: Float, y: Float, z: Float, w: Float, format: VertexFormatElement) {
+        val ptr = beginElementAccess(format)
         if (ptr == -1L) return
         MemoryUtil.memPutFloat(ptr, x)
         MemoryUtil.memPutFloat(ptr + 4L, y)
