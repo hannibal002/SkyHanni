@@ -78,6 +78,11 @@ class FishingConfig {
     val healthDisplay: SeaCreatureHealthDisplayConfig = SeaCreatureHealthDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Cocoon Settings", desc = "")
+    @Accordion
+    val cocoonSettings: FishingCocoonConfig = FishingCocoonConfig()
+
+    @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle

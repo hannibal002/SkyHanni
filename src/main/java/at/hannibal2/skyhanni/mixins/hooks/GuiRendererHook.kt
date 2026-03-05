@@ -70,9 +70,8 @@ object GuiRendererHook {
         return original.call(state)
     }
 
-    fun prepareSkyHanniItems(
+    fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
-        renderState: GuiRenderState,
         bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
@@ -80,16 +79,25 @@ object GuiRendererHook {
         val renderer = pictureInPictureRenderers[SkyHanniGuiItemRenderState::class.java]
         if (renderer !is SkyHanniPipCoordinatorRenderer) return
 
-        val pipCoordinatorStates = renderer.takePendingStates()
-        if (pipCoordinatorStates.isEmpty()) return
+        // Peek, do not consume. States are still needed for per-item blit submission.
+        val states = renderer.peekPendingStates()
+        if (states.isEmpty()) return
 
-        SkyHanniItemRenderCoordinator.prepare(
-            pipCoordinatorStates,
-            renderState,
+        SkyHanniItemRenderCoordinator.preRenderAtlas(
+            states,
             bufferSource,
             featureRenderDispatcher,
             frameNumber
         )
+        renderer.clearPendingStates()
+    }
+
+    fun submitBlitForState(
+        state: SkyHanniGuiItemRenderState,
+        guiRenderState: GuiRenderState,
+        frameNumber: Int,
+    ) {
+        SkyHanniItemRenderCoordinator.submitBlit(state, guiRenderState, frameNumber)
     }
 
 }
