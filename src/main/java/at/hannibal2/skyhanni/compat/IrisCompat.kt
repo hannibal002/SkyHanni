@@ -42,7 +42,7 @@ object IrisCompat {
                     "assignPipeline",
                     RenderPipeline::class.java,
                     irisProgramEnum
-                ) ?: return@runCatching null
+                )
             }.getOrNull() ?: return
 
             SkyHanniRenderPipeline.entries.forEach { shPipeline ->
