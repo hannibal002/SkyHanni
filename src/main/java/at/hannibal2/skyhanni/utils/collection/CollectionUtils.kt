@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import net.minecraft.tags.TagEntry.element
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue

@@ -68,15 +68,15 @@ object HolographicEntities {
             HolographicEntity(entity, position, yaw)
     }
 
-    val entityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>> by lazy {
-        Minecraft.getInstance().level?.let { level ->
-            return@let BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
-                val entity: LivingEntity = runCatching {
-                    entityType.create(level, EntitySpawnReason.COMMAND)
-                }.getOrNull() as? LivingEntity ?: return@type null
-                entity::class to HolographicBase(entity)
-            }
-        } ?: emptyMap()
+    private var _internalEntityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>>? = null
+    val entityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>> get() = _internalEntityHoloBases ?: run {
+        val level = Minecraft.getInstance().level ?: return@run emptyMap()
+        BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
+            val entity: LivingEntity = runCatching {
+                entityType.create(level, EntitySpawnReason.COMMAND)
+            }.getOrNull() as? LivingEntity ?: return@type null
+            entity::class to HolographicBase(entity)
+        }.also { _internalEntityHoloBases = it }
     }
 
     fun <T : LivingEntity> getFilteredEntityHoloBases(

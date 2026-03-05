@@ -119,7 +119,6 @@ class RewardWarningConfig {
     @FeatureToggle
     var preventRefusingNew: Boolean = true
 
-    // Todo rename to transparency
     @Expose
     @ConfigOption(name = "Transparency", desc = "How transparent the offer buttons should be when blocked.")
     @ConfigEditorSlider(minValue = 0f, maxValue = 255f, minStep = 5f)

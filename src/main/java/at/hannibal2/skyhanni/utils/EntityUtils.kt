@@ -143,9 +143,6 @@ object EntityUtils {
             .firstOrNull { it.name == "textures" }?.value
     }
 
-    inline fun <reified T : Entity> getFilteredEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
-        getEntitiesNearby(radius) { predicate(it) }
-
     inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
         LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
 
