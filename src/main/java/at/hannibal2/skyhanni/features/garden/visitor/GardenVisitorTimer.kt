@@ -24,17 +24,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.collections.minusAssign
-import kotlin.compareTo
-import kotlin.div
-import kotlin.inc
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
-import kotlin.times
 
 @SkyHanniModule
 object GardenVisitorTimer {
@@ -83,7 +78,6 @@ object GardenVisitorTimer {
 
     private data class TabUpdateContext(
         var visitorsAmount: Int,
-        var visitorInterval: Duration,
         var millis: Duration,
         var queueFull: Boolean,
     )
@@ -116,7 +110,6 @@ object GardenVisitorTimer {
         val visitorInterval = visitorInterval ?: return
         val context = TabUpdateContext(
             visitorsAmount = VisitorApi.visitorsInTabList(event.tabList).size,
-            visitorInterval = visitorInterval,
             millis = visitorInterval,
             queueFull = false,
         )
@@ -129,7 +122,7 @@ object GardenVisitorTimer {
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
                 visitorInterval = millis
-                this.visitorInterval = visitorInterval
+                visitorInterval = visitorInterval
             } else {
                 updateSixthVisitorArrivalTime()
             }
@@ -142,6 +135,7 @@ object GardenVisitorTimer {
             }
             millis = sixthVisitorArrivalTime.timeUntil()
 
+            val visitorInterval = visitorInterval ?: return
             val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
             GardenApi.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
             if (millis.isNegative()) {

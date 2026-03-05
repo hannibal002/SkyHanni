@@ -44,15 +44,15 @@ object TabListDataComponent {
         internal set
 
     private fun copyCommand() {
-        @Suppress("DEPRECATION")
-        val resultList = tablistCache.map { if (it.string == "") " " else it.string }
         val tabHeader = header?.string.orEmpty()
         val tabFooter = footer?.string.orEmpty()
-
+        val joinedResults = tablistCache.joinToString("\n") {
+            if (it.string == "") " " else it.string
+        }
         val widgets = TabWidget.entries.filter { it.isActive }.joinToString("\n") {
             "\n${it.name} : \n${it.lines.joinToString("\n")}"
         }
-        val joinedResults = resultList.joinToString("\n")
+
         val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
         OSUtils.copyToClipboard(outputString)
         ChatUtils.chat("Tab list components copied into the clipboard!")

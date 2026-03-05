@@ -74,14 +74,12 @@ object TabListReader {
         "dungeonbuff",
         "Dungeon Buffs",
     )
-
     // TODO: Regex tests
+    @Suppress("RepoPatternRegexTestMissing")
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
         "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
     )
-
-    // TODO: Regex tests
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
         "Active Power Ups",
