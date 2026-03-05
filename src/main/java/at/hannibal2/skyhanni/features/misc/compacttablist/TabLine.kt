@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
 
-class TabLine(val text: String, val type: TabStringType, val customName: String = text) {
+class TabLine(val component: Component, val type: TabStringType, val customName: String = component.string) {
 
     fun getWidth(): Int {
         val mc = Minecraft.getInstance()
@@ -21,7 +22,7 @@ class TabLine(val text: String, val type: TabStringType, val customName: String 
 
     fun getInfo(): PlayerInfo? {
         val minecraft = Minecraft.getInstance()
-        val usernameFromLine = TabStringType.usernameFromLine(text)
+        val usernameFromLine = TabStringType.usernameFromComponent(component)
         return minecraft.connection?.getPlayerInfo(usernameFromLine)
     }
 

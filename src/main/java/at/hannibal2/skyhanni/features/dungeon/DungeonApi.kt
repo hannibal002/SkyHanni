@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -115,12 +116,12 @@ object DungeonApi {
      * REGEX-TEST: §r§r§fBlessing of Power V§r
      */
     private val blessingPattern by patternGroup.pattern(
-        "blessings",
-        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
+        "blessings.colorless",
+        "Blessing of (?<type>\\w+) (?<amount>\\w+)",
     )
     private val noBlessingPattern by patternGroup.pattern(
-        "noblessings",
-        "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
+        "noblessings.colorless",
+        "No Buffs active\\. Find them by exploring the Dungeon!",
     )
 
     /**
@@ -242,14 +243,15 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    fun onTabUpdate(event: TablistFooterUpdateComponentEvent) {
         if (!inDungeon()) return
-        for (line in event.footer.split("\n")) {
+        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        for (line in lines) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
             }
-            val matcher = blessingPattern.matcher(line)
+            val matcher = blessingPattern.matcher(line.string)
             if (matcher.find()) {
                 val type = matcher.group("type") ?: continue
                 val amount = matcher.group("amount").romanToDecimalIfNecessary()

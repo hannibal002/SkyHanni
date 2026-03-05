@@ -32,13 +32,10 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (GlobalRender.renderDisabled) return
-        if (event.type != RenderLayer.PLAYER_LIST) return
-        if (!config.enabled.get()) return
+        if (GlobalRender.renderDisabled || event.type != RenderLayer.PLAYER_LIST || !config.enabled.get()) return
         event.cancel()
 
         if (config.toggleTab) return
-
         drawTabList()
     }
 
@@ -47,23 +44,18 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (GlobalRender.renderDisabled) return
-        if (!config.enabled.get()) return
-        if (!config.toggleTab) return
+        if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
         if (Minecraft.getInstance().screen != null) return
 
-        if (Minecraft.getInstance().options.keyPlayerList.isActive()) {
-            if (!isPressed) {
-                isPressed = true
-                isTabToggled = !isTabToggled
-            }
-        } else {
+        val playerListKeyActive = Minecraft.getInstance().options.keyPlayerList.isActive()
+        if (playerListKeyActive && !isPressed) {
+            isPressed = true
+            isTabToggled = !isTabToggled
+        } else if (playerListKeyActive) {
             isPressed = false
         }
 
-        if (isTabToggled) {
-            drawTabList()
-        }
+        if (isTabToggled) drawTabList()
     }
 
     private fun drawTabList() {
@@ -182,7 +174,7 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
+                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.component.string else tabLine.customName
                 if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     GuiRenderUtils.drawString(
@@ -213,7 +205,7 @@ object TabListRenderer {
 
     @HandleEvent
     fun onSkipTablistLine(event: SkipTabListLineEvent) {
-        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
+        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.component)) {
             event.cancel()
         }
     }

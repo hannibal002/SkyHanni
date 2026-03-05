@@ -1,17 +1,19 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
+import net.minecraft.network.chat.Component
+
 class TabColumn(val columnTitle: String) {
 
-    val lines = mutableListOf<String>()
+    val components = mutableListOf<Component>()
     val sections = mutableListOf<TabSection>()
 
-    fun addLine(line: String) {
-        lines.add(line)
+    fun addComponent(component: Component) {
+        components.add(component)
     }
 
     fun addSection(section: TabSection) {
         sections.add(section)
     }
 
-    fun size() = lines.size + 1
+    fun size() = components.size + 1
 }

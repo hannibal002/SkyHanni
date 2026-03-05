@@ -21,7 +21,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
+import kotlin.collections.drop
+import kotlin.collections.first
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
@@ -33,39 +36,40 @@ object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
     /**
-     * REGEX-TEST: §8[§r§9290§r§8] §r§bSkirtwearer §r§6ꀾ§r§7♲
-     * REGEX-TEST: §8[§r§714§r§8] §r§bSrColombianoGood §r§6Ⓑ
-     * REGEX-TEST: §8[§r§b218§r§8] §r§bnightdives
+     * REGEX-TEST: [290] Skirtwearer ꀾ♲
+     * REGEX-TEST: [14] ColombianoGood Ⓑ
+     * REGEX-TEST: [218] nightdives
      */
     private val levelPattern by RepoPattern.pattern(
-        "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)",
+        "misc.compacttablist.advanced.level.colorless",
+        ".*\\[(?<level>.*)] (?<name>.*)",
     )
 
-    private var playerData = mutableMapOf<String, PlayerData>()
+    private var playerData = mutableMapOf<Component, PlayerData>()
 
-    fun createTabLine(text: String, type: TabStringType) = playerData[text]?.let {
-        TabLine(text, type, createCustomName(it))
-    } ?: TabLine(text, type)
+    fun createTabLine(component: Component, type: TabStringType) = playerData[component]?.let {
+        TabLine(component, type, createCustomName(it))
+    } ?: TabLine(component, type)
 
-    fun newSorting(original: List<String>): List<String> {
+    fun newSorting(original: List<Component>): List<Component> {
         if (KuudraApi.inKuudra) return original
         if (DungeonApi.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
-        val newList = mutableListOf<String>()
-        val currentData = mutableMapOf<String, PlayerData>()
+        val newList = mutableListOf<Component>()
+        val currentData = mutableMapOf<Component, PlayerData>()
         newList.add(original.first())
 
         var extraTitles = 0
         var i = 0
 
-        for (line in original) {
+        for (component in original) {
+            val line = component.string
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break
-            if (line == "               §r§3§lInfo") break
-            if (line.contains("§r§a§lPlayers")) {
+            if (line == "               Info") break
+            if (line.contains("Players")) {
                 extraTitles++
                 continue
             }
@@ -90,14 +94,13 @@ object AdvancedPlayerList {
                 if (name != "?") {
                     tabPlayerData[name] = it
                 }
-                currentData[line] = it
+                currentData[component] = it
             }
         }
         playerData = currentData
         val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
-
             // SB Level
             PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
 

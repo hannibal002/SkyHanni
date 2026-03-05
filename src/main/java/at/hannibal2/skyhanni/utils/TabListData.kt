@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -153,12 +152,6 @@ object TabListData {
         val tabListOverlay = Minecraft.getInstance().gui.tabList
 
         header = tabListOverlay.header?.formattedTextCompat().orEmpty()
-
-        val tabFooter = tabListOverlay.footer?.formattedTextCompat().orEmpty()
-        if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).post()
-        }
-        footer = tabFooter
     }
 
     private fun workaroundDelayedTabListUpdateAgain() {

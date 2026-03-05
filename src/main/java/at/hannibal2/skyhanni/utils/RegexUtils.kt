@@ -31,6 +31,13 @@ object RegexUtils {
 
     inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
+    inline fun <T> Pattern.firstComponentMatcher(list: List<Component>, consumer: Matcher.() -> T): T? {
+        for (line in list) {
+            matcher(line.string).let { if (it.matches()) return consumer(it) }
+        }
+        return null
+    }
+
     inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
         firstMatcherWithIndex(list.asSequence(), consumer)
 

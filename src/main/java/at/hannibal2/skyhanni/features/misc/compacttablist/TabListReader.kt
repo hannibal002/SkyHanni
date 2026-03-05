@@ -3,25 +3,30 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 // heavily inspired by SBA code
 @SkyHanniModule
 object TabListReader {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList
-
     private val patternGroup = RepoPattern.group("misc.compacttablist")
+    var hypixelAdvertisingString = "HYPIXEL.NET"
+    var renderColumns = mutableListOf<RenderColumn>()
+        private set
+    private val dataColumns = mutableListOf<TabColumn>()
+
+    private var lastTabComponents: List<Component>? = null
+    private var lastFooterComponent: Component? = null
 
     /**
      * REGEX-TEST: [164] CalMWolfs ᛝ♲
@@ -33,93 +38,99 @@ object TabListReader {
     )
 
     /**
-     * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
+     * REGEX-TEST: You have a God Potion active! 12 Hours
      */
     private val godPotPattern by patternGroup.pattern(
-        "effects.godpot",
-        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r",
+        "effects.godpot.colorless",
+        "You have a God Potion active! (?<timer>[\\w ]+)",
     )
 
     /**
-     * REGEX-TEST: §r§r§a§lActive Effects§r
+     * REGEX-TEST: Active Effects
      */
     private val activeEffectPattern by patternGroup.pattern(
         "effects.active",
-        "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*",
+        "Active Effects",
     )
 
     /**
-     * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
+     * REGEX-TEST: You have 1 active effect. Use "/effects" to see it!
      */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect",
+        "You have (?<effectCount>[0-9]+) active effect",
     )
 
     /**
-     * REGEX-TEST: §r§r§d§lCookie Buff§r§r§r§7§r§7Not active! Obtain booster cookies from the community§r
+     * REGEX-TEST: Cookie Buff
      */
     private val cookiePattern by patternGroup.pattern(
         "cookie",
-        "Cookie Buff(?:§.)*(?:\\n(?:§.)*§7.+)*",
+        "Cookie Buff",
     )
 
     /**
-     * REGEX-TEST: §r§r§6§lDungeon Buffs§r§r§r§7No Buffs active. Find them by exploring the Dungeon!§r
+     * REGEX-TEST: Dungeon Buffs
      */
     private val dungeonBuffPattern by patternGroup.pattern(
         "dungeonbuff",
-        "Dungeon Buffs(?:§.)*(?:\\n(?:§.)*§7.+)*",
+        "Dungeon Buffs",
     )
+
+    // TODO: Regex tests
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
-        "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
+        "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
     )
+
+    // TODO: Regex tests
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
-        "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*"
+        "Active Power Ups",
     )
 
-    var hypixelAdvertisingString = "HYPIXEL.NET"
-
-    val renderColumns = mutableListOf<RenderColumn>()
-
-    private fun updateTablistData(tablist: List<String>? = null) {
-        if (!SkyBlockUtils.inSkyBlock) return
-
-        var tabLines = tablist ?: TabListData.getTabList()
-
-        if (tabLines.size < 80) return
-
-        tabLines = tabLines.subList(0, 80)
-
-        val columns = parseColumns(tabLines)
-        val footerColumn = parseFooterAsColumn()
-
-        if (footerColumn != null) {
-            columns.add(footerColumn)
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled) {
+            rebuildRenderColumns()
         }
+    }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+        this.lastTabComponents = event.tabList
+        rebuildRenderColumns()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabListFooterUpdate(event: TablistFooterUpdateComponentEvent) {
+        this.lastFooterComponent = event.footer
+        rebuildRenderColumns()
+    }
+
+    private fun rebuildRenderColumns() {
+        val columns = rebuildColumns()
         parseSections(columns)
 
-        renderColumns.clear()
         val renderColumn = RenderColumn()
-        renderColumns.add(renderColumn)
+        renderColumns = mutableListOf(renderColumn)
         combineColumnsToRender(columns, renderColumn)
-
     }
 
-    @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        updateTablistData(event.tabList)
-    }
+    private fun rebuildColumns(): MutableList<TabColumn> = buildList {
+        val components = this@TabListReader.lastTabComponents ?: emptyList()
+        addAll(parseComponentColumns(components))
 
-    private fun parseColumns(original: List<String>): MutableList<TabColumn> {
+        val footer = this@TabListReader.lastFooterComponent ?: return@buildList
+        parseFooterAsColumn(footer)?.let { add(it) }
+    }.toMutableList()
+
+    private fun parseComponentColumns(components: List<Component>): MutableList<TabColumn> {
         val columns = mutableListOf<TabColumn>()
-        val fullTabList = AdvancedPlayerList.newSorting(original)
+        val fullTabComponents = AdvancedPlayerList.newSorting(components)
 
-        for (entry in fullTabList.indices step 20) {
-            val title = fullTabList[entry].trimWhiteSpaceAndResets()
+        for (entry in fullTabComponents.indices step 20) {
+            val title = fullTabComponents[entry].string
             var column = getColumnFromName(columns, title)
 
             if (column == null) {
@@ -127,69 +138,86 @@ object TabListReader {
                 columns.add(column)
             }
 
-            for (columnEntry in (entry + 1) until fullTabList.size.coerceAtMost(entry + 20)) {
-                column.addLine(fullTabList[columnEntry])
+            for (columnEntry in (entry + 1) until fullTabComponents.size.coerceAtMost(entry + 20)) {
+                column.addComponent(fullTabComponents[columnEntry])
             }
         }
         return columns
     }
 
-    private fun parseFooterAsColumn(): TabColumn? {
-        var footer = TabListData.getFooter().removeSFormattingCode()
-        if (footer.isEmpty()) return null
+    private fun parseFooterAsColumn(component: Component): TabColumn? {
+        val lines = TextHelper.split(component, "\n") ?: listOf(component)
 
-        footer = godPotPattern.findMatcher(footer) {
-            activeEffectPattern.matcher(footer)
-                .replaceAll("Active Effects:\n§cGod Potion§r: ${group("timer")}")
-        } ?: run {
-            effectCountPattern.findMatcher(footer) {
-                activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e" + group("effectCount"))
-            } ?: activeEffectPattern.matcher(footer).replaceAll("Active Effects: §r§e0")
+        val godPotTimer = lines.firstNotNullOfOrNull {
+            godPotPattern.matchMatcher(it.string) { group("timer") }
+        }
+        val effectCount = lines.firstNotNullOfOrNull {
+            effectCountPattern.matchMatcher(it.string) { group("effectCount") }
         }
 
-        cookiePattern.findMatcher(footer) {
-            if (group().contains("Not active!")) {
-                footer = this.replaceAll("Cookie Buff \n§r§7Not Active")
-            }
-        }
+        return TabColumn("§2§lOther").apply {
+            for (lineComponent in lines) {
+                val lineStr = lineComponent.string
+                if (lineStr.contains(hypixelAdvertisingString)) continue
 
-        dungeonBuffPattern.findMatcher(footer) {
-            if (group().contains("No Buffs active.")) {
-                footer = this.replaceAll("Dungeon Buffs \n§r§7None Found")
-            }
-        }
+                // These lines were consumed into the active effects header — skip them
+                if (godPotTimer != null && godPotPattern.matches(lineStr)) continue
+                if (effectCountPattern.matches(lineStr)) continue
 
-        winterPowerUpsPattern.findMatcher(footer) {
-            if (group().contains("No Power Ups active.")) {
-                footer = this.replaceAll("Active Power Ups \n§r§7None")
-            }
-        }
+                when {
+                    activeEffectPattern.matches(lineStr) -> {
+                        when {
+                            godPotTimer != null -> {
+                                addComponent(Component.literal("Active Effects:"))
+                                addComponent(Component.literal(" God Potion: $godPotTimer"))
+                            }
+                            effectCount != null -> addComponent(Component.literal("Active Effects: $effectCount"))
+                            else -> addComponent(Component.literal("Active Effects: 0"))
+                        }
+                    }
+                    
+                    cookiePattern.matches(lineStr) -> {
+                        // Fallthrough to not active check
+                        addComponent(Component.literal("Cookie Buff"))
+                    }
+                    lineStr.startsWith("Not active!") &&
+                        components.lastOrNull()?.string == "Cookie Buff" -> {
+                        addComponent(Component.literal(" Not Active"))
+                    }
 
-        val column = TabColumn("§2§lOther")
+                    dungeonBuffPattern.matches(lineStr) -> {
+                        addComponent(Component.literal("Dungeon Buffs"))
+                    }
+                    lineStr.startsWith("No Buffs active.") &&
+                        components.lastOrNull()?.string == "Dungeon Buffs" -> {
+                        addComponent(Component.literal(" None Found"))
+                    }
 
-        for (line in footer.split("\n")) {
-            if (line.contains(hypixelAdvertisingString)) continue
+                    winterPowerUpsPattern.matches(lineStr) -> {
+                        addComponent(Component.literal("Active Power Ups"))
+                    }
+                    lineStr.startsWith("No Power Ups active.") &&
+                        components.lastOrNull()?.string == "Active Power Ups" -> {
+                        addComponent(Component.literal(" None"))
+                    }
+                    
+                    upgradesPattern.matches(lineStr) -> {
+                        upgradesPattern.matchMatcher(lineStr) {
+                            var firstPart = group("firstPart")
+                            if (!lineComponent.style.isBold) firstPart = " $firstPart"
+                            addComponent(Component.literal(firstPart))
+                            addComponent(Component.literal(group("secondPart")))
+                        }
+                    }
 
-            var newLine = line
-
-            upgradesPattern.matchMatcher(newLine.removeResets()) {
-                var firstPart = group("firstPart").trimWhiteSpaceAndResets()
-                if (!firstPart.contains("§l")) {
-                    firstPart = " $firstPart"
+                    else -> {
+                        var newLine = lineStr
+                        if (!lineComponent.style.isBold) newLine = " $newLine"
+                        addComponent(Component.literal(newLine))
+                    }
                 }
-                column.addLine(firstPart)
-
-                newLine = group("secondPart")
             }
-
-            newLine = newLine.trimWhiteSpaceAndResets()
-            if (!newLine.contains("§l")) {
-                newLine = " $newLine"
-            }
-            column.addLine(newLine)
-        }
-
-        return column
+        }.takeIf { it.components.isNotEmpty() }
     }
 
     private fun getColumnFromName(columns: List<TabColumn>, name: String): TabColumn? {
@@ -204,8 +232,8 @@ object TabListReader {
     private fun parseSections(columns: MutableList<TabColumn>) {
         for (column in columns) {
             var currentTabSection: TabSection? = null
-            for (line in column.lines) {
-                if (line.trimWhiteSpaceAndResets().isEmpty()) {
+            for (line in column.components) {
+                if (line.string.isEmpty()) {
                     currentTabSection = null
                     continue
                 }
@@ -214,76 +242,43 @@ object TabListReader {
                     column.addSection(TabSection(column).also { currentTabSection = it })
                 }
 
-                currentTabSection?.addLine(line)
+                currentTabSection?.addComponent(line)
             }
         }
     }
 
     private fun combineColumnsToRender(columns: MutableList<TabColumn>, firstColumn: RenderColumn) {
-        var firstColumnCopy = firstColumn
+        var currentColumn = firstColumn
         var lastTitle: String? = null
 
-        for (section in columns.flatMap { it.sections }) {
-            var sectionSize = section.size()
-
-            var needsTitle = false
-            if (lastTitle != section.columnValue.columnTitle) {
-                needsTitle = true
-                sectionSize++
-            }
-
-            var currentCount = firstColumnCopy.size()
-
-            if (sectionSize >= TabListRenderer.MAX_LINES / 2) {
-                if (currentCount >= TabListRenderer.MAX_LINES) {
-                    renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                    currentCount = 1
-                } else {
-                    if (firstColumnCopy.size() > 0) {
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
-                    }
-                }
-
-                if (needsTitle) {
-                    lastTitle = section.columnValue.columnTitle
-                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
-                    currentCount++
-                }
-
-                for (line in section.lines) {
-                    if (currentCount >= TabListRenderer.MAX_LINES) {
-                        renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                        currentCount = 1
-                    }
-
-                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
-                    currentCount++
-                }
-            } else {
-                if (currentCount + sectionSize > TabListRenderer.MAX_LINES) {
-                    renderColumns.add(RenderColumn().also { firstColumnCopy = it })
-                } else {
-                    if (firstColumnCopy.size() > 0) {
-                        firstColumnCopy.addLine(AdvancedPlayerList.createTabLine("", TabStringType.TEXT))
-                    }
-                }
-
-                if (needsTitle) {
-                    lastTitle = section.columnValue.columnTitle
-                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(lastTitle, TabStringType.TITLE))
-                }
-
-                for (line in section.lines) {
-                    firstColumnCopy.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromLine(line)))
-                }
+        fun newColumnOrSpacer(required: Boolean) {
+            if (required || currentColumn.size() >= TabListRenderer.MAX_LINES) {
+                renderColumns.add(RenderColumn().also { currentColumn = it })
+            } else if (currentColumn.size() > 0) {
+                currentColumn.addLine(AdvancedPlayerList.createTabLine(Component.literal(""), TabStringType.TEXT))
             }
         }
-    }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.enabled) {
-            updateTablistData()
+        fun addLine(line: Component) {
+            if (currentColumn.size() >= TabListRenderer.MAX_LINES) {
+                renderColumns.add(RenderColumn().also { currentColumn = it })
+            }
+            currentColumn.addLine(AdvancedPlayerList.createTabLine(line, TabStringType.fromComponent(line)))
+        }
+
+        for (section in columns.flatMap { it.sections }) {
+            val needsTitle = lastTitle != section.columnValue.columnTitle
+            val sectionSize = section.size() + if (needsTitle) 1 else 0
+            val isLarge = sectionSize >= TabListRenderer.MAX_LINES / 2
+
+            newColumnOrSpacer(required = isLarge && currentColumn.size() >= TabListRenderer.MAX_LINES)
+
+            if (needsTitle) {
+                lastTitle = section.columnValue.columnTitle
+                currentColumn.addLine(AdvancedPlayerList.createTabLine(Component.literal(lastTitle), TabStringType.TITLE))
+            }
+
+            for (line in section.components) addLine(line)
         }
     }
 }
