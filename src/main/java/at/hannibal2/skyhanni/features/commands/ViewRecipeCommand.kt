@@ -65,7 +65,7 @@ object ViewRecipeCommand {
     @HandleEvent(NeuRepositoryReloadEvent::class)
     fun onNeuRepoReload() {
         list = NeuItems.allNeuRepoItems().asSequence().filter { (_, json) ->
-            json.recipes.any { it.type == NeuRecipeType.CRAFTING }
+            json.recipe != null || json.recipes.any { it.type == NeuRecipeType.CRAFTING }
         }.map { (key, _) -> key.repoItemName.lowercase() }.toList()
     }
 

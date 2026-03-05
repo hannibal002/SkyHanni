@@ -192,7 +192,7 @@ object EnoughUpdatesManager {
 
     private fun NeuItemJson?.toStack(
         useCache: Boolean = true,
-        useReplacements: Boolean = false
+        useReplacements: Boolean = false,
     ): ItemStack {
         this ?: return ItemStack(Items.PAINTING)
 
@@ -259,7 +259,7 @@ object EnoughUpdatesManager {
 
         val addZero = nums.statLevellingType == 1
 
-        for (i in 0..otherNumsMax.size) {
+        for (i in otherNumsMax.indices) {
             val start = if (addZero) "0➡" else ""
             this[i.toString()] = "$start${otherNumsMin[i]}➡${otherNumsMax[i]}"
         }
