@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -56,7 +57,7 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (MinecraftCompat.localPlayer.onGround()) {
+        if (PlayerUtils.onGround()) {
             isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
     }

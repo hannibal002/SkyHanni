@@ -41,7 +41,8 @@ object PlayerUtils {
 
     fun getName(): String = MinecraftCompat.localPlayer.plainTextName
 
-    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround()
+    fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
+    fun inAir(): Boolean = !onGround()
 
     fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

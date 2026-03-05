@@ -170,7 +170,7 @@ object GardenOptimalSpeed {
     }
 
     private fun warn(optimalSpeed: Int) {
-        if (!MinecraftCompat.localPlayer.onGround()) return
+        if (!PlayerUtils.onGround()) return
         if (GardenApi.onUnfarmablePlot) return
         if (!config.warning) return
         if (!GardenApi.isCurrentlyFarming()) return
