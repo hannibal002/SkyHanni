@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 
@@ -23,7 +22,6 @@ object TabListReader {
     var hypixelAdvertisingString = "HYPIXEL.NET"
     var renderColumns = mutableListOf<RenderColumn>()
         private set
-    private val dataColumns = mutableListOf<TabColumn>()
 
     private var lastTabComponents: List<Component>? = null
     private var lastFooterComponent: Component? = null
@@ -145,6 +143,8 @@ object TabListReader {
         return columns
     }
 
+    // Todo split up into smaller functions
+    @Suppress("CyclomaticComplexMethod")
     private fun parseFooterAsColumn(component: Component): TabColumn? {
         val lines = TextHelper.split(component, "\n") ?: listOf(component)
 
@@ -175,7 +175,7 @@ object TabListReader {
                             else -> addComponent(Component.literal("Active Effects: 0"))
                         }
                     }
-                    
+
                     cookiePattern.matches(lineStr) -> {
                         // Fallthrough to not active check
                         addComponent(Component.literal("Cookie Buff"))
@@ -200,7 +200,7 @@ object TabListReader {
                         components.lastOrNull()?.string == "Active Power Ups" -> {
                         addComponent(Component.literal(" None"))
                     }
-                    
+
                     upgradesPattern.matches(lineStr) -> {
                         upgradesPattern.matchMatcher(lineStr) {
                             var firstPart = group("firstPart")

@@ -51,6 +51,8 @@ object AdvancedPlayerList {
         TabLine(component, type, createCustomName(it))
     } ?: TabLine(component, type)
 
+    // Todo split up into smaller functions
+    @Suppress("CyclomaticComplexMethod")
     fun newSorting(original: List<Component>): List<Component> {
         if (KuudraApi.inKuudra) return original
         if (DungeonApi.inDungeon()) return original

@@ -29,7 +29,7 @@ object TabListDataComponent {
     internal class TabPlayerComparator : Comparator<PlayerInfo> {
         override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int = ComparisonChain.start()
             .compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
-            .compare(o1.team?.name ?: "", o2.team?.name ?: "")
+            .compare(o1.team?.name.orEmpty(), o2.team?.name.orEmpty())
             .compare(o1.profile.name, o2.profile.name).result()
     }
 
@@ -82,24 +82,21 @@ object TabListDataComponent {
         if (!dirty) return
         dirty = false
 
-        val tabList = readTabList() ?: return
-        if (tablistCache != tabList) {
-            tablistCache = tabList
-            TabListUpdateComponentEvent(tablistCache).post()
-            if (!SkyBlockUtils.onHypixel) DelayedRun.runDelayed(2.seconds) {
+        tablistCache = readTabList()?.takeIf { it != tablistCache }?.let { newTabList ->
+            if (!SkyBlockUtils.onHypixel) DelayedRun.runDelayedReturning(2.seconds) {
                 if (SkyBlockUtils.onHypixel) {
                     println("workaroundDelayedTabListUpdateAgain")
-                    TabListUpdateComponentEvent(tablistCache).post()
-                }
-            }
-        }
+                    newTabList.also { TabListUpdateComponentEvent(it).post() }
+                } else tablistCache
+            }.second() else newTabList
+        } ?: tablistCache
 
         val tabListOverlay = Minecraft.getInstance().gui.tabList
         header = tabListOverlay.header
         footer = tabListOverlay.footer?.let {
             if (it == footer || it.string == "") footer
             else it.also { TablistFooterUpdateComponentEvent(it).post() }
-        }
+        } ?: footer
     }
 
     @HandleEvent

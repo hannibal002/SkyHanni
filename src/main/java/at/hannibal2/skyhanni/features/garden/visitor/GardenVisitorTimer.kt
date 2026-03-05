@@ -24,12 +24,17 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.collections.minusAssign
+import kotlin.compareTo
+import kotlin.div
+import kotlin.inc
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import kotlin.times
 
 @SkyHanniModule
 object GardenVisitorTimer {
@@ -76,33 +81,51 @@ object GardenVisitorTimer {
         visitorJustArrived = false
     }
 
+    private data class TabUpdateContext(
+        var visitorsAmount: Int,
+        var visitorInterval: Duration,
+        var millis: Duration,
+        var queueFull: Boolean,
+    )
+
+    private fun TabListUpdateComponentEvent.readTimePattern(
+        context: TabUpdateContext
+    ): Boolean = timePattern.firstComponentMatcher(tabList) {
+        val timeInfo = group("info")
+        if (timeInfo == "Not Unlocked!") {
+            display = Renderable.text("§cVisitors not unlocked!")
+            return false
+        }
+        if (timeInfo == "Queue Full!") {
+            context.queueFull = true
+        } else {
+            if (lastTimerValue != timeInfo) {
+                lastTimerUpdate = SimpleTimeMark.now()
+                lastTimerValue = timeInfo
+            }
+            context.millis = TimeUtils.getDuration(timeInfo)
+        }
+        true
+    } ?: run {
+        display = createDisplayText("§cVisitor time info not in tab list")
+        return false
+    }
+
     @HandleEvent
     fun onTabListUpdate(event: TabListUpdateComponentEvent) {
-        var visitorsAmount = VisitorApi.visitorsInTabList(event.tabList).size
-        var visitorInterval = visitorInterval ?: return
-        var millis = visitorInterval
-        var queueFull = false
+        val visitorInterval = visitorInterval ?: return
+        val context = TabUpdateContext(
+            visitorsAmount = VisitorApi.visitorsInTabList(event.tabList).size,
+            visitorInterval = visitorInterval,
+            millis = visitorInterval,
+            queueFull = false,
+        )
 
-        timePattern.firstComponentMatcher(event.tabList) {
-            val timeInfo = group("info")
-            if (timeInfo == "Not Unlocked!") {
-                display = Renderable.text("§cVisitors not unlocked!")
-                return
-            }
-            if (timeInfo == "Queue Full!") {
-                queueFull = true
-            } else {
-                if (lastTimerValue != timeInfo) {
-                    lastTimerUpdate = SimpleTimeMark.now()
-                    lastTimerValue = timeInfo
-                }
-                millis = TimeUtils.getDuration(timeInfo)
-            }
-        } ?: run {
-            display = createDisplayText("§cVisitor time info not in tab list")
-            return
-        }
+        if (!event.readTimePattern(context)) return
+        context.processUpdates()
+    }
 
+    private fun TabUpdateContext.processUpdates() {
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
                 visitorInterval = millis
