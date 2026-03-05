@@ -82,6 +82,8 @@ object VanquisherWaypointShare {
 
     private val waypoints: Map<String, SharedVanquisher> get() = sharedWaypoints
 
+    private var maxDistance = 15
+
     data class SharedVanquisher(
         val playerName: String,
         val location: LorenzVec,
@@ -203,14 +205,23 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
         val message = event.cleanMessage
 
-        if (vanquisherSpawnedPattern.matches(message)) {
-            if (myVanquisherId == null) {
-                val closestId = vanquisherNearby.values.minByOrNull {
-                    it.distanceToPlayer()
-                }
-                if (closestId != null) { foundVanquisher(closestId.id) }
-            }
+        handleVanquisherSpawned(message)
+        handleVanquisherShared(message, event)
+        handleVanquisherDied(message)
+    }
+
+    private fun handleVanquisherSpawned(message: String) {
+        if (!vanquisherSpawnedPattern.matches(message)) return
+        if (myVanquisherId != null) return
+
+        val closestId = vanquisherNearby.values.minByOrNull { it.distanceToPlayer() }
+
+        if (closestId != null) {
+            foundVanquisher(closestId.id)
         }
+    }
+
+    private fun handleVanquisherShared(message: String, event: SkyHanniChatEvent.Allow) {
         vanquisherSharedPattern.matchMatchers(message) {
             val rawName = group("playerName").trim()
             val x = group("x").toDoubleOrNull() ?: return@matchMatchers
@@ -219,23 +230,25 @@ object VanquisherWaypointShare {
 
             val name = rawName.cleanPlayerName()
             val playerDisplayName = rawName.cleanPlayerName(displayName = true)
-
             val yourName = PlayerUtils.getName()
             val playerIsYou = name.equals(yourName, ignoreCase = true)
-
             val location = LorenzVec(x, y, z)
 
-            if (playerIsYou) {
-                sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
-            } else {
-                ChatUtils.notifyOrDisable("$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!", config::enabled, false)
+            sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
+
+            if (!playerIsYou) {
+                ChatUtils.notifyOrDisable(
+                    "$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!",
+                    config::enabled,
+                    false
+                )
                 TitleManager.sendTitle("§5§lVanquisher from $playerDisplayName")
-
-                sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
-
                 event.blockedReason = "vanquisher_waypoint"
             }
         }
+    }
+
+    private fun handleVanquisherDied(message: String) {
         vanquisherDiedPattern.matchMatcher(message) {
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
@@ -251,7 +264,7 @@ object VanquisherWaypointShare {
         if (entity.name.string.equals("Wither", ignoreCase = true)) {
             vanquisherNearby[entity.id] = entity
 
-            if (entity.distanceToPlayer() < 15.0) {
+            if (entity.distanceToPlayer() < maxDistance) {
                 if (myVanquisherId != entity.id) {
                     foundVanquisher(entity.id)
                 }
