@@ -9,6 +9,7 @@ import org.lwjgl.system.MemoryUtil
 
 private typealias VFEType = VertexFormatElement.Type
 private typealias VFEUsage = VertexFormatElement.Usage
+internal typealias SkyHanniVFE = SkyHanniVertexFormats
 
 object SkyHanniVertexFormats {
 
@@ -27,11 +28,12 @@ object SkyHanniVertexFormats {
         return VertexFormatElement.register(id, index, type, usage, count)
     }
 
-    private fun BufferBuilder.beginElementAccess(element: VertexFormatElement): Long =
+    internal fun BufferBuilder.beginElementAccess(element: VertexFormatElement): Long =
         (this as MixinBufferBuilderAccessor).invokeBeginElement(element)
 
     // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
     val ROUNDED_PARAMS_0: VertexFormatElement = safeRegister(6)
+
     // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
     val ROUNDED_PARAMS_1: VertexFormatElement = safeRegister(7)
 
@@ -42,8 +44,15 @@ object SkyHanniVertexFormats {
         .add("RoundedParams1", ROUNDED_PARAMS_1)
         .build()
 
-    fun BufferBuilder.writeParams(x: Float, y: Float, z: Float, w: Float, format: VertexFormatElement) {
-        val ptr = beginElementAccess(format)
+    internal inline fun BufferBuilder.writeParams(
+        x: Float,
+        y: Float,
+        z: Float,
+        w: Float,
+        elementSelector: () -> VertexFormatElement
+    ) {
+        val element = elementSelector()
+        val ptr = beginElementAccess(element)
         if (ptr == -1L) return
         MemoryUtil.memPutFloat(ptr, x)
         MemoryUtil.memPutFloat(ptr + 4L, y)
