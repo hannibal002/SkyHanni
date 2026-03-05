@@ -19,12 +19,14 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputat
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import com.google.gson.JsonObject
 
 @SkyHanniModule
 object PetUtils {
@@ -36,7 +38,7 @@ object PetUtils {
     private var displayNameMap: Map<String, String> = mapOf()
     private var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
     private var petInternalNames: Set<NeuInternalName> = setOf()
-    private var petSkinNbtNames: List<String> = listOf()
+    private var petSkinNbtNames: Set<String> = setOf()
     private var petItemResolution: Map<String, NeuInternalName> = mapOf()
 
     // Late load from SH repo
@@ -79,11 +81,13 @@ object PetUtils {
         }
     }
 
-    fun getVariantIndexOrNull(properSkinInternalName: NeuInternalName): Int? =
-        petSkinVariants.entries.indexOfFirstOrNull { it.key == properSkinInternalName }
+    fun getVariantIndexOrNull(extraData: JsonObject): Int? = petSkinNbtNames.firstNotNullOfOrNull {
+        extraData.get(it)?.asInt
+    }
 
-    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName]
-        ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf { !it.isPet }
+    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName] ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf {
+        !it.isPet && it.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET_ITEM
+    }
 
     fun isKnownPetInternalName(internalName: NeuInternalName) = internalName in petInternalNames
 
@@ -230,7 +234,7 @@ object PetUtils {
             it,
             "Failed to calculate level for total XP $totalXp with internal name $petInternalName",
         )
-        0
+        1
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {

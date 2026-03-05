@@ -22,10 +22,9 @@ class HotmConfig {
 
     @Expose
     @ConfigOption(name = "Sky Mall Display", desc = "Display your current Sky Mall perk in a GUI element.")
-    @ConfigEditorBoolean
-    @FeatureToggle
+    @ConfigEditorDropdown
     @SearchTag("skymall")
-    var skyMallDisplay: Boolean = false
+    var skyMallDisplay: SkyMallDisplayVisibility = SkyMallDisplayVisibility.OFF
 
     @Expose
     @ConfigLink(owner = HotmConfig::class, field = "skyMallDisplay")
@@ -71,4 +70,12 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var currentPowder: Boolean = true
+
+    enum class SkyMallDisplayVisibility(val display: String) {
+        OFF("Off"),
+        MINING_ONLY("Mining Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }

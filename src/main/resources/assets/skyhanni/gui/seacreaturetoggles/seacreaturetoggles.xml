@@ -56,6 +56,19 @@
                     </Button>
                 </Row>
             </Center>
+            <Spacer height = "5"/>
+            <Center><Text text = "Cocoon Notification Toggles"/></Center>
+            <Center>
+                <Row>
+                    <Button onClick="@showCocoonChatSettings">
+                        <Text text="Send To Party Chat"/>
+                    </Button>
+                    <Spacer width = "10" />
+                    <Button onClick="@showCocoonWarnSettings">
+                        <Text text="Title To Self"/>
+                    </Button>
+                </Row>
+            </Center>
         </Column>
     </Gui>
 </Root>

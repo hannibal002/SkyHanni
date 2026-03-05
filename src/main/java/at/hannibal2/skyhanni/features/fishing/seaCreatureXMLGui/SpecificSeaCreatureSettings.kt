@@ -13,4 +13,6 @@ data class SpecificSeaCreatureSettings(
     @Expose var shouldSelfNotifyOnCatch: Boolean?,
     @Expose var shouldNotifyForNonOwn: Boolean?,
     @Expose var shouldHighlight: Boolean?,
+    @Expose var shouldShareCocoonInChat: Boolean?,
+    @Expose var shouldWarnWhenCocooned: Boolean?,
 )
