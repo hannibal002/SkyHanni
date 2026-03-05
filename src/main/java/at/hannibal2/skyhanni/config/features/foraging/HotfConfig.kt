@@ -21,13 +21,12 @@ class HotfConfig {
 
     @Expose
     @ConfigOption(name = "Lottery Display", desc = "Display your current Lottery perk in a GUI element.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var lotteryDisplay: Boolean = false
+    @ConfigEditorDropdown
+    var lotteryDisplay: LotteryDisplayVisibility = LotteryDisplayVisibility.OFF
 
     @Expose
     @ConfigLink(owner = HotfConfig::class, field = "lotteryDisplay")
-    val lotteryPosition: Position = Position(100, 100)
+    val lotteryPosition: Position = Position(100, 120)
 
     @Expose
     @ConfigOption(name = "Level Stack", desc = "Show the level of a perk as item stacks.")
@@ -69,4 +68,12 @@ class HotfConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var currentWhispers: Boolean = true
+
+    enum class LotteryDisplayVisibility(val display: String) {
+        OFF("Off"),
+        FORAGING_ONLY("Foraging Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }

@@ -2,30 +2,42 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
+import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import kotlin.reflect.KClass
 
 @SkyHanniModule(devOnly = true)
 object RenderableTestSuite {
 
-    private val register = mutableMapOf<String, TestRenderable>()
+    private val register = mutableMapOf<String, TestRenderableBase<*>>()
 
     private val storage get() = SkyHanniMod.feature.storage
 
-    private val active = mutableSetOf<TestRenderable>()
+    private val active = mutableSetOf<TestRenderableBase<*>>()
 
     @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
     fun onGuiRender() {
-        for (test in active) {
+        for (test in active.filter { it.eventClass == GuiRenderEvent.GuiOnTopRenderEvent::class }) {
+            test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")
+        }
+    }
+
+    @HandleEvent
+    fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
+        if (event.type != RenderLayer.HOTBAR) return
+        for (test in active.filter { it.eventClass == GameOverlayRenderPostEvent::class }) {
             test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")
         }
     }
@@ -35,7 +47,7 @@ object RenderableTestSuite {
         event.registerBrigadier("shtestrenderable") {
             category = CommandCategory.DEVELOPER_TEST
             description = "Used for testing specific gui element primitives."
-            argCallback("test", BrigadierArguments.greedyString(), register.keys) { arg ->
+            argCallback("test", BrigadierArguments.greedyString(), register.keys) { arg: String ->
                 testCommand(arg)
             }
             simpleCallback {
@@ -59,7 +71,7 @@ object RenderableTestSuite {
         active.add(test)
     }
 
-    private val TestRenderable.finalRenderable: Renderable?
+    private val TestRenderableBase<*>.finalRenderable: Renderable?
         get() = if (shouldRenderBounds) renderable()?.renderBounds(LorenzColor.RED.addOpacity(50)) else renderable()
 
     /**
@@ -78,8 +90,26 @@ object RenderableTestSuite {
      * @property renderable Function that is called for retrieving the [Renderable] that is going to be tested (and rendered on screen, once active). Define here your test you want to do.
      * @property position The position at which the test will be rendered. There should be no reason that is touched. Other than inside [RenderableTestSuite].
      */
-    abstract class TestRenderable(val name: String, val shouldRenderBounds: Boolean = true) {
+    abstract class TestRenderable(
+        name: String,
+        shouldRenderBounds: Boolean = true
+    ) : TestRenderableBase<GuiRenderEvent.GuiOnTopRenderEvent>(
+        name,
+        GuiRenderEvent.GuiOnTopRenderEvent::class,
+        shouldRenderBounds
+    )
 
+    abstract class TestRenderableFor<T : RenderingSkyHanniEvent>(
+        name: String,
+        eventClass: KClass<T>,
+        shouldRenderBounds: Boolean = true
+    ) : TestRenderableBase<T>(name, eventClass, shouldRenderBounds)
+
+    abstract class TestRenderableBase<T : RenderingSkyHanniEvent>(
+        val name: String,
+        val eventClass: KClass<T>,
+        val shouldRenderBounds: Boolean = true
+    ) {
         abstract fun renderable(): Renderable?
 
         val position: Position get() = storage.testRenderablePositions.getOrPut(name) { Position(20, 20) }
