@@ -81,8 +81,8 @@ object TabListReader {
         "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
-        "winterpowerups",
-        "Active Power Ups.colorless",
+        "winterpowerups.colorless",
+        "Active Power Ups",
     )
 
     @HandleEvent

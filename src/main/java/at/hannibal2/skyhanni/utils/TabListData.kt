@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
+import at.hannibal2.skyhanni.mixins.hooks.tabListGuarded
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
@@ -61,13 +61,11 @@ object TabListData {
     private fun readTabList(): List<Component>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
         val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
-        val result = mutableListOf<Component>()
-        tabListGuard = true
-        for (info in players) {
-            val name = Minecraft.getInstance().gui.tabList.getNameForDisplay(info)
-            result.add(name)
+        val result = tabListGuarded { safeTabList ->
+            players.map {
+                safeTabList.getNameForDisplay(it)
+            }
         }
-        tabListGuard = false
         return if (result.size < 80) result.dropLast(1)
         else result.subList(0, 80)
     }
