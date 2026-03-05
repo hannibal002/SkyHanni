@@ -40,7 +40,7 @@ object RoundedShapeDrawer {
     lateinit var circleBufferSlice: GpuBufferSlice
     lateinit var radialGradientCircleBufferSlice: GpuBufferSlice
 
-    fun performBaseRoundedUniforms(renderPass: RenderPass) {
+    private fun performBaseRoundedUniforms(renderPass: RenderPass) {
         renderPass.setUniform("SkyHanniRoundedUniforms", roundedBufferSlice)
     }
 

@@ -145,7 +145,7 @@ object SkyHanniTypeAdapters {
             writer.value(value.toString())
         }
 
-        override fun read(reader: JsonReader?): NEURaritySpecificPetNums {
+        override fun read(reader: JsonReader): NEURaritySpecificPetNums {
             val obj = JsonParser.parseReader(reader).asJsonObject
             val neuPetNumsAdapter = ConfigManager.gson.getAdapter(NeuPetNums::class.java)
             val min = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("1"))

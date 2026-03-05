@@ -14,7 +14,7 @@ data class NeuRecipeComponent(val internalName: NeuInternalName?, val count: Int
             if (component.isEmpty()) return null
             val parts = component.split(":")
             val internalName = parts.firstOrNull()?.toInternalName() ?: return null
-            val quantity = parts.getOrNull(1)?.toDoubleOrNull()?.toInt() ?: 1
+            val quantity = parts.getOrNull(1)?.toIntOrNull() ?: 1
             return NeuRecipeComponent(internalName, quantity)
         }
     }

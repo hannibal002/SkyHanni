@@ -21,12 +21,8 @@ data class NeuMobDropsRecipeJson(
         PrimitiveIngredient(itemJson.internalName)
     )
 
-    override fun getPrimitiveOutputs(
-        itemJson: NeuItemJson
-    ) = super.getPrimitiveOutputs(itemJson).toMutableList().apply {
-        drops.mapNotNull {
-            it.id.toPrimitiveIngredientOrNull()
-        }.let { addAll(it) }
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) = drops.mapNotNull {
+        it.id.toPrimitiveIngredientOrNull()
     }
 }
 

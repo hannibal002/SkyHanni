@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectOutlineRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectRenderState
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -278,7 +279,7 @@ object ShaderRenderUtils {
 
     }
 
-    private fun buildRoundedShaderParams(x: Int, y: Int, width: Int, height: Int, radius: Int): RoundedShaderParams {
+    private fun buildRoundedStateParams(x: Int, y: Int, width: Int, height: Int, radius: Int): RoundedRenderStateParams {
         val scaleFactor = GuiScreenUtils.scaleFactor
         val halfSizeX = (width * scaleFactor) / 2f
         val halfSizeY = (height * scaleFactor) / 2f
@@ -289,11 +290,13 @@ object ShaderRenderUtils {
         val yScale = matrix.m11()
         val xTranslation = matrix.m20()
         val yTranslation = matrix.m21()
-        return RoundedShaderParams(
+        return RoundedRenderStateParams(
             radius = radius.toFloat(),
             adjustedHalfSizeX = halfSizeX * xScale,
             adjustedHalfSizeY = halfSizeY * yScale,
             adjustedCenterPosX = (centerPosX * xScale) + (xTranslation * scaleFactor),
+            // Y-Scaling affects the center-point of the rounded rect differently than X-Scaling, as it scales from the top edge rather
+            // than the center, so we need to adjust the center Y position accordingly before applying translation
             adjustedCenterPosY = (if (yScale != 1f) centerPosY - (halfSizeY * (yScale - 1)) else centerPosY) - (yTranslation * scaleFactor),
             matXScale = xScale,
             matYScale = yScale,
@@ -335,7 +338,7 @@ object ShaderRenderUtils {
         radius: Int,
         smoothness: Float,
     ): SkyHanniRoundedRectRenderState {
-        val params = buildRoundedShaderParams(x, y, width, height, radius)
+        val params = buildRoundedStateParams(x, y, width, height, radius)
         return SkyHanniRoundedRectRenderState(
             x, y, width, height, color, smoothness, params,
             DrawContextUtils.drawContext.scissorStack.peek(),
@@ -349,7 +352,7 @@ object ShaderRenderUtils {
         radius: Int,
         blur: Float,
     ): SkyHanniRoundedRectOutlineRenderState {
-        val params = buildRoundedShaderParams(x, y, width, height, radius)
+        val params = buildRoundedStateParams(x, y, width, height, radius)
         return SkyHanniRoundedRectOutlineRenderState(
             x, y, width, height, topColor, bottomColor,
             borderThickness.toFloat(), max(1 - blur, 0f), params,

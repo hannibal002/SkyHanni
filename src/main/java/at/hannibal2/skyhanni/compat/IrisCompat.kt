@@ -37,18 +37,17 @@ object IrisCompat {
             val irisApiClass = Class.forName(IRIS_API_PATH)
             val irisInstance = irisApiClass.getMethod("getInstance").invoke(null)
             val irisInstanceClass = irisInstance?.javaClass ?: return
-            val pipelineMethod = irisInstanceClass.getMethod(
-                "assignPipeline",
-                RenderPipeline::class.java,
-                irisProgramEnum
-            ) ?: return
-            val programMap: Map<IrisProgram, Any> = IrisProgram.entries.associateWith { it.asJavaEnum() }
+            val pipelineMethod = runCatching {
+                irisInstanceClass.getMethod(
+                    "assignPipeline",
+                    RenderPipeline::class.java,
+                    irisProgramEnum
+                ) ?: return@runCatching null
+            }.getOrNull() ?: return
 
-            // Assign our custom pipelines by their program
             SkyHanniRenderPipeline.entries.forEach { shPipeline ->
-                val irisProgram = programMap[shPipeline.irisProgram] ?: return@forEach
                 try {
-                    pipelineMethod.invoke(irisInstance, shPipeline, irisProgram)
+                    pipelineMethod.invoke(irisInstance, shPipeline, shPipeline.irisProgram.asJavaEnum())
                 } catch (exception: Exception) {
                     ErrorManager.logErrorWithData(exception, "Failed to assign Iris pipeline!")
                 }

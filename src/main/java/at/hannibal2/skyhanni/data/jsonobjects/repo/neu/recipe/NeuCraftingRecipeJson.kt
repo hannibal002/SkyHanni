@@ -39,5 +39,5 @@ data class NeuCraftingRecipeJson(
     }
 
     override fun getPrimitiveInputs(itemJson: NeuItemJson) = primitiveIngredients
-    override fun getOutputOverride() = NeuOverrideProvider(overrideCount = outputCount)
+    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(overrideCount = outputCount)
 }

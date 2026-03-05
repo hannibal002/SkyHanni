@@ -19,6 +19,5 @@ data class NeuTradeRecipeJson(
     override fun getPrimitiveInputs(itemJson: NeuItemJson) = listOf(
         cost.toPrimitiveIngredient(costCount)
     )
-
-    override fun getOutputOverride() = NeuOverrideProvider(result)
+    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(result)
 }

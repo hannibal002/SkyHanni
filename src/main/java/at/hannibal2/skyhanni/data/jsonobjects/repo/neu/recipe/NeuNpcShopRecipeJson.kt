@@ -11,5 +11,5 @@ data class NeuNpcShopRecipeJson(
     override fun getPrimitiveInputs(itemJson: NeuItemJson) = cost.mapNotNull {
         it.toPrimitiveIngredientOrNull()
     }
-    override fun getOutputOverride() = NeuOverrideProvider(result)
+    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(result)
 }
