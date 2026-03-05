@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -313,7 +314,7 @@ object GriffinBurrowHelper {
             val nearby = allGuesses.filter { it.getCurrent().distanceSq(location) < 10 }.toSet()
             removeGuess(nearby, "chain finished with leftover burrow within 3 blocks")
             if (config.warnOnChainComp) {
-                val playerLoc = MinecraftCompat.localPlayer.position().toLorenzVec()
+                val playerLoc = PlayerUtils.getLocation()
                 val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
                 if (anyClose.isEmpty()) showUseSpadeTitle()
             }

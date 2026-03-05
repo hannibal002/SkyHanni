@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -41,7 +42,7 @@ data class GuessEntry(
 
         if (GriffinBurrowHelper.shouldBurrowParticlesBeVisible(timeInPast = 1.seconds) &&
             !GriffinBurrowParticleFinder.containsBurrow(this.getCurrent()) && // burrow is not found
-            this.getCurrent().distanceSq(MinecraftCompat.localPlayer.position().toLorenzVec()) < 900 // within 30 blocks
+            this.getCurrent().distanceSq(PlayerUtils.getLocation()) < 900 // within 30 blocks
         ) {
             reason.append("particles not found when they should have been ")
             shouldMove = true

@@ -46,5 +46,7 @@ object PlayerUtils {
 
     fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(0)
 
+    fun getLocation() = MinecraftCompat.localPlayer.getLorenzVec()
+
     fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }
