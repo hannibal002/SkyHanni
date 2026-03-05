@@ -295,6 +295,8 @@ object ShaderRenderUtils {
             adjustedHalfSizeX = halfSizeX * xScale,
             adjustedHalfSizeY = halfSizeY * yScale,
             adjustedCenterPosX = (centerPosX * xScale) + (xTranslation * scaleFactor),
+            // Y-Scaling affects the center-point of the rounded rect differently than X-Scaling, as it scales from the top edge rather
+            // than the center, so we need to adjust the center Y position accordingly before applying translation
             adjustedCenterPosY = (if (yScale != 1f) centerPosY - (halfSizeY * (yScale - 1)) else centerPosY) - (yTranslation * scaleFactor),
             matXScale = xScale,
             matYScale = yScale,
