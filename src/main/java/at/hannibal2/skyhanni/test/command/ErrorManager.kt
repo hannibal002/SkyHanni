@@ -190,7 +190,6 @@ object ErrorManager {
         LOGGED,
         BLOCKED_NOT_NEEDED,
         BLOCKED_CAN_NOT_SHOW,
-        ;
     }
 
     @Suppress("ReturnCount")
