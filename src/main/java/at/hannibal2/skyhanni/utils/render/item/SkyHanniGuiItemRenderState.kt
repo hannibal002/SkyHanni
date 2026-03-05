@@ -47,7 +47,7 @@ data class SkyHanniGuiItemRenderState(
         frameNumber?.let { appendModelIdentityElement(it) }
         if (rotationVector != Vec3.ZERO || frameNumber != null) setAnimated()
     }
-    private val _atlasKey = run {
+    val atlasKey by lazy {
         val baseKey = SkyHanniAtlasKey(
             item = itemStack.item.toString(),
             modelIdentity = trackingState.modelIdentity,
@@ -56,7 +56,6 @@ data class SkyHanniGuiItemRenderState(
         if (trackingState.isAnimated) SkyHanniAnimatedAtlasKey(baseKey, frameNumber ?: 0)
         else baseKey
     }
-    val atlasKey get() = _atlasKey
 
     private val x0 = x.toInt()
     private val x1 = (x + (scale * 16)).toInt()
