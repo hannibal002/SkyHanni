@@ -17,7 +17,7 @@ class DarkMonolithConfig {
     @Expose
     @ConfigOption(
         name = "Tracker",
-        desc = "Track mithril powder, coins, and Rock the Fish drops obtained from collecting Dark Monoliths."
+        desc = "Track mithril powder, coins, and Rock the Fish drops obtained from collecting Dark Monoliths.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -86,7 +86,7 @@ class DarkMonolithConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()

@@ -84,6 +84,7 @@ object DarkMonolithFeatures {
         var renderBox: AABB? = null,
         var nextBlockCheck: SimpleTimeMark = SimpleTimeMark.farPast(),
     ) : Resettable
+
     private val data = DarkMonolithData()
 
     init {
@@ -165,11 +166,12 @@ object DarkMonolithFeatures {
     private fun DarkMonolithData.checkTitle() {
         if (foundEggVec == null || foundEggVec == lastFoundEggVec) return
         lastFoundEggVec = foundEggVec
-        if (!config.title.enabled) return
-        val titleText = config.title.text.takeIf { it.isNotEmpty() }
+        val titleConfig = config.title
+        if (!titleConfig.enabled) return
+        val titleText = titleConfig.text.takeIf { it.isNotEmpty() }
             ?: DarkMonolithConfig.DEFAULT_TITLE
         TitleManager.sendTitle(titleText, duration = 3.seconds)
-        ChatUtils.notifyOrDisable(titleText, config::title)
+        ChatUtils.notifyOrDisable(titleText, titleConfig::enabled)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -177,7 +179,7 @@ object DarkMonolithFeatures {
         val profit = tracker.drawItems(data, { true }, this)
         add(Renderable.text("§7Monoliths looted: §d${data.monolithsLooted}").toSearchable())
         addAll(
-            tracker.addTotalProfit(profit, data.monolithsLooted, "loot", data.getTotalUptime())
+            tracker.addTotalProfit(profit, data.monolithsLooted, "loot", data.getTotalUptime()),
         )
         tracker.addPriceFromButton(this)
     }
