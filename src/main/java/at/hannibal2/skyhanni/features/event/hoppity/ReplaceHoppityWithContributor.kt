@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CircularList
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.network.chat.Component
@@ -71,9 +72,8 @@ object ReplaceHoppityWithContributor {
         event.toolTip.add(" ")
         event.toolTip.add("§8§oSome might say this rabbit is also known as $realName")
 
-        // TODO find a way to handle non containing entries in a kotlin nullable way instead of checking for -1
-        val index = event.toolTip.indexOfFirst { it.string.contains(" a duplicate") }
-        if (index == -1) return
+        val index = event.toolTip.indexOfFirstOrNull { it.string.contains(" a duplicate") }
+        if (index == null) return
         val oldLine = event.toolTip[index]
         event.toolTip[index] = Component.literal(oldLine.formattedTextCompat().replace(cleanName, fakeName))
     }

@@ -9,7 +9,9 @@ import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 
 @JvmInline
-value class NeuInternalName private constructor(private val internalName: String) {
+value class NeuInternalName private constructor(private val internalName: String) : Comparable<NeuInternalName> {
+
+    override fun compareTo(other: NeuInternalName): Int = internalName.compareTo(other.internalName)
 
     fun asString() = internalName
 
@@ -25,6 +27,11 @@ value class NeuInternalName private constructor(private val internalName: String
         internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
+
+    fun isArmor(): Boolean = internalName.endsWith("_BOOTS") ||
+        internalName.endsWith("_HELMET") ||
+        internalName.endsWith("_CHESTPLATE") ||
+        internalName.endsWith("_LEGGINGS")
 
     fun getItemCategoryOrNull(): ItemCategory? =
         categoryCache.getOrPut(this) { getItemStackOrNull()?.getItemCategoryOrNull() ?: return null }
@@ -49,7 +56,6 @@ value class NeuInternalName private constructor(private val internalName: String
 
     private val isEnchantedBook: Boolean
         get() = getItemStackOrNull()?.item == Items.ENCHANTED_BOOK
-
 
     companion object {
 

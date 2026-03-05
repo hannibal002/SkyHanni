@@ -17,7 +17,6 @@ open class ItemStackRenderable internal constructor(
     open val config: ItemRenderableConfig,
     private val stackGetter: () -> ItemStack = { ItemStack.EMPTY },
 ) : Renderable {
-
     private val scaledSize get() = (15.5 * config.scale + 0.5).toInt()
     override val width: Int get() = scaledSize + config.xSpacing
     override val height: Int get() = scaledSize + config.ySpacing
@@ -26,6 +25,7 @@ open class ItemStackRenderable internal constructor(
 
     open val stack: ItemStack get() = stackGetter()
     private var stableRenderId: Int? = null
+    open fun getStableId() = stableRenderId
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         this.stableRenderId = stack.renderOnScreen(
