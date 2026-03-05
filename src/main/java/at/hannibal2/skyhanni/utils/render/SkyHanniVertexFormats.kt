@@ -14,7 +14,11 @@ internal typealias SHVFE = SkyHanniVertexFormats.SkyHanniVertexFormatElement
 object SkyHanniVertexFormats {
 
     internal enum class SkyHanniVertexFormatElement(
+        // Only used to determine an "internal" reference, not used in registration
         val shId: Int,
+        // The ID we use to register the format element with Minecraft.
+        // see safeRegister() for details on how this is used and determined at runtime.
+        private val registrationId: Int,
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         private val usage: VFEUsage = VFEUsage.GENERIC,
@@ -26,7 +30,7 @@ object SkyHanniVertexFormats {
         ROUNDED_PARAMS_1(1, 7),
         ;
 
-        val element by lazy { safeRegister(shId, index, type, usage, count) }
+        val element by lazy { safeRegister(registrationId, index, type, usage, count) }
     }
 
     /**
