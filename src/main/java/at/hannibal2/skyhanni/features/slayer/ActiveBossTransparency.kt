@@ -47,7 +47,7 @@ object ActiveBossTransparency {
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityTransparencyTickEvent<LivingEntity>) {
+    fun onEntityTransparencyTick(event: EntityTransparencyTickEvent<LivingEntity>) {
         if (!isActive()) return
         val entity = event.entity
 

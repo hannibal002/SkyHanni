@@ -55,7 +55,7 @@ class HoppityEggsConfig {
         desc = "Adjust the transparency of players near shared & guessed egg waypoints. (in %)",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
-    var playerOpacity: Int = 40
+    var playerTransparency: Int = 40
 
     @Expose
     @ConfigOption(
@@ -114,7 +114,7 @@ class HoppityEggsConfig {
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-
+            event.move(126, "event.hoppityEggs.playerOpacity", "event.hoppityEggs.playerTransparency")
         }
     }
 }

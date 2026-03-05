@@ -28,25 +28,25 @@ object HoppityEggDisplayManager {
 
     private var display = listOf<Renderable>()
 
-    private fun canChangeOpacity(entity: Player): Boolean {
+    private fun canChangeTransparency(entity: Player): Boolean {
         if (entity.isLocalPlayer) return false
         if (!entity.isRealPlayer()) return false
 
         val shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { entity.distanceTo(it) < 4.0 }
             ?: HoppityEggLocator.possibleEggLocations.any { entity.distanceTo(it) < 4.0 }
 
-        return config.playerOpacity < 100 && shouldHidePlayer
+        return config.playerTransparency < 100 && shouldHidePlayer
     }
 
     @HandleEvent
     fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
-        event.setActive(HoppityEggLocator.isEnabled() && config.playerOpacity < 100)
+        event.setActive(HoppityEggLocator.isEnabled() && config.playerTransparency < 100)
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityTransparencyTickEvent<Player>) {
-        if (canChangeOpacity(event.entity)) {
-            event.newTransparency = config.playerOpacity
+    fun onEntityTransparencyTick(event: EntityTransparencyTickEvent<Player>) {
+        if (canChangeTransparency(event.entity)) {
+            event.newTransparency = config.playerTransparency
         }
     }
 

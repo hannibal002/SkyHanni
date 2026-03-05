@@ -19,7 +19,7 @@ object HideIrrelevantMobsInSlayerArea {
 
     @HandleEvent
     fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
-        irrelevantMob = if (isActive() && config.hideIrrelevantMobsOpacity < 100) {
+        irrelevantMob = if (isActive() && config.hideIrrelevantMobsTransparency < 100) {
             IrrelevantMob.entries.find { it.isInArea() }
         } else null
         irrelevantMob?.let {
@@ -28,10 +28,10 @@ object HideIrrelevantMobsInSlayerArea {
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityTransparencyTickEvent<LivingEntity>) {
+    fun onEntityTransparencyTick(event: EntityTransparencyTickEvent<LivingEntity>) {
         val irrelevantMob = irrelevantMob ?: return
         if (event.entity.mob?.name in irrelevantMob.mobNames) {
-            event.newTransparency = config.hideIrrelevantMobsOpacity
+            event.newTransparency = config.hideIrrelevantMobsTransparency
         }
     }
 
