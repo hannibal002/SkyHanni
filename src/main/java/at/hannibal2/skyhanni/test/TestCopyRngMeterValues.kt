@@ -28,7 +28,7 @@ object TestCopyRngMeterValues {
      */
     private val rngScorePattern by patternGroup.pattern(
         "rngscore",
-        "((?:Slayer|Experimental|Nucleus|Frozen Corpse) XP|Dungeon Score): .*/(?<xp>.*)",
+        "(?:(?:Slayer|Experimental|Nucleus|Frozen Corpse) XP|Dungeon Score): .*/(?<xp>.*)"
     )
 
     @HandleEvent
