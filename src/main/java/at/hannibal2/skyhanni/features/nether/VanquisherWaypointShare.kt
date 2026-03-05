@@ -3,16 +3,23 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -20,21 +27,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.boss.wither.WitherBoss
+import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.seconds
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import net.minecraft.world.entity.Entity
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
-import net.minecraft.world.entity.boss.wither.WitherBoss
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.utils.PlayerUtils
-import java.awt.Color
 
 
 @SkyHanniModule
@@ -80,10 +80,9 @@ object VanquisherWaypointShare {
 
     private val sharedWaypoints = ConcurrentHashMap<String, SharedVanquisher>()
 
-    val waypoints: Map<String, SharedVanquisher> get() = sharedWaypoints
+    private val waypoints: Map<String, SharedVanquisher> get() = sharedWaypoints
 
     data class SharedVanquisher(
-        val fromPlayer: String,
         val playerName: String,
         val location: LorenzVec,
         val spawnTime: SimpleTimeMark,
@@ -99,7 +98,6 @@ object VanquisherWaypointShare {
         if (entity != null) {
             val playerName = Minecraft.getInstance().player?.name?.string ?: "You"
             sharedWaypoints[playerName] = SharedVanquisher(
-                playerName,
                 playerName,
                 entity.getLorenzVec(),
                 SimpleTimeMark.now()
@@ -133,7 +131,7 @@ object VanquisherWaypointShare {
         val entity = vanquisherNearby[myVanquisherId] ?: EntityUtils.getEntityByID(myVanquisherId!!)
 
         if (entity == null || entity.deceased) {
-            ChatUtils.chat("§cRare Mob is dead")
+            ChatUtils.chat("No Vanquisher found")
             return
         }
 
@@ -143,7 +141,7 @@ object VanquisherWaypointShare {
         val z = location.z.toInt()
         if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
-        } else {
+        } else if (config.readGlobalChat == isEnabled()) {
             HypixelCommands.allChat("x: $x, y: $y, z: $z | Vanquisher")
         }
     }
@@ -156,7 +154,7 @@ object VanquisherWaypointShare {
         myVanquisherId = null
         if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("Vanquisher dead!")
-        } else {
+        } else if (config.readGlobalChat == isEnabled()) {
             HypixelCommands.allChat("Vanquisher dead!")
         }
     }
@@ -228,12 +226,12 @@ object VanquisherWaypointShare {
             val location = LorenzVec(x, y, z)
 
             if (playerIsYou) {
-                sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+                sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
             } else {
-                ChatUtils.chat("$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!")
+                ChatUtils.notifyOrDisable("$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!", config::enabled, false)
                 TitleManager.sendTitle("§5§lVanquisher from $playerDisplayName")
 
-                sharedWaypoints[name] = SharedVanquisher(name, playerDisplayName, location, SimpleTimeMark.now())
+                sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
 
                 event.blockedReason = "vanquisher_waypoint"
             }
@@ -267,7 +265,7 @@ object VanquisherWaypointShare {
 
         with(WorldRenderUtils) {
             for (waypoint in waypoints.values) {
-                if (waypoint.spawnTime.passedSince() > 30.seconds) continue
+                if (waypoint.spawnTime.passedSince() > 60.seconds) continue
 
                 val beaconColor = Color(160, 37, 191)
 
