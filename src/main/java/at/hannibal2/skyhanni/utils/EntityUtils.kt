@@ -144,10 +144,10 @@ object EntityUtils {
     }
 
     inline fun <reified T : Entity> getFilteredEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
-        getEntitiesNearby(radius) { it is T && predicate(it) }
+        getEntitiesNearby(radius) { predicate(it) }
 
     inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
-        getEntitiesNearby_old<T>(LocationUtils.playerLocation(), radius, predicate)
+        LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
     @Deprecated(
