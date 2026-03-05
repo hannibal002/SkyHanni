@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
@@ -227,7 +227,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTablistChange(event: TabListUpdateComponentEvent) {
+    fun onTablistChange(event: TabListUpdateEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
@@ -243,7 +243,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTabUpdate(event: TablistFooterUpdateComponentEvent) {
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
         val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         for (line in lines) {
@@ -457,7 +457,7 @@ object DungeonApi {
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
     @HandleEvent
-    fun onTabUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
         playerDungeonTeamPattern.matchAllComponents(event.tabList) {

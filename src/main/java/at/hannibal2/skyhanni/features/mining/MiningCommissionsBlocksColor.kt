@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.MiningApi.inDwarvenMines
 import at.hannibal2.skyhanni.data.MiningApi.inGlacite
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
@@ -61,7 +61,7 @@ object MiningCommissionsBlocksColor {
 
     // TODO Commission API
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
             val tabList = " ${block.commissionName}: "
             val newValue = event.tabList.any { it.string.startsWith(tabList) && !it.string.contains("DONE") }

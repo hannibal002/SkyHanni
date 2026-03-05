@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -102,7 +102,7 @@ object SkillApi {
     private var lastTabComponents: List<Component> = emptyList()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         lastTabComponents = event.tabList
     }
 

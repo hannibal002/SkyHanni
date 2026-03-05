@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.TabListDataComponent
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -68,7 +68,7 @@ object CustomScoreboard {
         display ?: return
 
         val render = cache?.let {
-            if (!TabListDataComponent.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch) it
+            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch) it
             else null
         } ?: display ?: return
 
@@ -112,7 +112,7 @@ object CustomScoreboard {
             nextScoreboardUpdate = 250.milliseconds.fromNow()
             dirty = false
             display = createLines().removeEmptyLinesFromEdges().createRenderable()
-            if (TabListDataComponent.fullyLoaded) {
+            if (TabListData.fullyLoaded) {
                 cache = display
             }
         }

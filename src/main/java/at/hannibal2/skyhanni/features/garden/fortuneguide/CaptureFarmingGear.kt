@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentTyp
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -210,7 +210,7 @@ object CaptureFarmingGear {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         strengthPattern.firstComponentMatcher(event.tabList) {
             GardenApi.storage?.fortune?.farmingStrength = group("strength").toInt()
         }

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -196,7 +196,7 @@ object TrevorFeatures {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation

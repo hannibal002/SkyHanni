@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
-import at.hannibal2.skyhanni.utils.TabListDataComponent
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 
 // scoreboard && tablist
@@ -13,7 +13,7 @@ object ScoreboardEventSpooky : ScoreboardEvent() {
         ScoreboardPattern.spookyPattern.firstMatches(getSBLines())?.let { time ->
             add(time)
             add("§7Your Candy: ")
-            TabListDataComponent.footer?.let { footerComponent ->
+            TabListData.footer?.let { footerComponent ->
                 val lines = TextHelper.split(footerComponent, "\n") ?: listOf(footerComponent)
                 val matchLine = lines.firstOrNull { it.string.startsWith("Your Candy:") }?.string?.removePrefix("§7Your Candy: ")
                 add(matchLine ?: "§cCandy not found")

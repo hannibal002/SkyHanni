@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
@@ -148,7 +148,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateComponentEvent) {
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!checkFooter) return
         val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         if (!lines.any { it.string.contains("Active Effects") }) return

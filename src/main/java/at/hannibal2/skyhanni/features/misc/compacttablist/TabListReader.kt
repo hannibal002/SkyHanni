@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -93,13 +93,13 @@ object TabListReader {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         this.lastTabComponents = event.tabList
         rebuildRenderColumns()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListFooterUpdate(event: TablistFooterUpdateComponentEvent) {
+    fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         this.lastFooterComponent = event.footer
         rebuildRenderColumns()
     }

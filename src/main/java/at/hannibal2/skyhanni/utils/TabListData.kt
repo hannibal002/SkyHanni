@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +22,7 @@ import net.minecraft.world.level.GameType
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object TabListDataComponent {
+object TabListData {
     private val playerOrdering = Ordering.from(TabPlayerComparator())
 
     @Environment(EnvType.CLIENT)
@@ -86,7 +86,7 @@ object TabListDataComponent {
             if (!SkyBlockUtils.onHypixel) DelayedRun.runDelayedReturning(2.seconds) {
                 if (SkyBlockUtils.onHypixel) {
                     println("workaroundDelayedTabListUpdateAgain")
-                    newTabList.also { TabListUpdateComponentEvent(it).post() }
+                    newTabList.also { TabListUpdateEvent(it).post() }
                 } else tablistCache
             }.second() else newTabList
         } ?: tablistCache
@@ -95,7 +95,7 @@ object TabListDataComponent {
         header = tabListOverlay.header
         footer = tabListOverlay.footer?.let {
             if (it == footer || it.string == "") footer
-            else it.also { TablistFooterUpdateComponentEvent(it).post() }
+            else it.also { TablistFooterUpdateEvent(it).post() }
         } ?: footer
     }
 

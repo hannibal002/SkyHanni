@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.TabListDataComponent
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -76,8 +76,8 @@ object TabListRenderer {
         var totalHeight = maxLines * LINE_HEIGHT
 
         val (header, footer) = listOf(
-            TabListDataComponent.header,
-            TabListDataComponent.footer,
+            TabListData.header,
+            TabListData.footer,
         ).map { component ->
             val componentHeader: Component = component ?: Component.empty()
             val componentLines = TextHelper.split(componentHeader, "\n") ?: listOf(componentHeader)

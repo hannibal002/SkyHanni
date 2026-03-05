@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -82,7 +82,7 @@ object GardenVisitorTimer {
         var queueFull: Boolean,
     )
 
-    private fun TabListUpdateComponentEvent.readTimePattern(
+    private fun TabListUpdateEvent.readTimePattern(
         context: TabUpdateContext
     ): Boolean = timePattern.firstComponentMatcher(tabList) {
         val timeInfo = group("info")
@@ -106,7 +106,7 @@ object GardenVisitorTimer {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+    fun onTabListUpdate(event: TabListUpdateEvent) {
         val visitorInterval = visitorInterval ?: return
         val context = TabUpdateContext(
             visitorsAmount = VisitorApi.visitorsInTabList(event.tabList).size,
