@@ -14,8 +14,6 @@ internal typealias SHVFE = SkyHanniVertexFormats.SkyHanniVertexFormatElement
 object SkyHanniVertexFormats {
 
     internal enum class SkyHanniVertexFormatElement(
-        // Only used to determine an "internal" reference, not used in registration
-        val shId: Int,
         // The ID we use to register the format element with Minecraft.
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int,
