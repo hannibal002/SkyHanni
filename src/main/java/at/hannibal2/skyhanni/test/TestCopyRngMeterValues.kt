@@ -25,6 +25,7 @@ object TestCopyRngMeterValues {
      * REGEX-TEST: Dungeon Score: 489,850/75,000
      * REGEX-TEST: Frozen Corpse XP: 20,625/60,000
      * REGEX-TEST: Experimental XP: 20,105/150,000
+     * REGEX-TEST: Nucleus XP: 202,105/320,000
      */
     private val rngScorePattern by patternGroup.pattern(
         "rngscore",
