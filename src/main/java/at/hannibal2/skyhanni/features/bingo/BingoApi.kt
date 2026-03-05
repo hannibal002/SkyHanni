@@ -153,38 +153,6 @@ object BingoApi {
         }
     }
 
-    private var bingoNpcsHidden = false
-
-    @HandleEvent(IslandGraphReloadEvent::class)
-    fun onIslandGraphReload() {
-        bingoNpcsHidden = false
-        checkBingoNpcs()
-    }
-
-    // Reset state on every island change in case IslandGraphReloadEvent does not fire for this island (private island, garden)
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
-        bingoNpcsHidden = false
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(10)) return
-        checkBingoNpcs()
-    }
-
-    private fun checkBingoNpcs() {
-        if (!IslandType.HUB.isCurrent()) return
-        val shouldHideBingoNpcs = !SkyBlockUtils.isBingoProfile
-        if (shouldHideBingoNpcs == bingoNpcsHidden) return
-
-        bingoNpcsHidden = shouldHideBingoNpcs
-        val npcs = setOf(IslandGraphs.node("Alixer", GraphNodeTag.NPC), IslandGraphs.node("Bingo", GraphNodeTag.NPC))
-        for (node in npcs) {
-            node.enabled = !shouldHideBingoNpcs
-        }
-    }
-
     @HandleEvent(IslandGraphReloadEvent::class)
     fun onIslandGraphReload() {
         bingoNpcHidden = false
@@ -203,14 +171,6 @@ object BingoApi {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(10)) return
         checkBingoNpcs()
-    }
-
-    private fun isInBingoEventWindow(): Boolean {
-        val eventStart = getStartOfMonth()
-        val now = OffsetDateTime.now(ZoneOffset.UTC).asTimeMark()
-        val windowStart = eventStart - BINGO_NPC_OFFSET
-        val windowEnd = eventStart + BINGO_EVENT_DURATION + BINGO_NPC_OFFSET
-        return now in windowStart..windowEnd
     }
 
     private fun checkBingoNpcs() {
@@ -227,5 +187,13 @@ object BingoApi {
             bingoNpcHidden = shouldHideBingoNpc
             IslandGraphs.node("Bingo", GraphNodeTag.NPC).enabled = !shouldHideBingoNpc
         }
+    }
+
+    private fun isInBingoEventWindow(): Boolean {
+        val eventStart = getStartOfMonth()
+        val now = OffsetDateTime.now(ZoneOffset.UTC).asTimeMark()
+        val windowStart = eventStart - BINGO_NPC_OFFSET
+        val windowEnd = eventStart + BINGO_EVENT_DURATION + BINGO_NPC_OFFSET
+        return now in windowStart..windowEnd
     }
 }
