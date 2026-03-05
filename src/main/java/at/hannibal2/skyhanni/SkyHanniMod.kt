@@ -73,13 +73,6 @@ object SkyHanniMod {
         configManager.firstLoad()
         if (PlatformUtils.getRepoPatternDumpLocation() == null) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
-        val runtime = Runtime.getRuntime()
-        runtime.addShutdownHook(
-            Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
-        )
-        runtime.addShutdownHook(
-            Thread { SkyHanniItemRenderCoordinator.closeAtlas() }
-        )
         try {
             if (PlatformUtils.getRepoPatternDumpLocation() == null) SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
@@ -102,6 +95,13 @@ object SkyHanniMod {
         Minecraft.getInstance().setScreen(screenToOpen)
         screenTicks = 0
         this.screenToOpen = null
+    }
+
+    @HandleEvent
+    fun onClientShutdown() {
+        configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
+
+        SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"
