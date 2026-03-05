@@ -44,5 +44,7 @@ object PlayerUtils {
     fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
     fun inAir(): Boolean = !onGround()
 
+    fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(0)
+
     fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

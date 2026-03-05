@@ -147,7 +147,7 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(1)) {
+            with(PlayerUtils.blockPosition()) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
