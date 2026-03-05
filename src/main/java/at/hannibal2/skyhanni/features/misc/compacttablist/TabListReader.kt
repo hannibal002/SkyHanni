@@ -47,7 +47,7 @@ object TabListReader {
      * REGEX-TEST: Active Effects
      */
     private val activeEffectPattern by patternGroup.pattern(
-        "effects.active",
+        "effects.active.colorless",
         "Active Effects",
     )
 
@@ -55,7 +55,7 @@ object TabListReader {
      * REGEX-TEST: You have 1 active effect. Use "/effects" to see it!
      */
     private val effectCountPattern by patternGroup.pattern(
-        "effects.count",
+        "effects.count.colorless",
         "You have (?<effectCount>[0-9]+) active effect",
     )
 
@@ -63,7 +63,7 @@ object TabListReader {
      * REGEX-TEST: Cookie Buff
      */
     private val cookiePattern by patternGroup.pattern(
-        "cookie",
+        "cookie.colorless",
         "Cookie Buff",
     )
 
@@ -71,18 +71,18 @@ object TabListReader {
      * REGEX-TEST: Dungeon Buffs
      */
     private val dungeonBuffPattern by patternGroup.pattern(
-        "dungeonbuff",
+        "dungeonbuff.colorless",
         "Dungeon Buffs",
     )
     // TODO: Regex tests
     @Suppress("RepoPatternRegexTestMissing")
     private val upgradesPattern by patternGroup.pattern(
-        "upgrades",
+        "upgrades.colorless",
         "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
-        "Active Power Ups",
+        "Active Power Ups.colorless",
     )
 
     @HandleEvent

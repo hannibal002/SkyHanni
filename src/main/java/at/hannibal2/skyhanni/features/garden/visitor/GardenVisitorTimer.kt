@@ -41,7 +41,7 @@ object GardenVisitorTimer {
      * REGEX-TEST:  Next Visitor: Queue Full!
      */
     private val timePattern by RepoPattern.pattern(
-        "garden.visitor.timer.time.new",
+        "garden.visitor.timer.time.new.colorless",
         " Next Visitor: (?<info>.*)",
     )
 
