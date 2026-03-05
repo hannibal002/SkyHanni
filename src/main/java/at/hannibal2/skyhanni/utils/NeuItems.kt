@@ -278,7 +278,12 @@ object NeuItems {
     fun loadNBTData(encoded: String): ItemStack {
         val jsonString = StringUtils.decodeBase64(encoded)
         val neuItem = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(jsonString) ?: run {
-            println("\nCould not load NEU item from encoded string:\n\n $encoded.\n")
+            ErrorManager.logErrorStateWithData(
+                "Could not parse NEU item from encoded string",
+                internalMessage = "Could not load NEU item from encoded string - GSON parsing failed",
+                "encoded" to encoded,
+                "jsonString" to jsonString
+            )
             return ItemUtils.createItemStack(Items.MAP, "unloaded")
         }
         return EnoughUpdatesManager.neuItemToStack(neuItem, useCache = false)
