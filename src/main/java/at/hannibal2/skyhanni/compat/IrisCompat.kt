@@ -37,13 +37,14 @@ object IrisCompat {
             val irisApiClass = Class.forName(IRIS_API_PATH)
             val irisInstance = irisApiClass.getMethod("getInstance").invoke(null)
             val irisInstanceClass = irisInstance?.javaClass ?: return
-            val pipelineMethod = irisInstanceClass.getMethod(
-                "assignPipeline",
-                RenderPipeline::class.java,
-                irisProgramEnum
-            ) ?: return
+            val pipelineMethod = runCatching {
+                irisInstanceClass.getMethod(
+                    "assignPipeline",
+                    RenderPipeline::class.java,
+                    irisProgramEnum
+                ) ?: return@runCatching null
+            }.getOrNull() ?: return
 
-            // Assign our custom pipelines by their program
             SkyHanniRenderPipeline.entries.forEach { shPipeline ->
                 try {
                     pipelineMethod.invoke(irisInstance, shPipeline, shPipeline.irisProgram.asJavaEnum())

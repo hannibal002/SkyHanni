@@ -279,7 +279,6 @@ object ShaderRenderUtils {
 
     }
 
-
     private fun buildRoundedStateParams(x: Int, y: Int, width: Int, height: Int, radius: Int): RoundedRenderStateParams {
         val scaleFactor = GuiScreenUtils.scaleFactor
         val halfSizeX = (width * scaleFactor) / 2f
