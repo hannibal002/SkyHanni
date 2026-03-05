@@ -23,9 +23,9 @@ object SkyHanniVertexFormats {
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
-        ROUNDED_PARAMS_0(0, 6),
+        ROUNDED_PARAMS_0(6),
         // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
-        ROUNDED_PARAMS_1(1, 7),
+        ROUNDED_PARAMS_1(7),
         ;
 
         val element by lazy { safeRegister(registrationId, index, type, usage, count) }

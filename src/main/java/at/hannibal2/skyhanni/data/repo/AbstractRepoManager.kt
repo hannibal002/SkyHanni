@@ -107,7 +107,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
     // Will be invoked by the implementation of this class
-    fun registerCommands(event: CommandRegistrationEvent) {
+    internal fun registerCommands(event: CommandRegistrationEvent) {
         event.registerBrigadier(updateCommand) {
             description = "Remove and re-download the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
