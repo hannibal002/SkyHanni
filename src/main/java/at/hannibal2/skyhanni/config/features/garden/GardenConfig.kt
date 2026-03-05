@@ -18,9 +18,11 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import org.lwjgl.glfw.GLFW
 
 class GardenConfig {
     @Expose
@@ -147,6 +149,11 @@ class GardenConfig {
     val atmosphericFilterDisplay: AtmosphericFilterDisplayConfig = AtmosphericFilterDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Garden Tracker Uptime Settings", desc = "")
+    @Accordion
+    val trackerUptimeSettings: GardenTrackerUptimeConfig = GardenTrackerUptimeConfig()
+
+    @Expose
     @ConfigOption(name = "Hoe Levels Display", desc = "")
     @Accordion
     val hoeLevelDisplay: HoeLevelsDisplayConfig = HoeLevelsDisplayConfig()
@@ -199,13 +206,12 @@ class GardenConfig {
 
     @Expose
     @ConfigOption(
-        name = "Enable Plot Borders",
-        desc = "Enable the use of F3 + G hotkey to show Garden plot borders. " +
-            "Similar to how later Minecraft version render chunk borders.",
+        name = "Plot Border Key",
+        desc = "Show Garden plot borders when pressing this key " +
+            "(similar to how F3 + G shows chunk borders).",
     )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var plotBorders: Boolean = true
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var plotBorderKey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(

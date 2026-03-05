@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -106,12 +107,13 @@ object IslandGraphs {
 
     var currentIslandGraph: Graph? = null
         private set
-    private var lastLoadedIslandType = "nothing"
+    var lastLoadedIslandType = "nothing"
     private var lastLoadedTime = SimpleTimeMark.farPast()
 
     var disabledNodesReason: String? = null
         private set
 
+    // TODO add carnival in hub
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
         val graph = currentIslandGraph ?: return
         disabledNodesReason = reason
@@ -518,7 +520,7 @@ object IslandGraphs {
     }
 
     /**
-     * Activates pathfinding to a location in the island.
+     * Activates pathfinding to a location on the current island.
      *
      * @param location The goal of the pathfinder.
      * @param label The name of the navigation goal in chat. Cannot be empty.
@@ -541,6 +543,15 @@ object IslandGraphs {
         pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
 
+    fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
+        currentIslandGraph?.getClosestNode(nodeName, nodeTag) ?: error("node not found: name:$nodeName, tag: $nodeTag")
+
+    fun nodes(nodeName: String, nodeTag: GraphNodeTag): List<GraphNode> =
+        currentIslandGraph?.getNodesWithNameAndTags(nodeName, nodeTag) ?: emptyList()
+
+    fun nodesAround(node: GraphNode, condition: (GraphNode) -> Boolean): Set<GraphNode> =
+        currentIslandGraph?.nodesAround(node, condition) ?: emptySet()
+
     private fun pathFind0(
         location: LorenzVec,
         label: String,
@@ -556,7 +567,7 @@ object IslandGraphs {
         this.onManualCancel = onManualCancel
         this.condition = condition
         val graph = currentIslandGraph ?: return
-        goal = graph.minBy { it.position.distance(currentTarget!!) }
+        goal = graph.minByActive { it.position.distance(currentTarget!!) }
         updateFeedback()
     }
 
@@ -747,5 +758,4 @@ object IslandGraphs {
             extraData = data.map { it.key to it.value }.normalizeAsArray(),
         )
     }
-
 }

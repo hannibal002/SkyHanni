@@ -132,7 +132,7 @@ object BazaarApi {
 
     fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
-    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int = -1) {
+    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int? = null) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
@@ -143,6 +143,15 @@ object BazaarApi {
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
+    }
+
+    fun searchForBazaarItemOrRecipe(internalName: NeuInternalName, amount: Int? = null) {
+        searchForBazaarItemOrRecipe(internalName.itemNameWithoutColor, amount)
+    }
+
+    fun searchForBazaarItemOrRecipe(displayName: String, amount: Int? = null) {
+        if (!SkyBlockUtils.noTradeMode) searchForBazaarItem(displayName, amount)
+        else HypixelCommands.recipe(displayName)
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)

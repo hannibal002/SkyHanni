@@ -40,6 +40,8 @@ object NonGodPotEffectDisplay {
     private val setRecently: TimeLimitedSet<NonGodPotEffect> = TimeLimitedSet(5.seconds)
     private var display = emptyList<String>()
 
+    fun isActive(effect: NonGodPotEffect): Boolean = effectDuration.any { it.key == effect && !it.value.ended }
+
     /**
      * REGEX-TEST: §7You have §e10 §7non-god effects.
      */
@@ -107,7 +109,7 @@ object NonGodPotEffectDisplay {
             val format = remaining.format(TimeUnit.HOUR)
             val color = remaining.timerColor()
 
-            val displayName = effect.tabListName
+            val displayName = effect.displayName
             newDisplay.add("$displayName $color$format")
         }
         val diff = totalEffectsCount - effectDuration.size
@@ -134,7 +136,7 @@ object NonGodPotEffectDisplay {
         effectDuration.sorted().forEach { (effect, time) ->
             if (time.remaining.inWholeSeconds != config.expireWarnTime.toLong()) return
 
-            if (effectWarning) TitleManager.sendTitle(effect.tabListName)
+            if (effectWarning) TitleManager.sendTitle(effect.displayName)
             if (effectSound) repeat(5) { playPlingSound() }
         }
     }

@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -57,8 +58,7 @@ object GardenVisitorTimer {
     private var lastTimerUpdate = SimpleTimeMark.farPast()
     private var lastVisitors: Int = -1
 
-    // TODO nea?
-    // private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    // TODO do this some day: private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
@@ -67,13 +67,13 @@ object GardenVisitorTimer {
             }
         }
 
-    @HandleEvent
-    fun onVisitorArrival(event: VisitorArrivalEvent) {
+    @HandleEvent(VisitorArrivalEvent::class)
+    fun onVisitorArrival() {
         visitorJustArrived = true
     }
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         display = null
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
@@ -82,9 +82,9 @@ object GardenVisitorTimer {
 
     // TODO split up into multiple smaller functions
     @Suppress("CyclomaticComplexMethod")
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed() {
+        var visitorsAmount = VisitorApi.visitorsInTabList(TabListDataComponent.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
@@ -212,8 +212,8 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @HandleEvent
-    fun onCropClick(event: CropClickEvent) {
+    @HandleEvent(CropClickEvent::class)
+    fun onCropClick() {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 
@@ -223,8 +223,8 @@ object GardenVisitorTimer {
         }
     }
 
-    @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    @HandleEvent(PestKillEvent::class)
+    fun onPestKill() {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 30.seconds
 

@@ -37,22 +37,27 @@ object GraphParkour {
     }
 
     private fun saveParkour() {
-        val graph = GraphEditor.compileGraph()
-
+        val graph = GraphEditorIO.compileGraph()
         val list = graphToList(graph) ?: return
 
-        val resultList = mutableListOf<String>()
-        for (location in list) {
+        val resultList = list.map { location ->
             val x = location.x.toString().replace(",", ".")
             val y = location.y.toString().replace(",", ".")
             val z = location.z.toString().replace(",", ".")
-            resultList.add("\"$x:$y:$z\"".replace(".0", ""))
+            "\"$x:$y:$z\"".replace(".0", "")
         }
-        OSUtils.copyToClipboard(resultList.joinToString((",\n")))
+
+        OSUtils.copyToClipboard(resultList.joinToString(",\n"))
         ChatUtils.chat("Saved graph as parkour to clipboard!")
     }
 
     private fun graphToList(graph: Graph): List<LorenzVec>? {
+        val start = validateStartNode(graph) ?: return null
+        validateEndNode(graph) ?: return null
+        return validatePath(graph, start)
+    }
+
+    fun validateStartNode(graph: Graph): GraphNode? {
         val starts = graph.getNodesWithName("start")
         if (starts.isEmpty()) {
             ChatUtils.userError("No start node found!")
@@ -62,6 +67,22 @@ object GraphParkour {
             ChatUtils.userError("More than one start node found!")
             return null
         }
+
+        val start = starts.first()
+        val neighbours = start.neighbours.entries
+        if (neighbours.isEmpty()) {
+            ChatUtils.userError("Start has no neighbours!")
+            return null
+        }
+        if (neighbours.size != 1) {
+            ChatUtils.userError("Start has more than one neighbours!")
+            return null
+        }
+
+        return start
+    }
+
+    fun validateEndNode(graph: Graph): GraphNode? {
         val ends = graph.getNodesWithName("end")
         if (ends.isEmpty()) {
             ChatUtils.userError("No end node found!")
@@ -71,25 +92,19 @@ object GraphParkour {
             ChatUtils.userError("More than one end node found!")
             return null
         }
+        return ends.first()
+    }
 
-        val start = starts.first()
-        val startN = start.neighbours.entries
-        if (startN.isEmpty()) {
-            ChatUtils.userError("Start has no neighbours!")
-            return null
-        }
-        if (startN.size != 1) {
-            ChatUtils.userError("Start has more than one neighbours!")
-            return null
-        }
-
+    fun validatePath(graph: Graph, start: GraphNode): List<LorenzVec>? {
+        val startNeighbours = start.neighbours.entries.first()
         val list = mutableListOf<GraphNode>()
         list.add(start)
 
-        var current = startN.first().key
+        var current = startNeighbours.key
 
         while (list.size != graph.size - 1) {
             val neighbours = current.neighbours.filter { it.key !in list }.keys
+
             if (neighbours.size > 1) {
                 ChatUtils.userError("One node has more than two neighbours!")
                 showErrorAt(current.position)
@@ -105,32 +120,31 @@ object GraphParkour {
                 showErrorAt(current.position)
                 return null
             }
+
             list.add(current)
             current = neighbours.first()
         }
+
         if (current.name != "end") {
             ChatUtils.userError("Last node does not have the name end!")
             showErrorAt(current.position)
             return null
         }
-        list.add(current)
 
+        list.add(current)
         return list.map { it.position }
     }
 
     private fun showErrorAt(vec: LorenzVec) {
-        IslandGraphs.pathFind(
-            vec, "Node error",
-            LorenzColor.RED.toColor(),
-            condition = ::isEnabled,
-        )
+        IslandGraphs.pathFind(vec, "Node error", LorenzColor.RED.toColor(), condition = ::isEnabled)
     }
 
     private fun loadParkour() {
         val locations = readListFromClipboard() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
-        GraphEditor.import(graph)
+        GraphEditorHistory.save("load parkour")
+        GraphEditor.state = GraphEditorIO.createStateFrom(graph)
         IslandGraphs.pathFind(
             locations.first(),
             "Start of parkour",
@@ -148,19 +162,15 @@ object GraphParkour {
     }
 
     private fun listToGraph(locations: List<LorenzVec>): Graph {
-        val nodes = mutableListOf<GraphNode>()
-
-        for ((index, location) in locations.withIndex()) {
+        val nodes = locations.mapIndexed { index, location ->
             val name = when (index) {
                 0 -> "start"
                 locations.size - 1 -> "end"
                 else -> null
             }
-            nodes.add(
-                GraphNode(index, location, name = name).also {
-                    it.neighbours = emptyMap()
-                },
-            )
+            GraphNode(index, location, name = name).also {
+                it.neighbours = emptyMap()
+            }
         }
 
         for (node in nodes) {
@@ -180,8 +190,7 @@ object GraphParkour {
     }
 
     private fun addNeighbour(a: GraphNode, b: GraphNode, distance: Double) {
-        val neighbours = mutableMapOf<GraphNode, Double>()
-        neighbours.putAll(a.neighbours)
+        val neighbours = a.neighbours.toMutableMap()
         neighbours[b] = distance
         a.neighbours = neighbours
     }

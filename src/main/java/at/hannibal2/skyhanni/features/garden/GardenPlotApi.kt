@@ -101,24 +101,23 @@ object GardenPlotApi {
     )
 
     /**
-     * REGEX-TEST: §9§lSPLASH! §r§6Your §r§aGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!
-     * REGEX-TEST: §9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!
+     * REGEX-TEST: SPLASH! Your Garden was cleared of all active Sprayonator effects!
      */
     private val portableWasherPattern by patternGroup.pattern(
-        "spray.cleared.portablewasher",
-        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!",
+        "spray.cleared.portablewasher-nocolor",
+        "SPLASH! Your Garden was cleared of all active Sprayonator effects!",
     )
 
     /**
-     * REGEX-TEST: Spray: §r§7None
-     * REGEX-TEST: Spray: §r§aCompost §r§7(12m)
-     * REGEX-TEST: Spray: §r§aCompost §r§7(1m 3s)
-     * REGEX-TEST: Spray: §r§aCompost §r§7(53s)
-     * REGEX-TEST: Spray: §r§aHoney Jar §r§7(53s)
+     * REGEX-TEST: Spray: None
+     * REGEX-TEST: Spray: Compost (12m)
+     * REGEX-TEST: Spray: Compost (1m 3s)
+     * REGEX-TEST: Spray: Compost (53s)
+     * REGEX-TEST: Spray: Honey Jar (53s)
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
-        "tablist.spraytime",
-        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?<time>.*)\\))?",
+        "tablist.spraytime-nocolor",
+        "Spray: (?<spray>[\\w\\s]+)(?:\\((?<time>.*)\\))?",
     )
     var plots = listOf<Plot>()
 
@@ -351,7 +350,7 @@ object GardenPlotApi {
             plot?.locked = false
         }
 
-        portableWasherPattern.matchMatcher(event.message) {
+        portableWasherPattern.matchMatcher(event.cleanMessage) {
             for (plot in plots) {
                 if (plot.currentSpray != null) {
                     plot.removeSpray()
@@ -399,7 +398,7 @@ object GardenPlotApi {
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
-        plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
+        plotSprayedTablistPattern.firstMatcher(event.lines.map { it.string.trim() }) {
             val sprayName = group("spray").trim()
             val time = groupOrNull("time")?.let { getTablistEndTime(it, plot.getData()?.sprayExpiryTime) }
             if (time == null) {

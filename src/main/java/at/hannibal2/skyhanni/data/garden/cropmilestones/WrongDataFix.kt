@@ -68,14 +68,14 @@ object WrongDataFix {
     @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
-        tabListPercentPattern.firstMatcher(event.lines) {
+        tabListPercentPattern.firstMatcher(event.lines.map { it.string }) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()
             val cropName = group("crop")
 
             checkTabDifference(cropName, tier, percentage)
         }
-        tabListMaxPattern.firstMatcher(event.lines) {
+        tabListMaxPattern.firstMatcher(event.lines.map { it.string }) {
             val tier = group("tier").toInt()
             val cropName = group("crop")
 

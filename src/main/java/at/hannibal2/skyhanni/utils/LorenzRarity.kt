@@ -2,6 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import java.util.Optional
 
 // TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
@@ -13,7 +17,6 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     LEGENDARY(LorenzColor.GOLD, 4),
     MYTHIC(LorenzColor.LIGHT_PURPLE, 5),
     DIVINE(LorenzColor.AQUA, 6),
-    SUPREME(LorenzColor.DARK_RED, 7),
     SPECIAL(LorenzColor.RED, 8),
     VERY_SPECIAL(LorenzColor.RED, 9),
     ULTIMATE(LorenzColor.DARK_RED, 10),
@@ -58,5 +61,27 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
         fun getByNameOrError(name: String): LorenzRarity = getByName(name) ?: error("LorenzRarity not found by name: '$name'")
 
         fun getByColorCode(colorCode: Char): LorenzRarity? = entries.find { it.color.chatColorCode == colorCode }
+
+        fun getByComponent(component: Component, stringMatch: String): LorenzRarity? {
+            var rarity: LorenzRarity? = null
+            TextHelper.matcher(component, stringMatch)?.visit({ style: Style?, string: String? ->
+                if (string == stringMatch) {
+                    rarity = when {
+                        (style?.color?.name == "dark_red") -> ULTIMATE
+                        (style?.color?.name == "red") -> SPECIAL // special and very special are the same name
+                        (style?.color?.name == "aqua") -> DIVINE
+                        (style?.color?.name == "light_purple") -> MYTHIC
+                        (style?.color?.name == "gold") -> LEGENDARY
+                        (style?.color?.name == "dark_purple") -> EPIC
+                        (style?.color?.name == "blue") -> RARE
+                        (style?.color?.name == "green") -> UNCOMMON
+                        (style?.color?.name == "white") -> COMMON
+                        else -> null
+                    }
+                }
+                Optional.empty<Component>()
+            }, Style.EMPTY)
+            return rarity
+        }
     }
 }

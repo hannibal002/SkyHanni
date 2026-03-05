@@ -15,6 +15,7 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.awt.Color
+import java.util.Optional
 
 @Suppress("TooManyFunctions")
 object TextHelper {
@@ -199,5 +200,69 @@ object TextHelper {
 
     fun getChromaColorStyle(): TextColor {
         return chromaStyle
+    }
+
+    fun matcher(component: Component, match: String): Component? {
+        var index = 0
+        var newComponent: Component = Component.empty()
+        var currentString = ""
+
+        component.visit({ style: Style?, string: String? ->
+            if (string.isNullOrEmpty()) return@visit Optional.empty()
+            for (c in string) {
+                if (index >= match.length) {
+                    if (!currentString.isEmpty()) {
+                        newComponent.append(Component.literal(currentString).withStyle(style))
+                    }
+                    currentString = ""
+                    return@visit Optional.of(newComponent)
+                }
+                if (c == match[index]) {
+                    currentString += c
+                    index++
+                } else {
+                    currentString = ""
+                    newComponent = Component.empty()
+                    index = 0
+                }
+            }
+            if (!currentString.isEmpty()) {
+                newComponent.append(Component.literal(currentString).withStyle(style))
+            }
+            currentString = ""
+
+            Optional.empty()
+        }, Style.EMPTY)
+        if (newComponent.string.isEmpty()) return null
+        return newComponent
+    }
+
+    fun split(component: Component, delimiter: String): List<Component>? {
+        val newComponents = mutableListOf<MutableComponent>()
+        var currentComponent = Component.empty()
+
+        component.visit({ style: Style?, string: String? ->
+            if (string.isNullOrEmpty()) return@visit Optional.empty()
+            val split = string.split(delimiter)
+            if (split.isEmpty() || split.size == 1) {
+                currentComponent.append(Component.literal(string).withStyle(style))
+            } else {
+                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                currentComponent = Component.empty()
+                for ((index, str) in split.withIndex()) {
+                    if (index == 0) continue
+                    currentComponent.append(Component.literal(str).withStyle(style))
+                    if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                    currentComponent = Component.empty()
+                }
+            }
+
+            Optional.empty<Component>()
+        }, Style.EMPTY)
+
+        if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+        if (newComponents.isEmpty()) return null
+        return newComponents
     }
 }

@@ -29,10 +29,11 @@ object DarkAuctionItemDisplay {
 
     /**
      * REGEX-TEST: [NPC] Sirius: The highest bidder was qtLuna with a bid of 25,950,000 Coins!
+     * REGEX-TEST: [NPC] Sirius: No one made any bids!
      */
     private val highestBidPattern by patternGroup.pattern(
         "highest-bid",
-        "\\[NPC] Sirius: The highest bidder was \\w+ with a bid of [\\d,]+ Coins!",
+        "\\[NPC] Sirius: (?:The highest bidder was \\w+ with a bid of [\\d,]+ Coins|No one made any bids)!",
     )
 
     private var lastItem: String? = null

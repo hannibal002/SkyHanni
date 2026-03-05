@@ -72,4 +72,6 @@ object ThunderSparksHighlight {
         event.move(3, "fishing.thunderSparkHighlight", "fishing.thunderSpark.highlight")
         event.move(3, "fishing.thunderSparkColor", "fishing.thunderSpark.color")
     }
+
+    fun getActiveSparks(): Set<ArmorStand> = sparks
 }

@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -45,8 +44,6 @@ object ItemTipHelper {
         if (gui !is ContainerScreen) return
         val inventoryName = InventoryUtils.openInventoryName()
 
-        val guiLeft = (gui as AccessorHandledScreen).guiLeft
-        val guiTop = (gui as AccessorHandledScreen).guiTop
         val fontRenderer = Minecraft.getInstance().font
 
         DrawContextUtils.pushMatrix()
@@ -61,10 +58,10 @@ object ItemTipHelper {
             val xDisplayPosition = slot.x
             val yDisplayPosition = slot.y
 
-            val x = guiLeft + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
+            val x = gui.leftPos + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
                 fontRenderer.width(stackTip)
             } else 0
-            val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
+            val y = gui.topPos + yDisplayPosition + 9 + itemTipEvent.offsetY
 
             GuiRenderUtils.drawString(stackTip, x, y, -1)
         }

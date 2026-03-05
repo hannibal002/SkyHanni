@@ -9,11 +9,21 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.VertexFormat;
+
+import java.util.Map;
 import java.util.function.Supplier;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.gui.render.GuiRenderer;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiRenderState;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -49,6 +59,49 @@ public class MixinGuiRenderer {
     @WrapOperation(method = "addElementToMesh", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;"))
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
+    }
+
+    // Here and below is to construct our own render pipeline for atlas-ed item rendering.
+    @Shadow
+    private int frameNumber;
+
+    @Shadow
+    @Final
+    private MultiBufferSource.BufferSource bufferSource;
+
+    @Unique
+    public MultiBufferSource.BufferSource getBufferSource() {
+        return bufferSource;
+    }
+
+    @Shadow
+    @Final
+    private FeatureRenderDispatcher featureRenderDispatcher;
+
+    @Shadow
+    @Final
+    GuiRenderState renderState;
+
+    @Shadow
+    @Final
+    private Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> pictureInPictureRenderers;
+
+    // Inject at the tail of preparePictureInPictureState, after Fabric's
+    // postPrepareSpecialElements has run. At this point all PIP states have
+    // been submitted, our collector has gathered them, and renderState is
+    // ready to accept new BlitRenderState submissions before sortElements runs.
+    @Inject(
+        method = "preparePictureInPictureState",
+        at = @At("TAIL")
+    )
+    private void skyhanni$prepareSkyHanniItems(CallbackInfo ci) {
+        GuiRendererHook.INSTANCE.prepareSkyHanniItems(
+            pictureInPictureRenderers,
+            renderState,
+            getBufferSource(),
+            featureRenderDispatcher,
+            frameNumber
+        );
     }
 
 }
