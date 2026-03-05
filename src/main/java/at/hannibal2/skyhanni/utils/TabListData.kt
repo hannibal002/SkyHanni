@@ -36,9 +36,7 @@ object TabListData {
 
     var fullyLoaded = false
 
-    // TODO replace with TabListUpdateEvent
-    @Deprecated("replace with TabListUpdateEvent")
-    fun getTabList() = debugCache ?: tablistCache
+    private fun getTabList() = debugCache ?: tablistCache
     fun getHeader() = header
     fun getFooter() = footer
 
@@ -95,21 +93,14 @@ object TabListData {
         ChatUtils.chat("Tab list copied into the clipboard!")
     }
 
-    private val playerOrdering = Ordering.from(PlayerComparator())
+    private val playerOrdering = Ordering.from(TabPlayerComparator())
 
     @Environment(EnvType.CLIENT)
-    internal class PlayerComparator : Comparator<PlayerInfo> {
-
-        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int {
-            val team1 = o1.team
-            val team2 = o2.team
-            return ComparisonChain.start().compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
-                .compare(
-                    if (team1 != null) team1.name else "",
-                    if (team2 != null) team2.name else "",
-                )
-                .compare(o1.profile.name, o2.profile.name).result()
-        }
+    internal class TabPlayerComparator : Comparator<PlayerInfo> {
+        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int = ComparisonChain.start()
+            .compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
+            .compare(o1.team?.name ?: "", o2.team?.name ?: "")
+            .compare(o1.profile.name, o2.profile.name).result()
     }
 
     private fun readTabList(): List<String>? {

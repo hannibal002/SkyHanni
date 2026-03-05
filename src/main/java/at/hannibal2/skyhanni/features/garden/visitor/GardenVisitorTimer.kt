@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -14,15 +13,12 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -41,12 +37,12 @@ object GardenVisitorTimer {
     private val config get() = VisitorApi.config.timer
 
     /**
-     * REGEX-TEST:  Next Visitor: §r§b11m
-     * REGEX-TEST:  Next Visitor: §r§c§lQueue Full!
+     * REGEX-TEST:  Next Visitor: 11m
+     * REGEX-TEST:  Next Visitor: Queue Full!
      */
     private val timePattern by RepoPattern.pattern(
         "garden.visitor.timer.time.new",
-        " Next Visitor: §r(?<info>.*)",
+        " Next Visitor: (?<info>.*)",
     )
 
     private var display: Renderable? = null
@@ -80,17 +76,15 @@ object GardenVisitorTimer {
         visitorJustArrived = false
     }
 
-    // TODO split up into multiple smaller functions
-    @Suppress("CyclomaticComplexMethod")
-    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed() {
-        var visitorsAmount = VisitorApi.visitorsInTabList(TabListDataComponent.getTabList()).size
+    @HandleEvent
+    fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+        var visitorsAmount = VisitorApi.visitorsInTabList(event.tabList).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
 
-        timePattern.firstMatcher(TabListData.getTabList()) {
-            val timeInfo = group("info").removeColor()
+        timePattern.firstComponentMatcher(event.tabList) {
+            val timeInfo = group("info")
             if (timeInfo == "Not Unlocked!") {
                 display = Renderable.text("§cVisitors not unlocked!")
                 return

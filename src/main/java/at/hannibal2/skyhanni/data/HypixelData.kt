@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
@@ -205,7 +206,7 @@ object HypixelData {
             "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
             "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
             "islandType" to SkyBlockUtils.currentIsland,
-            "tablist" to TabListData.getTabList(),
+            "tablistComponents" to TabListDataComponent.getTabList(),
             "scoreboard" to ScoreboardData.sidebarLinesFormatted,
         )
     }
