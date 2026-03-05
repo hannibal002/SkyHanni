@@ -181,7 +181,7 @@ object TotemOfCorruption {
         return totems.minByOrNull { it.distance }
     }
 
-    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(100.0)
+    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNearby<ArmorStand>(100.0)
         .filter { totemNamePattern.matches(it.cleanName()) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null

@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityUnclaimedEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityActiveEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -40,14 +39,14 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onEntityOpacityActive(event: EntityOpacityActiveEvent) {
+    fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
         event.setActive(HoppityEggLocator.isEnabled() && config.playerOpacity < 100)
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityOpacityEvent<Player>) {
+    fun onEntityOpacity(event: EntityTransparencyTickEvent<Player>) {
         if (canChangeOpacity(event.entity)) {
-            event.opacity = config.playerOpacity
+            event.newTransparency = config.playerOpacity
         }
     }
 

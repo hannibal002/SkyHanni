@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
+import net.minecraft.advancements.criterion.LocationPredicate.Builder.location
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -143,16 +144,30 @@ object EntityUtils {
             .firstOrNull { it.name == "textures" }?.value
     }
 
-    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
+    inline fun <reified T : Entity> getFilteredEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
+        getEntitiesNearby(radius) { it is T && predicate(it) }
+
+    inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
         getEntitiesNearby<T>(LocationUtils.playerLocation(), radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
+    @Deprecated(
+        message = "Use LorenzVec extension instead",
+        replaceWith = ReplaceWith("location.getEntitiesNearby<T>(radius, predicate)"),
+    )
     inline fun <reified T : Entity> getEntitiesNearby(
         location: LorenzVec,
         radius: Double,
         noinline predicate: (T) -> Boolean = ALWAYS,
     ): List<T> {
         return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
+    }
+
+    inline fun <reified T : Entity> LorenzVec.getEntitiesNearby(
+        radius: Double,
+        noinline predicate: (T) -> Boolean = ALWAYS,
+    ): List<T> {
+        return getEntitiesInBox<T>(this, radius) { it.distanceTo(this) < radius && predicate(it) }
     }
 
     @AllEntitiesGetter
