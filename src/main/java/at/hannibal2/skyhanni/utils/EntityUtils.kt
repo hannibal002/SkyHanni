@@ -147,19 +147,6 @@ object EntityUtils {
         LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
-    @Deprecated(
-        message = "Use LorenzVec extension instead",
-        replaceWith = ReplaceWith("location.getEntitiesNearby<T>(radius, predicate)"),
-    )
-    @Suppress("FunctionName")
-    inline fun <reified T : Entity> getEntitiesNearby_old(
-        location: LorenzVec,
-        radius: Double,
-        noinline predicate: (T) -> Boolean = ALWAYS,
-    ): List<T> {
-        return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
-    }
-
     inline fun <reified T : Entity> LorenzVec.getEntitiesNearby(
         radius: Double,
         noinline predicate: (T) -> Boolean = ALWAYS,
