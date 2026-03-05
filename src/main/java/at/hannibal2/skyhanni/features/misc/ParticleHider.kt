@@ -39,7 +39,7 @@ object ParticleHider {
         if (config.hideFireballParticles &&
             (type == ParticleTypes.SMOKE || type == ParticleTypes.LARGE_SMOKE)
         ) {
-            if (EntityUtils.getEntitiesNearby<SmallFireball>(event.location, 5.0).isNotEmpty()) event.cancel()
+            if (EntityUtils.getEntitiesNearby_old<SmallFireball>(event.location, 5.0).isNotEmpty()) event.cancel()
         }
     }
 

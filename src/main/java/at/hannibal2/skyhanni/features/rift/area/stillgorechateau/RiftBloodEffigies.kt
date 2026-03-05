@@ -148,7 +148,7 @@ object RiftBloodEffigies {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        eLoop@for (entity in EntityUtils.getEntitiesNearby<ArmorStand>(LocationUtils.playerLocation(), 15.0)) {
+        eLoop@for (entity in EntityUtils.getEntitiesNearby_old<ArmorStand>(LocationUtils.playerLocation(), 15.0)) {
             effigiesTimerPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
                 val index = getIndex(entity) ?: continue@eLoop
                 val time = TimeUtils.getDuration(group("time"))

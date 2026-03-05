@@ -138,7 +138,7 @@ object CakeCounterFeatures {
     private fun checkForSoulsStand(cakesStand: ArmorStand) {
         if (soulsFoundEntityId != null) return // in case it was found during DelayedRun time
 
-        val nearbyArmorStands = EntityUtils.getEntitiesNearby<ArmorStand>(cakesStand.blockPosition().toLorenzVec(), 1.0)
+        val nearbyArmorStands = EntityUtils.getEntitiesNearby_old<ArmorStand>(cakesStand.blockPosition().toLorenzVec(), 1.0)
         soulsStandExists = nearbyArmorStands.any { armorStand ->
             soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompatLessResets()) {
                 soulsFoundEntityId = armorStand.id

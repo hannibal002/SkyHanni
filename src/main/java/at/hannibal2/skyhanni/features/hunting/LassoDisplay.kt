@@ -47,7 +47,7 @@ object LassoDisplay {
             if (entity !is net.minecraft.world.entity.Leashable) continue
             val leashEntity = entity.leashHolder ?: continue
             if (!leashEntity.isLocalPlayer) continue
-            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStand>(entity.blockPosition().toLorenzVec().up(2), 2.0)
+            val entitiesNearby = EntityUtils.getEntitiesNearby_old<ArmorStand>(entity.blockPosition().toLorenzVec().up(2), 2.0)
             for (armorStandEntity in entitiesNearby) {
                 val name = armorStandEntity.displayName.formattedTextCompat()
                 if (name.contains("§l§m")) {

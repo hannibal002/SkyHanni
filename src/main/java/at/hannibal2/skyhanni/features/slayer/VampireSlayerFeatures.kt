@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.features.slayer.VampireSlayerFeatures.process
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
@@ -324,9 +323,9 @@ object VampireSlayerFeatures {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        for (boss in EntityUtils.getEntitiesNearby<RemotePlayer>(loc, 3.0)) {
+        for (boss in EntityUtils.getEntitiesNearby_old<RemotePlayer>(loc, 3.0)) {
             if (!boss.isHighlighted() || event.type != ParticleTypes.ENCHANT) continue
-            for (ichor in EntityUtils.getEntitiesNearby<ArmorStand>(event.location, 3.0)) {
+            for (ichor in EntityUtils.getEntitiesNearby_old<ArmorStand>(event.location, 3.0)) {
                 if (ichor.hasSkullTexture(KILLER_SPRING_TEXTURE) || ichor.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
                     standList = standList.editCopy { this[ichor] = boss }
                 }

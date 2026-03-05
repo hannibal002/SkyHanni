@@ -136,7 +136,7 @@ object GardenVisitorStatus {
      */
     private fun findEntity(nameTag: ArmorStand, visitor: VisitorApi.Visitor) {
         val nameTagVec = nameTag.getLorenzVec()
-        EntityUtils.getEntitiesNearby<LivingEntity>(nameTagVec, 5.0) { entity ->
+        EntityUtils.getEntitiesNearby_old<LivingEntity>(nameTagVec, 5.0) { entity ->
             entity !is ArmorStand && entity !is LocalPlayer &&
                 entity.distanceToIgnoreY(nameTagVec) < 0.5
         }.forEach {

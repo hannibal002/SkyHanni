@@ -84,7 +84,7 @@ object HighlightVisitorsOutsideOfGarden {
         }
 
     private fun isVisitorNearby(location: LorenzVec) =
-        EntityUtils.getEntitiesNearby<LivingEntity>(location, 2.0).any { isVisitor(it) }
+        EntityUtils.getEntitiesNearby_old<LivingEntity>(location, 2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {

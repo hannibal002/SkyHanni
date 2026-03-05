@@ -139,7 +139,7 @@ object TotemOfCorruption {
     }
 
     private fun getTimeRemaining(totem: ArmorStand): Duration? =
-        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
+        EntityUtils.getEntitiesNearby_old<ArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
                 timeRemainingPattern.matchMatcher(entity.cleanName()) {
                     val minutes = group("min")?.toIntOrNull() ?: 0
@@ -149,7 +149,7 @@ object TotemOfCorruption {
             }
 
     private fun getOwner(totem: ArmorStand): String? =
-        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
+        EntityUtils.getEntitiesNearby_old<ArmorStand>(totem.getLorenzVec(), 2.0)
             .firstNotNullOfOrNull { entity ->
                 ownerPattern.matchMatcher(entity.cleanName()) {
                     group("owner")

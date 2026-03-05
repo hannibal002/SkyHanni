@@ -59,7 +59,7 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!config.useArmorStandDetection) return
         if (entity.name.formattedTextCompatLessResets() != HAS_GIFTED_NAMETAG) return
 
-        val matchedPlayer = EntityUtils.getEntitiesNearby<Player>(entity.getLorenzVec(), 2.0)
+        val matchedPlayer = EntityUtils.getEntitiesNearby_old<Player>(entity.getLorenzVec(), 2.0)
             .singleOrNull { !it.isNpc() } ?: return
         addGiftedPlayer(matchedPlayer.name.formattedTextCompatLessResets())
     }

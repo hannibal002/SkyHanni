@@ -26,7 +26,7 @@ object MobUtils {
     fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.id + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
-        EntityUtils.getEntitiesNearby<ArmorStand>(entity.getLorenzVec(), range)
+        EntityUtils.getEntitiesNearby_old<ArmorStand>(entity.getLorenzVec(), range)
 
     fun getClosestArmorStand(entity: Entity, range: Double) =
         getArmorStandByRangeAll(entity, range).minByOrNull { it.distanceTo(entity) }

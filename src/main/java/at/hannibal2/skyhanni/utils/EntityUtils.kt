@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
-import net.minecraft.advancements.criterion.LocationPredicate.Builder.location
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -148,14 +147,15 @@ object EntityUtils {
         getEntitiesNearby(radius) { it is T && predicate(it) }
 
     inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
-        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius, predicate)
+        getEntitiesNearby_old<T>(LocationUtils.playerLocation(), radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
     @Deprecated(
         message = "Use LorenzVec extension instead",
         replaceWith = ReplaceWith("location.getEntitiesNearby<T>(radius, predicate)"),
     )
-    inline fun <reified T : Entity> getEntitiesNearby(
+    @Suppress("FunctionName")
+    inline fun <reified T : Entity> getEntitiesNearby_old(
         location: LorenzVec,
         radius: Double,
         noinline predicate: (T) -> Boolean = ALWAYS,

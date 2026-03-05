@@ -243,7 +243,7 @@ object MinionFeatures {
         val removedEntities = mutableListOf<LorenzVec>()
         for (location in minions.keys) {
             if (location.distanceToPlayer() > 30) continue
-            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStand>(location, 5.0).map { it.distanceTo(location) }
+            val entitiesNearby = EntityUtils.getEntitiesNearby_old<ArmorStand>(location, 5.0).map { it.distanceTo(location) }
             if (!entitiesNearby.any { it == 0.0 }) {
                 removedEntities.add(location)
             }

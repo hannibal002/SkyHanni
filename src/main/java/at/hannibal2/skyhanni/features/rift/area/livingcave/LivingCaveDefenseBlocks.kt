@@ -79,7 +79,7 @@ object LivingCaveDefenseBlocks {
             if (entity == null) {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
-                entity = EntityUtils.getEntitiesNearby<RemotePlayer>(compareLocation, 2.0)
+                entity = EntityUtils.getEntitiesNearby_old<RemotePlayer>(compareLocation, 2.0)
                     .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }
