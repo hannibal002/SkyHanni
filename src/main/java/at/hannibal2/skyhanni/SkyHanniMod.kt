@@ -100,7 +100,10 @@ object SkyHanniMod {
     @HandleEvent
     fun onClientShutdown() {
         configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
+    }
 
+    @HandleEvent
+    fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
