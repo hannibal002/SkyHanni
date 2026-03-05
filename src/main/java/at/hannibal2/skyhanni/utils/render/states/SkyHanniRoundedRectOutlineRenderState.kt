@@ -3,12 +3,9 @@ package at.hannibal2.skyhanni.utils.render.states
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
 import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats
 import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats.writeParams
-import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.gui.navigation.ScreenRectangle
-import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.gui.render.state.GuiElementRenderState
 
 class SkyHanniRoundedRectOutlineRenderState(
     x: Int,
