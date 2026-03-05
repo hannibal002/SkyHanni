@@ -14,7 +14,9 @@ internal typealias SHVFE = SkyHanniVertexFormats.SkyHanniVertexFormatElement
 object SkyHanniVertexFormats {
 
     internal enum class SkyHanniVertexFormatElement(
-        val shId: Int,
+        // The ID we use to register the format element with Minecraft.
+        // see safeRegister() for details on how this is used and determined at runtime.
+        private val registrationId: Int,
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         private val usage: VFEUsage = VFEUsage.GENERIC,
@@ -26,7 +28,7 @@ object SkyHanniVertexFormats {
         ROUNDED_PARAMS_1(1, 7),
         ;
 
-        val element by lazy { safeRegister(shId, index, type, usage, count) }
+        val element by lazy { safeRegister(registrationId, index, type, usage, count) }
     }
 
     /**
@@ -46,10 +48,12 @@ object SkyHanniVertexFormats {
         usage: VFEUsage = VFEUsage.GENERIC,
         count: Int = 4,
     ): VertexFormatElement {
+        // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
+        //  but, technically possible, and something we should account for eventually.
         val id = (desiredId until VertexFormatElement.MAX_COUNT).first { VertexFormatElement.byId(it) == null }
-        if (id != desiredId) ErrorManager.logErrorWithData(
-            IllegalStateException("VertexFormatElement ID $desiredId was already taken, using $id instead"),
-            "SkyHanni vertex format element ID conflict — desired ID $desiredId was already registered",
+        if (id != desiredId) ErrorManager.logErrorStateWithData(
+            "VertexFormatElement ID $desiredId was already taken, using $id instead",
+            "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
         return VertexFormatElement.register(id, index, type, usage, count)
     }
