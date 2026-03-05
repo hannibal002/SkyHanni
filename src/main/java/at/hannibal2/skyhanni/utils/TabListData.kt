@@ -61,10 +61,8 @@ object TabListData {
     private fun readTabList(): List<Component>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
         val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
-        val result = tabListGuarded { safeTabList ->
-            players.map {
-                safeTabList.getNameForDisplay(it)
-            }
+        val result = tabListGuarded {
+            players.map(it::getNameForDisplay)
         }
         return if (result.size < 80) result.dropLast(1)
         else result.subList(0, 80)
