@@ -92,7 +92,6 @@ object VanquisherWaypointShare {
     private fun foundVanquisher(entityId: Int) {
         lastShareTime = SimpleTimeMark.farPast()
         myVanquisherId = entityId
-
         TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
         ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled, false )
 
