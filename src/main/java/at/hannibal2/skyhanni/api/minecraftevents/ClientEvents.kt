@@ -3,11 +3,13 @@ package at.hannibal2.skyhanni.api.minecraftevents
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -53,6 +55,13 @@ object ClientEvents {
         ClientPlayConnectionEvents.DISCONNECT.register(
             ClientPlayConnectionEvents.Disconnect { _, _ ->
                 ClientDisconnectEvent.post()
+            },
+        )
+
+        // Connect event
+        ClientPlayConnectionEvents.JOIN.register(
+            ClientPlayConnectionEvents.Join { _, _, _ ->
+                ClientConnectEvent.post()
             },
         )
 
@@ -129,7 +138,7 @@ object ClientEvents {
                     TextHelper.createGradientText(
                         ColorUtils.getRandomColor(),
                         ColorUtils.getRandomColor(),
-                        message.string.removeColor()
+                        message.string.removeColor(),
                     )
                 } else {
                     message
@@ -139,7 +148,7 @@ object ClientEvents {
                     TextHelper.createGradientText(
                         ColorUtils.getRandomColor(),
                         ColorUtils.getRandomColor(),
-                        result.string.removeColor()
+                        result.string.removeColor(),
                     )
                 } else {
                     result
