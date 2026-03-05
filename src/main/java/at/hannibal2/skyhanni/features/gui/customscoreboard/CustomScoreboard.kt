@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -62,16 +62,15 @@ object CustomScoreboard {
 
     private var dirty = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return
 
-        val render =
-            if (SkyBlockUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache != null) cache
-            else display
-
-        render ?: return
+        val render = cache?.let {
+            if (!TabListDataComponent.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch) it
+            else null
+        } ?: display ?: return
 
         // We want to update the background every time, so we can have a smooth transition when using chroma as the color
         val finalRenderable = RenderBackground.addBackground(render)
@@ -113,7 +112,7 @@ object CustomScoreboard {
             nextScoreboardUpdate = 250.milliseconds.fromNow()
             dirty = false
             display = createLines().removeEmptyLinesFromEdges().createRenderable()
-            if (TabListData.fullyLoaded) {
+            if (TabListDataComponent.fullyLoaded) {
                 cache = display
             }
         }

@@ -12,13 +12,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.TabListDataComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object TabListRenderer {
@@ -73,20 +75,15 @@ object TabListRenderer {
 
         var totalHeight = maxLines * LINE_HEIGHT
 
-        var header = listOf<String>()
-
-        if (!config.hideAdverts) {
-            header = TabListData.getHeader().split("\n").toMutableList()
-            header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            totalHeight += header.size * LINE_HEIGHT + TAB_PADDING
-        }
-
-        var footer = listOf<String>()
-
-        if (!config.hideAdverts) {
-            footer = TabListData.getFooter().split("\n").toMutableList()
-            footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            totalHeight += footer.size * LINE_HEIGHT + TAB_PADDING
+        val (header, footer) = listOf(
+            TabListDataComponent.header,
+            TabListDataComponent.footer,
+        ).map { component ->
+            val componentHeader: Component = component ?: Component.empty()
+            val componentLines = TextHelper.split(componentHeader, "\n") ?: listOf(componentHeader)
+            val filteredLines = componentLines.filter { line -> line.string.contains(TabListReader.hypixelAdvertisingString) }
+            totalHeight += filteredLines.size * LINE_HEIGHT + TAB_PADDING
+            filteredLines.toMutableList()
         }
 
         val minecraft = Minecraft.getInstance()
@@ -94,15 +91,13 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        if (!config.hideTabBackground) {
-            GuiRenderUtils.drawRect(
-                x - COLUMN_SPACING,
-                y - TAB_PADDING,
-                screenWidth + totalWidth / 2 + COLUMN_SPACING,
-                10 + totalHeight + TAB_PADDING,
-                -0x80000000,
-            )
-        }
+        if (!config.hideTabBackground) GuiRenderUtils.drawRect(
+            x - COLUMN_SPACING,
+            y - TAB_PADDING,
+            screenWidth + totalWidth / 2 + COLUMN_SPACING,
+            10 + totalHeight + TAB_PADDING,
+            -0x80000000,
+        )
 
         var headerY = y
         if (header.isNotEmpty()) {

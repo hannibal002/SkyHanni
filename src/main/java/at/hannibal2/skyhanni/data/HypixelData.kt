@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -176,7 +175,7 @@ object HypixelData {
         if (!SkyBlockUtils.inSkyBlock) return
         if (serverId != null) return
         if (SkyBlockUtils.lastWorldSwitch.passedSince() < 1.seconds) return
-        if (!TabListData.fullyLoaded) return
+        if (!TabListDataComponent.fullyLoaded) return
 
         TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
@@ -206,7 +205,6 @@ object HypixelData {
             "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
             "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
             "islandType" to SkyBlockUtils.currentIsland,
-            "tablistComponents" to TabListDataComponent.getTabList(),
             "scoreboard" to ScoreboardData.sidebarLinesFormatted,
         )
     }
@@ -542,12 +540,12 @@ object HypixelData {
         val foundIsland: String
         if (event.isClear()) {
 
-            TabListData.fullyLoaded = false
+            TabListDataComponent.fullyLoaded = false
             newIsland = IslandType.NONE
             foundIsland = ""
 
         } else {
-            TabListData.fullyLoaded = true
+            TabListDataComponent.fullyLoaded = true
             // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
             val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
             foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
@@ -566,7 +564,7 @@ object HypixelData {
             } else {
                 loggerIslandChange.log(newIsland.name)
             }
-            if (TabListData.fullyLoaded) {
+            if (TabListDataComponent.fullyLoaded) {
                 TabWidget.reSendEvents()
             }
         }

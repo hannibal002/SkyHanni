@@ -445,14 +445,14 @@ enum class TabWidget(
         }
 
         private val FORCE_UPDATE_DELAY = 2.seconds
+        private var lastTabComponents: List<Component> = emptyList()
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onSecondPassed(event: SecondPassedEvent) {
             if (sentSinceWorldChange) return
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
-            @Suppress("DEPRECATION")
-            update(TabListDataComponent.getTabList())
+            update(lastTabComponents)
             ChatUtils.debug("Forcefully Updated Widgets")
         }
 
@@ -486,7 +486,8 @@ enum class TabWidget(
         }
 
         private fun update(newTablist: List<Component>) {
-            val tabList = filterTabList(newTablist)
+            lastTabComponents = filterTabList(newTablist)
+            val tabList = lastTabComponents
 
             separatorIndexes.clear()
 

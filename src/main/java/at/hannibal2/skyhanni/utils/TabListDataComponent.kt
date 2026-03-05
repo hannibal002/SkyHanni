@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -24,65 +23,40 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TabListDataComponent {
+    private val playerOrdering = Ordering.from(TabPlayerComparator())
+
+    @Environment(EnvType.CLIENT)
+    internal class TabPlayerComparator : Comparator<PlayerInfo> {
+        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int = ComparisonChain.start()
+            .compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
+            .compare(o1.team?.name ?: "", o2.team?.name ?: "")
+            .compare(o1.profile.name, o2.profile.name).result()
+    }
+
     private var tablistCache = emptyList<Component>()
-    //private var debugCache: List<String>? = null
+    private var dirty = false
 
-    private var header: Component? = null
-    private var footer: Component? = null
-
+    var header: Component? = null
+        private set
+    var footer: Component? = null
+        private set
     var fullyLoaded = false
-
-    // TODO replace with TabListUpdateEvent
-    @Deprecated("replace with TabListUpdateEvent")
-    fun getTabList() = /*debugCache ?: */ tablistCache
-
-    @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Tab List Debug Cache")
-        /*debugCache?.let {
-            event.addData {
-                add("debug active!")
-                add("lines: (${it.size})")
-                for (line in it) {
-                    add(" '$line'")
-                }
-            }
-        } ?: */event.addIrrelevant("not active.")
-    }
-
-    private fun toggleDebug() {
-        /*if (debugCache != null) {
-            ChatUtils.chat("Disabled tab list debug.")
-            debugCache = null
-            return
-        }
-        SkyHanniMod.launchCoroutine("tab list toggle debug") {
-            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
-            debugCache = clipboard.lines()
-            ChatUtils.chat("Enabled tab list debug with your clipboard.")
-        }*/
-    }
+        internal set
 
     private fun copyCommand() {
-        val resultList = mutableListOf<String>()
-        for (line in getTabList()) {
-            val tabListLine = line
-            if (tabListLine.string != "") resultList.add("'$tabListLine'")
-        }
-
+        @Suppress("DEPRECATION")
+        val resultList = tablistCache.map { if (it.string == "") " " else it.string }
         val tabHeader = header?.string.orEmpty()
         val tabFooter = footer?.string.orEmpty()
 
-        val widgets = TabWidget.entries.filter { it.isActive }
-            .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
-        val string =
-            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
-
-        OSUtils.copyToClipboard(string)
-        ChatUtils.chat("Tab list copied into the clipboard!")
+        val widgets = TabWidget.entries.filter { it.isActive }.joinToString("\n") {
+            "\n${it.name} : \n${it.lines.joinToString("\n")}"
+        }
+        val joinedResults = resultList.joinToString("\n")
+        val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+        OSUtils.copyToClipboard(outputString)
+        ChatUtils.chat("Tab list components copied into the clipboard!")
     }
-
-    private val playerOrdering = Ordering.from(TabListData.TabPlayerComparator())
 
     private fun readTabList(): List<Component>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
@@ -98,13 +72,9 @@ object TabListDataComponent {
         else result.subList(0, 80)
     }
 
-    var dirty = false
-
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        if (event.packet is ClientboundPlayerInfoUpdatePacket) {
-            dirty = true
-        }
+        if (event.packet is ClientboundPlayerInfoUpdatePacket) dirty = true
     }
 
     @HandleEvent
@@ -116,37 +86,24 @@ object TabListDataComponent {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateComponentEvent(tablistCache).post()
-            if (!SkyBlockUtils.onHypixel) {
-                workaroundDelayedTabListUpdateAgain()
+            if (!SkyBlockUtils.onHypixel) DelayedRun.runDelayed(2.seconds) {
+                if (SkyBlockUtils.onHypixel) {
+                    println("workaroundDelayedTabListUpdateAgain")
+                    TabListUpdateComponentEvent(tablistCache).post()
+                }
             }
         }
 
         val tabListOverlay = Minecraft.getInstance().gui.tabList
         header = tabListOverlay.header
-
-        val tabFooter = tabListOverlay.footer
-        if (tabFooter != footer && tabFooter != null && tabFooter.string != "") {
-            TablistFooterUpdateComponentEvent(tabFooter).post()
-        }
-        footer = tabFooter
-    }
-
-    private fun workaroundDelayedTabListUpdateAgain() {
-        DelayedRun.runDelayed(2.seconds) {
-            if (SkyBlockUtils.onHypixel) {
-                println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateComponentEvent(tablistCache).post()
-            }
+        footer = tabListOverlay.footer?.let {
+            if (it == footer || it.string == "") footer
+            else it.also { TablistFooterUpdateComponentEvent(it).post() }
         }
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shtesttablistcomponent") {
-            description = "Set your clipboard as a fake tab list."
-            category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { toggleDebug() }
-        }
         event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
