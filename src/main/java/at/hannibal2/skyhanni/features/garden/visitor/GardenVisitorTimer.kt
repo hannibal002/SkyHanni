@@ -118,6 +118,8 @@ object GardenVisitorTimer {
         context.processUpdates()
     }
 
+    // Todo split up into smaller functions
+    @Suppress("CyclomaticComplexMethod")
     private fun TabUpdateContext.processUpdates() {
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
