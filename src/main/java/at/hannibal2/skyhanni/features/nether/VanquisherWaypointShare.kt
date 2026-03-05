@@ -82,7 +82,7 @@ object VanquisherWaypointShare {
 
     val waypoints: Map<String, SharedVanquisher> get() = sharedWaypoints
 
-    class SharedVanquisher(
+    data class SharedVanquisher(
         val fromPlayer: String,
         val playerName: String,
         val location: LorenzVec,
@@ -94,7 +94,7 @@ object VanquisherWaypointShare {
         myVanquisherId = entityId
 
         TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
-        ChatUtils.chat("You Spawned a Vanquisher")
+        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled, false )
 
         val entity = vanquisherNearby[entityId] ?: EntityUtils.getEntityByID(entityId)
         if (entity != null) {
