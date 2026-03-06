@@ -113,11 +113,9 @@ object IslandGraphs {
     var disabledNodesReason: String? = null
         private set
 
-    // TODO add carnival in hub
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
-        val graph = currentIslandGraph ?: return
         disabledNodesReason = reason
-        for (node in graph.filter { it.position.distance(center) < radius }) {
+        for (node in getNonNullableGraph().filter { it.position.distance(center) < radius }) {
             node.enabled = false
         }
     }
@@ -350,7 +348,7 @@ object IslandGraphs {
             }
         }
 
-        val graph = currentIslandGraph ?: return
+        val graph = getNonNullableGraph()
 
         // Update cache every second for normal movement
         if (lastCacheUpdate.passedSince() > 1.seconds) {
@@ -543,14 +541,16 @@ object IslandGraphs {
         pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
 
+    private fun getNonNullableGraph(): Graph = currentIslandGraph ?: error("current island graph is not loaded")
+
     fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
-        currentIslandGraph?.getClosestNode(nodeName, nodeTag) ?: error("node not found: name:$nodeName, tag: $nodeTag")
+        getNonNullableGraph().getClosestNode(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
 
     fun nodes(nodeName: String, nodeTag: GraphNodeTag): List<GraphNode> =
-        currentIslandGraph?.getNodesWithNameAndTags(nodeName, nodeTag) ?: emptyList()
+        getNonNullableGraph().getNodesWithNameAndTags(nodeName, nodeTag)
 
     fun nodesAround(node: GraphNode, condition: (GraphNode) -> Boolean): Set<GraphNode> =
-        currentIslandGraph?.nodesAround(node, condition) ?: emptySet()
+        getNonNullableGraph().nodesAround(node, condition)
 
     private fun pathFind0(
         location: LorenzVec,
@@ -566,8 +566,7 @@ object IslandGraphs {
         this.onFound = onFound
         this.onManualCancel = onManualCancel
         this.condition = condition
-        val graph = currentIslandGraph ?: return
-        goal = graph.minByActive { it.position.distance(currentTarget!!) }
+        goal = getNonNullableGraph().minByActive { it.position.distance(currentTarget!!) }
         updateFeedback()
     }
 
@@ -666,9 +665,7 @@ object IslandGraphs {
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
 
     fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
-        val graph = currentIslandGraph ?: return null
-
-        val found = graph.getNearestNode(location, condition)
+        val found = getNonNullableGraph().getNearestNode(location, condition)
         return found.takeIf { it.position.distance(location) < radius }
     }
 

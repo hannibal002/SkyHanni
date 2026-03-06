@@ -630,6 +630,7 @@ object ComposterOverlay {
         }
     }
 
+    // TODO add neu repo reload support
     private fun updateOrganicMatterFactors() {
         try {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
@@ -641,34 +642,31 @@ object ComposterOverlay {
         }
     }
 
+    // todo repo
     private val blockedItems = listOf(
         "POTION_AFFINITY_TALISMAN",
         "CROPIE_TALISMAN",
         "SPEED_TALISMAN",
         "SIMPLE_CARROT_CANDY",
-    )
+    ).map { it.toInternalName() }
 
-    private fun isBlockedArmor(internalName: String): Boolean {
-        return internalName.endsWith("_BOOTS") ||
-            internalName.endsWith("_HELMET") ||
-            internalName.endsWith("_CHESTPLATE") ||
-            internalName.endsWith("_LEGGINGS")
-    }
+    private val HUGE_MUSHROOM_1 = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
+    private val HUGE_MUSHROOM_2 = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
 
     private fun updateOrganicMatterFactors(baseValues: Map<NeuInternalName, Double>): Map<NeuInternalName, Double> {
         val map = mutableMapOf<NeuInternalName, Double>()
-        for ((internalName, _) in NeuItems.allNeuRepoItems()) {
-            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
+        for (internalName in NeuItems.allNeuRepoInternalNames()) {
+            if (blockedItems.contains(internalName) || internalName.isArmor()) continue
 
-            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName.toInternalName())
-            if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
+            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
+            if (internalName == HUGE_MUSHROOM_1 || internalName == HUGE_MUSHROOM_2) {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
             baseValues[newId]?.let {
                 val totalOrganicMatter = it * amount
                 if (totalOrganicMatter <= config.minimumOrganicMatter.get()) continue
-                map[internalName.toInternalName()] = totalOrganicMatter
+                map[internalName] = totalOrganicMatter
             }
         }
         return map

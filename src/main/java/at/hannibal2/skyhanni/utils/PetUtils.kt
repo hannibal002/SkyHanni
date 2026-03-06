@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -59,7 +58,7 @@ object PetUtils {
     }
 
     private fun getCiFactionVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
-        val playerFaction = CrimsonIsleReputationHelper.factionType ?: FactionType.BARBARIAN
+        val playerFaction = CrimsonIsleReputationApi.factionType ?: FactionType.BARBARIAN
         val variantFauxInternalName = "${skinInternalName.asString()}_${playerFaction.name}"
         return animatedPetSkins[variantFauxInternalName]
     }
@@ -174,7 +173,7 @@ object PetUtils {
 
     fun findPetSkinOrNull(petInternalName: NeuInternalName, skinColorTag: String): NeuItemJson? =
         petSkins[petInternalName.getProperName()]?.singleOrNull {
-            it.displayName.startsWith(skinColorTag)
+            it.displayName?.startsWith(skinColorTag) == true
         }
 
     fun getMaxLevel(petInternalName: NeuInternalName): Int =
@@ -285,14 +284,13 @@ object PetUtils {
 
         val rawPetInternalNames = mutableSetOf<NeuInternalName>()
         val rawPetSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
-        NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
-            val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
-            petSkinNamePattern.matchMatcher(rawInternalName) {
+        NeuItems.allNeuRepoItems().forEach { (internalName, itemData) ->
+            petSkinNamePattern.matchMatcher(internalName.asString()) {
                 val properPetName = group("pet") ?: return@matchMatcher
-                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(petItemData)
+                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(itemData)
             }
-            neuPetLorePattern.firstMatcher(petItemData.lore) {
-                rawPetInternalNames.add(rawInternalName.toInternalName())
+            neuPetLorePattern.firstMatcher(itemData.lore) {
+                rawPetInternalNames.add(internalName)
             }
         }
         petInternalNames = rawPetInternalNames

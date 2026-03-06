@@ -26,6 +26,9 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
 
-    override fun reportExtraStatusInfo() = EnoughUpdatesManager.reportItemStatus()
+    override fun reportExtraStatusInfo() = with(EnoughUpdatesManager) {
+        reportItemStatus()
+        reportRecipeStatus()
+    }
     override suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = EnoughUpdatesManager.reloadItemsFromRepo(progress)
 }

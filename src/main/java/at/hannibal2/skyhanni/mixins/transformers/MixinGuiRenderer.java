@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -86,20 +87,32 @@ public class MixinGuiRenderer {
     @Final
     private Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> pictureInPictureRenderers;
 
-    // Inject at the tail of preparePictureInPictureState, after Fabric's
-    // postPrepareSpecialElements has run. At this point all PIP states have
-    // been submitted, our collector has gathered them, and renderState is
-    // ready to accept new BlitRenderState submissions before sortElements runs.
+    @Inject(
+        method = "preparePictureInPicture",
+        at = @At("HEAD")
+    )
+    private void skyhanni$preRenderAtlas(CallbackInfo ci) {
+        GuiRendererHook.INSTANCE.preRenderAtlas(
+            pictureInPictureRenderers,
+            getBufferSource(),
+            featureRenderDispatcher,
+            frameNumber
+        );
+    }
+
     @Inject(
         method = "preparePictureInPictureState",
         at = @At("TAIL")
     )
-    private void skyhanni$prepareSkyHanniItems(CallbackInfo ci) {
-        GuiRendererHook.INSTANCE.prepareSkyHanniItems(
-            pictureInPictureRenderers,
+    private void skyhanni$prepareSkyHanniItems(
+        PictureInPictureRenderState state,
+        int guiScale,
+        CallbackInfo ci
+    ) {
+        if (!(state instanceof SkyHanniGuiItemRenderState skyHanniState)) return;
+        GuiRendererHook.INSTANCE.submitBlitForState(
+            skyHanniState,
             renderState,
-            getBufferSource(),
-            featureRenderDispatcher,
             frameNumber
         );
     }
