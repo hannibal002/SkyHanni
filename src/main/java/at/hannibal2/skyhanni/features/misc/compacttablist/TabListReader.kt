@@ -239,6 +239,7 @@ object TabListReader {
                 val previousComponent = lines.getOrNull(index - 1)
                 matchFooterTabComponent(lineComponent, previousComponent, godPotTimer, effectCount)
             }
+            if (lines.last().string.isEmpty()) removeLastComponent()
         }.takeIf { it.components.isNotEmpty() }
     }
 

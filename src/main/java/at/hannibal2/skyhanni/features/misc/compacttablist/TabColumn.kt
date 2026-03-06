@@ -11,6 +11,10 @@ class TabColumn(val titleComponent: Component) {
         components.add(component)
     }
 
+    fun removeLastComponent() {
+        if (components.isNotEmpty()) components.removeAt(components.size - 1)
+    }
+
     fun addSection(section: TabSection) {
         sections.add(section)
     }
