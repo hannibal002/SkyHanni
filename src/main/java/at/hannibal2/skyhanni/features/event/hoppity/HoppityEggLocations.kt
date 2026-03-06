@@ -77,7 +77,7 @@ object HoppityEggLocations {
     }
 
     @HandleEvent
-    fun onProfileViewerDataLoadedEvent(event: ProfileViewerDataLoadedEvent) {
+    fun onProfileViewerDataLoaded(event: ProfileViewerDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.waypoints.loadFromNeuPv) return
 
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return
