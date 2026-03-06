@@ -130,11 +130,10 @@ object TabListReader {
         val fullTabComponents = AdvancedPlayerList.newSorting(components)
 
         for (entry in fullTabComponents.indices step 20) {
-            val title = fullTabComponents[entry].string
-            var column = getColumnFromName(columns, title)
-
+            val titleComponent = fullTabComponents[entry]
+            var column = getColumnFromComponent(columns, titleComponent)
             if (column == null) {
-                column = TabColumn(title)
+                column = TabColumn(titleComponent)
                 columns.add(column)
             }
 
@@ -220,7 +219,8 @@ object TabListReader {
             effectCountPattern.matchMatcher(it.string) { group("effectCount") }
         }
 
-        return TabColumn("§2§lOther").apply {
+        val titleColumn = Component.literal("§2§lOther")
+        return TabColumn(titleColumn).apply {
             for ((index, lineComponent) in lines.withIndex()) {
                 val previousComponent = lines.getOrNull(index - 1)
                 matchFooterTabComponent(lineComponent, previousComponent, godPotTimer, effectCount)
@@ -228,9 +228,9 @@ object TabListReader {
         }.takeIf { it.components.isNotEmpty() }
     }
 
-    private fun getColumnFromName(columns: List<TabColumn>, name: String): TabColumn? {
+    private fun getColumnFromComponent(columns: List<TabColumn>, component: Component): TabColumn? {
         for (tabColumn in columns) {
-            if (name == tabColumn.columnTitle) {
+            if (component == tabColumn.titleComponent) {
                 return tabColumn
             }
         }
@@ -257,7 +257,7 @@ object TabListReader {
 
     private fun combineColumnsToRender(columns: MutableList<TabColumn>, firstColumn: RenderColumn) {
         var currentColumn = firstColumn
-        var lastTitle: String? = null
+        var lastTitleComponent: Component? = null
 
         fun newColumnOrSpacer(required: Boolean) {
             if (required || currentColumn.size() >= TabListRenderer.MAX_LINES) {
@@ -275,15 +275,15 @@ object TabListReader {
         }
 
         for (section in columns.flatMap { it.sections }) {
-            val needsTitle = lastTitle != section.columnValue.columnTitle
+            val needsTitle = lastTitleComponent != section.columnValue.titleComponent
             val sectionSize = section.size() + if (needsTitle) 1 else 0
             val isLarge = sectionSize >= TabListRenderer.MAX_LINES / 2
 
             newColumnOrSpacer(required = isLarge && currentColumn.size() >= TabListRenderer.MAX_LINES)
 
             if (needsTitle) {
-                lastTitle = section.columnValue.columnTitle
-                currentColumn.addLine(AdvancedPlayerList.createTabLine(Component.literal(lastTitle), TabStringType.TITLE))
+                lastTitleComponent = section.columnValue.titleComponent
+                currentColumn.addLine(AdvancedPlayerList.createTabLine(lastTitleComponent, TabStringType.TITLE))
             }
 
             for (line in section.components) addLine(line)

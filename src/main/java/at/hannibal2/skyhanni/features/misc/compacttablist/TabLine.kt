@@ -6,17 +6,15 @@ import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
 
-class TabLine(val component: Component, val type: TabStringType, val customName: String = component.string) {
+class TabLine(val component: Component, val type: TabStringType, val customName: String = "") {
 
     fun getWidth(): Int {
         val mc = Minecraft.getInstance()
-        var width = mc.font.width(customName)
-        if (type === TabStringType.PLAYER) {
-            width += 8 + 2 // Player head
-        }
-        if (type === TabStringType.TEXT) {
-            width += 4
-        }
+        var width = if (customName.isEmpty()) mc.font.width(component)
+        else mc.font.width(customName)
+
+        if (type === TabStringType.PLAYER) width += 8 + 2
+        if (type === TabStringType.TEXT) width += 4
         return width
     }
 
@@ -28,11 +26,9 @@ class TabLine(val component: Component, val type: TabStringType, val customName:
 
     private var entity: Player? = null
 
-    fun getEntity(pLayerInfo: PlayerInfo): Player? {
-        entity?.let {
-            return it
-        }
-        val entity = MinecraftCompat.localWorld.getPlayerByUUID(pLayerInfo.profile.id)
+    fun getEntity(playerInfo: PlayerInfo): Player? {
+        entity?.let { return it }
+        val entity = MinecraftCompat.localWorld.getPlayerByUUID(playerInfo.profile.id)
         this.entity = entity
         return entity
     }

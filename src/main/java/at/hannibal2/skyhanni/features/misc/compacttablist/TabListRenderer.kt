@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.PlayerFaceRenderer
@@ -170,23 +169,14 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.component.formattedTextCompat() else tabLine.customName
-                if (text.contains("§l")) text = "§r$text"
-                if (tabLine.type == TabStringType.TITLE) {
-                    GuiRenderUtils.drawString(
-                        text,
-                        middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
-                        middleY.toFloat(),
-                        -1,
-                    )
+                val drawX = middleX + if (tabLine.type == TabStringType.TITLE) column.getMaxWidth() / 2f - tabLine.getWidth() / 2f else 0f
+                val drawY = middleY.toFloat()
+                if (AdvancedPlayerList.ignoreCustomTabList() || tabLine.customName.isEmpty()) {
+                    GuiRenderUtils.drawString(tabLine.component, drawX, drawY, -1)
                 } else {
-                    GuiRenderUtils.drawString(
-                        text,
-                        middleX.toFloat(),
-                        middleY.toFloat(),
-                        -1,
-                    )
+                    GuiRenderUtils.drawString(tabLine.customName, drawX, drawY, -1)
                 }
+
                 middleY += LINE_HEIGHT
                 middleX = savedX
             }

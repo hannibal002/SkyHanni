@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import net.minecraft.network.chat.Component
 
-class TabColumn(val columnTitle: String) {
+class TabColumn(val titleComponent: Component) {
 
     val components = mutableListOf<Component>()
     val sections = mutableListOf<TabSection>()
