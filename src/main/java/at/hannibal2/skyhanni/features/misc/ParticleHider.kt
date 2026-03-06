@@ -29,8 +29,8 @@ object ParticleHider {
         with(event) {
             val hideFarCancel = (config.hideFarParticles && distanceToPlayer > 40 && !inM7Boss())
             val hideCloseRedstoneCancel = (config.hideCloseRedstoneParticles && type == ParticleTypes.DUST && distanceToPlayer < 2)
-            val hideFireballCancel = config.hideFireballParticles && type in smokeTypes
-                && event.location.getEntitiesNearby<SmallFireball>(5.0).isNotEmpty()
+            val hideFireballCancel = config.hideFireballParticles && type in smokeTypes &&
+                event.location.getEntitiesNearby<SmallFireball>(5.0).isNotEmpty()
 
             if (hideFarCancel || hideCloseRedstoneCancel || hideFireballCancel) event.cancel()
         }
