@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.contains
 import at.hannibal2.skyhanni.utils.StringUtils.startsWith
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 
@@ -131,8 +132,8 @@ object TabListReader {
 
         for (entry in fullTabComponents.indices step 20) {
             val titleComponent = fullTabComponents[entry]
-            val trimmedTitle = Component.literal(titleComponent.string.trim()).withStyle(titleComponent.style)
-            var column = getColumnFromComponent(columns, titleComponent)
+            val trimmedTitle = Component.literal(titleComponent.formattedTextCompat().trim())
+            var column = getColumnFromComponent(columns, trimmedTitle)
             if (column == null) {
                 column = TabColumn(trimmedTitle)
                 columns.add(column)
