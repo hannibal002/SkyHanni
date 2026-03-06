@@ -112,10 +112,11 @@ object ChatFilter {
 
     // Kill Combo
     /**
+     * REGEX-TEST: §6§l+175 Kill Combo
      * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b✯ Magic Find
      */
     private val killComboPatterns = listOf(
-        "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
+        "§.§l\\+(.*) Kill Combo(.*)".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern(),
     )
     private val killComboMessages = listOf(
