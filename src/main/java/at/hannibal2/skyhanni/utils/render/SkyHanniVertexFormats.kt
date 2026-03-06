@@ -13,21 +13,26 @@ internal typealias SHVFE = SkyHanniVertexFormats.SkyHanniVertexFormatElement
 
 object SkyHanniVertexFormats {
 
+    // 1.21.10, Minecraft registers 0-5, on 1.21.11 they register 0-6, so load the last registered ID dynamically.
+    val lastRegisteredId by lazy {
+        (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
+    }
+
     internal enum class SkyHanniVertexFormatElement(
-        // The ID we use to register the format element with Minecraft.
-        // see safeRegister() for details on how this is used and determined at runtime.
-        private val registrationId: Int,
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         private val usage: VFEUsage = VFEUsage.GENERIC,
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
-        ROUNDED_PARAMS_0(6),
+        ROUNDED_PARAMS_0,
         // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
-        ROUNDED_PARAMS_1(7),
+        ROUNDED_PARAMS_1,
         ;
 
+        // The ID we use to register the format element with Minecraft.
+        // see safeRegister() for details on how this is used and determined at runtime.
+        private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
         val element by lazy { safeRegister(registrationId, index, type, usage, count) }
     }
 
