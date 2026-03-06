@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.contains
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.startsWith
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -90,12 +89,11 @@ object TabListReader {
     )
 
     /**
-     * REGEX-TEST: §eWardrobe Slots IV §f5 Days
-     * REGEX-FAIL: §6Hot Chocolate Mixin I §f3d
+     * REGEX-TEST: Wardrobe Slots IV 5 Days
      */
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
-        "(?<firstPart>§e(?:§.)*[A-Za-z ]+)(?<secondPart> §f(?:§.)*[\\w ]+)"
+        "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups.colorless",
@@ -209,12 +207,17 @@ object TabListReader {
             return@apply addComponent(Component.literal("§7 None"))
         }
 
-        // Match against formattedTextCompat() so captured groups include § color codes
-        upgradesPattern.matchMatcher(component.formattedTextCompat().removeResets()) {
-            var firstPart = group("firstPart")
-            if (!firstPart.contains("§l")) firstPart = " $firstPart"
-            addComponent(Component.literal(firstPart))
-            addComponent(Component.literal(group("secondPart")))
+        upgradesPattern.matchMatcher(component.string) {
+            if (!component.formattedTextCompat().startsWith("§e")) return@matchMatcher
+
+            val firstComponent = TextHelper.matcher(component, group("firstPart")) ?: return@apply
+            val secondComponent = TextHelper.matcher(component, group("secondPart")) ?: return@apply
+            val displayFirst = if (!firstComponent.string.startsWith(" ") && !firstComponent.style.isBold) {
+                TextHelper.join(" ", firstComponent)
+            } else firstComponent
+
+            addComponent(displayFirst)
+            addComponent(secondComponent)
             return@apply
         }
 
