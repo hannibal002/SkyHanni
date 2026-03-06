@@ -59,7 +59,7 @@ object TabListReader {
      */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count.colorless",
-        "You have (?<effectCount>[0-9]+) active effect",
+        "You have (?<effectCount>[0-9]+) (?:active|non-god) effects?.*",
     )
 
     /**
@@ -86,6 +86,10 @@ object TabListReader {
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups.colorless",
         "Active Power Ups",
+    )
+    private val effectsUseCommandPattern by patternGroup.pattern(
+        "effects.usecommand.colorless",
+        "Use \"/effects\".*",
     )
 
     @HandleEvent
@@ -159,15 +163,16 @@ object TabListReader {
         // These lines were consumed into the active effects header — skip them
         if (godPotTimer != null && godPotPattern.matches(component)) return@apply
         if (effectCountPattern.matches(component)) return@apply
+        if (effectsUseCommandPattern.matches(component)) return@apply
 
         activeEffectPattern.matchMatcher(component) {
             when {
                 godPotTimer != null -> {
-                    addComponent(Component.literal("§aActive Effects:"))
+                    addComponent(Component.literal("§a§lActive Effects:"))
                     addComponent(Component.literal(" §cGod Potion§r: $godPotTimer"))
                 }
-                effectCount != null -> addComponent(Component.literal("§aActive Effects: §e$effectCount"))
-                else -> addComponent(Component.literal("§aActive Effects: §e0"))
+                effectCount != null -> addComponent(Component.literal("§a§lActive Effects: §e$effectCount"))
+                else -> addComponent(Component.literal("§a§lActive Effects: §e0"))
             }
             return@apply
         }
@@ -197,13 +202,15 @@ object TabListReader {
         // Match against formattedTextCompat() so captured groups include § color codes
         upgradesPattern.matchMatcher(component.formattedTextCompat()) {
             var firstPart = group("firstPart")
-            if (!component.style.isBold) firstPart = " $firstPart"
+            if (!firstPart.contains("§l")) firstPart = " $firstPart"
             addComponent(Component.literal(firstPart))
             addComponent(Component.literal(group("secondPart")))
             return@apply
         }
 
-        addComponent(component)
+        val formatted = component.formattedTextCompat()
+        if (!formatted.contains("§l")) addComponent(Component.literal(" ").append(component))
+        else addComponent(component)
     }
 
     @Suppress("CyclomaticComplexMethod")

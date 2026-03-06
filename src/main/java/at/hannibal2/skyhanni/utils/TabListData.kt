@@ -54,7 +54,10 @@ object TabListData {
             if (it.string == "") " " else line
         }
         val widgets = TabWidget.entries.filter { it.isActive }.joinToString("\n") {
-            "\n${it.name} : \n${it.lines.joinToString("\n")}"
+            val widgetFormat = it.lines.joinToString { line ->
+                if (asComponents) line.toString() else line.formattedTextCompat()
+            }
+            "\n${it.name} : \n$widgetFormat"
         }
 
         val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
