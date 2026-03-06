@@ -4,16 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi.factionType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -34,11 +32,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
 object CrimsonIsleReputationHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
-
-    var factionType get() = ProfileStorageData.profileSpecific?.crimsonIsleFaction
-        set(it) {
-            ProfileStorageData.profileSpecific?.crimsonIsleFaction = it
-        }
 
     private var display = emptyList<Renderable>()
     private var dirty = true
@@ -85,21 +78,6 @@ object CrimsonIsleReputationHelper {
     @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         dirty = true
-    }
-
-    @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.REPUTATION)) return
-
-        TabWidget.REPUTATION.matchMatcherFirstLine {
-            factionType = FactionType.fromName(group("faction"))
-        }
-    }
-
-    @HandleEvent
-    fun onProfileViewerLoad(event: ProfileViewerDataLoadedEvent) {
-        val faction = event.getCurrentPlayerData()?.netherData?.currentFaction.orEmpty()
-        factionType = FactionType.fromAPIName(faction)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)

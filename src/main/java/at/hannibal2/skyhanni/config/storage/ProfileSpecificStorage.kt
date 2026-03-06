@@ -94,9 +94,6 @@ class ProfileSpecificStorage(
     @Expose
     var crimsonIsleFaction: FactionType? = null
 
-    @Expose
-    var crimsonIsleReputation: MutableMap<FactionType, Int> = mutableMapOf()
-
     // features
     // - combat
     @Expose
@@ -879,6 +876,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+
+        @Expose
+        var reputation: MutableMap<FactionType, Int> = mutableMapOf()
     }
 
     // - rift

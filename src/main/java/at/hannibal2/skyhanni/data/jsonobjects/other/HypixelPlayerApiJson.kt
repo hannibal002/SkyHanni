@@ -15,7 +15,7 @@ data class HypixelApiProfile(
 data class HypixelApiPlayer(
     @Expose @SerializedName("trophy_fish") val trophyFish: HypixelApiTrophyFish,
     @Expose val events: HypixelApiEvents,
-    @Expose @SerializedName("nether_island_player_data") val netherData: HypixelApiFactionInfo
+    @Expose @SerializedName("nether_island_player_data") val netherData: HypixelApiFactionInfo,
 )
 
 data class HypixelApiEvents(
