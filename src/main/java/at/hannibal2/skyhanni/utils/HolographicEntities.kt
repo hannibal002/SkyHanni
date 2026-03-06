@@ -1,9 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.mixins.hooks.activeHolographicEntities
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
@@ -11,13 +18,51 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.zombie.Zombie
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
 /**
  * Utility for creating fake entities without an associated world to avoid contaminating the world state.
  */
+@SkyHanniModule
 object HolographicEntities {
+
+    private var debugHologram: HolographicEntity<Zombie>? = null
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shdebughologram") {
+            description = "Spawns a holographic zombie 5 blocks in front of you for testing"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { spawnDebugHologram() }
+        }
+    }
+
+    private fun spawnDebugHologram() {
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val yaw = Math.toRadians(player.yRot.toDouble())
+        val pos = LorenzVec(
+            player.x - sin(yaw) * 5,
+            player.y,
+            player.z + cos(yaw) * 5,
+        )
+        val base = entityHoloBases[Zombie::class] ?: run {
+            ErrorManager.skyHanniError("HolographicEntityDebug: Zombie not found in entityHoloBases (size=${HolographicEntities.entityHoloBases.size})")
+        }
+        @Suppress("UNCHECKED_CAST")
+        debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot)
+        ChatUtils.debug("HolographicEntityDebug: spawned debug hologram at $pos")
+    }
+
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        val hologram = debugHologram ?: return
+        ChatUtils.debug("HolographicEntityDebug: rendering hologram at ${hologram.position}")
+        event.renderHolographicEntity(hologram, holographicness = 1f)
+    }
 
     /**
      * An instance of a holographic entity. Maintains a minimal controlled state,
@@ -102,6 +147,8 @@ object HolographicEntities {
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
         val interpolatedYaw = holographicEntity.interpolatedYaw(partialTicks)
 
+        ChatUtils.debug("holo render: entity=${holographicEntity.entity::class.simpleName} pos=$mobPosition")
+
         // Populate entity fields that extractRenderState will read.
         // These are safe to set because HolographicBase entities are never ticked.
         entity.yRot = interpolatedYaw
@@ -119,16 +166,21 @@ object HolographicEntities {
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
 
-        EntityTransparencyManager.withHolographicTransparency(entity, holographicness) {
-            client.entityRenderDispatcher.submit(
-                entityRenderState,
-                cameraRenderState,
-                mobPosition.x,
-                mobPosition.y,
-                mobPosition.z,
-                matrices,
-                submitNodeCollector,
-            )
+        activeHolographicEntities.add(entity)
+        try {
+            EntityTransparencyManager.withHolographicTransparency(entity, holographicness) {
+                client.entityRenderDispatcher.submit(
+                    entityRenderState,
+                    cameraRenderState,
+                    mobPosition.x,
+                    mobPosition.y,
+                    mobPosition.z,
+                    matrices,
+                    submitNodeCollector,
+                )
+            }
+        } finally {
+            activeHolographicEntities.remove(entity)
         }
     }
 }
