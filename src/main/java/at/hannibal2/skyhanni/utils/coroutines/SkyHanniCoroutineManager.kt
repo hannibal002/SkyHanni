@@ -31,35 +31,44 @@ interface CoroutineManager {
 }
 
 // TODO when no more usages of these old functions remain, get rid of the compat class.
-@Deprecated(
-    "Use CoroutineManager with CoroutineConfig options instead",
-    ReplaceWith("CoroutineManager with CoroutineConfig options instead")
-)
+@Deprecated("Use CoroutineManager with CoroutineConfig options instead")
 interface CompatCoroutineManager : CoroutineManager {
     @Deprecated(
         "Use launchCoroutine with CoroutineConfig options instead",
-        ReplaceWith("CoroutineConfig(name, timeout).launchCoroutine(block)")
+        ReplaceWith(
+            "CoroutineConfig(name, timeout).launchCoroutine(block)",
+            "at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig"
+        )
     )
     fun launchCoroutine(name: String, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit): Job =
         CoroutineConfig(name, timeout).launchCoroutine(block)
 
     @Deprecated(
         "Use launchCoroutine with CoroutineConfig options instead",
-        ReplaceWith("CoroutineConfig(name, timeout).launchCoroutine(block)")
+        ReplaceWith(
+            "CoroutineConfig(name, timeout).launchCoroutine(block)",
+            "at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig"
+        )
     )
     fun launchIOCoroutine(name: String, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit): Job =
         CoroutineConfig(name, timeout).withIOContext().launchCoroutine(block)
 
     @Deprecated(
         "Use launchUnScopedCoroutine with CoroutineConfig options instead",
-        ReplaceWith("CoroutineConfig(name, timeout).launchUnScopedCoroutine(block)")
+        ReplaceWith(
+            "CoroutineConfig(name, timeout).launchUnScopedCoroutine(block)",
+            "at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig"
+        )
     )
     fun launchNoScopeCoroutine(name: String, timeout: Duration = 10.seconds, block: suspend () -> Unit): Job =
         CoroutineConfig(name, timeout).launchUnScopedCoroutine(block)
 
     @Deprecated(
         "Use launchCoroutine with CoroutineConfig options instead",
-        ReplaceWith("CoroutineConfig(name, timeout).withMutex(mutex).launchCoroutine(block)")
+        ReplaceWith(
+            "CoroutineConfig(name, timeout).launchCoroutine(block)",
+            "at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig"
+        )
     )
     fun launchCoroutineWithMutex(
         name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit
@@ -67,7 +76,10 @@ interface CompatCoroutineManager : CoroutineManager {
 
     @Deprecated(
         "Use launchCoroutine with CoroutineConfig options instead",
-        ReplaceWith("CoroutineConfig(name, timeout).withIOContext().withMutex(mutex).launchCoroutine(block)")
+        ReplaceWith(
+            "CoroutineConfig(name, timeout).launchCoroutine(block)",
+            "at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig"
+        )
     )
     fun launchIOCoroutineWithMutex(
         name: String, mutex: Mutex, timeout: Duration = 10.seconds, block: suspend CoroutineScope.() -> Unit
@@ -75,6 +87,7 @@ interface CompatCoroutineManager : CoroutineManager {
 }
 
 @OptIn(InternalCoroutinesApi::class)
+@Suppress("DEPRECATION")
 class SkyHanniCoroutineManager(
     private val coroutineScope: CoroutineScope,
 ) : CompatCoroutineManager {
@@ -107,13 +120,22 @@ class SkyHanniCoroutineManager(
      * @param block The suspend function to run within the coroutine, which will be wrapped with error handling,
      *  and the provided config options.
      * @return Deferred<T?> representing the result of the asynchronous computation, or null if an exception occurred.
-     *  The Deferred will complete exceptionally if a TimeoutCancellationException occurs.
+     *  The Deferred will complete exceptionally if a [TimeoutCancellationException] occurs.
      */
     override fun <T> CoroutineConfig.asyncCoroutine(block: suspend CoroutineScope.() -> T): Deferred<T?> =
         coroutineScope.async(CoroutineName("SkyHanni $name")) {
             runWithErrorHandling(block)
         }
 
+    /**
+     * Executes the given [block] asynchronously with the specified configuration options from the receiver [CoroutineConfig],
+     *  but without a CoroutineScope, and returns a Deferred result. This is useful for running code that doesn't need to be aware of
+     *  the CoroutineScope, or needs its own.
+     * @receiver CoroutineConfig containing options for how to run the coroutine, such as timeout, IO context, and mutex.
+     * @param block The suspend function to run within the coroutine, which will be wrapped with error handling, and the provided config options.
+     * @return Deferred<T?> representing the result of the asynchronous computation, or null if an exception occurred.
+     *  The Deferred will complete exceptionally if a [TimeoutCancellationException] occurs.
+     */
     override fun <T> CoroutineConfig.asyncUnScopedCoroutine(block: suspend () -> T): Deferred<T?> =
         asyncCoroutine { block() }
 
