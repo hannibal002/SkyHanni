@@ -77,7 +77,7 @@ object DarkMonolithFeatures {
         "MONOLITH! You.*and were rewarded ?(?:(?<coins>[\\d,]+) Coins ?)?(?:!|and )?(?:(?<powder>[\\d,]+) ᠅ Mithril Powder!)?",
     )
 
-    private data class DarkMonolithData(
+    internal data class DarkMonolithData(
         var knownEggs: Set<LorenzVec> = setOf(),
         var foundEggVec: LorenzVec? = null,
         var lastFoundEggVec: LorenzVec? = null,
@@ -85,7 +85,7 @@ object DarkMonolithFeatures {
         var nextBlockCheck: SimpleTimeMark = SimpleTimeMark.farPast(),
     ) : Resettable
 
-    private val data = DarkMonolithData()
+    internal val data = DarkMonolithData()
 
     init {
         RenderDisplayHelper(
