@@ -199,7 +199,7 @@ object AdvancedPlayerList {
             if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
         } else ""
 
-        var suffix = if (config.hideEmblem) {
+        val suffix = if (config.hideEmblem) {
             if (data.ironman) Component.literal("§7♲") else data.bingoLevel?.let {
                 Component.literal(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
             } ?: Component.empty()
