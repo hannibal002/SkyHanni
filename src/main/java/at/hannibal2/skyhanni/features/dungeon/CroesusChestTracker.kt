@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
-import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState.Companion.getOpenState
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.inDungeon
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -112,7 +111,7 @@ object CroesusChestTracker {
 
         if (!inCroesusInventory || croesusEmpty) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
-            val color = (getOpenState(slot.item.getLore()) ?: return@forEach).color ?: return@forEach
+            val color = (OpenedState.getOpenState(slot.item.getLore()) ?: return@forEach).color ?: return@forEach
             slot.highlight(color)
         }
     }
@@ -162,7 +161,7 @@ object CroesusChestTracker {
                     )
             if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) run.floor =
                 ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
-            run.openState = getOpenState(lore)
+            run.openState = OpenedState.getOpenState(lore)
         }
     }
 
