@@ -19,7 +19,9 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern.Companion.group
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -66,7 +68,7 @@ object AdvancedPlayerList {
         var i = 0
 
         for (component in original) {
-            val line = component.string
+            val line = component.formattedTextCompat()
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break

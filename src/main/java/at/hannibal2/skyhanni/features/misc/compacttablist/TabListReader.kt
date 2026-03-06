@@ -131,9 +131,10 @@ object TabListReader {
 
         for (entry in fullTabComponents.indices step 20) {
             val titleComponent = fullTabComponents[entry]
+            val trimmedTitle = Component.literal(titleComponent.string.trim()).withStyle(titleComponent.style)
             var column = getColumnFromComponent(columns, titleComponent)
             if (column == null) {
-                column = TabColumn(titleComponent)
+                column = TabColumn(trimmedTitle)
                 columns.add(column)
             }
 
