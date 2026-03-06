@@ -49,9 +49,9 @@ object HolographicEntities {
             player.y,
             player.z + cos(yaw) * 5,
         )
-        val base = entityHoloBases[Zombie::class] ?: run {
-            ErrorManager.skyHanniError("HolographicEntityDebug: Zombie not found in entityHoloBases (size=${HolographicEntities.entityHoloBases.size})")
-        }
+        val base = entityHoloBases[Zombie::class] ?: ErrorManager.skyHanniError(
+            "HolographicEntityDebug: Zombie not found in entityHoloBases (size=${entityHoloBases.size})"
+        )
         @Suppress("UNCHECKED_CAST")
         debugHologram = (base as HolographicBase<Zombie>).instance(pos, player.yRot)
         ChatUtils.debug("HolographicEntityDebug: spawned debug hologram at $pos")
