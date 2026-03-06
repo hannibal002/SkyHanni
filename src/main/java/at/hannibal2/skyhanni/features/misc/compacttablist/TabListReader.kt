@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.contains
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.startsWith
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -218,8 +219,12 @@ object TabListReader {
         }
 
         val formatted = component.formattedTextCompat()
-        if (!formatted.contains("§l")) addComponent(Component.literal(" ").append(component))
-        else addComponent(component)
+        when {
+            // Separators are truly emptied
+            formatted.removeColor().trim().isEmpty() -> addComponent(Component.empty())
+            !formatted.contains("§l") -> addComponent(Component.literal(" ").append(component))
+            else -> addComponent(component)
+        }
     }
 
     @Suppress("CyclomaticComplexMethod")
@@ -239,7 +244,9 @@ object TabListReader {
                 val previousComponent = lines.getOrNull(index - 1)
                 matchFooterTabComponent(lineComponent, previousComponent, godPotTimer, effectCount)
             }
-            if (lines.last().string.isEmpty()) removeLastComponent()
+            while (components.isNotEmpty() && components.last().string.trim().isEmpty()) {
+                removeLastComponent()
+            }
         }.takeIf { it.components.isNotEmpty() }
     }
 
