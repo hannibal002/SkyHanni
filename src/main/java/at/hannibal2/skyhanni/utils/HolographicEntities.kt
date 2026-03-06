@@ -91,6 +91,7 @@ object HolographicEntities {
         var lastPosition: LorenzVec = position
         var lastYaw: Float = yaw
         val createdAt = SimpleTimeMark.now()
+        internal var cachedRenderState: EntityRenderState? = null
 
         val monotonicProgress get() = createdAt.passedSince().inWholeTicks
 
@@ -173,7 +174,9 @@ object HolographicEntities {
         @Suppress("UNCHECKED_CAST")
         val renderer = client.entityRenderDispatcher?.getRenderer(entity) as? EntityRenderer<T, EntityRenderState> ?: return
         val gameRenderer = client.gameRenderer ?: return
-        val entityRenderState: EntityRenderState = renderer.createRenderState() ?: return
+        val entityRenderState = holographicEntity.cachedRenderState
+            ?: renderer.createRenderState()?.also { holographicEntity.cachedRenderState = it }
+            ?: return
         val cameraRenderState = gameRenderer.levelRenderState.cameraRenderState ?: return
         val cameraPos = cameraRenderState.pos
         val submitNodeCollector = gameRenderer.featureRenderDispatcher.submitNodeStorage ?: return
