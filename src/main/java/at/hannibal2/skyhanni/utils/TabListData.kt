@@ -44,7 +44,7 @@ object TabListData {
     var fullyLoaded = false
         internal set
 
-    private fun copyCommand(asComponents: Boolean = true) {
+    private suspend fun copyCommand(asComponents: Boolean = true) {
         fun Component?.localCopyFormat() = if (asComponents) this?.toString().orEmpty() else this?.formattedTextCompat().orEmpty()
 
         val tabHeader = header.localCopyFormat()
@@ -58,7 +58,8 @@ object TabListData {
         }
 
         val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
-        OSUtils.copyToClipboard(outputString)
+        val copied = OSUtils.copyToClipboardAsync(outputString) ?: false
+        if (!copied) return ChatUtils.chat("Failed to copy tab list data to clipboard!")
 
         val copyFormat = if (asComponents) "components" else "formatted text"
         ChatUtils.chat("Tab list $copyFormat copied into the clipboard!")
@@ -110,12 +111,12 @@ object TabListData {
         event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { copyCommand() }
+            coroutineSimpleCallback { copyCommand() }
         }
         event.registerBrigadier("shcopytablist") {
             description = "Copies the tab list body to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { copyCommand(false) }
+            coroutineSimpleCallback { copyCommand(asComponents = false) }
         }
     }
 }
