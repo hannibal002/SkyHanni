@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.PlayerFaceRenderer
@@ -53,7 +54,7 @@ object TabListRenderer {
         if (playerListKeyActive && !isPressed) {
             isPressed = true
             isTabToggled = !isTabToggled
-        } else if (playerListKeyActive) {
+        } else if (!playerListKeyActive) {
             isPressed = false
         }
 
@@ -169,7 +170,7 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.component.string else tabLine.customName
+                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.component.formattedTextCompat() else tabLine.customName
                 if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     GuiRenderUtils.drawString(

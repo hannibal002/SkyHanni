@@ -78,14 +78,16 @@ object TabListData {
         if (!dirty) return
         dirty = false
 
-        tablistCache = readTabList()?.takeIf { it != tablistCache }?.let { newTabList ->
+        val newTablistCache = readTabList()?.let { newTabList ->
             if (!SkyBlockUtils.onHypixel) DelayedRun.runDelayedReturning(2.seconds) {
                 if (SkyBlockUtils.onHypixel) {
                     println("workaroundDelayedTabListUpdateAgain")
                     newTabList.also { TabListUpdateEvent(it).post() }
                 } else tablistCache
             }.second() else newTabList
-        } ?: tablistCache
+        }?.takeIf { it != tablistCache } ?: return
+        tablistCache = newTablistCache
+        TabListUpdateEvent(newTablistCache).post()
 
         val tabListOverlay = Minecraft.getInstance().gui.tabList
         header = tabListOverlay.header

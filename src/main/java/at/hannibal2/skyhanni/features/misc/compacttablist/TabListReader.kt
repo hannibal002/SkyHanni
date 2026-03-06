@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.contains
+import at.hannibal2.skyhanni.utils.StringUtils.startsWith
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -105,6 +107,7 @@ object TabListReader {
     }
 
     private fun rebuildRenderColumns() {
+        if (lastTabComponents == null) return
         val columns = rebuildColumns()
         parseSections(columns)
 
@@ -142,7 +145,70 @@ object TabListReader {
         return columns
     }
 
-    // Todo split up into smaller functions
+    private fun TabColumn.matchFooterTabComponent(
+        component: Component,
+        previousComponent: Component?,
+        godPotTimer: String?,
+        effectCount: String?,
+    ): TabColumn = this.apply {
+        val lastIsCookieBuff = previousComponent?.string == "Cookie Buff"
+        val lastIsDungeons = previousComponent?.string == "Dungeon Buffs"
+        val lastIsWinterPowerUps = previousComponent?.string == "Active Power Ups"
+
+        if (component.contains(hypixelAdvertisingString)) return@apply
+        fun addStyledComponent(text: String) = addComponent(
+            Component.literal(text).withStyle(component.style)
+        )
+
+        // These lines were consumed into the active effects header — skip them
+        if (godPotTimer != null && godPotPattern.matches(component)) return@apply
+        if (effectCountPattern.matches(component)) return@apply
+
+        activeEffectPattern.matchMatcher(component) {
+            when {
+                godPotTimer != null -> {
+                    // copy formatting from the original line, but add the timer at the end ?
+                    addStyledComponent("Active Effects:")
+                    addStyledComponent(" God Potion: $godPotTimer")
+                }
+                effectCount != null -> addStyledComponent("Active Effects: $effectCount")
+                else -> addStyledComponent("Active Effects: 0")
+            }
+            return@apply
+        }
+
+        cookiePattern.matchMatcher(component) {
+            return@apply addStyledComponent("Cookie Buff")
+        }
+        if (component.startsWith("Not active!") && lastIsCookieBuff) {
+            return@apply addStyledComponent(" Not Active")
+        }
+
+        dungeonBuffPattern.matchMatcher(component) {
+            return@apply addStyledComponent("Dungeon Buffs")
+        }
+        if (component.startsWith("No Buffs active.") && lastIsDungeons) {
+            return@apply addStyledComponent(" None Found")
+        }
+
+        winterPowerUpsPattern.matchMatcher(component) {
+            return@apply addStyledComponent("Active Power Ups")
+        }
+        if (component.startsWith("No Power Ups active.") && lastIsWinterPowerUps) {
+            return@apply addStyledComponent(" None Found")
+        }
+
+        upgradesPattern.matchMatcher(component) {
+            var firstPart = group("firstPart")
+            if (!component.style.isBold) firstPart = " $firstPart"
+            addStyledComponent(firstPart)
+            addStyledComponent(group("secondPart"))
+            return@apply
+        }
+
+        addComponent(component)
+    }
+
     @Suppress("CyclomaticComplexMethod")
     private fun parseFooterAsColumn(component: Component): TabColumn? {
         val lines = TextHelper.split(component, "\n") ?: listOf(component)
@@ -155,66 +221,9 @@ object TabListReader {
         }
 
         return TabColumn("§2§lOther").apply {
-            for (lineComponent in lines) {
-                val lineStr = lineComponent.string
-                if (lineStr.contains(hypixelAdvertisingString)) continue
-
-                // These lines were consumed into the active effects header — skip them
-                if (godPotTimer != null && godPotPattern.matches(lineStr)) continue
-                if (effectCountPattern.matches(lineStr)) continue
-
-                when {
-                    activeEffectPattern.matches(lineStr) -> {
-                        when {
-                            godPotTimer != null -> {
-                                addComponent(Component.literal("Active Effects:"))
-                                addComponent(Component.literal(" God Potion: $godPotTimer"))
-                            }
-                            effectCount != null -> addComponent(Component.literal("Active Effects: $effectCount"))
-                            else -> addComponent(Component.literal("Active Effects: 0"))
-                        }
-                    }
-
-                    cookiePattern.matches(lineStr) -> {
-                        // Fallthrough to not active check
-                        addComponent(Component.literal("Cookie Buff"))
-                    }
-                    lineStr.startsWith("Not active!") &&
-                        components.lastOrNull()?.string == "Cookie Buff" -> {
-                        addComponent(Component.literal(" Not Active"))
-                    }
-
-                    dungeonBuffPattern.matches(lineStr) -> {
-                        addComponent(Component.literal("Dungeon Buffs"))
-                    }
-                    lineStr.startsWith("No Buffs active.") &&
-                        components.lastOrNull()?.string == "Dungeon Buffs" -> {
-                        addComponent(Component.literal(" None Found"))
-                    }
-
-                    winterPowerUpsPattern.matches(lineStr) -> {
-                        addComponent(Component.literal("Active Power Ups"))
-                    }
-                    lineStr.startsWith("No Power Ups active.") &&
-                        components.lastOrNull()?.string == "Active Power Ups" -> {
-                        addComponent(Component.literal(" None"))
-                    }
-
-                    upgradesPattern.matches(lineStr) -> {
-                        upgradesPattern.matchMatcher(lineStr) {
-                            var firstPart = group("firstPart")
-                            if (!lineComponent.style.isBold) firstPart = " $firstPart"
-                            addComponent(Component.literal(firstPart))
-                            addComponent(Component.literal(group("secondPart")))
-                        }
-                    }
-
-                    else -> {
-                        var newLine = lineStr
-                        if (!lineComponent.style.isBold) newLine = " $newLine"
-                        addComponent(Component.literal(newLine))
-                    }
-                }
+            for ((index, lineComponent) in lines.withIndex()) {
+                val previousComponent = lines.getOrNull(index - 1)
+                matchFooterTabComponent(lineComponent, previousComponent, godPotTimer, effectCount)
             }
         }.takeIf { it.components.isNotEmpty() }
     }
