@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.network.chat.Component
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.world.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -81,7 +80,7 @@ object VisitorRewardWarning {
             }
             return
         }
-        if (isAcceptSlot && stack.getLore().contains("§eClick to give!")) {
+        if (isAcceptSlot && stack.getLoreComponent().any { it.string.contains("Click to give!") }) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.ACCEPTED, "accepted")
             return
         }

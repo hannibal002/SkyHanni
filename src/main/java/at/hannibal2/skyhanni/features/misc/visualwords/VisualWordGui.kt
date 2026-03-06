@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -70,7 +71,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
 
         @JvmStatic
         fun onCommand() {
-            if (!SkyBlockUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
                 ChatUtils.userError("You need to join Hypixel to use this feature!")
             } else {
                 if (sbeConfigPath.exists()) drawImport = true

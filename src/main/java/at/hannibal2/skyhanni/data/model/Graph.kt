@@ -78,6 +78,7 @@ value class Graph(
 
     constructor() : this(emptyList())
 
+    // todo clean this up
     companion object {
         val gson: Gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
             { out, value -> serializeGraph(out, value) },
