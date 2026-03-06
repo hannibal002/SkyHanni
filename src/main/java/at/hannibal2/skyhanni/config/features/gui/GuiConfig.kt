@@ -82,6 +82,16 @@ class GuiConfig {
     val xpBar: XPBarConfig = XPBarConfig()
 
     @Expose
+    @ConfigOption(name = "Action Bar", desc = "Settings for adjusting the action bar.")
+    @Accordion
+    val actionBar: ActionBarConfig = ActionBarConfig()
+
+    @Expose
+    @ConfigOption(name = "Held Item Tooltip", desc = "Settings for adjusting the held item tooltip.")
+    @Accordion
+    val heldItemTooltip: HeldItemTooltipConfig = HeldItemTooltipConfig()
+
+    @Expose
     @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.")
     @Accordion
     var mayorOverlay = MayorOverlayConfig()

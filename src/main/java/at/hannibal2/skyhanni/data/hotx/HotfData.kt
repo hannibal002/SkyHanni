@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data.hotx
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotfApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.foraging.HotfConfig.LotteryDisplayVisibility
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
@@ -268,6 +270,16 @@ enum class HotfData(
         override val rotatingPerkEntry = LOTTERY
         override var currentRotPerk = HotfApi.lottery
         override val applicableIslandType = IslandTypeTags.FORAGING
+        private val config get() = SkyHanniMod.feature.foraging.hotf
+
+        override val position: Position get() = config.lotteryPosition
+
+        override val shouldShowDisplay
+            get() = when (config.lotteryDisplay) {
+                LotteryDisplayVisibility.OFF -> false
+                LotteryDisplayVisibility.FORAGING_ONLY -> inApplicableIsland
+                LotteryDisplayVisibility.EVERYWHERE -> true
+            }
 
         override var tokens: Int
             get() = ProfileStorageData.profileSpecific?.foraging?.tokens ?: 0

@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SlayerProfitTrackerConfig {
     @Expose
@@ -31,7 +32,7 @@ class SlayerProfitTrackerConfig {
         desc = "Show all Enderman Slayer Features while in the Dragon's Nest.",
     )
     @ConfigEditorBoolean
-    var voidgloomInNest: Boolean = false
+    val voidgloomInNest: Property<Boolean> = Property.of(false)
 
     // TODO move out of slayer profit tracker and into the generic slayer config.
     @Expose
@@ -40,7 +41,7 @@ class SlayerProfitTrackerConfig {
         desc = "Show all Enderman Slayer Features while outside of Void Sepulture and Zealot Bruiser Hideout.",
     )
     @ConfigEditorBoolean
-    var voidgloomInNoArea: Boolean = true
+    val voidgloomInNoArea: Property<Boolean> = Property.of(true)
 
     // TODO move out of slayer profit tracker and into the generic slayer config.
     @Expose
@@ -49,7 +50,7 @@ class SlayerProfitTrackerConfig {
         desc = "Show all Revenant Slayer Features while inside the Graveyard.",
     )
     @ConfigEditorBoolean
-    var revenantInGraveyard: Boolean = true
+    val revenantInGraveyard: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -59,3 +60,4 @@ class SlayerProfitTrackerConfig {
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }
+

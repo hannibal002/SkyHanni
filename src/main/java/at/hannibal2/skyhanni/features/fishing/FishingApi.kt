@@ -75,6 +75,8 @@ object FishingApi {
         "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
+    const val babySlugName = "Baby Magma Slug"
+
     val lavaBlocks = buildList { addLavas() }
     private val waterBlocks = buildList { addWaters() }
 

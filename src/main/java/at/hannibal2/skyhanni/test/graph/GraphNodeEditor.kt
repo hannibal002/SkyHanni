@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -76,6 +78,7 @@ object GraphNodeEditor {
                 add(list.buildSearchableScrollable(height, textInput, scrollValueNodes, velocity = 10.0))
             }
         }
+        updateDisabledNames()
     }
 
     private fun updateToggleTags() {
@@ -255,7 +258,28 @@ object GraphNodeEditor {
         },
     ).toSearchable(name)
 
-    fun isEnabled() = GraphEditor.isEnabled()
+    private var disabledLocations = setOf<LorenzVec>()
+
+    fun handleDisabled(graph: Graph) {
+        val newDisabled = mutableSetOf<LorenzVec>()
+        for (node in graph) {
+            if (!node.enabled) {
+                newDisabled.add(node.position)
+            }
+        }
+
+        disabledLocations = newDisabled
+        updateDisabledNames()
+    }
+
+    private fun updateDisabledNames() {
+        for (node in state.nodes) {
+            node.enabled = node.position !in disabledLocations
+        }
+    }
+
+    private fun isEnabled() = GraphEditor.isEnabled()
+
     private val config get() = GraphEditor.config
 
 }
