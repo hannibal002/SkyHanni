@@ -89,11 +89,12 @@ object TabListReader {
     )
 
     /**
-     * REGEX-TEST: Wardrobe Slots IV 5 Days
+     * REGEX-TEST: §eWardrobe Slots IV §f5 Days
+     * REGEX-FAIL: §6Hot Chocolate Mixin I §f3d
      */
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
-        "(?<firstPart>(?:§.)*[A-Za-z ]+)(?<secondPart> (?:§.)*[\\w ]+)"
+        "(?<firstPart>§e(?:§.)*[A-Za-z ]+)(?<secondPart> §f(?:§.)*[\\w ]+)"
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups.colorless",
