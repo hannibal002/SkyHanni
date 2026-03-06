@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.greenhouse.DnaAnalyzerSolver.Colors.Companion.toColor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -66,7 +67,9 @@ object DnaAnalyzerSolver {
             val column = i % 9
             initialBoard[column][row] = stack.toColor() ?: return
         }
-        currentBoard = DnaBoard(initialBoard)
+        DelayedRun.runNextTick {
+            currentBoard = DnaBoard(initialBoard)
+        }
     }
 
     @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
