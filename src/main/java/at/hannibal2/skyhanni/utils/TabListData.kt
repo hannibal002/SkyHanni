@@ -91,10 +91,12 @@ object TabListData {
 
         val tabListOverlay = Minecraft.getInstance().gui.tabList
         header = tabListOverlay.header
-        footer = tabListOverlay.footer?.let {
-            if (it == footer || it.string == "") footer
-            else it.also { TablistFooterUpdateEvent(it).post() }
-        } ?: footer
+        val newFooter = tabListOverlay.footer
+        if (newFooter != footer) {
+            footer = newFooter
+            if (newFooter == null || newFooter.string.isEmpty()) return
+            TablistFooterUpdateEvent(newFooter).post()
+        }
     }
 
     @HandleEvent
