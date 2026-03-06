@@ -33,12 +33,14 @@ import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import net.minecraft.client.Minecraft
@@ -83,6 +85,18 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(Coroutin
         }
         InitFinishedEvent.post()
     }
+
+    fun CoroutineConfig.launch(block: suspend CoroutineScope.() -> Unit): Job =
+        with(SkyHanniMod) { launchCoroutine(block) }
+
+    fun CoroutineConfig.launchUnScoped(block: suspend () -> Unit): Job =
+        with(SkyHanniMod) { launchUnScopedCoroutine(block) }
+
+    fun <T> CoroutineConfig.async(block: suspend CoroutineScope.() -> T): Deferred<T?> =
+        with(SkyHanniMod) { asyncCoroutine(block) }
+
+    fun <T> CoroutineConfig.asyncUnScoped(block: suspend () -> T): Deferred<T?> =
+        with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
     fun onTick() {
