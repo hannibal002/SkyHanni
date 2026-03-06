@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
-import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi.factionType
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
@@ -95,7 +95,7 @@ object CrimsonIsleReputationHelper {
     private fun updateRender() {
         display = buildList {
             addString("§e§lReputation Helper")
-            if (factionType == null) {
+            if (CrimsonIsleReputationApi.factionType == null) {
                 addString("§cFaction not found!")
                 return
             }

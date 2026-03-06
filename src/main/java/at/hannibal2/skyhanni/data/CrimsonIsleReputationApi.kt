@@ -24,13 +24,16 @@ object CrimsonIsleReputationApi {
         " (?<rep>(?:\\d+,?)+)",
     )
 
-    var factionType get() = ProfileStorageData.profileSpecific?.crimsonIsleFaction
+    private val storage get() = ProfileStorageData.profileSpecific
+    private val crimsonStorage get() = storage?.crimsonIsle
+
+    var factionType
+        get() = storage?.crimsonIsleFaction
         set(it) {
-            ProfileStorageData.profileSpecific?.crimsonIsleFaction = it
+            storage?.crimsonIsleFaction = it
         }
 
-    // LOWEST to avoid running before the factionType updating in ReputationHelper Updater.
-    @HandleEvent()
+    @HandleEvent
     fun onWidgetUpdateEvent(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.REPUTATION)) return
 
@@ -42,18 +45,17 @@ object CrimsonIsleReputationApi {
         tablistReputationCountPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val currentRep = group("rep").replace(",", "").toInt()
             ChatUtils.debug("Tried Setting ${currentFaction.factionName} Reputation to $currentRep")
-            ProfileStorageData.profileSpecific?.crimsonIsle?.reputation[currentFaction] = currentRep
+            crimsonStorage?.reputation[currentFaction] = currentRep
         }
     }
 
     @HandleEvent
     fun onProfileViewerLoad(event: ProfileViewerDataLoadedEvent) {
-        val facInfo = event.getCurrentPlayerData()?.netherData ?: return
-        val faction = event.getCurrentPlayerData()?.netherData?.currentFaction.orEmpty()
-        factionType = FactionType.fromAPIName(faction)
-        ProfileStorageData.profileSpecific?.crimsonIsle?.reputation[FactionType.MAGE] = facInfo.mageReputation
-        ChatUtils.debug("Set Mage Reputation to ${facInfo.mageReputation}")
-        ProfileStorageData.profileSpecific?.crimsonIsle?.reputation[FactionType.BARBARIAN] = facInfo.barbarianReputation
-        ChatUtils.debug("Set Barbarian Reputation to ${facInfo.barbarianReputation}")
+        val faction = event.getCurrentPlayerData()?.netherData ?: return
+        factionType = FactionType.fromAPIName(faction.currentFaction)
+        crimsonStorage?.reputation[FactionType.MAGE] = faction.mageReputation
+        ChatUtils.debug("Set Mage Reputation to ${faction.mageReputation}")
+        crimsonStorage?.reputation[FactionType.BARBARIAN] = faction.barbarianReputation
+        ChatUtils.debug("Set Barbarian Reputation to ${faction.barbarianReputation}")
     }
 }
