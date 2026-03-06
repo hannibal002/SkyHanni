@@ -21,12 +21,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern.Companion.group
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
-import kotlin.collections.drop
-import kotlin.collections.first
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
@@ -191,7 +188,7 @@ object AdvancedPlayerList {
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 
-    private fun createCustomName(data: PlayerData): String {
+    private fun createCustomName(data: PlayerData): Component {
 
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
@@ -203,28 +200,29 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let {
-                BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1)
-            }.orEmpty()
-        } else data.nameSuffix
+            if (data.ironman) Component.literal("§7♲") else data.bingoLevel?.let {
+                Component.literal(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
+            } ?: Component.empty()
+        } else Component.literal(data.nameSuffix)
 
         if (config.markSpecialPersons) {
-            suffix += " ${getSocialIcon(data.name).icon()}"
+            suffix.append(" ${getSocialIcon(data.name).icon()}")
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
             Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
                 ContributorManager.getSuffix(playerInfo.profile.id)?.let {
-                    suffix += " $it"
+                    suffix.append(" ").append(it)
                 }
             }
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            suffix += data.faction.icon.orEmpty()
+            suffix.append(data.faction.icon.orEmpty())
         }
 
-        return "$level $playerName ${suffix.trim()}"
+        // todo: level and player name should also really be components
+        return Component.literal("$level $playerName ").append(suffix)
     }
 
     private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)

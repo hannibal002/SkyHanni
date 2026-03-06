@@ -1,0 +1,13 @@
+{
+    "providers": [
+        {
+         "type": "bitmap",
+         "file": "skyhanni:flags/trans.png",
+         "ascent": 11,
+         "height": 12,
+         "chars": [
+            "\uE001"
+            ]
+        }
+    ]
+}

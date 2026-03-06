@@ -171,7 +171,7 @@ object TabListRenderer {
 
                 val drawX = middleX + if (tabLine.type == TabStringType.TITLE) column.getMaxWidth() / 2f - tabLine.getWidth() / 2f else 0f
                 val drawY = middleY.toFloat()
-                if (AdvancedPlayerList.ignoreCustomTabList() || tabLine.customName.isEmpty()) {
+                if (AdvancedPlayerList.ignoreCustomTabList() || tabLine.customName == null) {
                     GuiRenderUtils.drawString(tabLine.component, drawX, drawY, -1)
                 } else {
                     GuiRenderUtils.drawString(tabLine.customName, drawX, drawY, -1)

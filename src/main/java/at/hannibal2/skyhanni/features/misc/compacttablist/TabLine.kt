@@ -6,11 +6,11 @@ import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
 
-class TabLine(val component: Component, val type: TabStringType, val customName: String = "") {
+class TabLine(val component: Component, val type: TabStringType, val customName: Component? = null) {
 
     fun getWidth(): Int {
         val mc = Minecraft.getInstance()
-        var width = if (customName.isEmpty()) mc.font.width(component)
+        var width = if (customName == null) mc.font.width(component)
         else mc.font.width(customName)
 
         if (type === TabStringType.PLAYER) width += 8 + 2
