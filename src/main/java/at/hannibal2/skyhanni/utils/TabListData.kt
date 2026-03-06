@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuarded
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.fabricmc.api.EnvType
@@ -43,11 +44,14 @@ object TabListData {
     var fullyLoaded = false
         internal set
 
-    private fun copyCommand() {
-        val tabHeader = header?.string.orEmpty()
-        val tabFooter = footer?.string.orEmpty()
+    private fun copyCommand(asComponents: Boolean = true) {
+        fun Component?.localCopyFormat() = if (asComponents) this?.toString().orEmpty() else this?.formattedTextCompat().orEmpty()
+
+        val tabHeader = header.localCopyFormat()
+        val tabFooter = footer.localCopyFormat()
         val joinedResults = tablistCache.joinToString("\n") {
-            if (it.string == "") " " else it.string
+            val line = if (asComponents) it.toString() else it.formattedTextCompat()
+            if (it.string == "") " " else line
         }
         val widgets = TabWidget.entries.filter { it.isActive }.joinToString("\n") {
             "\n${it.name} : \n${it.lines.joinToString("\n")}"
@@ -55,7 +59,9 @@ object TabListData {
 
         val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
         OSUtils.copyToClipboard(outputString)
-        ChatUtils.chat("Tab list components copied into the clipboard!")
+
+        val copyFormat = if (asComponents) "components" else "formatted text"
+        ChatUtils.chat("Tab list $copyFormat copied into the clipboard!")
     }
 
     private fun readTabList(): List<Component>? {
@@ -105,6 +111,11 @@ object TabListData {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback { copyCommand() }
+        }
+        event.registerBrigadier("shcopytablist") {
+            description = "Copies the tab list body to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback { copyCommand(false) }
         }
     }
 }

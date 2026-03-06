@@ -80,8 +80,8 @@ object TabListReader {
     // TODO: Regex tests
     @Suppress("RepoPatternRegexTestMissing")
     private val upgradesPattern by patternGroup.pattern(
-        "upgrades.colorless",
-        "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
+        "upgrades",
+        "(?<firstPart>(?:§.)*[A-Za-z ]+)(?<secondPart> (?:§.)*[\\w ]+)"
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups.colorless",
@@ -155,9 +155,6 @@ object TabListReader {
         val lastIsWinterPowerUps = previousComponent?.string == "Active Power Ups"
 
         if (component.contains(hypixelAdvertisingString)) return@apply
-        fun addStyledComponent(text: String) = addComponent(
-            Component.literal(text).withStyle(component.style)
-        )
 
         // These lines were consumed into the active effects header — skip them
         if (godPotTimer != null && godPotPattern.matches(component)) return@apply
@@ -166,42 +163,43 @@ object TabListReader {
         activeEffectPattern.matchMatcher(component) {
             when {
                 godPotTimer != null -> {
-                    // copy formatting from the original line, but add the timer at the end ?
-                    addStyledComponent("Active Effects:")
-                    addStyledComponent(" God Potion: $godPotTimer")
+                    addComponent(Component.literal("§aActive Effects:"))
+                    addComponent(Component.literal(" §cGod Potion§r: $godPotTimer"))
                 }
-                effectCount != null -> addStyledComponent("Active Effects: $effectCount")
-                else -> addStyledComponent("Active Effects: 0")
+                effectCount != null -> addComponent(Component.literal("§aActive Effects: §e$effectCount"))
+                else -> addComponent(Component.literal("§aActive Effects: §e0"))
             }
             return@apply
         }
 
+        // For these three, the component itself is already correct — no reconstruction needed
         cookiePattern.matchMatcher(component) {
-            return@apply addStyledComponent("Cookie Buff")
+            return@apply addComponent(component)
         }
         if (component.startsWith("Not active!") && lastIsCookieBuff) {
-            return@apply addStyledComponent(" Not Active")
+            return@apply addComponent(Component.literal("§7 Not Active"))
         }
 
         dungeonBuffPattern.matchMatcher(component) {
-            return@apply addStyledComponent("Dungeon Buffs")
+            return@apply addComponent(component)
         }
         if (component.startsWith("No Buffs active.") && lastIsDungeons) {
-            return@apply addStyledComponent(" None Found")
+            return@apply addComponent(Component.literal("§7 None Found"))
         }
 
         winterPowerUpsPattern.matchMatcher(component) {
-            return@apply addStyledComponent("Active Power Ups")
+            return@apply addComponent(component)
         }
         if (component.startsWith("No Power Ups active.") && lastIsWinterPowerUps) {
-            return@apply addStyledComponent(" None Found")
+            return@apply addComponent(Component.literal("§7 None"))
         }
 
-        upgradesPattern.matchMatcher(component) {
+        // Match against formattedTextCompat() so captured groups include § color codes
+        upgradesPattern.matchMatcher(component.formattedTextCompat()) {
             var firstPart = group("firstPart")
             if (!component.style.isBold) firstPart = " $firstPart"
-            addStyledComponent(firstPart)
-            addStyledComponent(group("secondPart"))
+            addComponent(Component.literal(firstPart))
+            addComponent(Component.literal(group("secondPart")))
             return@apply
         }
 

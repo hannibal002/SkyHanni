@@ -27,38 +27,34 @@ import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
+import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+
+internal object CoroutineSetup {
+    private val globalJob: Job = Job(null)
+    private val coroutineContext = CoroutineName("SkyHanni") + SupervisorJob(globalJob)
+    internal val coroutineScope = CoroutineScope(coroutineContext)
+}
 
 @SkyHanniModule
-object SkyHanniMod {
+object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(CoroutineSetup.coroutineScope) {
 
     fun preInit() {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
@@ -132,107 +128,6 @@ object SkyHanniMod {
     }
 
     val modules: MutableList<Any> = ArrayList()
-    private val globalJob: Job = Job(null)
-    private val coroutineScope = CoroutineScope(
-        CoroutineName("SkyHanni") + SupervisorJob(globalJob),
-    )
-
-    /**
-     * Launch an IO coroutine with a lock on the provided mutex.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param mutex The mutex to lock during the execution of the block.
-     * @param block The suspend function to execute within the IO context.
-     */
-    fun launchIOCoroutineWithMutex(
-        name: String,
-        mutex: Mutex,
-        timeout: Duration = 10.seconds,
-        block: suspend CoroutineScope.() -> Unit,
-    ): Job = launchCoroutine("launchIOCoroutineWithMutex $name", timeout) {
-        mutex.withLock {
-            withContext(Dispatchers.IO, block)
-        }
-    }
-
-    /**
-     * Launch an IO coroutine in the SkyHanni scope.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param block The suspend function to execute within the IO context.
-     */
-    fun launchIOCoroutine(
-        name: String,
-        timeout: Duration = 10.seconds,
-        block: suspend CoroutineScope.() -> Unit,
-    ): Job = launchCoroutine("launchIOCoroutine $name", timeout) {
-        withContext(Dispatchers.IO, block)
-    }
-
-    /**
-     * Launches a coroutine in the SkyHanni scope.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * The function provided here must not rely on the CoroutineScope's context.
-     * @param block The block to execute in the coroutine.
-     */
-    fun launchNoScopeCoroutine(
-        name: String,
-        timeout: Duration = 10.seconds,
-        block: suspend () -> Unit,
-    ): Job = launchCoroutine("launchNoScopeCoroutine $name", timeout) { block() }
-
-    /**
-     * Launch a coroutine with a lock on the provided mutex.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param mutex The mutex to lock during the execution of the block.
-     * @param block The suspend function to execute within the IO context.
-     */
-    fun launchCoroutineWithMutex(
-        name: String,
-        mutex: Mutex,
-        timeout: Duration = 10.seconds,
-        block: suspend CoroutineScope.() -> Unit,
-    ): Job = launchCoroutine("launchCoroutineWithMutex $name", timeout) {
-        mutex.withLock { block() }
-    }
-
-    /**
-     * Launches a coroutine in the SkyHanni scope.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param function The suspend function to execute in the coroutine.
-     */
-    @OptIn(InternalCoroutinesApi::class)
-    fun launchCoroutine(
-        name: String,
-        timeout: Duration = 10.seconds,
-        function: suspend CoroutineScope.() -> Unit,
-    ): Job = coroutineScope.launch(CoroutineName("SkyHanni $name")) {
-        try {
-            if (timeout != Duration.INFINITE && timeout > Duration.ZERO) {
-                withTimeout(timeout) { function() }
-            } else {
-                function()
-            }
-        } catch (e: TimeoutCancellationException) {
-            /*ErrorManager.logErrorWithData(
-                e,
-                "Coroutine $name timed out after $timeout",
-                "coroutine name" to name,
-                "timeout" to timeout,
-            )*/
-            throw e
-        } catch (e: CancellationException) {
-            // Don't notify the user about cancellation exceptions - these are to be expected at times
-            val jobState = coroutineContext[Job]?.toString() ?: "unknown job"
-            val cancellationCause = coroutineContext[Job]?.getCancellationException()
-            logger.debug("Job $jobState/$name was cancelled with cause: $cancellationCause", e)
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Asynchronous exception caught in $name",
-                "coroutine name" to name,
-                "coroutine timeout" to timeout,
-            )
-        }
-    }
 
     var screenToOpen: Screen? = null
     var shouldCloseScreen: Boolean = true
