@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.contains
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.startsWith
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -56,6 +57,7 @@ object TabListReader {
 
     /**
      * REGEX-TEST: You have 1 active effect. Use "/effects" to see it!
+     * REGEX-TEST: You have 1 non-god effects.
      */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count.colorless",
@@ -77,8 +79,18 @@ object TabListReader {
         "dungeonbuff.colorless",
         "Dungeon Buffs",
     )
-    // TODO: Regex tests
-    @Suppress("RepoPatternRegexTestMissing")
+
+    /**
+     * REGEX-TEST: Use "/effects" to see them!
+     */
+    private val effectsUseCommandPattern by patternGroup.pattern(
+        "effects.usecommand.colorless",
+        "Use \"/effects\".*",
+    )
+
+    /**
+     * REGEX-TEST: Wardrobe Slots IV 5 Days
+     */
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
         "(?<firstPart>(?:§.)*[A-Za-z ]+)(?<secondPart> (?:§.)*[\\w ]+)"
@@ -86,10 +98,6 @@ object TabListReader {
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups.colorless",
         "Active Power Ups",
-    )
-    private val effectsUseCommandPattern by patternGroup.pattern(
-        "effects.usecommand.colorless",
-        "Use \"/effects\".*",
     )
 
     @HandleEvent
@@ -200,7 +208,7 @@ object TabListReader {
         }
 
         // Match against formattedTextCompat() so captured groups include § color codes
-        upgradesPattern.matchMatcher(component.formattedTextCompat()) {
+        upgradesPattern.matchMatcher(component.formattedTextCompat().removeResets()) {
             var firstPart = group("firstPart")
             if (!firstPart.contains("§l")) firstPart = " $firstPart"
             addComponent(Component.literal(firstPart))
