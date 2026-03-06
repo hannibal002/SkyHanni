@@ -880,6 +880,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+
+        @Expose
+        var reputation: MutableMap<FactionType, Int> = mutableMapOf()
     }
 
     // - rift

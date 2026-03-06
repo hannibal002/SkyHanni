@@ -150,7 +150,6 @@ object InstanceChestProfit {
     private val chestProfits: MutableMap<String, Double> = mutableMapOf()
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
-
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
