@@ -158,7 +158,9 @@ object BingoApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(10)) return
-        checkBingoNpcs()
+        if (IslandGraphs.currentIslandGraph != null) {
+            checkBingoNpcs()
+        }
     }
 
     private fun checkBingoNpcs() {
