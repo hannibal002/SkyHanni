@@ -1,9 +1,0 @@
-{
-	"providers": [
-      
-        {
-			"type": "reference",
-			"id": "minecraft:flags"
-		}
-	]
-}
