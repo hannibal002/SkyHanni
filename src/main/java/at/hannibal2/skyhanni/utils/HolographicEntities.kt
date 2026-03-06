@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.EntitySpawnReason
+import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.zombie.Zombie
 import kotlin.math.cos
@@ -54,7 +55,7 @@ object HolographicEntities {
         }
     }
 
-    private fun spawnDebugHologram(transparency: Float = 1f) {  // ← ADD param
+    private fun spawnDebugHologram(transparency: Float = 1f) {
         val player = MinecraftCompat.localPlayerOrNull ?: return
         val yaw = Math.toRadians(player.yRot.toDouble())
         val pos = LorenzVec(
@@ -74,7 +75,7 @@ object HolographicEntities {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val hologram = debugHologram ?: return
-        event.renderHolographicEntity(hologram, holographicness = debugHologramTransparency)  // ← USE
+        event.renderHolographicEntity(hologram, holographicness = debugHologramTransparency)
     }
 
     /**
@@ -122,19 +123,24 @@ object HolographicEntities {
      * [HolographicEntity] to prevent untested entities with potential NPEs
      * being instantiated.
      */
-    class HolographicBase<T : LivingEntity> internal constructor(internal val entity: T) {
-        fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T> =
-            HolographicEntity(entity, position, yaw)
+    class HolographicBase<T : LivingEntity> internal constructor(internal val entityType: EntityType<T>) {
+        fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T>? {
+            val level = Minecraft.getInstance().level ?: return null
+            val entity = entityType.create(level, EntitySpawnReason.COMMAND) ?: return null
+            return HolographicEntity(entity, position, yaw)
+        }
     }
 
     private var _internalEntityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>>? = null
     val entityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>> get() = _internalEntityHoloBases ?: run {
         val level = Minecraft.getInstance().level ?: return@run emptyMap()
         BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
-            val entity: LivingEntity = runCatching {
+            // Create a throwaway instance only to determine the KClass key.
+            val testEntity: LivingEntity = runCatching {
                 entityType.create(level, EntitySpawnReason.COMMAND)
             }.getOrNull() as? LivingEntity ?: return@type null
-            entity::class to HolographicBase(entity)
+            @Suppress("UNCHECKED_CAST")
+            testEntity::class to HolographicBase(entityType as EntityType<LivingEntity>)
         }.also { _internalEntityHoloBases = it }
     }
 
