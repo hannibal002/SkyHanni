@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
@@ -57,7 +58,7 @@ object PetUtils {
     }
 
     private fun getCiFactionVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
-        val playerFaction = CrimsonIsleReputationHelper.factionType ?: FactionType.BARBARIAN
+        val playerFaction = CrimsonIsleReputationApi.factionType ?: FactionType.BARBARIAN
         val variantFauxInternalName = "${skinInternalName.asString()}_${playerFaction.name}"
         return animatedPetSkins[variantFauxInternalName]
     }

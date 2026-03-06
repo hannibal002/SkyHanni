@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RescueParkourJson
@@ -145,7 +146,7 @@ object RescueMissionWaypoints {
         val tier = tier ?: return
 
         if (tier == "S") {
-            if (CrimsonIsleReputationHelper.factionType == FactionType.MAGE) {
+            if (CrimsonIsleReputationApi.factionType == FactionType.MAGE) {
                 ErrorManager.logErrorStateWithData(
                     "No data present for Mage S-rank Rescue Mission",
                     "No Mage S-Rank in repo",
@@ -163,7 +164,7 @@ object RescueMissionWaypoints {
         }
 
         parkourHelper = data?.let { data ->
-            val source = when (CrimsonIsleReputationHelper.factionType) {
+            val source = when (CrimsonIsleReputationApi.factionType) {
                 FactionType.MAGE -> data.mage
                 FactionType.BARBARIAN -> data.barb
                 null -> null
@@ -278,7 +279,7 @@ object RescueMissionWaypoints {
 
     private fun navigateToUndercoverAgent() {
         if (!config.agentPath) return
-        val factionType = CrimsonIsleReputationHelper.factionType ?: return
+        val factionType = CrimsonIsleReputationApi.factionType ?: return
         val undercoverAgentLocation = when (factionType) {
             FactionType.MAGE -> LorenzVec(-626.7, 119.0, -960.0)
             FactionType.BARBARIAN -> LorenzVec(-15.5, 93.0, -843.7)
@@ -352,7 +353,7 @@ object RescueMissionWaypoints {
             add("parkour is loaded")
             add("tier: $tier")
             add("tierWasUnknown: $tierWasUnknown")
-            add("factionType: ${CrimsonIsleReputationHelper.factionType}")
+            add("factionType: ${CrimsonIsleReputationApi.factionType}")
         }
     }
 }
