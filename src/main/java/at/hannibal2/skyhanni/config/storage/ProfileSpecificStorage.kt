@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
@@ -805,6 +806,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var flowstatePersonalBest = 0
+
+        @Expose
+        var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
     }
 
     @Expose

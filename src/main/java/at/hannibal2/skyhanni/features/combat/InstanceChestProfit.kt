@@ -236,7 +236,7 @@ object InstanceChestProfit {
                 var itemName = ItemUtils.readBookType(loreLine) ?: loreLine
                 var itemInternalName = NeuInternalName.fromItemNameOrNull(itemName)
                 bookColorFixer.matchMatcher(itemName) {
-                    itemName = ItemResolutionQuery.resolveEnchantmentByName(group("item")) ?: itemName
+                    itemName = ItemResolutionQuery.resolveEnchantmentByName(group("item"))?.repoItemName ?: itemName
                     itemInternalName = itemName.toInternalName()
                 }
                 val internalName = itemInternalName

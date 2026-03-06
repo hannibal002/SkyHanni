@@ -106,7 +106,7 @@ class AnimatedItemStackRenderable private constructor(
     override val stack: ItemStack get() = frameDefs[frameIndex].stack
 
     private var stableRenderId: Int = -1
-    fun getStableId() = stableRenderId
+    override fun getStableId() = stableRenderId
 
     private var currentTranslation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var currentRotation: Vec3 = initialRotation

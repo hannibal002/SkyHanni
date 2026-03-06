@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -14,8 +16,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.JsonArray
-import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object ViewRecipeCommand {
@@ -64,19 +64,9 @@ object ViewRecipeCommand {
 
     @HandleEvent(NeuRepositoryReloadEvent::class)
     fun onNeuRepoReload() {
-        list = NeuItems.allNeuRepoItems()
-            .asSequence()
-            .filter { (_, value) ->
-                val recipes = value.getAsJsonArray("recipes") ?: JsonArray()
-                value.getAsJsonObject("recipe")?.let { recipe ->
-                    recipe.add("type", JsonPrimitive("crafting"))
-                    recipes.add(recipe)
-                }
-
-                recipes.any { it.asJsonObject.getAsJsonPrimitive("type")?.asString == "crafting" }
-            }
-            .map { (key, _) -> key.lowercase() }
-            .toList()
+        list = NeuItems.allNeuRepoItems().asSequence().filter { (_, json) ->
+            json.recipe != null || json.recipes.any { it.type == NeuRecipeType.CRAFTING }
+        }.map { (key, _) -> key.repoItemName.lowercase() }.toList()
     }
 
     fun customTabComplete(command: String): List<String>? {
