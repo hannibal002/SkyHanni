@@ -143,6 +143,7 @@ class SkyHanniCoroutineManager(
      * Wraps [block] with timeout, IO context, mutex, and error handling
      * as specified by the receiver [CoroutineConfig].
      */
+    @Suppress("InjectDispatcher")
     private suspend fun <T> CoroutineConfig.runWithErrorHandling(
         block: suspend CoroutineScope.() -> T,
     ): T? {

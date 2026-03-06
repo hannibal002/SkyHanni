@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.minecraft.util.Util
 import java.io.File
 import java.io.IOException
@@ -66,8 +65,7 @@ object OSUtils {
     )
     fun copyToClipboard(text: String) = ClipboardUtils.copyToClipboard(text)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun copyToClipboardAsync(text: String): Boolean? = ClipboardUtils.copyToClipboardAsync(text).getCompleted()
+    suspend fun copyToClipboardAsync(text: String): Boolean? = ClipboardUtils.copyToClipboardAsync(text).await()
 
     fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 

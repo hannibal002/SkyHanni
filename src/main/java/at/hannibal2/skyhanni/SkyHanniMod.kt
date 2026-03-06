@@ -49,15 +49,10 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
-internal object CoroutineSetup {
-    private val globalJob: Job = Job(null)
-    private val coroutineContext = CoroutineName("SkyHanni") + SupervisorJob(globalJob)
-    internal val coroutineScope = CoroutineScope(coroutineContext)
-}
-
 @SkyHanniModule
-object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(CoroutineSetup.coroutineScope) {
-
+object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
+    CoroutineScope(CoroutineName("SkyHanni") + SupervisorJob(Job(null)))
+) {
     fun preInit() {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 

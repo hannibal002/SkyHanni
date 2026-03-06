@@ -16,9 +16,11 @@ object ClipboardUtils {
 
     @Deprecated("Use copyToClipboardAsync instead", ReplaceWith("copyToClipboardAsync(text).await()"))
     fun copyToClipboard(text: String, step: Int = 0) = copyToClipboardInternal(text, step)
+
     fun copyToClipboardAsync(text: String, step: Int = 0): Deferred<Boolean?> = clipboardCoroutineConfig.async {
         copyToClipboardInternal(text, step)
     }
+
     private fun copyToClipboardInternal(text: String, step: Int = 0): Boolean = runCatching {
         ClipboardManager().setClipboard(Minecraft.getInstance().window, text)
         true
