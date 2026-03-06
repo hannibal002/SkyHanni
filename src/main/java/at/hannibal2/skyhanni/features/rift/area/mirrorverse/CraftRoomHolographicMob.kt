@@ -53,9 +53,7 @@ object CraftRoomHolographicMob {
         if (!enabled) return
 
         val nonPlayerEntities = EntityUtils.getEntitiesNearby<LivingEntity>(25.0).filterNotClass(Player::class)
-        ChatUtils.debug("holo tick: entities=${nonPlayerEntities.size} holoMap=${entityToHolographicEntity.size}")
         holograms = nonPlayerEntities.associateNotNull holo@{ entity ->
-            ChatUtils.debug("holo candidate: ${entity::class.simpleName} lookup=${entityToHolographicEntity[entity::class]}")
             val holographicEntity = entityToHolographicEntity[entity::class] ?: return@holo null
 
             val currentLocation = entity.getLorenzVec()
