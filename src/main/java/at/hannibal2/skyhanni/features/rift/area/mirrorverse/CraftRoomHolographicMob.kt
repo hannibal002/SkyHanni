@@ -91,7 +91,7 @@ object CraftRoomHolographicMob {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
-        holograms.values.associateNotNull({ it }).forEach { (mob, string) ->
+        holograms.values.forEach { (mob, string) ->
             event.renderHolographicEntity(mob)
             event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), string.orEmpty())
         }
