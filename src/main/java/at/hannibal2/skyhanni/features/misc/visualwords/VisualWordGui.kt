@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -25,9 +26,9 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
@@ -139,6 +140,21 @@ object VisualWordGui {
         )
     }
 
+    private fun Renderable.dimmed(): Renderable {
+        val inner = this
+        return object : Renderable {
+            override val width = inner.width
+            override val height = inner.height
+            override val horizontalAlign = inner.horizontalAlign
+            override val verticalAlign = inner.verticalAlign
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                inner.render(mouseOffsetX, mouseOffsetY)
+                val altBackground = COLOR_BG.toColor().darker(0.5)
+                ShaderRenderUtils.drawRoundRectDeferred(0, 0, width, height, altBackground.rgb, 0, 1f)
+            }
+        }
+    }
+
     private fun buildWordRow(screen: VisualWordScreen, index: Int, word: VisualWord): Renderable {
         val indexLabel = Renderable.fixedSizeLine(Renderable.text("§7${index + 1}."), width = 20)
 
@@ -153,21 +169,23 @@ object VisualWordGui {
             width = 230,
         )
 
+        val upItem = Renderable.item(itemUp, scale = 1.5)
         val upBtn = if (index > 0)
             Renderable.clickable(
-                Renderable.item(itemUp, scale = 0.9),
+                upItem.withTip(),
                 onLeftClick = { screen.moveWord(index, up = true) },
                 bypassChecks = true,
             )
-        else Renderable.placeholder(18)
+        else upItem.dimmed()
 
+        val downItem = Renderable.item(itemDown, scale = 1.5)
         val downBtn = if (index < screen.modifiedWords.lastIndex)
             Renderable.clickable(
-                Renderable.item(itemDown, scale = 0.9),
+                downItem.withTip(),
                 onLeftClick = { screen.moveWord(index, up = false) },
                 bypassChecks = true,
             )
-        else Renderable.placeholder(18)
+        else downItem.dimmed()
 
         val statusItem = if (word.enabled) ColoredBlockCompat.GREEN.createStainedClay()
         else ColoredBlockCompat.RED.createStainedClay()
@@ -285,9 +303,7 @@ object VisualWordGui {
                 val displayText = if (isActive) textInput.editText() else textInput.textBox
                 DrawContextUtils.pushPop {
                     DrawContextUtils.translate(3f, ((height - 8) / 2).toFloat())
-                    ModifyVisualWords.changeWords = false
                     RenderableUtils.renderString(displayText, scale = 1.0, color = Color.WHITE)
-                    ModifyVisualWords.changeWords = true
                 }
             }
         }

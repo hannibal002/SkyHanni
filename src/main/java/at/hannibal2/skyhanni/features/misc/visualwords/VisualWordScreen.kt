@@ -44,11 +44,16 @@ class VisualWordScreen : SkyHanniBaseScreen() {
         val startX = (width - renderable.width) / 2
         val startY = (height - renderable.height) / 2
 
-        DrawContextUtils.pushPop {
-            DrawContextUtils.translate(startX.toFloat(), startY.toFloat())
-            Renderable.withMousePosition(mouseX - startX, mouseY - startY) {
-                renderable.render(0, 0)
+        ModifyVisualWords.changeWords = false
+        try {
+            DrawContextUtils.pushPop {
+                DrawContextUtils.translate(startX.toFloat(), startY.toFloat())
+                Renderable.withMousePosition(mouseX - startX, mouseY - startY) {
+                    renderable.render(0, 0)
+                }
             }
+        } finally {
+            ModifyVisualWords.changeWords = true
         }
     }
 

@@ -64,10 +64,10 @@ object ModifyVisualWords {
             }
 
             val characters = if (canReplace) doReplacements(rawCharacters) else rawCharacters
-
-            FormattedCharSequence.composite(characters.toStyleRuns().map { (text, style) ->
+            val compositeCharacters = characters.toStyleRuns().map { (text, style) ->
                 FormattedCharSequence.forward(text, style)
-            })
+            }
+            FormattedCharSequence.composite(compositeCharacters)
         }
     }
 
