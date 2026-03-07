@@ -130,14 +130,18 @@ object InstanceChestProfit {
     )
 
     /**
-     * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
-     * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
+     * REGEX-TEST: §d§lWisdom I§f
+     * REGEX-TEST: §d§lCombo I§f
      */
     private val bookColorFixer by patternGroup.pattern(
         "bookcolorfixnew",
         "(?<item>.+)(?:§.)+",
     )
 
+    /**
+     * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
+     * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
+     */
     private val bookColorFixerold by patternGroup.pattern(
         "bookcolorfix",
         "Enchanted Book\\((?<item>.+)(?:§.)+\\)"
