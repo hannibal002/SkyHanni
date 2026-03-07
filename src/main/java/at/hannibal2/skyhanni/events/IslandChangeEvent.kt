@@ -6,4 +6,4 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 @PrimaryFunction("onIslandChange")
 class IslandChangeEvent(val newIsland: IslandType, val oldIsland: IslandType) : SkyHanniEvent()
-//TODO: old Island never works due to being set to none in SkyblockLeaveEvent and Skyblock Leave Event firing every Island swap
+// TODO old Island never works due to being set to none in SkyblockLeaveEvent and Skyblock Leave Event firing every Island swap
