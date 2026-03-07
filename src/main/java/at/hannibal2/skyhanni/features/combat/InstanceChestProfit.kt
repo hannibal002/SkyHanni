@@ -131,12 +131,12 @@ object InstanceChestProfit {
     )
 
     /**
-     * REGEX-TEST: §d§lUltimate Wise I§f
-     * REGEX-TEST: §d§lCombo I§f
+     * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
+     * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
     private val bookColorFixer by patternGroup.pattern(
         "bookcolorfix",
-        "(?<item>.+)(?:§.)+",
+        "Enchanted Book \\((?<item>.+)(?:§.)+",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
