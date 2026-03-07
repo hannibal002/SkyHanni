@@ -234,11 +234,10 @@ object GoldenFishTimer {
         if (icon) {
             // TODO use MutableList<Renderable>.addItemStack once it allows for align
             add(
-                Renderable.item(
-                    goldenFishSkullItem,
-                    2.5,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ),
+                Renderable.item(goldenFishSkullItem) {
+                    scale = 2.5
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                }
             )
         }
         val text = buildList {

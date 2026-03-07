@@ -105,6 +105,20 @@ object DrawContextUtils {
     }
 
     /**
+     * Performs a push-pop around the action, and runs the action inside a DrawContext translation, returning the result of the action.
+     */
+    inline fun <reified T> translatedPushPopResult(
+        x: Number = 0,
+        y: Number = 0,
+        postTranslateScale: Float? = null,
+        action: () -> T,
+    ): T = pushPopResult {
+        translate(x.toFloat(), y.toFloat())
+        postTranslateScale?.let { scale(it, it) }
+        return action()
+    }
+
+    /**
      * Run operations inside a DrawContext scale
      */
     inline fun scaled(x: Number = 1, y: Number = 1, action: () -> Unit) {
