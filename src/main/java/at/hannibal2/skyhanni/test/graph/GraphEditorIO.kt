@@ -38,6 +38,7 @@ object GraphEditorIO {
                 node.position,
                 node.name,
                 node.tags.map { it.internalName },
+                node.extraWeight,
             )
         }
 
@@ -53,7 +54,9 @@ object GraphEditorIO {
                 val otherNode = edge.getOther(node)
                 val compiledOther = compiledNodeMap[otherNode.id]
                     ?: error("Invalid node ID ${otherNode.id} referenced in edge")
-                compiledOther to node.position.distance(otherNode.position)
+                val distance = node.position.distance(otherNode.position)
+                val extraWeight = node.extraWeight + otherNode.extraWeight
+                compiledOther to distance + extraWeight
             }.sortedBy { it.second }.toMap()
         }
 
@@ -178,6 +181,7 @@ object GraphEditorIO {
                 graphNode.position,
                 graphNode.name,
                 graphNode.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
+                graphNode.extraWeight,
             )
         }
         val translation = graph.zip(importedNodes).toMap()

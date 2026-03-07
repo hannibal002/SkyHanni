@@ -83,6 +83,7 @@ class GraphEditorState {
                 oldNode.position.copy(),
                 oldNode.name,
                 ArrayList(oldNode.tags),
+                oldNode.extraWeight,
             )
             newState.nodes.add(newNode)
             nodeMap[oldNode] = newNode
