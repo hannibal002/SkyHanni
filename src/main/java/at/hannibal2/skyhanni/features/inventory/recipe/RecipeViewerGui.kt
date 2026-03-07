@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -37,13 +39,16 @@ object RecipeViewerGui {
     private const val GRID_SPACING = 2
     private const val PANEL_PADDING = 10
 
-    private const val ITEM_SCALE = 2.5
-    private fun scaledItem(internalName: NeuInternalName, withTip: Boolean = true) = Renderable.item(
-        provider = NeuItemStackProvider(internalName),
-        scale = ITEM_SCALE
-    ).let { if (withTip) it.withTip() else it }
+    private const val ITEM_SCALE = 1.25
+    private fun scaledItem(internalName: NeuInternalName, withTip: Boolean = true): Renderable {
+        val provider = NeuItemStackProvider(internalName)
+        val glint = internalName.asString().startsWith("ENCHANTED_")
+        return Renderable.item(
+            stackGetter = { provider.stack.let { if (glint) it.addEnchantGlint() else it } },
+            scale = ITEM_SCALE,
+        ).let { if (withTip) it.withTip() else it }
+    }
 
-    // Derive slot size from the actual rendered item dimensions so empty and filled slots always match.
     private val SLOT_SIZE by lazy {
         scaledItem(NeuInternalName.MISSING_ITEM).let {
             it.width.coerceAtLeast(it.height)
@@ -61,6 +66,7 @@ object RecipeViewerGui {
     private val COLOR_CLOSE = ChromaColour.fromStaticRGB(200, 60, 60, 210)
     private val COLOR_OUTLINE_TOP = ChromaColour.fromStaticRGB(100, 100, 160, 255)
     private val COLOR_OUTLINE_BOT = ChromaColour.fromStaticRGB(60, 60, 100, 255)
+    private val COLOR_BACK = ChromaColour.fromStaticRGB(60, 100, 200, 210)
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -80,7 +86,6 @@ object RecipeViewerGui {
                 }
 
                 if (EnoughUpdatesManager.getRecipesFor(internalName).isEmpty()) {
-                    // Still open so the user can see the item info even without recipes.
                     ChatUtils.chat("§e$raw §7has no recipes in the NEU repo.")
                 }
 
@@ -102,14 +107,17 @@ object RecipeViewerGui {
             buildNoRecipesPlaceholder(screen.internalName)
         } else {
             Renderable.vertical(
-                listOf(buildNavRow(screen, recipes, index), buildRecipeRenderable(recipes[index])),
+                listOf(
+                    buildNavRow(screen, recipes, index),
+                    buildRecipeRenderable(recipes[index], screen)
+                ),
                 spacing = 6,
                 horizontalAlign = HA.CENTER,
             )
         }
 
         val inner = Renderable.vertical(
-            listOf(buildHeaderRow(screen.internalName), body, buildCloseButton(screen)),
+            listOf(buildHeaderRow(screen.internalName), body, buildActionsRow(screen)),
             spacing = 8,
             horizontalAlign = HA.CENTER,
         )
@@ -129,8 +137,7 @@ object RecipeViewerGui {
     private fun buildHeaderRow(internalName: NeuInternalName): Renderable {
         val texts = Renderable.vertical(spacing = 2, horizontalAlign = HA.CENTER) {
             add(Renderable.text(internalName.repoItemName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
-            val internalFormat = "§7${internalName.asString()}"
-            add(Renderable.text(internalFormat, scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
+            add(Renderable.text("§7${internalName.asString()}", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
         }
         return Renderable.horizontal(
             listOf(scaledItem(internalName, withTip = false), texts),
@@ -158,7 +165,7 @@ object RecipeViewerGui {
             screen.rebuildDisplay()
         }
 
-        val currentType = recipes[currentIndex].recipeType
+        val currentType = recipes[currentIndex].recipeType.displayName
         val label = Renderable.vertical(
             listOf(
                 Renderable.text("Recipe ${currentIndex + 1} / $total", color = Color.WHITE, horizontalAlign = HA.CENTER),
@@ -171,60 +178,68 @@ object RecipeViewerGui {
         return Renderable.horizontal(listOf(prevButton, label, nextButton), spacing = 8, verticalAlign = VA.CENTER)
     }
 
-    private fun buildRecipeRenderable(recipe: PrimitiveRecipe): Renderable = when (recipe.recipeType) {
-        NeuRecipeType.CRAFTING -> buildCraftingLayout(recipe)
-        NeuRecipeType.FORGE -> buildForgeLayout(recipe)
-        else -> buildGenericLayout(recipe)
+    private fun buildRecipeRenderable(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable = when (recipe.recipeType) {
+        NeuRecipeType.CRAFTING -> buildCraftingLayout(recipe, screen)
+        NeuRecipeType.FORGE -> buildForgeLayout(recipe, screen)
+        else -> buildGenericLayout(recipe, screen)
     }
 
-    private fun buildCraftingLayout(recipe: PrimitiveRecipe): Renderable {
-        // Ingredients are ordered by slot position; fill remaining slots with null (empty).
+    private fun buildCraftingLayout(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
         val ingredients = recipe.ingredients.toList()
         val grid: Array<PrimitiveIngredient?> = Array(9) { ingredients.getOrNull(it) }
         val gridRenderable = grid.toList().chunked(3).map { row ->
-            Renderable.horizontal(row.map { buildItemSlot(it) }, spacing = GRID_SPACING)
+            Renderable.horizontal(row.map { buildItemSlot(it, screen) }, spacing = GRID_SPACING)
         }.let { Renderable.vertical(it, spacing = GRID_SPACING) }
 
-        val arrow = Renderable.text(" ──► ", scale = 1.3, color = COLOR_ARROW.toColor(), horizontalAlign = HA.CENTER)
-        val output = buildItemSlot(recipe.outputs.firstOrNull())
+        val arrow = arrowRenderable()
+        val output = buildItemSlot(recipe.outputs.firstOrNull(), screen)
 
         return Renderable.horizontal(listOf(gridRenderable, arrow, output), spacing = 6, verticalAlign = VA.CENTER)
     }
 
-    private fun buildForgeLayout(recipe: PrimitiveRecipe): Renderable {
+    private fun buildForgeLayout(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
         val inputsPanel = Renderable.vertical(
             buildList {
                 add(sectionLabel("Ingredients"))
-                addAll(recipe.ingredients.map { buildIngredientRow(it) })
+                addAll(recipe.ingredients.map { buildIngredientRow(it, screen) })
             },
             spacing = 3,
         )
+
+        if (recipe.outputs.size <= 1) return inputsPanel
+
         val outputPanel = Renderable.vertical(
-            listOf(sectionLabel("Output"), buildItemSlot(recipe.outputs.firstOrNull())),
-            spacing = 4,
+            buildList {
+                add(sectionLabel("Output"))
+                addAll(recipe.outputs.map { buildIngredientRow(it, screen) })
+            },
+            spacing = 3,
             horizontalAlign = HA.CENTER,
         )
-        val arrow = Renderable.text(" ──► ", scale = 1.3, color = COLOR_ARROW.toColor(), horizontalAlign = HA.CENTER)
 
-        return Renderable.horizontal(listOf(inputsPanel, arrow, outputPanel), spacing = 8, verticalAlign = VA.CENTER)
+        return Renderable.horizontal(listOf(inputsPanel, arrowRenderable(), outputPanel), spacing = 8, verticalAlign = VA.TOP)
     }
 
-    private fun buildGenericLayout(recipe: PrimitiveRecipe): Renderable {
+    private fun buildGenericLayout(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
         fun panel(title: String, ingredients: Set<PrimitiveIngredient>) = Renderable.vertical(
             buildList {
                 add(sectionLabel(title))
                 if (ingredients.isEmpty()) add(Renderable.text("§7(none)", scale = 0.85))
-                else addAll(ingredients.map { buildIngredientRow(it) })
+                else addAll(ingredients.map { buildIngredientRow(it, screen) })
             },
             spacing = 3,
         )
 
-        val arrow = Renderable.text(" ──► ", scale = 1.3, color = COLOR_ARROW.toColor(), horizontalAlign = HA.CENTER)
-
-        return Renderable.horizontal(
-            listOf(panel("Inputs", recipe.ingredients), arrow, panel("Output", recipe.outputs)),
+        val inputsPanel = panel("Inputs", recipe.ingredients)
+        return if (recipe.outputs.size <= 1) inputsPanel
+        else Renderable.horizontal(
+            listOf(
+                inputsPanel,
+                arrowRenderable(),
+                panel("Outputs", recipe.outputs)
+            ),
             spacing = 8,
-            verticalAlign = VA.CENTER,
+            verticalAlign = VA.TOP,
         )
     }
 
@@ -232,48 +247,70 @@ object RecipeViewerGui {
      * A single item slot: a fixed-size dark square containing an item icon with tooltip.
      * Empty slots render as a dimmer square with no content.
      */
-    private fun buildItemSlot(ingredient: PrimitiveIngredient?): Renderable {
-        if (ingredient == null) {
-            return Renderable.drawInsideRoundedRect(
-                Renderable.placeholder(SLOT_SIZE, SLOT_SIZE),
-                COLOR_SLOT_EMPTY.toColor(),
-                padding = 0,
-                radius = (4 * ITEM_SCALE).toInt(),
-            )
+    private fun buildItemSlot(ingredient: PrimitiveIngredient?, screen: RecipeViewerScreen): Renderable {
+        if (ingredient == null) return Renderable.drawInsideRoundedRect(
+            Renderable.placeholder(SLOT_SIZE, SLOT_SIZE),
+            COLOR_SLOT_EMPTY.toColor(), padding = 0, radius = (4 * ITEM_SCALE).toInt(),
+        )
+        val hasRecipes = EnoughUpdatesManager.getRecipesFor(ingredient.internalName).isNotEmpty()
+        if (!hasRecipes) {
+            return Renderable.drawInsideRoundedRect(scaledItem(ingredient.internalName), COLOR_SLOT_FILLED.toColor(), padding = 0, radius = 4)
         }
-
-        // withTip() wraps the item in a hoverTips using the item's own vanilla tooltip.
-        val itemWithTip = scaledItem(ingredient.internalName)
-
-        return Renderable.drawInsideRoundedRect(itemWithTip, COLOR_SLOT_FILLED.toColor(), padding = 0, radius = 4)
+        val provider = NeuItemStackProvider(ingredient.internalName)
+        val slot = Renderable.drawInsideRoundedRect(scaledItem(ingredient.internalName, withTip = false), COLOR_SLOT_FILLED.toColor(), padding = 0, radius = 4)
+        val tips = provider.stack.getTooltipCompat(false) + listOf("", "§eClick to view recipes")
+        return Renderable.clickable(slot, onLeftClick = { screen.navigateTo(ingredient.internalName) }, tips = tips)
     }
 
-    private fun buildIngredientRow(ingredient: PrimitiveIngredient): Renderable {
+    private fun buildIngredientRow(ingredient: PrimitiveIngredient, screen: RecipeViewerScreen): Renderable {
         val name = ingredient.internalName.repoItemName
-        val label = Renderable.text("$name §7×${ingredient.count.toInt().addSeparators()}", scale = 0.9, color = Color.WHITE)
-        return Renderable.horizontal(listOf(buildItemSlot(ingredient), label), spacing = 4, verticalAlign = VA.CENTER)
+        val count = ingredient.count.toInt()
+        val countSuffix = if (count > 1) " §7×${count.addSeparators()}" else ""
+        val label = Renderable.text("$name$countSuffix", scale = 0.9, color = Color.WHITE)
+        return Renderable.horizontal(listOf(buildItemSlot(ingredient, screen), label), spacing = 4, verticalAlign = VA.CENTER)
     }
 
     private fun sectionLabel(text: String) =
         Renderable.text("§7$text:", scale = 0.85, color = COLOR_SUBHEADER.toColor())
 
+    private fun arrowRenderable() =
+        Renderable.text(" ──► ", scale = 1.3, color = COLOR_ARROW.toColor(), horizontalAlign = HA.CENTER)
+
     private fun buildNoRecipesPlaceholder(internalName: NeuInternalName) =
         Renderable.text("§cNo recipes found for §e${internalName.asString()}", color = Color.WHITE, horizontalAlign = HA.CENTER)
 
-    private fun buildCloseButton(screen: RecipeViewerScreen): Renderable {
-        val closeColor = COLOR_CLOSE.toColor()
-        val label = Renderable.text("Close", color = Color.WHITE)
+    private fun buildCloseButton(screen: RecipeViewerScreen): Renderable = Renderable.clickable(
+        Renderable.drawInsideRoundedRectWithOutline(
+            Renderable.text("Close", color = Color.WHITE),
+            color = COLOR_CLOSE.toColor(),
+            padding = 5,
+            radius = 8,
+            topOutlineColor = COLOR_CLOSE.toColor().brighter().rgb,
+            bottomOutlineColor = COLOR_CLOSE.toColor().darker().rgb,
+            borderOutlineThickness = 1,
+        ),
+        onLeftClick = { screen.onClose() },
+    )
+
+    private fun buildActionsRow(screen: RecipeViewerScreen): Renderable {
+        val buttons = buildList {
+            if (screen.canNavigateBack) add(buildBackButton(screen))
+            add(buildCloseButton(screen))
+        }
+        return Renderable.horizontal(buttons, spacing = 6, verticalAlign = VA.CENTER)
+    }
+
+    private fun buildBackButton(screen: RecipeViewerScreen): Renderable {
+        val color = COLOR_BACK.toColor()
         return Renderable.clickable(
             Renderable.drawInsideRoundedRectWithOutline(
-                label,
-                color = closeColor,
-                padding = 5,
-                radius = 8,
-                topOutlineColor = closeColor.brighter().rgb,
-                bottomOutlineColor = closeColor.darker().rgb,
+                Renderable.text("◄ Back", color = Color.WHITE),
+                color = color, padding = 5, radius = 8,
+                topOutlineColor = color.brighter().rgb,
+                bottomOutlineColor = color.darker().rgb,
                 borderOutlineThickness = 1,
             ),
-            onLeftClick = { screen.onClose() },
+            onLeftClick = { screen.navigateBack() },
         )
     }
 }

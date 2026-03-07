@@ -39,7 +39,7 @@ open class ItemStackRenderable protected constructor(
     }
 
     fun withTip(advancedTooltipCompat: Boolean = false) = Renderable.hoverTips(
-        stack,
+        this,
         stack.getTooltipCompat(advancedTooltipCompat),
         stack = stack,
     )

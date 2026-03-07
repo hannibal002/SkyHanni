@@ -15,12 +15,18 @@ import org.lwjgl.glfw.GLFW
  * This class owns mutable UI state and delegates render/input to the Renderable system.
  */
 class RecipeViewerScreen(
-    internal val internalName: NeuInternalName,
+    internalName: NeuInternalName,
 ) : SkyHanniBaseScreen() {
+    internal var internalName: NeuInternalName = internalName
+        private set
 
     /** Current recipe page, mutated by navigation buttons built in [RecipeViewerGui]. */
     var recipeIndex: Int = 0
         internal set
+
+    /** History stack for back navigation; stores pairs of internal name and recipe index. */
+    private val history = ArrayDeque<Pair<NeuInternalName, Int>>()
+    val canNavigateBack get() = history.isNotEmpty()
 
     private var display: Renderable? = null
 
@@ -31,6 +37,20 @@ class RecipeViewerScreen(
     /** Rebuilds the display tree; called on init and whenever navigation state changes. */
     internal fun rebuildDisplay() {
         display = RecipeViewerGui.buildDisplay(this)
+    }
+
+    fun navigateTo(name: NeuInternalName) {
+        history.addLast(internalName to recipeIndex)
+        internalName = name
+        recipeIndex = 0
+        rebuildDisplay()
+    }
+
+    fun navigateBack() {
+        val (name, index) = history.removeLastOrNull() ?: return
+        internalName = name
+        recipeIndex = index
+        rebuildDisplay()
     }
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
