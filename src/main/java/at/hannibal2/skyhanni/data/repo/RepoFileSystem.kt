@@ -1,13 +1,19 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.async
+import at.hannibal2.skyhanni.SkyHanniMod.launch
+import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonElement
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
@@ -15,7 +21,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
-import kotlin.time.Duration.Companion.minutes
 
 sealed interface RepoFileSystem {
     fun exists(path: String): Boolean
@@ -37,46 +42,49 @@ sealed interface RepoFileSystem {
         return gson.fromJson<JsonElement>(jsonText)
     }
 
-    fun loadFromZip(
+    suspend fun loadFromZip(
         progress: ChatProgressUpdates,
         zipFile: File,
         logger: RepoLogger,
-    ): Boolean = runCatching {
-        progress.update("loadFromZip")
-        ZipFile(zipFile.absolutePath).use { zip ->
-            progress.update("zipFile entries collect")
-            val entries = zip.entries().asSequence()
-                .filterNot { it.isDirectory }
-                .toList()
-            progress.innerProgressStart(entries.size)
-            for (entry in entries) {
-                progress.innerProgressStep()
-                val relative = entry.name.substringAfter('/', entry.name)
-                if (relative.isBlank()) continue
+        coroutineConfig: CoroutineConfig
+    ): Boolean = coroutineConfig.withIOContext().async {
+        runCatching {
+            progress.update("loadFromZip")
+            ZipFile(zipFile.absolutePath).use { zip ->
+                progress.update("zipFile entries collect")
+                val entries = zip.entries().asSequence()
+                    .filterNot { it.isDirectory }
+                    .toList()
+                progress.innerProgressStart(entries.size)
+                for (entry in entries) {
+                    progress.innerProgressStep()
+                    val relative = entry.name.substringAfter('/', entry.name)
+                    if (relative.isBlank()) continue
 
-                if (this@RepoFileSystem is DiskRepoFileSystem) {
-                    val outPath = root.toPath().resolve(relative).normalize()
-                    if (!outPath.startsWith(root.toPath())) {
-                        throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
-                                "please report this on the SkyHanni discord.",
-                        )
+                    if (this@RepoFileSystem is DiskRepoFileSystem) {
+                        val outPath = root.toPath().resolve(relative).normalize()
+                        if (!outPath.startsWith(root.toPath())) {
+                            throw RuntimeException(
+                                "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                    "please report this on the SkyHanni discord.",
+                            )
+                        }
+                    }
+
+                    zip.getInputStream(entry).use { input ->
+                        val data = input.readBytes()
+                        write(relative, data)
                     }
                 }
-
-                zip.getInputStream(entry).use { input ->
-                    val data = input.readBytes()
-                    write(relative, data)
-                }
+                progress.update("done with forEach")
             }
-            progress.update("done with forEach")
+            true
+        }.getOrElse {
+            progress.update("Failed to load repo from zip file: ${zipFile.absolutePath}")
+            logger.logNonDestructiveError("Failed to load repo from zip file: ${zipFile.absolutePath}")
+            false
         }
-        true
-    }.getOrElse {
-        progress.update("Failed to load repo from zip file: ${zipFile.absolutePath}")
-        logger.logNonDestructiveError("Failed to load repo from zip file: ${zipFile.absolutePath}")
-        false
-    }
+    }.await() ?: false
 
     companion object {
         fun createAndClean(root: File, useMemory: Boolean): RepoFileSystem {
@@ -124,45 +132,56 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
     }.map { it.removePrefix("$path/") }
 
-    override fun loadFromZip(progress: ChatProgressUpdates, zipFile: File, logger: RepoLogger): Boolean {
+    override suspend fun loadFromZip(
+        progress: ChatProgressUpdates,
+        zipFile: File,
+        logger: RepoLogger,
+        coroutineConfig: CoroutineConfig
+    ): Boolean = coroutineConfig.withIOContext().async {
         progress.update("repo file system loadFromZip")
-        val success = super.loadFromZip(progress, zipFile, logger)
-        if (flushJob == null) {
-            progress.update("start new launchIOCoroutine task")
-            flushJob = SkyHanniMod.launchIOCoroutine("repo file saveToDisk", timeout = 2.minutes) {
-                saveToDisk(progress.category, diskRoot)
-            }
+        val success = super.loadFromZip(progress, zipFile, logger, coroutineConfig)
+        check(flushJob == null) { "loadFromZip called twice on the same MemoryRepoFileSystem instance" }
+        flushJob = coroutineConfig.launch {
+            saveToDisk(progress.category, diskRoot, coroutineConfig)
         }
         progress.update("loadFromZip end")
-        return success
-    }
+        return@async success
+    }.await() ?: false
 
     override fun dispose() = storage.clear()
 
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
         progress.update("waiting on flushJob")
-        runBlocking { flushJob?.join() }
+        flushJob?.join()
         progress.update("dispose")
         dispose()
-        progress.update("transitionAfterReload end")
         return DiskRepoFileSystem(diskRoot)
     }
 
-    private fun saveToDisk(group: ChatProgressUpdates.ChatProgressCategory, root: File) {
+    @Suppress("InjectDispatcher")
+    private suspend fun saveToDisk(
+        group: ChatProgressUpdates.ChatProgressCategory,
+        root: File,
+        coroutineConfig: CoroutineConfig
+    ) = withContext(Dispatchers.IO) {
         val progress = group.start("saveToDisk")
 
         val base = root.toPath()
         progress.update("createDirectoriesFor")
         base.createDirectoriesFor(storage.keys)
-        progress.update("parallelStream forEach resolve write")
+
         val entries = storage.entries.toList()
         progress.innerProgressStart(entries.size)
-        entries.parallelStream().forEach { (relativePath, bytes) ->
-            progress.innerProgressStep()
-            val out = base.resolve(relativePath)
-            Files.write(out, bytes)
-        }
+        progress.update("writing entries")
 
+        coroutineScope {
+            entries.map { (relativePath, bytes) ->
+                coroutineConfig.launchUnScoped {
+                    Files.write(base.resolve(relativePath), bytes)
+                    progress.innerProgressStep()
+                }
+            }.joinAll()
+        }
         progress.end("saveToDisk end")
     }
 
