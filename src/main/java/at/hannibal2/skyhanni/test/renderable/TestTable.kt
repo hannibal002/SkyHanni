@@ -31,15 +31,14 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
             text("Search Colum", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),
             text("Last Column", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),
         )
-        val input = mapOf<List<Renderable>, String>(
+        val input = mapOf(
             listOf(
                 text("Normal", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),
                 empty(),
                 text("not searchable").renderBounds(),
-                item(
-                    "BOX_OF_SEEDS".toInternalName(),
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                ).renderBounds(),
+                item("BOX_OF_SEEDS".toInternalName()) {
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                }.renderBounds(),
             ) to "",
             listOf(
                 text(
@@ -49,18 +48,19 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                 ).renderBounds(),
                 vertical(text("Sub Row 1"), text("Sub Row 2"), text("Sub Row 3")).renderBounds(),
                 text("searchable: Spaces", verticalAlign = RenderUtils.VerticalAlignment.BOTTOM).renderBounds(),
-                item("BOX_OF_SEEDS".toInternalName(), verticalAlign = RenderUtils.VerticalAlignment.CENTER).renderBounds(),
+                item("BOX_OF_SEEDS".toInternalName()) {
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                }.renderBounds(),
             ) to "Spaces",
             listOf(
                 text("Hoverable", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),
                 hoverTips("Hover Here!", listOf("You see me!")).renderBounds(),
                 text("searchable: Hover").renderBounds(),
                 hoverTips(
-                    item(
-                        "BOX_OF_SEEDS".toInternalName(),
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
-                    ),
+                    item("BOX_OF_SEEDS".toInternalName()) {
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                        verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                    },
                     listOf("I'm a secret"),
                 ).renderBounds(),
             ) to "Hover",
@@ -77,7 +77,9 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 ).renderBounds(),
                 text("searchable: Spaces", verticalAlign = RenderUtils.VerticalAlignment.TOP).renderBounds(),
-                item("BOX_OF_SEEDS".toInternalName(), verticalAlign = RenderUtils.VerticalAlignment.CENTER).renderBounds(),
+                item("BOX_OF_SEEDS".toInternalName()) {
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                }.renderBounds(),
             ) to "Spaces",
             listOf(
                 text(
@@ -92,20 +94,18 @@ object TestTable : RenderableTestSuite.TestRenderable("table") {
                     horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
                 ).renderBounds(),
                 text("searchable: Spaces", verticalAlign = RenderUtils.VerticalAlignment.TOP).renderBounds(),
-                item(
-                    "BOX_OF_SEEDS".toInternalName(),
-                    verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
-                ).renderBounds(),
+                item("BOX_OF_SEEDS".toInternalName()) {
+                    verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                    horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT
+                }.renderBounds(),
             ) to "Spaces",
             listOf(
                 text("Again Normal", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),
                 empty(),
                 text("not searchable").renderBounds(),
-                item(
-                    "BOX_OF_SEEDS".toInternalName(),
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                ).renderBounds(),
+                item("BOX_OF_SEEDS".toInternalName()) {
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                }.renderBounds(),
             ) to "",
             listOf(
                 text("Searchable", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER).renderBounds(),
