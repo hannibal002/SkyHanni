@@ -58,12 +58,14 @@ object SkyHanniVertexFormats {
         return VertexFormatElement.register(id, index, type, usage, count)
     }
 
-    val POSITION_COLOR_ROUNDED: VertexFormat = VertexFormat.builder()
-        .add("Position", VertexFormatElement.POSITION)
-        .add("Color", VertexFormatElement.COLOR)
-        .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
-        .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
-        .build()
+    val POSITION_COLOR_ROUNDED: VertexFormat by lazy {
+        VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION)
+            .add("Color", VertexFormatElement.COLOR)
+            .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
+            .build()
+    }
 
     internal fun BufferBuilder.writeParams(
         x: Float,
