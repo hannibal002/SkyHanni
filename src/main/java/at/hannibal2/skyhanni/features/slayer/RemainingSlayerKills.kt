@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
@@ -149,6 +149,7 @@ object RemainingSlayerKills {
         killCombatWisdomPattern.matchMatcher(message) {
             killComboWisdom = group("wisdom").formatInt()
         }
+        // TODO Repoify Hypixel are planning to add more Wisdom to Grandma wolf see https://hypixel.net/threads/design-thread-magic-find.6015417/
     }
 
     private fun update() {
@@ -173,9 +174,10 @@ object RemainingSlayerKills {
     private fun getMobNames(missing: Double): List<String> {
         val mobs = getMobs() ?: return listOf()
 
-        val multiplier = getMultiplier()
+        val combatWisdomMultiplier = getCombatWisdomMultiplier()
+        val multiplicativeMultiplier = getMultiplicativeMultiplier()
         return mobs.map { mob ->
-            val timesNeeded = missing / (mob.xp * multiplier)
+            val timesNeeded = missing / (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
             val kills = "§e${ceil(timesNeeded).addSeparators()}x"
             " §7- $kills ${mob.names()}" to timesNeeded
         }.sortedByDescending { it.second }.map { it.first }
@@ -194,7 +196,7 @@ object RemainingSlayerKills {
         }
     }
 
-    private fun getMultiplier(): Double {
+    private fun getCombatWisdomMultiplier(): Double {
         var combatWisdom = 1.0
 
         combatWisdom += (baseCombatWisdom ?: 0)
@@ -220,14 +222,25 @@ object RemainingSlayerKills {
             combatWisdom += 10
         }
 
-        // TODO confirm if this is correct
-        if (ElectionApi.isDerpy) {
-            combatWisdom += 30
-        }
-
-        // TODO add 20% xp boost globally from hypixel event
-
         return 1 + 0.01 * combatWisdom
+    }
+
+    private fun getMultiplicativeMultiplier(): Double {
+        var multiplier = 1.0
+        if (Perk.WORK_HARDER.isActive) {
+            multiplier *= 1.5
+        }
+        if (Perk.MOAR_SKILLZ.isActive) {
+            multiplier *= 1.5
+        }
+        // TODO Repoify these in case of rebalance
+        // Derpy/Aura XP Boost were disallowed in First Aura simultaneously, this is for if they change that opinion
+
+        // Do Not add Multiplicative Bonuses here from Seasonal buffs without checking fully
+        // They Have Historically not worked on slayer spawn entirely.
+
+        // TODO add Pet Combat Boosts
+        return multiplier
     }
 
     private fun countHabaneroOnArmor(): Double {
@@ -248,7 +261,7 @@ object RemainingSlayerKills {
                 }
             }
         }
-        return counter * 2.5
+        return counter * 2.5 // TODO Repoify This Wisdom Magic Number from Habanero
     }
 
     private fun Mob.names() = buildString {
