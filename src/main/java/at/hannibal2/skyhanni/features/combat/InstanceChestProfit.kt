@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
+@Suppress("UnusedPrivateProperty")
 object InstanceChestProfit {
     private val patternGroup = RepoPattern.group("combat.instance-chest-profit")
 
@@ -142,10 +143,9 @@ object InstanceChestProfit {
      * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
      * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
-    @Suppress("UnusedPrivateProperty") // Remove after 7.6.0 is pushed
-    private val bookColorFixerold by patternGroup.pattern(
+    private val bookColorFixerold by patternGroup.pattern( // Remove after 7.6.0 is pushed
         "bookcolorfix",
-        "Enchanted Book\\((?<item>.+)(?:§.)+\\)"
+        "Enchanted Book \\((?<item>.+)(?:§.)+\\)"
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
