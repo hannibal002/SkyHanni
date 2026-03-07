@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
@@ -75,7 +74,10 @@ object VisualWordGui {
         )
     }
     private val defaultConfig = ItemRenderableConfig { scale = 1.0 }
-    private val dimmedConfig = ItemRenderableConfig { scale = 1.0; alpha = 0.4f }
+    private val dimmedConfig = ItemRenderableConfig {
+        scale = 1.0
+        alpha = 0.4f
+    }
     private val upItem by lazy { Renderable.item(upSkull, defaultConfig) }
     private val upItemDimmed by lazy { Renderable.item(upSkull, dimmedConfig) }
     private val downItem by lazy { Renderable.item(downSkull, defaultConfig) }
