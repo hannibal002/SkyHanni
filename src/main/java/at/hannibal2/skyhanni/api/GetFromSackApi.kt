@@ -164,7 +164,11 @@ object GetFromSackApi {
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax$amount §9$item §efrom bazaar",
-        onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!",
+        onClick = {
+            OSUtils.copyToClipboard(amount.toString())
+            HypixelCommands.bazaar(item.removeColor())
+        },
+        "§eClick to find on the bazaar!",
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
