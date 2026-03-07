@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.StringSplitter;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,11 +24,19 @@ public class MixinTextHandler {
     )
     private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, FormattedText wrappedLinePrefix, Operation<List<FormattedText>> original) {
         ModifyVisualWords.INSTANCE.setChangeWords(false);
-
         List<FormattedText> lines = original.call(text, maxWidth, style, wrappedLinePrefix);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
         return lines;
     }
+    //?} else {
+    /*@WrapMethod(
+        method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;Ljava/util/function/BiConsumer;)V"
+    )
+    private void dontWrapOtherLines(FormattedText text, int maxWidth, Style style, BiConsumer<FormattedText, Style> lineConsumer, Operation<Void> original) {
+        ModifyVisualWords.INSTANCE.setChangeWords(false);
+        original.call(text, maxWidth, style, lineConsumer);
+        ModifyVisualWords.INSTANCE.setChangeWords(true);
+    }*/
     //? }
 
     @WrapMethod(
@@ -35,29 +44,21 @@ public class MixinTextHandler {
     )
     private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
         ModifyVisualWords.INSTANCE.setChangeWords(false);
-
         List<FormattedText> lines = original.call(text, maxWidth, style);
-
         ModifyVisualWords.INSTANCE.setChangeWords(true);
         return lines;
     }
 
     @ModifyVariable(
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;Ljava/util/function/BiConsumer;)V",
-        at = @At(
-            value = "HEAD"
-        ),
+        at = @At(value = "HEAD"),
         index = 1,
         argsOnly = true
     )
     private FormattedText modifyStringVisitable(FormattedText visitable) {
-
-        FormattedText replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(
-            visitable
-        );
-
-        if (replaced == null) return visitable;
-        return replaced;
+        if (!(visitable instanceof Component component)) return visitable;
+        Component replaced = ModifyVisualWords.INSTANCE.transformComponent(component);
+        return replaced != null ? replaced : visitable;
     }
 
 }

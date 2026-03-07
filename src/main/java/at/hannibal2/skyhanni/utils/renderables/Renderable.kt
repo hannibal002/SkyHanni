@@ -11,6 +11,9 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ColorUtils.rgb
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ColorUtils.toInt
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -37,6 +40,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.SearchableScrollT
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.PauseScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
@@ -1036,7 +1040,41 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                ShaderRenderUtils.drawRoundRectDeferred(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
+                input.render(mouseOffsetX + padding, mouseOffsetY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
+            }
+        }
+
+        fun drawInsideFloatingRectWithBorder(
+            input: Renderable,
+            backgroundColor: ChromaColour,
+            lightColor: ChromaColour,
+            darkColor: ChromaColour = lightColor,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            borderThickness: Int = 1,
+            blur: Float = 0.7f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                ShaderRenderUtils.drawRoundRectDeferred(0, 0, width, height, backgroundColor.toInt(), radius, smoothness.toFloat())
+                ShaderRenderUtils.drawRoundRectOutlineDeferred(
+                    0, 0, width, height,
+                    lightColor.toInt(),
+                    darkColor.toInt(),
+                    borderThickness,
+                    radius,
+                    blur,
+                )
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())
@@ -1177,8 +1215,8 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                ShaderRenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
-                ShaderRenderUtils.drawRoundRectOutline(
+                ShaderRenderUtils.drawRoundRectDeferred(0, 0, width, height, color.rgb, radius, smoothness.toFloat())
+                ShaderRenderUtils.drawRoundRectOutlineDeferred(
                     0,
                     0,
                     width,
@@ -1189,7 +1227,6 @@ interface Renderable {
                     radius,
                     blur,
                 )
-
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat())
                 input.render(mouseOffsetX + padding, mouseOffsetY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat())

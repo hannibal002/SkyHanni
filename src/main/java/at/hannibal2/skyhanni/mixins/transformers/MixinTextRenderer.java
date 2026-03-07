@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils;
 import net.minecraft.client.gui.Font;
-import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -55,7 +56,8 @@ public class MixinTextRenderer {
     @ModifyVariable(method = "width(Lnet/minecraft/network/chat/FormattedText;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedText modifyWidth(FormattedText value) {
 
-        FormattedText replaced = ModifyVisualWords.INSTANCE.transformStringVisitable(value);
+        if (!(value instanceof Component component)) return value;
+        Component replaced = ModifyVisualWords.INSTANCE.transformComponent(component);
 
         if (replaced == null) return value;
         return replaced;
