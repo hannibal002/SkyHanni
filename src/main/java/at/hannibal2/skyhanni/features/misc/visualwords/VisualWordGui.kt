@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -26,9 +25,10 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
@@ -60,21 +60,26 @@ object VisualWordGui {
 
     val sbeConfigPath: File = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
 
-    val itemUp by lazy {
+    private val upSkull by lazy {
         ItemUtils.createSkull(
             displayName = "§aMove Up",
             uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
             value = SkullTextureHolder.getTexture("UP_ARROW"),
         )
     }
-
-    val itemDown by lazy {
+    private val downSkull by lazy {
         ItemUtils.createSkull(
             displayName = "§aMove Down",
             uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
             value = SkullTextureHolder.getTexture("DOWN_ARROW"),
         )
     }
+    private val defaultConfig = ItemRenderableConfig { scale = 1.0 }
+    private val dimmedConfig = ItemRenderableConfig { scale = 1.0; alpha = 0.4f }
+    private val upItem by lazy { Renderable.item(upSkull, defaultConfig) }
+    private val upItemDimmed by lazy { Renderable.item(upSkull, dimmedConfig) }
+    private val downItem by lazy { Renderable.item(downSkull, defaultConfig) }
+    private val downItemDimmed by lazy { Renderable.item(downSkull, dimmedConfig) }
 
     fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
 
@@ -130,6 +135,7 @@ object VisualWordGui {
                 scrollValue = screen.listScrollValue,
                 bypassChecks = true,
                 showScrollableTipsInList = false,
+                showScrollbar = true,
             )
         }
 
@@ -138,21 +144,6 @@ object VisualWordGui {
             spacing = 6,
             horizontalAlign = HA.CENTER,
         )
-    }
-
-    private fun Renderable.dimmed(): Renderable {
-        val inner = this
-        return object : Renderable {
-            override val width = inner.width
-            override val height = inner.height
-            override val horizontalAlign = inner.horizontalAlign
-            override val verticalAlign = inner.verticalAlign
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                inner.render(mouseOffsetX, mouseOffsetY)
-                val altBackground = COLOR_BG.toColor().darker(0.5)
-                ShaderRenderUtils.drawRoundRectDeferred(0, 0, width, height, altBackground.rgb, 0, 1f)
-            }
-        }
     }
 
     private fun buildWordRow(screen: VisualWordScreen, index: Int, word: VisualWord): Renderable {
@@ -169,46 +160,45 @@ object VisualWordGui {
             width = 230,
         )
 
-        val upItem = Renderable.item(itemUp, scale = 1.5)
         val upBtn = if (index > 0)
             Renderable.clickable(
                 upItem.withTip(),
                 onLeftClick = { screen.moveWord(index, up = true) },
                 bypassChecks = true,
             )
-        else upItem.dimmed()
+        else upItemDimmed.withTip()
 
-        val downItem = Renderable.item(itemDown, scale = 1.5)
+
         val downBtn = if (index < screen.modifiedWords.lastIndex)
             Renderable.clickable(
                 downItem.withTip(),
                 onLeftClick = { screen.moveWord(index, up = false) },
                 bypassChecks = true,
             )
-        else downItem.dimmed()
+        else downItemDimmed.withTip()
 
         val statusItem = if (word.enabled) ColoredBlockCompat.GREEN.createStainedClay()
         else ColoredBlockCompat.RED.createStainedClay()
 
         val statusBtn = Renderable.clickable(
-            Renderable.item(statusItem, scale = 0.9),
+            Renderable.item(statusItem) { scale = 0.9 },
             onLeftClick = { screen.toggleEnabled(index) },
             bypassChecks = true,
         )
 
+        val clickableText = Renderable.clickable(
+            Renderable.fixedSizeLine(textFixed, width = 230),
+            onLeftClick = { screen.enterEditMode(index) },
+            bypassChecks = true,
+        )
         val rowContent = Renderable.horizontal(
-            listOf(indexLabel, textFixed, upBtn, downBtn, statusBtn),
+            listOf(indexLabel, clickableText, upBtn, downBtn, statusBtn),
             spacing = 4,
             verticalAlign = VA.CENTER,
         )
-
-        return Renderable.clickable(
-            Renderable.hoverable(
-                Renderable.drawInsideRoundedRect(rowContent, COLOR_ROW_HOVER.toColor(), padding = 3, radius = 5),
-                Renderable.drawInsideRoundedRect(rowContent, COLOR_ROW_NORMAL.toColor(), padding = 3, radius = 5),
-                bypassChecks = true,
-            ),
-            onLeftClick = { screen.enterEditMode(index) },
+        return Renderable.hoverable(
+            Renderable.drawInsideRoundedRect(rowContent, COLOR_ROW_HOVER.toColor(), padding = 3, radius = 5),
+            Renderable.drawInsideRoundedRect(rowContent, COLOR_ROW_NORMAL.toColor(), padding = 3, radius = 5),
             bypassChecks = true,
         )
     }
