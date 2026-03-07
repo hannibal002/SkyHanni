@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.async
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
@@ -14,7 +13,6 @@ import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
@@ -23,7 +21,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipFile
-import kotlin.time.Duration.Companion.minutes
 
 sealed interface RepoFileSystem {
     fun exists(path: String): Boolean
@@ -161,6 +158,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         return DiskRepoFileSystem(diskRoot)
     }
 
+    @Suppress("InjectDispatcher")
     private suspend fun saveToDisk(
         group: ChatProgressUpdates.ChatProgressCategory,
         root: File,
