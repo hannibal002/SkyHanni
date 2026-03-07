@@ -11,6 +11,8 @@ class GraphingNode(
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
     var extraWeight: Int = 0,
+    var conditionalShow: MutableList<String> = mutableListOf(),
+    var conditionalHide: MutableList<String> = mutableListOf(),
 ) : GraphUtils.GenericNode {
 
     var rendering = true

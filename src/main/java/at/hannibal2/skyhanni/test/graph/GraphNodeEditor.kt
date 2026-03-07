@@ -132,6 +132,7 @@ object GraphNodeEditor {
     private fun updateTagView(node: GraphingNode) {
         lastUpdate = SimpleTimeMark.now() + 60.seconds
         nodesDisplay = buildList {
+            showConditions()
             val list = drawTagNames(node)
             val size = list.size
             addString("§eGraph Nodes: $size")
@@ -140,6 +141,24 @@ object GraphNodeEditor {
                 add(Renderable.scrollList(list, height, scrollValueTags, velocity = 10.0))
             }
         }
+    }
+
+    private fun MutableList<Renderable>.showConditions() {
+        if (GraphEditor.conditions.isEmpty()) return
+        addString("")
+        addString("${GraphEditor.conditions.size} §eConditions:")
+        for ((name, state) in GraphEditor.conditions) {
+            val label = if (state) "§aActive" else "§7Disabled"
+            val clickable = Renderable.clickable(
+                text = "$name $label",
+                onLeftClick = {
+                    GraphEditor.conditions[name] = !state
+                    GraphEditor.updateConditions()
+                },
+            )
+            add(clickable)
+        }
+        addString("")
     }
 
     private fun drawTagNames(node: GraphingNode): List<Renderable> = buildList {
@@ -275,6 +294,8 @@ object GraphNodeEditor {
 
     private fun updateDisabledNames() {
         for (node in state.nodes) {
+            if (node.conditionalShow.isNotEmpty()) continue
+            if (node.conditionalHide.isNotEmpty()) continue
             node.enabled = node.position !in disabledLocations
         }
     }

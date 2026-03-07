@@ -81,6 +81,8 @@ class GraphEditorState {
                 oldNode.name,
                 ArrayList(oldNode.tags),
                 oldNode.extraWeight,
+                oldNode.conditionalShow,
+                oldNode.conditionalHide,
             )
             newState.nodes.add(newNode)
             nodeMap[oldNode] = newNode

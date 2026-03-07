@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
@@ -44,6 +45,7 @@ object GraphEditorRenderer {
     private val closestColor = LorenzColor.YELLOW.addOpacity(200)
 
     private val edgeColor = LorenzColor.GOLD.addOpacity(150)
+    private val disabledEdgeColor = LorenzColor.GRAY.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -159,8 +161,10 @@ object GraphEditorRenderer {
 
     private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (!edge.node1.rendering && !edge.node2.rendering) return
+        val isEnabled = edge.node1.enabled && edge.node2.enabled
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
+            !isEnabled -> disabledEdgeColor
             else -> edge.networkColor ?: edgeColor
         }
 

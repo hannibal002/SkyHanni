@@ -165,6 +165,8 @@ value class Graph(
             var tags: List<String> = emptyList(),
             val neighbors: MutableList<Pair<Int, Double>> = mutableListOf(),
             var extraWeight: Int = 0,
+            var conditionalShow: List<String> = mutableListOf(),
+            var conditionalHide: List<String> = mutableListOf(),
         )
 
         private fun parseNodeData(reader: JsonReader): NodeData {
@@ -187,6 +189,8 @@ value class Graph(
                     "Neighbours" -> parseNeighbours(reader, data.neighbors)
                     "Name" -> data.name = reader.nextString()
                     "Tags" -> data.tags = parseTags(reader)
+                    "ConditionalShow" -> data.conditionalShow = parseTags(reader)
+                    "ConditionalHide" -> data.conditionalHide = parseTags(reader)
                 }
             }
 
@@ -240,6 +244,8 @@ class GraphNode(
     val name: String? = null,
     val tagNames: List<String> = emptyList(),
     val extraWeight: Int = 0,
+    var conditionalShow: MutableList<String> = mutableListOf(),
+    var conditionalHide: MutableList<String> = mutableListOf(),
 ) :
     GraphUtils.GenericNode {
 

@@ -19,11 +19,17 @@ object GraphEditorNodeOperations {
     fun addNode() {
         val closestNode = state.closestNode
         if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == state.activeNode) {
-            GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
+            GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from the active node.")
             GraphEditorHistory.save("removed node")
-            nodes.remove(closestNode)
-            edges.removeIf { it.isInEdge(closestNode) }
-            GraphEditor.updateCache()
+            GraphEditor.editCondition?.let {
+                closestNode.conditionalHide.add(it)
+                closestNode.enabled = false
+                GraphEditor.updateConditions()
+            } ?: run {
+                nodes.remove(closestNode)
+                edges.removeIf { it.isInEdge(closestNode) }
+                GraphEditor.updateCache()
+            }
             if (closestNode == state.activeNode) state.activeNode = null
             state.closestNode = null
             return
@@ -36,6 +42,10 @@ object GraphEditorNodeOperations {
         val node = GraphingNode(state.id++, playerPosition)
         GraphEditorHistory.save("added node")
         nodes.add(node)
+        GraphEditor.editCondition?.let {
+            node.conditionalShow.add(it)
+            GraphEditor.updateConditions()
+        }
         GraphEditor.feedBackInTutorial("Added graph node.")
         state.activeNode?.let {
             addEdge(it, node)

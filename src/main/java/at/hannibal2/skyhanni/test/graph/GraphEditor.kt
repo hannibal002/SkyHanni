@@ -44,6 +44,36 @@ object GraphEditor {
     var hideDisabled = false
         private set
 
+    var editCondition: String? = null
+    val conditions = mutableMapOf<String, Boolean>()
+
+    fun updateConditions() {
+        ChatUtils.chat("conditions: ${conditions.size}")
+        for (node in nodes) {
+            for (condition in node.conditionalHide) {
+                val hideState = conditions[condition]
+                if (hideState == null) {
+                    conditions[condition] = false
+                } else {
+                    if (hideState) {
+                        node.enabled = false
+                    }
+                }
+            }
+            for (condition in node.conditionalShow) {
+                val showState = conditions[condition]
+                if (showState == null) {
+                    conditions[condition] = false
+                } else {
+                    if (showState) {
+                        node.enabled = true
+                    }
+                }
+            }
+        }
+
+    }
+
     fun flagDisabledDirty() {
         disabledDirty = true
     }
@@ -173,6 +203,29 @@ object GraphEditor {
                     return@simpleCallback
                 }
                 GraphNodeEditor.getWeight()
+            }
+        }
+
+        event.registerBrigadier("shgraphcondition") {
+            description = "Change what condition gets currently edited"
+            category = CommandCategory.DEVELOPER_TEST
+            arg("condition", BrigadierArguments.string()) { condition ->
+                callback {
+                    if (!isEnabled()) {
+                        ChatUtils.userError("Graph Editor is not active!")
+                        return@callback
+                    }
+                    editCondition = getArg(condition)
+                    ChatUtils.chat("Set Graph Editor edit condition to $editCondition")
+                }
+            }
+            simpleCallback {
+                if (!isEnabled()) {
+                    ChatUtils.userError("Graph Editor is not active!")
+                    return@simpleCallback
+                }
+                editCondition = null
+                ChatUtils.chat("Reset Graph Editor edit condition")
             }
         }
     }

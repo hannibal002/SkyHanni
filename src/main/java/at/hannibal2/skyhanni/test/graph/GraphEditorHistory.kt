@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import org.lwjgl.glfw.GLFW
 
 object GraphEditorHistory {
@@ -57,13 +59,9 @@ object GraphEditorHistory {
             sendUndoRedoMessage("§cNothing to redo.")
             return
         }
-
         val entry = redoStack.pop()
-
         undoStack.push(HistoryEntry(state.copy(), entry.label, GraphUtils.playerPosition))
-
         state = entry.state
-
         restoreContext(entry, "Redo")
     }
 

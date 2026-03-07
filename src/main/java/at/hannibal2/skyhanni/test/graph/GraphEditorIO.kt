@@ -182,6 +182,8 @@ object GraphEditorIO {
                 graphNode.name,
                 graphNode.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
                 graphNode.extraWeight,
+                graphNode.conditionalShow,
+                graphNode.conditionalHide,
             )
         }
         val translation = graph.zip(importedNodes).toMap()
