@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.FormattedText
 import net.minecraft.network.chat.Style
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.StringDecomposer
@@ -46,6 +47,22 @@ object ModifyVisualWords {
         return userModifiedWords.isNotEmpty()
     }
 
+    private fun visitAndReplace(visitable: FormattedText): Component {
+        val rawCharacters = mutableListOf<StyledCharacter>()
+        visitable.visit(
+            { style, string ->
+                rawCharacters.addAll(string.toStyledCharacterList(style, false))
+                Optional.empty<Boolean>()
+            },
+            Style.EMPTY,
+        )
+        return Component.empty().also { result ->
+            doReplacements(rawCharacters).toStyleRuns().forEach { (text, style) ->
+                result.append(Component.literal(text).withStyle(style))
+            }
+        }
+    }
+
     fun transformText(orderedText: FormattedCharSequence?): FormattedCharSequence? {
         if (orderedText == null) return null
         if (!isActive()) return null
@@ -71,28 +88,17 @@ object ModifyVisualWords {
         }
     }
 
+    fun transformFormattedText(formattedText: FormattedText?): FormattedText? {
+        if (formattedText == null) return null
+        if (formattedText is Component) return transformComponent(formattedText)
+        if (!isActive()) return null
+        return visitAndReplace(formattedText)
+    }
+
     fun transformComponent(component: Component?): Component? {
         if (component == null) return null
         if (!isActive()) return null
-
-        return componentCache.getOrPut(component) {
-            val rawCharacters = mutableListOf<StyledCharacter>()
-            component.visit(
-                { style, string ->
-                    rawCharacters.addAll(string.toStyledCharacterList(style, false))
-                    Optional.empty<Boolean>()
-                },
-                Style.EMPTY,
-            )
-
-            val characters = doReplacements(rawCharacters)
-
-            Component.empty().also { result ->
-                characters.toStyleRuns().forEach { (text, style) ->
-                    result.append(Component.literal(text).withStyle(style))
-                }
-            }
-        }
+        return componentCache.getOrPut(component) { visitAndReplace(component) }
     }
 
     private fun doReplacements(characters: MutableList<StyledCharacter>): MutableList<StyledCharacter> {

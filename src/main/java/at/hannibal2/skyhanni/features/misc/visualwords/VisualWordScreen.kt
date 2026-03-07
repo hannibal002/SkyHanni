@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.mixins.hooks.VisualWordsHook
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -44,16 +45,13 @@ class VisualWordScreen : SkyHanniBaseScreen() {
         val startX = (width - renderable.width) / 2
         val startY = (height - renderable.height) / 2
 
-        ModifyVisualWords.changeWords = false
-        try {
+        VisualWordsHook.withoutWordChanges {
             DrawContextUtils.pushPop {
                 DrawContextUtils.translate(startX.toFloat(), startY.toFloat())
                 Renderable.withMousePosition(mouseX - startX, mouseY - startY) {
                     renderable.render(0, 0)
                 }
             }
-        } finally {
-            ModifyVisualWords.changeWords = true
         }
     }
 
