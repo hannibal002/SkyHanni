@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -135,8 +134,13 @@ object InstanceChestProfit {
      * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
     private val bookColorFixer by patternGroup.pattern(
+        "bookcolorfixnew",
+        "(?<item>.+)(?:§.)+",
+    )
+
+    private val bookColorFixerold by patternGroup.pattern(
         "bookcolorfix",
-        "Enchanted Book \\((?<item>.+)(?:§.)+",
+        "Enchanted Book\\((?<item>.+)(?:§.)+\\)"
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -232,11 +236,10 @@ object InstanceChestProfit {
                 }
             } else {
                 var itemPrice: Double
-                var itemName = ItemUtils.readBookType(loreLine) ?: loreLine
-                var itemInternalName = NeuInternalName.fromItemNameOrNull(itemName)
-                bookColorFixer.matchMatcher(itemName) {
-                    itemName = ItemResolutionQuery.resolveEnchantmentByName(group("item"))?.repoItemName ?: itemName
-                    itemInternalName = itemName.toInternalName()
+                val bookCheckedLoreLine = ItemUtils.readBookType(loreLine) ?: loreLine
+                var itemInternalName = NeuInternalName.fromItemNameOrNull(bookCheckedLoreLine)
+                bookColorFixer.matchMatcher(bookCheckedLoreLine) {
+                    itemInternalName = ItemResolutionQuery.resolveEnchantmentByName(group("item")) ?: itemInternalName
                 }
                 val internalName = itemInternalName
                 var favorited = ""
