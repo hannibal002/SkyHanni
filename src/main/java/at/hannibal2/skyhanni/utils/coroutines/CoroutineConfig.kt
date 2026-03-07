@@ -33,7 +33,7 @@ open class CoroutineConfig(
  * A [CoroutineConfig] that additionally holds a [Mutex], which will be acquired
  * before the coroutine block executes.
  */
-class MutexedCoroutineConfig(
+open class MutexedCoroutineConfig(
     name: String,
     val mutex: Mutex,
     timeout: Duration = 10.seconds,
