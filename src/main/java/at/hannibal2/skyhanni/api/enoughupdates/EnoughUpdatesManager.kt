@@ -85,6 +85,7 @@ object EnoughUpdatesManager {
         internalNameSet.clear()
         titleWordMap.clear()
         recipesMap.clear()
+        ingredientToOutputs.clear()
 
         val tempItemMap = TreeMap<NeuInternalName, NeuItemJson>()
         loadItemMap(progress, tempItemMap)

@@ -43,21 +43,35 @@ object RecipeViewerGui {
     private const val PANEL_PADDING = 10
     private const val ITEM_SCALE = 1.25
 
-    private fun scaledItem(internalName: NeuInternalName, withTip: Boolean = true): Renderable {
-        val provider = NeuItemStackProvider(internalName)
-        val glint = internalName.asString().startsWith("ENCHANTED_")
-        return Renderable.item(
-            stackGetter = { provider.stack.let { if (glint) it.addEnchantGlint() else it } },
-            scale = ITEM_SCALE,
-        ).let { if (withTip) it.withTip() else it }
+    private val providerCache = HashMap<NeuInternalName, NeuItemStackProvider>()
+    private fun providerFor(internalName: NeuInternalName) = providerCache.getOrPut(internalName) {
+        NeuItemStackProvider(internalName)
     }
 
-    private val providerCache = HashMap<NeuInternalName, NeuItemStackProvider>()
-    private fun providerFor(internalName: NeuInternalName) =
-        providerCache.getOrPut(internalName) { NeuItemStackProvider(internalName) }
+    private val itemProviderCache = HashMap<Triple<NeuInternalName, Int, Boolean>, NeuItemStackProvider>()
+    private fun itemProviderFor(internalName: NeuInternalName, stackCount: Int): NeuItemStackProvider {
+        val glint = internalName.asString().startsWith("ENCHANTED_")
+        return itemProviderCache.getOrPut(Triple(internalName, stackCount, glint)) {
+            NeuItemStackProvider(internalName) {
+                if (glint) addEnchantGlint()
+                count = stackCount
+            }
+        }
+    }
+
+    private val itemRenderableCache = HashMap<Triple<NeuInternalName, Int, Boolean>, Renderable>()
+    private fun NeuInternalName.scaledItem(
+        withTip: Boolean = true,
+        stackCount: Int = 1
+    ): Renderable = itemRenderableCache.getOrPut(Triple(this, stackCount, withTip)) {
+        Renderable.item(itemProviderFor(this, stackCount), scale = ITEM_SCALE).let {
+            if (withTip) it.withTip() else it
+        }
+    }
+
     private val COIN_ITEM = "SKYBLOCK_COIN".toInternalName()
     private val SLOT_SIZE by lazy {
-        scaledItem(NeuInternalName.MISSING_ITEM).let {
+        NeuInternalName.MISSING_ITEM.scaledItem().let {
             it.width.coerceAtLeast(it.height)
         }
     }
@@ -141,7 +155,7 @@ object RecipeViewerGui {
             add(Renderable.text("§7${asString()}", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
         }
         return Renderable.horizontal(
-            listOf(scaledItem(this, withTip = false), texts),
+            listOf(this@buildHeaderRow.scaledItem(withTip = false), texts),
             spacing = 6,
             verticalAlign = VA.CENTER,
         )
@@ -154,7 +168,7 @@ object RecipeViewerGui {
             val color = if (active) COLOR_NAV_ACTIVE.toColor() else COLOR_NAV_INACTIVE.toColor()
             val text = Renderable.text(label, scale = 1.2, color = if (active) Color.WHITE else Color.GRAY)
             val button = Renderable.drawInsideRoundedRect(text, color, padding = 3, radius = 6)
-            return if (active) Renderable.clickable(button, onClick) else button
+            return if (active) Renderable.clickable(button, onClick, bypassChecks = true) else button
         }
 
         val prevButton = navButton("◄", currentIndex > 0) {
@@ -274,7 +288,7 @@ object RecipeViewerGui {
             val canNavigateFor = canNavigate && EnoughUpdatesManager.getRecipesFor(ingredient.internalName).isNotEmpty()
             val canNavigateUsing = canNavigate && EnoughUpdatesManager.getRecipesUsing(ingredient.internalName).isNotEmpty()
 
-            val slot = scaledItem(ingredient.internalName, withTip = false).drawInSlot()
+            val slot = ingredient.internalName.scaledItem(withTip = false, stackCount = ingredient.count.toInt()).drawInSlot()
             val baseTips = providerFor(ingredient.internalName).stack.getTooltipCompat(false)
             val tips = baseTips + listOfNotNull(
                 "",
@@ -282,7 +296,7 @@ object RecipeViewerGui {
                 "§eRight click for recipe usages".takeIf { canNavigateUsing },
             )
 
-            return@run if (!canNavigateFor && !canNavigateUsing) Renderable.hoverTips(slot, baseTips)
+            return@run if (!canNavigateFor && !canNavigateUsing) Renderable.hoverTips(slot, baseTips, bypassChecks = true)
             else Renderable.clickable(
                 slot,
                 onAnyClick = buildMap {
@@ -290,6 +304,7 @@ object RecipeViewerGui {
                     if (canNavigateUsing) put(RIGHT_MOUSE) { screen.navigateToUsages(ingredient.internalName) }
                 },
                 tips = tips,
+                bypassChecks = true,
             )
         }
     }
@@ -311,6 +326,14 @@ object RecipeViewerGui {
     private fun buildNoRecipesPlaceholder(internalName: NeuInternalName) =
         Renderable.text("§cNo recipes found for §e${internalName.asString()}", color = Color.WHITE, horizontalAlign = HA.CENTER)
 
+    private fun buildActionsRow(screen: RecipeViewerScreen) = Renderable.horizontal(
+        spacing = 6,
+        verticalAlign = VA.CENTER
+    ) {
+        if (screen.canNavigateBack) add(buildBackButton(screen))
+        add(buildCloseButton(screen))
+    }
+
     private fun buildCloseButton(screen: RecipeViewerScreen) = Renderable.clickable(
         Renderable.drawInsideRoundedRectWithOutline(
             Renderable.text("Close", color = Color.WHITE),
@@ -322,15 +345,8 @@ object RecipeViewerGui {
             borderOutlineThickness = 1,
         ),
         onLeftClick = { screen.onClose() },
+        bypassChecks = true,
     )
-
-    private fun buildActionsRow(screen: RecipeViewerScreen) = Renderable.horizontal(
-        spacing = 6,
-        verticalAlign = VA.CENTER
-    ) {
-        if (screen.canNavigateBack) add(buildBackButton(screen))
-        add(buildCloseButton(screen))
-    }
 
     private fun buildBackButton(screen: RecipeViewerScreen) = Renderable.clickable(
         Renderable.drawInsideRoundedRectWithOutline(
@@ -341,5 +357,6 @@ object RecipeViewerGui {
             borderOutlineThickness = 1,
         ),
         onLeftClick = { screen.navigateBack() },
+        bypassChecks = true,
     )
 }
