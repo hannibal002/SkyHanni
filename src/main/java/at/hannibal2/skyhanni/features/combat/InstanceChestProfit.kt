@@ -142,6 +142,7 @@ object InstanceChestProfit {
      * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
      * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
+    @Suppress("UnusedPrivateProperty") // Remove after 7.6.0 is pushed
     private val bookColorFixerold by patternGroup.pattern(
         "bookcolorfix",
         "Enchanted Book\\((?<item>.+)(?:§.)+\\)"
