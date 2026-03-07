@@ -45,6 +45,7 @@ import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
+@Suppress("UnusedPrivateProperty")
 object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
@@ -446,7 +447,8 @@ object HypixelData {
     fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
         val oldIsland = skyBlockIsland
         if (oldIsland != IslandType.NONE) {
-            IslandChangeEvent(IslandType.NONE, oldIsland)
+            skyBlockIsland = IslandType.NONE
+            IslandChangeEvent(skyBlockIsland, oldIsland)
         }
     }
 
@@ -553,7 +555,8 @@ object HypixelData {
             newIsland = getIslandType(foundIsland, guesting)
         }
 
-        if (skyBlockIsland != newIsland && !eitherIsNone(skyBlockIsland, newIsland)) {
+        // TODO Re-Add EitherIsNone, reverted alongside rest of changes from #5270 due to event firing issues
+        if (skyBlockIsland != newIsland) {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
