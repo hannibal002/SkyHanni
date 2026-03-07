@@ -11,8 +11,11 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
@@ -38,8 +41,8 @@ object RecipeViewerGui {
 
     private const val GRID_SPACING = 2
     private const val PANEL_PADDING = 10
-
     private const val ITEM_SCALE = 1.25
+
     private fun scaledItem(internalName: NeuInternalName, withTip: Boolean = true): Renderable {
         val provider = NeuItemStackProvider(internalName)
         val glint = internalName.asString().startsWith("ENCHANTED_")
@@ -49,6 +52,10 @@ object RecipeViewerGui {
         ).let { if (withTip) it.withTip() else it }
     }
 
+    private val providerCache = HashMap<NeuInternalName, NeuItemStackProvider>()
+    private fun providerFor(internalName: NeuInternalName) =
+        providerCache.getOrPut(internalName) { NeuItemStackProvider(internalName) }
+    private val COIN_ITEM = "SKYBLOCK_COIN".toInternalName()
     private val SLOT_SIZE by lazy {
         scaledItem(NeuInternalName.MISSING_ITEM).let {
             it.width.coerceAtLeast(it.height)
@@ -100,30 +107,24 @@ object RecipeViewerGui {
      * Stateless — all mutable state lives in [RecipeViewerScreen].
      */
     fun buildDisplay(screen: RecipeViewerScreen): Renderable {
-        val recipes = EnoughUpdatesManager.getRecipesFor(screen.internalName).toList()
+        val recipes = when (screen.viewMode) {
+            RecipeViewerScreen.RecipeViewMode.RECIPES_FOR -> EnoughUpdatesManager.getRecipesFor(screen.internalName)
+            RecipeViewerScreen.RecipeViewMode.RECIPES_USING -> EnoughUpdatesManager.getRecipesUsing(screen.internalName)
+        }.toList()
         val index = screen.recipeIndex.coerceIn(0, (recipes.size - 1).coerceAtLeast(0))
 
-        val body = if (recipes.isEmpty()) {
-            buildNoRecipesPlaceholder(screen.internalName)
-        } else {
-            Renderable.vertical(
-                listOf(
-                    buildNavRow(screen, recipes, index),
-                    buildRecipeRenderable(recipes[index], screen)
-                ),
-                spacing = 6,
-                horizontalAlign = HA.CENTER,
-            )
+        val body = if (recipes.isEmpty()) buildNoRecipesPlaceholder(screen.internalName)
+        else Renderable.vertical(spacing = 6, horizontalAlign = HA.CENTER) {
+            add(buildNavRow(screen, recipes, index))
+            add(buildRecipeRenderable(recipes[index], screen))
         }
 
-        val inner = Renderable.vertical(
-            listOf(buildHeaderRow(screen.internalName), body, buildActionsRow(screen)),
-            spacing = 8,
-            horizontalAlign = HA.CENTER,
-        )
-
         return Renderable.drawInsideFloatingRectWithBorder(
-            inner,
+            Renderable.vertical(spacing = 8, horizontalAlign = HA.CENTER) {
+                add(screen.internalName.buildHeaderRow())
+                add(body)
+                add(buildActionsRow(screen))
+            },
             backgroundColor = COLOR_BG,
             lightColor = COLOR_OUTLINE_TOP,
             darkColor = COLOR_OUTLINE_BOT,
@@ -134,13 +135,13 @@ object RecipeViewerGui {
         )
     }
 
-    private fun buildHeaderRow(internalName: NeuInternalName): Renderable {
+    private fun NeuInternalName.buildHeaderRow(): Renderable {
         val texts = Renderable.vertical(spacing = 2, horizontalAlign = HA.CENTER) {
-            add(Renderable.text(internalName.repoItemName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
-            add(Renderable.text("§7${internalName.asString()}", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
+            add(Renderable.text(repoItemName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
+            add(Renderable.text("§7${asString()}", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
         }
         return Renderable.horizontal(
-            listOf(scaledItem(internalName, withTip = false), texts),
+            listOf(scaledItem(this, withTip = false), texts),
             spacing = 6,
             verticalAlign = VA.CENTER,
         )
@@ -243,23 +244,54 @@ object RecipeViewerGui {
         )
     }
 
+    private fun Renderable.drawInSlot(
+        filled: Boolean = true,
+        radiusScalar: Double = 1.0,
+    ): Renderable = Renderable.drawInsideRoundedRect(
+        this,
+        if (filled) COLOR_SLOT_FILLED.toColor() else COLOR_SLOT_EMPTY.toColor(),
+        padding = 0,
+        radius = (4 * radiusScalar).toInt(),
+    )
+
     /**
      * A single item slot: a fixed-size dark square containing an item icon with tooltip.
      * Empty slots render as a dimmer square with no content.
      */
-    private fun buildItemSlot(ingredient: PrimitiveIngredient?, screen: RecipeViewerScreen): Renderable {
-        if (ingredient == null) return Renderable.drawInsideRoundedRect(
-            Renderable.placeholder(SLOT_SIZE, SLOT_SIZE),
-            COLOR_SLOT_EMPTY.toColor(), padding = 0, radius = (4 * ITEM_SCALE).toInt(),
-        )
-        val hasRecipes = EnoughUpdatesManager.getRecipesFor(ingredient.internalName).isNotEmpty()
-        if (!hasRecipes) {
-            return Renderable.drawInsideRoundedRect(scaledItem(ingredient.internalName), COLOR_SLOT_FILLED.toColor(), padding = 0, radius = 4)
+    private fun buildItemSlot(
+        ingredient: PrimitiveIngredient?,
+        screen: RecipeViewerScreen,
+        isOutput: Boolean = false,
+    ): Renderable = when {
+        ingredient == null ->
+            Renderable.placeholder(SLOT_SIZE, SLOT_SIZE).drawInSlot(filled = false, radiusScalar = ITEM_SCALE)
+
+        ingredient.internalName == COIN_ITEM ->
+            Renderable.item(ItemUtils.getCoinItemStack(ingredient.count), scale = ITEM_SCALE).drawInSlot()
+
+        else -> run {
+            val canNavigate = !isOutput && ingredient.internalName != screen.internalName
+            val canNavigateFor = canNavigate && EnoughUpdatesManager.getRecipesFor(ingredient.internalName).isNotEmpty()
+            val canNavigateUsing = canNavigate && EnoughUpdatesManager.getRecipesUsing(ingredient.internalName).isNotEmpty()
+
+            val slot = scaledItem(ingredient.internalName, withTip = false).drawInSlot()
+            val baseTips = providerFor(ingredient.internalName).stack.getTooltipCompat(false)
+            val tips = baseTips + listOfNotNull(
+                "",
+                "§eLeft click to view recipes".takeIf { canNavigateFor },
+                "§eRight click for recipe usages".takeIf { canNavigateUsing },
+            )
+
+            return@run if (!canNavigateFor && !canNavigateUsing) Renderable.hoverTips(slot, baseTips)
+            else Renderable.clickable(
+                slot,
+                onAnyClick = buildMap {
+                    if (canNavigateFor) put(LEFT_MOUSE) { screen.navigateTo(ingredient.internalName) }
+                    if (canNavigateUsing) put(RIGHT_MOUSE) { screen.navigateToUsages(ingredient.internalName) }
+                },
+                tips = tips,
+            )
         }
-        val provider = NeuItemStackProvider(ingredient.internalName)
-        val slot = Renderable.drawInsideRoundedRect(scaledItem(ingredient.internalName, withTip = false), COLOR_SLOT_FILLED.toColor(), padding = 0, radius = 4)
-        val tips = provider.stack.getTooltipCompat(false) + listOf("", "§eClick to view recipes")
-        return Renderable.clickable(slot, onLeftClick = { screen.navigateTo(ingredient.internalName) }, tips = tips)
     }
 
     private fun buildIngredientRow(ingredient: PrimitiveIngredient, screen: RecipeViewerScreen): Renderable {
@@ -279,7 +311,7 @@ object RecipeViewerGui {
     private fun buildNoRecipesPlaceholder(internalName: NeuInternalName) =
         Renderable.text("§cNo recipes found for §e${internalName.asString()}", color = Color.WHITE, horizontalAlign = HA.CENTER)
 
-    private fun buildCloseButton(screen: RecipeViewerScreen): Renderable = Renderable.clickable(
+    private fun buildCloseButton(screen: RecipeViewerScreen) = Renderable.clickable(
         Renderable.drawInsideRoundedRectWithOutline(
             Renderable.text("Close", color = Color.WHITE),
             color = COLOR_CLOSE.toColor(),
@@ -292,25 +324,22 @@ object RecipeViewerGui {
         onLeftClick = { screen.onClose() },
     )
 
-    private fun buildActionsRow(screen: RecipeViewerScreen): Renderable {
-        val buttons = buildList {
-            if (screen.canNavigateBack) add(buildBackButton(screen))
-            add(buildCloseButton(screen))
-        }
-        return Renderable.horizontal(buttons, spacing = 6, verticalAlign = VA.CENTER)
+    private fun buildActionsRow(screen: RecipeViewerScreen) = Renderable.horizontal(
+        spacing = 6,
+        verticalAlign = VA.CENTER
+    ) {
+        if (screen.canNavigateBack) add(buildBackButton(screen))
+        add(buildCloseButton(screen))
     }
 
-    private fun buildBackButton(screen: RecipeViewerScreen): Renderable {
-        val color = COLOR_BACK.toColor()
-        return Renderable.clickable(
-            Renderable.drawInsideRoundedRectWithOutline(
-                Renderable.text("◄ Back", color = Color.WHITE),
-                color = color, padding = 5, radius = 8,
-                topOutlineColor = color.brighter().rgb,
-                bottomOutlineColor = color.darker().rgb,
-                borderOutlineThickness = 1,
-            ),
-            onLeftClick = { screen.navigateBack() },
-        )
-    }
+    private fun buildBackButton(screen: RecipeViewerScreen) = Renderable.clickable(
+        Renderable.drawInsideRoundedRectWithOutline(
+            Renderable.text("◄ Back", color = Color.WHITE),
+            color = COLOR_BACK.toColor(), padding = 5, radius = 8,
+            topOutlineColor = COLOR_BACK.toColor().brighter().rgb,
+            bottomOutlineColor = COLOR_BACK.toColor().darker().rgb,
+            borderOutlineThickness = 1,
+        ),
+        onLeftClick = { screen.navigateBack() },
+    )
 }

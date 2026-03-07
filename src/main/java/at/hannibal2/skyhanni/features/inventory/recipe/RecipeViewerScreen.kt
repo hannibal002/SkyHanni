@@ -17,6 +17,11 @@ import org.lwjgl.glfw.GLFW
 class RecipeViewerScreen(
     internalName: NeuInternalName,
 ) : SkyHanniBaseScreen() {
+    enum class RecipeViewMode { RECIPES_FOR, RECIPES_USING }
+
+    var viewMode: RecipeViewMode = RecipeViewMode.RECIPES_FOR
+        private set
+
     internal var internalName: NeuInternalName = internalName
         private set
 
@@ -25,7 +30,7 @@ class RecipeViewerScreen(
         internal set
 
     /** History stack for back navigation; stores pairs of internal name and recipe index. */
-    private val history = ArrayDeque<Pair<NeuInternalName, Int>>()
+    private val history = ArrayDeque<Triple<NeuInternalName, Int, RecipeViewMode>>()
     val canNavigateBack get() = history.isNotEmpty()
 
     private var display: Renderable? = null
@@ -40,16 +45,26 @@ class RecipeViewerScreen(
     }
 
     fun navigateTo(name: NeuInternalName) {
-        history.addLast(internalName to recipeIndex)
+        history.addLast(Triple(internalName, recipeIndex, viewMode))
         internalName = name
         recipeIndex = 0
+        viewMode = RecipeViewMode.RECIPES_FOR
+        rebuildDisplay()
+    }
+
+    fun navigateToUsages(name: NeuInternalName) {
+        history.addLast(Triple(internalName, recipeIndex, viewMode))
+        internalName = name
+        recipeIndex = 0
+        viewMode = RecipeViewMode.RECIPES_USING
         rebuildDisplay()
     }
 
     fun navigateBack() {
-        val (name, index) = history.removeLastOrNull() ?: return
+        val (name, index, mode) = history.removeLastOrNull() ?: return
         internalName = name
         recipeIndex = index
+        viewMode = mode
         rebuildDisplay()
     }
 

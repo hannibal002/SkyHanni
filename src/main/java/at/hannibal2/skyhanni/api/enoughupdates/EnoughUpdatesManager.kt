@@ -44,6 +44,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import java.io.File
 import java.util.TreeMap
+import kotlin.collections.emptySet
 import kotlin.math.floor
 
 // Most functions are taken from NotEnoughUpdates
@@ -60,6 +61,7 @@ object EnoughUpdatesManager {
     private val itemStackCache = mutableMapOf<NeuInternalName, ItemStack>()
     private val displayNameCache = mutableMapOf<NeuInternalName, String>()
     private val recipesMap = HashMap<NeuInternalName, MutableSet<PrimitiveRecipe>>()
+    private val ingredientToOutputs = HashMap<NeuInternalName, MutableSet<NeuInternalName>>()
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: NeuPetNumsJson? = null
@@ -98,7 +100,9 @@ object EnoughUpdatesManager {
         }
     }
 
-    fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesFor(internalName: NeuInternalName) = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesUsing(internalName: NeuInternalName) = ingredientToOutputs.getOrDefault(internalName, emptySet())
+        .flatMapTo(mutableSetOf()) { getRecipesFor(it) }
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
         progress.update("loadItemMap")
@@ -136,10 +140,13 @@ object EnoughUpdatesManager {
             recipeType = this.type,
             shouldUseForCraftCost = this.type.useForCraftCost,
         )
-        for (internalName in recipe.outputs) {
-            val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
-            recipeSet.add(recipe)
-        }
+        for (internalName in recipe.outputs) recipesMap.getOrPut(internalName.internalName) {
+            mutableSetOf()
+        }.add(recipe)
+
+        for (internalName in recipe.ingredients) ingredientToOutputs.getOrPut(internalName.internalName) {
+            mutableSetOf()
+        }.addAll(recipe.outputs.map { it.internalName })
     }
 
     private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
