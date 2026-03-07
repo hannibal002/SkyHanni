@@ -22,7 +22,6 @@ import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.reflect.ParameterizedType
