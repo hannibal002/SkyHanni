@@ -422,7 +422,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         silentError: Boolean = true,
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
-    ): FetchUnpackResult = repoMutex.withLock {
+    ): FetchUnpackResult {
         progress.update("fetchAndUnpackRepo")
         val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
@@ -495,7 +495,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = Unit
 
-    private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") = repoMutex.withLock {
+    private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") {
         progress.update("reloadRepository")
         if (!shouldManuallyReload) {
             progress.end("should not manually reload")
