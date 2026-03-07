@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.DurationPrimitiveRecipe
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -20,14 +21,17 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -48,26 +52,20 @@ object RecipeViewerGui {
         NeuItemStackProvider(internalName)
     }
 
-    private val itemProviderCache = HashMap<Triple<NeuInternalName, Int, Boolean>, NeuItemStackProvider>()
-    private fun itemProviderFor(internalName: NeuInternalName, stackCount: Int): NeuItemStackProvider {
-        val glint = internalName.asString().startsWith("ENCHANTED_")
-        return itemProviderCache.getOrPut(Triple(internalName, stackCount, glint)) {
-            NeuItemStackProvider(internalName) {
-                if (glint) addEnchantGlint()
-                count = stackCount
-            }
+    private val itemRenderableCache = HashMap<Pair<NeuInternalName, Boolean>, Renderable>()
+    private fun NeuInternalName.scaledItem(withTip: Boolean = true): Renderable =
+        itemRenderableCache.getOrPut(Pair(this, withTip)) {
+            val provider = providerFor(this)
+            val glint = asString().startsWith("ENCHANTED_")
+            Renderable.item(
+                stackGetter = {
+                    provider.stack.copy().apply {
+                        if (glint) addEnchantGlint()
+                    }
+                },
+                scale = ITEM_SCALE,
+            ).let { if (withTip) it.withTip() else it }
         }
-    }
-
-    private val itemRenderableCache = HashMap<Triple<NeuInternalName, Int, Boolean>, Renderable>()
-    private fun NeuInternalName.scaledItem(
-        withTip: Boolean = true,
-        stackCount: Int = 1
-    ): Renderable = itemRenderableCache.getOrPut(Triple(this, stackCount, withTip)) {
-        Renderable.item(itemProviderFor(this, stackCount), scale = ITEM_SCALE).let {
-            if (withTip) it.withTip() else it
-        }
-    }
 
     private val COIN_ITEM = "SKYBLOCK_COIN".toInternalName()
     private val SLOT_SIZE by lazy {
@@ -133,9 +131,14 @@ object RecipeViewerGui {
             add(buildRecipeRenderable(recipes[index], screen))
         }
 
+        fun MutableList<Renderable>.addViewMode() = if (screen.viewMode == RecipeViewerScreen.RecipeViewMode.RECIPES_FOR) {
+            add(Renderable.text("§7Viewing recipes for item", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
+        } else this
+
         return Renderable.drawInsideFloatingRectWithBorder(
             Renderable.vertical(spacing = 8, horizontalAlign = HA.CENTER) {
                 add(screen.internalName.buildHeaderRow())
+                addViewMode()
                 add(body)
                 add(buildActionsRow(screen))
             },
@@ -195,7 +198,8 @@ object RecipeViewerGui {
 
     private fun buildRecipeRenderable(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable = when (recipe.recipeType) {
         NeuRecipeType.CRAFTING -> buildCraftingLayout(recipe, screen)
-        NeuRecipeType.FORGE -> buildForgeLayout(recipe, screen)
+        NeuRecipeType.FORGE -> buildDurationLayout(recipe, screen, timeLabel = "Forge time")
+        NeuRecipeType.KAT_UPGRADE ->  buildDurationLayout(recipe, screen, timeLabel = "Upgrade time", alwaysShowOutput = true)
         else -> buildGenericLayout(recipe, screen)
     }
 
@@ -207,30 +211,45 @@ object RecipeViewerGui {
         }.let { Renderable.vertical(it, spacing = GRID_SPACING) }
 
         val arrow = arrowRenderable()
-        val output = buildItemSlot(recipe.outputs.firstOrNull(), screen)
+        val rawOutput = buildItemSlot(recipe.outputs.firstOrNull(), screen, isOutput = true)
+        val output = Renderable.fixedSizeColumn(
+            object : Renderable by rawOutput { override val verticalAlign = VA.CENTER },
+            gridRenderable.height,
+        )
 
         return Renderable.horizontal(listOf(gridRenderable, arrow, output), spacing = 6, verticalAlign = VA.CENTER)
     }
 
-    private fun buildForgeLayout(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
-        val inputsPanel = Renderable.vertical(
-            buildList {
-                add(sectionLabel("Ingredients"))
-                addAll(recipe.ingredients.map { buildIngredientRow(it, screen) })
-            },
-            spacing = 3,
-        )
+    private fun Renderable.withCountOverlay(count: Int): Renderable {
+        if (count <= 1) return this
+        val countStr = if (count >= 1000) count.shortFormat() else count.toString()
+        val countLabel = Renderable.text(countStr, scale = 0.75, color = Color.WHITE,
+            horizontalAlign = HA.RIGHT, verticalAlign = VA.BOTTOM)
+        return Renderable.doubleLayered(this, countLabel, blockBottomHover = false, forceBottomRenderFirst = true)
+    }
 
-        if (recipe.outputs.size <= 1) return inputsPanel
+    private fun buildDurationLayout(
+        recipe: PrimitiveRecipe,
+        screen: RecipeViewerScreen,
+        timeLabel: String,
+        alwaysShowOutput: Boolean = false,
+    ): Renderable {
+        // Needs to be a DurationPrimitiveRecipe to access the duration, but we want to allow
+        // all PrimitiveRecipes for flexibility, so we check and cast here.
+        require(recipe is DurationPrimitiveRecipe)
 
-        val outputPanel = Renderable.vertical(
-            buildList {
-                add(sectionLabel("Output"))
-                addAll(recipe.outputs.map { buildIngredientRow(it, screen) })
-            },
-            spacing = 3,
-            horizontalAlign = HA.CENTER,
-        )
+        val inputsPanel = Renderable.vertical(spacing = 3) {
+            add(sectionLabel("Ingredients"))
+            addAll(recipe.ingredients.map { buildIngredientRow(it, screen) })
+            add(sectionLabel(timeLabel))
+            add(Renderable.text("§e${recipe.duration.format()}", scale = 0.85, color = Color.WHITE))
+        }
+        if (!alwaysShowOutput && recipe.outputs.size <= 1) return inputsPanel
+
+        val outputPanel = Renderable.vertical(spacing = 3, horizontalAlign = HA.CENTER) {
+            add(sectionLabel("Output"))
+            addAll(recipe.outputs.map { buildIngredientRow(it, screen) })
+        }
 
         return Renderable.horizontal(listOf(inputsPanel, arrowRenderable(), outputPanel), spacing = 8, verticalAlign = VA.TOP)
     }
@@ -245,17 +264,31 @@ object RecipeViewerGui {
             spacing = 3,
         )
 
-        val inputsPanel = panel("Inputs", recipe.ingredients)
-        return if (recipe.outputs.size <= 1) inputsPanel
-        else Renderable.horizontal(
-            listOf(
-                inputsPanel,
-                arrowRenderable(),
-                panel("Outputs", recipe.outputs)
-            ),
-            spacing = 8,
-            verticalAlign = VA.TOP,
-        )
+        val outputsPanel = panel("Outputs", recipe.outputs)
+        val inputRenderable = if (recipe.ingredients.size == 1) {
+            val ingredient = recipe.ingredients.first()
+            val stack = Renderable.vertical(
+                listOf(
+                    buildItemSlot(ingredient, screen),
+                    Renderable.wrappedText(ingredient.internalName.repoItemName, setWidth = 80, scale = 0.8, color = Color.WHITE),
+                ),
+                spacing = 2,
+                horizontalAlign = HA.CENTER,
+            )
+            Renderable.fixedSizeColumn(
+                object : Renderable by stack {
+                    override val verticalAlign = VA.CENTER
+                },
+                outputsPanel.height,
+            )
+        } else panel("Inputs", recipe.ingredients)
+
+        return if (recipe.outputs.size <= 1) inputRenderable
+        else Renderable.horizontal(spacing = 8, verticalAlign = if (recipe.ingredients.size == 1) VA.CENTER else VA.TOP) {
+            add(inputRenderable)
+            add(arrowRenderable())
+            add(outputsPanel)
+        }
     }
 
     private fun Renderable.drawInSlot(
@@ -288,7 +321,7 @@ object RecipeViewerGui {
             val canNavigateFor = canNavigate && EnoughUpdatesManager.getRecipesFor(ingredient.internalName).isNotEmpty()
             val canNavigateUsing = canNavigate && EnoughUpdatesManager.getRecipesUsing(ingredient.internalName).isNotEmpty()
 
-            val slot = ingredient.internalName.scaledItem(withTip = false, stackCount = ingredient.count.toInt()).drawInSlot()
+            val slot = ingredient.internalName.scaledItem(withTip = false).drawInSlot().withCountOverlay(ingredient.count.toInt())
             val baseTips = providerFor(ingredient.internalName).stack.getTooltipCompat(false)
             val tips = baseTips + listOfNotNull(
                 "",
@@ -313,7 +346,10 @@ object RecipeViewerGui {
         val name = ingredient.internalName.repoItemName
         val count = ingredient.count.toInt()
         val countSuffix = if (count > 1) " §7×${count.addSeparators()}" else ""
-        val label = Renderable.text("$name$countSuffix", scale = 0.9, color = Color.WHITE)
+        val label = if (ingredient.internalName == COIN_ITEM) {
+            val shortedCount = count.shortFormat(true)
+            Renderable.wrappedText("§6$shortedCount Coins", scale = 0.9, setWidth = 175, color = Color.WHITE)
+        } else Renderable.wrappedText("$name$countSuffix", scale = 0.9, setWidth = 175, color = Color.WHITE)
         return Renderable.horizontal(listOf(buildItemSlot(ingredient, screen), label), spacing = 4, verticalAlign = VA.CENTER)
     }
 

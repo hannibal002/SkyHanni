@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
 enum class NeuRecipeType(
     val neuRepoId: String? = null,
     val useForCraftCost: Boolean = true,
-    val castClazz: Class<out NeuAbstractRecipe> = NeuAbstractRecipe::class.java,
+    val castClazz: Class<out NeuAbstractRecipe<*>> = NeuAbstractRecipe::class.java,
 ) {
     FORGE("forge", castClazz = NeuForgeRecipeJson::class.java),
     TRADE("trade", false, castClazz = NeuTradeRecipeJson::class.java),

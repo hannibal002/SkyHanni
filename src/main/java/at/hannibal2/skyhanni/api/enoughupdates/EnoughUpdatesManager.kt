@@ -104,6 +104,7 @@ object EnoughUpdatesManager {
     fun getRecipesFor(internalName: NeuInternalName) = recipesMap.getOrDefault(internalName, emptySet())
     fun getRecipesUsing(internalName: NeuInternalName) = ingredientToOutputs.getOrDefault(internalName, emptySet())
         .flatMapTo(mutableSetOf()) { getRecipesFor(it) }
+        .filterTo(mutableSetOf()) { recipe -> recipe.ingredients.any { it.internalName == internalName } }
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
         progress.update("loadItemMap")
@@ -132,15 +133,8 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun NeuAbstractRecipe.loadAndRegister(itemJson: NeuItemJson) {
-        val ingredients = this.getPrimitiveInputs(itemJson).toSet()
-        val outputs = this.getPrimitiveOutputs(itemJson).toSet()
-        val recipe = PrimitiveRecipe(
-            ingredients,
-            outputs,
-            recipeType = this.type,
-            shouldUseForCraftCost = this.type.useForCraftCost,
-        )
+    private fun NeuAbstractRecipe<*>.loadAndRegister(itemJson: NeuItemJson) {
+        val recipe = this.getPrimitiveRecipe(itemJson)
         for (internalName in recipe.outputs) recipesMap.getOrPut(internalName.internalName) {
             mutableSetOf()
         }.add(recipe)

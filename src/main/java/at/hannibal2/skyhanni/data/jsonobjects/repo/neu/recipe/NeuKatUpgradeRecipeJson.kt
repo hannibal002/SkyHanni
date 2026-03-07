@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
+import at.hannibal2.skyhanni.utils.DurationPrimitiveRecipe
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
@@ -15,14 +17,19 @@ data class NeuKatUpgradeRecipeJson(
     @Expose val input: NeuInternalName,
     @Expose val output: NeuInternalName,
     @Expose val items: List<NeuRecipeComponent> = emptyList(),
-) : NeuAbstractRecipe() {
+) : NeuAbstractRecipe<DurationPrimitiveRecipe>() {
     val duration by lazy { time.seconds }
-
-    override fun getPrimitiveInputs(itemJson: NeuItemJson) = buildList {
-        items.forEach { add(it.toPrimitiveIngredient()) }
-        add(PrimitiveIngredient(input))
-        add(PrimitiveIngredient.coinIngredient(coins))
+    private val primitiveIngredients by lazy {
+        buildList {
+            items.forEach { add(it.toPrimitiveIngredient()) }
+            add(PrimitiveIngredient(input))
+            add(PrimitiveIngredient.coinIngredient(coins))
+        }
     }
 
-    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(output)
+    override fun getPrimitiveRecipe(itemJson: NeuItemJson): DurationPrimitiveRecipe = BasePrimitiveRecipe(
+        primitiveIngredients.toSet(),
+        getPrimitiveOutputs(itemJson, 1),
+        this.type,
+    ).withDuration(duration)
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
 import at.hannibal2.skyhanni.utils.KSerializable
 import com.google.gson.annotations.Expose
 
@@ -11,13 +12,17 @@ data class NeuTradeRecipeJson(
     @Expose private val min: Int? = null,
     @Expose private val max: Int? = null,
     @Expose val result: NeuRecipeComponent,
-) : NeuAbstractRecipe() {
+) : NeuAbstractRecipe<BasePrimitiveRecipe>() {
     private val costCount = when {
         min != null && max != null -> (min + max) / 2
         else -> cost.count
     }
-    override fun getPrimitiveInputs(itemJson: NeuItemJson) = listOf(
-        cost.toPrimitiveIngredient(costCount)
+    private val primitiveIngredient by lazy { setOf(cost.toPrimitiveIngredientOrNull()).filterNotNull().toSet() }
+    private val primitiveOutput by lazy { setOf(result.toPrimitiveIngredientOrNull()).filterNotNull().toSet() }
+
+    override fun getPrimitiveRecipe(itemJson: NeuItemJson): BasePrimitiveRecipe = BasePrimitiveRecipe(
+        primitiveIngredient,
+        primitiveOutput,
+        this.type,
     )
-    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(result)
 }

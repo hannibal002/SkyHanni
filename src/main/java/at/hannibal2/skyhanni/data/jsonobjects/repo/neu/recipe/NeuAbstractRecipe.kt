@@ -2,21 +2,14 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
+import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 
-abstract class NeuAbstractRecipe {
+abstract class NeuAbstractRecipe<P : PrimitiveRecipe> {
     abstract val type: NeuRecipeType
 
-    abstract fun getPrimitiveInputs(itemJson: NeuItemJson): List<PrimitiveIngredient>
+    abstract fun getPrimitiveRecipe(itemJson: NeuItemJson): P
 
-    open fun getPrimitiveOutputs(itemJson: NeuItemJson): List<PrimitiveIngredient> = listOf(
-        getPrimitiveOutput(itemJson)
+    internal open fun getPrimitiveOutputs(itemJson: NeuItemJson, countOverride: Int? = null): Set<PrimitiveIngredient> = setOf(
+        PrimitiveIngredient(itemJson.internalName, countOverride ?: 1)
     )
-
-    protected open val outputOverride: NeuOverrideProvider? = null
-
-    private fun getPrimitiveOutput(itemJson: NeuItemJson): PrimitiveIngredient {
-        val craftAmount = outputOverride?.overrideCount ?: 1
-        val outputInternalName = outputOverride?.overrideItem ?: itemJson.internalName
-        return PrimitiveIngredient(outputInternalName, craftAmount)
-    }
 }
