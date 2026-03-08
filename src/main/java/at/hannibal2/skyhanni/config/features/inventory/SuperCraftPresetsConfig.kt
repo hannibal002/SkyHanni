@@ -29,7 +29,5 @@ class SuperCraftPresetsConfig {
 
     @Expose
     @ConfigLink(owner = SuperCraftPresetsConfig::class, field = "enabled")
-    val signPosition: Position = Position(100, 100, false, true)
+    val signPosition: Position = Position(100, 100)
 }
-
-
