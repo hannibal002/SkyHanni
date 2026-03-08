@@ -55,17 +55,23 @@ object RecipeViewerGui {
     }
 
     private val itemRenderableCache = HashMap<Triple<NeuInternalName, Boolean, Int>, Renderable>()
-    private fun NeuInternalName.scaledItem(
-        withTip: Boolean = true,
-        scale: Double = ITEM_SCALE
-    ): Renderable = itemRenderableCache.getOrPut(Triple(this, withTip, (scale * 100).toInt())) {
-        val provider = providerFor(this)
-        val glint = asString().startsWith("ENCHANTED_")
-        Renderable.item(
-            stackGetter = { provider.stack.copy().apply { if (glint) addEnchantGlint() } },
-            scale = scale,
-        ).let { if (withTip) it.withTip() else it }
-    }
+
+    // xSpacing/ySpacing zeroed so the item renders flush at (0,0); visual padding is handled
+    // symmetrically by drawInSlot (padding=1).
+    private fun NeuInternalName.scaledItem(withTip: Boolean = true, scale: Double = ITEM_SCALE): Renderable =
+        itemRenderableCache.getOrPut(Triple(this, withTip, (scale * 100).toInt())) {
+            val provider = providerFor(this)
+            val glint = asString().startsWith("ENCHANTED_")
+            Renderable.item(
+                stackGetter = { provider.stack.copy().apply { if (glint) addEnchantGlint() } },
+                scale = scale,
+                xSpacing = 0,
+                ySpacing = 0,
+            ).let { if (withTip) it.withTip() else it }
+        }
+
+    /** Raw rendered pixel size of an item at [scale], excluding slot padding. */
+    private fun itemPixelSize(scale: Double) = (15.5 * scale + 0.5).toInt()
 
     private val COIN_ITEM = "SKYBLOCK_COIN".toInternalName()
 
@@ -147,11 +153,7 @@ object RecipeViewerGui {
             add(Renderable.text(repoItemName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
             add(Renderable.text("§7${asString()}", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))
         }
-        return Renderable.horizontal(
-            listOf(scaledItem(withTip = false), texts),
-            spacing = 6,
-            verticalAlign = VA.CENTER,
-        )
+        return Renderable.horizontal(listOf(scaledItem(withTip = false), texts), spacing = 6, verticalAlign = VA.CENTER)
     }
 
     private fun buildNavRow(screen: RecipeViewerScreen, recipes: List<PrimitiveRecipe>, currentIndex: Int): Renderable {
@@ -209,9 +211,10 @@ object RecipeViewerGui {
         val aggregated = ingredients.groupBy { it.internalName }.map { (name, group) ->
             PrimitiveIngredient(name, group.sumOf { it.count })
         }.takeIfNotEmpty() ?: return craftingRow
+
         val ingredientList = Renderable.vertical(spacing = 3) {
             add(sectionLabel("Ingredients"))
-            addAll(aggregated.map { buildIngredientRow(it, screen, scale = ITEM_SCALE_SMALL) })
+            addAll(aggregated.map { buildIngredientText(it) })
         }
         return Renderable.vertical(listOf(craftingRow, ingredientList), spacing = 8, horizontalAlign = HA.CENTER)
     }
@@ -249,17 +252,15 @@ object RecipeViewerGui {
 
     /**
      * Builds the output panel for duration-based recipes (forge/kat).
-     * For single-output recipes, the item is vertically centered within [containerHeight],
-     * with the "Output:" label sitting above it.
+     * For a single output the item is vertically centred within [containerHeight].
      */
     private fun buildCenteredOutputPanel(recipe: PrimitiveRecipe, screen: RecipeViewerScreen, containerHeight: Int): Renderable {
         val label = sectionLabel("Output")
         return if (recipe.outputs.size == 1) {
             val rawOutput = buildItemSlot(recipe.outputs.first(), screen, isOutput = true)
-            val availableHeight = (containerHeight - label.height - 3).coerceAtLeast(rawOutput.height)
             val centeredItem = Renderable.fixedSizeColumn(
                 object : Renderable by rawOutput { override val verticalAlign = VA.CENTER },
-                availableHeight,
+                (containerHeight - label.height - 3).coerceAtLeast(rawOutput.height),
             )
             Renderable.vertical(listOf(label, centeredItem), spacing = 3, horizontalAlign = HA.CENTER)
         } else {
@@ -296,26 +297,22 @@ object RecipeViewerGui {
             } else panel("Inputs", recipe.ingredients)
         }
 
+        // Single-input (mob drop): item sits above its label, both centred on the arrow via VA.CENTER.
         if (recipe.ingredients.size == 1) {
             val ingredient = recipe.ingredients.first()
-            val slot = buildItemSlot(ingredient, screen)
-            val text = Renderable.wrappedText(ingredient.internalName.repoItemName, setWidth = 80, scale = 0.8, color = Color.WHITE)
-            // Push the item down so its center aligns with the arrow, which is centered to outputsPanel.height.
-            val topPad = (outputsPanel.height - slot.height).coerceAtLeast(0) / 2
             val inputColumn = Renderable.vertical(
-                buildList {
-                    if (topPad > 0) add(Renderable.placeholder(slot.width, topPad))
-                    add(slot)
-                    add(text)
-                },
+                listOf(
+                    buildItemSlot(ingredient, screen),
+                    Renderable.wrappedText(ingredient.internalName.repoItemName, setWidth = 80, scale = 0.8, color = Color.WHITE),
+                ),
                 spacing = 2,
                 horizontalAlign = HA.CENTER,
             )
-            val centeredArrow = Renderable.fixedSizeColumn(
-                object : Renderable by arrowRenderable() { override val verticalAlign = VA.CENTER },
-                outputsPanel.height,
+            return Renderable.horizontal(
+                listOf(inputColumn, arrowRenderable(), outputsPanel),
+                spacing = 8,
+                verticalAlign = VA.CENTER,
             )
-            return Renderable.horizontal(listOf(inputColumn, centeredArrow, outputsPanel), spacing = 8, verticalAlign = VA.TOP)
         }
 
         return Renderable.horizontal(spacing = 8, verticalAlign = VA.TOP) {
@@ -329,12 +326,13 @@ object RecipeViewerGui {
         Renderable.drawInsideRoundedRect(
             this,
             if (filled) COLOR_SLOT_FILLED.toColor() else COLOR_SLOT_EMPTY.toColor(),
-            padding = 0,
+            // padding=1 gives 1px of uniform background around the item on all sides.
+            padding = 1,
             radius = (4 * radiusScalar).toInt(),
         )
 
     /**
-     * A single item slot: a fixed-size dark square containing an item icon with tooltip.
+     * A single item slot: a dark square containing a centred item icon with tooltip.
      * Empty slots render as a dimmer square with no content.
      */
     private fun buildItemSlot(
@@ -343,25 +341,20 @@ object RecipeViewerGui {
         isOutput: Boolean = false,
         scale: Double = ITEM_SCALE,
     ): Renderable {
-        val slotSize = (16 * scale).toInt()
+        val pixelSize = itemPixelSize(scale)
         return when {
             ingredient == null ->
-                Renderable.placeholder(slotSize, slotSize).drawInSlot(filled = false, radiusScalar = scale)
+                Renderable.placeholder(pixelSize, pixelSize).drawInSlot(filled = false, radiusScalar = scale)
 
-            ingredient.internalName == COIN_ITEM -> {
-                val coinItem = Renderable.item(ItemUtils.getCoinItemStack(ingredient.count), scale = scale).let { raw ->
-                    object : Renderable by raw { override val width = slotSize; override val height = slotSize }
-                }
-                coinItem.drawInSlot()
-            }
+            ingredient.internalName == COIN_ITEM ->
+                Renderable.item(ItemUtils.getCoinItemStack(ingredient.count), scale = scale, xSpacing = 0, ySpacing = 0).drawInSlot()
 
             else -> {
                 val canNavigate = !isOutput && ingredient.internalName != screen.internalName
                 val canNavigateFor = canNavigate && EnoughUpdatesManager.getRecipesFor(ingredient.internalName).isNotEmpty()
                 val canNavigateUsing = canNavigate && EnoughUpdatesManager.getRecipesUsing(ingredient.internalName).isNotEmpty()
 
-                val scaledItem = ingredient.internalName.scaledItem(withTip = false, scale = scale)
-                val slot = scaledItem.drawInSlot().withCountOverlay(ingredient.count.toInt())
+                val slot = ingredient.internalName.scaledItem(withTip = false, scale = scale).drawInSlot().withCountOverlay(ingredient.count.toInt())
                 val baseTips = providerFor(ingredient.internalName).stack.getTooltipCompat(false)
                 val tips = baseTips + listOfNotNull(
                     "",
@@ -383,14 +376,16 @@ object RecipeViewerGui {
         }
     }
 
-    private fun buildIngredientRow(ingredient: PrimitiveIngredient, screen: RecipeViewerScreen, scale: Double = ITEM_SCALE): Renderable {
-        val name = ingredient.internalName.repoItemName
+    private fun buildIngredientRow(ingredient: PrimitiveIngredient, screen: RecipeViewerScreen, scale: Double = ITEM_SCALE): Renderable =
+        Renderable.horizontal(listOf(buildItemSlot(ingredient, screen, scale = scale), buildIngredientText(ingredient)), spacing = 4, verticalAlign = VA.CENTER)
+
+    /** Text-only ingredient label (no slot icon), used in the crafting ingredient summary. */
+    private fun buildIngredientText(ingredient: PrimitiveIngredient): Renderable {
         val count = ingredient.count.toInt()
         val countSuffix = if (count > 1) " §7×${count.addSeparators()}" else ""
-        val label = if (ingredient.internalName == COIN_ITEM) {
+        return if (ingredient.internalName == COIN_ITEM) {
             Renderable.wrappedText("§6${count.shortFormat(true)} Coins", scale = 0.9, setWidth = 175, color = Color.WHITE)
-        } else Renderable.wrappedText("$name$countSuffix", scale = 0.9, setWidth = 175, color = Color.WHITE)
-        return Renderable.horizontal(listOf(buildItemSlot(ingredient, screen, scale = scale), label), spacing = 4, verticalAlign = VA.CENTER)
+        } else Renderable.wrappedText("${ingredient.internalName.repoItemName}$countSuffix", scale = 0.9, setWidth = 175, color = Color.WHITE)
     }
 
     private fun Renderable.withCountOverlay(count: Int): Renderable = if (count <= 1) this else Renderable.doubleLayered(
