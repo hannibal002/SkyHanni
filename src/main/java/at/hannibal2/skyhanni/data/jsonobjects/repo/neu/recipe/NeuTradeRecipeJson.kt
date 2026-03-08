@@ -17,8 +17,8 @@ data class NeuTradeRecipeJson(
         min != null && max != null -> (min + max) / 2
         else -> cost.count
     }
-    private val primitiveIngredient by lazy { setOf(cost.toPrimitiveIngredientOrNull()).filterNotNull().toSet() }
-    private val primitiveOutput by lazy { setOf(result.toPrimitiveIngredientOrNull()).filterNotNull().toSet() }
+    private val primitiveIngredient by lazy { listOf(cost.toPrimitiveIngredient(costCount)) }
+    private val primitiveOutput by lazy { listOf(result.toPrimitiveIngredient()) }
 
     override fun getPrimitiveRecipe(itemJson: NeuItemJson): BasePrimitiveRecipe = BasePrimitiveRecipe(
         primitiveIngredient,

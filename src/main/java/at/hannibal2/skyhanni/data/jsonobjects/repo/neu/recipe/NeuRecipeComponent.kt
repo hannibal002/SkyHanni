@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
-import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient

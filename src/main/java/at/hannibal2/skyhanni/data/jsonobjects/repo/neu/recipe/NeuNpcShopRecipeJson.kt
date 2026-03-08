@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
-import at.hannibal2.skyhanni.utils.KSerializable
 import com.google.gson.annotations.Expose
 
 data class NeuNpcShopRecipeJson(

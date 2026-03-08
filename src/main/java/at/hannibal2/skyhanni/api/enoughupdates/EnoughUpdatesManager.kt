@@ -163,14 +163,11 @@ object EnoughUpdatesManager {
         }
         itemJson
     }.getOrElse { e ->
-        if (!reported) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Failed to parse item: $internalName",
-                "json" to json.toString(),
-            )
-            reported = true
-        }
+        ErrorManager.logErrorWithData(
+            e,
+            "Failed to parse item: $internalName",
+            "json" to json.toString(),
+        )
         null
     }
 

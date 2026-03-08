@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
-import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
-import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 

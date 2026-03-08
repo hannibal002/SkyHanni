@@ -17,7 +17,7 @@ data class BasePrimitiveRecipe(
     override val ingredients: Collection<PrimitiveIngredient>,
     override val outputs: Collection<PrimitiveIngredient>,
     override val recipeType: NeuRecipeType,
-    override val shouldUseForCraftCost: Boolean = true,
+    override val shouldUseForCraftCost: Boolean = recipeType.useForCraftCost,
 ) : PrimitiveRecipe {
     override val output by lazy { outputs.firstOrNull() }
 
