@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -79,7 +79,7 @@ object FlareDisplay {
     }
 
     @HandleEvent
-    fun onEntitySpawn(event: EntityEnterWorldEvent<ArmorStand>) {
+    fun onEntitySpawn(event: EntityEquipmentChangeEvent<ArmorStand>) {
         val entity = event.entity
         if (entity.tickCount.ticks > MAX_FLARE_TIME) return
         if (isAlreadyKnownFlare(entity)) return
