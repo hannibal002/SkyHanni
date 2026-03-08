@@ -107,66 +107,67 @@ object EnoughUpdatesManager {
         .filterTo(mutableSetOf()) { recipe -> recipe.ingredients.any { it.internalName == internalName } }
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
-        progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
         progress.innerProgressStart(list.size)
+
         val async = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
                 val itemJson = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
-                val item = parseItem(
-                    internalName = internalName,
-                    json = itemJson,
-                )
+                val item = parseItem(internalName, itemJson) ?: return@mapNotNullAsync null
                 progress.innerProgressStep()
-                val parsed = item ?: return@mapNotNullAsync null
-                internalName.toInternalName() to parsed
+                Triple(internalName.toInternalName(), item, item.collectRecipes())
             } catch (e: Exception) {
-                progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
                 null
             }
         }
-        async.forEach { (internalName, item) ->
+
+        async.forEach { (internalName, item, recipes) ->
             tempItemMap[internalName] = item
+            recipes.forEach { it.register() }
         }
     }
 
-    private fun NeuAbstractRecipe<*>.loadAndRegister(itemJson: NeuItemJson) {
-        val recipe = this.getPrimitiveRecipe(itemJson)
-        for (internalName in recipe.outputs) recipesMap.getOrPut(internalName.internalName) {
-            mutableSetOf()
-        }.add(recipe)
+    private fun NeuItemJson.collectRecipes(): List<Pair<NeuAbstractRecipe<*>, NeuItemJson>> = buildList {
+        recipe?.let { add(it to this@collectRecipes) }
+        recipes.forEach { add(it to this@collectRecipes) }
+    }
 
-        for (internalName in recipe.ingredients) ingredientToOutputs.getOrPut(internalName.internalName) {
-            mutableSetOf()
-        }.addAll(recipe.outputs.map { it.internalName })
+    private fun Pair<NeuAbstractRecipe<*>, NeuItemJson>.register() {
+        val (neuRecipe, itemJson) = this
+        val recipe = runCatching { neuRecipe.getPrimitiveRecipe(itemJson) }.getOrElse { e ->
+            ErrorManager.logErrorWithData(e, "Failed to parse recipe for ${itemJson.internalName}", "type" to neuRecipe.type)
+            return
+        }
+        for (output in recipe.outputs)
+            recipesMap.getOrPut(output.internalName) { mutableSetOf() }.add(recipe)
+        for (ingredient in recipe.ingredients)
+            ingredientToOutputs.getOrPut(ingredient.internalName) { mutableSetOf() }
+                .addAll(recipe.outputs.map { it.internalName })
     }
 
     private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
-        val itemJson: NeuItemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
-        // If the itemId is vanilla, replace it with the vanilla item identifier
-        itemJson.itemId.getVanillaItem()?.let { mcItem ->
-            itemJson.itemId = mcItem.getIdentifierString()
+        val itemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: run {
+            ErrorManager.logErrorWithData(
+                RuntimeException("Failed to deserialize NeuItemJson"),
+                "Item could not be parsed from repo JSON",
+                "internalName" to internalName,
+            )
+            return@runCatching null
         }
-        // Crafting type recipe
-        itemJson.recipe?.loadAndRegister(itemJson)
-        // Other types of recipes
-        itemJson.recipes.forEach { recipe ->
-            recipe.loadAndRegister(itemJson)
-        }
+        itemJson.itemId.getVanillaItem()?.let { itemJson.itemId = it.getIdentifierString() }
         itemJson.displayName?.let { displayName ->
             synchronized(titleWordMap) {
                 for ((index, str) in displayName.split(" ").withIndex()) {
-                    val cleanedStr = str.cleanString()
-                    val internalMap = titleWordMap.getOrPut(cleanedStr) { TreeMap() }
-                    val indexList = internalMap.getOrPut(internalName) { mutableListOf() }
-                    indexList.add(index)
+                    titleWordMap.getOrPut(str.cleanString()) { TreeMap() }
+                        .getOrPut(internalName) { mutableListOf() }
+                        .add(index)
                 }
             }
         }
-        return itemJson
+        itemJson
     }.getOrThrow()
 
     fun getItemById(id: String): NeuItemJson? = itemMap[id.toInternalName()]

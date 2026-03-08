@@ -21,7 +21,7 @@ data class NeuKatUpgradeRecipeJson(
     val duration by lazy { time.seconds }
     private val primitiveIngredients by lazy {
         buildList {
-            items.forEach { add(it.toPrimitiveIngredient()) }
+            items.mapNotNull { it.toPrimitiveIngredientOrNull() }.forEach { add(it) }
             add(PrimitiveIngredient(input))
             add(PrimitiveIngredient.coinIngredient(coins))
         }
@@ -29,7 +29,7 @@ data class NeuKatUpgradeRecipeJson(
 
     override fun getPrimitiveRecipe(itemJson: NeuItemJson): DurationPrimitiveRecipe = BasePrimitiveRecipe(
         primitiveIngredients.toSet(),
-        getPrimitiveOutputs(itemJson, 1),
+        setOf(PrimitiveIngredient(output)),
         this.type,
     ).withDuration(duration)
 }
