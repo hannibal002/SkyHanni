@@ -32,7 +32,7 @@ data class NeuCraftingRecipeJson(
      * How many items this recipe produces.
      */
     @Expose @SerializedName("count") val outputCount: Int = 1,
-) : NeuAbstractRecipe<BasePrimitiveRecipe>() {
+) : NeuAbstractRecipe {
     private val primitiveIngredients: Set<PrimitiveIngredient> by lazy {
         listOfNotNull(a1, a2, a3, b1, b2, b3, c1, c2, c3).mapNotNull {
             it.toPrimitiveIngredientOrNull()

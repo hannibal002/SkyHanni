@@ -12,7 +12,7 @@ data class NeuTradeRecipeJson(
     @Expose private val min: Int? = null,
     @Expose private val max: Int? = null,
     @Expose val result: NeuRecipeComponent,
-) : NeuAbstractRecipe<BasePrimitiveRecipe>() {
+) : NeuAbstractRecipe {
     private val costCount = when {
         min != null && max != null -> (min + max) / 2
         else -> cost.count

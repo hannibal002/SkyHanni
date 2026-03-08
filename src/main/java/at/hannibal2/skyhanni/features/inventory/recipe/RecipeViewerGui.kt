@@ -255,7 +255,7 @@ object RecipeViewerGui {
     }
 
     private fun buildGenericLayout(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
-        fun panel(title: String, ingredients: Set<PrimitiveIngredient>) = Renderable.vertical(
+        fun panel(title: String, ingredients: Collection<PrimitiveIngredient>) = Renderable.vertical(
             buildList {
                 add(sectionLabel(title))
                 if (ingredients.isEmpty()) add(Renderable.text("§7(none)", scale = 0.85))

@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import kotlin.time.Duration
 
 interface PrimitiveRecipe {
-    val ingredients: Set<PrimitiveIngredient>
-    val outputs: Set<PrimitiveIngredient>
+    val ingredients: Collection<PrimitiveIngredient>
+    val outputs: Collection<PrimitiveIngredient>
     val recipeType: NeuRecipeType
     val shouldUseForCraftCost: Boolean
     val output: PrimitiveIngredient?
@@ -14,8 +14,8 @@ interface PrimitiveRecipe {
 }
 
 data class BasePrimitiveRecipe(
-    override val ingredients: Set<PrimitiveIngredient>,
-    override val outputs: Set<PrimitiveIngredient>,
+    override val ingredients: Collection<PrimitiveIngredient>,
+    override val outputs: Collection<PrimitiveIngredient>,
     override val recipeType: NeuRecipeType,
     override val shouldUseForCraftCost: Boolean = true,
 ) : PrimitiveRecipe {

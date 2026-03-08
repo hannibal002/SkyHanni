@@ -17,7 +17,7 @@ data class NeuForgeRecipeJson(
     @Expose val count: Int,
     @Expose val overrideOutputId: NeuInternalName? = null,
     @Expose @SerializedName("duration") private val durationSeconds: Int,
-) : NeuAbstractRecipe<DurationPrimitiveRecipe>() {
+) : NeuAbstractRecipe {
     val duration by lazy { durationSeconds.seconds }
     override fun getPrimitiveRecipe(itemJson: NeuItemJson): DurationPrimitiveRecipe = BasePrimitiveRecipe(
         inputs.mapNotNull { it.toPrimitiveIngredientOrNull() }.toSet(),

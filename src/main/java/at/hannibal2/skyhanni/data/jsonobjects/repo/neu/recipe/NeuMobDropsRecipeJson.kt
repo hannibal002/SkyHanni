@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
+import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import com.google.gson.annotations.Expose
@@ -18,10 +19,8 @@ data class NeuMobDropsRecipeJson(
     @Expose @SerializedName("combat_xp") val combatXp: Int? = null,
     @Expose val drops: List<NeuDropJson>,
     @Expose val extra: List<String> = emptyList(),
-) : NeuAbstractRecipe<BasePrimitiveRecipe>() {
-    private val primitiveOutputs by lazy {
-        drops.mapNotNull { it.id.toPrimitiveIngredientOrNull() }.toSet()
-    }
+) : NeuAbstractRecipe {
+    private val primitiveOutputs get() = drops.mapNotNull { it.id.toPrimitiveIngredientOrNull() }.toSet()
     override fun getPrimitiveRecipe(itemJson: NeuItemJson): BasePrimitiveRecipe = BasePrimitiveRecipe(
         setOf(PrimitiveIngredient(itemJson.internalName)),
         primitiveOutputs,

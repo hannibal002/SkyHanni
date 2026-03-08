@@ -42,7 +42,7 @@ data class NeuItemJson(
     @Expose val infoType: String? = null,
     @Expose val info: List<String> = emptyList(),
     @Expose val recipe: NeuCraftingRecipeJson? = null,
-    @Expose val recipes: List<NeuAbstractRecipe<*>> = emptyList(),
+    @Expose val recipes: List<NeuAbstractRecipe> = emptyList(),
     @Expose val count: Int? = null,
 ) {
     companion object {

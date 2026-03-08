@@ -17,7 +17,7 @@ data class NeuKatUpgradeRecipeJson(
     @Expose val input: NeuInternalName,
     @Expose val output: NeuInternalName,
     @Expose val items: List<NeuRecipeComponent> = emptyList(),
-) : NeuAbstractRecipe<DurationPrimitiveRecipe>() {
+) : NeuAbstractRecipe {
     val duration by lazy { time.seconds }
     private val primitiveIngredients by lazy {
         buildList {

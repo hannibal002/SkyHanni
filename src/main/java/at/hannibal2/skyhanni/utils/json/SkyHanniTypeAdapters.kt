@@ -126,12 +126,12 @@ object SkyHanniTypeAdapters {
         { NeuRecipeType.fromNeuId(this) },
     )
 
-    val NEU_ABSTRACT_RECIPE = object : TypeAdapter<NeuAbstractRecipe<*>>() {
-        override fun write(writer: JsonWriter, value: NeuAbstractRecipe<*>) {
+    val NEU_ABSTRACT_RECIPE = object : TypeAdapter<NeuAbstractRecipe>() {
+        override fun write(writer: JsonWriter, value: NeuAbstractRecipe) {
             writer.value(value.toString())
         }
 
-        override fun read(reader: JsonReader): NeuAbstractRecipe<*> {
+        override fun read(reader: JsonReader): NeuAbstractRecipe {
             val obj = JsonParser.parseReader(reader).asJsonObject
             val typeId = obj.get("type").asString
             val recipeType = NeuRecipeType.fromNeuIdOrNull(typeId)

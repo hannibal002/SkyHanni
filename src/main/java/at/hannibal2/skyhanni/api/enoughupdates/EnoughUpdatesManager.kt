@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
+import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -130,12 +130,13 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun NeuItemJson.collectRecipes(): List<Pair<NeuAbstractRecipe<*>, NeuItemJson>> = buildList {
+    private fun NeuItemJson.collectRecipes(): List<Pair<NeuAbstractRecipe, NeuItemJson>> = buildList {
         recipe?.let { add(it to this@collectRecipes) }
         recipes.forEach { add(it to this@collectRecipes) }
     }
 
-    private fun Pair<NeuAbstractRecipe<*>, NeuItemJson>.register() {
+    private var reported = false
+    private fun Pair<NeuAbstractRecipe, NeuItemJson>.register() {
         val (neuRecipe, itemJson) = this
         val recipe = runCatching { neuRecipe.getPrimitiveRecipe(itemJson) }.getOrElse { e ->
             ErrorManager.logErrorWithData(e, "Failed to parse recipe for ${itemJson.internalName}", "type" to neuRecipe.type)
@@ -149,14 +150,7 @@ object EnoughUpdatesManager {
     }
 
     private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
-        val itemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: run {
-            ErrorManager.logErrorWithData(
-                RuntimeException("Failed to deserialize NeuItemJson"),
-                "Item could not be parsed from repo JSON",
-                "internalName" to internalName,
-            )
-            return@runCatching null
-        }
+        val itemJson = ConfigManager.gson.fromJson<NeuItemJson>(json)
         itemJson.itemId.getVanillaItem()?.let { itemJson.itemId = it.getIdentifierString() }
         itemJson.displayName?.let { displayName ->
             synchronized(titleWordMap) {
@@ -168,7 +162,17 @@ object EnoughUpdatesManager {
             }
         }
         itemJson
-    }.getOrThrow()
+    }.getOrElse { e ->
+        if (!reported) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to parse item: $internalName",
+                "json" to json.toString(),
+            )
+            reported = true
+        }
+        null
+    }
 
     fun getItemById(id: String): NeuItemJson? = itemMap[id.toInternalName()]
     fun getItemById(internalName: NeuInternalName): NeuItemJson? = itemMap[internalName]
