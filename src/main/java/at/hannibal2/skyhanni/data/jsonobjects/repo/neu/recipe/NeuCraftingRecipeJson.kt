@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
 import at.hannibal2.skyhanni.utils.KSerializable
-import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -33,15 +31,11 @@ data class NeuCraftingRecipeJson(
      */
     @Expose @SerializedName("count") val outputCount: Int = 1,
 ) : NeuAbstractRecipe {
-    private val primitiveIngredients: Set<PrimitiveIngredient> by lazy {
+    override val primitiveIngredients by lazy {
         listOfNotNull(a1, a2, a3, b1, b2, b3, c1, c2, c3).mapNotNull {
             it.toPrimitiveIngredientOrNull()
-        }.toSet()
+        }
     }
-
-    override fun getPrimitiveRecipe(itemJson: NeuItemJson): BasePrimitiveRecipe = BasePrimitiveRecipe(
-        primitiveIngredients,
-        getPrimitiveOutputs(itemJson, outputCount),
-        this.type,
-    )
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) =
+        super.getPrimitiveOutputsFromJson(itemJson, outputCount)
 }

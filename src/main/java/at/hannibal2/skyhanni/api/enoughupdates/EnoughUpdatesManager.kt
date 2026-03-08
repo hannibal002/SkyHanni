@@ -135,7 +135,6 @@ object EnoughUpdatesManager {
         recipes.forEach { add(it to this@collectRecipes) }
     }
 
-    private var reported = false
     private fun Pair<NeuAbstractRecipe, NeuItemJson>.register() {
         val (neuRecipe, itemJson) = this
         val recipe = runCatching { neuRecipe.getPrimitiveRecipe(itemJson) }.getOrElse { e ->
@@ -234,7 +233,7 @@ object EnoughUpdatesManager {
     }
 
     private fun ItemStack?.getPetLoreReplacements(): Map<String, String> {
-        val petInfo = this?.getPetInfo() ?: return emptyMap()
+        val petInfo = this?.getPetInfo(useDefaultForRepo = true) ?: return emptyMap()
         val properInternalName = petInfo.type
         // We let PetData do the heavy lifting of parsing the pet info
         val petData = PetData(petInfo)

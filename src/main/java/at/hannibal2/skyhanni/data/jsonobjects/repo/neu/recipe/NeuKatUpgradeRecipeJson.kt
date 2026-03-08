@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
 import at.hannibal2.skyhanni.utils.DurationPrimitiveRecipe
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
@@ -19,17 +20,15 @@ data class NeuKatUpgradeRecipeJson(
     @Expose val items: List<NeuRecipeComponent> = emptyList(),
 ) : NeuAbstractRecipe {
     val duration by lazy { time.seconds }
-    private val primitiveIngredients by lazy {
+    override val primitiveIngredients by lazy {
         buildList {
             items.mapNotNull { it.toPrimitiveIngredientOrNull() }.forEach { add(it) }
             add(PrimitiveIngredient(input))
-            add(PrimitiveIngredient.coinIngredient(coins))
+            add(PrimitiveIngredient(SKYBLOCK_COIN, coins))
         }
     }
-
-    override fun getPrimitiveRecipe(itemJson: NeuItemJson): DurationPrimitiveRecipe = BasePrimitiveRecipe(
-        primitiveIngredients.toSet(),
-        setOf(PrimitiveIngredient(output)),
-        this.type,
-    ).withDuration(duration)
+    private val primitiveOutput by lazy { PrimitiveIngredient(output) }
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) = listOf(primitiveOutput)
+    override fun getPrimitiveRecipe(itemJson: NeuItemJson): DurationPrimitiveRecipe =
+        super.getBasePrimitiveRecipe(itemJson).withDuration(duration)
 }

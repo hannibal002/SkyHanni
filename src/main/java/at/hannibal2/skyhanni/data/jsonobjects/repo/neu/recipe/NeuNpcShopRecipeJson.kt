@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
+import at.hannibal2.skyhanni.utils.MerchantPrimitiveRecipe
 import com.google.gson.annotations.Expose
 
 data class NeuNpcShopRecipeJson(
@@ -9,11 +9,10 @@ data class NeuNpcShopRecipeJson(
     @Expose val cost: List<NeuRecipeComponent>,
     @Expose val result: NeuRecipeComponent,
 ) : NeuAbstractRecipe {
-    private val primitiveInputs get() = cost.mapNotNull { it.toPrimitiveIngredientOrNull() }.toSet()
-
-    override fun getPrimitiveRecipe(itemJson: NeuItemJson): BasePrimitiveRecipe = BasePrimitiveRecipe(
-        primitiveInputs,
-        listOfNotNull(result.toPrimitiveIngredientOrNull()),
-        this.type,
-    )
+    // These cannot be by lazy since this class cannot be KSerializable.
+    override val primitiveIngredients get() = cost.mapNotNull { it.toPrimitiveIngredientOrNull() }
+    private val primitiveOutputs get() = listOf(result.toPrimitiveIngredient())
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) = primitiveOutputs
+    override fun getPrimitiveRecipe(itemJson: NeuItemJson): MerchantPrimitiveRecipe =
+        super.getBasePrimitiveRecipe(itemJson).withMerchant(itemJson.internalName)
 }

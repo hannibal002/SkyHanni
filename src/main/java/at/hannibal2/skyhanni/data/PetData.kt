@@ -75,7 +75,7 @@ data class PetData(
         SkyBlockItemModifierUtils.PetInfo(
             type = it,
             tier = rarity,
-            exp = exp ?: 0.0,
+            exp = exp ?: 20.0,
             properSkinItem = skinInternalName,
             heldItem = heldItemInternalName,
             uniqueId = uuid,

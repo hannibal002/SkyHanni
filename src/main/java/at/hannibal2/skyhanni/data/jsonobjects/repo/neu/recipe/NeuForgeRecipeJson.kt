@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
-import at.hannibal2.skyhanni.utils.DurationPrimitiveRecipe
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
@@ -19,11 +17,9 @@ data class NeuForgeRecipeJson(
     @Expose @SerializedName("duration") private val durationSeconds: Int,
 ) : NeuAbstractRecipe {
     val duration by lazy { durationSeconds.seconds }
-    override fun getPrimitiveRecipe(itemJson: NeuItemJson): DurationPrimitiveRecipe = BasePrimitiveRecipe(
-        inputs.mapNotNull { it.toPrimitiveIngredientOrNull() }.toSet(),
-        overrideOutputId?.let {
-            setOf(PrimitiveIngredient(it, count))
-        } ?: getPrimitiveOutputs(itemJson, count),
-        this.type,
-    ).withDuration(duration)
+    override val primitiveIngredients by lazy {
+        inputs.mapNotNull { it.toPrimitiveIngredientOrNull() }
+    }
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) = super.getPrimitiveOutputsFromJson(itemJson, count)
+    override fun getPrimitiveRecipe(itemJson: NeuItemJson) = super.getBasePrimitiveRecipe(itemJson).withDuration(duration)
 }

@@ -22,11 +22,19 @@ data class BasePrimitiveRecipe(
     override val output by lazy { outputs.firstOrNull() }
 
     fun withDuration(duration: Duration) = DurationPrimitiveRecipe(this, duration)
+    fun withMerchant(merchant: NeuInternalName) = MerchantPrimitiveRecipe(this, merchant)
 }
 
 data class DurationPrimitiveRecipe(
     val primitiveRecipe: BasePrimitiveRecipe,
     val duration: Duration,
+) : PrimitiveRecipe by primitiveRecipe {
+    override val output by lazy { outputs.firstOrNull() }
+}
+
+data class MerchantPrimitiveRecipe(
+    val primitiveRecipe: BasePrimitiveRecipe,
+    val merchant: NeuInternalName,
 ) : PrimitiveRecipe by primitiveRecipe {
     override val output by lazy { outputs.firstOrNull() }
 }
