@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.MiningProfitTrackerConfig.GemstoneType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -83,16 +83,11 @@ object MiningTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && onMiningIsland() },
+            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
         )
-    }
-
-    fun onMiningIsland(): Boolean {
-        return MiningApi.inDwarvenMines or MiningApi.inGlaciteArea() or
-            MiningApi.inEnd or MiningApi.inCrimsonIsle or MiningApi.inCrystalHollows
     }
 
     // Associated data when hovering over tracker lines.
@@ -114,9 +109,9 @@ object MiningTracker {
 
         // Description when hovering over the above line
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val mobKillCoinsFormat = item.totalAmount.shortFormat()
+            val miningCoinsGained = item.totalAmount.shortFormat()
             return listOf(
-                "§7You have gained §6$mobKillCoinsFormat coins §7from mining associated tasks."
+                "§7You have gained §6$miningCoinsGained coins §7from mining associated tasks."
             )
         }
 
@@ -205,7 +200,7 @@ object MiningTracker {
     // BlockType category control. All is for any minable quantity.
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!config.enabled || !onMiningIsland()) return
+        if (!config.enabled || !IslandTypeTags.CUSTOM_MINING.inAny()) return
         tracker.update()
         if (event.clickType != at.hannibal2.skyhanni.data.ClickType.LEFT_CLICK) return
 
@@ -219,7 +214,7 @@ object MiningTracker {
     //Adding to the number of blocks mined
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!config.enabled || !onMiningIsland()) return
+        if (!config.enabled || !IslandTypeTags.CUSTOM_MINING.inAny()) return
         tracker.firstUpdate()
         val oldState = event.oldState
         val newState = event.newState
@@ -268,7 +263,7 @@ object MiningTracker {
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
-        if (!onMiningIsland()) return
+        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-mining item pickup: $internalName'")
             return

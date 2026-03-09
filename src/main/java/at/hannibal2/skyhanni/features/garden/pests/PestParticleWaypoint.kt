@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -70,6 +71,7 @@ object PestParticleWaypoint {
         val pos = event.location
 
         if (bezierFitter.isEmpty()) {
+            if (pos.distance(LocationUtils.playerLocation()) > 5) return
             bezierFitter.addPoint(pos)
             return
         }

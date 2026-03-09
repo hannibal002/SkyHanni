@@ -36,14 +36,6 @@ class MiningProfitTrackerConfig {
         override fun toString() = displayName
     }
 
-    @Expose
-    @ConfigOption(
-        name = "Tracker Time settings",
-        desc = "Choose how the tracker behaves when you stop mining.\n" +
-            "§ePause: Pauses the timer after timeout.\n" +
-            "§eReset: Resets the data after timeout.\n" +
-            "§eAlways On: Timer keeps running even if you stop mining."
-    )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 

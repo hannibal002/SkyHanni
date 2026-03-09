@@ -1,10 +1,21 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.components.PlayerTabOverlay
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.reflect.KProperty
 
-var tabListGuard by object : ThreadLocal<Boolean>() {
+fun <T> tabListGuarded(block: (PlayerTabOverlay) -> T): T {
+    tabListGuard = true
+    try {
+        return block(Minecraft.getInstance().gui.tabList)
+    } finally {
+        tabListGuard = false
+    }
+}
+
+private var tabListGuard by object : ThreadLocal<Boolean>() {
     override fun initialValue(): Boolean {
         return false
     }

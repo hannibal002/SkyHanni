@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
@@ -213,7 +213,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateComponentEvent) {
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
         val footerLines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         footerLines.readNonGodPotEffects()
     }

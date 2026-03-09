@@ -81,6 +81,16 @@ class TrevorTheTrapperConfig {
     var solver: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Theodolite Visualizer",
+        desc = "Draw the radius given by Talbot's Theodolite.\n" +
+            "The larger the height difference, the more accurate it will be."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var talbotCircles: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
     @ConfigEditorBoolean
     @FeatureToggle

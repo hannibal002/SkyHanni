@@ -33,30 +33,11 @@ object GraphEditorBugFinder {
         checkConflictingTags(graph, errorsInWorld)
         checkConflictingAreas(graph, errorsInWorld)
         checkMissingData(graph, errorsInWorld)
-        val clusters = checkDisjointClusters(graph, errorsInWorld)
 
         this.errorsInWorld = errorsInWorld
-        if (clusters.size <= 1) {
-            errorsInWorld.keys.minByOrNull {
-                it.distanceSqToPlayer()
-            }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
-        }
-    }
-
-    private fun checkDisjointClusters(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>): List<Set<GraphNode>> {
-        val clusters = GraphUtils.findDisjointClusters(graph)
-        if (clusters.size <= 1) return clusters
-
-        val closestCluster = clusters.minBy { cluster -> cluster.minOf { it.distanceSqToPlayer() } }
-        val foreignClusters = clusters.filter { it !== closestCluster }
-        val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.distanceSqToPlayer() } }
-        closestForeignNodes.forEach {
-            errorsInWorld[it] = "§cDisjoint node network"
-        }
-        val closestForeignNode = closestForeignNodes.minBy { it.distanceSqToPlayer() }
-        val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-        closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
-        return clusters
+        errorsInWorld.keys.minByOrNull {
+            it.distanceSqToPlayer()
+        }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
     }
 
     private fun checkMissingData(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {

@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -54,5 +54,5 @@ object SirihHelper {
         lastSentMessage = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = config.sirihHelper && CrimsonIsleReputationHelper.factionType == FactionType.BARBARIAN
+    fun isEnabled() = config.sirihHelper && CrimsonIsleReputationApi.factionType == FactionType.BARBARIAN
 }

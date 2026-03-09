@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -33,9 +34,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -62,29 +63,29 @@ object SkillApi {
 
     // TODO find out whats going on here
     /**
-     * REGEX-TEST:  Farming 35: §r§a12.4%
+     * REGEX-TEST:  Farming 35: 12.4%
      */
     private val skillTabPattern by patternGroup.pattern(
-        "skill.tab",
-        " (?:§r§a)?(?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
+        "skill.tab.colorless",
+        " (?<type>\\w+)(?: (?<level>\\d+))?: (?<progress>[0-9.]+)%",
     )
 
     /**
-     * REGEX-TEST:  §r§aFarming 60: §r§c§lMAX
-     * REGEX-TEST:  Mining 60: §r§c§lMAX
+     * REGEX-TEST:  Farming 60: MAX
+     * REGEX-TEST:  Mining 60: MAX
      */
     private val maxSkillTabPattern by patternGroup.pattern(
-        "skill.tab.max",
-        " (?:§r§a)?(?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
+        "skill.tab.max.colorless",
+        " (?<type>\\w+) (?<level>\\d+): MAX",
     )
 
     /**
-     * REGEX-TEST:  §r§aMining 14: §r§e22,922§r§6/§r§e75k
-     * REGEX-TEST:  §r§aCombat 49: §r§e7,678§r§6/§r§e4M
+     * REGEX-TEST:  Mining 14: 22,922/75k
+     * REGEX-TEST:  Combat 49: 7,678/4M
      */
     private val skillTabNoPercentPattern by patternGroup.pattern(
-        "skill.tab.nopercent",
-        " (?:§r§a)?(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[\\d,.]+[kMB]?+)",
+        "skill.tab.nopercent.colorless",
+        " (?<type>\\w+)(?: (?<level>\\d+))?: (?<current>[0-9,.]+)/(?<needed>[\\d,.]+[kMB]?+)",
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -98,7 +99,14 @@ object SkillApi {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @HandleEvent(SecondPassedEvent::class)
+    private var lastTabComponents: List<Component> = emptyList()
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        lastTabComponents = event.tabList
+    }
+
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
@@ -271,11 +279,10 @@ object SkillApi {
     private fun handleSkillPatternPercent(matcher: Matcher, skillType: SkillType) {
         var current = 0L
         var needed = 0L
-        var xpPercentage = 0.0
         var isPercentPatternFound = false
         var tablistLevel: Int? = null
 
-        line@ for (line in TabListData.getTabList()) {
+        line@ for (line in lastTabComponents) {
             skillTabPattern.matchMatcher(line) {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
@@ -304,8 +311,7 @@ object SkillApi {
             }
         }
 
-        xpPercentage = matcher.group("progress").formatDouble()
-
+        val xpPercentage = matcher.group("progress").formatDouble()
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
         val level = tablistLevel ?: return
         if (isPercentPatternFound) {

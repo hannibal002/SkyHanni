@@ -10,8 +10,10 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,7 +21,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi.getLevel
@@ -76,6 +78,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
+    private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
     private var organicMatter: Map<NeuInternalName, Double> = emptyMap()
@@ -118,26 +121,23 @@ object ComposterOverlay {
     private val VOLTA = "VOLTA".toInternalName()
     private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @HandleEvent(TabListUpdateEvent::class, priority = HandleEvent.LOW)
-    fun onTabListUpdate() {
-        if (inInventory) {
-            update()
-        }
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!isEnabled() || !event.isWidget(TabWidget.COMPOSTER)) return
+        displayDirty = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
         if (composterUpgradesInventory.isInside() && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
             extraComposterUpgrade = null
-            update()
+            displayDirty = true
         }
     }
 
     @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened() {
-        if (inInventory) {
-            update()
-        }
+        if (inInventory) displayDirty = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -150,7 +150,7 @@ object ComposterOverlay {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
                 } == 25
                 extraComposterUpgrade = upgrade
-                update()
+                displayDirty = true
                 return
             }
         }
@@ -158,7 +158,7 @@ object ComposterOverlay {
             extraComposterUpgrade = null
             maxLevel = false
         }
-        update()
+        displayDirty = true
     }
 
     private fun update() {
@@ -275,11 +275,11 @@ object ComposterOverlay {
             addString("§7Items needed to fill §eOrganic Matter")
             val fillList = fillList(organicMatterFactors, missingOrganicMatter, testOffset) {
                 currentOrganicMatterItem = it
-                update()
+                displayDirty = true
             }
             if (currentOrganicMatterItem == NONE) {
                 currentOrganicMatterItem = fillList
-                update()
+                displayDirty = true
             }
         }
     }
@@ -293,11 +293,11 @@ object ComposterOverlay {
         val missingFuel = (maxFuel - currentFuel).toDouble()
         val fillList = fillList(fuelFactors, missingFuel) {
             currentFuelItem = it
-            update()
+            displayDirty = true
         }
         if (currentFuelItem == NONE) {
             currentFuelItem = fillList
-            update()
+            displayDirty = true
         }
     }
 
@@ -367,7 +367,7 @@ object ComposterOverlay {
                 current = currentTimeType,
                 onChange = {
                     currentTimeType = it
-                    update()
+                    displayDirty = true
                 },
             )
 
@@ -428,7 +428,7 @@ object ComposterOverlay {
 
         val testOffset = if (testOffsetRec > map.size) {
             ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
-            ComposterOverlay.testOffset = 0
+            testOffset = 0
             0
         } else testOffsetRec
 
@@ -437,7 +437,7 @@ object ComposterOverlay {
             add(
                 Renderable.link("testOffset = $testOffset") {
                     ComposterOverlay.testOffset = 0
-                    update()
+                    displayDirty = true
                 },
             )
         }
@@ -546,24 +546,31 @@ object ComposterOverlay {
             return
         }
 
-        val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
-            GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
-            // TODO Add sack type repo data
+        val havingInSacks: Int
+        if (internalName.isMissingSackItem()) {
+            // sunflower oil doesnt go into sacks so have to do this
+            havingInSacks = 0
+        } else {
+            havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
+                GetFromSackApi.getFromSack(internalName, itemsNeeded - havingInInventory)
+                // TODO Add sack type repo data
 
-            val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
-            val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
-            ChatUtils.clickableChat(
-                "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                onClick = { HypixelCommands.sacks() },
-                "§eClick to run /sax!",
-                replaceSameMessage = true,
-            )
-            return
+                val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
+                val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
+                ChatUtils.clickableChat(
+                    "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
+                    onClick = { HypixelCommands.sacks() },
+                    "§eClick to run /sax!",
+                    replaceSameMessage = true,
+                )
+                return
+            }
         }
         if (havingInSacks == 0) {
             SoundUtils.playErrorSound()
             if (SkyBlockUtils.noTradeMode) {
-                ChatUtils.chat("No $itemName §efound in sacks.")
+                ChatUtils.chat("No $itemName §efound in sacks. Opening recipe.")
+                HypixelCommands.recipe(itemName)
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
                 BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
@@ -626,6 +633,7 @@ object ComposterOverlay {
     private fun updateOrganicMatterFactors() {
         try {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
+            displayDirty = true
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Failed to calculate composter overlay data",
@@ -634,34 +642,31 @@ object ComposterOverlay {
         }
     }
 
+    // todo repo
     private val blockedItems = listOf(
         "POTION_AFFINITY_TALISMAN",
         "CROPIE_TALISMAN",
         "SPEED_TALISMAN",
         "SIMPLE_CARROT_CANDY",
-    )
+    ).map { it.toInternalName() }
 
-    private fun isBlockedArmor(internalName: String): Boolean {
-        return internalName.endsWith("_BOOTS") ||
-            internalName.endsWith("_HELMET") ||
-            internalName.endsWith("_CHESTPLATE") ||
-            internalName.endsWith("_LEGGINGS")
-    }
+    private val HUGE_MUSHROOM_1 = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
+    private val HUGE_MUSHROOM_2 = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
 
     private fun updateOrganicMatterFactors(baseValues: Map<NeuInternalName, Double>): Map<NeuInternalName, Double> {
         val map = mutableMapOf<NeuInternalName, Double>()
-        for ((internalName, _) in NeuItems.allNeuRepoItems()) {
-            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
+        for (internalName in NeuItems.allNeuRepoInternalNames()) {
+            if (blockedItems.contains(internalName) || internalName.isArmor()) continue
 
-            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName.toInternalName())
-            if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
+            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
+            if (internalName == HUGE_MUSHROOM_1 || internalName == HUGE_MUSHROOM_2) {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
             baseValues[newId]?.let {
                 val totalOrganicMatter = it * amount
                 if (totalOrganicMatter <= config.minimumOrganicMatter.get()) continue
-                map[internalName.toInternalName()] = totalOrganicMatter
+                map[internalName] = totalOrganicMatter
             }
         }
         return map
@@ -671,6 +676,10 @@ object ComposterOverlay {
     fun onBackgroundDraw() {
         if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
+        if (displayDirty) {
+            update()
+            displayDirty = false
+        }
 
         config.overlayOrganicMatterPos.renderRenderable(
             organicMatterDisplay,
