@@ -630,10 +630,10 @@ object ComposterOverlay {
         }
     }
 
-    // TODO add neu repo reload support
     private fun updateOrganicMatterFactors() {
         try {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
+            displayDirty = true
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Failed to calculate composter overlay data",

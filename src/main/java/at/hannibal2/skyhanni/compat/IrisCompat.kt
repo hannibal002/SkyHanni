@@ -47,7 +47,7 @@ object IrisCompat {
 
             SkyHanniRenderPipeline.entries.forEach { shPipeline ->
                 try {
-                    pipelineMethod.invoke(irisInstance, shPipeline, shPipeline.irisProgram.asJavaEnum())
+                    pipelineMethod.invoke(irisInstance, shPipeline(), shPipeline.irisProgram.asJavaEnum())
                 } catch (exception: Exception) {
                     ErrorManager.logErrorWithData(exception, "Failed to assign Iris pipeline!")
                 }
