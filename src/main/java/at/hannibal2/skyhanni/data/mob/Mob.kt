@@ -189,6 +189,11 @@ class Mob(
             extraEntities.forEach {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color) { !this.isInvisible() && condition() }
             }
+            // Also highlight the armor stand (e.g. the rat skull head) so mobs whose visible
+            // representation is their armor stand (invisible base entity + equipped skull) are highlighted.
+            armorStand?.let {
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color) { !this.isInvisible() && condition() }
+            }
         }
     }
 
@@ -198,6 +203,7 @@ class Mob(
         extraEntities.forEach {
             RenderLivingEntityHelper.removeCustomRender(it)
         }
+        armorStand?.let { RenderLivingEntityHelper.removeCustomRender(it) }
     }
 
     val boundingBox: AABB

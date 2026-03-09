@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.data.entity.EntityOpacityManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -11,6 +12,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -62,12 +64,28 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
 
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
-        if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return;
-            //? if < 1.21.11 {
-            cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
-            //?} else
-            //cir.setReturnValue(RenderTypes.itemEntityTranslucentCull(this.getTextureLocation(state)));
+        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+            // Suppress the body geometry of invisible armor stands during the outline pass.
+            // These mobs (e.g. "rat" mobs) are represented visually by only their skull head
+            // item (rendered via CustomHeadLayer). The skull outline is handled separately via
+            // customOutlineSkullStates (depth-tested / NO_XRAY). Without this suppression,
+            // the invisible armor stand body skeleton would appear as a white outline through
+            // blocks in the vanilla x-ray outline buffer, which is considered cheating.
+            if (showOutline
+                    && livingEntity instanceof ArmorStand armorStand
+                    && armorStand.isInvisible()
+                    && RenderLivingEntityHelper.isEntityCustomHighlighted(armorStand)) {
+                cir.setReturnValue(null);
+                return;
+            }
+
+            if (showBody) {
+                if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return;
+                //? if < 1.21.11 {
+                cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
+                //?} else
+                //cir.setReturnValue(RenderTypes.itemEntityTranslucentCull(this.getTextureLocation(state)));
+            }
         }
     }
 

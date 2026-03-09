@@ -5,8 +5,11 @@ import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
@@ -26,6 +29,50 @@ object RenderLivingEntityHelper {
     @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
+    /**
+     * Synchronous flag — true only while SkullBlockRenderer.submitSkull is executing for a
+     * custom-outlined entity (set/cleared by MixinHeadFeatureRenderer). Both the setter and
+     * SubmitNodeCollection.submitModel run on the same call stack, so no race condition.
+     */
+    @JvmField
+    var isSubmittingCustomOutlineSkull = false
+
+    /** Java-accessible setter for [isSubmittingCustomOutlineSkull] used by MixinSkullBlockRenderer. */
+    @JvmStatic
+    fun setSkullOutlineActive(active: Boolean) {
+        isSubmittingCustomOutlineSkull = active
+    }
+
+    /**
+     * Tracks skull render-state objects whose geometry was submitted while an entity was using
+     * SkyHanni's custom NO_XRAY outline. Weak keys so states are GC'd normally.
+     * Populated at submitModel HEAD (via MixinSubmitNodeCollection) when the flag above is set.
+     * Read during the deferred render phase by MixinModelFeatureRenderer (Case 2) via
+     * model.state() — the same object that was passed to submitModel.
+     */
+    @JvmStatic
+    private val customOutlineSkullStates: MutableSet<Any> =
+        java.util.Collections.newSetFromMap(java.util.WeakHashMap())
+
+    @JvmStatic
+    fun markModelSubmitAsCustomOutline(state: Any) {
+        customOutlineSkullStates.add(state)
+    }
+
+    @JvmStatic
+    fun isModelSubmitCustomOutline(state: Any): Boolean = customOutlineSkullStates.contains(state)
+
+    /**
+     * Returns true if the given entity has a custom highlight color registered and its condition
+     * is currently active. Used by MixinRendererLivingEntity to detect invisible armor stands
+     * that are custom-highlighted so their body outline can be suppressed during the glow pass.
+     */
+    @JvmStatic
+    fun isEntityCustomHighlighted(entity: LivingEntity): Boolean {
+        val condition = entityColorCondition[entity] ?: return false
+        return condition.invoke()
+    }
+
     private fun isEntityInGlowEvent(entity: Entity): Int {
         return currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb ?: 0
     }
@@ -38,7 +85,7 @@ object RenderLivingEntityHelper {
     @JvmStatic
     fun getEntityGlowColor(entity: Entity): Int? {
         val livingEntity = entity as? LivingEntity ?: return null
-        if (livingEntity.isInvisible) return null
+        if (livingEntity.isInvisible && livingEntity.getAllEquipment().isEmpty()) return null
         val color = internalSetColorMultiplier(livingEntity, 0)
         if (color == 0) {
             val eventColor = isEntityInGlowEvent(entity)
