@@ -268,7 +268,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         totalAmount: Long,
         action: String,
         duration: Duration,
-        actionPluralized: String = ""
+        actionPluralized: String = "",
+        actionShorten: Boolean = true,
     ): List<Searchable> {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
@@ -286,7 +287,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
 
             if (totalAmount > 0 && duration > 0.seconds && actionPluralized != "") {
                 val amountPerHour = totalAmount / duration.inPartialHours
-                add("§7$actionPluralized per hour: §e${amountPerHour.shortFormat()}")
+                val amount = if (actionShorten) amountPerHour.shortFormat() else amountPerHour
+                add("§7$actionPluralized per hour: §e$amount")
             }
         }
 

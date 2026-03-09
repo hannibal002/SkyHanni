@@ -514,6 +514,8 @@ object StringUtils {
 
     fun Component.contains(string: String): Boolean = formattedTextCompat().contains(string)
 
+    fun Component.startsWith(string: String): Boolean = formattedTextCompat().startsWith(string)
+
     fun String.width(): Int {
         return Minecraft.getInstance().font.width(this)
     }

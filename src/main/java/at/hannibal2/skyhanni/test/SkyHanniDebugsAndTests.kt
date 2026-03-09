@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
@@ -45,7 +43,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -54,7 +51,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -68,7 +64,13 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import net.minecraft.client.gui.components.debug.DebugScreenDisplayer
+import net.minecraft.client.gui.components.debug.DebugScreenEntries
+import net.minecraft.client.gui.components.debug.DebugScreenEntry
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.resources.Identifier
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.chunk.LevelChunk
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -77,16 +79,28 @@ object SkyHanniDebugsAndTests {
 
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
-    var displayLine = ""
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    var displayList = emptyList<Renderable>()
+    var displayLine: String? = null
+    private var displayList = emptyList<Renderable>()
 
-    var a = 1.0
-    var b = 60.0
-    var c = 0.0
+    init {
+        registerDebugScreenEntry("current_area", SkyBlockUtils::inSkyBlock) {
+            add("[SkyHanni] Current Area: ${HypixelData.skyBlockArea}")
+            add("[SkyHanni] Graph Area: ${SkyBlockUtils.graphArea}")
+        }
 
-    val debugLogger = LorenzLogger("debug/test")
+        registerDebugScreenEntry("ray_traced_ore_block", SkyBlockUtils::inSkyBlock) {
+            BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
+                OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
+                    add("[SkyHanni] Looking at: ${ore.name} (${pos.toCleanString()})")
+                }
+            }
+        }
+
+        registerDebugScreenEntry("test", { !displayLine.isNullOrBlank() }) {
+            add("[SkyHanni Test] $displayLine")
+        }
+    }
 
     private fun run(compound: CompoundTag, text: String) {
         print("$text'$compound'")
@@ -202,7 +216,7 @@ object SkyHanniDebugsAndTests {
 
     private fun testGardenVisitors() {
         if (displayList.isNotEmpty()) {
-            displayList = mutableListOf()
+            displayList = emptyList()
             return
         }
 
@@ -220,7 +234,7 @@ object SkyHanniDebugsAndTests {
                         try {
                             val internalName = NeuInternalName.fromItemName(itemName)
                             addItemStack(internalName.getItemStack())
-                        } catch (e: Error) {
+                        } catch (_: Error) {
                             ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
                             errors++
                         }
@@ -244,7 +258,7 @@ object SkyHanniDebugsAndTests {
         // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
             File("config/skyhanni/blocked-features.txt").readLines().toList()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
 
@@ -314,6 +328,30 @@ object SkyHanniDebugsAndTests {
         "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
         "navigate" -> "`/shnavigate $x $y $z`" to "navigate"
         else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
+    }
+
+    private fun registerDebugScreenEntry(
+        name: String,
+        condition: () -> Boolean = { true },
+        lineBuilder: MutableList<String>.() -> Unit,
+    ) {
+        val id = Identifier.fromNamespaceAndPath("skyhanni", name)
+        DebugScreenEntries.register(
+            id,
+            object : DebugScreenEntry {
+                override fun display(
+                    displayer: DebugScreenDisplayer,
+                    level: Level?,
+                    clientChunk: LevelChunk?,
+                    serverChunk: LevelChunk?,
+                ) {
+                    if (level == null || !condition()) return
+                    displayer.addToGroup(id, buildList(lineBuilder))
+                }
+
+                override fun isAllowed(reducedDebugInfo: Boolean) = true
+            }
+        )
     }
 
     @HandleEvent(GuiKeyPressEvent::class)
@@ -422,41 +460,10 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent(SkyHanniChatEvent.Allow::class)
-    @Suppress("EmptyFunctionBlock")
-    fun onChat() {
-    }
-
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
-        if (MinecraftCompat.showDebugHud) {
-            if (debugConfig.currentAreaDebug) {
-                val renderables = buildList {
-                    addString("Current Area: ${HypixelData.skyBlockArea}")
-                    addString("Graph Area: ${SkyBlockUtils.graphArea}")
-                }
-
-                config.debugLocationPos.renderRenderables(renderables, posLabel = "SkyBlock Area (Debug)")
-            }
-
-            if (debugConfig.rayTracedOreBlock) {
-                BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
-                    OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
-                        config.debugOrePos.renderString(
-                            "Looking at: ${ore.name} (${pos.toCleanString()})",
-                            posLabel = "OreBlock",
-                        )
-                    }
-                }
-            }
-        }
-
-
-        if (!debugConfig.enabled) return
-
-        if (displayLine.isNotEmpty()) {
-            config.debugPos.renderString("test: $displayLine", posLabel = "Test")
-        }
+        // TODO: make this not tied to debug HUD
+        if (!debugConfig.enabled || !MinecraftCompat.showDebugHud) return
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
@@ -466,31 +473,6 @@ object SkyHanniDebugsAndTests {
         val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
-    }
-
-    @HandleEvent
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
-//        val particleType = event.type
-//        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
-//
-//        println("")
-//        println("particleType: $particleType")
-//
-//        val particleCount = event.count
-//
-//        println("distance: $distance")
-//
-//        val particleArgs = event.particleArgs
-//        println("args: " + particleArgs.size)
-//        for ((i, particleArg) in particleArgs.withIndex()) {
-//            println("$i $particleArg")
-//        }
-//
-//        val particleSpeed = event.speed
-//        val offset = event.offset
-//        println("particleCount: $particleCount")
-//        println("particleSpeed: $particleSpeed")
-//        println("offset: $offset")
     }
 
     @HandleEvent
@@ -614,7 +596,7 @@ object SkyHanniDebugsAndTests {
                 if (SkyBlockUtils.inSkyBlock) {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
                 } else {
-                    ChatUtils.chat("§eYou are not in Skyblock.")
+                    ChatUtils.chat("§eYou are not in SkyBlock.")
                 }
             }
         }

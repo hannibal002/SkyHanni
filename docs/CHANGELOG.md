@@ -57,6 +57,12 @@
 #### Event
 
 + Added hiding of Bingo-related NPCs on the Hub island graph when not playing on a Bingo profile. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5316)
++ Made Diana Tracker show exact burrows per hour when above 1000. - nopo (https://github.com/hannibal002/SkyHanni/pull/5340)
+
+#### Farming
+
++ Added the ability to block refusing Seymour's Special Armor visitor reward. - Luna (https://github.com/hannibal002/SkyHanni/pull/5311)
+  + This includes Velvet Top Hat, Cashmere Jacket, Satin Trousers, and Oxford Shoes.
 
 #### Misc
 
@@ -68,6 +74,7 @@
     + Loading to show the waypoint count and detected format name.
 + Added option to show Sky Mall and Lottery HUD outside of mining/foraging islands. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5297)
 + Improved visual quality of items in displays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5318)
++ Added a copy to clipboard for missing sack items. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/5351)
 
 ### Fixes
 
@@ -89,6 +96,7 @@
 + Fixed Pest Prediction Waypoint inaccuracy when used too rapidly. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5310)
 + Fixed some Garden displays not rendering if you downgraded the mod. - nopo (https://github.com/hannibal002/SkyHanni/pull/5295)
 + Fixed error when first opening Composter with overlay enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5320)
++ Fixed composter overlay not reloading when repo does. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5350)
 
 #### Combat
 
@@ -100,6 +108,11 @@
 + Fixed Tarantula Broodfather invincible detection not working for tiers 3 and 4. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4818)
 + Fixed high kill combo chat messages not getting filtered. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5336)
 + Fixed Kuudra Chests being incorrectly marked as fully opened when opening Croesus. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5322)
++ Fixed Croesus Chest Overlay Profit not functiong due to messed up pattern. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5345)
++ Fixed Croesus Highlight throwing chat errors. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5345)
++ Fixed Flare Display sometimes causing freezes. - nopo (https://github.com/hannibal002/SkyHanni/pull/5355)
+  + Should also improve performance with Flare Display a little bit.
++ Fixed Kuudra Keys not counting Reputation Discount in croesus/Instance Chest Profit. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5292)
 
 #### GUI
 
@@ -136,6 +149,11 @@
 #### Foraging
 
 + Fixed error in DNA Analyzer Solver. - hannibal2 + nopo (https://github.com/hannibal002/SkyHanni/pull/5337)
+
+#### Misc
+
++ Fixed some features not working when changing from 1 island to the same island type. (e.g. hub--> hub) . - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5348)
++ Fixed world rendering not working with Iris. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5354)
 
 ### Technical Details
 
@@ -185,6 +203,20 @@
 + Re-enabled custom item rendering on modern Minecraft versions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5318)
 + Refined property collection for config iteration. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5264)
 + Removed a deprecated method to get the item lore in `VisitorRewardWarning`. - Taubsie (https://github.com/hannibal002/SkyHanni/pull/5308)
++ Added `ClientShutdownEvent` and `RenderShutdownEvent` and migrated shutdown hooks to them as appropriate. - Luna (https://github.com/hannibal002/SkyHanni/pull/5330)
++ Added `SkyHanniDebugsAndTests.registerDebugScreenEntry`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5307)
+  + This uses the Minecraft `DebugScreenEntries` API to register new entries to add to the debug screen (F3).
+  + SkyBlock Area and OreBlock Name have been migrated to this, and the config options have been removed, as whether to show them is now configured in F3+F6.
++ Added CoroutineConfig for static definition of intent. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5339)
++ Added new async clipboard copy that returns a success boolean. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5339)
++ Added support for Components for Contributor suffixes. - nopo (https://github.com/hannibal002/SkyHanni/pull/5329)
+  + This means we can support custom images such as flags.
++ Removed all direct usages of getTabList in tab data. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5329)
+  + Function now private.
++ Removed all usages of TabListData, and replaced the class with the Component version. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5329)
++ Replaced TablistFooterUpdateEvent and TabListUpdateEvent with Component versions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5329)
++ Split coroutine handling into new manager class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5339)
++ Support for node weight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5325)
 
 ## Version 7.0.0
 

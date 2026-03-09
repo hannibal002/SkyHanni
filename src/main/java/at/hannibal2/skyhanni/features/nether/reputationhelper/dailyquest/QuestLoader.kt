@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 
@@ -114,7 +113,6 @@ object QuestLoader {
             "dojoGoal" to dojoGoal,
             "state" to state,
             "needAmount" to needAmount,
-            "tablist" to TabListData.getTabList(),
         )
         return UnknownQuest(name)
     }
