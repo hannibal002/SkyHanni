@@ -32,7 +32,7 @@ object RiftWiltedBerberisHelper {
 
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
 
-    private val berberisSounds = setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")
+    private val berberisSounds = setOf("entity.donkey.death", "entity.donkey.hurt")
 
     // NOTE: Do not make this a set, it breaks identity checks
     private val list = mutableListOf<WiltedBerberis>()

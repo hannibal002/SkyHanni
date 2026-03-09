@@ -19,9 +19,9 @@ object SoundUtils {
 
     private val config get() = SkyHanniMod.feature.misc
     private val beepSoundCache = mutableMapOf<Float, SoundInstance>()
-    private val clickSound by lazy { createSound("gui.button.press", 1f) }
-    private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
-    val plingSound by lazy { createSound("note.pling", 1f) }
+    private val clickSound by lazy { createSound("ui.button.click", 1f) }
+    private val errorSound by lazy { createSound("entity.enderman.teleport", 0f) }
+    val plingSound by lazy { createSound("block.note_block.pling", 1f) }
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun SoundInstance.playSound() {
@@ -65,7 +65,7 @@ object SoundUtils {
     }
 
     fun playBeepSound(pitch: Float = 1f) {
-        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("random.orb", pitch) }
+        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("entity.experience_orb.pickup", pitch) }
         beepSound.playSound()
     }
 

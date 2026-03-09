@@ -339,7 +339,7 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
         if (!configKillerSpring.fixSoundSpam) return
 
-        if (event.soundName == "mob.wither.spawn") {
+        if (event.soundName == "entity.wither.spawn") {
             if (lastWitherSpawnSound.passedSince() < 1.ticks) {
                 ChatUtils.debug("Cancelling duplicate wither spawn sound sent within the same tick")
                 return event.cancel()

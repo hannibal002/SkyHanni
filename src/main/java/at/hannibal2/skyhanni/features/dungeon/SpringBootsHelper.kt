@@ -21,16 +21,16 @@ object SpringBootsHelper {
     private val SPRING_BOOTS = "SPRING_BOOTS".toInternalName()
 
     /**
-     * Two [PlaySoundEvent] get created roughly every 100ms. This tracks the amount of times we heard the `note.pling` sound while wearing Spring Boots and sneaking.
+     * Two [PlaySoundEvent] get created roughly every 100ms. This tracks the amount of times we heard the `block.note_block.pling` sound while wearing Spring Boots and sneaking.
      */
     private var soundStreak = 0
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onSound(event: PlaySoundEvent) {
         if (!isEnabled()) return
-        if (!(event.soundName == "note.pling" || event.soundName == "fireworks.launch" || event.soundName == "random.eat")) return
+        if (!(event.soundName.let { it == "block.note_block.pling" || it == "entity.firework_rocket.launch" || it == "entity.generic.eat" })) return
         if (InventoryUtils.getBoots()?.getInternalName() != SPRING_BOOTS) return
-        if (event.soundName == "fireworks.launch" || event.soundName == "random.eat") {
+        if (event.soundName.let { it == "entity.firework_rocket.launch" || it == "entity.generic.eat" }) {
             soundStreak = 0
             return
         }

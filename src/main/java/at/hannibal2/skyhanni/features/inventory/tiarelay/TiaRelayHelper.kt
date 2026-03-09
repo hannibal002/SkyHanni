@@ -32,7 +32,7 @@ object TiaRelayHelper {
     fun onPlaySound(event: PlaySoundEvent) {
         val soundName = event.soundName
 
-        if (config.tiaRelayMute && soundName == "mob.wolf.whine") {
+        if (config.tiaRelayMute && soundName == "entity.wolf.whine") {
             event.cancel()
         }
 

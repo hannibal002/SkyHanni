@@ -29,7 +29,7 @@ object MetalDetectorMute {
     fun onSound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (oldItem != METAL_DETECTOR && currentItem != METAL_DETECTOR) return
-        if (event.soundName == "note.harp") {
+        if (event.soundName == "block.note_block.harp") {
             event.cancel()
         }
     }
