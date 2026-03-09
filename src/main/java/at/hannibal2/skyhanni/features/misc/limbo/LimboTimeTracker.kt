@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -84,13 +83,13 @@ object LimboTimeTracker {
                     append("! You've surpassed your previous record of ")
                     appendWithColor("$oldPB", ChatFormatting.YELLOW)
                     append("!")
-                }
+                },
             )
             ChatUtils.chat(
                 componentBuilder {
                     append("Keep it up!")
                     withColor(ChatFormatting.WHITE)
-                }
+                },
             )
         }
         val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString

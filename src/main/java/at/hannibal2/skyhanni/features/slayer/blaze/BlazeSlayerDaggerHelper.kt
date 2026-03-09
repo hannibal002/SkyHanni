@@ -34,6 +34,10 @@ object BlazeSlayerDaggerHelper {
 
     private val config get() = SlayerApi.config.blazes.hellion
 
+    /**
+     * REGEX-TEST: §cStrike using the §r§f§lSPIRIT §r§cattunement on your dagger!
+     * REGEX-TEST: §cStrike using the §r§8§lASHEN §r§cattunement on your dagger!
+     */
     private val attunementPattern by RepoPattern.pattern(
         "slayer.blaze.dagger.attunement",
         "§cStrike using the §r.+ §r§cattunement on your dagger!",

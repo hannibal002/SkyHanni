@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -85,6 +84,7 @@ object PowderChestTimer {
             event.oldState.`is`(Blocks.STONE) && event.newState.`is`(Blocks.AIR) -> {
                 minedBlocks.add(location)
             }
+
             !event.oldState.`is`(Blocks.CHEST) && event.newState.`is`(Blocks.CHEST) -> {
                 val mined = minedBlocks.remove(location)
                 val possibleFalsePositive = arePlayersNearby || (!mined && event.oldState.`is`(Blocks.AIR))
@@ -93,6 +93,7 @@ object PowderChestTimer {
 
                 chests[location] = maxDuration.fromNow()
             }
+
             event.oldState.`is`(Blocks.CHEST) && !event.newState.`is`(Blocks.CHEST) -> {
                 chests.remove(location)
             }

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -24,7 +23,7 @@ object ArmorStackDisplay {
      */
     private val armorStackPattern by RepoPattern.pattern(
         "combat.armorstack.actionbar",
-        " (?:§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])"
+        " (?:§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])",
     )
 
     @HandleEvent
