@@ -238,10 +238,12 @@ object MinionFeatures {
             }
         }
 
-        val size = removedEntities.size.takeIf { size ->
-            (size != 0).also { nonZero ->
-                if (!nonZero && isCommand) ChatUtils.chat("No bugged minions found nearby.")
+        val size = removedEntities.size
+        if (size == 0) {
+            if (isCommand) {
+                ChatUtils.chat("No bugged minions found nearby.")
             }
+            return
         }
         for (removedEntity in removedEntities) {
             minions.remove(removedEntity)
