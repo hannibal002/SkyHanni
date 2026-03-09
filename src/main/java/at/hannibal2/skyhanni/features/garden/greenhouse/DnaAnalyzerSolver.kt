@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.features.garden.greenhouse.DnaAnalyzerSolver.Colors.Companion.toColor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -23,10 +25,12 @@ object DnaAnalyzerSolver {
 
     private var inInventory = false
     private var fakeInventory = false
+    private var errorCount = 0
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inInventory = event.inventoryName.endsWith(" DNA")
+        errorCount = 0
     }
 
     @HandleEvent
@@ -65,6 +69,18 @@ object DnaAnalyzerSolver {
             val column = i % 9
             initialBoard[column][row] = stack.toColor() ?: return
         }
+
+        if (initialBoard.any { column -> column.toSet().size != column.size }) {
+            if (errorCount == 0) {
+                ChatUtils.debug("DNA analyzer did not find every color in every column")
+            }
+            errorCount++
+            return
+        }
+        if (errorCount > 0) {
+            ChatUtils.debug("DNA analyzer is finally valid after $errorCount inventory updates.")
+            errorCount = 0
+        }
         currentBoard = DnaBoard(initialBoard)
     }
 
@@ -73,7 +89,7 @@ object DnaAnalyzerSolver {
         if (!isEnabled()) return
         val board = currentBoard ?: return
 
-        val currentSwap = board.swaps.last()
+        val currentSwap = board.swaps.lastOrNull() ?: return
         val slot1 = currentSwap.first.first + (currentSwap.first.second + 1) * 9
         val slot2 = currentSwap.second.first + (currentSwap.second.second + 1) * 9
         InventoryUtils.getSlotAtIndex(slot1)?.highlight(LorenzColor.GREEN)
@@ -154,6 +170,18 @@ object DnaAnalyzerSolver {
                     best = dp[mutableCount - 1][p]
                     last = p
                 }
+            }
+
+            if (last == -1) {
+                ErrorManager.logErrorWithData(
+                    IllegalStateException("DNA Analyzer board has no valid solution"),
+                    "DNA Analyzer board has no valid solution",
+                    "initialBoard" to initialBoard,
+                    "allowEnds" to allowEnds,
+                    "firstMutable" to firstMutable,
+                    "lastMutable" to lastMutable,
+                )
+                return UNREACHABLE to emptyList()
             }
 
             val result = mutableListOf<Pair<Pair<Int, Int>, Pair<Int, Int>>>()

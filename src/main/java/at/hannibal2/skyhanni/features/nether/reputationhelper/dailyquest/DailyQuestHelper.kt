@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -235,7 +236,7 @@ object DailyQuestHelper {
     }
 
     fun getQuestBoardLocation(): LorenzVec {
-        val factionType = CrimsonIsleReputationHelper.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
+        val factionType = CrimsonIsleReputationApi.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
         return when (factionType) {
             FactionType.BARBARIAN -> questBoardBarbarian
             FactionType.MAGE -> questBoardMage
@@ -246,7 +247,7 @@ object DailyQuestHelper {
         if (!quests.any { it.needsTownBoardLocation() }) return
 
         // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
-        if (CrimsonIsleReputationHelper.factionType == null && SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
+        if (CrimsonIsleReputationApi.factionType == null && SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         val location = getQuestBoardLocation()
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
