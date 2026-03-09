@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -43,11 +44,11 @@ object NonGodPotEffectDisplay {
     fun isActive(effect: NonGodPotEffect): Boolean = effectDuration.any { it.key == effect && !it.value.ended }
 
     /**
-     * REGEX-TEST: §7You have §e10 §7non-god effects.
+     * REGEX-TEST: You have 10 non-god effects.
      */
     private val effectsCountPattern by RepoPattern.pattern(
-        "misc.nongodpot.effects",
-        "§7You have §e(?<name>\\d+) §7non-god effects\\.",
+        "misc.nongodpot.effects.colorless",
+        "You have (?<count>\\d+) non-god effects\\.",
     )
     private var totalEffectsCount = 0
 
@@ -149,18 +150,13 @@ object NonGodPotEffectDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!checkFooter) return
-        val lines = event.footer.split("\n")
-        if (!lines.any { it.contains("§a§lActive Effects") }) return
+        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        if (!lines.any { it.string.contains("Active Effects") }) return
 
         checkFooter = false
-        var effectsCount = 0
-        for (line in lines) {
-            effectsCountPattern.matchMatcher(line) {
-                val group = group("name")
-                effectsCount = group.toInt()
-            }
-        }
-        totalEffectsCount = effectsCount
+        totalEffectsCount = effectsCountPattern.firstComponentMatcher(lines) {
+            group("count").toIntOrNull()
+        } ?: 0
     }
 
     @HandleEvent
