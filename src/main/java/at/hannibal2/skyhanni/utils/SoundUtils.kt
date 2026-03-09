@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.SoundCompat
 import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
@@ -59,7 +60,7 @@ object SoundUtils {
     //Minecraft.getInstance().soundManager.updateCategoryVolume(this.source, level)
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
-        val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
+        val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
     }

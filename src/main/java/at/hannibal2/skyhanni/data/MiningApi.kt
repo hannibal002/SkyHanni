@@ -164,7 +164,14 @@ object MiningApi {
 
     val blockStrengths = mutableMapOf<OreBlock, Int>()
 
-    private val allowedSoundNames = setOf("block.glass.break", "block.stone.break", "block.gravel.break", "block.wool.break", "entity.experience_orb.pickup", "block.metal.place")
+    private val allowedSoundNames = setOf(
+        "block.glass.break",
+        "block.stone.break",
+        "block.gravel.break",
+        "block.wool.break",
+        "entity.experience_orb.pickup",
+        "block.metal.place",
+    )
 
     var heat: Int = 0
         private set
@@ -540,8 +547,9 @@ object MiningApi {
 
         blockStrengths.clear()
         repo.blockStrengths.forEach { (key, value) ->
-            val ore = OreBlock.getByNameOrNull(key) ?: return@forEach
-            blockStrengths[ore] = value
+            OreBlock.getByNameOrNull(key)?.let { ore ->
+                blockStrengths[ore] = value
+            }
         }
     }
 }
