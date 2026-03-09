@@ -25,12 +25,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.milliseconds
@@ -91,7 +94,7 @@ object GardenLevelDisplay {
         " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience",
     )
 
-    private var display = ""
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -202,7 +205,7 @@ object GardenLevelDisplay {
     }
 
     private fun update() {
-        display = drawDisplay()
+        display = Renderable.text(drawDisplay())
     }
 
     private fun drawDisplay(): String {
@@ -230,7 +233,7 @@ object GardenLevelDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 
-        config.pos.renderString(display, posLabel = "Garden Level")
+        config.pos.renderRenderable(display, posLabel = "Garden Level")
     }
 
     @HandleEvent

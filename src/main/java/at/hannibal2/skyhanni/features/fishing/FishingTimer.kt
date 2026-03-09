@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -28,6 +29,8 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
@@ -39,7 +42,7 @@ object FishingTimer {
     private val mobDespawnTime = mutableMapOf<Mob, SimpleTimeMark>()
 
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
-    private var display: String? = null
+    private var display: Renderable? = null
     private var lastNameFished: String? = null
 
     private var babyMagmaSlugsToFind = 0
@@ -210,17 +213,16 @@ object FishingTimer {
         if (currentCount == 0) return
         if (!FishingApi.isFishing()) return
 
-        val text = display ?: return
-        config.pos.renderString(text, posLabel = "BarnTimer")
+        config.pos.renderRenderable(display, posLabel = "BarnTimer")
     }
 
-    private fun createDisplay(): String {
+    private fun createDisplay(): Renderable {
         val passedSince = startTime.passedSince()
         val timeColor = if (passedSince > config.alertTime.seconds) "§c" else "§e"
         val timeFormat = passedSince.format(TimeUnit.MINUTE)
         val countColor = if (config.fishingCapAlert && currentCount >= currentCap) "§c" else "§e"
         val name = StringUtils.pluralize(currentCount, "sea creature")
-        return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
+        return Renderable.text("$timeColor$timeFormat §8($countColor$currentCount §b$name§8)")
     }
 
     @HandleEvent

@@ -9,10 +9,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
@@ -79,10 +82,10 @@ object FishingHookDisplay {
             return
         }
         if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible) return
-        val alertText = if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets()
+        val alertText = Renderable.text(if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§") else armorStand.name.formattedTextCompatLessResets())
 
         isRendering = true
-        config.position.renderString(alertText, posLabel = "Fishing Hook Display")
+        config.position.renderRenderable(alertText, posLabel = "Fishing Hook Display")
     }
 
     @HandleEvent

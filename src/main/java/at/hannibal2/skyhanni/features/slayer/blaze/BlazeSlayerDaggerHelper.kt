@@ -15,12 +15,14 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
@@ -34,12 +36,12 @@ object BlazeSlayerDaggerHelper {
 
     private val attunementPattern by RepoPattern.pattern(
         "slayer.blaze.dagger.attunement",
-        "§cStrike using the §r.+ §r§cattunement on your dagger!"
+        "§cStrike using the §r.+ §r§cattunement on your dagger!",
     )
 
     private var clientSideClicked = false
-    private var textTop = ""
-    private var textBottom = ""
+    private var textTop: Renderable? = null
+    private var textBottom: Renderable? = null
 
     private var lastDaggerCheck = SimpleTimeMark.farPast()
     private var lastNearestCheck = SimpleTimeMark.farPast()
@@ -65,8 +67,8 @@ object BlazeSlayerDaggerHelper {
             return
         }
 
-        textTop = ""
-        textBottom = ""
+        textTop = null
+        textBottom = null
     }
 
     private fun setDaggerText(holding: Dagger) {
@@ -76,8 +78,8 @@ object BlazeSlayerDaggerHelper {
         val first = Dagger.entries[config.firstDagger.ordinal] // todo avoid ordinal
         val second = first.other()
 
-        textTop = format(holding, true, first) + " " + format(holding, true, second)
-        textBottom = format(holding, false, first) + " " + format(holding, false, second)
+        textTop = Renderable.text(format(holding, true, first) + " " + format(holding, true, second))
+        textBottom = Renderable.text(format(holding, false, first) + " " + format(holding, false, second))
     }
 
     private fun findNearest(): HellionShield? {
@@ -244,12 +246,11 @@ object BlazeSlayerDaggerHelper {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (textTop == "") return
         val currentScreen = Minecraft.getInstance().screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
-        config.positionTop.renderString(textTop, posLabel = "Blaze Slayer Dagger Top")
-        config.positionBottom.renderString(textBottom, posLabel = "Blaze Slayer Dagger Bottom")
+        config.positionTop.renderRenderable(textTop, posLabel = "Blaze Slayer Dagger Top")
+        config.positionBottom.renderRenderable(textBottom, posLabel = "Blaze Slayer Dagger Bottom")
     }
 
     @HandleEvent

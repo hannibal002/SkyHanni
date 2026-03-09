@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ArmorStackDisplay {
     private val config get() = SkyHanniMod.feature.combat.stackDisplayConfig
-    private var display = ""
+    private var display: Renderable? = null
 
     /**
      * REGEX-TEST: §66,171/4,422❤  §6§l10ᝐ§r     §a1,295§a❈ Defense     §b525/1,355✎ §3400ʬ
@@ -30,13 +33,13 @@ object ArmorStackDisplay {
         val stacks = armorStackPattern.findMatcher(event.actionBar) {
             "§6§l" + group("stack")
         }.orEmpty()
-        display = stacks
+        display = Renderable.text(stacks)
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.position.renderString(display, posLabel = "Armor Stack Display")
+        config.position.renderRenderable(display, posLabel = "Armor Stack Display")
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled

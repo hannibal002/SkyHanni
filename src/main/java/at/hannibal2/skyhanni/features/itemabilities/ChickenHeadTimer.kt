@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -64,7 +66,7 @@ object ChickenHeadTimer {
             "Chicken Head Timer: §b$formatDuration"
         }
 
-        config.position.renderString(displayText, posLabel = "Chicken Head Timer")
+        config.position.renderRenderable(Renderable.text(displayText), posLabel = "Chicken Head Timer")
     }
 
     @HandleEvent

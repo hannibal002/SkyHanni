@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -53,6 +54,8 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -70,7 +73,7 @@ object MinionFeatures {
     private var lastMinionOpened = 0L
 
     private var lastInventoryClosed = 0L
-    private var coinsPerDay = ""
+    private var coinsPerDay: Renderable? = null
 
     private val patternGroup = RepoPattern.group("minion")
 
@@ -274,7 +277,7 @@ object MinionFeatures {
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
-        coinsPerDay = ""
+        coinsPerDay = null
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
@@ -290,10 +293,10 @@ object MinionFeatures {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        if (coinsPerDay != "") return
+        if (coinsPerDay != null) return
 
         if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
-            coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
+            coinsPerDay = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }
 
@@ -432,7 +435,7 @@ object MinionFeatures {
         if (!minionInventoryOpen) return
 
         if (config.hopperProfitDisplay) {
-            config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
+            config.hopperProfitPos.renderRenderable(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
     }
 

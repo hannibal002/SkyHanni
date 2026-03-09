@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -24,8 +26,8 @@ object AshfangNextResetCooldown {
         val format = if (nextSpawn.isInPast()) "§aNow!"
         else "§b${nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)}"
 
-        config.nextResetCooldownPos.renderString(
-            "§cAshfang next reset in: $format",
+        config.nextResetCooldownPos.renderRenderable(
+            Renderable.text("§cAshfang next reset in: $format"),
             posLabel = "Ashfang Reset Cooldown",
         )
     }

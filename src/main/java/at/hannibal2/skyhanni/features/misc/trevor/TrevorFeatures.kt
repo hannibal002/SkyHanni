@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
@@ -39,6 +39,8 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.LivingEntity
@@ -239,9 +241,9 @@ object TrevorFeatures {
         else if (timeUntilNextReady == 1) "1 second left"
         else "$timeUntilNextReady seconds left"
 
-        config.cooldownGuiPosition.renderString(
-            "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
-            posLabel = "Trapper Cooldown GUI",
+        val display = Renderable.text("${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage")
+        config.cooldownGuiPosition.renderRenderable(
+            display, posLabel = "Trapper Cooldown GUI",
         )
     }
 

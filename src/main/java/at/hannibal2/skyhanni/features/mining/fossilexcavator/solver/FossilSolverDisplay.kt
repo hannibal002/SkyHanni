@@ -17,10 +17,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -192,7 +193,7 @@ object FossilSolverDisplay {
 
         if (inExcavatorMenu) {
             // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
-            config.position.renderString("§eExcavator solver GUI", posLabel = "Fossil Excavator Solver")
+            config.position.renderRenderable(Renderable.text("§eExcavator solver GUI"), posLabel = "Fossil Excavator Solver")
             return
         }
 

@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,8 +39,8 @@ object AshfangFreezeCooldown {
         if (!isCurrentlyFrozen()) return
 
         val format = unfrozenTime.timeUntil().format(showMilliSeconds = true)
-        config.freezeCooldownPos.renderString(
-            "§cAshfang Freeze: §a$format",
+        config.freezeCooldownPos.renderRenderable(
+            Renderable.text("§cAshfang Freeze: §a$format"),
             posLabel = "Ashfang Freeze Cooldown",
         )
     }

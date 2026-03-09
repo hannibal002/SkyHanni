@@ -7,9 +7,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
@@ -17,7 +20,7 @@ object MovementSpeedDisplay {
 
     private val config get() = SkyHanniMod.feature.misc
 
-    private var display = ""
+    private var display: Renderable? = null
 
     /**
      * This speed value represents the movement speed in blocks per second.
@@ -44,7 +47,7 @@ object MovementSpeedDisplay {
         }
 
         if (isEnabled()) {
-            display = "Movement Speed: ${speed.roundTo(2)}"
+            display = Renderable.text("Movement Speed: ${speed.roundTo(2)}")
         }
     }
 
@@ -52,7 +55,7 @@ object MovementSpeedDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
+        config.playerMovementSpeedPos.renderRenderable(display, posLabel = "Movement Speed")
     }
 
     fun isEnabled() = SkyBlockUtils.onHypixel &&

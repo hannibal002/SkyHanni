@@ -156,7 +156,7 @@ object TheGreatSpook {
         }
         if (config.fearStatDisplay) {
             SkyblockStat.FEAR.displayValue?.let {
-                config.positionFear.renderString(it, posLabel = "Fear Stat Display")
+                config.positionFear.renderRenderable(Renderable.text(it), posLabel = "Fear Stat Display")
             }
         }
         if (config.greatSpookTimeLeft) {
