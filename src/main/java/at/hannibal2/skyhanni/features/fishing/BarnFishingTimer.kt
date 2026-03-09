@@ -25,7 +25,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object FishingTimer {
+object BarnFishingTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private const val GLOBAL_CAP = 60
