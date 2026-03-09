@@ -95,9 +95,6 @@ class ProfileSpecificStorage(
     @Expose
     var crimsonIsleFaction: FactionType? = null
 
-    @Expose
-    var crimsonIsleReputation: MutableMap<FactionType, Int> = mutableMapOf()
-
     // features
     // - combat
     @Expose

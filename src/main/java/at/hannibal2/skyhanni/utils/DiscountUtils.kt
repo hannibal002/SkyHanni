@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemDiscountsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 
 @SkyHanniModule
 object DiscountUtils {
-    // TODO: Add Shifty Talismansm, Too complex for initial PR
+    // TODO: Add Shifty Talismans, Too complex for initial PR
 
     private val itemPriceCoinOnly = mutableMapOf<NeuInternalName, Int>()
     private val emissaryItems = mutableListOf<NeuInternalName>()
@@ -35,7 +36,7 @@ object DiscountUtils {
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double {
-        val lowestNPCPrice = getRecipes(this).filter { it.recipeType != RecipeType.NPC_SHOP && it !in pastRecipes }
+        val lowestNPCPrice = getRecipes(this).filter { it.recipeType != NeuRecipeType.NPC_SHOP && it !in pastRecipes }
             .map { it.getRecipePrice(priceSource, pastRecipes + it) }
             .filter { it > 0 }
             .minOrNull() ?: return 0.0
@@ -46,7 +47,7 @@ object DiscountUtils {
     }
 
     private fun NeuInternalName.getEmissaryDiscountedPrice(lowestNPCPrice: Double): Double {
-        val rep = ProfileStorageData.profileSpecific?.crimsonIsleReputation?.maxBy { it.value }?.value ?: 0
+        val rep = ProfileStorageData.profileSpecific?.crimsonIsle?.reputation?.maxBy { it.value }?.value ?: 0
         var itemDiscount = 1.0
         emissaryScalingDiscounts.forEach { (reputation, discount) ->
             if (rep > reputation) itemDiscount = (1.0 - discount)
