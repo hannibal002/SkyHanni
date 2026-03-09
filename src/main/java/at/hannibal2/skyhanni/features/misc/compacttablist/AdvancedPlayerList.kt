@@ -19,8 +19,10 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
@@ -33,39 +35,42 @@ object AdvancedPlayerList {
     private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
     /**
-     * REGEX-TEST: §8[§r§9290§r§8] §r§bSkirtwearer §r§6ꀾ§r§7♲
-     * REGEX-TEST: §8[§r§714§r§8] §r§bSrColombianoGood §r§6Ⓑ
-     * REGEX-TEST: §8[§r§b218§r§8] §r§bnightdives
+     * REGEX-TEST: [290] Skirtwearer ꀾ♲
+     * REGEX-TEST: [14] ColombianoGood Ⓑ
+     * REGEX-TEST: [218] nightdives
      */
     private val levelPattern by RepoPattern.pattern(
-        "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)",
+        "misc.compacttablist.advanced.level.colorless",
+        ".*\\[(?<level>.*)] (?<name>.*)",
     )
 
-    private var playerData = mutableMapOf<String, PlayerData>()
+    private var playerData = mutableMapOf<Component, PlayerData>()
 
-    fun createTabLine(text: String, type: TabStringType) = playerData[text]?.let {
-        TabLine(text, type, createCustomName(it))
-    } ?: TabLine(text, type)
+    fun createTabLine(component: Component, type: TabStringType) = playerData[component]?.let {
+        TabLine(component, type, createCustomName(it))
+    } ?: TabLine(component, type)
 
-    fun newSorting(original: List<String>): List<String> {
+    // Todo split up into smaller functions
+    @Suppress("CyclomaticComplexMethod")
+    fun newSorting(original: List<Component>): List<Component> {
         if (KuudraApi.inKuudra) return original
         if (DungeonApi.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
-        val newList = mutableListOf<String>()
-        val currentData = mutableMapOf<String, PlayerData>()
+        val newList = mutableListOf<Component>()
+        val currentData = mutableMapOf<Component, PlayerData>()
         newList.add(original.first())
 
         var extraTitles = 0
         var i = 0
 
-        for (line in original) {
+        for (component in original) {
+            val line = component.formattedTextCompat()
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break
-            if (line == "               §r§3§lInfo") break
-            if (line.contains("§r§a§lPlayers")) {
+            if (line == "               Info") break
+            if (line.contains("Players")) {
                 extraTitles++
                 continue
             }
@@ -90,14 +95,13 @@ object AdvancedPlayerList {
                 if (name != "?") {
                     tabPlayerData[name] = it
                 }
-                currentData[line] = it
+                currentData[component] = it
             }
         }
         playerData = currentData
         val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
-
             // SB Level
             PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
 
@@ -184,7 +188,7 @@ object AdvancedPlayerList {
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 
-    private fun createCustomName(data: PlayerData): String {
+    private fun createCustomName(data: PlayerData): Component {
 
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
@@ -195,29 +199,30 @@ object AdvancedPlayerList {
             if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
         } else ""
 
-        var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let {
-                BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1)
-            }.orEmpty()
-        } else data.nameSuffix
+        val suffix = if (config.hideEmblem) {
+            if (data.ironman) Component.literal("§7♲") else data.bingoLevel?.let {
+                Component.literal(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
+            } ?: Component.empty()
+        } else Component.literal(data.nameSuffix)
 
         if (config.markSpecialPersons) {
-            suffix += " ${getSocialIcon(data.name).icon()}"
+            suffix.append(" ${getSocialIcon(data.name).icon()}")
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
             Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
                 ContributorManager.getSuffix(playerInfo.profile.id)?.let {
-                    suffix += " $it"
+                    suffix.append(" ").append(it)
                 }
             }
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            suffix += data.faction.icon.orEmpty()
+            suffix.append(data.faction.icon.orEmpty())
         }
 
-        return "$level $playerName ${suffix.trim()}"
+        // todo: level and player name should also really be components
+        return Component.literal("$level $playerName ").append(suffix)
     }
 
     private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)

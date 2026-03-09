@@ -62,16 +62,15 @@ object CustomScoreboard {
 
     private var dirty = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return
 
-        val render =
-            if (SkyBlockUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache != null) cache
-            else display
-
-        render ?: return
+        val render = cache?.let {
+            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch) it
+            else null
+        } ?: display ?: return
 
         // We want to update the background every time, so we can have a smooth transition when using chroma as the color
         val finalRenderable = RenderBackground.addBackground(render)
