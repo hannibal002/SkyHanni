@@ -71,7 +71,6 @@ object HuntingBoxValue {
             addString("§7Total Attribute Shards: §a$totalShards")
             addString("§7Total Instant Sell Value: §6${totalInstantSell.addSeparators()}")
             addString("§7Total Instant Buy Value: §6${totalInstantBuy.addSeparators()}")
-            addExportToSkyShardsButton()
         }
     }
 
@@ -81,23 +80,6 @@ object HuntingBoxValue {
         addString("§cError detected!")
         addString("§cPlease run §e/shdebug repo§c to get debug information.")
         addString("§cThen send the data on discord.")
-        addExportToSkyShardsButton()
-    }
-
-    private fun MutableList<Renderable>.addExportToSkyShardsButton() {
-        if (!config.exportToSkyShards) return
-
-        val clickable = Renderable.clickable(
-            "§eExport to and open SkyShards",
-            tips = listOf(
-                "§7Click to copy your shard data to your clipboard,",
-                "§7Then opens SkyShards in your browser.",
-            ),
-            onLeftClick = {
-                exportToSkyShards()
-            },
-        )
-        add(clickable)
     }
 
     private data class SkyShardsAttributeData(
@@ -110,16 +92,6 @@ object HuntingBoxValue {
             AttributeShardsData.shardNameToAttributeInformation(key)?.shardId
                 ?: ErrorManager.skyHanniError("Could not find shard ID for attribute shard with internal name $key")
         }
-    }
-
-    private fun exportToSkyShards() {
-        val huntingBoxShards = storage?.map { it.key to it.value.amountInBox }?.toMap()?.filter { it.value > 0 }.orEmpty()
-        val attributeMenuShards = storage?.map { it.key to it.value.amountSyphoned }?.toMap()?.filter { it.value > 0 }.orEmpty()
-        val data = SkyShardsAttributeData(huntingBoxShards.toShardIds(), attributeMenuShards.toShardIds())
-        val json = ConfigManager.gson.toJson(data)
-        ClipboardUtils.copyToClipboard(json)
-        OSUtils.openBrowser("https://skyshards.com/smart")
-        ChatUtils.chat("§aCopied your attribute shard data to your clipboard and opened §dSkyShards§a.")
     }
 
     private fun processAttributeShardSlot(slotNumber: Int, stack: ItemStack, table: MutableList<DisplayTableEntry>) {
