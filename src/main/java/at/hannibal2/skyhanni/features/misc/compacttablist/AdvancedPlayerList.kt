@@ -38,10 +38,11 @@ object AdvancedPlayerList {
      * REGEX-TEST: [290] Skirtwearer ꀾ♲
      * REGEX-TEST: [14] ColombianoGood Ⓑ
      * REGEX-TEST: [218] nightdives
+     * REGEX-TEST: [281] [YOUTUBE] Remittal
      */
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level.colorless",
-        ".*\\[(?<level>.*)] (?<name>.*)",
+        ".*\\[(?<level>[\\d,]+)](?: \\[\\w+\\])? (?<name>.*)",
     )
 
     private var playerData = mutableMapOf<Component, PlayerData>()
@@ -78,7 +79,7 @@ object AdvancedPlayerList {
                 val levelText = group("level")
                 val removeColor = levelText.removeColor()
                 try {
-                    val sbLevel = removeColor.toInt()
+                    val sbLevel = removeColor.toIntOrNull() ?: return@matchMatcher null
                     readPlayerData(sbLevel, levelText, line)
                 } catch (e: NumberFormatException) {
                     ErrorManager.logErrorWithData(
