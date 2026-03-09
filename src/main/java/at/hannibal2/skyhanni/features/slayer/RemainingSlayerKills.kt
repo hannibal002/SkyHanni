@@ -149,7 +149,8 @@ object RemainingSlayerKills {
         killCombatWisdomPattern.matchMatcher(message) {
             killComboWisdom = group("wisdom").formatInt()
         }
-        // TODO Repoify Hypixel are planning to add more Wisdom to Grandma wolf see https://hypixel.net/threads/design-thread-magic-find.6015417/
+        // TODO add to repo since Hypixel is planning to add more Wisdom to Grandma Wolf see
+        // https://hypixel.net/threads/design-thread-magic-find.6015417/
     }
 
     private fun update() {
@@ -233,13 +234,16 @@ object RemainingSlayerKills {
         if (Perk.MOAR_SKILLZ.isActive) {
             multiplier *= 1.5
         }
-        // TODO Repoify these in case of rebalance
+        // TODO use repo for these in case of rebalance
         // Derpy/Aura XP Boost were disallowed in First Aura simultaneously, this is for if they change that opinion
 
-        // Do Not add Multiplicative Bonuses here from Seasonal buffs without checking fully
-        // They Have Historically not worked on slayer spawn entirely.
+        // Do not add multiplicative bonuses here from Seasonal buffs without checking fully
+        // They have historically not worked on slayer spawn entirely.
 
         // TODO add Pet Combat Boosts
+
+        // TODO add 20% xp boost globally from hypixel event
+
         return multiplier
     }
 
@@ -261,7 +265,7 @@ object RemainingSlayerKills {
                 }
             }
         }
-        return counter * 2.5 // TODO Repoify This Wisdom Magic Number from Habanero
+        return counter * 2.5 // TODO put this wisdom magic number in repo from Habanero
     }
 
     private fun Mob.names() = buildString {
