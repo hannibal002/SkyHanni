@@ -20,11 +20,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConnectionRetryHelper
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import dev.cbyrne.kdiscordipc.KDiscordIPC
+import dev.cbyrne.kdiscordipc.core.error.ConnectionError
 import dev.cbyrne.kdiscordipc.core.event.data.ErrorEventData
 import dev.cbyrne.kdiscordipc.core.event.impl.DisconnectedEvent
 import dev.cbyrne.kdiscordipc.core.event.impl.ErrorEvent
@@ -52,6 +54,9 @@ object DiscordRPCManager {
 
     private val progressCategory = ChatProgressUpdates.category("Discord RPC")
 
+    private val retryHelper = ConnectionRetryHelper(listOf(10.seconds, 20.seconds, 30.seconds))
+    private var retryJob: Job? = null
+
     suspend fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
         progress.update("call start")
         if (isConnected()) {
@@ -67,10 +72,34 @@ object DiscordRPCManager {
         try {
             progress.update("calling setup")
             setup(progress, fromCommand)
+            retryJob?.cancel()
+            retryHelper.reset()
+        } catch (e: ConnectionError) {
+            progress.end("discord not detected: ${e.message}")
+            val retryDelay = retryHelper.onFailure()
+            if (retryDelay != null) {
+                updateDebugStatus("Discord not detected, retrying in ${retryDelay.inWholeSeconds}s ${retryHelper.retriesLabel}")
+
+                retryJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc retry", timeout = Duration.INFINITE) {
+                    delay(retryDelay)
+                    val retryProgress = progressCategory.start("discord rpc autoretry ${retryHelper.currentRetry}")
+                    start(retryProgress)
+                }
+            } else {
+                updateDebugStatus("Discord not detected after all retries")
+                ChatUtils.clickableChat(
+                    message = "Discord RPC could not connect automatically. Click to retry!",
+                    onClick = ::startCommand,
+                    hover = "§eClick to run /shrpcstart!",
+                )
+            }
         } catch (e: Throwable) {
             progress.end("error: ${e.message}")
             updateDebugStatus("Unexpected error: ${e.message}", error = true)
-            ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
+            ErrorManager.logErrorWithData(
+                e,
+                "Discord RPC has thrown an unexpected error while trying to start",
+            )
         }
     }
 
@@ -105,9 +134,9 @@ object DiscordRPCManager {
                     "Please report this and ping NetheriteMiner.",
             )
             ChatUtils.clickableChat(
-                "Click here to retry.",
+                message = "Click here to retry!",
                 onClick = ::startCommand,
-                "§eClick to run /shrpcstart!",
+                hover = "§eClick to run /shrpcstart!",
             )
         }
     }
@@ -238,6 +267,8 @@ object DiscordRPCManager {
 
     @HandleEvent(ClientDisconnectEvent::class)
     fun onDisconnect() {
+        retryJob?.cancel()
+        retryHelper.reset()
         stop()
     }
 
@@ -255,11 +286,17 @@ object DiscordRPCManager {
             return
         }
 
-        progress.end("attempting to start")
+        retryJob?.cancel()
+        retryHelper.reset()
+        progress.update("attempting to start")
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             progress.end("launchCoroutine")
-            SkyHanniMod.launchCoroutine("discord rpc manual start") { start(progress, true) }
+            SkyHanniMod.launchCoroutine("discord rpc manual start") {
+                val startProgress = progressCategory.start("discord rpc manual start")
+                start(startProgress, true)
+            }
+
             updateDebugStatus("Successfully started")
         } catch (e: Exception) {
             updateDebugStatus("Unable to start: ${e.message}", error = true)

@@ -68,10 +68,11 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
      * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§aBubbles§r§a!
      */
     val eggBoughtPattern by CFApi.patternGroup.pattern(
         "egg.bought",
-        "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6(?<cost>[\\d,]*) Coins§r§a!",
+        "§aYou bought §r(?<rabbitname>.*?)(?: §r§afor §r§6(?<cost>[\\d,]*) Coins)?§r§a!",
     )
 
     /**

@@ -479,8 +479,8 @@ object DamageIndicatorManager {
                 return thorn
             }
 
-            BossType.SLAYER_SPIDER_5_1 -> {
-                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckTier5 && config.spiderSlayer.showInvincible) {
+            BossType.SLAYER_SPIDER_3, BossType.SLAYER_SPIDER_4, BossType.SLAYER_SPIDER_5_1 -> {
+                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckMobs && config.spiderSlayer.showInvincible) {
                     "§eKill hatchlings!"
                 } else ""
 

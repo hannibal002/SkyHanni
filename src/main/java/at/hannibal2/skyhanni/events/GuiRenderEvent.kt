@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
 import net.minecraft.client.gui.GuiGraphics
 
-open class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context) {
+sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context) {
 
     /**
      * Renders only while inside an inventory

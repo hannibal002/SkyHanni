@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.LOWEST
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper.factionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,32 +19,43 @@ object CrimsonIsleReputationApi {
      * REGEX-TEST:  19,130
      * REGEX-TEST:  635
      */
-    val tablistRepRegex by patternGroup.pattern(
+    private val tablistReputationCountPattern by patternGroup.pattern(
         "tablistreputation",
         " (?<rep>(?:\\d+,?)+)",
     )
 
-    // LOWEST to avoid running before the factionType updating in ReputationHelper Updater.
-    @HandleEvent(priority = LOWEST)
+    private val storage get() = ProfileStorageData.profileSpecific
+    private val crimsonStorage get() = storage?.crimsonIsle
+
+    var factionType
+        get() = storage?.crimsonIsleFaction
+        set(it) {
+            storage?.crimsonIsleFaction = it
+        }
+
+    @HandleEvent
     fun onWidgetUpdateEvent(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.REPUTATION)) return
-        val currentFaction = factionType ?: return
-        val factionReputation = ProfileStorageData.profileSpecific?.crimsonIsleReputation ?: return
 
-        tablistRepRegex.firstMatcher(event.widget.lines.map { it.string }) {
+        TabWidget.REPUTATION.matchMatcherFirstLine {
+            factionType = FactionType.fromName(group("faction"))
+        }
+        val currentFaction = factionType ?: return
+
+        tablistReputationCountPattern.firstMatcher(event.widget.lines.map { it.string }) {
             val currentRep = group("rep").replace(",", "").toInt()
             ChatUtils.debug("Tried Setting ${currentFaction.factionName} Reputation to $currentRep")
-            factionReputation[currentFaction] = currentRep
+            crimsonStorage?.reputation[currentFaction] = currentRep
         }
     }
 
     @HandleEvent
     fun onProfileViewerLoad(event: ProfileViewerDataLoadedEvent) {
-        val factionReputation = ProfileStorageData.profileSpecific?.crimsonIsleReputation ?: return
-        val facInfo = event.getCurrentPlayerData()?.netherData ?: return
-        factionReputation[FactionType.MAGE] = facInfo.mageReputation
-        ChatUtils.debug("Set Mage Reputation to ${facInfo.mageReputation}")
-        factionReputation[FactionType.BARBARIAN] = facInfo.barbarianReputation
-        ChatUtils.debug("Set Barbarian Reputation to ${facInfo.barbarianReputation}")
+        val faction = event.getCurrentPlayerData()?.netherData ?: return
+        factionType = FactionType.fromAPIName(faction.currentFaction)
+        crimsonStorage?.reputation[FactionType.MAGE] = faction.mageReputation
+        ChatUtils.debug("Set Mage Reputation to ${faction.mageReputation}")
+        crimsonStorage?.reputation[FactionType.BARBARIAN] = faction.barbarianReputation
+        ChatUtils.debug("Set Barbarian Reputation to ${faction.barbarianReputation}")
     }
 }

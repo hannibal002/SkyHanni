@@ -15,4 +15,9 @@ class DevToolConfig {
     @Expose
     @NoConfigLink
     val chatProgressPosition: Position = Position(1, 160)
+
+    @Expose
+    @ConfigOption(name = "LOS Face Test", desc = "")
+    @Accordion
+    val canSeeFace: TestCanSeeFaceConfig = TestCanSeeFaceConfig()
 }

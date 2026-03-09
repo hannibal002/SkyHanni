@@ -104,30 +104,26 @@ object GardenPlotIcon {
                 else
                     editMode--
             }
-            return
-        }
-        if (editMode != 0) {
-            if (event.slotId in 54..89) {
-                event.cancel()
-                copyStack = event.slot?.item?.copy()?.also {
-                    it.count = 1
-                } ?: return
-                // TODO different format, not bold or show not in chat at all.
-                ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
+        } else if (editMode == 0) {
+            // do nothing
+        } else if (event.slotId in 54..89) {
+            event.cancel()
+            copyStack = event.slot?.item?.copy()?.also {
+                it.count = 1
+            } ?: return
+            // TODO different format, not bold or show not in chat at all.
+            ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
+        } else {
+            val plotList = plotList ?: return
+            if (!whitelistedSlot.contains(event.slotId)) return
+            event.cancel()
+            if (editMode == 2) {
+                plotList.remove(event.slotId)
                 return
             }
-            if (event.slotId != 53) {
-                val plotList = plotList ?: return
-                if (!whitelistedSlot.contains(event.slotId)) return
-                event.cancel()
-                if (editMode == 2) {
-                    plotList.remove(event.slotId)
-                    return
-                }
-                val copyStack = copyStack ?: return
-                plotList[event.slotId] = copyStack.getInternalName()
-                cachedStack[event.slotId] = copyStack
-            }
+            val copyStack = copyStack ?: return
+            plotList[event.slotId] = copyStack.getInternalName()
+            cachedStack[event.slotId] = copyStack
         }
     }
 

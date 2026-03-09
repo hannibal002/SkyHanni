@@ -8,7 +8,10 @@ import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -25,6 +28,7 @@ object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
     val expectedLifetime = 6.4.seconds
+
     /*
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
@@ -34,6 +38,7 @@ object CocoonAPI {
 
     data class CocoonMob(
         val mob: Mob,
+        val seaCreature: LivingSeaCreatureData?,
         val coordinates: LorenzVec,
         val spawnTime: SimpleTimeMark,
         val cocoonID: Int,
@@ -51,19 +56,24 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEquipmentChangeEvent(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (IslandType.THE_RIFT.isCurrent()) return
-        if (!event.entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val entity = event.entity
-        val id = entity.id
-        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5 || it.cocoonID == id) }) return
+        if (!entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val position = entity.getLorenzVec()
+        val id = entity.id
+        if (isSameCocoonGroup(position, id)) return
         val mob = getCocoonMob(position) ?: return
-        val cocoon = CocoonMob(mob, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
-        if (existingCocoons.any { (it.coordinates.distanceSqIgnoreY(entity.getLorenzVec()) < 0.5) }) return
+        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
         existingCocoons.add(cocoon)
-        logger.log("${mob.name} Cocoon (${cocoon.cocoonID} Entered List")
+        val debug = "${cocoon.mob.name}, CocoonID (${cocoon.cocoonID}) Entered List"
+        ChatUtils.debug(debug)
+        logger.log(debug)
         CocoonSpawnEvent(cocoon).post()
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onWorldChange(event: WorldChangeEvent) {
+        existingCocoons.clear()
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
@@ -75,16 +85,14 @@ object CocoonAPI {
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onWorldChange(event: WorldChangeEvent) {
-        existingCocoons.clear()
-    }
-
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
         val mob = skyblockMobs.minByOrNull { it.baseEntity.getLorenzVec().distanceIgnoreY(cocoonVector) } ?: return null
         if (mob.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
         return mob
+    }
+
+    private fun isSameCocoonGroup(currentPos: LorenzVec, currentID: Int): Boolean {
+        return existingCocoons.any { it.coordinates.distanceSqIgnoreY(currentPos) < 0.5 || it.cocoonID == currentID }
     }
 
 }
