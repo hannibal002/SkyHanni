@@ -49,8 +49,8 @@ object VanquisherWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
-        "vanquisher.waypoint.share",
-        "^(?:Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*",
+        "share",
+        "^(?<channel>Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*",
     )
 
     /**
@@ -60,7 +60,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        "^(?:.*> )?(?<playerName>[^:]+): Vanquisher dead!.*"
+        "^(?<channel>.*> )?(?<playerName>[^:]+): Vanquisher dead!.*"
     )
 
     /**
@@ -82,7 +82,7 @@ object VanquisherWaypointShare {
 
     private val waypoints: Map<String, SharedVanquisher> get() = sharedWaypoints
 
-    private const val maxDistance = 15
+    private const val MAX_DISTANCE = 15
 
     data class SharedVanquisher(
         val playerName: String,
@@ -94,11 +94,11 @@ object VanquisherWaypointShare {
         lastShareTime = SimpleTimeMark.farPast()
         myVanquisherId = entityId
         TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
-        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled, false)
+        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled)
 
         val entity = vanquisherNearby[entityId] ?: EntityUtils.getEntityByID(entityId)
         if (entity != null) {
-            val playerName = Minecraft.getInstance().player?.name?.string ?: "You"
+            val playerName = PlayerUtils.getName()
             sharedWaypoints[playerName] = SharedVanquisher(
                 playerName,
                 entity.getLorenzVec(),
@@ -116,7 +116,6 @@ object VanquisherWaypointShare {
     }
 
     private fun sendVanquisher() {
-        if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
@@ -141,10 +140,13 @@ object VanquisherWaypointShare {
         val x = location.x.toInt()
         val y = location.y.toInt()
         val z = location.z.toInt()
+
+        val message = "x: $x, y: $y, z: $z | Vanquisher"
+
         if (PartyApi.isInParty()) {
-            HypixelCommands.partyChat("x: $x, y: $y, z: $z | Vanquisher")
-        } else if (config.readGlobalChat == isEnabled()) {
-            HypixelCommands.allChat("x: $x, y: $y, z: $z | Vanquisher")
+            HypixelCommands.partyChat(message)
+        } else if (config.readGlobalChat) {
+            HypixelCommands.allChat(message)
         }
     }
 
@@ -156,7 +158,7 @@ object VanquisherWaypointShare {
         myVanquisherId = null
         if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("Vanquisher dead!")
-        } else if (config.readGlobalChat == isEnabled()) {
+        } else if (config.readGlobalChat) {
             HypixelCommands.allChat("Vanquisher dead!")
         }
     }
@@ -223,6 +225,11 @@ object VanquisherWaypointShare {
 
     private fun handleVanquisherShared(message: String, event: SkyHanniChatEvent.Allow) {
         vanquisherSharedPattern.matchMatchers(message) {
+            val channel = group("channel")
+            val isGlobalChat = channel.isNullOrEmpty()
+
+            if(isGlobalChat && !config.readGlobalChat) return@matchMatchers
+
             val rawName = group("playerName").trim()
             val x = group("x").toDoubleOrNull() ?: return@matchMatchers
             val y = group("y").toDoubleOrNull() ?: return@matchMatchers
@@ -240,7 +247,6 @@ object VanquisherWaypointShare {
                 ChatUtils.notifyOrDisable(
                     "$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!",
                     config::enabled,
-                    false
                 )
                 TitleManager.sendTitle("§5§lVanquisher from $playerDisplayName")
                 event.blockedReason = "vanquisher_waypoint"
@@ -250,6 +256,10 @@ object VanquisherWaypointShare {
 
     private fun handleVanquisherDied(message: String) {
         vanquisherDiedPattern.matchMatcher(message) {
+            val channel = group("channel")
+            val isGlobalChat = channel.isNullOrEmpty()
+            if(isGlobalChat && !config.readGlobalChat) return@matchMatcher
+
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
             sharedWaypoints.remove(name)
@@ -259,29 +269,26 @@ object VanquisherWaypointShare {
     @HandleEvent
     fun onRawEntityJoin(event: EntityEnterWorldEvent<WitherBoss>) {
         if (!isEnabled()) return
+
         val entity = event.entity
+        if (!entity.name.string.equals("Wither", ignoreCase = true)) return
+        vanquisherNearby[entity.id] = entity
 
-        if (entity.name.string.equals("Wither", ignoreCase = true)) {
-            vanquisherNearby[entity.id] = entity
-
-            if (entity.distanceToPlayer() < maxDistance) {
-                if (myVanquisherId != entity.id) {
-                    foundVanquisher(entity.id)
-                }
+            if (entity.distanceToPlayer() < MAX_DISTANCE && myVanquisherId != entity.id) {
+                foundVanquisher(entity.id)
             }
         }
-    }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
+        val beaconColor = Color(160, 37, 191)
+
         with(WorldRenderUtils) {
             for (waypoint in waypoints.values) {
                 if (waypoint.spawnTime.passedSince() > 60.seconds) continue
-
-                val beaconColor = Color(160, 37, 191)
-
+22
                 event.drawWaypointFilled(
                     location = waypoint.location,
                     color = beaconColor,
