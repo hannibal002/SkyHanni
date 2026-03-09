@@ -135,6 +135,7 @@ object HypixelData {
     private var lastSuccessfulServerIdFetchTime = SimpleTimeMark.farPast()
     private var lastSuccessfulServerIdFetchType: String? = null
     private var failedServerIdFetchCounter = 0
+    private var hasPostedIslandChangeEvent = false
 
     // Ironman, Stranded and Bingo
     var noTrade = false
@@ -205,7 +206,6 @@ object HypixelData {
             "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
             "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
             "islandType" to SkyBlockUtils.currentIsland,
-            "tablist" to TabListData.getTabList(),
             "scoreboard" to ScoreboardData.sidebarLinesFormatted,
         )
     }
@@ -308,6 +308,7 @@ object HypixelData {
 
     @HandleEvent
     fun onWorldChange() {
+        hasPostedIslandChangeEvent = false
         locrawData = null
         skyBlock = false
         inLimbo = false
@@ -446,7 +447,6 @@ object HypixelData {
     fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
         val oldIsland = skyBlockIsland
         if (oldIsland != IslandType.NONE) {
-            skyBlockIsland = IslandType.NONE
             IslandChangeEvent(IslandType.NONE, oldIsland)
         }
     }
@@ -554,11 +554,11 @@ object HypixelData {
             newIsland = getIslandType(foundIsland, guesting)
         }
 
-        // TODO don't send events when one of the arguments is none, at least when not on sb anymore
-        if (skyBlockIsland != newIsland) {
+        if (!hasPostedIslandChangeEvent && !eitherIsNone(skyBlockIsland, newIsland)) {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
+            hasPostedIslandChangeEvent = true
             HypixelLocationApi.checkEquals()
 
             if (newIsland == IslandType.UNKNOWN) {
@@ -571,6 +571,10 @@ object HypixelData {
                 TabWidget.reSendEvents()
             }
         }
+    }
+
+    private fun eitherIsNone(oldIsland: IslandType, newIsland: IslandType): Boolean {
+        return (oldIsland == IslandType.NONE || newIsland == IslandType.NONE)
     }
 
     private fun getIslandType(name: String, guesting: Boolean): IslandType {

@@ -12,16 +12,14 @@ class SkyHanniPipCoordinatorRenderer(
         private val pendingStates = ArrayList<SkyHanniGuiItemRenderState>(256)
     }
 
-    fun takePendingStates(): List<SkyHanniGuiItemRenderState> = synchronized(pendingStates) {
-        val result = ArrayList(pendingStates)
-        pendingStates.clear()
-        return result
-    }
-
-    override fun textureIsReadyToBlit(state: SkyHanniGuiItemRenderState): Boolean = synchronized(pendingStates) {
+    override fun textureIsReadyToBlit(state: SkyHanniGuiItemRenderState): Boolean {
         pendingStates.add(state)
         return true
     }
+
+    fun peekPendingStates(): List<SkyHanniGuiItemRenderState> = pendingStates.toList()
+
+    fun clearPendingStates() = pendingStates.clear()
 
     override fun renderToTexture(state: SkyHanniGuiItemRenderState, poseStack: PoseStack) = Unit
     override fun blitTexture(state: SkyHanniGuiItemRenderState, guiRenderState: GuiRenderState) = Unit

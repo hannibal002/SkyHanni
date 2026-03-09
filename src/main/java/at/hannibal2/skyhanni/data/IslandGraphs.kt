@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -112,11 +113,9 @@ object IslandGraphs {
     var disabledNodesReason: String? = null
         private set
 
-    // TODO add carnival in hub
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
-        val graph = currentIslandGraph ?: return
         disabledNodesReason = reason
-        for (node in graph.filter { it.position.distance(center) < radius }) {
+        for (node in getNonNullableGraph().filter { it.position.distance(center) < radius }) {
             node.enabled = false
         }
     }
@@ -349,7 +348,7 @@ object IslandGraphs {
             }
         }
 
-        val graph = currentIslandGraph ?: return
+        val graph = getNonNullableGraph()
 
         // Update cache every second for normal movement
         if (lastCacheUpdate.passedSince() > 1.seconds) {
@@ -519,7 +518,7 @@ object IslandGraphs {
     }
 
     /**
-     * Activates pathfinding to a location in the island.
+     * Activates pathfinding to a location on the current island.
      *
      * @param location The goal of the pathfinder.
      * @param label The name of the navigation goal in chat. Cannot be empty.
@@ -542,6 +541,17 @@ object IslandGraphs {
         pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
 
+    private fun getNonNullableGraph(): Graph = currentIslandGraph ?: error("current island graph is not loaded")
+
+    fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
+        getNonNullableGraph().getClosestNode(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
+
+    fun nodes(nodeName: String, nodeTag: GraphNodeTag): List<GraphNode> =
+        getNonNullableGraph().getNodesWithNameAndTags(nodeName, nodeTag)
+
+    fun nodesAround(node: GraphNode, condition: (GraphNode) -> Boolean): Set<GraphNode> =
+        getNonNullableGraph().nodesAround(node, condition)
+
     private fun pathFind0(
         location: LorenzVec,
         label: String,
@@ -556,8 +566,7 @@ object IslandGraphs {
         this.onFound = onFound
         this.onManualCancel = onManualCancel
         this.condition = condition
-        val graph = currentIslandGraph ?: return
-        goal = graph.minBy { it.position.distance(currentTarget!!) }
+        goal = getNonNullableGraph().minByActive { it.position.distance(currentTarget!!) }
         updateFeedback()
     }
 
@@ -656,9 +665,7 @@ object IslandGraphs {
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
 
     fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
-        val graph = currentIslandGraph ?: return null
-
-        val found = graph.getNearestNode(location, condition)
+        val found = getNonNullableGraph().getNearestNode(location, condition)
         return found.takeIf { it.position.distance(location) < radius }
     }
 
@@ -748,5 +755,4 @@ object IslandGraphs {
             extraData = data.map { it.key to it.value }.normalizeAsArray(),
         )
     }
-
 }

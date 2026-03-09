@@ -4,12 +4,12 @@ import net.minecraft.core.Direction.Axis
 import net.minecraft.world.phys.Vec3
 import kotlin.math.roundToInt
 
-data class SnappedVec3(
-    private var snappedX: Double = 0.0,
-    private var snappedY: Double = 0.0,
-    private var snappedZ: Double = 0.0,
-    val snapValue: Double = 1.0,
-    val maxValue: Double = 360.0,
+class SnappedVec3(
+    private val snappedX: Double = 0.0,
+    private val snappedY: Double = 0.0,
+    private val snappedZ: Double = 0.0,
+    private val snapValue: Double = 1.0,
+    private val maxValue: Double = 360.0,
 ) : Vec3(
     snap(snappedX, snapValue),
     snap(snappedY, snapValue),
@@ -21,13 +21,21 @@ data class SnappedVec3(
         Axis.Z -> copy(snappedZ = value % maxValue)
     }
 
+    fun copy(
+        snappedX: Double = this.snappedX,
+        snappedY: Double = this.snappedY,
+        snappedZ: Double = this.snappedZ,
+        snapValue: Double = this.snapValue,
+        maxValue: Double = this.maxValue,
+    ) = SnappedVec3(snappedX, snappedY, snappedZ, snapValue, maxValue)
+
     fun applyAxisOffset(axis: Axis, offset: Double): SnappedVec3 = applyAxisValue(
         axis,
         offset + when (axis) {
             Axis.X -> snappedX
             Axis.Y -> snappedY
             Axis.Z -> snappedZ
-        }
+        },
     )
 
     companion object {

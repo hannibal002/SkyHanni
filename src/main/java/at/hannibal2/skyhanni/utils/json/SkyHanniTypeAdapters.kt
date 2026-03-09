@@ -1,9 +1,15 @@
 package at.hannibal2.skyhanni.utils.json
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardTypeAdapter
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NEURaritySpecificPetNums
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetNums
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeComponent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -106,6 +112,49 @@ object SkyHanniTypeAdapters {
         { name.lowercase() },
         { SkyblockStat.getValue(this.uppercase()) },
     )
+
+    val NEU_RECIPE_COMPONENT: TypeAdapter<NeuRecipeComponent> = SimpleStringTypeAdapter(
+        { this.toJsonString() },
+        {
+            NeuRecipeComponent.fromJsonStringOrNull(this)
+                ?: NeuRecipeComponent.EMPTY
+        }
+    )
+
+    val NEU_RECIPE_TYPE: TypeAdapter<NeuRecipeType> = SimpleStringTypeAdapter(
+        { neuRepoId.orEmpty() },
+        { NeuRecipeType.fromNeuId(this) },
+    )
+
+    val NEU_ABSTRACT_RECIPE = object : TypeAdapter<NeuAbstractRecipe>() {
+        override fun write(writer: JsonWriter, value: NeuAbstractRecipe) {
+            writer.value(value.toString())
+        }
+
+        override fun read(reader: JsonReader): NeuAbstractRecipe {
+            val obj = JsonParser.parseReader(reader).asJsonObject
+            val typeId = obj.get("type").asString
+            val recipeType = NeuRecipeType.fromNeuIdOrNull(typeId)
+                ?: throw IllegalArgumentException("Unknown recipe type: $typeId")
+            return ConfigManager.gson.fromJson(obj, recipeType.castClazz)
+        }
+    }
+
+    val NEU_RARITY_SPECIFIC_PET_NUMS = object : TypeAdapter<NEURaritySpecificPetNums>() {
+        override fun write(writer: JsonWriter, value: NEURaritySpecificPetNums) {
+            writer.value(value.toString())
+        }
+
+        override fun read(reader: JsonReader): NEURaritySpecificPetNums {
+            val obj = JsonParser.parseReader(reader).asJsonObject
+            val neuPetNumsAdapter = ConfigManager.gson.getAdapter(NeuPetNums::class.java)
+            val min = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("1"))
+            val max = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("100"))
+            val curve = obj.get("stats_levelling_curve")?.asString
+            return NEURaritySpecificPetNums(min, max, curve)
+        }
+
+    }
 
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 

@@ -66,8 +66,7 @@ open class AnimatedRotationPropertyStorage(
  * a negative rotation speed will rotate it clockwise, and a
  * rotation speed of 0.0 will make the item stationary.
  *
- * @param axis The axis around which the item stack will rotate.
- * @param rotationSpeed How many degrees the item should rotate per second.
+ * @param axes A map of axis to rotation definitions, defining the rotation behavior for each axis.
  */
 data class AnimatedRotationDefinition(
     private val axes: Map<Axis, AxisRotationDefinition> = mapOf(
@@ -78,8 +77,7 @@ data class AnimatedRotationDefinition(
 ) : Map<Axis, AxisRotationDefinition> by axes {
     constructor(vararg pairs: Pair<Axis, AxisRotationDefinition>) : this(pairs.asList().associate { it.first to it.second })
 
-    private val enabled get() = axes.values.any { it.isEnabled() }
-    fun isEnabled() = enabled
+    fun isEnabled() = axes.values.any { it.isEnabled() }
     fun isAxisEnabled(axis: Axis) = axes[axis]?.isEnabled() ?: false
     fun getStaticRotation(axis: Axis) = axes[axis]?.staticRotation ?: 0.0
     fun setStaticRotation(axis: Axis, rotation: Double) {

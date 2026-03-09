@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.math.abs
@@ -85,5 +86,6 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun Duration.fromNow() = now() + this
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
+        fun OffsetDateTime.asTimeMark() = SimpleTimeMark(toInstant().toEpochMilli())
     }
 }

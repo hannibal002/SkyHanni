@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.test.graph
 
+import java.awt.Color
+
 class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var direction: EdgeDirection = EdgeDirection.BOTH) {
+
+    var networkColor: Color? = null
 
     fun isInEdge(node: GraphingNode?) = node1 == node || node2 == node
 

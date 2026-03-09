@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTimeMark
@@ -33,7 +35,6 @@ import net.minecraft.core.Rotations
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,6 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 object FireFreezeFeatures {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireFreeze
+    private const val PARTICLE_OFFSET = 3.921568568330258E-4
 
     private data class FireFreezeArea(
         val center: LorenzVec,
@@ -99,6 +101,7 @@ object FireFreezeFeatures {
         val pitch = event.pitch
         if (pitch !in 0.0..2.0) return
         val fireFreeze = fireFreezes[pos]
+        if (ThunderSparksHighlight.getActiveSparks().any { it.distanceTo(pos) < 2 }) return
         if (fireFreeze == null) {
             fireFreezes[pos] = FireFreezeArea(pos, pitch)
             return
@@ -117,7 +120,7 @@ object FireFreezeFeatures {
     private fun LorenzVec.isInAnyFireFreeze(): Boolean = fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
 
     private fun ReceiveParticleEvent.isFreezeParticle(): Boolean {
-        return abs(offset.x) < 0.001 && abs(offset.y) < 0.001 && offset.z < 0.001
+        return offset.x == PARTICLE_OFFSET && offset.y == PARTICLE_OFFSET && offset.z == PARTICLE_OFFSET
     }
 
     @HandleEvent(onlyOnSkyblock = true)

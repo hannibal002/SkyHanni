@@ -137,7 +137,7 @@ object SeaCreatureManager {
         }
         SeaCreatureManager.allFishingMobs = allFishingMobs
         allVariants = variants
-        SpecificSeaCreatures.updateList()
+        SpecificSeaCreatures.saveSeaCreatures(SpecificSeaCreatures.updateList())
     }
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {

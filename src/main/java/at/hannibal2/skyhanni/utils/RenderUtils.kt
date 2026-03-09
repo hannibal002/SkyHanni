@@ -18,6 +18,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.world.inventory.Slot
 import java.awt.Color
+import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -48,16 +49,37 @@ object RenderUtils {
      * Runs a block on an asserted Render Thread.
      * @param block the block to run
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun runOnRenderThread(
+    private fun <T> runOnRenderThread(
         setupFor: Lighting.Entry? = null,
-        noinline block: () -> Unit,
-    ) = Minecraft.getInstance().execute {
+        block: () -> T,
+    ): T {
         RenderSystem.assertOnRenderThread()
         setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
-        block()
+        return block()
     }
 
+    /**
+     * Returns a [Thread] that schedules a block on the Render Thread when started.
+     * Useful for [Runtime.addShutdownHook].
+     */
+    fun threadOnRenderThread(
+        setupFor: Lighting.Entry? = null,
+        block: () -> Any,
+    ) = Thread { scheduleOnRenderThread(setupFor, block) }
+
+    /**
+     * Runs or schedules a block on the Render Thread.
+     * - If already on the render thread, executes immediately and returns a completed future.
+     * - Otherwise, queues via [Minecraft.submit] and returns a pending future.
+     */
+    fun <T> scheduleOnRenderThread(
+        setupFor: Lighting.Entry? = null,
+        block: () -> T,
+    ): CompletableFuture<T> =
+        if (RenderSystem.isOnRenderThread()) CompletableFuture.completedFuture(runOnRenderThread(setupFor, block))
+        else Minecraft.getInstance().submit<T> {
+            runOnRenderThread(setupFor, block)
+        }
 
     /**
      * Used for some debugging purposes.

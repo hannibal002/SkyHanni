@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.renderables.animated
 
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -22,13 +21,14 @@ import net.minecraft.core.Direction
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 
-class AnimatedItemStackRenderable(
+class AnimatedItemStackRenderable internal constructor(
     override val config: AnimatedItemRenderableConfig<ItemStackAnimatedFrame>,
 ) : ItemStackRenderable(config),
     TimeDependentRenderable,
     BouncingBehavior,
     RotatingBehavior,
     FramedBehavior<ItemStackAnimatedFrame> {
+
     override val stack: ItemStack get() = currentFrame.stack
     override val bounceStartTime: SimpleTimeMark = SimpleTimeMark.now()
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
@@ -37,12 +37,13 @@ class AnimatedItemStackRenderable(
     override val height: Int get() = super.height + bounceDefinition.getTotalBounceOffset(Direction.Axis.Y)
     override val width: Int get() = super.width + bounceDefinition.getTotalBounceOffset(Direction.Axis.X)
     override var stableRenderId: Int? = null
+    override fun getStableId() = stableRenderId
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         applyRotation(deltaTime)
         applyBounce()
         tryMoveNextFrame(deltaTime.inPartialSeconds)
-        this.stableRenderId = stack.renderOnScreen((config.xSpacing / 2f), 0f, config, stableRenderId)
+        super<ItemStackRenderable>.render(mouseOffsetX, mouseOffsetY)
     }
 
     @Suppress("DEPRECATION")

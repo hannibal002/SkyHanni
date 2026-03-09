@@ -354,6 +354,7 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
+        frameNumber: Int? = null,
     ): Int? {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -377,10 +378,8 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight())) {
-            item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
-            return null
-        }
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
+            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
         /**
          * This is used to render items that fit these criteria:
@@ -391,10 +390,10 @@ object GuiRenderUtils {
          *
          *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
          *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
-         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
-         *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config.
+         *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
-        val guiRenderState = GuiItemRenderState(
+        val guiItemRenderState = GuiItemRenderState(
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
@@ -403,11 +402,15 @@ object GuiRenderUtils {
             DrawContextUtils.drawContext.scissorStack.peek()
         )
         val newRenderState = SkyHanniGuiItemRenderState(
-            guiRenderState, x, y,
+            itemStack = this,
+            guiItemRenderState,
+            translateX,
+            translateY,
             rotationVec, translationVec,
-            scale = scale.toFloat(),
-            adjustedScale = (scale * guiScaleX).toFloat(),
+            scale = finalItemScale.toFloat(),
+            adjustedScale = (finalItemScale * guiScaleX).toFloat(),
             stableRenderId,
+            frameNumber = frameNumber,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId
@@ -417,9 +420,10 @@ object GuiRenderUtils {
         translateX: Float,
         translateY: Float,
         scale: Float
-    ) = RenderUtils.runOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
+    ): Int? = RenderUtils.scheduleOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
         DrawContextUtils.translatedPushPopResult(translateX, translateY, postTranslateScale = scale) {
             DrawContextUtils.drawItem(this, 0, 0)
         }
-    }
+        return@scheduleOnRenderThread null
+    }.get()
 }
