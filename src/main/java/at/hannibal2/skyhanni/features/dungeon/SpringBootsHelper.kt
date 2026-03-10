@@ -20,9 +20,9 @@ object SpringBootsHelper {
 
     private val SPRING_BOOTS = "SPRING_BOOTS".toInternalName()
 
-    private val startSound = "entity.firework_rocket.launch"
-    private val streakSound = "block.note_block.ping"
-    private val endSound = "entity.generic.eat"
+    private const val startSound = "entity.firework_rocket.launch"
+    private const val streakSound = "block.note_block.ping"
+    private const val endSound = "entity.generic.eat"
     private val springBootsSounds = setOf(startSound, streakSound, endSound)
 
     /**
