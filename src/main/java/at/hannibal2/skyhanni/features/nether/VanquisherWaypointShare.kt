@@ -288,7 +288,6 @@ object VanquisherWaypointShare {
         with(WorldRenderUtils) {
             for (waypoint in waypoints.values) {
                 if (waypoint.spawnTime.passedSince() > 60.seconds) continue
-22
                 event.drawWaypointFilled(
                     location = waypoint.location,
                     color = beaconColor,
