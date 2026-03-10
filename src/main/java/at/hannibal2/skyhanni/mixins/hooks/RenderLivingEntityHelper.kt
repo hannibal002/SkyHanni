@@ -20,6 +20,7 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     var areMobsHighlighted = false
+        private set
 
     @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
