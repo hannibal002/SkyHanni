@@ -13,7 +13,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Barn Fishing Timer",
-        desc = "Show the time and amount of own/Global sea creatures nearby while barn fishing.",
+        desc = "Show the time and amount of own/global sea creatures nearby while barn fishing.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -43,7 +43,9 @@ class BarnTimerConfig {
     var warnPersonalCap: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Warn Global Cap", desc = "Warns you when you reach the global sea creature cap if all mobs are in range.")
+    @ConfigOption(
+        name = "Warn Global Cap",
+        desc = "Warns you when you reach the global sea creature cap (Only works if all mobs are in range).")
     @ConfigEditorBoolean
     var warnGlobalCap: Boolean = true
 
@@ -56,10 +58,10 @@ class BarnTimerConfig {
     @ConfigOption(
         name = "Time Alert Seconds",
         desc = "The time in seconds to alert you at.\n" +
-            "§cNote: (sea creatures despawn after 6 minutes, aka 360s).",
+            "§cNote: sea creatures despawn after 6 minutes, (360s).",
     )
     @ConfigEditorSlider(minValue = 240f, maxValue = 360f, minStep = 1f)
-    var timeAlertSeconds: Int = 300
+    var alertTime: Int = 300
 
     @Expose
     @ConfigOption(name = "Winter Fishing", desc = "Show the Barn Fishing Timer on the Jerry's Workshop island.")

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.client.player.LocalPlayer
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -32,14 +34,14 @@ object BarnFishingTimer {
     private val warningDelay = 5.seconds
     private val barnLocation = LorenzVec(108, 89, -252)
 
-    private enum class FishingCap(val island: IslandType, personalCap: Int? = null) {
+    private enum class FishingCap(val island: IslandType, islandPersonalCap: Int? = null) {
         CRIMSON_ISLE(IslandType.CRIMSON_ISLE, 5),
         CRYSTAL_HOLLOWS(IslandType.CRYSTAL_HOLLOWS, 20),
         OTHERS(IslandType.NONE),
         ;
 
-        val personalCap: Int = personalCap ?: GLOBAL_CAP
-        val hasPersonalCap: Boolean = personalCap != null
+        val currentPersonalCap: Int = islandPersonalCap ?: GLOBAL_CAP
+        val hasPersonalCap: Boolean = islandPersonalCap != null
 
         companion object {
             fun getForIsland(island: IslandType): FishingCap = entries.find { it.island == island } ?: OTHERS
@@ -77,10 +79,10 @@ object BarnFishingTimer {
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = event.seaCreature.handleSpawn()
 
     @HandleEvent
-    fun onSeaCreatureRedetect(event: SeaCreatureEvent.ReDetect) = event.seaCreature.handleSpawn()
+    fun onSeaCreatureReDetect(event: SeaCreatureEvent.ReDetect) = event.seaCreature.handleSpawn()
 
     @HandleEvent
-    fun onSeaCreatureRemove(event: SeaCreatureEvent.DeSpawn) = event.seaCreature.handleDeSpawn()
+    fun onSeaCreatureDeSpawn(event: SeaCreatureEvent.DeSpawn) = event.seaCreature.handleDeSpawn()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() = update()
@@ -145,8 +147,8 @@ object BarnFishingTimer {
         with(config) {
             return when {
                 lastWarning.passedSince() < warningDelay -> AlertReason.NO_ALERT
-                timeAlert && timeSince >= timeAlertSeconds.seconds -> AlertReason.TIME
-                warnPersonalCap && currentCap.hasPersonalCap && ownMobs >= currentCap.personalCap -> AlertReason.PERSONAL_CAP
+                timeAlert && timeSince >= alertTime.seconds -> AlertReason.TIME
+                warnPersonalCap && currentCap.hasPersonalCap && ownMobs >= currentCap.currentPersonalCap -> AlertReason.PERSONAL_CAP
                 warnGlobalCap && totalMobs >= GLOBAL_CAP -> AlertReason.GLOBAL_CAP
                 else -> AlertReason.NO_ALERT
             }
@@ -189,8 +191,15 @@ object BarnFishingTimer {
         reset()
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get() && enabledInIsland
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        enabledInIsland = if (config.showAnywhere) true else when (SkyBlockUtils.currentIsland) {
+            IslandType.HUB -> barnLocation.distanceToPlayer() < 50
+            else -> false
+        }
+    }
 
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get() && enabledInIsland
 
     private fun updateLocation(island: IslandType): Boolean {
         if (config.showAnywhere) return true
@@ -199,7 +208,6 @@ object BarnFishingTimer {
             IslandType.CRYSTAL_HOLLOWS -> config.crystalHollows.get()
             IslandType.CRIMSON_ISLE -> config.crimsonIsle.get()
             IslandType.WINTER -> config.winterIsland.get()
-            IslandType.HUB -> barnLocation.distanceToPlayer() < 50
             IslandType.PRIVATE_ISLAND -> config.forStranded.get() && SkyBlockUtils.isStrandedProfile
             else -> false
         }
