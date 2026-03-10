@@ -91,17 +91,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
-    private fun repoCoroutineConfig(repoAction: String, commonName: String, repoMutex: Mutex? = null) = object : CoroutineConfig(
+    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineConfig(
         name = "$commonName Repo $repoAction Coroutine",
         timeout = 2.minutes,
         withIOContext = true,
-    ) { }.let {
+    ).let {
         if (repoMutex != null) it.withMutex(repoMutex) else it
     }
-    private val repoIOCoroutineConfig = repoCoroutineConfig("IO", commonName)
-    private val repoInitCoroutineConfig = repoCoroutineConfig("Init", commonName, repoMutex)
-    private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", commonName, repoMutex)
-    private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", commonName, repoMutex)
+
+    private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
+    private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
+    private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
+    private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
 
     var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory) }
         private set
