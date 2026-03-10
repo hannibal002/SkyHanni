@@ -153,7 +153,6 @@ object BarnFishingTimer {
                 else -> AlertReason.NO_ALERT
             }
         }
-
     }
 
     private fun calculateOldest() {
