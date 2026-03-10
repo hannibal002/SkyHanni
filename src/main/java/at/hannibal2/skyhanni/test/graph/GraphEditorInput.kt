@@ -41,6 +41,7 @@ object GraphEditorInput {
     private val closestNode get() = state.closestNode
     private val selectedEdge get() = state.selectedEdge
 
+    @Suppress("ReturnCount")
     fun input() {
         if (handleUndoRedo()) return
 
