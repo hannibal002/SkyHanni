@@ -30,20 +30,6 @@ object RenderLivingEntityHelper {
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
     /**
-     * Synchronous flag — true only while SkullBlockRenderer.submitSkull is executing for a
-     * custom-outlined entity (set/cleared by MixinHeadFeatureRenderer). Both the setter and
-     * SubmitNodeCollection.submitModel run on the same call stack, so no race condition.
-     */
-    @JvmField
-    var isSubmittingCustomOutlineSkull = false
-
-    /** Java-accessible setter for [isSubmittingCustomOutlineSkull] used by MixinSkullBlockRenderer. */
-    @JvmStatic
-    fun setSkullOutlineActive(active: Boolean) {
-        isSubmittingCustomOutlineSkull = active
-    }
-
-    /**
      * Tracks skull render-state objects whose geometry was submitted while an entity was using
      * SkyHanni's custom NO_XRAY outline. Weak keys so states are GC'd normally.
      * Populated at submitModel HEAD (via MixinSubmitNodeCollection) when the flag above is set.

@@ -42,7 +42,8 @@ public class MixinSubmitNodeCollection<E> {
      */
     @Inject(method = "submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V", at = @At("HEAD"))
     private void onSubmitModelHead(Model model, Object state, PoseStack poseStack, RenderType renderType, int i, int j, int k, TextureAtlasSprite sprite, int light, ModelFeatureRenderer.CrumblingOverlay crumbling, CallbackInfo ci) {
-        if (RenderLivingEntityHelper.isSubmittingCustomOutlineSkull && state != null) {
+        EntityRenderState currentState = EntityRenderDispatcherHookKt.getEntityRenderState();
+        if (currentState instanceof EntityRenderStateStore store && store.skyhanni$isUsingCustomOutline() && state != null) {
             RenderLivingEntityHelper.markModelSubmitAsCustomOutline(state);
         }
     }
