@@ -103,6 +103,13 @@ object CroesusChestTracker {
 
     private var display: List<Renderable>? = null
 
+    private val chestSlots = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    )
+
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
     @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true)
@@ -111,8 +118,10 @@ object CroesusChestTracker {
 
         if (!inCroesusInventory || croesusEmpty) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
-            val color = (OpenedState.getOpenState(slot.item.getLore()) ?: return@forEach).color ?: return@forEach
-            slot.highlight(color)
+            if (chestSlots.any { it.contains(slot.containerSlot) }) {
+                val color = (OpenedState.getOpenState(slot.item.getLore()) ?: return@forEach).color ?: return@forEach
+                slot.highlight(color)
+            }
         }
     }
 

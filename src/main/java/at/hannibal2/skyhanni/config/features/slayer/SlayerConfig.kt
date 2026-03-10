@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.config.features.slayer
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
@@ -7,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
 import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
 import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -157,12 +160,12 @@ class SlayerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Adjust Irrelevant Opacity",
-        desc = "Adjust the opacity of irrelevant mobs. (in %)",
+        name = "Adjust Irrelevant Transparency",
+        desc = "Adjust the transparency of irrelevant mobs. (in %)",
     )
     @SearchTag("magma cube tarantula tara spider slayer quest")
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
-    var hideIrrelevantMobsOpacity: Int = 40
+    var hideIrrelevantMobsTransparency: Int = 40
 
     @Expose
     @ConfigOption(name = "Time to Kill Message", desc = "Sends time to kill a slayer in chat.")
@@ -200,4 +203,12 @@ class SlayerConfig {
     @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss.")
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
+        }
+    }
 }

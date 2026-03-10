@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -136,7 +136,7 @@ object GardenVisitorStatus {
      */
     private fun findEntity(nameTag: ArmorStand, visitor: VisitorApi.Visitor) {
         val nameTagVec = nameTag.getLorenzVec()
-        EntityUtils.getEntitiesNearby<LivingEntity>(nameTagVec, 5.0) { entity ->
+        nameTagVec.getEntitiesNearby<LivingEntity>(5.0) { entity ->
             entity !is ArmorStand && entity !is LocalPlayer &&
                 entity.distanceToIgnoreY(nameTagVec) < 0.5
         }.forEach {

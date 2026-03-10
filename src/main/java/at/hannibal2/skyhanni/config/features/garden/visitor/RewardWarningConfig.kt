@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -117,12 +120,21 @@ class RewardWarningConfig {
     var preventRefusingNew: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Opacity", desc = "How strong the offer buttons should be grayed out when blocked.")
+    @ConfigOption(name = "Transparency", desc = "How transparent the offer buttons should be when blocked.")
     @ConfigEditorSlider(minValue = 0f, maxValue = 255f, minStep = 5f)
-    var opacity: Int = 180
+    var transparency: Int = 180
 
     @Expose
     @ConfigOption(name = "Outline", desc = "Add a red/green line around the best offer buttons.")
     @ConfigEditorBoolean
     var optionOutline: Boolean = true
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            val base = "garden.visitors.rewardWarning"
+            event.move(126, "$base.opacity", "$base.transparency")
+        }
+    }
 }
