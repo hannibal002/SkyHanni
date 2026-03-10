@@ -78,13 +78,14 @@ object TabListRenderer {
         val (header, footer) = listOf(
             TabListData.header,
             TabListData.footer,
-        ).map { component ->
+        ).mapNotNull cMap@{ component ->
+            if (config.hideAdverts) return@cMap null
             val componentHeader: Component = component ?: Component.empty()
             val componentLines = TextHelper.split(componentHeader, "\n") ?: listOf(componentHeader)
             val filteredLines = componentLines.filter { line -> line.string.contains(TabListReader.hypixelAdvertisingString) }
             totalHeight += filteredLines.size * LINE_HEIGHT + TAB_PADDING
             filteredLines.toMutableList()
-        }
+        }.toList()
 
         val minecraft = Minecraft.getInstance()
         val screenWidth = GuiScreenUtils.scaledWindowWidth / 2
