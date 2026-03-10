@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -59,7 +60,6 @@ object BarnFishingTimer {
 
         inline val isAlert: Boolean get() = this != NO_ALERT
 
-        fun getColor(reason: AlertReason): String = if (reason == this) "§c" else "§a"
     }
 
     private var ownMobs: Int = 0
@@ -127,9 +127,9 @@ object BarnFishingTimer {
             TitleManager.sendTitle(reason.display, duration = 2.seconds)
         }
 
-        val timeColor = AlertReason.TIME.getColor(reason)
-        val personalCapColor = AlertReason.PERSONAL_CAP.getColor(reason)
-        val globalCapColor = AlertReason.GLOBAL_CAP.getColor(reason)
+        val timeColor = if (reason == AlertReason.TIME) "§c" else "§a"
+        val personalCapColor = if (reason == AlertReason.PERSONAL_CAP) "§c" else "§a"
+        val globalCapColor = if (reason == AlertReason.GLOBAL_CAP) "§c" else "§a"
 
         val formatTime = timeSince.format(showMilliSeconds = false)
 
