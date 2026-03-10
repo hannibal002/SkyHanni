@@ -151,7 +151,6 @@ object VanquisherWaypointShare {
     }
 
     private fun sendVanquisherDeath() {
-        if (!isEnabled()) return
         if (lastShareTime.passedSince() < 2.seconds) return
         if (myVanquisherId == null) return
 
@@ -228,7 +227,7 @@ object VanquisherWaypointShare {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
 
-            if(isGlobalChat && !config.readGlobalChat) return@matchMatchers
+            if (isGlobalChat && !config.readGlobalChat) return@matchMatchers
 
             val rawName = group("playerName").trim()
             val x = group("x").toDoubleOrNull() ?: return@matchMatchers
@@ -258,7 +257,7 @@ object VanquisherWaypointShare {
         vanquisherDiedPattern.matchMatcher(message) {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
-            if(isGlobalChat && !config.readGlobalChat) return@matchMatcher
+            if (isGlobalChat && !config.readGlobalChat) return@matchMatcher
 
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
@@ -274,10 +273,10 @@ object VanquisherWaypointShare {
         if (!entity.name.string.equals("Wither", ignoreCase = true)) return
         vanquisherNearby[entity.id] = entity
 
-            if (entity.distanceToPlayer() < MAX_DISTANCE && myVanquisherId != entity.id) {
-                foundVanquisher(entity.id)
-            }
+        if (entity.distanceToPlayer() < MAX_DISTANCE && myVanquisherId != entity.id) {
+            foundVanquisher(entity.id)
         }
+    }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -288,7 +287,7 @@ object VanquisherWaypointShare {
         with(WorldRenderUtils) {
             for (waypoint in waypoints.values) {
                 if (waypoint.spawnTime.passedSince() > 60.seconds) continue
-22
+
                 event.drawWaypointFilled(
                     location = waypoint.location,
                     color = beaconColor,
