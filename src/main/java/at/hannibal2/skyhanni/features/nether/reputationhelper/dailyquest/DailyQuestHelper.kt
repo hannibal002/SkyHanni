@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -60,10 +61,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DailyQuestHelper {
-
-    private val questBoardMage = LorenzVec(-138, 92, -755)
-    private val questBoardBarbarian = LorenzVec(-572, 100, -687)
-
     val quests = mutableListOf<Quest>()
 
     val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
@@ -235,12 +232,10 @@ object DailyQuestHelper {
         renderTownBoard(event)
     }
 
-    fun getQuestBoardLocation(): LorenzVec {
+    fun getQuestBoardLocation(): GraphNode {
         val factionType = CrimsonIsleReputationApi.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
-        return when (factionType) {
-            FactionType.BARBARIAN -> questBoardBarbarian
-            FactionType.MAGE -> questBoardMage
-        }
+
+        return factionType.getQuestBoardNode()
     }
 
     private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
@@ -248,7 +243,7 @@ object DailyQuestHelper {
 
         // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
         if (CrimsonIsleReputationApi.factionType == null && SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
-        val location = getQuestBoardLocation()
+        val location = getQuestBoardLocation().position
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
     }

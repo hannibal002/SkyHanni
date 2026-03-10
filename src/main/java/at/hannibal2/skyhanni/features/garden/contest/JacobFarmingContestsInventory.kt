@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -115,24 +116,24 @@ object JacobFarmingContestsInventory {
 
     private fun openContest(year: String, month: String, day: String) {
         val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
-        OSUtils.openBrowser("https://elitebot.dev/contests/$date")
+        OSUtils.openBrowser("https://elitebot.dev/contests/$date".addSkyHanniUtm())
         ChatUtils.chat("Opening contest in elitebot.dev")
     }
 
     private fun openFromJacobMenu(itemName: String) {
         when (itemName) {
             "§6Upcoming Contests" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
+                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming".addSkyHanniUtm())
                 ChatUtils.chat("Opening upcoming contests in elitebot.dev")
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests")
+                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
                 ChatUtils.chat("Opening your contests in elitebot.dev")
             }
 
             "§aWhat is this?" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests")
+                OSUtils.openBrowser("https://elitebot.dev/contests".addSkyHanniUtm())
                 ChatUtils.chat("Opening contest page in elitebot.dev")
             }
 
@@ -157,7 +158,7 @@ object JacobFarmingContestsInventory {
                 openContest(year, month, day)
             } else {
                 val timestamp = time / 1000
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming#$timestamp")
+                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming".addSkyHanniUtm() + "#$timestamp")
                 ChatUtils.chat("Opening upcoming contests in elitebot.dev")
             }
             event.cancel()

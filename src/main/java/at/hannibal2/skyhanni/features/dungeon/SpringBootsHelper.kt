@@ -20,35 +20,36 @@ object SpringBootsHelper {
 
     private val SPRING_BOOTS = "SPRING_BOOTS".toInternalName()
 
+    private const val startSound = "entity.firework_rocket.launch"
+    private const val streakSound = "block.note_block.pling"
+    private const val endSound = "entity.generic.eat"
+    private val springBootsSounds = setOf(startSound, streakSound, endSound)
+
     /**
-     * Two [PlaySoundEvent] get created roughly every 100ms. This tracks the amount of times we heard the `note.pling` sound while wearing Spring Boots and sneaking.
+     * Two [PlaySoundEvent] get created roughly every 100ms. This tracks the amount of times
+     * we heard the `block.note_block.pling` sound while wearing Spring Boots and sneaking.
      */
     private var soundStreak = 0
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onSound(event: PlaySoundEvent) {
         if (!isEnabled()) return
-        if (!(event.soundName == "note.pling" || event.soundName == "fireworks.launch" || event.soundName == "random.eat")) return
         if (InventoryUtils.getBoots()?.getInternalName() != SPRING_BOOTS) return
-        if (event.soundName == "fireworks.launch" || event.soundName == "random.eat") {
+        if (event.soundName !in springBootsSounds) return
+
+        if (event.soundName != streakSound) {
             soundStreak = 0
             return
         }
         if (!PlayerUtils.isSneaking()) return
         soundStreak += 1
-
         if (soundStreak == 5) {
             TitleManager.sendTitle("§cSpring Boots ready!", duration = 2.seconds)
             SoundUtils.playBeepSound()
         }
     }
 
-    private fun shouldShow(): Boolean {
-        if (!DungeonApi.inBossRoom) return false
-        if (!DungeonApi.isOneOf("F7", "M7")) return false
-
-        return true
-    }
+    private fun shouldShow(): Boolean = DungeonApi.isOneOf("F7", "M7") && DungeonApi.inBossRoom
 
     private fun isEnabled() = shouldShow() && config.springBootsNotification
 }

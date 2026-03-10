@@ -251,13 +251,12 @@ object DungeonLividFinder {
     private fun RemotePlayer.highlight(color: LorenzColor?) {
         if (color == null) {
             RenderLivingEntityHelper.removeEntityColor(this)
-            RenderLivingEntityHelper.removeNoHurtTime(this)
             return
         }
 
         val newColor = if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color
 
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+        RenderLivingEntityHelper.setEntityColor(
             entity = this,
             color = newColor.toColor(),
             condition = { this.isLividColor(newColor) },
@@ -278,14 +277,13 @@ object DungeonLividFinder {
             val newLivid = livid ?: return
             val newColor = color ?: return
 
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            RenderLivingEntityHelper.setEntityColor(
                 entity = newLivid,
                 color = newColor.toColor(),
                 condition = { newLivid.isLividColor(newColor) },
             )
         } else {
             RenderLivingEntityHelper.removeEntityColor(livid ?: return)
-            RenderLivingEntityHelper.removeNoHurtTime(livid ?: return)
         }
     }
 

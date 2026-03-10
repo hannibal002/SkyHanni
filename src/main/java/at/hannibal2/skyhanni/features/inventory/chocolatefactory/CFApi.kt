@@ -135,7 +135,7 @@ object CFApi {
     var bestPossibleSlot = -1
 
     var specialRabbitTextures = listOf<String>()
-    var warningSound = SoundUtils.createSound("note.pling", 1f)
+    var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
     val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
 
     private val partyModeRegex = Regex("§[a-fA-F0-9]")
