@@ -514,13 +514,13 @@ object EnchantParser {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "inventory.enchantParsing"
         event.duplicate(
-            since = 125,
+            since = 126,
             sourcePath = "$base.ultimateEnchantColor",
             newPath = "$base.maxUltimateEnchantColor",
             default = JsonPrimitive("LIGHT_PURPLE"),
         )
         event.duplicate(
-            since = 125,
+            since = 126,
             sourcePath = "$base.advancedEnchantColors.advancedUltimateColor",
             newPath = "$base.advancedEnchantColors.advancedMaxUltimateColor",
             default = JsonPrimitive("0:255:255:85:1"),
