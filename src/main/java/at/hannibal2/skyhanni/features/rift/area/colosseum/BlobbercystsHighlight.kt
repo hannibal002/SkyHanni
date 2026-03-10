@@ -26,7 +26,7 @@ object BlobbercystsHighlight {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity.name.string != BLOBBER_NAME) return
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, Color.RED.addAlpha(80)) { isEnabled() }
+        RenderLivingEntityHelper.setEntityColor(entity, Color.RED.addAlpha(80)) { isEnabled() }
         entityList.add(entity)
     }
 

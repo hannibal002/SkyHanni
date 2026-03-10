@@ -166,7 +166,7 @@ object GoldenFishTimer {
         if (weakPattern.matches(event.message)) {
             goldenFishDespawnTimer = DESPAWN_TIME.fromServerNow()
             val entity = confirmedGoldenFishEntity ?: return
-            if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            if (config.highlight) RenderLivingEntityHelper.setEntityColor(
                 entity,
                 LorenzColor.GREEN.toColor().addAlpha(100),
             ) { true }

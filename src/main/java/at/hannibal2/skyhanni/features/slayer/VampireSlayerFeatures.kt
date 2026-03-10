@@ -195,7 +195,7 @@ object VampireSlayerFeatures {
             }
 
             if (shouldRender) {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(this, color) { isEnabled() }
+                RenderLivingEntityHelper.setEntityColor(this, color) { isEnabled() }
                 entityList.add(this)
             }
         }

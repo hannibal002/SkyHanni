@@ -174,7 +174,7 @@ object DungeonHideItems {
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = SimpleTimeMark.now()
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            RenderLivingEntityHelper.setEntityColor(
                 entity,
                 LorenzColor.GOLD.toColor().addAlpha(60),
             ) { shouldColorMovingSkull(entity) }
