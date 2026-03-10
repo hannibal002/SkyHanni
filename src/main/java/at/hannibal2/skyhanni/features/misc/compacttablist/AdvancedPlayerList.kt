@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -38,11 +38,10 @@ object AdvancedPlayerList {
      * REGEX-TEST: [290] Skirtwearer ꀾ♲
      * REGEX-TEST: [14] ColombianoGood Ⓑ
      * REGEX-TEST: [218] nightdives
-     * REGEX-TEST: [281] [YOUTUBE] Remittal
      */
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level.colorless",
-        ".*\\[(?<level>[\\d,]+)](?: \\[\\w+\\])? (?<name>.*)",
+        ".*\\[(?<level>.*)] (?<name>.*)",
     )
 
     private var playerData = mutableMapOf<Component, PlayerData>()
@@ -78,8 +77,18 @@ object AdvancedPlayerList {
             val playerData: PlayerData? = levelPattern.matchMatcher(line) {
                 val levelText = group("level")
                 val removeColor = levelText.removeColor()
-                val sbLevel = removeColor.formatIntOrNull() ?: return@matchMatcher null
-                readPlayerData(sbLevel, levelText, line)
+                try {
+                    val sbLevel = removeColor.toInt()
+                    readPlayerData(sbLevel, levelText, line)
+                } catch (e: NumberFormatException) {
+                    ErrorManager.logErrorWithData(
+                        e, "Advanced Player List failed to parse username",
+                        "line" to line,
+                        "i" to i,
+                        "original" to original,
+                    )
+                    null
+                }
             }
             playerData?.let {
                 val name = it.name
