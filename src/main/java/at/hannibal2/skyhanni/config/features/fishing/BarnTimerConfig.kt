@@ -45,7 +45,8 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Warn Global Cap",
-        desc = "Warns you when you reach the global sea creature cap (Only works if all mobs are in range).")
+        desc = "Warns you when you reach the global sea creature cap (Only works if all mobs are in range)."
+    )
     @ConfigEditorBoolean
     var warnGlobalCap: Boolean = true
 
