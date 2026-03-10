@@ -525,5 +525,11 @@ object EnchantParser {
             newPath = "$base.advancedEnchantColors.advancedMaxUltimateColor",
             default = JsonPrimitive("0:255:255:85:1"),
         )
+        event.duplicate(
+            since = 126,
+            sourcePath = "$base.advancedEnchantColors.useAdvancedUltimateColor",
+            newPath = "$base.advancedEnchantColors.useAdvancedMaxUltimateColor",
+            default = JsonPrimitive(false),
+        )
     }
 }
