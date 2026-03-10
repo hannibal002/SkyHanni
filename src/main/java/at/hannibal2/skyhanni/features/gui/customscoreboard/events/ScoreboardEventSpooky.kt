@@ -15,7 +15,7 @@ object ScoreboardEventSpooky : ScoreboardEvent() {
             add("§7Your Candy: ")
             TabListData.footer?.let { footerComponent ->
                 val lines = TextHelper.split(footerComponent, "\n") ?: listOf(footerComponent)
-                val matchLine = lines.firstOrNull { it.string.startsWith("Your Candy:") }?.string?.removePrefix("§7Your Candy: ")
+                val matchLine = lines.firstOrNull { it.string.startsWith("Your Candy:") }?.string?.removePrefix("Your Candy: ")
                 add(matchLine ?: "§cCandy not found")
             }
 

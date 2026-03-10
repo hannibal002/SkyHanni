@@ -32,13 +32,13 @@ import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -386,7 +386,7 @@ object IslandGraphs {
     }
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.size > 1) {
-        val hideNearby = if (MinecraftCompat.localPlayer.onGround()) 9 else 25
+        val hideNearby = if (PlayerUtils.onGround()) 9 else 25
         Graph(graph.takeLastWhile { it.distanceSqToPlayer() > hideNearby })
     } else graph
 
@@ -443,7 +443,7 @@ object IslandGraphs {
         // TODO cleanup
         val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.toMutableList()
-        if (MinecraftCompat.localPlayer.onGround()) {
+        if (PlayerUtils.onGround()) {
             nodes.add(0, GraphNode(0, playerPosition))
         }
         renderPath(setPath, nodes)
