@@ -170,7 +170,6 @@ object VanquisherWaypointShare {
         sharedWaypoints.clear()
         vanquisherNearby.clear()
         myVanquisherId = null
-
     }
 
     @HandleEvent
@@ -198,7 +197,6 @@ object VanquisherWaypointShare {
         if (event.repeatSeconds(3)) {
             sharedWaypoints.values.removeIf { it.spawnTime.passedSince() > 60.seconds }
             vanquisherNearby.values.removeIf { it.deceased }
-
         }
     }
 
