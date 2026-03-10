@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityUnclaimedEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityActiveEvent
-import at.hannibal2.skyhanni.events.entity.EntityOpacityEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -29,25 +28,25 @@ object HoppityEggDisplayManager {
 
     private var display = listOf<Renderable>()
 
-    private fun canChangeOpacity(entity: Player): Boolean {
+    private fun canChangeTransparency(entity: Player): Boolean {
         if (entity.isLocalPlayer) return false
         if (!entity.isRealPlayer()) return false
 
         val shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { entity.distanceTo(it) < 4.0 }
             ?: HoppityEggLocator.possibleEggLocations.any { entity.distanceTo(it) < 4.0 }
 
-        return config.playerOpacity < 100 && shouldHidePlayer
+        return config.playerTransparency < 100 && shouldHidePlayer
     }
 
     @HandleEvent
-    fun onEntityOpacityActive(event: EntityOpacityActiveEvent) {
-        event.setActive(HoppityEggLocator.isEnabled() && config.playerOpacity < 100)
+    fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
+        event.setActive(HoppityEggLocator.isEnabled() && config.playerTransparency < 100)
     }
 
     @HandleEvent
-    fun onEntityOpacity(event: EntityOpacityEvent<Player>) {
-        if (canChangeOpacity(event.entity)) {
-            event.opacity = config.playerOpacity
+    fun onEntityTransparencyTick(event: EntityTransparencyTickEvent<Player>) {
+        if (canChangeTransparency(event.entity)) {
+            event.newTransparency = config.playerTransparency
         }
     }
 

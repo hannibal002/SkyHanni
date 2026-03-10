@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -48,11 +51,11 @@ class HoppityEggsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Adjust player opacity",
-        desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)",
+        name = "Adjust player transparency",
+        desc = "Adjust the transparency of players near shared & guessed egg waypoints. (in %)",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
-    var playerOpacity: Int = 40
+    var playerTransparency: Int = 40
 
     @Expose
     @ConfigOption(
@@ -106,4 +109,12 @@ class HoppityEggsConfig {
     @ConfigEditorDropdown
     @SearchTag("rolling eat")
     var soundMode: EggSoundMode = EggSoundMode.NO_MODIFICATION
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(126, "event.hoppityEggs.playerOpacity", "event.hoppityEggs.playerTransparency")
+        }
+    }
 }

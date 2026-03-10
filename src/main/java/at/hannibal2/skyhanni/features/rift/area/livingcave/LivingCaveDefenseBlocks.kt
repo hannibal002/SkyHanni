@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -79,7 +79,7 @@ object LivingCaveDefenseBlocks {
             if (entity == null) {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
-                entity = EntityUtils.getEntitiesNearby<RemotePlayer>(compareLocation, 2.0)
+                entity = compareLocation.getEntitiesNearby<RemotePlayer>(2.0)
                     .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }

@@ -108,7 +108,7 @@
 + Fixed Tarantula Broodfather invincible detection not working for tiers 3 and 4. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4818)
 + Fixed high kill combo chat messages not getting filtered. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5336)
 + Fixed Kuudra Chests being incorrectly marked as fully opened when opening Croesus. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5322)
-+ Fixed Croesus Chest Overlay Profit not functiong due to messed up pattern. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5345)
++ Fixed Croesus Chest Overlay Profit not functioning due to messed up pattern. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5345)
 + Fixed Croesus Highlight throwing chat errors. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5345)
 + Fixed Flare Display sometimes causing freezes. - nopo (https://github.com/hannibal002/SkyHanni/pull/5355)
   + Should also improve performance with Flare Display a little bit.
