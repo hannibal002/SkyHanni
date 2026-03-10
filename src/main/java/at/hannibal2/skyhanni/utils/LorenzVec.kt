@@ -283,7 +283,7 @@ data class LorenzVec(
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(position().x, position().y, position().z)
+fun Entity.getLorenzVec(): LorenzVec = position().toLorenzVec()
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(xOld, yOld, zOld)
 fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(positionCodec.base.x, positionCodec.base.y, positionCodec.base.z)
 
