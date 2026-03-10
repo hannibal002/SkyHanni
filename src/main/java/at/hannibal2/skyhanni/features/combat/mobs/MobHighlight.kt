@@ -61,8 +61,28 @@ object MobHighlight {
     private fun parseColor(input: String): LorenzColor? =
         LorenzColor.entries.firstOrNull { it.name.equals(input.replace('-', '_'), ignoreCase = true) }
 
+    // Quote names containing spaces for suggestions so the user can insert a quoted name like "graveyard zombie".
+    private fun quoteIfNeeded(name: String): String = if (name.contains(' ')) '"'.toString() + name + '"' else name
+
+    // Normalize a mob name argument by stripping surrounding quotes (single or double) if present.
+    private fun normalizeMobArg(input: String): String {
+        val trimmed = input.trim()
+        if (trimmed.length >= 2) {
+            val first = trimmed.first()
+            val last = trimmed.last()
+            if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
+                return trimmed.substring(1, trimmed.length - 1)
+            }
+        }
+        return trimmed
+    }
+
     private fun getMobNameSuggestions(): Collection<String> =
-        MobData.skyblockMobs.map { it.name }.filter { it.isNotBlank() }.distinct().sorted()
+        MobData.skyblockMobs.map { it.name }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .sorted()
+            .map { quoteIfNeeded(it) }
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -179,7 +199,7 @@ object MobHighlight {
                     // with optional color argument
                     arg("color", BrigadierArguments.string(), colorNames) { colorArg ->
                         callback {
-                            val mobName = getArg(mobArg)
+                            val mobName = normalizeMobArg(getArg(mobArg))
                             val colorInput = getArg(colorArg)
                             val color = parseColor(colorInput)
                             if (color == null) {
@@ -193,7 +213,7 @@ object MobHighlight {
                     }
                     // without color, defaults to GREEN
                     callback {
-                        val mobName = getArg(mobArg)
+                        val mobName = normalizeMobArg(getArg(mobArg))
                         customHighlights[mobName] = LorenzColor.GREEN
                         applyCustomHighlightToExisting(mobName, LorenzColor.GREEN)
                         ChatUtils.chat("Now highlighting §a$mobName§7 with default color §agreen§7.")
@@ -204,9 +224,9 @@ object MobHighlight {
 
             // /shmobhighlight remove <mob>
             literal("remove") {
-                arg("mob", BrigadierArguments.string(), dynamicSuggestionProvider { customHighlights.keys.sorted() }) { mobArg ->
+                arg("mob", BrigadierArguments.string(), dynamicSuggestionProvider { customHighlights.keys.sorted().map { quoteIfNeeded(it) } }) { mobArg ->
                     callback {
-                        val mobName = getArg(mobArg)
+                        val mobName = normalizeMobArg(getArg(mobArg))
                         if (customHighlights.remove(mobName) != null) {
                             removeCustomHighlightFromExisting(mobName)
                             ChatUtils.chat("Removed highlight for §a$mobName§7.")
