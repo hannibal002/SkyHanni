@@ -52,7 +52,7 @@ object TestCopyBestiaryValues {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
-        SkyHanniDebugsAndTests.displayLine = ""
+        SkyHanniDebugsAndTests.displayLine = null
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3] ?: return
         if (backItem.getLore().none { it.contains("Bestiary Milestone") }) {

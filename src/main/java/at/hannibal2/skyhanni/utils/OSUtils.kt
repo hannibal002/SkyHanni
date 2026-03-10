@@ -59,9 +59,13 @@ object OSUtils {
         openBrowser(url)
     }
 
-    fun copyToClipboard(text: String) {
-        ClipboardUtils.copyToClipboard(text)
-    }
+    @Deprecated(
+        "Use copyToClipboardAsync instead for a success boolean return",
+        ReplaceWith("copyToClipboardAsync(text)"),
+    )
+    fun copyToClipboard(text: String) = ClipboardUtils.copyToClipboard(text)
+
+    suspend fun copyToClipboardAsync(text: String): Boolean? = ClipboardUtils.copyToClipboardAsync(text).await()
 
     fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 

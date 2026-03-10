@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.compat.append
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
 import java.util.UUID
 
@@ -51,7 +52,9 @@ object ContributorManager {
         }
     }
 
-    fun getSuffix(uuid: UUID): String? = contributors[uuid]?.suffix
+    fun getSuffix(uuid: UUID): Component? {
+        return contributors[uuid]?.componentSuffix ?: Component.literal(contributors[uuid]?.suffix ?: return null)
+    }
 
     fun shouldSpin(uuid: UUID): Boolean = contributors[uuid]?.spinny ?: false
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
