@@ -115,24 +115,24 @@ object JacobFarmingContestsInventory {
 
     private fun openContest(year: String, month: String, day: String) {
         val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
-        OSUtils.openBrowser("https://elitebot.dev/contests/$date")
+        OSUtils.openBrowser("https://elitebot.dev/contests/$date?utm_source=SkyHanni")
         ChatUtils.chat("Opening contest in elitebot.dev")
     }
 
     private fun openFromJacobMenu(itemName: String) {
         when (itemName) {
             "§6Upcoming Contests" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
+                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming?utm_source=SkyHanni")
                 ChatUtils.chat("Opening upcoming contests in elitebot.dev")
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests")
+                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests?utm_source=SkyHanni")
                 ChatUtils.chat("Opening your contests in elitebot.dev")
             }
 
             "§aWhat is this?" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests")
+                OSUtils.openBrowser("https://elitebot.dev/contests?utm_source=SkyHanni")
                 ChatUtils.chat("Opening contest page in elitebot.dev")
             }
 
@@ -157,7 +157,7 @@ object JacobFarmingContestsInventory {
                 openContest(year, month, day)
             } else {
                 val timestamp = time / 1000
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming#$timestamp")
+                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming?utm_source=SkyHanni#$timestamp")
                 ChatUtils.chat("Opening upcoming contests in elitebot.dev")
             }
             event.cancel()

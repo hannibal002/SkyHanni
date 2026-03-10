@@ -282,7 +282,7 @@ object FarmingWeightData {
         lastOpenWebsite = SimpleTimeMark.now()
         lastName = name
 
-        OSUtils.openBrowser("https://elitebot.dev/@$name/")
+        OSUtils.openBrowser("https://elitebot.dev/@$name?utm_source=SkyHanni")
         ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 
