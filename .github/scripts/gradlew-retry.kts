@@ -24,6 +24,7 @@ val cmd = listOf("./gradlew") + gradleArgs
  * REGEX-TEST:          > Could not GET 'https://maven.shedaniel.me/dev/architectury/architectury-naming-service/2.0.9/architectury-naming-service-2.0.9.jar'.
  * REGEX-TEST: Caused by: net.fabricmc.loom.util.download.DownloadException: Failed to download file
  * REGEX-TEST: > java.io.IOException: Server returned HTTP response code: 502 for URL: https://github.com/NotEnoughUpdates/NotEnoughUpdates-Repo/archive/refs/heads/master.zip
+ * REGEX-TEST: Caused by: java.io.IOException: Server returned HTTP response code: 502 for URL: https://github.com/NotEnoughUpdates/NotEnoughUpdates-Repo/archive/refs/heads/master.zip
  */
 val retryableErrorRegex = Regex(
     // language=RegExp
