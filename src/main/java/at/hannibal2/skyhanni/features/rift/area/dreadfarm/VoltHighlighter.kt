@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -45,9 +45,8 @@ object VoltHighlighter {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
         if (!config.voltWarning) return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
-            event.entity.position().distanceToSqr(player.position()) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
+            event.entity.distanceSqToPlayer() <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {
             chargingSince = chargingSince.editCopy {
                 this[event.entity] = SimpleTimeMark.now()

@@ -66,11 +66,6 @@ class AttributeShardsConfig {
     var huntingBoxValue: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Export to SkyShards", desc = "Displays a button in the hunting box to export to and open SkyShards.")
-    @ConfigEditorBoolean
-    var exportToSkyShards: Boolean = true
-
-    @Expose
     @ConfigLink(owner = AttributeShardsConfig::class, field = "enabled")
     val displayPosition: Position = Position(174, 139)
 
