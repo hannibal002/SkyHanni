@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.isModelSubmitCustomOutline
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import com.mojang.blaze3d.systems.RenderSystem
@@ -111,27 +111,21 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
          * (NO_XRAY) outline buffer instead of the vanilla x-ray outline buffer.
          *
          * Two cases:
-         * 1. Normal entity body parts — the entity render state carries skyhanni$isUsingCustomOutline
-         * (original behaviour, must be preserved for normal zombies etc.).
-         * 2. Skull head geometry (armor-stand rat mobs) — submitted via SkullBlockRenderer which
-         * creates ModelSubmit nodes with a block-entity state, not an EntityRenderState.
-         * MixinModelCommand mixes GlowingStateStore into ModelSubmit and
-         * MixinSubmitNodeCollection tags the node at submission time via the synchronous
-         * isSubmittingCustomOutlineSkull flag set by MixinHeadFeatureRenderer.
+         * 1. Normal entity body parts: the entity render state carries skyhanni$isUsingCustomOutline.
+         * 2. Skull head geometry (armor-stand rat mobs): submitted via SkullBlockRenderer which
+         *    creates ModelSubmit nodes with a skull-specific state, not an EntityRenderState.
+         *    MixinSubmitNodeCollection tags the state object in a WeakHashMap at submission time
+         *    by checking getEntityRenderState(). This set is checked here at deferred-render time.
          */
-        @Unique
         private fun shouldUseCustomOutline(model: SubmitNodeStorage.ModelSubmit<*>): Boolean {
-            // Case 1 – normal entity body (original check, must not be removed).
             val state = model.state() ?: return false
-            val currentState = state as? EntityRenderStateStore ?: return false
-            if (currentState.`skyhanni$isUsingCustomOutline`()) {
-                return true
-            }
 
-            // Case 2 – skull/block-entity model: state object was registered in a WeakHashMap at
-            // submission time by MixinSubmitNodeCollection.onSubmitModelHead when the synchronous
-            // isSubmittingCustomOutlineSkull flag (set by MixinHeadFeatureRenderer) was active.
-            return isModelSubmitCustomOutline(state)
+            // Case 1: normal entity body (original check, must not be removed).
+            if (state is EntityRenderStateStore && state.`skyhanni$isUsingCustomOutline`()) return true
+
+            // Case 2: skull state registered in the WeakHashMap by MixinSubmitNodeCollection.onSubmitModelHead
+            // at submission time, when getEntityRenderState() confirmed a custom-outlined entity.
+            return RenderLivingEntityHelper.isModelSubmitCustomOutline(state)
         }
 
         fun outlineBufferHook(

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.combat.mobs.MobHighlight.onMobSpawn
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -192,7 +191,7 @@ object MobHighlight {
                             ChatUtils.chat("Now highlighting §a$mobName§7 with color ${color.getChatColor()}${color.name.lowercase().replace('_', '-')}§7.")
                         }
                     }
-                    // without color – defaults to GREEN
+                    // without color, defaults to GREEN
                     callback {
                         val mobName = getArg(mobArg)
                         customHighlights[mobName] = LorenzColor.GREEN

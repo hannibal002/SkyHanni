@@ -30,9 +30,9 @@ object RenderLivingEntityHelper {
     /**
      * Tracks skull render-state objects whose geometry was submitted while an entity was using
      * SkyHanni's custom NO_XRAY outline. Weak keys so states are GC'd normally.
-     * Populated at submitModel HEAD (via MixinSubmitNodeCollection) when the flag above is set.
-     * Read during the deferred render phase by MixinModelFeatureRenderer (Case 2) via
-     * model.state() — the same object that was passed to submitModel.
+     * Populated at submitModel HEAD (via MixinSubmitNodeCollection) by checking getEntityRenderState()
+     * at submission time. Read during the deferred render phase by SkyHanniOutlineVertexConsumerProvider
+     * via model.state(), which is the same object that was passed to submitModel.
      */
     @JvmStatic
     private val customOutlineSkullStates: MutableSet<Any> =
