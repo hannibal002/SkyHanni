@@ -60,7 +60,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        "^(?<channel>.*> )?(?<playerName>[^:]+): Vanquisher dead!.*"
+        "^(?<channel>.*> )?(?<playerName>[^:]+): Vanquisher dead!.*",
     )
 
     /**
@@ -69,7 +69,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherSpawnedPattern by patternGroup.pattern(
         "spawned",
-        ".*A Vanquisher is spawning nearby!"
+        ".*A Vanquisher is spawning nearby!",
     )
 
     private var myVanquisherId: Int? = null
@@ -102,7 +102,7 @@ object VanquisherWaypointShare {
             sharedWaypoints[playerName] = SharedVanquisher(
                 playerName,
                 entity.getLorenzVec(),
-                SimpleTimeMark.now()
+                SimpleTimeMark.now(),
             )
         }
 
@@ -228,7 +228,7 @@ object VanquisherWaypointShare {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
 
-            if(isGlobalChat && !config.readGlobalChat) return@matchMatchers
+            if (isGlobalChat && !config.readGlobalChat) return@matchMatchers
 
             val rawName = group("playerName").trim()
             val x = group("x").toDoubleOrNull() ?: return@matchMatchers
@@ -258,7 +258,7 @@ object VanquisherWaypointShare {
         vanquisherDiedPattern.matchMatcher(message) {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
-            if(isGlobalChat && !config.readGlobalChat) return@matchMatcher
+            if (isGlobalChat && !config.readGlobalChat) return@matchMatcher
 
             val simpleName = group("playerName")
             val name = simpleName.cleanPlayerName()
@@ -274,10 +274,10 @@ object VanquisherWaypointShare {
         if (!entity.name.string.equals("Wither", ignoreCase = true)) return
         vanquisherNearby[entity.id] = entity
 
-            if (entity.distanceToPlayer() < MAX_DISTANCE && myVanquisherId != entity.id) {
-                foundVanquisher(entity.id)
-            }
+        if (entity.distanceToPlayer() < MAX_DISTANCE && myVanquisherId != entity.id) {
+            foundVanquisher(entity.id)
         }
+    }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -292,17 +292,17 @@ object VanquisherWaypointShare {
                     location = waypoint.location,
                     color = beaconColor,
                     seeThroughBlocks = true,
-                    beacon = false
+                    beacon = false,
                 )
                 event.renderBeaconBeam(
                     waypoint.location,
-                    beaconColor.rgb
+                    beaconColor.rgb,
                 )
                 event.drawLineToEye(
                     location = waypoint.location,
                     color = beaconColor,
                     lineWidth = 3,
-                    depth = false
+                    depth = false,
                 )
             }
         }
