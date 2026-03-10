@@ -70,7 +70,7 @@ object SackDisplay {
     }
 
     fun update(savingSacks: Boolean) {
-        // Ensure we're running on the render thread - this gets called from the network thread in SackAPI
+        // Ensure we're running on the render thread - this gets called from the network thread in SackApi
         DelayedRun.runOrNextTick {
             display = drawDisplay(savingSacks)
         }
