@@ -31,12 +31,25 @@ object RegexUtils {
 
     inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
+    inline fun <T> Pattern.firstComponentMatcher(list: List<Component>, consumer: Matcher.() -> T): T? {
+        for (line in list) {
+            matcher(line.string).let { if (it.matches()) return consumer(it) }
+        }
+        return null
+    }
+
     inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
         firstMatcherWithIndex(list.asSequence(), consumer)
 
     inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T) {
         for (line in list) {
             matcher(line).let { if (it.find()) consumer(it) }
+        }
+    }
+
+    inline fun <T> Pattern.matchAllComponents(list: List<Component>, consumer: Matcher.() -> T) {
+        for (line in list) {
+            matcher(line.string).let { if (it.find()) consumer(it) }
         }
     }
 
@@ -76,6 +89,7 @@ object RegexUtils {
 
     fun Pattern.firstMatches(list: List<String>): String? = list.firstOrNull { matches(it) }
     fun Pattern.allMatches(list: List<String>): List<String> = list.filter { matches(it) }
+    fun Pattern.allMatchesComponent(list: List<Component>): List<Component> = list.filter { matches(it) }
 
     /**
      * Get the group, otherwise, return null

@@ -34,14 +34,13 @@ object RoundedShapeDrawer {
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
     var circleUniform = SkyHanniCircleUniform()
     var radialGradientCircleUniform = SkyHanniRadialGradientCircleUniform()
-    var roundedBufferSlice: GpuBufferSlice? = null
-    var roundedOutlineBufferSlice: GpuBufferSlice? = null
-    var circleBufferSlice: GpuBufferSlice? = null
-    var radialGradientCircleBufferSlice: GpuBufferSlice? = null
 
-    private fun <T : RoundedShader<T>> T.performBaseUniforms(
-        renderPass: RenderPass,
-    ) {
+    lateinit var roundedBufferSlice: GpuBufferSlice
+    lateinit var roundedOutlineBufferSlice: GpuBufferSlice
+    lateinit var circleBufferSlice: GpuBufferSlice
+    lateinit var radialGradientCircleBufferSlice: GpuBufferSlice
+
+    private fun performBaseRoundedUniforms(renderPass: RenderPass) {
         renderPass.setUniform("SkyHanniRoundedUniforms", roundedBufferSlice)
     }
 
@@ -97,7 +96,7 @@ object RoundedShapeDrawer {
             draw(pipeline, buffer.buildOrThrow()) { pass ->
                 RenderSystem.bindDefaultUniforms(pass)
                 pass.setUniform("DynamicTransforms", dynamicTransforms)
-                this@performVQuadAndUniforms.performBaseUniforms(pass)
+                performBaseRoundedUniforms(pass)
                 passOp.invoke(pass)
             }
 
@@ -204,14 +203,12 @@ object RoundedShapeDrawer {
         setUniform("SkyHanniRadialGradientCircleUniforms", radialGradientCircleBufferSlice)
     }
 
-    private fun ChromaColour.destructToFloatArray(): FloatArray {
-        return floatArrayOf(
-            this.toColor().red.toFloat() / 255f,
-            this.toColor().green.toFloat() / 255f,
-            this.toColor().blue.toFloat() / 255f,
-            this.alpha.toFloat() / 255f,
-        )
-    }
+    private fun ChromaColour.destructToFloatArray(): FloatArray = floatArrayOf(
+        this.toColor().red.toFloat() / 255f,
+        this.toColor().green.toFloat() / 255f,
+        this.toColor().blue.toFloat() / 255f,
+        this.alpha.toFloat() / 255f,
+    )
 
     fun clearUniforms() {
         roundedUniform.clear()

@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
@@ -67,7 +68,7 @@ object DianaProfitTracker {
 
     data class Data(
         @Expose var burrowsDug: Long = 0,
-    ) : ItemTrackerData() {
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = percentage.coerceAtMost(1.0).formatPercentage()
@@ -103,7 +104,7 @@ object DianaProfitTracker {
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows"))
+        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows", false))
 
         tracker.addPriceFromButton(this)
     }

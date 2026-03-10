@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -26,8 +29,11 @@ object ViewRecipeCommand {
      */
     private val pattern by RepoPattern.pattern(
         "commands.viewrecipe",
-        "\\/viewrecipe (?<item>.*)"
+        "/viewrecipe (?<item>.*)",
     )
+
+    var list = emptyList<String>()
+        private set
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
@@ -56,14 +62,11 @@ object ViewRecipeCommand {
         HypixelCommands.viewRecipe(item.toInternalName(), page)
     }
 
-    val list by lazy {
-        val list = mutableListOf<String>()
-        for ((key, value) in NeuItems.allNeuRepoItems()) {
-            if (value.has("recipe")) {
-                list.add(key.lowercase())
-            }
-        }
-        list
+    @HandleEvent(NeuRepositoryReloadEvent::class)
+    fun onNeuRepoReload() {
+        list = NeuItems.allNeuRepoItems().asSequence().filter { (_, json) ->
+            json.recipe != null || json.recipes.any { it.type == NeuRecipeType.CRAFTING }
+        }.map { (key, _) -> key.repoItemName.lowercase() }.toList()
     }
 
     fun customTabComplete(command: String): List<String>? {

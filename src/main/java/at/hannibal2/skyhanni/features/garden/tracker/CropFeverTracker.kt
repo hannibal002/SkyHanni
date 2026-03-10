@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
@@ -46,7 +47,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     ::BucketData,
     { it.garden.cropFeverTracker },
     drawDisplay = { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.garden.cropFeverTracker.perTrackerConfig }
+    trackerConfig = { SkyHanniMod.feature.garden.cropFeverTracker.perTrackerConfig },
+    customUptimeControl = true
 ) {
     data class BucketData(
         @Expose var blocksBrokenDuring: MutableMap<CropType, Long> = EnumMap(CropType::class.java),
@@ -56,7 +58,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         @Expose var partialFeverAmount: MutableMap<CropType, Long> = EnumMap(CropType::class.java),
         @Expose var cropFeverDuration: MutableMap<CropType, Stopwatch> = EnumMap(CropType::class.java),
         @Expose var rngDrops: MutableMap<CropType, MutableMap<RngDropEnum, Long>> = EnumMap(CropType::class.java),
-    ) : BucketedItemTrackerData<CropType>(CropType::class) {
+    ) : BucketedItemTrackerData<CropType, SessionUptime.Garden>(CropType::class, SessionUptime.Garden::class) {
         override fun getDescription(bucket: CropType?, timesGained: Long): List<String> {
             val blocksBroken = blocksBrokenDuring[bucket] ?: getTotalDuringCount()
             val dropRate = if (timesGained == 0L) 0 else blocksBroken.div(timesGained)

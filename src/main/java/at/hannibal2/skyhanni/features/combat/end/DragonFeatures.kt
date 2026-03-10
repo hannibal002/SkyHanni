@@ -50,7 +50,7 @@ object DragonFeatures {
     private val repoGroup = RepoPattern.group("combat.boss.dragon.1")
     private val chatGroup = repoGroup.group("chat")
     private val scoreBoardGroup = repoGroup.group("scoreboard")
-    private val tabListGroup = repoGroup.group("tablist")
+    private val tabListGroup = repoGroup.group("tablist-nocolor")
 
     /**
      * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
@@ -138,14 +138,14 @@ object DragonFeatures {
     private val scoreDragonPattern by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     /**
-     * REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
-     * REGEX-TEST:  §r§a42069HzMonitor: §r§c3M❤
-     * REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
-     * REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
+     * REGEX-TEST:  JamBeastie: 7.4M❤
+     * REGEX-TEST:  42069HzMonitor: 3M❤
+     * REGEX-TEST:  ItsJxxxxx2001: 457k❤
+     * REGEX-TEST:  Thunderblade73: 12.3k❤
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        ".*§r§.(?<name>.+): §r§c(?<damage>[\\d.]+[kM]?)❤",
+        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)❤",
     )
 
     private var yourEyes = 0

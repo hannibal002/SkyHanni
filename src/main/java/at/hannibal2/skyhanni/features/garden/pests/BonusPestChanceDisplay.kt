@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.compat.iterator
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -23,12 +23,12 @@ object BonusPestChanceDisplay {
     private val patternGroup = RepoPattern.group("garden.bonuspestchance")
 
     /**
-     * REGEX-TEST:  §r§7§mBonus Pest Chance: ൠ70
-     * REGEX-TEST:  Bonus Pest Chance: §r§2ൠ70
+     * REGEX-TEST:  Bonus Pest Chance: ൠ70
+     * REGEX-TEST:  Bonus Pest Chance: ൠ70
      */
     private val bonusPestChancePattern by patternGroup.pattern(
-        "widget",
-        "\\s+(?:§.)*?(?<disabled>§m)?Bonus Pest Chance: (?:§.)*ൠ(?<amount>[\\d,.]+)",
+        "widget-no-color",
+        "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
     )
     private var display: String? = null
 
@@ -43,7 +43,13 @@ object BonusPestChanceDisplay {
         val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
         event.widget.lines.forEach { line ->
             bonusPestChancePattern.matchMatcher(line) {
-                val disabled = groupOrNull("disabled") != null
+                var disabled = false
+                for (component in line.iterator()) {
+                    if (component.style.isStrikethrough) {
+                        disabled = true
+                        break
+                    }
+                }
                 val amount = group("amount").formatInt()
 
                 display = buildString {

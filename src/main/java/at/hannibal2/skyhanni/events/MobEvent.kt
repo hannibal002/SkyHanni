@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import net.minecraft.world.damagesource.DamageSource
 
-open class MobEvent(val mob: Mob) : SkyHanniEvent() {
-    open class Spawn(mob: Mob) : MobEvent(mob) {
+sealed class MobEvent(val mob: Mob) : SkyHanniEvent() {
+    sealed class Spawn(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : Spawn(mob)
         class Summon(mob: Mob) : Spawn(mob)
         class Player(mob: Mob) : Spawn(mob)
@@ -14,7 +14,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class Projectile(mob: Mob) : Spawn(mob)
     }
 
-    open class DeSpawn(mob: Mob) : MobEvent(mob) {
+    sealed class DeSpawn(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : DeSpawn(mob)
         class Summon(mob: Mob) : DeSpawn(mob)
         class Player(mob: Mob) : DeSpawn(mob)
@@ -23,7 +23,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class Projectile(mob: Mob) : DeSpawn(mob)
     }
 
-    open class FirstSeen(mob: Mob) : MobEvent(mob) {
+    sealed class FirstSeen(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : FirstSeen(mob)
         class Summon(mob: Mob) : FirstSeen(mob)
         class Player(mob: Mob) : FirstSeen(mob)
@@ -32,7 +32,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class Projectile(mob: Mob) : FirstSeen(mob)
     }
 
-    open class Hurt(mob: Mob, val source: DamageSource, val amount: Float) : MobEvent(mob) {
+    sealed class Hurt(mob: Mob, val source: DamageSource, val amount: Float) : MobEvent(mob) {
         class SkyblockMob(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Summon(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Player(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)

@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class MountaintopConfig {
 
@@ -33,18 +34,30 @@ class MountaintopConfig {
     @ConfigOption(name = "Ubik's Cube Reminder", desc = "Reminder when the 2 hour cooldown is over for Ubik's Cube in the Rift.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("split or steal")
     var ubikReminder: Boolean = false
 
     @Expose
     @ConfigOption(name = "Ubik's Cube GUI", desc = "GUI that shows how long until Ubik's Cube is ready.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("split or steal")
     var ubikGui: Boolean = false
 
     @Expose
     @ConfigOption(name = "Only Show When Ready", desc = "Only show the Ubik's Cube GUI when it is ready.")
     @ConfigEditorBoolean
+    @SearchTag("split or steal")
     var ubikOnlyWhenReady: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Ubik's Cube Quick Close",
+        desc = "Close the Split or Steal minigame by clicking anywhere after it ends.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var ubikQuickClose: Boolean = true
 
     @Expose
     @ConfigLink(owner = MountaintopConfig::class, field = "ubikGui")

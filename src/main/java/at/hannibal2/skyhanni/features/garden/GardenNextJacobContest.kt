@@ -27,10 +27,10 @@ import at.hannibal2.skyhanni.utils.DialogUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -119,25 +119,25 @@ object GardenNextJacobContest {
 
     // This pattern covers both the tab list widget, and calendar item lore.
     /**
-     * REGEX-TEST: §e○ §7Cactus
-     * REGEX-TEST: §6☘ §7Carrot
-     * REGEX-TEST: §e○ §7Melon
-     * REGEX-TEST:  §r§6☘ §r§fMushroom
-     * REGEX-TEST:  §r§e○ §r§fPumpkin
-     * REGEX-TEST:  §r§e○ §r§fWheat
+     * REGEX-TEST: ○ Cactus
+     * REGEX-TEST: ☘ Carrot
+     * REGEX-TEST: ○ Melon
+     * REGEX-TEST:  ☘ Mushroom
+     * REGEX-TEST:  ○ Pumpkin
+     * REGEX-TEST:  ○ Wheat
      */
     private val cropPattern by patternGroup.pattern(
-        "crop",
-        " ?(?:§.)*(?:○|(?<boosted>☘)) (?:§.)*(?<crop>.*)",
+        "crop-no-color",
+        " ?(?:○|(?<boosted>☘)) (?<crop>.*)",
     )
 
     /**
-     * REGEX-TEST: §e§lJacob's Contest: §r§a19m left
-     * REGEX-TEST: §e§lJacob's Contest: §r§a8m left
+     * REGEX-TEST: Jacob's Contest: 19m left
+     * REGEX-TEST: Jacob's Contest: 8m left
      */
     private val timeLeftPattern by patternGroup.pattern(
-        "time-left",
-        "(?:§.)+Jacob's Contest: (?:§.)+(?<timeleft>\\d+[smh]+) left",
+        "time-left-no-color",
+        "Jacob's Contest: (?<timeleft>\\d+[smh]+) left",
     )
 
     @HandleEvent
@@ -192,7 +192,7 @@ object GardenNextJacobContest {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
         simpleDisplay = Renderable.vertical {
-            event.lines.forEach { addString(it) }
+            event.lines.forEach { add(Renderable.text(it)) }
             if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
             else {
                 addString("§cOpen calendar for")
@@ -206,9 +206,9 @@ object GardenNextJacobContest {
         nextContest ?: return
         val firstLine = lines.firstOrNull() ?: return
         if (timeLeftPattern.matches(firstLine)) return
-        cropPattern.matchAll(lines) {
-            if (groupOrNull("boosted") == null) return@matchAll
-            val cropType = CropType.getByNameOrNull(groupOrNull("crop") ?: return@matchAll)
+        cropPattern.matchAllComponents(lines) {
+            if (groupOrNull("boosted") == null) return@matchAllComponents
+            val cropType = CropType.getByNameOrNull(groupOrNull("crop") ?: return@matchAllComponents)
             nextContest?.boostedCrop = cropType
         }
     }
@@ -253,8 +253,8 @@ object GardenNextJacobContest {
         if (haveAllContests) return
 
         val contestsOnPage = items.mapNotNull { item ->
-            val lore = item.getLore()
-            if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) return@mapNotNull null
+            val lore = item.getLoreComponent()
+            if (!lore.any { it.string.contains("Jacob's Farming Contest") }) return@mapNotNull null
 
             val day = dayPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
                 group("day").toInt()

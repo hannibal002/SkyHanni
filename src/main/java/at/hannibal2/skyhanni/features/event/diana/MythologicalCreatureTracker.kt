@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
@@ -58,7 +59,7 @@ object MythologicalCreatureTracker {
     data class Data(
         @Expose var since: MutableMap<String, Int> = mutableMapOf(),
         @Expose var count: MutableMap<String, Int> = mutableMapOf(),
-    ) : TrackerData()
+    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
 
     var lastSinceAmount: Int? = null
 
@@ -98,7 +99,7 @@ object MythologicalCreatureTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Modify) {
+    fun onChatModify(event: SkyHanniChatEvent.Modify) {
         if (lastSinceAmount == null) return
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
@@ -112,8 +113,12 @@ object MythologicalCreatureTracker {
         tracker.modify {
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
                 if (creatureEntry == type) {
-                    val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
-                    event.replaceComponent(newComp, "diana_mobs_since")
+                    if (lastSinceAmount != null) {
+                        val newComp = event.chatComponent.copy().append(" §e($lastSinceAmount)")
+                        event.replaceComponent(newComp, "diana_mobs_since")
+                    }
+                    lastSinceAmount = null
+
                 }
             }
         }

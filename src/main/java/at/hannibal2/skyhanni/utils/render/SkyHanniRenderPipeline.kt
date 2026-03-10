@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.compat.IrisCompat
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
@@ -24,18 +26,21 @@ enum class SkyHanniRenderPipeline(
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
     depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
+    val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
-        vFormat = DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/,
+        vFormat = PosColorNormal,
         vDrawMode = VertexFormat.Mode.LINES,
+        irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
-        vFormat = DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/,
+        vFormat = PosColorNormal,
         vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
         depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     FILLED(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -90,6 +95,7 @@ enum class SkyHanniRenderPipeline(
         sampler = "textureSampler",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_OUTLINE(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
@@ -133,7 +139,23 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "textured_chroma",
         sampler = "Sampler0",
         uniforms = commonChromaUniforms,
-    ), ;
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+    ),
+    ROUNDED_RECT_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_rect_deferred",
+        depthWrite = false,
+    ),
+    ROUNDED_RECT_OUTLINE_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_rect_outline_deferred",
+        depthWrite = false,
+    ),
+    ;
 
     private val _pipe: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
@@ -160,11 +182,8 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    fun getCommonRoundedUniforms(): Map<String, UniformType> {
-        return mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
-    }
-
-    val commonChromaUniforms = mapOf(
-        "SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER,
-    )
+    fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
+    val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
+    val PosColorNormal: VertexFormat =
+        DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/
 }

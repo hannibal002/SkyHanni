@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.mining.HotmConfig.SkyMallDisplayVisibility
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
@@ -428,6 +430,16 @@ enum class HotmData(
         override var currentRotPerk = HotmApi.skymall
         override val applicableIslandType = IslandTypeTags.MINING
 
+        private val config get() = SkyHanniMod.feature.mining.hotm
+        override val position: Position get() = config.skyMallPosition
+
+        override val shouldShowDisplay
+            get() = when (config.skyMallDisplay) {
+                SkyMallDisplayVisibility.OFF -> false
+                SkyMallDisplayVisibility.MINING_ONLY -> inApplicableIsland
+                SkyMallDisplayVisibility.EVERYWHERE -> true
+            }
+
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
         val abilities =
@@ -523,12 +535,12 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: §r§299,918
-         * REGEX-TEST:  Gemstone: §r§d37,670
+         * REGEX-TEST:  Mithril: 99,918
+         * REGEX-TEST:  Gemstone: 37,670
          */
         private val powderPattern by patternGroup.pattern(
-            "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
+            "widget.powder-nocolor",
+            "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
         // </editor-fold>
 
