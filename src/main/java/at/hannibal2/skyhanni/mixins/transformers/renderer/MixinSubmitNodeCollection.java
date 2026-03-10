@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderStateStore;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
@@ -25,7 +25,7 @@ public class MixinSubmitNodeCollection<E> {
 
     @WrapOperation(method = "submitItem", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
     private boolean onSubmitItem(List<E> list, E itemCommand, Operation<Boolean> original) {
-        EntityRenderState currentState = EntityRenderDispatcherHookKt.getEntityRenderState();
+        EntityRenderState currentState = EntityRenderDispatcherHook.INSTANCE.getEntityRenderState();
         if (itemCommand instanceof GlowingStateStore casted && currentState instanceof EntityRenderStateStore stateStore && stateStore.skyhanni$isUsingCustomOutline()) {
             casted.skyhanni$setUsingCustomOutline();
         }
@@ -42,7 +42,7 @@ public class MixinSubmitNodeCollection<E> {
      */
     @Inject(method = "submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V", at = @At("HEAD"))
     private void onSubmitModelHead(Model model, Object state, PoseStack poseStack, RenderType renderType, int i, int j, int k, TextureAtlasSprite sprite, int light, ModelFeatureRenderer.CrumblingOverlay crumbling, CallbackInfo ci) {
-        EntityRenderState currentState = EntityRenderDispatcherHookKt.getEntityRenderState();
+        EntityRenderState currentState = EntityRenderDispatcherHook.INSTANCE.getEntityRenderState();
         if (currentState instanceof EntityRenderStateStore store && store.skyhanni$isUsingCustomOutline() && state != null) {
             RenderLivingEntityHelper.markModelSubmitAsCustomOutline(state);
         }

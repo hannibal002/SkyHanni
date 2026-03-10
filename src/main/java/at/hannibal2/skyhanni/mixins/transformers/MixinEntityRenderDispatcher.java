@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -19,8 +19,8 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
 
     @Inject(method = "submit", at = @At(value = "HEAD"), cancellable = true)
     public void onRenderPre(EntityRenderState renderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
-        EntityRenderDispatcherHookKt.setEntity(renderState);
-        Entity entity = EntityRenderDispatcherHookKt.getEntity();
+        EntityRenderDispatcherHook.INSTANCE.setEntity(renderState);
+        Entity entity = EntityRenderDispatcherHook.INSTANCE.getEntity();
         if (entity instanceof LivingEntity livingEntity) {
             if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
                 ci.cancel();
@@ -30,10 +30,10 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
 
     @Inject(method = "submit", at = @At(value = "RETURN"))
     public void onRenderPost(EntityRenderState entityRenderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
-        Entity entity = EntityRenderDispatcherHookKt.getEntity();
+        Entity entity = EntityRenderDispatcherHook.INSTANCE.getEntity();
         if (entity instanceof LivingEntity livingEntity) {
             new SkyHanniRenderEntityEvent.Post<>(livingEntity, d, e, f).post();
         }
-        EntityRenderDispatcherHookKt.clearEntity();
+        EntityRenderDispatcherHook.INSTANCE.clearEntity();
     }
 }

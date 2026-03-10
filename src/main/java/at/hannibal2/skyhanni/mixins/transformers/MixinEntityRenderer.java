@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHook;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -24,7 +24,7 @@ public class MixinEntityRenderer {
 
     @Inject(method = "submitNameTag", at = @At("HEAD"), cancellable = true)
     public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+        if (EntityRenderDispatcherHook.INSTANCE.getEntity() instanceof LivingEntity livingEntity) {
             if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post()) {
                 ci.cancel();
             }
@@ -33,7 +33,7 @@ public class MixinEntityRenderer {
 
     @Inject(method = "submitNameTag", at = @At("TAIL"))
     public void onRenderLabelTail(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+        if (EntityRenderDispatcherHook.INSTANCE.getEntity() instanceof LivingEntity livingEntity) {
             new SkyHanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
         }
     }

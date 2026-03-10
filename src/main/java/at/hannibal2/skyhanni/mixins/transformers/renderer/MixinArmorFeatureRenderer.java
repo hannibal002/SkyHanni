@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.HideArmorHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.HideArmorHook;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ public class MixinArmorFeatureRenderer {
     private void onRenderArmor(
         PoseStack poseStack, SubmitNodeCollector submitNodeCollector, ItemStack itemStack, EquipmentSlot slot, int i, HumanoidRenderState humanoidRenderState, CallbackInfo ci
     ) {
-        if (HideArmorHookKt.shouldHideHead(slot)) {
+        if (HideArmorHook.INSTANCE.shouldHideHead(slot)) {
             ci.cancel();
         }
     }
