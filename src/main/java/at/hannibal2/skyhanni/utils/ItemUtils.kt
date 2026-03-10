@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -911,17 +912,21 @@ object ItemUtils {
         }.toMap()
     }
 
+    private val coinSkullCache = TimeLimitedCache<Number, ItemStack>(2.minutes)
+
     // Taken from NEU
-    fun getCoinItemStack(coinAmount: Number): ItemStack {
+    fun getCoinItemStack(coinAmount: Number): ItemStack = coinSkullCache.getOrPut(coinAmount) {
         val amount = coinAmount.toDouble()
         val skull = when {
             amount >= 10000000 -> coinSkulls[COIN_TEXTURE_3]
             amount >= 100000 -> coinSkulls[COIN_TEXTURE_2]
             else -> coinSkulls[COIN_TEXTURE_1]
         } ?: coinSkulls.entries.first().value
-        skull.setCustomItemName(amount.formatCoin() + " Coins")
-        skull.extraAttributes = skull.extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
-        return skull
+
+        return skull.copy().apply {
+            setCustomItemName(amount.formatCoin() + " Coins")
+            extraAttributes = extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
+        }
     }
 
     fun ItemStack.isSkull(): Boolean {
