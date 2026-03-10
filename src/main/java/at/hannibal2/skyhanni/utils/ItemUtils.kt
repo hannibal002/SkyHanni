@@ -916,6 +916,7 @@ object ItemUtils {
 
     // Taken from NEU
     fun getCoinItemStack(coinAmount: Number): ItemStack = coinSkullCache.getOrPut(coinAmount) {
+        ChatUtils.debug("Generating coin skull for amount ${coinAmount.addSeparators()}")
         val amount = coinAmount.toDouble()
         val skull = when {
             amount >= 10000000 -> coinSkulls[COIN_TEXTURE_3]
@@ -923,7 +924,7 @@ object ItemUtils {
             else -> coinSkulls[COIN_TEXTURE_1]
         } ?: coinSkulls.entries.first().value
 
-        return skull.copy().apply {
+        skull.copy().apply {
             setCustomItemName(amount.formatCoin() + " Coins")
             extraAttributes = extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
         }
