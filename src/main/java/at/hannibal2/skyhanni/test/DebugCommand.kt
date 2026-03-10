@@ -23,9 +23,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -147,7 +145,7 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(1)) {
+            with(PlayerUtils.blockPosition()) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
