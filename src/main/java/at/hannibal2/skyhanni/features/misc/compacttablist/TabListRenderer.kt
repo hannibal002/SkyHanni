@@ -13,12 +13,14 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object TabListRenderer {
@@ -32,13 +34,10 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (GlobalRender.renderDisabled) return
-        if (event.type != RenderLayer.PLAYER_LIST) return
-        if (!config.enabled.get()) return
+        if (GlobalRender.renderDisabled || event.type != RenderLayer.PLAYER_LIST || !config.enabled.get()) return
         event.cancel()
 
         if (config.toggleTab) return
-
         drawTabList()
     }
 
@@ -47,23 +46,18 @@ object TabListRenderer {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (GlobalRender.renderDisabled) return
-        if (!config.enabled.get()) return
-        if (!config.toggleTab) return
+        if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
         if (Minecraft.getInstance().screen != null) return
 
-        if (Minecraft.getInstance().options.keyPlayerList.isActive()) {
-            if (!isPressed) {
-                isPressed = true
-                isTabToggled = !isTabToggled
-            }
-        } else {
+        val playerListKeyActive = Minecraft.getInstance().options.keyPlayerList.isActive()
+        if (playerListKeyActive && !isPressed) {
+            isPressed = true
+            isTabToggled = !isTabToggled
+        } else if (!playerListKeyActive) {
             isPressed = false
         }
 
-        if (isTabToggled) {
-            drawTabList()
-        }
+        if (isTabToggled) drawTabList()
     }
 
     private fun drawTabList() {
@@ -81,20 +75,15 @@ object TabListRenderer {
 
         var totalHeight = maxLines * LINE_HEIGHT
 
-        var header = listOf<String>()
-
-        if (!config.hideAdverts) {
-            header = TabListData.getHeader().split("\n").toMutableList()
-            header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            totalHeight += header.size * LINE_HEIGHT + TAB_PADDING
-        }
-
-        var footer = listOf<String>()
-
-        if (!config.hideAdverts) {
-            footer = TabListData.getFooter().split("\n").toMutableList()
-            footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            totalHeight += footer.size * LINE_HEIGHT + TAB_PADDING
+        val (header, footer) = listOf(
+            TabListData.header,
+            TabListData.footer,
+        ).map { component ->
+            val componentHeader: Component = component ?: Component.empty()
+            val componentLines = TextHelper.split(componentHeader, "\n") ?: listOf(componentHeader)
+            val filteredLines = componentLines.filter { line -> line.string.contains(TabListReader.hypixelAdvertisingString) }
+            totalHeight += filteredLines.size * LINE_HEIGHT + TAB_PADDING
+            filteredLines.toMutableList()
         }
 
         val minecraft = Minecraft.getInstance()
@@ -102,15 +91,13 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        if (!config.hideTabBackground) {
-            GuiRenderUtils.drawRect(
-                x - COLUMN_SPACING,
-                y - TAB_PADDING,
-                screenWidth + totalWidth / 2 + COLUMN_SPACING,
-                10 + totalHeight + TAB_PADDING,
-                -0x80000000,
-            )
-        }
+        if (!config.hideTabBackground) GuiRenderUtils.drawRect(
+            x - COLUMN_SPACING,
+            y - TAB_PADDING,
+            screenWidth + totalWidth / 2 + COLUMN_SPACING,
+            10 + totalHeight + TAB_PADDING,
+            -0x80000000,
+        )
 
         var headerY = y
         if (header.isNotEmpty()) {
@@ -182,23 +169,14 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
 
-                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
-                if (text.contains("§l")) text = "§r$text"
-                if (tabLine.type == TabStringType.TITLE) {
-                    GuiRenderUtils.drawString(
-                        text,
-                        middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
-                        middleY.toFloat(),
-                        -1,
-                    )
+                val drawX = middleX + if (tabLine.type == TabStringType.TITLE) column.getMaxWidth() / 2f - tabLine.getWidth() / 2f else 0f
+                val drawY = middleY.toFloat()
+                if (AdvancedPlayerList.ignoreCustomTabList() || tabLine.customName == null) {
+                    GuiRenderUtils.drawString(tabLine.component, drawX, drawY, -1)
                 } else {
-                    GuiRenderUtils.drawString(
-                        text,
-                        middleX.toFloat(),
-                        middleY.toFloat(),
-                        -1,
-                    )
+                    GuiRenderUtils.drawString(tabLine.customName, drawX, drawY, -1)
                 }
+
                 middleY += LINE_HEIGHT
                 middleX = savedX
             }
@@ -213,7 +191,7 @@ object TabListRenderer {
 
     @HandleEvent
     fun onSkipTablistLine(event: SkipTabListLineEvent) {
-        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
+        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.component)) {
             event.cancel()
         }
     }
