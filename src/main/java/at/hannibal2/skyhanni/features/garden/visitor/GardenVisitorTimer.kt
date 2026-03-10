@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -14,15 +13,12 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -41,12 +37,12 @@ object GardenVisitorTimer {
     private val config get() = VisitorApi.config.timer
 
     /**
-     * REGEX-TEST:  Next Visitor: §r§b11m
-     * REGEX-TEST:  Next Visitor: §r§c§lQueue Full!
+     * REGEX-TEST:  Next Visitor: 11m
+     * REGEX-TEST:  Next Visitor: Queue Full!
      */
     private val timePattern by RepoPattern.pattern(
-        "garden.visitor.timer.time.new",
-        " Next Visitor: §r(?<info>.*)",
+        "garden.visitor.timer.time.new.colorless",
+        " Next Visitor: (?<info>.*)",
     )
 
     private var display: Renderable? = null
@@ -58,8 +54,7 @@ object GardenVisitorTimer {
     private var lastTimerUpdate = SimpleTimeMark.farPast()
     private var lastVisitors: Int = -1
 
-    // TODO nea?
-    // private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    // TODO do this some day: private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
@@ -68,52 +63,68 @@ object GardenVisitorTimer {
             }
         }
 
-    @HandleEvent
-    fun onVisitorArrival(event: VisitorArrivalEvent) {
+    @HandleEvent(VisitorArrivalEvent::class)
+    fun onVisitorArrival() {
         visitorJustArrived = true
     }
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         display = null
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
     }
 
-    // TODO split up into multiple smaller functions
-    @Suppress("CyclomaticComplexMethod")
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        var visitorsAmount = VisitorApi.visitorsInTabList(TabListDataComponent.getTabList()).size
-        var visitorInterval = visitorInterval ?: return
-        var millis = visitorInterval
-        var queueFull = false
+    private data class TabUpdateContext(
+        var visitorsAmount: Int,
+        var millis: Duration,
+        var queueFull: Boolean,
+    )
 
-        timePattern.firstMatcher(TabListData.getTabList()) {
-            val timeInfo = group("info").removeColor()
-            if (timeInfo == "Not Unlocked!") {
-                display = Renderable.text("§cVisitors not unlocked!")
-                return
-            }
-            if (timeInfo == "Queue Full!") {
-                queueFull = true
-            } else {
-                if (lastTimerValue != timeInfo) {
-                    lastTimerUpdate = SimpleTimeMark.now()
-                    lastTimerValue = timeInfo
-                }
-                millis = TimeUtils.getDuration(timeInfo)
-            }
-        } ?: run {
-            display = createDisplayText("§cVisitor time info not in tab list")
-            return
+    private fun TabListUpdateEvent.readTimePattern(
+        context: TabUpdateContext
+    ): Boolean = timePattern.firstComponentMatcher(tabList) {
+        val timeInfo = group("info")
+        if (timeInfo == "Not Unlocked!") {
+            display = Renderable.text("§cVisitors not unlocked!")
+            return false
         }
+        if (timeInfo == "Queue Full!") {
+            context.queueFull = true
+        } else {
+            if (lastTimerValue != timeInfo) {
+                lastTimerUpdate = SimpleTimeMark.now()
+                lastTimerValue = timeInfo
+            }
+            context.millis = TimeUtils.getDuration(timeInfo)
+        }
+        true
+    } ?: run {
+        display = createDisplayText("§cVisitor time info not in tab list")
+        return false
+    }
 
+    @HandleEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        val visitorInterval = visitorInterval ?: return
+        val context = TabUpdateContext(
+            visitorsAmount = VisitorApi.visitorsInTabList(event.tabList).size,
+            millis = visitorInterval,
+            queueFull = false,
+        )
+
+        if (!event.readTimePattern(context)) return
+        context.processUpdates()
+    }
+
+    // Todo split up into smaller functions
+    @Suppress("CyclomaticComplexMethod")
+    private fun TabUpdateContext.processUpdates() {
         if (lastVisitors != -1 && visitorsAmount - lastVisitors == 1) {
             if (!queueFull) {
                 visitorInterval = millis
-                this.visitorInterval = visitorInterval
+                visitorInterval = visitorInterval
             } else {
                 updateSixthVisitorArrivalTime()
             }
@@ -126,6 +137,7 @@ object GardenVisitorTimer {
             }
             millis = sixthVisitorArrivalTime.timeUntil()
 
+            val visitorInterval = visitorInterval ?: return
             val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
             GardenApi.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
             if (millis.isNegative()) {
@@ -213,8 +225,8 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @HandleEvent
-    fun onCropClick(event: CropClickEvent) {
+    @HandleEvent(CropClickEvent::class)
+    fun onCropClick() {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
 
@@ -224,8 +236,8 @@ object GardenVisitorTimer {
         }
     }
 
-    @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
+    @HandleEvent(PestKillEvent::class)
+    fun onPestKill() {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 30.seconds
 

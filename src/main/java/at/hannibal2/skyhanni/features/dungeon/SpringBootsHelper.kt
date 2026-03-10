@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -34,7 +34,7 @@ object SpringBootsHelper {
             soundStreak = 0
             return
         }
-        if (!MinecraftCompat.localPlayer.isShiftKeyDown) return
+        if (!PlayerUtils.isSneaking()) return
         soundStreak += 1
 
         if (soundStreak == 5) {

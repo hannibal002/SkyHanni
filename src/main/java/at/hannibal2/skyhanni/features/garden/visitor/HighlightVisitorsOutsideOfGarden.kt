@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.entity.Entity
@@ -65,8 +65,8 @@ object HighlightVisitorsOutsideOfGarden {
 
     // TODO: optimize to not get entities every second
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!config.highlightVisitors) return
         val color = LorenzColor.DARK_RED.toColor().addAlpha(50)
         EntityUtils.getEntities<LivingEntity>()
@@ -89,7 +89,7 @@ object HighlightVisitorsOutsideOfGarden {
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
-        if (MinecraftCompat.localPlayer.isShiftKeyDown) return
+        if (PlayerUtils.isSneaking()) return
         val entity = event.clickedEntity
         if (isVisitor(entity) || (entity is ArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             ChatUtils.chatAndOpenConfig(

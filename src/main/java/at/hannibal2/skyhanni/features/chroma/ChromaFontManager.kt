@@ -9,6 +9,9 @@ var renderingChat: Boolean = false
 private val textColor = TextColor(0xFFFFFF, "chroma")
 private val textColorOffWhite = TextColor(0xFFFFFE, "chroma")
 var glyphIsChroma = false
+// Unicode private use area character used to preview SkyHanni's chroma,
+// avoids the 'z' color code to stop other mods styling our preview text.
+const val CHROMA_PREVIEW_COLOR_CODE = '\uE002'
 
 fun checkIfGlyphIsChroma(drawnGlyph: GlyphInstance) {
     if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return
@@ -19,7 +22,7 @@ fun checkIfGlyphIsChroma(drawnGlyph: GlyphInstance) {
 
 fun setChromaColorStyle(style: Style, text: String, colorCode: Char): Style {
     if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
-    if (colorCode.lowercaseChar() == 'z') {
+    if (colorCode.lowercaseChar() == 'z' || colorCode == CHROMA_PREVIEW_COLOR_CODE) {
         return Style.EMPTY.withColor(textColor)
     }
     return style

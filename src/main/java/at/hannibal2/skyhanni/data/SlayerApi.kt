@@ -3,31 +3,33 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 
@@ -53,6 +55,7 @@ object SlayerApi {
 
     // for an enum, use activeType
     var latestCategory = ""
+    var tier = 0
 
     var latestWrongAreaWarning = SimpleTimeMark.farPast()
 
@@ -64,9 +67,7 @@ object SlayerApi {
     /**
      * What slayer type should be fought in the current area we are in
      */
-    val currentAreaType by RecalculatingValue(500.milliseconds) {
-        checkTypeForCurrentArea()
-    }
+    var currentAreaType: SlayerType? = null
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -124,7 +125,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" graph area: ${SkyBlockUtils.graphArea}")
-                with(MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(1)) {
+                with(PlayerUtils.blockPosition()) {
                     add(" /shtestwaypoint $x $y $z pathfind")
                 }
             }
@@ -158,26 +159,31 @@ object SlayerApi {
         val lines = getSlayerLines()
 
         val slayerQuest = lines.getOrNull(1).orEmpty()
+        val slayerProgress = lines.getOrNull(2).orEmpty()
+        if (event.isMod(5) || slayerQuest != latestCategory || latestProgress != slayerProgress) {
+            updateArea()
+        }
         if (slayerQuest != latestCategory) {
             val old = latestCategory
             latestCategory = slayerQuest
+            tier = slayerQuest.split(" ").lastOrNull()?.romanToDecimalIfNecessary()
+                ?: error(("latestCategory does not contain roman number or int: '$slayerQuest'"))
             SlayerChangeEvent(old, latestCategory).post()
         }
 
-        val slayerProgress = lines.getOrNull(2).orEmpty()
         if (latestProgress != slayerProgress) {
             SlayerProgressChangeEvent(latestProgress, slayerProgress).post()
             latestProgress = slayerProgress
         }
+    }
 
-        if (event.isMod(5)) {
-            if (SkyBlockUtils.isStrandedProfile) {
-                isInAnyArea = true
-                isInCorrectArea = true
-            } else {
-                isInAnyArea = currentAreaType != null
-                isInCorrectArea = currentAreaType == activeType && currentAreaType != null
-            }
+    private fun updateArea() {
+        if (SkyBlockUtils.isStrandedProfile) {
+            isInAnyArea = true
+            isInCorrectArea = true
+        } else {
+            isInAnyArea = currentAreaType != null
+            isInCorrectArea = currentAreaType == activeType && currentAreaType != null
         }
     }
 
@@ -239,9 +245,25 @@ object SlayerApi {
         else -> ActiveQuestState.NO_ACTIVE_QUEST
     }
 
+    @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
+    fun onAreaChange() {
+        currentAreaType = checkTypeForCurrentArea()
+        updateArea()
+    }
+
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        with(trackerConfig) {
+            ConditionalUtils.onToggle(revenantInGraveyard, voidgloomInNest, voidgloomInNoArea) {
+                currentAreaType = checkTypeForCurrentArea()
+                updateArea()
+            }
+        }
+    }
+
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
-        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isCurrent()) Type.REVENANT else null
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isCurrent()) Type.REVENANT else null
         "Revenant Cave" -> Type.REVENANT
 
         "Spider Mound",
@@ -260,11 +282,11 @@ object SlayerApi {
         "Zealot Bruiser Hideout",
         -> Type.VOID
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isCurrent()) Type.VOID else null
-        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isCurrent()) Type.VOID else null
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
+        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
 
         "Stronghold",
-        "The Wasteland",
+        "The Wasteland", // TODO check if we can remove this
         "Smoldering Tomb",
         -> Type.INFERNO
 

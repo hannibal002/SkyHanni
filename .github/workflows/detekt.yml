@@ -2,6 +2,7 @@ name: Detekt
 
 on:
     pull_request_target:
+        types: [opened, synchronize, reopened]
         branches:
             - "*"
     workflow_dispatch:

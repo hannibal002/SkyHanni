@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.hotx
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -37,6 +38,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     protected abstract val notUnlockedPattern: Pattern
     protected abstract val heartItemPattern: Pattern
     protected abstract val resetItemPattern: Pattern
+    abstract val position: Position
+    abstract val shouldShowDisplay: Boolean
 
     /**
      * Needs a group "token" (only digits)

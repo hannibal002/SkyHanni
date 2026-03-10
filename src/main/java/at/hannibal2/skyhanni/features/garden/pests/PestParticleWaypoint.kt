@@ -12,12 +12,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -44,7 +45,7 @@ object PestParticleWaypoint {
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (MinecraftCompat.localPlayer.isShiftKeyDown) return
+        if (PlayerUtils.isSneaking()) return
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
     }
@@ -70,6 +71,7 @@ object PestParticleWaypoint {
         val pos = event.location
 
         if (bezierFitter.isEmpty()) {
+            if (pos.distance(LocationUtils.playerLocation()) > 5) return
             bezierFitter.addPoint(pos)
             return
         }

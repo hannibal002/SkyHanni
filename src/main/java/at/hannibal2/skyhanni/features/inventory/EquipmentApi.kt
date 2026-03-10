@@ -39,6 +39,12 @@ object EquipmentApi {
     private val equipment get() = if (RiftApi.inRift()) storage?.riftSlots else storage?.slots
 
     fun getEquipment(slot: EquipmentSlot): ItemStack? = equipment?.get(slot.ordinal)
+
+    fun getSlots(): Map<EquipmentSlot, ItemStack?> =
+        EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
+
+    fun getAll(): List<ItemStack> = equipment?.filterNotNull() ?: emptyList()
+
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) = equipment?.set(slot.ordinal, itemStack)
 
     private val repoGroup = RepoPattern.group("data.equipment")

@@ -10,9 +10,11 @@ class GraphingNode(
     override var position: LorenzVec,
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
+    var extraWeight: Int = 0,
 ) : GraphUtils.GenericNode {
 
     var rendering = true
+    var enabled = true
 
     override fun hashCode(): Int {
         return id
