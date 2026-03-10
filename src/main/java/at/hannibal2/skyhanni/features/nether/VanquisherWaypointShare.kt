@@ -50,7 +50,7 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val vanquisherSharedPattern by patternGroup.list(
         "share",
-        "^(?<channel>Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*"
+        "^(?<channel>Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*",
     )
 
     /**
@@ -60,7 +60,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherDiedPattern by patternGroup.pattern(
         "died",
-        "^(?<channel>.*> )?(?<playerName>[^:]+): Vanquisher dead!.*"
+        "^(?<channel>.*> )?(?<playerName>[^:]+): Vanquisher dead!.*",
     )
 
     /**
@@ -69,7 +69,7 @@ object VanquisherWaypointShare {
 
     private val vanquisherSpawnedPattern by patternGroup.pattern(
         "spawned",
-        ".*A Vanquisher is spawning nearby!"
+        ".*A Vanquisher is spawning nearby!",
     )
 
     private var myVanquisherId: Int? = null
@@ -102,7 +102,7 @@ object VanquisherWaypointShare {
             sharedWaypoints[playerName] = SharedVanquisher(
                 playerName,
                 entity.getLorenzVec(),
-                SimpleTimeMark.now()
+                SimpleTimeMark.now(),
             )
         }
 
@@ -292,17 +292,17 @@ object VanquisherWaypointShare {
                     location = waypoint.location,
                     color = beaconColor,
                     seeThroughBlocks = true,
-                    beacon = false
+                    beacon = false,
                 )
                 event.renderBeaconBeam(
                     waypoint.location,
-                    beaconColor.rgb
+                    beaconColor.rgb,
                 )
                 event.drawLineToEye(
                     location = waypoint.location,
                     color = beaconColor,
                     lineWidth = 3,
-                    depth = false
+                    depth = false,
                 )
             }
         }
