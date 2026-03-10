@@ -67,22 +67,21 @@ object MobHighlight {
     // Normalize a mob name argument by stripping surrounding quotes (single or double) if present.
     private fun normalizeMobArg(input: String): String {
         val trimmed = input.trim()
-        if (trimmed.length >= 2) {
-            val first = trimmed.first()
-            val last = trimmed.last()
-            if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
-                return trimmed.substring(1, trimmed.length - 1)
-            }
+        if (trimmed.length < 2) return trimmed
+        val first = trimmed.first()
+        val last = trimmed.last()
+        if ((first == '"' && last == '"') || (first == '\'' && last == '\'')) {
+            return trimmed.substring(1, trimmed.length - 1)
         }
         return trimmed
     }
 
-    private fun getMobNameSuggestions(): Collection<String> =
-        MobData.skyblockMobs.map { it.name }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .sorted()
-            .map { quoteIfNeeded(it) }
+    private fun getMobNameSuggestions(): Collection<String> = MobData.skyblockMobs.asSequence()
+        .map { it.name }
+        .filter { it.isNotBlank() }
+        .distinct()
+        .sorted()
+        .map { quoteIfNeeded(it) }.toList()
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -158,6 +157,7 @@ object MobHighlight {
 
             entity.isZealotOrBruiser() ->
                 Triple(LorenzColor.DARK_AQUA, 127, config::zealotBruiserHighlighter)
+
             else -> return
         }
 
@@ -186,7 +186,6 @@ object MobHighlight {
     private fun LivingEntity.isZealotOrBruiser() = baseMaxHealth == 13_000 || baseMaxHealth == 65_000 ||
         baseMaxHealth == 13_000 * 4 || baseMaxHealth == 65_000 * 4 // runic
 
-
     @HandleEvent
     fun registerCommand(event: CommandRegistrationEvent) {
         event.registerBrigadier("shmobhighlight") {
@@ -208,7 +207,11 @@ object MobHighlight {
                             }
                             customHighlights[mobName] = color
                             applyCustomHighlightToExisting(mobName, color)
-                            ChatUtils.chat("Now highlighting §a$mobName§7 with color ${color.getChatColor()}${color.name.lowercase().replace('_', '-')}§7.")
+                            ChatUtils.chat(
+                                "Now highlighting §a$mobName§7 with color ${color.getChatColor()}${
+                                    color.name.lowercase().replace('_', '-')
+                                }§7.",
+                            )
                         }
                     }
                     // without color, defaults to GREEN
@@ -224,7 +227,11 @@ object MobHighlight {
 
             // /shmobhighlight remove <mob>
             literal("remove") {
-                arg("mob", BrigadierArguments.string(), dynamicSuggestionProvider { customHighlights.keys.sorted().map { quoteIfNeeded(it) } }) { mobArg ->
+                arg(
+                    "mob",
+                    BrigadierArguments.string(),
+                    dynamicSuggestionProvider { customHighlights.keys.sorted().map { quoteIfNeeded(it) } },
+                ) { mobArg ->
                     callback {
                         val mobName = normalizeMobArg(getArg(mobArg))
                         if (customHighlights.remove(mobName) != null) {
