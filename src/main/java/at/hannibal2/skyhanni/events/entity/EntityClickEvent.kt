@@ -7,5 +7,13 @@ import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 
-class EntityClickEvent(clickType: ClickType, val action: MinecraftInputHook.ActionType, val clickedEntity: Entity, itemInHand: ItemStack?) :
-    WorldClickEvent(itemInHand, clickType)
+class EntityClickEvent(clickType: ClickType, val action: ActionType, val clickedEntity: Entity, itemInHand: ItemStack?) :
+    WorldClickEvent(itemInHand, clickType) {
+
+
+    enum class ActionType {
+        INTERACT,
+        ATTACK,
+        INTERACT_AT,
+    }
+}

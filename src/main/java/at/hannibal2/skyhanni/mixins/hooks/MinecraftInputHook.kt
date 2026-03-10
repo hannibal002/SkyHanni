@@ -18,7 +18,7 @@ object MinecraftInputHook {
         handleClick(
             hitResult,
             ClickType.RIGHT_CLICK,
-            ActionType.INTERACT_AT,
+            EntityClickEvent.ActionType.INTERACT_AT,
         )
 
     @JvmStatic
@@ -26,7 +26,7 @@ object MinecraftInputHook {
         handleClick(
             hitResult,
             ClickType.LEFT_CLICK,
-            ActionType.ATTACK,
+            EntityClickEvent.ActionType.ATTACK,
         )
 
     @JvmStatic
@@ -54,7 +54,7 @@ object MinecraftInputHook {
     private fun handleClick(
         hitResult: HitResult?,
         clickType: ClickType,
-        entityAction: ActionType,
+        entityAction: EntityClickEvent.ActionType,
     ): Boolean {
         if (hitResult == null) return false
 
@@ -88,11 +88,5 @@ object MinecraftInputHook {
                 }.post()
             }
         }
-    }
-
-    enum class ActionType {
-        INTERACT,
-        ATTACK,
-        INTERACT_AT,
     }
 }

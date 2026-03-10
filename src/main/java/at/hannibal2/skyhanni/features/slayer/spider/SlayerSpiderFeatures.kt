@@ -33,7 +33,7 @@ object SlayerSpiderFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
-        if (event.action != MinecraftInputHook.ActionType.ATTACK) return
+        if (event.action != EntityClickEvent.ActionType.ATTACK) return
         val mob = event.clickedEntity.mob ?: return
         if (mob in allTier) {
             lastClicked = mob

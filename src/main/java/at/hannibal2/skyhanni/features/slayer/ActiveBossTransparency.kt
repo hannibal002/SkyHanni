@@ -39,7 +39,7 @@ object ActiveBossTransparency {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
-        if (event.action != MinecraftInputHook.ActionType.ATTACK) return
+        if (event.action != EntityClickEvent.ActionType.ATTACK) return
         val mob = event.clickedEntity.mob ?: return
 
         lastClickedMob = mob
