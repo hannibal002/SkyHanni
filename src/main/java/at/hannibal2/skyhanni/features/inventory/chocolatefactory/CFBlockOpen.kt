@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
@@ -18,10 +20,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -70,7 +72,7 @@ object CFBlockOpen {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val slotDisplayName = event.slot?.stack?.displayName ?: return
+        val slotDisplayName = event.slot?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
@@ -119,7 +121,7 @@ object CFBlockOpen {
                     action = {
                         HypixelCommands.warp("hub")
                         EntityMovementData.onNextTeleport(IslandType.HUB) {
-                            IslandGraphs.pathFind(LorenzVec(-32.5, 71.0, -76.5), "§aBazaar", condition = { true })
+                            IslandGraphs.node("Bazaar", GraphNodeTag.NPC).pathFind("§aBazaar", condition = { true })
                         }
                     },
                 )

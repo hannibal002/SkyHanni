@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.jerry
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.MobEvent
@@ -17,7 +18,8 @@ object HighlightJerries {
 
     private val config get() = SkyHanniMod.feature.event.jerry
 
-    /** REGEX-TEST: Blue Jerry
+    /**
+     * REGEX-TEST: Blue Jerry
      */
     private val jerryPattern by RepoPattern.pattern("jerry.highlight", "(?<color>\\w+) Jerry")
 

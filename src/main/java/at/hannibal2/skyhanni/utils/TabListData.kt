@@ -1,162 +1,86 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
+import at.hannibal2.skyhanni.mixins.hooks.tabListGuarded
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
-import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.Minecraft
-import net.minecraft.client.network.NetworkPlayerInfo
-import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
+import net.minecraft.world.level.GameType
 import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.16
-import net.minecraft.world.WorldSettings
-//#else
-//$$ import net.minecraft.world.level.GameType
-//#endif
 
 @SkyHanniModule
 object TabListData {
-    private var tablistCache = emptyList<String>()
-    private var debugCache: List<String>? = null
+    private val playerOrdering = Ordering.from(TabPlayerComparator())
 
-    private var header = ""
-    private var footer = ""
+    @Environment(EnvType.CLIENT)
+    internal class TabPlayerComparator : Comparator<PlayerInfo> {
+        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int = ComparisonChain.start()
+            .compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
+            .compare(o1.team?.name.orEmpty(), o2.team?.name.orEmpty())
+            .compare(o1.profile.name, o2.profile.name).result()
+    }
 
+    private var tablistCache = emptyList<Component>()
+    private var dirty = false
+
+    var header: Component? = null
+        private set
+    var footer: Component? = null
+        private set
     var fullyLoaded = false
+        internal set
 
-    // TODO replace with TabListUpdateEvent
-    @Deprecated("replace with TabListUpdateEvent")
-    fun getTabList() = debugCache ?: tablistCache
-    fun getHeader() = header
-    fun getFooter() = footer
+    private suspend fun copyCommand(asComponents: Boolean = true) {
+        fun Component?.localCopyFormat() = if (asComponents) this?.toString().orEmpty() else this?.formattedTextCompat().orEmpty()
 
-    @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Tab List Debug Cache")
-        debugCache?.let {
-            event.addData {
-                add("debug active!")
-                add("lines: (${it.size})")
-                for (line in it) {
-                    add(" '$line'")
-                }
+        val tabHeader = header.localCopyFormat()
+        val tabFooter = footer.localCopyFormat()
+        val joinedResults = tablistCache.joinToString("\n") {
+            val line = if (asComponents) it.toString() else it.formattedTextCompat()
+            if (it.string == "") " " else line
+        }
+        val widgets = TabWidget.entries.filter { it.isActive }.joinToString("\n") {
+            val widgetFormat = it.lines.joinToString { line ->
+                if (asComponents) line.toString() else line.formattedTextCompat()
             }
-        } ?: event.addIrrelevant("not active.")
+            "\n${it.name} : \n$widgetFormat"
+        }
+
+        val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+        val copied = OSUtils.copyToClipboardAsync(outputString) ?: false
+        if (!copied) return ChatUtils.chat("Failed to copy tab list data to clipboard!")
+
+        val copyFormat = if (asComponents) "components" else "formatted text"
+        ChatUtils.chat("Tab list $copyFormat copied into the clipboard!")
     }
 
-    private fun toggleDebug() {
-        if (debugCache != null) {
-            ChatUtils.chat("Disabled tab list debug.")
-            debugCache = null
-            return
-        }
-        SkyHanniMod.launchCoroutine {
-            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
-            debugCache = clipboard.lines()
-            ChatUtils.chat("Enabled tab list debug with your clipboard.")
-        }
-    }
-
-    private fun copyCommand(noColor: Boolean) {
-        if (debugCache != null) {
-            ChatUtils.clickableChat(
-                "Tab list debug is enabled!",
-                onClick = { toggleDebug() },
-                "§eClick to disable!",
-            )
-            return
-        }
-
-        val resultList = mutableListOf<String>()
-        for (line in getTabList()) {
-            val tabListLine = line.transformIf({ noColor }) { removeColor() }
-            if (tabListLine != "") resultList.add("'$tabListLine'")
-        }
-
-        val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
-        val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
-
-        val widgets = TabWidget.entries.filter { it.isActive }
-            .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
-        val string =
-            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
-
-        OSUtils.copyToClipboard(string)
-        ChatUtils.chat("Tab list copied into the clipboard!")
-    }
-
-    private val playerOrdering = Ordering.from(PlayerComparator())
-
-    @SideOnly(Side.CLIENT)
-    internal class PlayerComparator : Comparator<NetworkPlayerInfo> {
-
-        override fun compare(o1: NetworkPlayerInfo, o2: NetworkPlayerInfo): Int {
-            val team1 = o1.playerTeam
-            val team2 = o2.playerTeam
-            return ComparisonChain.start().compareTrueFirst(
-                //#if MC < 1.16
-                o1.gameType != WorldSettings.GameType.SPECTATOR,
-                o2.gameType != WorldSettings.GameType.SPECTATOR,
-                //#else
-                //$$ o1.gameMode != GameType.SPECTATOR,
-                //$$ o2.gameMode != GameType.SPECTATOR,
-                //#endif
-            )
-                .compare(
-                    if (team1 != null) team1.registeredName else "",
-                    if (team2 != null) team2.registeredName else ""
-                )
-                .compare(o1.gameProfile.name, o2.gameProfile.name).result()
-        }
-    }
-
-    private fun readTabList(): List<String>? {
+    private fun readTabList(): List<Component>? {
         val player = MinecraftCompat.localPlayerOrNull ?: return null
-        //#if MC < 1.16
-        val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
-        //#else
-        //$$ val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
-        //#endif
-        val result = mutableListOf<String>()
-        tabListGuard = true
-        for (info in players) {
-            val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            //#if MC < 1.16
-            result.add(name.stripHypixelMessage())
-            //#else
-            //$$ result.add(name.formattedTextCompat().stripHypixelMessage())
-            //#endif
+        val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
+        val result = tabListGuarded {
+            players.map(it::getNameForDisplay)
         }
-        tabListGuard = false
         return if (result.size < 80) result.dropLast(1)
         else result.subList(0, 80)
     }
 
-    var dirty = false
-
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        if (event.packet is S38PacketPlayerListItem) {
-            dirty = true
-        }
+        if (event.packet is ClientboundPlayerInfoUpdatePacket) dirty = true
     }
 
     @HandleEvent
@@ -164,48 +88,38 @@ object TabListData {
         if (!dirty) return
         dirty = false
 
-        val tabList = readTabList() ?: return
-        if (tablistCache != tabList) {
-            tablistCache = tabList
-            TabListUpdateEvent(getTabList()).post()
-            if (!SkyBlockUtils.onHypixel) {
-                workaroundDelayedTabListUpdateAgain()
-            }
-        }
+        val newTablistCache = readTabList()?.let { newTabList ->
+            if (!SkyBlockUtils.onHypixel) DelayedRun.runDelayedReturning(2.seconds) {
+                if (SkyBlockUtils.onHypixel) {
+                    println("workaroundDelayedTabListUpdateAgain")
+                    newTabList.also { TabListUpdateEvent(it).post() }
+                } else tablistCache
+            }.second() else newTabList
+        }?.takeIf { it != tablistCache } ?: return
+        tablistCache = newTablistCache
+        TabListUpdateEvent(newTablistCache).post()
 
-        val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedText.orEmpty()
-
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
-        if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).post()
-        }
-        footer = tabFooter
-    }
-
-    private fun workaroundDelayedTabListUpdateAgain() {
-        DelayedRun.runDelayed(2.seconds) {
-            if (SkyBlockUtils.onHypixel) {
-                println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).post()
-            }
+        val tabListOverlay = Minecraft.getInstance().gui.tabList
+        header = tabListOverlay.header
+        val newFooter = tabListOverlay.footer
+        if (newFooter != footer) {
+            footer = newFooter
+            if (newFooter == null || newFooter.string.isEmpty()) return
+            TablistFooterUpdateEvent(newFooter).post()
         }
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shtesttablist") {
-            description = "Set your clipboard as a fake tab list."
-            category = CommandCategory.DEVELOPER_TEST
-            simpleCallback { toggleDebug() }
-        }
-        event.registerBrigadier("shcopytablist") {
+        event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            arg("nocolor", BrigadierArguments.bool()) { noColor ->
-                callback { copyCommand(getArg(noColor)) }
-            }
-            simpleCallback { copyCommand(false) }
+            coroutineSimpleCallback { copyCommand() }
+        }
+        event.registerBrigadier("shcopytablist") {
+            description = "Copies the tab list body to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            coroutineSimpleCallback { copyCommand(asComponents = false) }
         }
     }
 }

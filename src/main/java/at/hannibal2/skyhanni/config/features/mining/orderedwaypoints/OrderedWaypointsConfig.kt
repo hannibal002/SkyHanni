@@ -77,6 +77,11 @@ class OrderedWaypointsConfig {
     var showDistance: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Show Name", desc = "Whether the name for ordered waypoints should be shown.")
+    @ConfigEditorBoolean
+    var showName: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Setup Mode", desc = "Setup mode for route clearing.")
     @ConfigEditorBoolean
     var setupMode: Boolean = false
@@ -120,4 +125,36 @@ class OrderedWaypointsConfig {
     @ConfigOption(name = "All Waypoint Color", desc = "Color used for waypoints when using show all mode.")
     @ConfigEditorColour
     var showAllWaypointColor: ChromaColour = ChromaColour.fromStaticRGB(0, 255, 0, 102)
+
+    @Expose
+    @ConfigOption(
+        name = "Auto Unload",
+        desc = "Automatically unloads route when changing Islands (Including Mineshafts)."
+    )
+    @ConfigEditorBoolean
+    var autoUnload: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-Load Shaft Routes",
+        desc = "Automatically loads a matching route if found when entering a Mineshaft. (format is from the Scoreboard e.g. Jasp_1/Peri_C)"
+    )
+    @ConfigEditorBoolean
+    var autoLoadMatchingShaftRoute: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto unload Mineshaft",
+        desc = "Automatically unloads SHO route when leaving mineshafts."
+    )
+    @ConfigEditorBoolean
+    var autoUnloadWhenLeavingMineshaft: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Auto-Skip Forward",
+        desc = "Automatically skip forward when reaching a waypoint further down in the route.",
+    )
+    @ConfigEditorBoolean
+    var autoSkipForward: Boolean = false
 }

@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.mining.HotmConfig.SkyMallDisplayVisibility
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 import java.util.regex.Matcher
 import kotlin.math.pow
 
@@ -112,7 +112,7 @@ enum class HotmData(
         140,
         { level -> (level + 1.0).pow(2.3) },
         { level -> mapOf(HotmReward.MINING_SPEED to 50.0 + (level * 5.0)) },
-        HotmApi.PowderType.GEMSTONE
+        HotmApi.PowderType.GEMSTONE,
     ),
     MOLE(
         "Mole",
@@ -430,6 +430,16 @@ enum class HotmData(
         override var currentRotPerk = HotmApi.skymall
         override val applicableIslandType = IslandTypeTags.MINING
 
+        private val config get() = SkyHanniMod.feature.mining.hotm
+        override val position: Position get() = config.skyMallPosition
+
+        override val shouldShowDisplay
+            get() = when (config.skyMallDisplay) {
+                SkyMallDisplayVisibility.OFF -> false
+                SkyMallDisplayVisibility.MINING_ONLY -> inApplicableIsland
+                SkyMallDisplayVisibility.EVERYWHERE -> true
+            }
+
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
         val abilities =
@@ -482,11 +492,11 @@ enum class HotmData(
         // but the value might be useful in the future or for debugging
 
         /**
-         * REGEX-TEST: §7Cost
+         * REGEX-TEST: Cost
          */
         val perkCostPattern by patternGroup.pattern(
-            "perk.cost",
-            "(?:§.)*§7Cost",
+            "perk.cost.new",
+            "Cost",
         )
 
         override val resetChatPattern by patternGroup.pattern(
@@ -525,12 +535,12 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: §r§299,918
-         * REGEX-TEST:  Gemstone: §r§d37,670
+         * REGEX-TEST:  Mithril: 99,918
+         * REGEX-TEST:  Gemstone: 37,670
          */
         private val powderPattern by patternGroup.pattern(
-            "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
+            "widget.powder-nocolor",
+            "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
         // </editor-fold>
 
@@ -614,12 +624,6 @@ enum class HotmData(
             }
         }
 
-        @HandleEvent
-        override fun onInventoryClose(event: InventoryCloseEvent) = super.onInventoryClose(event)
-
-        @HandleEvent(onlyOnSkyblock = true)
-        override fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) = super.onInventoryFullyOpened(event)
-
         override fun extraInventoryHandling() {
             abilities.filter { it.isUnlocked }.forEach {
                 it.rawLevel = if (CORE_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
@@ -639,14 +643,14 @@ enum class HotmData(
         }
 
         @HandleEvent(onlyOnSkyblock = true)
-        override fun onChat(event: SkyHanniChatEvent) = super.onChat(event)
+        override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
 
-        override fun tryBlock(event: SkyHanniChatEvent) {
+        override fun tryBlock(event: SkyHanniChatEvent.Allow) {
             if (!chatConfig.hideSkyMall || IslandTypeTags.MINING.inAny()) return
             event.blockedReason = "skymall"
         }
 
-        override fun extraChatHandling(event: SkyHanniChatEvent) {
+        override fun extraChatHandling(event: SkyHanniChatEvent.Allow) {
             DelayedRun.runNextTick {
                 mayhemChatPattern.matchMatcher(event.message) {
                     val perk = group("perk")

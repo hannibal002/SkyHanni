@@ -4,15 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -22,36 +21,30 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 @SkyHanniModule
 object CrimsonIsleReputationHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    var factionType get() = ProfileStorageData.profileSpecific?.crimsonIsleFaction
-        set(it) {
-            ProfileStorageData.profileSpecific?.crimsonIsleFaction = it
-        }
-
     private var display = emptyList<Renderable>()
     private var dirty = true
     var tabListQuestsMissing = false
 
     /**
-     * REGEX-TEST:  §r§c✖ Rescue Mission
-     * REGEX-TEST:  §r§a✔ Digested Mushrooms §r§8x20
-     * REGEX-TEST:  §r§c✖ Slugfish §r§8x1
+     * REGEX-TEST:  ✖ Rescue Mission
+     * REGEX-TEST:  ✔ Digested Mushrooms x20
+     * REGEX-TEST:  ✖ Slugfish x1
      */
     val tabListQuestPattern by RepoPattern.pattern(
-        "crimson.reputationhelper.tablist.quest",
-        " (?:§.*)?(?<status>[✖✔]) (?<name>.+?)(?: (?:§.)*?x(?<amount>\\d+))?",
+        "crimson.reputationhelper.tablist.quest-no-color",
+        "\\s*(?<status>[✖✔]) (?<name>.+?)(?: x(?<amount>\\d+))?$",
     )
 
     @HandleEvent
@@ -87,15 +80,6 @@ object CrimsonIsleReputationHelper {
         dirty = true
     }
 
-    @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.REPUTATION)) return
-
-        TabWidget.REPUTATION.matchMatcherFirstLine {
-            factionType = FactionType.fromName(group("faction"))
-        }
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onTick() {
         if (!config.enabled.get()) return
@@ -111,7 +95,7 @@ object CrimsonIsleReputationHelper {
     private fun updateRender() {
         display = buildList {
             addString("§e§lReputation Helper")
-            if (factionType == null) {
+            if (CrimsonIsleReputationApi.factionType == null) {
                 addString("§cFaction not found!")
                 return
             }
@@ -148,11 +132,10 @@ object CrimsonIsleReputationHelper {
     }
 
     fun isHotkeyHeld(): Boolean {
-        val isAllowedGui = Minecraft.getMinecraft().currentScreen.let {
-            it == null || it is GuiInventory
+        val isAllowedGui = Minecraft.getInstance().screen.let {
+            it == null || it is InventoryScreen
         }
         if (!isAllowedGui) return false
-        if (NeuItems.neuHasFocus()) return false
 
         return config.hotkey.isKeyHeld()
     }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -31,11 +33,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -62,23 +63,29 @@ object SkillApi {
 
     // TODO find out whats going on here
     /**
-     * REGEX-TEST: Farming 35: §r§a12.4%
+     * REGEX-TEST:  Farming 35: 12.4%
      */
     private val skillTabPattern by patternGroup.pattern(
-        "skill.tab",
-        " (?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
+        "skill.tab.colorless",
+        " (?<type>\\w+)(?: (?<level>\\d+))?: (?<progress>[0-9.]+)%",
     )
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST:  Farming 60: MAX
+     * REGEX-TEST:  Mining 60: MAX
+     */
     private val maxSkillTabPattern by patternGroup.pattern(
-        "skill.tab.max",
-        " (?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
+        "skill.tab.max.colorless",
+        " (?<type>\\w+) (?<level>\\d+): MAX",
     )
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST:  Mining 14: 22,922/75k
+     * REGEX-TEST:  Combat 49: 7,678/4M
+     */
     private val skillTabNoPercentPattern by patternGroup.pattern(
-        "skill.tab.nopercent",
-        " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)",
+        "skill.tab.nopercent.colorless",
+        " (?<type>\\w+)(?: (?<level>\\d+))?: (?<current>[0-9,.]+)/(?<needed>[\\d,.]+[kMB]?+)",
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -92,7 +99,14 @@ object SkillApi {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @HandleEvent(SecondPassedEvent::class)
+    private var lastTabComponents: List<Component> = emptyList()
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        lastTabComponents = event.tabList
+    }
+
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
@@ -116,7 +130,7 @@ object SkillApi {
 
     @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        val actionBar = event.actionBar.removeColor()
+        val actionBar = event.chatComponent.string.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {
             val matcher = listOf(skillPercentPattern, skillMultiplierPattern).firstOrNull {
@@ -265,16 +279,16 @@ object SkillApi {
     private fun handleSkillPatternPercent(matcher: Matcher, skillType: SkillType) {
         var current = 0L
         var needed = 0L
-        var xpPercentage = 0.0
         var isPercentPatternFound = false
         var tablistLevel: Int? = null
 
-        for (line in TabListData.getTabList()) {
+        line@ for (line in lastTabComponents) {
             skillTabPattern.matchMatcher(line) {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
                     isPercentPatternFound = true
                     if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                    break@line
                 }
             }
 
@@ -282,6 +296,7 @@ object SkillApi {
                 if (group("type") == skillType.displayName) {
                     tablistLevel = group("level").toInt()
                     if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                    break@line
                 }
             }
 
@@ -291,12 +306,12 @@ object SkillApi {
                     current = group("current").formatLong()
                     needed = group("needed").formatLong()
                     isPercentPatternFound = false
-                    return@matchMatcher
+                    break@line
                 }
             }
-            xpPercentage = matcher.group("progress").formatDouble()
         }
 
+        val xpPercentage = matcher.group("progress").formatDouble()
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
         val level = tablistLevel ?: return
         if (isPercentPatternFound) {
@@ -374,6 +389,11 @@ object SkillApi {
             this.lastGain = matcher.group("gained")
         }
         storage?.set(skillType, skillInfo)
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.remove(113, "#profile.skillData.null")
     }
 
     @Suppress("ReturnCount")
@@ -512,11 +532,12 @@ object SkillApi {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shskills") {
+        event.registerBrigadier("shskills") {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
-            callback { onCommand(it) }
-            autoComplete { args ->
+            legacyCallbackArgs { onCommand(it) }
+            // todo auto complete
+            /* autoComplete { args ->
                 when (args.size) {
                     1 -> listOf("levelwithxp", "xpforlevel", "goal")
                     2 -> if (args[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
@@ -526,7 +547,7 @@ object SkillApi {
 
                     else -> listOf()
                 }
-            }
+            }*/
         }
     }
 }

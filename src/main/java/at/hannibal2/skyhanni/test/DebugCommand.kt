@@ -23,9 +23,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +50,6 @@ object DebugCommand {
         // calling default debug stuff
         player(event)
         repoData(event)
-        globalRender(event)
         skyblockStatus(event)
         networkInfo(event)
         profileName(event)
@@ -146,24 +143,12 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            add("  scoreboard: '${SkyBlockUtils.graphArea}'")
+            add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+            with(PlayerUtils.blockPosition()) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
-        }
-    }
-
-    private fun globalRender(event: DebugDataCollectEvent) {
-        event.title("Global Render")
-        if (SkyHanniDebugsAndTests.globalRender) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData {
-                add("Global renderer is disabled!")
-                add("No renderable elements from SkyHanni will show up anywhere!")
-            }
         }
     }
 
@@ -199,7 +184,7 @@ object DebugCommand {
                 add(" neu repo location: default")
             }
 
-            add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
+            add(" loaded neu items: ${NeuItems.allNeuRepoInternalNames().size}")
         }
 
         val isRelevant = SkyHanniRepoManager.isUsingBackup || unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings

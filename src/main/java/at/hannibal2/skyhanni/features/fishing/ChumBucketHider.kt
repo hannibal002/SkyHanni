@@ -7,11 +7,14 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.entity.Entity
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -19,7 +22,7 @@ object ChumBucketHider {
 
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
-    private val hiddenEntities = TimeLimitedSet<Entity>(5.seconds)
+    private val hiddenEntities = TimeLimitedCache<Entity, Boolean>(5.seconds)
 
     @HandleEvent
     fun onWorldChange() {
@@ -27,23 +30,25 @@ object ChumBucketHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!config.enabled.get()) return
 
         val entity = event.entity
 
-        if (entity in hiddenEntities) {
-            event.cancel()
+        hiddenEntities[entity]?.let { cancelled ->
+            if (cancelled) {
+                event.cancel()
+            }
             return
         }
 
-        val name = entity.name
+        val name = entity.name.formattedTextCompatLessResets()
 
         // First text line
         if (name.endsWith("'s Chum Bucket") || name.endsWith("'s Chumcap Bucket")) {
             if (name.contains(PlayerUtils.getName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
-            hiddenEntities.add(entity)
+            hiddenEntities[entity] = true
             event.cancel()
             return
         }
@@ -53,7 +58,7 @@ object ChumBucketHider {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
-                    hiddenEntities.add(entity)
+                    hiddenEntities[entity] = true
                     event.cancel()
                     return
                 }
@@ -63,18 +68,19 @@ object ChumBucketHider {
         // Chum Bucket
         if (config.hideBucket.get() &&
             entity.getAllEquipment().any {
-                it != null && (it.displayName == "§fEmpty Chum Bucket" || it.displayName == "§aEmpty Chumcap Bucket")
+                it != null && (it.hoverName.string == "Empty Chum Bucket" || it.hoverName.string == "Empty Chumcap Bucket")
             }
         ) {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
-                    hiddenEntities.add(entity)
+                    hiddenEntities[entity] = true
                     event.cancel()
                     return
                 }
             }
         }
+        hiddenEntities[entity] = false
     }
 
     @HandleEvent

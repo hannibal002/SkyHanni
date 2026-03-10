@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign
+import at.hannibal2.skyhanni.data.hotx.CurrencyPerHotxPerk.CurrencySpentDesign
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -22,10 +22,9 @@ class HotmConfig {
 
     @Expose
     @ConfigOption(name = "Sky Mall Display", desc = "Display your current Sky Mall perk in a GUI element.")
-    @ConfigEditorBoolean
-    @FeatureToggle
+    @ConfigEditorDropdown
     @SearchTag("skymall")
-    var skyMallDisplay: Boolean = false
+    var skyMallDisplay: SkyMallDisplayVisibility = SkyMallDisplayVisibility.OFF
 
     @Expose
     @ConfigLink(owner = HotmConfig::class, field = "skyMallDisplay")
@@ -52,7 +51,7 @@ class HotmConfig {
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
-    var powderSpentDesign: PowderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE
+    var powderSpentDesign: CurrencySpentDesign = CurrencySpentDesign.NUMBER_AND_PERCENTAGE
 
     @Expose
     @ConfigOption(
@@ -71,4 +70,12 @@ class HotmConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var currentPowder: Boolean = true
+
+    enum class SkyMallDisplayVisibility(val display: String) {
+        OFF("Off"),
+        MINING_ONLY("Mining Islands Only"),
+        EVERYWHERE("Everywhere");
+
+        override fun toString() = display
+    }
 }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.mining.caverns.DeepCavernsGuideConfig
+import at.hannibal2.skyhanni.config.features.mining.dwarves.DarkMonolithConfig
 import at.hannibal2.skyhanni.config.features.mining.dwarves.KingTalismanConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.ColdOverlayConfig
 import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorConfig
@@ -21,7 +22,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class MiningConfig {
     @Expose
@@ -46,6 +46,11 @@ class MiningConfig {
     @ConfigOption(name = "King Talisman", desc = "")
     @Accordion
     val kingTalisman: KingTalismanConfig = KingTalismanConfig()
+
+    @Expose
+    @ConfigOption(name = "Dark Monolith", desc = "")
+    @Accordion
+    val darkMonolith: DarkMonolithConfig = DarkMonolithConfig()
 
     @Expose
     @ConfigOption(name = "Deep Caverns Guide", desc = "")
@@ -138,13 +143,6 @@ class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var crystalHollowsNamesInCore: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
-    @SearchTag("Pickaxe Pickobulus")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var privateIslandNoPickaxeAbility: Boolean = true
 
     @Expose
     @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")

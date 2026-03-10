@@ -35,10 +35,11 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingl
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -104,7 +105,7 @@ object TrophyFishDisplay {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
-        list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
+        list.add(Renderable.table(createTable(), ySpacing = config.extraSpace.get()))
         display = list
     }
 
@@ -285,7 +286,7 @@ object TrophyFishDisplay {
 
     private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
-        WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
+        WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getInstance().screen is InventoryScreen
         WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }

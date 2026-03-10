@@ -17,8 +17,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
@@ -38,6 +39,12 @@ object EquipmentApi {
     private val equipment get() = if (RiftApi.inRift()) storage?.riftSlots else storage?.slots
 
     fun getEquipment(slot: EquipmentSlot): ItemStack? = equipment?.get(slot.ordinal)
+
+    fun getSlots(): Map<EquipmentSlot, ItemStack?> =
+        EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
+
+    fun getAll(): List<ItemStack> = equipment?.filterNotNull() ?: emptyList()
+
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) = equipment?.set(slot.ordinal, itemStack)
 
     private val repoGroup = RepoPattern.group("data.equipment")
@@ -73,7 +80,7 @@ object EquipmentApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         chatEquipRegex.matchMatcher(event.message) {
             if (lastClickedEquipmentTime.passedSince() > 1.seconds) return@matchMatcher
             val chatItem = group("item").removeColor()
@@ -94,12 +101,12 @@ object EquipmentApi {
             }
             add("Equipment:")
             storage.slots.forEach { item ->
-                val name = item?.displayName
+                val name = item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 add(" - $name")
             }
             add("Rift Equipment:")
             storage.riftSlots.forEach { item ->
-                val name = item?.displayName
+                val name = item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 add(" - $name")
             }
         }

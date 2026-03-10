@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,15 +46,13 @@ object NpcVisitorFix {
         }
     }
 
-    private fun saveStaticVisitor(name: String, entity: EntityArmorStand) {
-        // clicked on the real visitor, ignoring
+    private fun saveStaticVisitor(name: String, entity: ArmorStand) {
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
         val storage = GardenApi.storage ?: return
 
         val location = entity.getLorenzVec()
         storage.npcVisitorLocations[name]?.let {
-            // alrady stored
             if (it.distance(location) < 1) return
         }
 
@@ -64,19 +62,19 @@ object NpcVisitorFix {
 
     private var lastVisitorOpen = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onVisitorOpen(event: VisitorOpenEvent) {
+    @HandleEvent(VisitorOpenEvent::class)
+    fun onVisitorOpen() {
         lastVisitorOpen = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         barnSkinChangePattern.matchMatcher(event.message) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }
     }
 
-    fun findNametag(visitorName: String): EntityArmorStand? {
+    fun findNametag(visitorName: String): ArmorStand? {
         val nametags = findNametags(visitorName)
         if (nametags.isEmpty()) return null
 
@@ -96,13 +94,9 @@ object NpcVisitorFix {
         return nametags.firstOrNull()
     }
 
-    private fun findNametags(visitorName: String): MutableList<EntityArmorStand> {
-        val foundVisitorNameTags = mutableListOf<EntityArmorStand>()
-        for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (entity.name.removeColor() == visitorName) {
-                foundVisitorNameTags.add(entity)
-            }
-        }
-        return foundVisitorNameTags
+    private fun findNametags(visitorName: String): MutableList<ArmorStand> {
+        return EntityUtils.getEntitiesInBoundingBox<ArmorStand>(GardenApi.barnArea) {
+            it.name.string.removeColor() == visitorName
+        }.toMutableList()
     }
 }

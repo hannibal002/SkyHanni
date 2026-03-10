@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import org.lwjgl.input.Keyboard
+import org.lwjgl.glfw.GLFW
 
 class TrevorTheTrapperConfig {
     @Expose
@@ -81,8 +81,19 @@ class TrevorTheTrapperConfig {
     var solver: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Theodolite Visualizer",
+        desc = "Draw the radius given by Talbot's Theodolite.\n" +
+            "The larger the height difference, the more accurate it will be."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var talbotCircles: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var mobDiedMessage: Boolean = true
 
     @Expose
@@ -106,8 +117,8 @@ class TrevorTheTrapperConfig {
         desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
             "§eRequires the relevant above settings to be toggled"
     )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var keyBind: Int = Keyboard.KEY_NONE
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var keyBind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")

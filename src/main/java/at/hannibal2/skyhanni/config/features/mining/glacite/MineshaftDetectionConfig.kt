@@ -24,6 +24,7 @@ class MineshaftDetectionConfig {
         desc = "Sends the type of mineshaft you entered to party chat."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var sendTypeToPartyChat: Boolean = true
 
     @Expose
@@ -43,8 +44,8 @@ class MineshaftDetectionConfig {
             "Other mineshafts will still have their data tracked, it just won't send stats for them."
     )
     @ConfigEditorDraggableList
-    val mineshaftsToTrack: MutableList<MineshaftDetection.MineshaftTypes> = mutableListOf(
-        MineshaftDetection.MineshaftTypes.FAIR1,
-        MineshaftDetection.MineshaftTypes.JASP1
+    val mineshaftsToTrack: MutableList<MineshaftDetection.MineshaftType> = mutableListOf(
+        MineshaftDetection.MineshaftType.FAIR_1,
+        MineshaftDetection.MineshaftType.JASP_1,
     )
 }

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.recentlyHeld
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -32,7 +33,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -159,7 +160,7 @@ object ItemAbilityCooldown {
                 }
             }
             // Weird Tuba & Weirder Tuba
-            event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
+            (event.soundName == "mob.wolf.howl" || event.soundName == "mob.wolf.death") && event.volume == 0.5f -> {
                 if (WEIRD_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }
@@ -369,7 +370,7 @@ object ItemAbilityCooldown {
 
         val stack = event.stack
 
-        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val guiOpen = Minecraft.getInstance().screen != null
         val uuid = stack.getIdentifier() ?: return
         val list = items[uuid] ?: return
 
@@ -390,7 +391,7 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
 
-        val guiOpen = Minecraft.getMinecraft().currentScreen != null
+        val guiOpen = Minecraft.getInstance().screen != null
         val stack = event.stack
 
         val uuid = stack?.getIdentifier() ?: return
@@ -410,10 +411,14 @@ object ItemAbilityCooldown {
         }
     }
 
-    private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
+    private fun ItemStack.getIdentifier(): String? =
+        cachedData.identifier ?: fetchIdentifier().also { cachedData.identifier = it }
+
+    private fun ItemStack.fetchIdentifier() = getItemUuid() ?: getItemId()
+
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -448,6 +453,7 @@ object ItemAbilityCooldown {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
     }
 
+    // TODO add item caching
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()

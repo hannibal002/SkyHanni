@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -19,12 +20,16 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.item.ItemStack
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object AgathaCouponProfit {
@@ -94,8 +99,7 @@ object AgathaCouponProfit {
             add("§7Sell price: §6${price.shortFormat()}")
             add("§7Total cost: §6${totalCost.shortFormat()}")
             for ((requiredName, amount) in requiredItems) {
-                val itemPrice = requiredName.getPriceOrNull()?.times(amount) ?: continue
-                add(" §8x$amount ${requiredName.repoItemName}: §7(§6${itemPrice.shortFormat()}§7)")
+                add(requiredName.getPriceName(amount))
             }
             add("")
             add("§7Profit per sell: §6${profit.shortFormat()}")
@@ -106,23 +110,23 @@ object AgathaCouponProfit {
 
         return DisplayTableEntry(
             itemName,
-            "§6${profitPerCoupon.shortFormat()}",
+            "§6${profitPerCoupon.shortFormat()}".asComponent(),
             profitPerCoupon,
             internalName,
-            hover,
+            hover.mapToComponents(),
             highlightsOnHoverSlots = listOf(slot),
         )
     }
 
     // TODO merge logic into core item utils logic, i think
-    private fun workOutInternalNameOrNull(item: ItemStack): Pair<NeuInternalName, String>? {
+    private fun workOutInternalNameOrNull(item: ItemStack): Pair<NeuInternalName, Component>? {
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             val internalName = item.getInternalNameOrNull() ?: return null
-            internalName to item.repoItemName
+            internalName to item.repoItemName.asComponent()
         } else {
-            val internalName = NeuInternalName.fromItemNameOrNull(item.displayName) ?: return null
-            internalName to item.displayName
+            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+            internalName to item.hoverName
         }
     }
 
@@ -142,7 +146,7 @@ object AgathaCouponProfit {
                 ErrorManager.logErrorStateWithData(
                     "Error in AnitaCoupon Profit", "Could not read item amount",
                     "rawItemName" to rawItemName,
-                    "name" to item.displayName,
+                    "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "lore" to lore,
                 )
                 continue

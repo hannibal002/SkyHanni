@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -12,12 +13,14 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.entity.player.EnumPlayerModelParts
+import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object TabListRenderer {
@@ -28,48 +31,39 @@ object TabListRenderer {
     private const val LINE_HEIGHT = 8 + 1
     private const val TAB_PADDING = 3
     private const val COLUMN_SPACING = 6
-    private const val TAB_Z_OFFSET = 10f
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
-        if (event.type != RenderLayer.PLAYER_LIST) return
-        if (!config.enabled.get()) return
+        if (GlobalRender.renderDisabled || event.type != RenderLayer.PLAYER_LIST || !config.enabled.get()) return
         event.cancel()
 
         if (config.toggleTab) return
-
         drawTabList()
     }
 
     private var isPressed = false
     private var isTabToggled = false
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled.get()) return
-        if (!config.toggleTab) return
-        if (Minecraft.getMinecraft().currentScreen != null) return
+        if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
+        if (Minecraft.getInstance().screen != null) return
 
-        if (Minecraft.getMinecraft().gameSettings.keyBindPlayerList.isActive()) {
-            if (!isPressed) {
-                isPressed = true
-                isTabToggled = !isTabToggled
-            }
-        } else {
+        val playerListKeyActive = Minecraft.getInstance().options.keyPlayerList.isActive()
+        if (playerListKeyActive && !isPressed) {
+            isPressed = true
+            isTabToggled = !isTabToggled
+        } else if (!playerListKeyActive) {
             isPressed = false
         }
 
-        if (isTabToggled) {
-            drawTabList()
-        }
+        if (isTabToggled) drawTabList()
     }
 
     private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
-
-        DrawContextUtils.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
         var totalWidth = 0 - COLUMN_SPACING
@@ -81,43 +75,36 @@ object TabListRenderer {
 
         var totalHeight = maxLines * LINE_HEIGHT
 
-        var header = listOf<String>()
-
-        if (!config.hideAdverts) {
-            header = TabListData.getHeader().split("\n").toMutableList()
-            header.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            totalHeight += header.size * LINE_HEIGHT + TAB_PADDING
+        val (header, footer) = listOf(
+            TabListData.header,
+            TabListData.footer,
+        ).map { component ->
+            val componentHeader: Component = component ?: Component.empty()
+            val componentLines = TextHelper.split(componentHeader, "\n") ?: listOf(componentHeader)
+            val filteredLines = componentLines.filter { line -> line.string.contains(TabListReader.hypixelAdvertisingString) }
+            totalHeight += filteredLines.size * LINE_HEIGHT + TAB_PADDING
+            filteredLines.toMutableList()
         }
 
-        var footer = listOf<String>()
-
-        if (!config.hideAdverts) {
-            footer = TabListData.getFooter().split("\n").toMutableList()
-            footer.removeIf { line -> !line.contains(TabListReader.hypixelAdvertisingString) }
-            totalHeight += footer.size * LINE_HEIGHT + TAB_PADDING
-        }
-
-        val minecraft = Minecraft.getMinecraft()
+        val minecraft = Minecraft.getInstance()
         val screenWidth = GuiScreenUtils.scaledWindowWidth / 2
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        if (!config.hideTabBackground) {
-            GuiRenderUtils.drawRect(
-                x - COLUMN_SPACING,
-                y - TAB_PADDING,
-                screenWidth + totalWidth / 2 + COLUMN_SPACING,
-                10 + totalHeight + TAB_PADDING,
-                -0x80000000,
-            )
-        }
+        if (!config.hideTabBackground) GuiRenderUtils.drawRect(
+            x - COLUMN_SPACING,
+            y - TAB_PADDING,
+            screenWidth + totalWidth / 2 + COLUMN_SPACING,
+            10 + totalHeight + TAB_PADDING,
+            -0x80000000,
+        )
 
         var headerY = y
         if (header.isNotEmpty()) {
             for (line in header) {
                 GuiRenderUtils.drawString(
                     line,
-                    x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
+                    x + totalWidth / 2f - minecraft.font.width(line) / 2f,
                     headerY.toFloat(),
                     -1,
                 )
@@ -132,14 +119,13 @@ object TabListRenderer {
             for (line in footer) {
                 GuiRenderUtils.drawString(
                     line,
-                    x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
+                    x + totalWidth / 2f - minecraft.font.width(line) / 2f,
                     footerY.toFloat(),
                     -1,
                 )
                 footerY += LINE_HEIGHT
             }
         }
-        DrawContextUtils.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
     private fun drawColumns(x: Int, headerY: Int, columns: List<RenderColumn>) {
@@ -175,40 +161,22 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
-                        val texture = playerInfo.locationSkin
-                        //#if MC < 1.21
-                        GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
-
-                        val player = tabLine.getEntity(playerInfo)
-                        if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
-                            GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 40 / 64f, 48 / 64f, 8 / 64f, 16 / 64f, texture)
-                        }
-                        //#else
-                        //$$ net.minecraft.client.gui.PlayerSkinDrawer.draw(
-                        //$$     DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.shouldShowHat(), false, -1
-                        //$$ )
-                        //#endif
+                        val texture = playerInfo.skin.body().id()
+                        PlayerFaceRenderer.draw(
+                            DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
+                        )
                     }
                     middleX += 8 + 2
                 }
 
-                var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
-                if (text.contains("§l")) text = "§r$text"
-                if (tabLine.type == TabStringType.TITLE) {
-                    GuiRenderUtils.drawString(
-                        text,
-                        middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
-                        middleY.toFloat(),
-                        -1,
-                    )
+                val drawX = middleX + if (tabLine.type == TabStringType.TITLE) column.getMaxWidth() / 2f - tabLine.getWidth() / 2f else 0f
+                val drawY = middleY.toFloat()
+                if (AdvancedPlayerList.ignoreCustomTabList() || tabLine.customName == null) {
+                    GuiRenderUtils.drawString(tabLine.component, drawX, drawY, -1)
                 } else {
-                    GuiRenderUtils.drawString(
-                        text,
-                        middleX.toFloat(),
-                        middleY.toFloat(),
-                        -1,
-                    )
+                    GuiRenderUtils.drawString(tabLine.customName, drawX, drawY, -1)
                 }
+
                 middleY += LINE_HEIGHT
                 middleX = savedX
             }
@@ -223,7 +191,7 @@ object TabListRenderer {
 
     @HandleEvent
     fun onSkipTablistLine(event: SkipTabListLineEvent) {
-        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
+        if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.component)) {
             event.cancel()
         }
     }

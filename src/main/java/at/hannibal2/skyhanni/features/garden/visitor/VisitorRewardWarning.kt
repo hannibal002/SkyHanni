@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.REFUSE_SLOT
@@ -10,15 +12,16 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.VisitorBlockReas
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraft.inventory.Slot
+import net.minecraft.network.chat.Component
+import net.minecraft.world.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,13 +57,13 @@ object VisitorRewardWarning {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorApi.inInventory) return
-        val stack = event.slot?.stack ?: return
+        val stack = event.slot?.item ?: return
 
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.displayName == "§cRefuse Offer"
-        val isAcceptSlot = stack.displayName == "§aAccept Offer"
+        val isRefuseSlot = stack.hoverName.string == "Refuse Offer"
+        val isAcceptSlot = stack.hoverName.string == "Accept Offer"
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -68,8 +71,7 @@ object VisitorRewardWarning {
             return
         }
 
-        // all but shift click types work for accepting visitor
-        if (event.clickType == GuiContainerEvent.ClickType.SHIFT) return
+        if (event.clickType == ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.REFUSED, "refused")
             // fallback if tab list is disabled
@@ -78,21 +80,21 @@ object VisitorRewardWarning {
             }
             return
         }
-        if (isAcceptSlot && stack.getLore().contains("§eClick to give!")) {
+        if (isAcceptSlot && stack.getLoreComponent().any { it.string.contains("Click to give!") }) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.ACCEPTED, "accepted")
             return
         }
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onTooltip(event: ToolTipEvent) {
+    fun onTooltip(event: ToolTipTextEvent) {
         if (!GardenApi.onBarnPlot) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.displayName == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.displayName == "§aAccept Offer"
+        val isRefuseSlot = event.itemStack.cleanName() == "Refuse Offer"
+        val isAcceptSlot = event.itemStack.cleanName() == "Accept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return
@@ -106,23 +108,24 @@ object VisitorRewardWarning {
     }
 
     private fun updateBlockedLore(
-        copiedTooltip: List<String>,
+        copiedTooltip: List<Component>,
         visitor: VisitorApi.Visitor,
         blockReason: VisitorBlockReason,
     ) {
-        val blockedToolTip = mutableListOf<String>()
-        for (line in copiedTooltip) {
-            if (line.contains("§aAccept Offer§r")) {
-                blockedToolTip.add(line.replace("§aAccept Offer§r", "§7Accept Offer§8"))
-            } else if (line.contains("§cRefuse Offer§r")) {
-                blockedToolTip.add(line.replace("§cRefuse Offer§r", "§7Refuse Offer§8"))
-            } else if (!line.contains("minecraft:") && !line.contains("NBT:")) {
-                blockedToolTip.add("§8" + line.removeColor())
+        val blockedToolTip = mutableListOf<Component>()
+        for (tip in copiedTooltip) {
+            val line = tip.string
+            if (line.contains("Accept Offer")) {
+                blockedToolTip.add("§aAccept Offer")
+            } else if (line.contains("Refuse Offer")) {
+                blockedToolTip.add("§cRefuse Offer")
+            } else {
+                blockedToolTip.add("§8$line")
             }
         }
 
         blockedToolTip.add("")
-        val pricePerCopper = visitor.pricePerCopper?.let { it.shortFormat() }
+        val pricePerCopper = visitor.pricePerCopper?.shortFormat()
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
         val formattedLoss = loss.absoluteValue.shortFormat()
@@ -139,7 +142,7 @@ object VisitorRewardWarning {
         formattedLoss: String,
     ) = blockReason.description + when (blockReason) {
         VisitorBlockReason.CHEAP_COPPER, VisitorBlockReason.EXPENSIVE_COPPER ->
-            " §7(§6$pricePerCopper §7per)"
+            " §7(paying §6$pricePerCopper §7per)"
 
         VisitorBlockReason.LOW_LOSS, VisitorBlockReason.HIGH_LOSS ->
             " §7(§6$formattedLoss §7${if (loss > 0) "loss" else "profit"} selling §9Green Thumb I§7)"

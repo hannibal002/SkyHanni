@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.PetDataStorage
@@ -21,38 +23,37 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
+import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
 @SkyHanniModule
-object SkyHanniMod {
-
+object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
+    CoroutineScope(CoroutineName("SkyHanni") + SupervisorJob(Job(null)))
+) {
     fun preInit() {
-        PlatformUtils.checkIfNeuIsLoaded()
-
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
@@ -63,38 +64,52 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesRepoManager.initRepo()
+        if (PlatformUtils.getRepoPatternDumpLocation() == null) EnoughUpdatesRepoManager.initRepo()
         MinecraftConsoleFilter.initLogging()
-        Runtime.getRuntime().addShutdownHook(
-            Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
-        )
         try {
-            SkyHanniRepoManager.initRepo()
+            if (PlatformUtils.getRepoPatternDumpLocation() == null) SkyHanniRepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
+        InitFinishedEvent.post()
     }
+
+    fun CoroutineConfig.launch(block: suspend CoroutineScope.() -> Unit): Job =
+        with(SkyHanniMod) { launchCoroutine(block) }
+
+    fun CoroutineConfig.launchUnScoped(block: suspend () -> Unit): Job =
+        with(SkyHanniMod) { launchUnScopedCoroutine(block) }
+
+    fun <T> CoroutineConfig.async(block: suspend CoroutineScope.() -> T): Deferred<T?> =
+        with(SkyHanniMod) { asyncCoroutine(block) }
+
+    fun <T> CoroutineConfig.asyncUnScoped(block: suspend () -> T): Deferred<T?> =
+        with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
     fun onTick() {
-        screenToOpen?.let {
-            screenTicks++
-            if (screenTicks == 5) {
-                val title = InventoryUtils.openInventoryName()
-                if (shouldCloseScreen) {
-                    //#if MC < 1.21
-                    MinecraftCompat.localPlayer.closeScreen()
-                    //#else
-                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
-                    //#endif
-                    OtherInventoryData.close(title)
-                }
-                shouldCloseScreen = true
-                Minecraft.getMinecraft().displayGuiScreen(it)
-                screenTicks = 0
-                screenToOpen = null
-            }
+        val screenToOpen = screenToOpen ?: return
+        screenTicks++
+        if (screenTicks != 5) return
+        val title = InventoryUtils.openInventoryName()
+        if (shouldCloseScreen) {
+            MinecraftCompat.localPlayer.closeContainer()
+            OtherInventoryData.close(title)
         }
+        shouldCloseScreen = true
+        Minecraft.getInstance().setScreen(screenToOpen)
+        screenTicks = 0
+        this.screenToOpen = null
+    }
+
+    @HandleEvent
+    fun onClientShutdown() {
+        configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook")
+    }
+
+    @HandleEvent
+    fun onRenderShutdown() {
+        SkyHanniItemRenderCoordinator.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"
@@ -115,6 +130,8 @@ object SkyHanniMod {
     lateinit var visualWordsData: VisualWordsJson
     lateinit var petData: PetDataStorage
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
+    lateinit var customTodos: CustomTodosStorage
+    lateinit var seaCreatureStorage: SpecificSeaCreatureStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
@@ -123,60 +140,8 @@ object SkyHanniMod {
     }
 
     val modules: MutableList<Any> = ArrayList()
-    private val globalJob: Job = Job(null)
-    private val coroutineScope = CoroutineScope(
-        CoroutineName("SkyHanni") + SupervisorJob(globalJob),
-    )
 
-    /**
-     * Launch an IO coroutine with a lock on the provided mutex.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param mutex The mutex to lock during the execution of the block.
-     * @param block The suspend function to execute within the IO context.
-     */
-    fun launchIOCoroutineWithMutex(
-        mutex: Mutex,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job = launchCoroutine {
-        mutex.withLock {
-            withContext(Dispatchers.IO, block)
-        }
-    }
-
-    /**
-     * Launch an IO coroutine in the SkyHanni scope.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param block The suspend function to execute within the IO context.
-     */
-    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit): Job = launchCoroutine {
-        withContext(Dispatchers.IO, block)
-    }
-
-    /**
-     * Launches a coroutine in the SkyHanni scope.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * The function provided here must not rely on the CoroutineScope's context.
-     * @param function The function to execute in the coroutine.
-     */
-    fun launchNoScopeCoroutine(function: suspend () -> Unit): Job = launchCoroutine { function() }
-
-    /**
-     * Launches a coroutine in the SkyHanni scope.
-     * This coroutine will catch any exceptions thrown by the provided function.
-     * @param function The suspend function to execute in the coroutine.
-     */
-    fun launchCoroutine(function: suspend CoroutineScope.() -> Unit): Job = coroutineScope.launch {
-        try {
-            function()
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e,
-                e.message ?: "Asynchronous exception caught",
-            )
-        }
-    }
-
-    var screenToOpen: GuiScreen? = null
+    var screenToOpen: Screen? = null
     var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {

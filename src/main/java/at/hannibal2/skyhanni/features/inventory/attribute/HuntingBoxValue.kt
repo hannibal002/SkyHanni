@@ -14,36 +14,39 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HuntingBoxValue {
 
     private val config get() = AttributeShardsData.config
+
     private var display = emptyList<Renderable>()
 
     private var totalShards = 0
-    private var totalInstantSell = 0.0
-    private var totalInstantBuy = 0.0
+    private var totalInstantSell = 0L
+    private var totalInstantBuy = 0L
 
     fun processInventory(slots: List<Slot>) {
         if (!config.huntingBoxValue) return
 
         totalShards = 0
-        totalInstantSell = 0.0
-        totalInstantBuy = 0.0
+        totalInstantSell = 0
+        totalInstantBuy = 0
 
         val table = mutableListOf<DisplayTableEntry>()
 
         for (slot in slots) {
-            val slotNumber = slot.slotNumber
+            val slotNumber = slot.index
             if (!isValidSlotNumber(slotNumber)) continue
-            val stack = slot.stack.orNull() ?: continue
+            val stack = slot.item.orNull() ?: continue
             processAttributeShardSlot(slotNumber, stack, table)
         }
 
@@ -57,8 +60,8 @@ object HuntingBoxValue {
             }
 
             addString("§7Total Attribute Shards: §a$totalShards")
-            addString("§7Total Instant Sell Value: §6${totalInstantSell.toInt().addSeparators()}")
-            addString("§7Total Instant Buy Value: §6${totalInstantBuy.toInt().addSeparators()}")
+            addString("§7Total Instant Sell Value: §6${totalInstantSell.addSeparators()}")
+            addString("§7Total Instant Buy Value: §6${totalInstantBuy.addSeparators()}")
         }
     }
 
@@ -80,30 +83,30 @@ object HuntingBoxValue {
 
         val pricePerInstantSell = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
         val totalPriceInstantSell = pricePerInstantSell * amountOwned
-        totalInstantSell += totalPriceInstantSell
+        totalInstantSell += totalPriceInstantSell.toLong()
 
         val pricePerInstantBuy = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
         val totalPriceInstantBuy = pricePerInstantBuy * amountOwned
-        totalInstantBuy += totalPriceInstantBuy
+        totalInstantBuy += totalPriceInstantBuy.toLong()
 
         val hover = buildList {
             add(internalName.repoItemName)
             add("")
-            add("§7Price per Instant Sell: §6${pricePerInstantSell.toInt().addSeparators()}")
-            add("§7Price per Instant Buy: §6${pricePerInstantBuy.toInt().addSeparators()}")
+            add("§7Price per Instant Sell: §6${pricePerInstantSell.addSeparators()}")
+            add("§7Price per Instant Buy: §6${pricePerInstantBuy.addSeparators()}")
             add("")
             add("§7Amount Owned: §a$amountOwned")
-            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.toInt().addSeparators()}")
-            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.toInt().addSeparators()}")
+            add("§7Total Price Instant Sell: §6${totalPriceInstantSell.addSeparators()}")
+            add("§7Total Price Instant Buy: §6${totalPriceInstantBuy.addSeparators()}")
         }
 
         table.add(
             DisplayTableEntry(
-                "${internalName.repoItemName} §8x$amountOwned",
-                "§6${totalPriceInstantSell.toInt().addSeparators()}",
+                "${internalName.repoItemName} §8x$amountOwned".asComponent(),
+                "§6${totalPriceInstantSell.addSeparators()}".asComponent(),
                 totalPriceInstantSell,
                 internalName,
-                hover,
+                hover.mapToComponents(),
                 highlightsOnHoverSlots = listOf(slotNumber),
             ),
         )

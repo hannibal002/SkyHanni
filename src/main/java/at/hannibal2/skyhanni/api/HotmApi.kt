@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
@@ -89,13 +89,13 @@ object HotmApi {
 
         fun resetTree() {
             current = total
-            PowderEvent(this).post()
+            PowderEvent.Reset(this).post()
         }
 
         fun resetFull() {
             current = 0L
             total = 0L
-            PowderEvent(this).post()
+            PowderEvent.Reset(this).post()
         }
 
         companion object {

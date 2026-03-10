@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,19 +36,21 @@ object RareDropMessages {
 
     /**
      * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168 §r§b✯ Magic Find§r§b)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Rat
      */
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
-        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)",
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>(?: .*)?)",
     )
 
     /**
-     * REGEX-TEST: §5§lGREAT CATCH! §r§bYou found a §r§7[Lvl 1] §r§aGuardian§r§b.
+     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
      */
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
-        "(?<start>(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
+        "(?<start>(?:§.)*⛃ (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
 
     /**
@@ -64,6 +67,16 @@ object RareDropMessages {
     private val petObtainedPattern by petGroup.pattern(
         "obtainedmessage",
         "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
+    )
+
+    /**
+     * REGEX-TEST: SMITE;6
+     * REGEX-TEST: ENDER_SLAYER;7
+     * REGEX-TEST: ULTIMATE_REITERATE;1
+     */
+    private val slayerBookIDPattern by repoGroup.pattern(
+        "slayerbook",
+        "SMITE;(?:6|7)|ENDER_SLAYER;(?:6|7)|MANA_STEAL;1|SMARTY_PANTS;1|BANE_OF_ARTHROPODS;6|CRITIAL;6|FIRE_ASPECT;3|ULTIMATE_REITERATE;1",
     )
 
     /**
@@ -100,7 +113,7 @@ object RareDropMessages {
     private val config get() = SkyHanniMod.feature.chat.rareDropMessages
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!config.petRarity) return
 
         petPatterns.matchMatchers(event.message) {
@@ -113,7 +126,10 @@ object RareDropMessages {
             if (start.endsWith("a ") && rarityName.first().isVowel())
                 start = start.substring(0..start.length - 2) + "n "
 
-            event.chatComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
+
+            val newComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
+            event.replaceComponent(newComponent, "pet_rarity")
+
         }
     }
 
@@ -140,13 +156,14 @@ object RareDropMessages {
 
         if (anyRecentMessage && config.enchantedBook) {
             ChatUtils.editFirstMessage(
-                component = { it.formattedText.replace("Enchanted Book", internalName.repoItemName).asComponent() },
+                component = { it.formattedTextCompat().replace("Enchanted Book", internalName.repoItemName).asComponent() },
                 "enchanted book",
                 predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) },
             )
         }
 
-        if (!anyRecentMessage && config.enchantedBookMissingMessage) {
+        // Hypixel send Slayer Book messages late, so we do a manual internalName Regex Match
+        if (!anyRecentMessage && config.enchantedBookMissingMessage && !slayerBookIDPattern.matches(internalName.asString())) {
             var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
             if (SkyHanniMod.feature.misc.userLuck) {
                 userLuck.takeIf { it != 0f }?.let { luck ->

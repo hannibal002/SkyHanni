@@ -30,6 +30,10 @@ class EventConfig {
     @Expose
     val gifting: GiftingConfig = GiftingConfig()
 
+    @Category(name = "Spooky", desc = "Spooky Festival")
+    @Expose
+    val spooky: SpookyConfig = SpookyConfig()
+
     @Expose
     @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
     val hoppityEggs: HoppityEggsConfig = HoppityEggsConfig()
@@ -64,7 +68,7 @@ class EventConfig {
     @Expose
     val anniversaryCelebration400: AnniversaryCelebration400Config = AnniversaryCelebration400Config()
 
-    @ConfigOption(name = "Year of the Seal", desc = "Features for Year of the Seals.")
+    @ConfigOption(name = "Year of the Seal", desc = "Features for Year of the Seal.")
     @Accordion
     @Expose
     val yearOfTheSeal: YearOfTheSealConfig = YearOfTheSealConfig()
@@ -73,6 +77,11 @@ class EventConfig {
     @Accordion
     @Expose
     val yearOfThePig: YearOfThePigConfig = YearOfThePigConfig()
+
+    @ConfigOption(name = "Year of the Witch", desc = "Features for Year of the Witch.")
+    @Accordion
+    @Expose
+    val yearOfTheWitch: YearOfTheWitchConfig = YearOfTheWitchConfig()
 
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose

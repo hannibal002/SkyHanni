@@ -26,19 +26,20 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Blocks
 
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "UnusedPrivateProperty")
 @SkyHanniModule
 object DungeonApi {
 
@@ -86,12 +87,21 @@ object DungeonApi {
     )
 
     /**
+     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
+     */
+    private val dungeonComplete by patternGroup.pattern(
+        "completecolorless",
+        "\\s+(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)",
+    )
+
+    /**
      * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor VII
      * REGEX-TEST: §f                         §r§cThe Catacombs §r§8- §r§eFloor V
      */
-    private val dungeonComplete by patternGroup.pattern(
+    private val dungeonCompleteOld by patternGroup.pattern(
+        // TODO: If It's April or Later and you're Reading This, remove this.
         "complete",
-        "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
+        "\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
 
     /**
@@ -106,24 +116,24 @@ object DungeonApi {
      * REGEX-TEST: §r§r§fBlessing of Power V§r
      */
     private val blessingPattern by patternGroup.pattern(
-        "blessings",
-        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
+        "blessings.colorless",
+        "Blessing of (?<type>\\w+) (?<amount>\\w+)",
     )
     private val noBlessingPattern by patternGroup.pattern(
-        "noblessings",
-        "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
+        "noblessings.colorless",
+        "No Buffs active\\. Find them by exploring the Dungeon!",
     )
 
     /**
-     * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
-     * REGEX-TEST: §8[§r§5393§r§8] §r§c[§r§fYOUTUBE§r§c] Remittal§r§f §r§7Σ§r§7♲ §r§f(§r§dMage XL§r§f)
-     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dMage XXXVI§r§f)
-     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dDEAD§r§f)
+     * REGEX-TEST: [319] Empa_ α (Mage XXXIV)
+     * REGEX-TEST: [393] [YOUTUBE] Remittal Σ♲ (Mage XL)
+     * REGEX-TEST: [273] Ovi_1 Ӄ (Mage XXXVI)
+     * REGEX-TEST: [273] Ovi_1 Ӄ (DEAD)
      */
     @Suppress("MaxLineLength")
     val playerDungeonTeamPattern by patternGroup.pattern(
-        "tablist.playerteam",
-        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) §r§f\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
+        "tablist.playerteam.colorless",
+        "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -221,7 +231,7 @@ object DungeonApi {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
-        val playerTeam = event.tabList.find { it.contains(PlayerUtils.getName()) }?.removeColor() ?: return
+        val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string ?: return
         for (dungeonClass in DungeonClass.entries) {
             if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
@@ -235,12 +245,13 @@ object DungeonApi {
     @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        for (line in event.footer.split("\n")) {
+        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        for (line in lines) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
             }
-            val matcher = blessingPattern.matcher(line)
+            val matcher = blessingPattern.matcher(line.string)
             if (matcher.find()) {
                 val type = matcher.group("type") ?: continue
                 val amount = matcher.group("amount").romanToDecimalIfNecessary()
@@ -268,17 +279,17 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
             DungeonStartEvent(floor).post()
         }
-        if (event.message.removeColor().matches(uniqueClassBonus)) {
+        if (event.cleanMessage.matches(uniqueClassBonus)) {
             isUniqueClass = true
         }
 
-        killPattern.matchMatcher(event.message.removeColor()) {
+        killPattern.matchMatcher(event.cleanMessage) {
             val bossCollections = bossStorage ?: return
             val boss = DungeonFloor.byBossName(group("boss"))
             if (matches() && boss != null && boss !in bossCollections) {
@@ -286,7 +297,7 @@ object DungeonApi {
             }
             return
         }
-        dungeonComplete.matchMatcher(event.message) {
+        dungeonComplete.matchMatcher(event.cleanMessage) {
             completed = true
             DungeonCompleteEvent(floor).post()
             return
@@ -311,7 +322,7 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.displayName == "§aGo Back") {
+            if (item.hoverName.string == "Go Back") {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
@@ -416,10 +427,10 @@ object DungeonApi {
 
         val position = event.position
         val blockType: ClickedBlockType = when (position.getBlockAt()) {
-            Blocks.chest -> ClickedBlockType.CHEST
-            Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
-            Blocks.lever -> ClickedBlockType.LEVER
-            Blocks.skull -> {
+            Blocks.CHEST -> ClickedBlockType.CHEST
+            Blocks.TRAPPED_CHEST -> ClickedBlockType.TRAPPED_CHEST
+            Blocks.LEVER -> ClickedBlockType.LEVER
+            Blocks.PLAYER_HEAD -> {
                 val blockTexture = BlockUtils.getTextureFromSkull(position)
                 if (blockTexture == WITHER_ESSENCE_TEXTURE) {
                     ClickedBlockType.WITHER_ESSENCE
@@ -449,7 +460,7 @@ object DungeonApi {
     fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
-        playerDungeonTeamPattern.matchAll(event.tabList) {
+        playerDungeonTeamPattern.matchAllComponents(event.tabList) {
             val username = group("playerName").removeColor()
             val playerDead = group("playerDead") == "DEAD"
 

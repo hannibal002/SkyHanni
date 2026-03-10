@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
 import com.google.gson.annotations.Expose
@@ -31,8 +32,9 @@ object ShinyOrbTracker {
     private val SHINY_ROD_ITEM = "SHINY_ROD".toInternalName()
     private val tracker = SkyHanniItemTracker(
         "Shiny Orb Tracker",
-        { ShinyOrbData() },
+        ::ShinyOrbData,
         { it.shinyOrbTracker },
+        trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
     private fun passesHoldingItem() = !config.holdingItems || InventoryUtils.getItemInHand()?.let {
@@ -45,14 +47,11 @@ object ShinyOrbTracker {
         ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
     }
 
-    class ShinyOrbData : ItemTrackerData() {
-
-        override fun resetItems() {
-            orbsUsed = 0L
-            orbsCompleted = 0L
-            skillXpGained = enumMapOf()
-        }
-
+    data class ShinyOrbData(
+        @Expose var orbsUsed: Long = 0L,
+        @Expose var orbsCompleted: Long = 0L,
+        @Expose var skillXpGained: MutableMap<SkillType, Long> = enumMapOf(),
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / orbsCompleted
             val perOrb = percentage.coerceAtMost(1.0).formatPercentage()
@@ -72,15 +71,6 @@ object ShinyOrbTracker {
                 "§7You got §6$coinsFormat coins §7that way.",
             )
         }
-
-        @Expose
-        var orbsUsed = 0L
-
-        @Expose
-        var orbsCompleted = 0L
-
-        @Expose
-        var skillXpGained: MutableMap<SkillType, Long> = enumMapOf()
     }
 
     @HandleEvent
@@ -122,6 +112,7 @@ object ShinyOrbTracker {
         // Skill XP gains
         addSkillXpInfo(data.skillXpGained)
 
-        add(tracker.addTotalProfit(profit, data.orbsCompleted, "orb used"))
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.orbsCompleted, "orb used", duration, "Orbs used"))
     }
 }

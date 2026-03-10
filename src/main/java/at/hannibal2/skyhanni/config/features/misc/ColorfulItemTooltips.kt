@@ -9,24 +9,16 @@ class ColorfulItemTooltips {
 
     @Expose
     @ConfigOption(
-        name = "Color Item Stat Numbers",
-        desc = "Changes the color of the numbers in item lore to the color they are in the SkyBlock stats menu.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var enabled: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Add stat icons",
+        name = "Add Stat Icons",
         desc = "Adds in the stat icons after the stat number.",
     )
     @ConfigEditorBoolean
-    var statIcons: Boolean = true
+    @FeatureToggle
+    var statIcons: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Replace percentages",
+        name = "Replace Percentages",
         desc = "Replaces the percentage sign with the stat icon if the stat ends with a percentage.\n" +
             "§eRequires add stat icons to be enabled.",
     )
@@ -35,7 +27,7 @@ class ColorfulItemTooltips {
 
     @Expose
     @ConfigOption(
-        name = "Replace rift seconds",
+        name = "Replace Rift Seconds",
         desc = "Replaces the 's' after the rift time stat.\n" +
             "§eRequires add stat icons to be enabled.",
     )

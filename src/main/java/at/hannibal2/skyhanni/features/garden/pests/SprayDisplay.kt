@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.greenhouse
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 
@@ -30,7 +32,7 @@ object SprayDisplay {
         if (!event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
-            display = GardenPlotApi.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
+            display = GardenPlotApi.getCurrentPlot()?.takeUnless { it.isBarn() || it.greenhouse }?.let { plot ->
                 plot.currentSpray?.let {
                     val timer = it.expiry.timeUntil()
                     "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
@@ -63,7 +65,7 @@ object SprayDisplay {
         expiredPlots.forEach { it.markExpiredSprayAsNotified() }
         val wasAwayString = if (wasAway) "§7While you were away, your" else "§7Your"
         val plotString = expiredPlots.map { "§b${it.name}" }.createCommaSeparatedList("§7")
-        val sprayString = if (expiredPlots.size > 1) "sprays" else "spray"
+        val sprayString = "spray".pluralize(expiredPlots.size)
         val out = "$wasAwayString $sprayString on §aPlot §7- $plotString §7expired."
         ChatUtils.chat(out)
     }

@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -41,10 +42,12 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -73,40 +76,25 @@ object GhostTracker {
     private var inArea: Boolean = false
     private var foundGhostBestiary: Boolean = false
 
+    private val ghostShard = "ATTRIBUTE_SHARD_VEIL;1".toInternalName()
+
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
-        { Data() },
+        ::Data,
         { it.ghostStorage.ghostTracker },
-    ) { drawDisplay(it) }
+        drawDisplay = { drawDisplay(it) },
+        trackerConfig = { config.perTrackerConfig }
+    )
 
-    class Data : ItemTrackerData() {
-
-        override fun resetItems() {
-            kills = 0
-            ghostsSinceSorrow = 0
-            maxKillCombo = 0
-            combatXpGained = 0
-        }
-
-        @Expose
-        var kills = 0L
-
-        @Expose
-        var ghostsSinceSorrow = 0L
-
-        @Expose
-        var maxKillCombo = 0L
-
+    data class Data(
+        @Expose var kills: Long = 0L,
+        @Expose var ghostsSinceSorrow: Long = 0L,
+        @Expose var maxKillCombo: Long = 0L,
         // TODO rename to combatXPGained
-        @Expose
-        var combatXpGained = 0L
-
-        @Expose
-        var totalMagicFind = 0L
-
-        @Expose
-        var totalMagicFindKills = 0L
-
+        @Expose var combatXpGained: Long = 0L,
+        @Expose var totalMagicFind: Long = 0L,
+        @Expose var totalMagicFindKills: Long = 0L,
+    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / kills
             val perKill = percentage.coerceAtMost(1.0).formatPercentage()
@@ -132,10 +120,11 @@ object GhostTracker {
 
     /**
      * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210 §r§b✯ Magic Find§r§b)
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop",
-        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)",
+        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\)",
     )
 
     /**
@@ -152,20 +141,20 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 21§r§f: §r§b29,614/40,000
-     * REGEX-TEST:  Ghost 15§r§f: §r§b12,449/12,500
+     * REGEX-TEST:  Ghost 21: 29,614/40,000
+     * REGEX-TEST:  Ghost 15: 12,449/12,500
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
-        "tablist.bestiary",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
+        "tablist.bestiary-no-color",
+        "\\s*Ghost (?<level>\\d+|[XVI]+): (?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
     )
 
     /**
-     * REGEX-TEST:  Ghost 25§r§f: §r§b§lMAX
+     * REGEX-TEST:  Ghost 25: MAX
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
-        "tablist.bestiarymax",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX",
+        "tablist.bestiarymax-no-color",
+        "\\s*Ghost (?<level>\\d+|[XVI]+): MAX",
     )
 
     private val SORROW = "SORROW".toInternalName()
@@ -176,7 +165,9 @@ object GhostTracker {
         config.ghostTrackerText.forEach { line ->
             addSearchString(line.line(data))
         }
-        add(tracker.addTotalProfit(profit, data.kills, "kill"))
+
+        val duration = data.getTotalUptime()
+        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
     }
 
     @HandleEvent
@@ -227,6 +218,12 @@ object GhostTracker {
     }
 
     @HandleEvent
+    fun onShard(event: ShardGainEvent) {
+        if (event.shardInternalName != ghostShard) return
+        tracker.addItem(ghostShard, event.amount, false)
+    }
+
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
@@ -237,12 +234,12 @@ object GhostTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        if (event.coins !in 200.0..2_000.0) return
+        if (event.coins !in 200.0..15_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
@@ -273,7 +270,7 @@ object GhostTracker {
         }
     }
 
-    private fun parseBestiaryWidget(lines: List<String>) {
+    private fun parseBestiaryWidget(lines: List<Component>) {
         foundGhostBestiary = false
         for (line in lines) {
             if (maxBestiaryTablistPattern.matches(line)) {
@@ -282,7 +279,7 @@ object GhostTracker {
                 return
             }
 
-            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.formatLong() ?: continue
+            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.string?.formatLong() ?: continue
             foundGhostBestiary = true
             if (kills <= currentBestiaryKills) return
             val difference = kills - currentBestiaryKills
@@ -382,10 +379,10 @@ object GhostTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shresetghosttracker") {
+        event.registerBrigadier("shresetghosttracker") {
             description = "Resets the Ghost Profit Tracker"
             category = CommandCategory.USERS_RESET
-            callback { tracker.resetCommand() }
+            simpleCallback { tracker.resetCommand() }
         }
     }
 

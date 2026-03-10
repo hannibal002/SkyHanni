@@ -1,45 +1,25 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.entity.EntityLivingBase
-import net.minecraft.potion.Potion
-import net.minecraft.potion.PotionEffect
-//#if MC > 1.16
-//$$ import net.minecraft.world.effect.MobEffects
-//#endif
-//#if MC > 1.21
-//$$ import net.minecraft.registry.entry.RegistryEntry
-//#endif
+import net.minecraft.core.Holder
+import net.minecraft.world.effect.MobEffect
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.LivingEntity
 
 enum class EffectsCompat(
-    //#if MC < 1.21
-    val potion: Potion,
-    //#else
-    //$$ val potion: RegistryEntry<StatusEffect>,
-    //#endif
+    val potion: Holder<MobEffect>,
 ) {
-    INVISIBILITY(
-        //#if MC < 1.16
-        Potion.invisibility
-        //#else
-        //$$ MobEffects.INVISIBILITY
-        //#endif
-    ),
-    BLINDNESS(
-        //#if MC < 1.16
-        Potion.blindness
-        //#else
-        //$$ MobEffects.BLINDNESS
-        //#endif
-    ),
+    INVISIBILITY(MobEffects.INVISIBILITY),
+    BLINDNESS(MobEffects.BLINDNESS),
     ;
 
     companion object {
-        fun EntityLivingBase.hasPotionEffect(effect: EffectsCompat): Boolean {
-            return this.isPotionActive(effect.potion)
+        fun LivingEntity.hasPotionEffect(effect: EffectsCompat): Boolean {
+            return this.hasEffect(effect.potion)
         }
 
-        fun EntityLivingBase.activePotionEffect(effect: EffectsCompat): PotionEffect? {
-            return this.getActivePotionEffect(effect.potion)
+        fun LivingEntity.activePotionEffect(effect: EffectsCompat): MobEffectInstance? {
+            return this.getEffect(effect.potion)
         }
     }
 }

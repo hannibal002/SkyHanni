@@ -1,14 +1,17 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapConfig
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class DungeonConfig {
     @Expose
@@ -68,13 +71,6 @@ class DungeonConfig {
     var highlightDeathmites: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Highlight Teammates", desc = "Highlight Dungeon teammates with a glowing outline.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @OnlyLegacy
-    var highlightTeammates: Boolean = true
-
-    @Expose
     @ConfigOption(
         name = "Architect Notifier",
         desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.\n" +
@@ -120,7 +116,7 @@ class DungeonConfig {
     val lividFinder: LividFinderConfig = LividFinderConfig()
 
     @Expose
-    @ConfigOption(name = "Trinity", desc = "")
+    @ConfigOption(name = "Trinity Helper", desc = "")
     @Accordion
     val trinityHelper: TrinityConfig = TrinityConfig()
 
@@ -199,4 +195,30 @@ class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var springBootsNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Secret Tracker Locator",
+        desc = "Shows the secret that the secret tracker is pointing to.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var dungeonSecretCompass: Boolean = true
+
+    @ConfigOption(
+        name = "Instance Chest Profit",
+        desc = "click the button to jump to Dungeon Chest Profit/Croesus Profit Settings.",
+    )
+    @ConfigEditorButton(buttonText = "Go")
+    val chestOverlayRunnable = Runnable { SkyHanniMod.feature.combat.instanceChestProfit::enabled.jumpToEditor() }
+
+    @Expose
+    @ConfigOption(
+        name = "Blood Camp Move",
+        desc = "Predicts when to kill blood mobs during Blood Camp to skip the Watcher dialogue"
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    @SearchTag("Dialogue Message Title")
+    var bloodCampTimer: Boolean = false
 }

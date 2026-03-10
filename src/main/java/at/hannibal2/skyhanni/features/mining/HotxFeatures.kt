@@ -2,6 +2,10 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.foraging.HotfConfig.LotteryDisplayVisibility
+import at.hannibal2.skyhanni.config.features.mining.HotmConfig.SkyMallDisplayVisibility
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxHandler
@@ -11,6 +15,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -23,29 +28,31 @@ object HotxFeatures {
     private val configHotm get() = SkyHanniMod.feature.mining.hotm
     private val configHotf get() = SkyHanniMod.feature.foraging.hotf
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        val (handler, configPos) = when {
-            HotmData.inApplicableIsland && configHotm.skyMallDisplay -> Pair(HotmData, configHotm.skyMallPosition)
-            HotfData.inApplicableIsland && configHotf.lotteryDisplay -> Pair(HotfData, configHotf.lotteryPosition)
-            else -> return
-        }
-        val rotatingPerkEntry = handler.rotatingPerkEntry
+    private val handlers = listOf(HotmData, HotfData)
+
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
+        handlers.forEach { it.renderOverlay() }
+    }
+
+    private fun HotxHandler<*, *, *>.renderOverlay() {
+        if (!shouldShowDisplay) return
+        val rotatingPerkEntry = rotatingPerkEntry
         if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
-        val currentPerk = handler.currentRotPerk
+        val currentPerk = currentRotPerk
 
         val perkDescriptionFormat = currentPerk?.perkDescription
-            ?: "§cUnknown! Run ${"§b/${handler.name.lowercase()}"} §cto fix this."
+            ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
         val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
 
-        configPos.renderRenderable(
+        position.renderRenderable(
             Renderable.text(finalFormat),
             posLabel = "${rotatingPerkEntry.guiName} Display",
         )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val claimMap: Map<HotxHandler<*, *, *>, Boolean?> = listOf(
             HotmData, HotfData,
         ).associateWith { data ->
@@ -59,13 +66,13 @@ object HotxFeatures {
 
         ErrorManager.logErrorStateWithData(
             "Could not read the rotating effect from chat",
-            "no hotxhandler claimed the event",
-            "chat" to event.message,
+            "no HotxHandler claimed the event",
+            "chat" to event.cleanMessage,
         )
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnSkyblock = true)
+    fun onBackgroundDrawn() {
         val handler: HotxHandler<*, *, *> = when {
             HotmData.inInventory && configHotm.highlightEnabledPerks -> HotmData
             HotfData.inInventory && configHotf.highlightEnabledPerks -> HotfData
@@ -91,7 +98,7 @@ object HotxFeatures {
             else -> return
         }
         handler.data.firstOrNull {
-            event.stack.displayName == it.item?.displayName
+            event.stack.hoverName.string == it.item?.hoverName?.string
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else "§e${it.activeLevel}"
             it.activeLevel.toString()
@@ -104,8 +111,17 @@ object HotxFeatures {
             HotfData.inInventory && configHotf.tokenStackSize -> HotfData
             else -> return
         }
-        if (event.stack.displayName != handler.heartItem?.stack?.displayName) return
+        if (event.stack.hoverName.string != handler.heartItem?.item?.hoverName?.string) return
         event.stackTip = handler.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(125, "mining.hotm.skyMallDisplay") {
+            ConfigUtils.migrateBooleanToEnum(it, SkyMallDisplayVisibility.MINING_ONLY, SkyMallDisplayVisibility.OFF)
+        }
+        event.transform(125, "foraging.hotf.lotteryDisplay") {
+            ConfigUtils.migrateBooleanToEnum(it, LotteryDisplayVisibility.FORAGING_ONLY, LotteryDisplayVisibility.OFF)
+        }
+    }
 }

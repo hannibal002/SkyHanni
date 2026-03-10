@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -22,9 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -43,10 +43,10 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -91,9 +91,9 @@ object CityProjectFeatures {
             action = {
                 HypixelCommands.warp("elizabeth")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
-                    IslandGraphs.pathFind(
-                        LorenzVec(-1.7, 72.0, -102.0),
-                        "§aCity Project",
+
+                    IslandGraphs.node("City Project", GraphNodeTag.POI).pathFind(
+                        label = "§aCity Project",
                         condition = { config.dailyReminder },
                     )
                 }
@@ -117,7 +117,7 @@ object CityProjectFeatures {
             // internal name -> amount
             val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                if (item.displayName != "§eContribute this component!") continue
+                if (item.hoverName.string != "Contribute this component!") continue
                 fetchMaterials(item, materials)
             }
 
@@ -147,7 +147,7 @@ object CityProjectFeatures {
                         nextTime = endTime
                     }
                 }
-                if (item.displayName != "§eContribute this component!") continue
+                if (item.hoverName.string != "Contribute this component!") continue
                 nextTime = now
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
@@ -190,13 +190,13 @@ object CityProjectFeatures {
     private fun materialLink(name: String, amount: Int): Renderable = Renderable.optionalLink(
         "$name §ex${amount.addSeparators()}",
         {
-            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+            if (Minecraft.getInstance().screen is SignEditScreen) {
                 SignUtils.setTextIntoSign("$amount")
             } else {
-                BazaarApi.searchForBazaarItem(name, amount)
+                BazaarApi.searchForBazaarItemOrRecipe(name, amount)
             }
         },
-    ) { inInventory && !NeuItems.neuHasFocus() }
+    ) { inInventory }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
@@ -233,8 +233,8 @@ object CityProjectFeatures {
         if (!config.showReady) return
         if (!inInventory) return
 
-        if (event.gui !is GuiChest) return
-        val chest = event.container as ContainerChest
+        if (event.gui !is ContainerScreen) return
+        val chest = event.container as ChestMenu
 
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()

@@ -16,14 +16,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.init.Blocks
-import net.minecraft.util.EnumParticleTypes
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -33,7 +33,9 @@ object RiftWiltedBerberisHelper {
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
 
     private val berberisSounds = setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")
-    private val list = mutableSetOf<WiltedBerberis>()
+
+    // NOTE: Do not make this a set, it breaks identity checks
+    private val list = mutableListOf<WiltedBerberis>()
 
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
@@ -54,8 +56,8 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (MinecraftCompat.localPlayer.onGround) {
-            isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.farmland
+        if (PlayerUtils.onGround()) {
+            isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
     }
 
@@ -71,7 +73,7 @@ object RiftWiltedBerberisHelper {
         val location = event.location
         val berberis = nearestBerberis(location)
 
-        if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
+        if (event.type != ParticleTypes.FIREWORK) {
             if (config.hideParticles && berberis != null) {
                 event.cancel()
             }

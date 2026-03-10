@@ -20,7 +20,7 @@ object PatcherFixes {
         lastCheck = SimpleTimeMark.now()
 
         val patcher = OtherModsSettings.patcher()
-        if (!patcher.getBoolean("parallaxFix")) return
+        if (!patcher.isEnabled("parallaxFix")) return
 
         if (lastChatMessage.passedSince() < 3.minutes) return
         lastChatMessage = SimpleTimeMark.now()
@@ -29,13 +29,13 @@ object PatcherFixes {
             "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!",
             config::fixPatcherLines,
             actionName = "disable this option in Patcher",
-            action = { tryFix() },
+            action = ::tryFix,
         )
     }
 
     private fun tryFix() {
         val patcher = OtherModsSettings.patcher()
-        if (patcher.getBoolean("parallaxFix")) {
+        if (patcher.isEnabled("parallaxFix")) {
             patcher.setBoolean("parallaxFix", false)
             ChatUtils.chat("§aDisabled Patcher's Parallax Fix! SkyHanni's lines should now work correctly.")
         } else {

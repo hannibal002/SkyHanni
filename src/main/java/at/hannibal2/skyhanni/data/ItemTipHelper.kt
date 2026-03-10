@@ -5,23 +5,22 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.container
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 @SkyHanniModule
 object ItemTipHelper {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
+        val stack = event.stack ?: return
 
         val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
         itemTipEvent.post()
@@ -39,41 +38,33 @@ object ItemTipHelper {
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
-        if (!SkyHanniDebugsAndTests.globalRender) return
+        if (GlobalRender.renderDisabled) return
 
-        val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is GuiChest) return
+        val gui = Minecraft.getInstance().screen
+        if (gui !is ContainerScreen) return
         val inventoryName = InventoryUtils.openInventoryName()
 
-        val guiLeft = (gui as AccessorGuiContainer).guiLeft
-        val guiTop = (gui as AccessorGuiContainer).guiTop
-        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+        val fontRenderer = Minecraft.getInstance().font
 
-        GlStateManager.disableLighting()
-        GlStateManager.disableDepth()
-        GlStateManager.disableBlend()
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 300f)
-        for (slot in gui.inventorySlots.inventorySlots) {
-            val stack = slot.stack ?: continue
+        for (slot in gui.container.slots) {
+            val stack = slot.item.orNull() ?: continue
 
             val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
             itemTipEvent.post()
             val stackTip = itemTipEvent.stackTip
             if (stackTip.isEmpty()) continue
 
-            val xDisplayPosition = slot.xDisplayPosition
-            val yDisplayPosition = slot.yDisplayPosition
+            val xDisplayPosition = slot.x
+            val yDisplayPosition = slot.y
 
-            val x = guiLeft + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
-                fontRenderer.getStringWidth(stackTip)
+            val x = gui.leftPos + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
+                fontRenderer.width(stackTip)
             } else 0
-            val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
+            val y = gui.topPos + yDisplayPosition + 9 + itemTipEvent.offsetY
 
             GuiRenderUtils.drawString(stackTip, x, y, -1)
         }
         DrawContextUtils.popMatrix()
-        GlStateManager.enableLighting()
-        GlStateManager.enableDepth()
     }
 }

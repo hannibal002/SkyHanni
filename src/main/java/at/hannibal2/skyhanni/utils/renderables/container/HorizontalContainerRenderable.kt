@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 
 
 class HorizontalContainerRenderable private constructor(
-    renderables: Collection<Renderable>,
-    spacing: Int = 0,
-    horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-    verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
-) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
+    override val renderables: Collection<Renderable>,
+    override val spacing: Int = 0,
+    override val horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+    override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
+) : ContainerRenderable() {
 
     override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
 
@@ -22,9 +22,9 @@ class HorizontalContainerRenderable private constructor(
         renderables.forEach {
             it.renderYAligned(x, mouseOffsetY, height)
             x += it.width + spacing
-            DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
+            DrawContextUtils.translate((it.width + spacing).toFloat(), 0f)
         }
-        DrawContextUtils.translate((-width - spacing).toFloat(), 0f, 0f)
+        DrawContextUtils.translate((-width - spacing).toFloat(), 0f)
     }
 
     companion object {

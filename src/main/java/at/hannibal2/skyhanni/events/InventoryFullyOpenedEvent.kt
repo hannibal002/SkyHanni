@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 
-open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
+sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title

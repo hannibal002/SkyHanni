@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import net.minecraft.CrashReport
 import net.minecraft.client.Minecraft
-import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
 /** Crashes if [value] is false and in developer environment */
@@ -119,6 +119,7 @@ object ErrorManager {
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
+    // when extraData is not used, rather call kotlin's `error()`
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         buildExtraDataString(extraData)?.let {
             cachedExtraData = it
@@ -144,7 +145,7 @@ object ErrorManager {
 
     inline fun crashInDevEnv(reason: String, t: (String) -> Throwable = { RuntimeException(it) }) {
         if (!PlatformUtils.isDevEnvironment) return
-        Minecraft.getMinecraft().crashed(CrashReport("SkyHanni - $reason", t(reason)))
+        Minecraft.getInstance().delayCrash(CrashReport("SkyHanni - $reason", t(reason)))
     }
 
     // just log for debug cases
@@ -174,7 +175,7 @@ object ErrorManager {
     // log with stack trace from other try catch block
     fun logErrorWithData(
         throwable: Throwable,
-        message: String,
+        message: String = throwable.message ?: "message is null",
         vararg extraData: Pair<String, Any?>,
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
@@ -183,6 +184,7 @@ object ErrorManager {
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
+    @Suppress("ReturnCount")
     private fun logError(
         originalThrowable: Throwable,
         message: String,
@@ -192,6 +194,9 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ): Boolean {
+        if (MinecraftCompat.localPlayerOrNull == null) {
+            println("extra data:\n${getExtraDataOrCached(extraData)}")
+        }
         if (betaOnly && !SkyHanniMod.isBetaVersion) return false
         val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {

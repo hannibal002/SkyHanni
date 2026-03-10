@@ -54,7 +54,7 @@ class AttributeShardsConfig {
     var tierAsStackSize: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Highlight Disabled Attributes", desc = "Highlight disabled attributes in /attributemenu.")
+    @ConfigOption(name = "Highlight Disabled Attributes", desc = "Highlight disabled attributes in §e/attributemenu§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightDisabledAttributes: Boolean = true

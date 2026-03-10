@@ -5,26 +5,34 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 data class RepoComparison(
+    val repoName: String,
     val localSha: String?,
     val localCommitTime: SimpleTimeMark?,
     val latestSha: String?,
     val latestCommitTime: SimpleTimeMark?,
 ) {
     constructor(
+        repoName: String,
         localCommit: RepoCommit?,
         latestCommit: RepoCommit?,
     ) : this(
+        repoName = repoName,
         localSha = localCommit?.sha,
         localCommitTime = localCommit?.time,
         latestSha = latestCommit?.sha,
         latestCommitTime = latestCommit?.time,
     )
 
+    val local: RepoCommit by lazy { RepoCommit(localSha, localCommitTime) }
+    val latest: RepoCommit by lazy { RepoCommit(latestSha, latestCommitTime) }
+
     val hashesMatch = localSha == latestSha
 
     fun reportRepoUpToDate() = ChatUtils.clickToClipboard(
-        "§7The repo is already up to date!",
+        "§7The $repoName repo is already up to date!",
         lines = buildList {
+            add("Repo: $repoName")
+            add("")
             add("latest commit sha: §e$localSha")
             latestCommitTime?.let { latestTime ->
                 add("latest commit time: §b$latestTime")
@@ -36,10 +44,12 @@ data class RepoComparison(
     fun reportForceRebuild() = reportRepoOutdated("Force redownloading repo..")
 
     fun reportRepoOutdated(
-        mainMessage: String = "Repo is outdated, updating.."
+        mainMessage: String = "$repoName Repo is outdated, updating..",
     ) = ChatUtils.clickToClipboard(
         mainMessage,
         lines = buildList {
+            add("Repo: $repoName")
+            add("")
             add("local commit sha: §e$latestSha")
             localCommitTime?.let { localTime ->
                 add("local commit time: §b$localTime")
