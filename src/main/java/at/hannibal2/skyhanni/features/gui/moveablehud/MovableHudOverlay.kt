@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.gui.moveablehud
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.gui.moveablehud.MoveableHudConfig
@@ -30,7 +29,7 @@ abstract class MovableHudOverlay(
 ) {
     abstract val config: MoveableHudConfig
     private val position: Position get() = config.position
-    private fun isEnabled(): Boolean = config.enabled && inSbEnabled()
+    private fun isEnabled() = config.enabled && inSbEnabled()
     private fun inSbEnabled() = SkyBlockUtils.inSkyBlock || (MinecraftCompat.localPlayerExists && config.showOutsideSkyblock)
     private var matrixPushed = false
 
