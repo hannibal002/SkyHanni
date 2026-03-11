@@ -95,13 +95,13 @@ object FastFairySoulsPathfinder {
 
         private fun getNearestSoul(): LorenzVec? {
             val playerLocation = LocationUtils.playerLocation()
-            val nearest = allSouls.minBy { it.distanceSq(playerLocation) }
+            val nearest = allSouls.minByOrNull { it.distanceSq(playerLocation) } ?: return null
             if (nearest.distanceToPlayer() < 10) return nearest
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
                 val abovePlayer = playerLocation.up(10)
-                val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
+                val aboveNearest = allSouls.minByOrNull { it.distanceSq(abovePlayer) } ?: return null
                 if (aboveNearest.distance(abovePlayer) < 10) return aboveNearest
             }
 
