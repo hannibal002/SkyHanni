@@ -396,7 +396,3 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
 repositories {
     mavenCentral()
 }
-
-tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:unchecked"))
-}
