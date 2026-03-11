@@ -47,7 +47,7 @@ object VanquisherApi {
 
     data object VanquisherOwnMessageEvent : SkyHanniEvent()
 
-    private val patternGroup = RepoPattern.Companion.group("combat.crimsonisle.vanquisherapi")
+    private val patternGroup = RepoPattern.group("combat.crimsonisle.vanquisherapi")
 
     private val spawnPattern by patternGroup.pattern(
         "spawnpattern",
@@ -103,7 +103,7 @@ object VanquisherApi {
         val soundPos = lastSoundPos ?: return
         val entityPos = lastSpawnEntityPos ?: return
         val entity = lastPossibleSpawnEntity ?: return
-        val now = SimpleTimeMark.Companion.now()
+        val now = SimpleTimeMark.now()
         if (now - lastSoundTime > vanquisherShortTimeout) return
         if (now - lastSpawnEntityTime > vanquisherShortTimeout) return
         if (now - lastOwnTime > vanquisherShortTimeout) return
