@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.outlineTopFace
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
-import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
     private val locations: List<LorenzVec>,
