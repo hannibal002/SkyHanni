@@ -28,14 +28,16 @@ open class AnimatedRotationLocalStorage(
         if (vec[axis] != 0.0) return@fold vec
         vec.applyAxisValue(axis, staticRotation)
     }
+
     constructor(rotationSpeed: Double) : this(
         AnimatedRotationDefinition(
             Axis.X to AxisRotationDefinition(rotationSpeed),
             Axis.Y to AxisRotationDefinition(rotationSpeed),
             Axis.Z to AxisRotationDefinition(rotationSpeed),
-        )
+        ),
     )
-    constructor(vararg definitionPairs: Pair<Axis, AxisRotationDefinition>) : this(AnimatedRotationDefinition(*definitionPairs))
+
+    constructor(vararg definitionPairs: Pair<Axis, AxisRotationDefinition>) : this(AnimatedRotationDefinition(definitionPairs.toMap()))
 }
 
 open class AnimatedRotationPropertyStorage(
@@ -73,7 +75,7 @@ data class AnimatedRotationDefinition(
         Axis.X to AxisRotationDefinition(),
         Axis.Y to AxisRotationDefinition(),
         Axis.Z to AxisRotationDefinition(),
-    )
+    ),
 ) : Map<Axis, AxisRotationDefinition> by axes {
     constructor(vararg pairs: Pair<Axis, AxisRotationDefinition>) : this(pairs.asList().associate { it.first to it.second })
 
@@ -102,5 +104,6 @@ data class AxisRotationDefinition(
     var staticRotation: Double = 0.0,
 ) {
     constructor(rotationSpeed: Double) : this(rotationSpeed, 0.0)
+
     fun isEnabled() = rotationSpeed != 0.0 || staticRotation != 0.0
 }
