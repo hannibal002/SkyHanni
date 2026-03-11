@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
@@ -204,12 +205,12 @@ object GraphEditorInput {
 
         val json = OSUtils.readFromClipboard() ?: return true
 
-        SkyHanniMod.launchIOCoroutine("load graph json") {
+        CoroutineConfig("load graph json").launchCoroutine {
             try {
                 val graph = Graph.fromJson(json)
                 val newState = GraphEditorIO.createStateFrom(graph)
 
-                Minecraft.getInstance().execute {
+                DelayedRun.runOrNextTick {
                     GraphEditorHistory.save("load from clipboard")
                     GraphEditor.state = newState
                     GraphEditorNetworks.recalculate()
