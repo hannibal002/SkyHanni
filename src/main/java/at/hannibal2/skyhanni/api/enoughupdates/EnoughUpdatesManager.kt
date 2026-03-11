@@ -104,13 +104,10 @@ object EnoughUpdatesManager {
             try {
                 val internalName = name.removeSuffix(".json")
                 val itemJson = fileSystem.readJson("items/$name").asJsonObject
-                val item = parseItem(
-                    internalName = internalName,
-                    json = itemJson,
-                )
+                val tryParsedItem = parseItem(itemJson)
                 progress.innerProgressStep()
-                val parsed = item ?: return@mapNotNullAsync null
-                internalName.toInternalName() to parsed
+                val parsedItem = tryParsedItem ?: return@mapNotNullAsync null
+                internalName.toInternalName() to parsedItem
             } catch (e: Exception) {
                 progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
@@ -150,7 +147,7 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
+    private fun parseItem(json: JsonObject): NeuItemJson? = runCatching {
         val itemJson: NeuItemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
         itemJson.itemId.getVanillaItem()?.let { mcItem ->
             itemJson.itemId = mcItem.getIdentifierString()
