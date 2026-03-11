@@ -44,8 +44,6 @@ open class IconConfig(
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 3.0f, minStep = 0.1f)
     open val scale: Property<Double> = Property.of(DEFAULT_ICON_SCALE * scalar)
 
-    // Todo, add back when custom item rendering is fixed
-    /*
     @Expose
     @ConfigOption(name = "Icon Rotation/Spin", desc = "")
     @Accordion
@@ -110,7 +108,7 @@ open class IconConfig(
             @ConfigEditorButton(buttonText = "Reset")
             val reset: Runnable = Runnable(::reset)
         }
-    }*/
+    }
 
     @ConfigOption(name = "Reset Icon Settings", desc = "Reset the icon settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")
