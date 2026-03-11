@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RescueParkourJson
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -281,10 +280,7 @@ object RescueMissionWaypoints {
     private fun navigateToUndercoverAgent() {
         if (!config.agentPath) return
         val factionType = CrimsonIsleReputationApi.factionType ?: return
-        val undercoverAgentNode = when (factionType) {
-            FactionType.MAGE -> IslandGraphs.node("Undercover Agent (Mage)", GraphNodeTag.NPC)
-            FactionType.BARBARIAN -> IslandGraphs.node("Undercover Agent (Barbarian)", GraphNodeTag.NPC)
-        }
+        val undercoverAgentNode = factionType.getUndercoverAgentNode()
 
         undercoverAgentNode.pathFind(
             "§5${factionType.factionName} Undercover Agent",
@@ -295,8 +291,7 @@ object RescueMissionWaypoints {
 
     private fun navigateToQuestBoard(reason: String) {
         val location = DailyQuestHelper.getQuestBoardLocation()
-        IslandGraphs.pathFind(
-            location,
+        location.pathFind(
             "Head back to Quest board, $reason",
             LorenzColor.WHITE.toColor(),
             condition = { (config.agentPath || config.hostagePath) },

@@ -36,8 +36,6 @@ class AnimatedItemStackRenderable internal constructor(
 
     override val height: Int get() = super.height + bounceDefinition.getTotalBounceOffset(Direction.Axis.Y)
     override val width: Int get() = super.width + bounceDefinition.getTotalBounceOffset(Direction.Axis.X)
-    override var stableRenderId: Int? = null
-    override fun getStableId() = stableRenderId
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
         applyRotation(deltaTime)

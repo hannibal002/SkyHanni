@@ -273,7 +273,7 @@ object TrevorFeatures {
             // Solve for the fact that Moby also has the same ID as the Trapper
             val entityMob = MobData.entityToMob[entityTrapper] ?: return
             if (entityMob.name == "Moby") return
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
+            RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color) {
                 config.cooldown
             }
             entityTrapper.getLorenzVec().let {

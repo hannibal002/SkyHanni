@@ -41,9 +41,6 @@ class GraphEditorState {
             }
         }
 
-    val highlightedNodes = mutableSetOf<GraphingNode>()
-    val highlightedEdges = mutableSetOf<GraphingEdge>()
-
     var cachedNearbyNodes = listOf<GraphingNode>()
     var lastCacheUpdate = SimpleTimeMark.farPast()
 
@@ -103,11 +100,6 @@ class GraphEditorState {
         if (selectedIndex != -1) {
             newState.selectedEdge = newState.edges[selectedIndex]
         }
-
-        this.highlightedNodes.mapNotNullTo(newState.highlightedNodes) { nodeMap[it] }
-
-        val edgeMap = this.edges.zip(newState.edges).toMap()
-        this.highlightedEdges.mapNotNullTo(newState.highlightedEdges) { edgeMap[it] }
 
         return newState
     }

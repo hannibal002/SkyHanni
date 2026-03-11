@@ -39,7 +39,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
-@Suppress("MemberVisibilityCanBePrivate", "UnusedPrivateProperty")
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
 
@@ -92,16 +92,6 @@ object DungeonApi {
     private val dungeonComplete by patternGroup.pattern(
         "completecolorless",
         "\\s+(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)",
-    )
-
-    /**
-     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor VII
-     * REGEX-TEST: §f                         §r§cThe Catacombs §r§8- §r§eFloor V
-     */
-    private val dungeonCompleteOld by patternGroup.pattern(
-        // TODO: If It's April or Later and you're Reading This, remove this.
-        "complete",
-        "\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
 
     /**
