@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.hotxfeel
+package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.HotfApi
