@@ -23,7 +23,7 @@ object EssenceUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts", NeuEssenceCostJson.TYPE)
+        val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts")
         this.itemPrices = reformatData(unformattedData)
     }
 
