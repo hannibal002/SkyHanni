@@ -312,7 +312,7 @@ object GardenApi {
                     if (profile.isNotEmpty()) profile += "/"
                     ChatUtils.clickableLinkChat(
                         "§cSkyHannis /ff display is no longer being developed! " +
-                                "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on elitebot.dev instead!",
+                            "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on elitebot.dev instead!",
                         "https://elitebot.dev/@$name/${profile}fortune".addSkyHanniUtm() + "#fortune",
                     )
                 }

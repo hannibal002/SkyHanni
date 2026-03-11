@@ -34,8 +34,6 @@ object ToolTooltipTweaks {
 
     private val counterStartLine = setOf("§6Logarithmic Counter", "§6Collection Analysis")
     private val reforgeEndLine = setOf("", "§7chance for multiple crops.")
-    private const val ABILITY_DESCRIPTION_START = "§7These boots gain §a+2❈ Defense"
-    private const val ABILITY_DESCRIPTION_END = "§7Skill level."
 
     private val statFormatter = DecimalFormat("0.##")
 
@@ -68,7 +66,6 @@ object ToolTooltipTweaks {
         var removingFarmhandDescription = false
         var removingCounterDescription = false
         var removingReforgeDescription = false
-        var removingAbilityDescription = false
 
         for (originalLine in iterator) {
             val line = originalLine.removePrefix("§5§o")
