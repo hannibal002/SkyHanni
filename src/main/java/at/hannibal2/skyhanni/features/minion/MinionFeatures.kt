@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -42,17 +42,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -109,13 +109,8 @@ object MinionFeatures {
     var minionInventoryOpen = false
     var minionStorageInventoryOpen = false
 
-    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
-        get() {
-            return ProfileStorageData.profileSpecific?.minions
-        }
-        set(value) {
-            ProfileStorageData.profileSpecific?.minions = value
-        }
+    private val minions: MutableMap<LorenzVec, ProfileSpecificStorage.MinionConfig>?
+        get() = ProfileStorageData.profileSpecific?.minions
 
     @HandleEvent
     fun onPlayerInteraction(event: PlayerInteractionEvent) {
@@ -207,20 +202,14 @@ object MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        if (!minions.contains(entity) && SkyBlockUtils.currentIsland != IslandType.HUB) {
-            MinionFeatures.minions = minions.editCopy {
-                this[entity] = ProfileSpecificStorage.MinionConfig().apply {
-                    displayName = name
-                    lastClicked = SimpleTimeMark.farPast()
-                }
-            }
-        } else {
-            minions[entity]?.let {
-                if (it.displayName != name) {
-                    it.displayName = name
-                }
-            }
-        }
+        val inHub = SkyBlockUtils.currentIsland == IslandType.HUB
+        val inStorage = minions.contains(entity)
+
+        if (!inStorage && !inHub) minions[entity] = ProfileSpecificStorage.MinionConfig().apply {
+            displayName = name
+            lastClicked = SimpleTimeMark.farPast()
+        } else minions[entity]?.apply { displayName = name }
+
         lastMinion = entity
         lastClickedEntity = null
         minionInventoryOpen = true
@@ -243,7 +232,7 @@ object MinionFeatures {
         val removedEntities = mutableListOf<LorenzVec>()
         for (location in minions.keys) {
             if (location.distanceToPlayer() > 30) continue
-            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStand>(location, 5.0).map { it.distanceTo(location) }
+            val entitiesNearby = location.getEntitiesNearby<ArmorStand>(5.0).map { it.distanceTo(location) }
             if (!entitiesNearby.any { it == 0.0 }) {
                 removedEntities.add(location)
             }
@@ -256,12 +245,10 @@ object MinionFeatures {
             }
             return
         }
-        this.minions = minions.editCopy {
-            for (removedEntity in removedEntities) {
-                remove(removedEntity)
-            }
-            ChatUtils.chat("Removed $size wrong/bugged minion locations from your island.")
+        for (removedEntity in removedEntities) {
+            minions.remove(removedEntity)
         }
+        ChatUtils.chat("Removed $size wrong/bugged minion locations from your island.")
     }
 
     @HandleEvent
@@ -351,18 +338,20 @@ object MinionFeatures {
             }
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
-            minions = minions?.editCopy { remove(lastMinion) }
+            minions?.remove(lastMinion)
             lastClickedEntity = null
             lastMinion = null
             lastMinionOpened = 0L
         }
-        if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
-            minions = minions?.editCopy {
-                this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
+
+        if (message.startsWith("§bYou placed a minion!")) newMinion?.let {
+            minions?.put(
+                it,
+                ProfileSpecificStorage.MinionConfig().apply {
                     displayName = newMinionName.orEmpty()
                     lastClicked = SimpleTimeMark.farPast()
-                }
-            }
+                },
+            )
             newMinion = null
             newMinionName = null
         }
@@ -406,20 +395,18 @@ object MinionFeatures {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<ArmorStand>) {
-        if (!isEnabled()) return
-        if (!config.hideMobsNametagNearby) return
+    fun onRenderLiving(event: CheckRenderEntityEvent<ArmorStand>) {
+        if (!isEnabled() || !config.hideMobsNametagNearby) return
 
-        val entity = event.entity
-        if (!entity.hasCustomName()) return
-        if (entity.deceased) return
+        val entity = event.entity.takeIf {
+            val nameMatch = it.customName?.string?.contains("❤") ?: false
+            it.hasCustomName() && !it.deceased && nameMatch
+        } ?: return
         val minions = minions ?: return
 
-        if (entity.customName.formattedTextCompatLessResets().contains("§c❤")) {
-            val loc = entity.getLorenzVec()
-            if (minions.any { it.key.distance(loc) < 5 }) {
-                event.cancel()
-            }
+        val loc = entity.getLorenzVec()
+        if (minions.any { it.key.distance(loc) < 5 }) {
+            event.cancel()
         }
     }
 
@@ -429,11 +416,9 @@ object MinionFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!minionInventoryOpen) return
+        if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
-        if (config.hopperProfitDisplay) {
-            config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
-        }
+        config.hopperProfitPos.renderRenderable(Renderable.text(coinsPerDay), posLabel = "Minion Coins Per Day")
     }
 
     @HandleEvent

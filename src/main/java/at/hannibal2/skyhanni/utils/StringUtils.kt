@@ -602,4 +602,6 @@ object StringUtils {
             this.substring(matcher.end())
         } else this
     }
+
+    fun String.addSkyHanniUtm(): String = "$this?utm_source=SkyHanni"
 }

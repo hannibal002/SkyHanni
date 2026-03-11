@@ -349,7 +349,7 @@ object CropMilestonesApi {
             chat(message, false)
         }
 
-        SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
+        SoundUtils.createSound("entity.player.levelup", 1f, 1f).playSound()
     }
 
     internal fun clearMilestoneCache() {

@@ -24,7 +24,7 @@ open class ItemStackRenderable internal constructor(
     override val verticalAlign get() = config.verticalAlign
 
     open val stack: ItemStack get() = stackGetter()
-    private var stableRenderId: Int? = null
+    var stableRenderId: Int? = null
     open fun getStableId() = stableRenderId
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {

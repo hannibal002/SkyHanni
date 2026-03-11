@@ -816,7 +816,7 @@ class ProfileSpecificStorage(
 
     // - minion
     @Expose
-    var minions: Map<LorenzVec, MinionConfig>? = mutableMapOf()
+    var minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
 
     class MinionConfig {
         @Expose

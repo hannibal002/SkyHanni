@@ -12,7 +12,7 @@ class LowHealthAlertSoundConfig {
     @Expose
     @ConfigOption(name = "Alert Sound", desc = "The sound that plays for the alert.")
     @ConfigEditorText
-    var alertSound: String = "random.anvil_land"
+    var alertSound: String = "block.anvil.land"
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the alert sound.")

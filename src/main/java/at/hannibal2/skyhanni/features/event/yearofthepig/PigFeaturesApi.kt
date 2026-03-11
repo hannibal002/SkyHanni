@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -146,7 +147,7 @@ object PigFeaturesApi {
     private val ORB_SKULL by lazy { SkullTextureHolder.getTexture("SHINY_PIG_ORB") }
 
     private fun tryFindOrb(location: LorenzVec): ArmorStand? {
-        val nearbyStands = EntityUtils.getEntitiesNearby<ArmorStand>(location, 5.0).toList()
+        val nearbyStands = location.getEntitiesNearby<ArmorStand>(5.0).toList()
         val sortedStands = nearbyStands.sortedBy { it.distanceTo(location) }
         return sortedStands.firstOrNull { stand ->
             stand.wearingSkullTexture(ORB_SKULL)

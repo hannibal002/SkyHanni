@@ -26,7 +26,7 @@ object PlayerDeathMessages {
     fun onSecondPassed() {
         if (!shouldHideFarDeaths()) return
 
-        EntityUtils.getEntitiesNextToPlayer<RemotePlayer>(25.0).forEach { player ->
+        EntityUtils.getEntitiesNearby<RemotePlayer>(25.0).forEach { player ->
             lastTimePlayerSeen[player.cleanName()] = SimpleTimeMark.now()
         }
     }

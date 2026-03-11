@@ -12,14 +12,14 @@ sealed interface AnimatedFrameStorage<T : AnimatedFrame> {
 
 open class AnimatedFrameLocalStorage<T : AnimatedFrame>(
     override val frames: List<T>,
-    override val tickRateProvider: FrameTickRateProvider = FrameTickRateProvider(),
+    override val tickRateProvider: FrameTickRateProvider = FrameTickRateProvider.of(1.0),
 ) : AnimatedFrameStorage<T> {
     override var currentFrameIndex: Int = 0
 }
 
 open class AnimatedFramePropertyStorage<T : AnimatedFrame>(
     override val frames: List<T>,
-    override val tickRateProvider: FrameTickRateProvider = FrameTickRateProvider(),
+    override val tickRateProvider: FrameTickRateProvider = FrameTickRateProvider.of(1.0),
     private val currentFrameIndexProvider: () -> Property<Int>,
 ) : AnimatedFrameStorage<T> {
     override var currentFrameIndex: Int
@@ -49,13 +49,12 @@ class ItemStackAnimatedFrame(
     val stack: ItemStack get() = stackProvider()
 }
 
-class FrameTickRateProvider(
+class FrameTickRateProvider private constructor(
     private val provider: (AnimatedFrame) -> Int = { it.transitionTicks }
 ) {
     companion object {
         fun <E : Number> of(value: E) = FrameTickRateProvider { value.toInt() }
         fun <E : Number> of(property: Property<E>) = FrameTickRateProvider { property.get().toInt() }
-        fun perFrame() = FrameTickRateProvider { 0 }
     }
 
     fun getTransitionTicks(frame: AnimatedFrame): Int = provider(frame)

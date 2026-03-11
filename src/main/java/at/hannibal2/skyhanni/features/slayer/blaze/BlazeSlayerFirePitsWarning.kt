@@ -33,7 +33,7 @@ object BlazeSlayerFirePitsWarning {
         if (!event.isMod(10)) return
 
         if (lastFirePitsWarning.passedSince() < 2.seconds) {
-            SoundUtils.createSound("random.orb", 0.8f).playSound()
+            SoundUtils.createSound("entity.experience_orb.pickup", 0.8f).playSound()
         }
     }
 

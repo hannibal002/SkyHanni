@@ -11,7 +11,9 @@ import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
 import java.util.regex.Pattern
+import kotlin.collections.filterNot
 import kotlin.math.ceil
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 
 @Suppress("TooManyFunctions")
@@ -559,6 +561,17 @@ object CollectionUtils {
         retainAll(sequence.toSet())
     }
 
-    fun <T> Set<T>.optionalEmpty(): Set<T> = if (isEmpty()) emptySet() else this
+    @Deprecated(
+        "Use the built-in ifEmpty function with emptySet() instead",
+        ReplaceWith("this.ifEmpty { emptySet() }")
+    )
+    fun <T> Set<T>.optionalEmpty(): Set<T> = ifEmpty { emptySet() }
 
+    inline fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?): Map<K, V> =
+        mapNotNull(transform).toMap()
+
+    fun <T> Collection<T>.filterNotClass(clazz: KClass<*>): List<T> = filterNot { clazz.isInstance(it) }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
 }

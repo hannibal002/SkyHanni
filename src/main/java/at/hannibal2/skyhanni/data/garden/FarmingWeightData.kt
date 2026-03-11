@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -282,7 +283,7 @@ object FarmingWeightData {
         lastOpenWebsite = SimpleTimeMark.now()
         lastName = name
 
-        OSUtils.openBrowser("https://elitebot.dev/@$name/")
+        OSUtils.openBrowser("https://elitebot.dev/@$name".addSkyHanniUtm())
         ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 
