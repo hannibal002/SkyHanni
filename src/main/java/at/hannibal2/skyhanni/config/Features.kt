@@ -60,7 +60,8 @@ class Features : Config() {
 
     override fun getTitle(): StructuredText {
         val modName = if (TimeUtils.isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
-        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89".asStructuredText()
+        val version = SkyHanniMod.VERSION.removeSuffix(".0")
+        return "$modName $version by §channibal2§r, config by §5Moulberry §rand §5nea89".asStructuredText()
     }
 
     /*
