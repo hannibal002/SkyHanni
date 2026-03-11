@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -13,6 +13,28 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBoxExtra
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.AABB
+
+sealed class SeaCreatureEvent(val seaCreature: LivingSeaCreatureData) : SkyHanniEvent() {
+
+    /** Gets called when a Sea Creature is initially detected. */
+    class Spawn(seaCreature: LivingSeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature's mob disappears, no matter the cause. */
+    class DeSpawn(seaCreature: LivingSeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature is removed from the sea creature list entirely. */
+    class Remove(seaCreature: LivingSeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature dies. */
+    class Death(seaCreature: LivingSeaCreatureData, val seenDeath: Boolean) : SeaCreatureEvent(seaCreature)
+
+    /** Gets called when a Sea Creature is re-detected after despawning. */
+    class ReDetect(seaCreature: LivingSeaCreatureData) : SeaCreatureEvent(seaCreature)
+
+    inline val name: String get() = seaCreature.name
+    inline val isOwn: Boolean get() = seaCreature.isOwn
+    inline val isRare: Boolean get() = seaCreature.isRare
+}
 
 class LivingSeaCreatureData(
     val isOwn: Boolean,
