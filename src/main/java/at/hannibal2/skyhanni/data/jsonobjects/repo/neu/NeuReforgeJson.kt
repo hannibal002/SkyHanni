@@ -13,13 +13,13 @@ import com.google.gson.annotations.SerializedName
 @KSerializable
 data class NeuReforgeJson(
     @Expose val reforgeName: String,
-    @Expose @SerializedName("nbtModifier") val rawNbtModifier: String?,
-    @Expose val internalName: NeuInternalName?,
+    @Expose @SerializedName("nbtModifier") val rawNbtModifier: String? = null,
+    @Expose val internalName: NeuInternalName? = null,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
-    @Expose val reforgeCosts: Map<LorenzRarity, Long>?,
-    @Expose val reforgeStats: Map<LorenzRarity, SkyblockStatList>?,
-    @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
+    @Expose val reforgeCosts: Map<LorenzRarity, Long>? = null,
+    @Expose val reforgeStats: Map<LorenzRarity, SkyblockStatList>? = null,
+    @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any? = null,
 ) {
 
     // NOTE: Lateinit fields are used here because `by lazy` causes errors
