@@ -21,7 +21,7 @@ object ConfigGuiManager {
         }
     }
 
-    var editor: MoulConfigEditor<Features>? = null
+    var editor: MoulConfigEditor<SkyHanniConfig>? = null
 
     fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also { editor = it }
 
