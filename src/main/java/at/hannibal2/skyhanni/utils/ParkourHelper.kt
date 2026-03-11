@@ -165,6 +165,7 @@ class ParkourHelper(
     private fun axisAlignedBB(loc: LorenzVec) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
 
     private fun colorForIndex(index: Int) = if (rainbowColor) {
-        RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f).toChromaColor()
+        val hueOffset = (-index / 12f).mod(1f)
+        Color(Color.HSBtoRGB(hueOffset, 1f, 0.7f)).toChromaColor(chromaSpeedMillis = 4000)
     } else monochromeColor
 }

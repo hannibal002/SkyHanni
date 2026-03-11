@@ -243,23 +243,6 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
-    @Deprecated("Use ChromaColor instead")
-    fun chromaColor(
-        timeTillRepeat: Duration,
-        offset: Float = 0f,
-        saturation: Float = 1F,
-        brightness: Float = 0.8F,
-        timeOverride: Long = System.currentTimeMillis(),
-    ): Color {
-        return Color(
-            Color.HSBtoRGB(
-                ((offset + timeOverride / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(),
-                saturation,
-                brightness,
-            ),
-        )
-    }
-
     // todo move to GuiRenderUtils?
     fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
         xPos: Int,
