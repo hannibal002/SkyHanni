@@ -283,7 +283,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     }
                 }
                 val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant]
-                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val levels = stackingData?.levels ?: listOf(0)
                 val level = enchantments.getIntOrDefault(stackingEnchant)
                 // Despite this `orEmpty()`, by this point, we know that statName is populated.
                 // Just here to make linting happy.
