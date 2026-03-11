@@ -19,6 +19,6 @@ object HighlightRareDianaMob {
         val rareMob = event.entity
 
         val color = config.color.toColor()
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(rareMob, color) { config.highlightRareMobs }
+        RenderLivingEntityHelper.setEntityColor(rareMob, color) { config.highlightRareMobs }
     }
 }

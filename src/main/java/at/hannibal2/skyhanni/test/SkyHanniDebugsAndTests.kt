@@ -508,9 +508,9 @@ object SkyHanniDebugsAndTests {
             description = "Prints the SkyHanni version in the chat"
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
-                val name1 = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
-                ChatUtils.chat("§eYou are using $name1")
-                OSUtils.copyToClipboard(name1)
+                val name = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
+                ChatUtils.chat("§eYou are using $name")
+                OSUtils.copyToClipboard(name)
             }
         }
         event.registerBrigadier("shtestgardenvisitors") {

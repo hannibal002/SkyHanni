@@ -102,7 +102,12 @@ enum class FarmingItemType(
     fun getDisplay(clickEnabled: Boolean = false) = object : Renderable {
 
         val content = Renderable.clickable(
-            Renderable.item(getItem(), scale = 1.0, xSpacing = 0, ySpacing = 0, rescaleSkulls = false).withTip(),
+            Renderable.item(getItem()) {
+                scale = 1.0
+                xSpacing = 0
+                ySpacing = 0
+                rescaleSkulls = false
+            }.withTip(),
             onLeftClick = onClick(),
             condition = { clickEnabled },
         )

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -165,7 +165,7 @@ object HoppityEggLocator {
         val dist = lastPoint.distance(pos)
         if (dist == 0.0 || dist > 3.0) return
 
-        if (EntityUtils.getEntitiesNearby<FishingHook>(pos, 0.3).any()) return
+        if (pos.getEntitiesNearby<FishingHook>(0.3).any()) return
 
         bezierFitter.addPoint(pos)
 

@@ -278,7 +278,7 @@ object MoongladeBeacon {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!colorMinigameInventory.isInside() || event.soundName != "note.bassattack") return
+        if (!colorMinigameInventory.isInside() || event.soundName != "block.note_block.bass") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
 
         if (upgradingStrength) pitch.handleMultipleSet()

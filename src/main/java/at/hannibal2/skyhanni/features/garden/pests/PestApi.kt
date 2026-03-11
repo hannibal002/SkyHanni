@@ -356,7 +356,7 @@ object PestApi {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
-    fun isNearPestTrap() = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(10.0).any {
+    fun isNearPestTrap() = EntityUtils.getEntitiesNearby<ArmorStand>(10.0).any {
         pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 

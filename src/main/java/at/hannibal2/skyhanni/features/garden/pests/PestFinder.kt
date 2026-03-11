@@ -233,7 +233,7 @@ object PestFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (PestApi.config.muteVacuum && event.soundName == "mob.wither.shoot") {
+        if (PestApi.config.muteVacuum && event.soundName == "entity.wither.shoot") {
             event.cancel()
         }
     }

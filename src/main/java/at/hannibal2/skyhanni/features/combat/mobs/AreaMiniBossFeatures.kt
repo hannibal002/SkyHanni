@@ -36,7 +36,7 @@ object AreaMiniBossFeatures {
         }
         lastSpawnTime = time
         if (config.areaBossHighlight) {
-            event.mob.highlight(type.color.addOpacity(type.colorOpacity).toChromaColor())
+            event.mob.highlight(type.color.addOpacity(type.colorTransparency).toChromaColor())
         }
         currentMobs.add(event.mob)
     }
@@ -76,7 +76,7 @@ object AreaMiniBossFeatures {
     private enum class AreaMiniBossType(
         val displayName: String,
         val color: LorenzColor,
-        val colorOpacity: Int,
+        val colorTransparency: Int,
         vararg val spawnLocations: LorenzVec,
     ) {
         GOLDEN_GHOUL(

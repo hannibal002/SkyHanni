@@ -38,16 +38,12 @@ object GraphEditorRenderer {
     private val selectedEdge get() = state.selectedEdge
     private val textBox get() = state.textBox
     private val seeThroughBlocks get() = state.seeThroughBlocks
-    private val highlightedEdges get() = state.highlightedEdges
-    private val highlightedNodes get() = state.highlightedNodes
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
     private val activeColor = LorenzColor.GREEN.addOpacity(200)
     private val closestColor = LorenzColor.YELLOW.addOpacity(200)
-    private val dijkstraColor = LorenzColor.LIGHT_PURPLE.addOpacity(200)
 
     private val edgeColor = LorenzColor.GOLD.addOpacity(150)
-    private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -165,7 +161,6 @@ object GraphEditorRenderer {
         if (!edge.node1.rendering && !edge.node2.rendering) return
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
-            edge in highlightedEdges -> edgeDijkstraColor
             else -> edge.networkColor ?: edgeColor
         }
 
@@ -211,7 +206,6 @@ object GraphEditorRenderer {
     private fun GraphingNode.getNodeColor() = when (this) {
         activeNode -> if (this == closestNode) ColorUtils.blendRGB(activeColor, closestColor, 0.5) else activeColor
         closestNode -> closestColor
-        in highlightedNodes -> dijkstraColor
         else -> nodeColor
     }
 

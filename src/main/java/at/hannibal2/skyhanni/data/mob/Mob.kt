@@ -185,18 +185,18 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color) { !this.isInvisible() && condition() }
+            RenderLivingEntityHelper.setEntityColor(baseEntity, color) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color) { !this.isInvisible() && condition() }
+                RenderLivingEntityHelper.setEntityColor(it, color) { !this.isInvisible() && condition() }
             }
         }
     }
 
     private fun internalRemoveColor() {
         if (highlightColor == null) return
-        RenderLivingEntityHelper.removeCustomRender(baseEntity)
+        RenderLivingEntityHelper.removeEntityColor(baseEntity)
         extraEntities.forEach {
-            RenderLivingEntityHelper.removeCustomRender(it)
+            RenderLivingEntityHelper.removeEntityColor(it)
         }
     }
 

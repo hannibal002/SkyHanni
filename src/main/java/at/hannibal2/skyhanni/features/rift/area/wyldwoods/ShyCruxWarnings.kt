@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.world.entity.Entity
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -24,7 +23,7 @@ object ShyCruxWarnings {
     }
 
     private fun checkForShy() {
-        if (EntityUtils.getEntitiesNextToPlayer<Entity>(8.0).any { it.name.string in shyNames }) {
+        if (EntityUtils.getEntitiesNearby<Entity>(8.0).any { it.name.string in shyNames }) {
             TitleManager.sendTitle("§eLook away!", duration = 150.milliseconds)
         }
     }

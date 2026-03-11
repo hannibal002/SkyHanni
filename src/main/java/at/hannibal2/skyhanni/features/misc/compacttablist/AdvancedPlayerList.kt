@@ -85,7 +85,7 @@ object AdvancedPlayerList {
                         e, "Advanced Player List failed to parse username",
                         "line" to line,
                         "i" to i,
-                        "original" to original,
+                        "original" to original.map { it.string },
                     )
                     null
                 }

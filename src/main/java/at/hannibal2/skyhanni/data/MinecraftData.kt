@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,6 +16,14 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinecraftData {
+
+    var hasLeftMainScreen: Boolean = false
+        private set
+
+    @HandleEvent(ClientConnectEvent::class, priority = HandleEvent.LOW)
+    fun onClientConnect() {
+        hasLeftMainScreen = true
+    }
 
     @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
