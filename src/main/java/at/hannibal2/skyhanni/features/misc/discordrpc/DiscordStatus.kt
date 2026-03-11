@@ -282,9 +282,12 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                         break
                     }
                 }
+                val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant]
                 val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
                 val level = enchantments.getIntOrDefault(stackingEnchant)
-                val amount = extraAttributes.getIntOrDefault(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
+                // Despite this `orEmpty()`, by this point, we know that statName is populated.
+                // Just here to make linting happy.
+                val amount = extraAttributes.getIntOrDefault(stackingData?.statName.orEmpty())
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =
