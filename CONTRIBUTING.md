@@ -108,7 +108,10 @@ the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pu
 
 ### Creating a Pull Request
 
-If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
+If you are not very familiar with Git, you might want to check out some of these resources:
+- [GitHub docs](https://docs.github.com/en/get-started/learning-to-code/getting-started-with-git)
+- [Git tutorial video](https://www.youtube.com/watch?v=Ala6PHlYjmw)
+- [Learn Git Branching](https://learngitbranching.js.org)
 
 Proposed changes are best made in their own branch, as this makes development easier for both you and the maintainers of this repository.
 You can do this by following the instructions within the IntelliJ window in the open SkyHanni project:

@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component
 
 object AbstractSourcedChatEvent {
 
+    // TODO docs missing
     open class Allow(
         val authorComponent: ComponentSpan,
         messageComponent: ComponentSpan,
@@ -15,6 +16,7 @@ object AbstractSourcedChatEvent {
         val author = authorComponent.getText()
     }
 
+    // TODO docs missing
     open class Modify(
         val authorComponent: ComponentSpan,
         messageComponent: ComponentSpan,
