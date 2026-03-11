@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Entity
 
 object MinecraftCompat {
 
-    val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("thePlayer is null")
+    val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("player is null")
 
     val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
 
@@ -16,7 +16,7 @@ object MinecraftCompat {
 
     val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
-    val localWorld get(): ClientLevel = localWorldOrNull ?: ErrorManager.skyHanniError("theWorld is null")
+    val localWorld get(): ClientLevel = localWorldOrNull ?: ErrorManager.skyHanniError("level is null")
 
     val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
 

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateComponentEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TabListDataComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -445,19 +444,19 @@ enum class TabWidget(
         }
 
         private val FORCE_UPDATE_DELAY = 2.seconds
+        private var lastTabComponents: List<Component> = emptyList()
 
         @HandleEvent(onlyOnSkyblock = true)
         fun onSecondPassed(event: SecondPassedEvent) {
             if (sentSinceWorldChange) return
             if (SkyBlockUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
-            @Suppress("DEPRECATION")
-            update(TabListDataComponent.getTabList())
+            update(lastTabComponents)
             ChatUtils.debug("Forcefully Updated Widgets")
         }
 
         @HandleEvent(priority = HandleEvent.HIGH)
-        fun onTabListUpdate(event: TabListUpdateComponentEvent) {
+        fun onTabListUpdate(event: TabListUpdateEvent) {
             if (!SkyBlockUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
                     separatorIndexes.forEach { it.second?.updateIsActive() }
@@ -486,7 +485,8 @@ enum class TabWidget(
         }
 
         private fun update(newTablist: List<Component>) {
-            val tabList = filterTabList(newTablist)
+            lastTabComponents = filterTabList(newTablist)
+            val tabList = lastTabComponents
 
             separatorIndexes.clear()
 

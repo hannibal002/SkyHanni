@@ -7,14 +7,12 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.rgb
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -80,21 +78,21 @@ object FlareDisplay {
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
-    // TODO: replace getEntities with entity events
-    @OptIn(AllEntitiesGetter::class)
+    @HandleEvent
+    fun onEntitySpawn(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        val entity = event.entity
+        if (entity.tickCount.ticks > MAX_FLARE_TIME) return
+        if (isAlreadyKnownFlare(entity)) return
+        getFlareTypeForTexture(entity)?.let {
+            flares.add(Flare(it, entity))
+        }
+        activeWarning = false
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!enabled) return
         flares.removeIf { !it.entity.isAlive }
-        for (entity in EntityUtils.getEntities<ArmorStand>()) {
-            if (!entity.canBeSeen()) continue
-            if (entity.tickCount.ticks > MAX_FLARE_TIME) continue
-            if (isAlreadyKnownFlare(entity)) continue
-            getFlareTypeForTexture(entity)?.let {
-                flares.add(Flare(it, entity))
-            }
-            activeWarning = false
-        }
         var newDisplay: List<Renderable>? = null
         for (type in FlareType.entries) {
             val flare = getFlareForType(type) ?: continue

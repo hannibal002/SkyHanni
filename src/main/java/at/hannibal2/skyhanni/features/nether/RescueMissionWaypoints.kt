@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RescueParkourJson
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -13,7 +16,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -145,7 +147,7 @@ object RescueMissionWaypoints {
         val tier = tier ?: return
 
         if (tier == "S") {
-            if (CrimsonIsleReputationHelper.factionType == FactionType.MAGE) {
+            if (CrimsonIsleReputationApi.factionType == FactionType.MAGE) {
                 ErrorManager.logErrorStateWithData(
                     "No data present for Mage S-rank Rescue Mission",
                     "No Mage S-Rank in repo",
@@ -163,7 +165,7 @@ object RescueMissionWaypoints {
         }
 
         parkourHelper = data?.let { data ->
-            val source = when (CrimsonIsleReputationHelper.factionType) {
+            val source = when (CrimsonIsleReputationApi.factionType) {
                 FactionType.MAGE -> data.mage
                 FactionType.BARBARIAN -> data.barb
                 null -> null
@@ -278,13 +280,13 @@ object RescueMissionWaypoints {
 
     private fun navigateToUndercoverAgent() {
         if (!config.agentPath) return
-        val factionType = CrimsonIsleReputationHelper.factionType ?: return
-        val undercoverAgentLocation = when (factionType) {
-            FactionType.MAGE -> LorenzVec(-626.7, 119.0, -960.0)
-            FactionType.BARBARIAN -> LorenzVec(-15.5, 93.0, -843.7)
+        val factionType = CrimsonIsleReputationApi.factionType ?: return
+        val undercoverAgentNode = when (factionType) {
+            FactionType.MAGE -> IslandGraphs.node("Undercover Agent (Mage)", GraphNodeTag.NPC)
+            FactionType.BARBARIAN -> IslandGraphs.node("Undercover Agent (Barbarian)", GraphNodeTag.NPC)
         }
-        IslandGraphs.pathFind(
-            undercoverAgentLocation,
+
+        undercoverAgentNode.pathFind(
             "§5${factionType.factionName} Undercover Agent",
             LorenzColor.DARK_PURPLE.toColor(),
             condition = { config.agentPath },
@@ -352,7 +354,7 @@ object RescueMissionWaypoints {
             add("parkour is loaded")
             add("tier: $tier")
             add("tierWasUnknown: $tierWasUnknown")
-            add("factionType: ${CrimsonIsleReputationHelper.factionType}")
+            add("factionType: ${CrimsonIsleReputationApi.factionType}")
         }
     }
 }

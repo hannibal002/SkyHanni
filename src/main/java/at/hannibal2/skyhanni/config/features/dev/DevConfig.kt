@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
@@ -79,18 +78,6 @@ class DevConfig {
     @NoConfigLink
     val debugPos: Position = Position(10, 10)
 
-    @Expose
-    @NoConfigLink
-    val debugLocationPos: Position = Position(1, 160)
-
-    @Expose
-    @NoConfigLink
-    val debugItemPos: Position = Position(90, 70)
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "rayTracedOreBlock")
-    val debugOrePos: Position = Position(1, 200)
-
     // TODO move [these] to a ContributorAppearanceConfig, or something similar
     @Expose
     @ConfigOption(
@@ -122,11 +109,6 @@ class DevConfig {
     )
     @ConfigEditorBoolean
     var rotateContributors: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "SBA Contributors", desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
-    @ConfigEditorBoolean
-    var fancySbaContributors: Boolean = false
 
     @Expose
     @ConfigOption(name = "Number Format Override", desc = "Forces the number format to use the en_US locale.")

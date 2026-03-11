@@ -155,6 +155,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added a guess for the Secret Tracker 3000 while in dungeons. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/4611)
 + Added Croesus Unopened Chest Count Overlay for Kuudra and Dungeons. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4846)
 + Croesus Profit Overlay and Highlight most profitable chest. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4857)
++ Added Blood Move Message for Dungeon Blood Camp. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/5276)
 
 </details>
 <details open><summary>
@@ -327,6 +328,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
     + The cooldown displayed is for the buff, not the item usage.
 + Added Tactical Insertion Ability Cooldown feature. - DungeonHub (https://github.com/hannibal002/SkyHanni/pull/2278)
++ Added Fire Freeze Features. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5224)
+    + Timer/Box on Mobs for Freeze Timer.
+    + Timer until Freeze Activation.
+    + Particle Replacer with Circular Line.
 
 </details>
 <details open><summary>
@@ -473,6 +478,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sends a message to party chat when a rare sea creature is caught.
 + Mute Banshee screams. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/5007)
 + Flay/Soul Whip Close Particle Hider. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5094)
++ Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Sea Creature Kill Time. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Sea Creature Lootshare Sphere. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Party Chat and Title Warning when an owned Sea Creature gets Cocooned. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5110)
 
 </details>
 <details open><summary>
@@ -614,6 +624,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a large display with a timer when the Fire Pillar is about to explode.
     + Also displays for other players' bosses.
 + Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
++ Added Remaining Slayer Kills Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4818)
+    + Shows the names and remaining number of mob kills needed until the boss spawns.
+    + Option to show mob level and health.
 
 </details>
 <details open><summary>
@@ -1154,6 +1167,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to mute final Tree Breaking Sound. - Siv (https://github.com/hannibal002/SkyHanni/pull/4459)
 + Added some whisper cost and spent info to HOTF perk tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4754)
 + Added Mute Fusion Machine. - Luna (https://github.com/hannibal002/SkyHanni/pull/5196)
++ Added tracker, titles, and block highlighting for Dark Monoliths. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4062)
 
 </details>
 <details open><summary>
@@ -1335,6 +1349,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Added Line to Jerry. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3388)
     + Shows a line to your spawned Jerry from Jerrypocalypse.
+
+#### Year of the Witch
+
++ Added Year of the Witch Stew Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/5315)
 
 </details>
 <details open><summary>
@@ -1577,6 +1595,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
         + Animals killed vs. animals that kill themselves
         + Pelts per hour
     + Press the hotkey to accept the next Trevor the Trapper quest. - CalMWolfs
++ Added ability to show the radius given by Talbot's Theodolite. - Maxwell Zhao (https://github.com/hannibal002/SkyHanni/pull/5293)
 + **GUI Scale**: - nea
     + Scroll within the position editor to independently adjust the GUI scale for each SkyHanni element.
     + Change the global scale of all SkyHanni elements at once (in the config under /sh scale).
@@ -1827,6 +1846,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + If you want your own todos featured, post them in Discord.
 + Added support for 1.21.11. - nopo + CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5178)
 + Added Transparent Minecraft Farming feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/5178)
++ Added the ability to move and scale the Action Bar in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
++ Added the ability to move and scale the Held Item Tooltip in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
 
 </details>
 <details open><summary>

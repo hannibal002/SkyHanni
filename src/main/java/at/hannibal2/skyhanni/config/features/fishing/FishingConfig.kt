@@ -78,6 +78,11 @@ class FishingConfig {
     val healthDisplay: SeaCreatureHealthDisplayConfig = SeaCreatureHealthDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Cocoon Settings", desc = "")
+    @Accordion
+    val cocoonSettings: FishingCocoonConfig = FishingCocoonConfig()
+
+    @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -162,7 +167,7 @@ class FishingConfig {
     @ConfigOption(
         name = "Lootshare Range",
         desc = "Shows the range at which you can lootshare. The range is §aGreen §7when the mob is your own or" +
-            "when inside the lootshare range."
+            " when inside the lootshare range."
     )
     @ConfigEditorBoolean
     @FeatureToggle

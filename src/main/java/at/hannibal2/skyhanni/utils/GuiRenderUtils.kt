@@ -335,6 +335,7 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
+        frameNumber: Int? = null,
     ): Int {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -370,10 +371,10 @@ object GuiRenderUtils {
          *
          *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
          *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
-         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
-         *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config.
+         *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
-        val guiRenderState = GuiItemRenderState(
+        val guiItemRenderState = GuiItemRenderState(
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
@@ -382,11 +383,15 @@ object GuiRenderUtils {
             DrawContextUtils.drawContext.scissorStack.peek()
         )
         val newRenderState = SkyHanniGuiItemRenderState(
-            guiRenderState, x, y,
+            itemStack = this,
+            guiItemRenderState,
+            translateX,
+            translateY,
             rotationVec, translationVec,
-            scale = scale.toFloat(),
-            adjustedScale = (scale * guiScaleX).toFloat(),
+            scale = finalItemScale.toFloat(),
+            adjustedScale = (finalItemScale * guiScaleX).toFloat(),
             stableRenderId,
+            frameNumber = frameNumber,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId

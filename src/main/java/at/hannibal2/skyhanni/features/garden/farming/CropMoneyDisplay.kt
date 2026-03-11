@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.pets.PetChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -344,26 +343,20 @@ object CropMoneyDisplay {
 
         SkyHanniMod.launchCoroutine("garden crop money display init") {
             val map = mutableMapOf<NeuInternalName, Int>()
-            for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
-                val internalName = rawInternalName.toInternalName()
-                if (internalName in ignoredItems) continue
-                if (!internalName.isBazaarItem()) continue
+            for ((_, internalName) in NeuItems.allInternalNames) {
+                if (internalName in ignoredItems || !internalName.isBazaarItem()) continue
 
                 val (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
                 val itemName = newId.itemNameWithoutColor
-                val crop = getByNameOrNull(itemName)
-                crop?.let {
+                CropType.getByNameOrNull(itemName)?.let {
                     map[internalName] = amount
                     cropNames[internalName] = it
                 }
             }
 
             multipliers = map
-
             ready = true
-            DelayedRun.runOrNextTick {
-                update()
-            }
+            DelayedRun.runOrNextTick(::update)
         }
     }
 
