@@ -55,19 +55,19 @@ object FastFairySoulsPathfinder {
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
-     * REGEX-TEST: §dYou have already found that Fairy Soul!
+     * REGEX-TEST: You have already found that Fairy Soul!
      */
     private val duplicatePattern by patternGroup.pattern(
-        "chat.duplicate",
-        "§dYou have already found that Fairy Soul!",
+        "chat.duplicate.colorless",
+        "^You have already found that Fairy Soul!$",
     )
 
     /**
-     * REGEX-TEST: §d§lSOUL! §fYou found a §r§dFairy Soul§r§f!
+     * REGEX-TEST: SOUL! You found a Fairy Soul!
      */
     private val newPattern by patternGroup.pattern(
-        "chat.new",
-        "§d§lSOUL! §fYou found a §r§dFairy Soul§r§f!",
+        "chat.new.colorless",
+        "^SOUL! You found a Fairy Soul!$",
     )
 
     /**
@@ -295,29 +295,22 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
+        if (duplicatePattern.matches(event.chatComponent) || newPattern.matches(event.chatComponent)) {
             data?.foundNearby()
         }
     }
 
     @HandleEvent(IslandGraphReloadEvent::class)
     fun onIslandGraphReload() {
-        if (isEnabled()) {
-            reload()
-        } else {
-            data = null
-        }
+        if (isEnabled()) reload()
+        else data = null
     }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Fairy Souls Pathfinder")
 
-        if (!isEnabled()) {
-            event.addIrrelevant("disabled")
-            return
-        }
-
+        if (!isEnabled()) return event.addIrrelevant("disabled")
         event.addData {
             data?.apply {
                 debugState?.let {
