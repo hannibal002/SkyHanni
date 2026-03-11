@@ -18,8 +18,10 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import net.minecraft.client.KeyMapping
 import java.awt.Color
 import kotlin.math.min
+import at.hannibal2.skyhanni.utils.KeyboardManager.WasdInputMatrix as Wasd
 
 @SkyHanniModule
 object GraphEditorRenderer {
@@ -63,43 +65,43 @@ object GraphEditorRenderer {
         if (GraphEditor.hideDisabled) {
             add("§cDisabled nodes are hidden!")
         }
-        add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
+        add("§eExit: §6${config.exitKey.name()}")
         if (!inEditMode && !inTextMode) {
-            add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
-            add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
-            add("§eSelect (Look): §6${KeyboardManager.getKeyName(config.selectRaycastKey)}")
-            add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
-            add("§eTest Dijkstra: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
-            add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
-            add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
-            add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
-            add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
-            add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
+            add("§ePlace: §6${config.placeKey.name()}")
+            add("§eSelect: §6${config.selectKey.name()}")
+            add("§eSelect (Look): §6${config.selectRaycastKey.name()}")
+            add("§eConnect: §6${config.connectKey.name()}")
+            add("§eTest Dijkstra: §6${config.dijkstraKey.name()}")
+            add("§eVision: §6${config.throughBlocksKey.name()}")
+            add("§eSave: §6${config.saveKey.name()}")
+            add("§eLoad: §6${config.loadKey.name()}")
+            add("§eClear: §6${config.clearKey.name()}")
+            add("§eTutorial: §6${config.tutorialKey.name()}")
             GraphEditorHistory.addDisplayLines(this)
             add(" ")
             if (activeNode != null) {
-                add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
-                if (dissolvePossible) add("§eDissolve: §6${KeyboardManager.getKeyName(config.dissolveKey)}")
+                add("§eText: §6${config.textKey.name()}")
+                if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.name()}")
                 if (selectedEdge != null) {
-                    add("§eSplit: §6${KeyboardManager.getKeyName(config.splitKey)}")
-                    add("§eCycle Direction: §6${KeyboardManager.getKeyName(config.edgeCycle)}")
+                    add("§eSplit: §6${config.splitKey.name()}")
+                    add("§eCycle Direction: §6${config.edgeCycle.name()}")
                 }
             }
         }
 
         if (!inTextMode) {
             if (activeNode != null) {
-                add("§eEdit active node: §6${KeyboardManager.getKeyName(config.editKey)}")
+                add("§eEdit active node: §6${config.editKey.name()}")
             }
         }
 
         if (inEditMode) {
-            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.key.value)}")
-            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.key.value)}")
-            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.key.value)}")
-            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.key.value)}")
-            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.key.value)}")
-            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.key.value)}")
+            add("§ex+ §6${Wasd.w.name()}")
+            add("§ex- §6${Wasd.s.name()}")
+            add("§ez+ §6${Wasd.a.name()}")
+            add("§ez- §6${Wasd.d.name()}")
+            add("§ey+ §6${Wasd.up.name()}")
+            add("§ey- §6${Wasd.down.name()}")
         }
         if (inTextMode) {
             add("§eFormat: ${textBox.finalText()}")
@@ -209,6 +211,9 @@ object GraphEditorRenderer {
         else -> nodeColor
     }
 
-    private fun isEnabled() = GraphEditor.isEnabled()
+    private fun Int.name() = KeyboardManager.getKeyName(this)
 
+    private fun KeyMapping.name() = key.value.name()
+
+    private fun isEnabled() = GraphEditor.isEnabled()
 }
