@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.math.abs
 import kotlin.math.sign
@@ -202,7 +202,7 @@ object ArrowGuessBurrow {
 
         // not your arrow
         if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 500.milliseconds) {
-            val playerLocation = MinecraftCompat.localPlayer.position()
+            val playerLocation = LocationUtils.playerLocation()
             val bStr = "[${adjustedBase.roundToBlock().x}, ${adjustedBase.roundToBlock().y}, ${adjustedBase.roundToBlock().z}]"
             val pStr = "[${playerLocation.x}, ${playerLocation.y}, ${playerLocation.z}]"
             GriffinBurrowHelper.addDebug("not your arrow detected at $bStr, player pos $pStr")
