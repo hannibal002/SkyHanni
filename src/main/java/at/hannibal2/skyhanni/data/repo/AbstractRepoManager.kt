@@ -237,8 +237,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                     progress.end("Failed to fetch & unpack repo - aborting.")
                     return@launch
                 }
-            }
-            if (!repoDirectoryHasContent()) {
+            } else if (!repoDirectoryHasContent()) {
                 if (!switchToBackupRepo(progress).canContinue) {
                     progress.end("No repo on disk and backup failed.")
                     return@launch
