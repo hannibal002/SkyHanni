@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import kotlin.Suppress;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,6 +18,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 @Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRenderState> {
 
+    @SuppressWarnings("deprecation")
     @Inject(method = "submit", at = @At(value = "HEAD"), cancellable = true)
     public void onRenderPre(EntityRenderState renderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         EntityRenderDispatcherHookKt.setEntity(renderState);
@@ -29,6 +31,7 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Inject(method = "submit", at = @At(value = "RETURN"))
     public void onRenderPost(EntityRenderState entityRenderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         Entity entity = EntityRenderDispatcherHookKt.getEntity();
