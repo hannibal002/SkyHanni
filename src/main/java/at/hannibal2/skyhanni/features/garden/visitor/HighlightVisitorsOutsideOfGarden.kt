@@ -36,7 +36,7 @@ object HighlightVisitorsOutsideOfGarden {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         visitorJson = event.getConstant<GardenJson>(
-            "Garden", GardenJson::class.java,
+            "Garden",
         ).visitors.values.groupBy {
             it.mode
         }
