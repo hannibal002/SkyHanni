@@ -43,6 +43,8 @@ object TestCopyBestiaryValues {
         var bracket: Int = 0
     }
 
+    // TODO add regex test
+    @Suppress("RepoPatternRegexTestMissing")
     private val bestiaryTypePattern by RepoPattern.pattern(
         "test.bestiary.type",
         "\\[Lv(?<lvl>.*)] (?<text>.*)",
