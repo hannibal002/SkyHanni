@@ -24,8 +24,6 @@ import kotlin.math.min
 @SkyHanniModule
 object GraphEditorRenderer {
 
-    val config: GraphConfig get() = DevApi.config.devTool.graph
-
     private val state get() = GraphEditor.state
 
     private val nodes get() = state.nodes
@@ -56,13 +54,15 @@ object GraphEditorRenderer {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
+        GraphEditor.config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
     }
 
     private fun buildDisplay(): List<Renderable> = buildList {
         if (GraphEditor.hideDisabled) {
             add("§cDisabled nodes are hidden!")
         }
+
+        val config = GraphEditor.config
         add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")

@@ -31,7 +31,7 @@ import org.lwjgl.glfw.GLFW
 @SkyHanniModule
 object GraphEditorInput {
 
-    val config: GraphConfig get() = DevApi.config.devTool.graph
+    val config: GraphConfig get() = GraphEditor.config
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 
@@ -70,7 +70,11 @@ object GraphEditorInput {
         }
         if (handleSelect()) return
         if (handleRayCast()) return
-        if (GraphEditorNodeOperations.handleConnect()) return
+
+        if (config.connectKey.isKeyClicked()) {
+            GraphEditorNodeOperations.handleConnect()
+            return
+        }
         if (handleThroughBlocks()) return
         if (config.dijkstraKey.isKeyClicked()) {
             ChatUtils.debug("testDijkstra")
@@ -88,7 +92,11 @@ object GraphEditorInput {
             handleSplit(selectedEdge)
             handleEdgeCycle(selectedEdge)
         }
-        if (GraphEditorNodeOperations.handleDissolve()) return
+
+        if (config.dissolveKey.isKeyClicked()) {
+            GraphEditorNodeOperations.handleDissolve()
+            return
+        }
     }
 
     private fun handleText(): Boolean {

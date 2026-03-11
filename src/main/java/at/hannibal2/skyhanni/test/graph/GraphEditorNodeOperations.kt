@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 
 object GraphEditorNodeOperations {
 
-    val config: GraphConfig get() = DevApi.config.devTool.graph
-
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
     private val edges get() = state.edges
@@ -53,11 +51,9 @@ object GraphEditorNodeOperations {
         return edges.add(edge)
     }
 
-    fun handleDissolve(): Boolean {
-        if (!config.dissolveKey.isKeyClicked()) return false
-
-        if (!state.dissolvePossible) return true
-        val activeNode = state.activeNode ?: return true
+    fun handleDissolve() {
+        if (!state.dissolvePossible) return
+        val activeNode = state.activeNode ?: return
 
         GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
         val edgePair = edges.filter { it.isInEdge(activeNode) }
@@ -73,7 +69,6 @@ object GraphEditorNodeOperations {
         nodes.remove(activeNode)
         state.activeNode = null
         addEdge(neighbors1, neighbors2, direction)
-        return true
     }
 
     private fun getDirection(
@@ -95,10 +90,8 @@ object GraphEditorNodeOperations {
         }
     }
 
-    fun handleConnect(): Boolean {
-        if (!config.connectKey.isKeyClicked()) return false
-
-        if (state.activeNode == state.closestNode) return true
+    fun handleConnect() {
+        if (state.activeNode == state.closestNode) return
         val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {
             GraphEditorHistory.save("added edge")
@@ -112,7 +105,6 @@ object GraphEditorNodeOperations {
             GraphEditor.feedBackInTutorial("Removed edge.")
             GraphEditor.updateRender()
         }
-        return true
     }
 
     fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
