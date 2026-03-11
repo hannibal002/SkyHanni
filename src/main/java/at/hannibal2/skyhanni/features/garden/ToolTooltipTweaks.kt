@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTool
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -121,7 +120,7 @@ object ToolTooltipTweaks {
                 }
             }
             // Beware, dubious control flow beyond these lines
-            if (config.compactToolTooltips || FFGuideGui.isInGui()) {
+            if (config.compactToolTooltips) {
                 if (line.startsWith("§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     iterator.remove()
@@ -139,22 +138,6 @@ object ToolTooltipTweaks {
                     removingReforgeDescription = !reforgeEndLine.contains(line)
                 }
                 if (line == "§9Bountiful Bonus") removingReforgeDescription = true
-
-                if (FFGuideGui.isInGui()) {
-                    if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
-                        iterator.remove()
-                    }
-
-                    if (line == ABILITY_DESCRIPTION_START) {
-                        removingAbilityDescription = true
-                    }
-                    if (removingAbilityDescription) {
-                        iterator.remove()
-                        if (line == ABILITY_DESCRIPTION_END) {
-                            removingAbilityDescription = false
-                        }
-                    }
-                }
             }
         }
     }
