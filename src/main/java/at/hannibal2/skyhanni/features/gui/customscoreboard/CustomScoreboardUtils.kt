@@ -68,7 +68,6 @@ object CustomScoreboardUtils {
     internal fun formatNumber(number: Number): String = when (displayConfig.numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> number.shortFormat()
         DisplayConfig.NumberFormat.LONG -> number.addSeparators()
-        else -> "0"
     }
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())

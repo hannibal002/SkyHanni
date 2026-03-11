@@ -106,8 +106,6 @@ object FFStats {
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 16.0)
                 FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 16.0)
             }
-
-            else -> {}
         }
         CarrolynTable.getByCrop(crop)?.let {
             val ff = if (it.get()) 12.0 else 0.0

@@ -150,7 +150,6 @@ object ChestValue {
     private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
         SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
         SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
-        else -> values.sortedByDescending { it.total }
     }
 
     private fun MutableList<Renderable>.addButton() {
@@ -225,11 +224,8 @@ object ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) this.shortFormat(true) else this
-                .shortFormat()
-
+            NumberFormatEntry.SHORT -> this.shortFormat(preciseBillions = this > 1_000_000_000)
             NumberFormatEntry.LONG -> this.addSeparators()
-            else -> "0"
         }
     }
 
