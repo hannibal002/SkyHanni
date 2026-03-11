@@ -103,7 +103,7 @@ object EnoughUpdatesManager {
         val parsedItems = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
-                val itemJson = fileSystem.readAllBytesAsJsonElement("items/$name").asJsonObject
+                val itemJson = fileSystem.readJson("items/$name").asJsonObject
                 val item = parseItem(
                     internalName = internalName,
                     json = itemJson,
