@@ -109,7 +109,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
     }
 
     // There is an open PR to change this entire file anyway, and I want these off my list
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION", "LongMethod", "CyclomaticComplexMethod")
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         drawDefaultBackground(mouseX, mouseY, partialTicks)
         screenHeight = height
