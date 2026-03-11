@@ -12,5 +12,4 @@ sealed class VanquisherEvent(val vanquisher: VanquisherData) : SkyHanniEvent() {
 
     /** Gets called when a Vanquisher is initially detected. */
     class Spawn(vanquisher: VanquisherData) : VanquisherEvent(vanquisher)
-
 }

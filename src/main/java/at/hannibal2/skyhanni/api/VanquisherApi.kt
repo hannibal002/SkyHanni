@@ -51,7 +51,7 @@ object VanquisherApi {
 
     private val spawnPattern by patternGroup.pattern(
         "spawnpattern",
-        "A Vanquisher is spawning nearby!"
+        "A Vanquisher is spawning nearby!",
     )
 
     private var lastOwnTime = SimpleTimeMark.farPast()
@@ -170,14 +170,14 @@ object VanquisherApi {
         event.title("VanquisherAPI")
         event.addIrrelevant {
             addAll(
-            "vanquishers $vanquishers",
-            "lastOwnVanqTime $lastOwnTime",
-            "vanqSpawnEntity $spawnEntity",
-            "lastPossibleVanqSpawnEntity $lastPossibleSpawnEntity",
-            "lastVanqSpawnEntityPos $lastSpawnEntityPos",
-            "lastVanqSpawnEntityTime $lastSpawnEntityTime",
-            "lastVanqSoundPos $lastSoundPos",
-            "lastVanqSoundTime $lastSoundTime",
+                "vanquishers $vanquishers",
+                "lastOwnVanqTime $lastOwnTime",
+                "vanqSpawnEntity $spawnEntity",
+                "lastPossibleVanqSpawnEntity $lastPossibleSpawnEntity",
+                "lastVanqSpawnEntityPos $lastSpawnEntityPos",
+                "lastVanqSpawnEntityTime $lastSpawnEntityTime",
+                "lastVanqSoundPos $lastSoundPos",
+                "lastVanqSoundTime $lastSoundTime",
             )
         }
     }
