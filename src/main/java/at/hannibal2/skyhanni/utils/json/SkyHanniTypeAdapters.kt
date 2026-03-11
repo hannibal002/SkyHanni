@@ -42,24 +42,57 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-object SkyHanniTypeAdapters {
-    val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
+// Because we have an enum named UUID, we have to skirt the clash
+private typealias J_UUID = UUID
 
-    val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
-        { this.toString() },
-        { StringUtils.parseUUID(this) },
-    )
-
-    val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
-        { this.asString() },
-        { NbtBoolean.fromString(this) },
-    )
-
-    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = object : TypeAdapter<NeuInternalName>() {
+/**
+ * All entries are automatically registered in [BaseGsonBuilder.gson] via [GsonBuilder.registerSkyHanniAdapters]
+ */
+enum class SkyHanniTypeAdapters(
+    val clazz: Class<*>,
+    val adapter: TypeAdapter<*>,
+) {
+    UUID(J_UUID::class.java, SimpleStringTypeAdapter({ this.toString() }, { StringUtils.parseUUID(this) })),
+    NBT_BOOLEAN(NbtBoolean::class.java, SimpleStringTypeAdapter({ this.asString() }, { NbtBoolean.fromString(this) })),
+    VEC(LorenzVec::class.java, SimpleStringTypeAdapter(LorenzVec::asStoredString, LorenzVec::decodeFromString)),
+    TROPHY_RARITY(TrophyRarity::class.java, SimpleStringTypeAdapter(
+        { name },
+        { TrophyRarity.getByName(this) ?: error("Could not parse TrophyRarity from '$this'") },
+    )),
+    NEU_RECIPE_COMPONENT(NeuRecipeComponent::class.java, SimpleStringTypeAdapter(
+        { this.toJsonString() },
+        { NeuRecipeComponent.fromJsonStringOrNull(this) ?: NeuRecipeComponent.EMPTY },
+    )),
+    NEU_ABSTRACT_RECIPE(NeuAbstractRecipe::class.java, object : TypeAdapter<NeuAbstractRecipe>() {
+        override fun write(writer: JsonWriter, value: NeuAbstractRecipe) { writer.value(value.toString()) }
+        override fun read(reader: JsonReader): NeuAbstractRecipe {
+            val obj = JsonParser.parseReader(reader).asJsonObject
+            val recipeType = NeuRecipeType.fromNeuIdOrNull(obj.get("type").asString)
+                ?: throw IllegalArgumentException("Unknown recipe type: ${obj.get("type").asString}")
+            return ConfigManager.gson.fromJson(obj, recipeType.castClazz)
+        }
+    }),
+    NEU_RECIPE_TYPE(NeuRecipeType::class.java, SimpleStringTypeAdapter(
+        { neuRepoId.orEmpty() },
+        { NeuRecipeType.fromNeuId(this) },
+    )),
+    NEU_RARITY_SPECIFIC_PET_NUMS(NEURaritySpecificPetNums::class.java, object : TypeAdapter<NEURaritySpecificPetNums>() {
+        override fun write(writer: JsonWriter, value: NEURaritySpecificPetNums) { writer.value(value.toString()) }
+        override fun read(reader: JsonReader): NEURaritySpecificPetNums {
+            val obj = JsonParser.parseReader(reader).asJsonObject
+            val neuPetNumsAdapter = ConfigManager.gson.getAdapter(NeuPetNums::class.java)
+            return NEURaritySpecificPetNums(
+                min = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("1")),
+                max = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("100")),
+                levelCurveString = obj.get("stats_levelling_curve")?.asString,
+            )
+        }
+    }),
+    NEU_ITEMSTACK(ItemStack::class.java, SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)),
+    INTERNAL_NAME(NeuInternalName::class.java, object : TypeAdapter<NeuInternalName>() {
         override fun write(writer: JsonWriter, value: NeuInternalName?) {
             if (value == null) writer.nullValue() else writer.value(value.asString())
         }
-
         override fun read(reader: JsonReader): NeuInternalName? {
             if (reader.peek() == JsonToken.NULL) {
                 reader.nextNull()
@@ -67,135 +100,55 @@ object SkyHanniTypeAdapters {
             }
             return reader.nextString().toInternalName()
         }
-    }
-
-    val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
-        LorenzVec::asStoredString,
-        LorenzVec::decodeFromString,
-    )
-
-    val TROPHY_RARITY: TypeAdapter<TrophyRarity> = SimpleStringTypeAdapter(
-        { name },
-        { TrophyRarity.getByName(this) ?: error("Could not parse TrophyRarity from '$this'") },
-    )
-
-    val TIME_MARK: TypeAdapter<SimpleTimeMark> = object : TypeAdapter<SimpleTimeMark>() {
-        override fun write(out: JsonWriter, value: SimpleTimeMark) {
-            out.value(value.toMillis())
-        }
-
-        override fun read(reader: JsonReader): SimpleTimeMark {
-            return reader.nextLong().asTimeMark()
-        }
-    }
-
-    val DURATION: TypeAdapter<Duration> = object : TypeAdapter<Duration>() {
-        override fun write(out: JsonWriter, value: Duration) {
-            out.value(value.inWholeMilliseconds)
-        }
-
-        override fun read(reader: JsonReader): Duration {
-            return reader.nextLong().milliseconds
-        }
-    }
-
-    val ELITE_LEADERBOARD_TYPE: TypeAdapter<EliteLeaderboardType> = EliteLeaderboardTypeAdapter()
-
-    val STOPWATCH: TypeAdapter<Stopwatch> = SimpleStringTypeAdapter(
+    }),
+    RARITY(LorenzRarity::class.java, SimpleStringTypeAdapter.forEnum<LorenzRarity>()),
+    ISLAND_TYPE(IslandType::class.java, SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)),
+    CROP_TYPE(CropType::class.java, SimpleStringTypeAdapter.forEnum<CropType>(CropType.WHEAT)),
+    PEST_TYPE(PestType::class.java, SimpleStringTypeAdapter.forEnum<PestType>(PestType.UNKNOWN)),
+    MOD_VERSION(ModVersion::class.java, SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)),
+    ELITE_LEADERBOARD_TYPE(EliteLeaderboardType::class.java, EliteLeaderboardTypeAdapter()),
+    TRACKER_DISPLAY_MODE(
+        SkyHanniTracker.DefaultDisplayMode::class.java,
+        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+    ),
+    TIME_MARK(SimpleTimeMark::class.java, object : TypeAdapter<SimpleTimeMark>() {
+        override fun write(out: JsonWriter, value: SimpleTimeMark) { out.value(value.toMillis()) }
+        override fun read(reader: JsonReader) = reader.nextLong().asTimeMark()
+    }),
+    DURATION(Duration::class.java, object : TypeAdapter<Duration>() {
+        override fun write(out: JsonWriter, value: Duration) { out.value(value.inWholeMilliseconds) }
+        override fun read(reader: JsonReader) = reader.nextLong().milliseconds
+    }),
+    STOPWATCH(Stopwatch::class.java, SimpleStringTypeAdapter(
         { this.getDuration().inWholeMilliseconds.toString() },
-        { this.toLongOrNull()?.milliseconds?.let { Stopwatch(it) } ?: error("Could not parse Stopwatch duration from '$this'") },
-    )
+        {
+            this.toLongOrNull()?.milliseconds?.let { Stopwatch(it) }
+                ?: error("Could not parse Stopwatch duration from '$this'")
+        },
+    )),
+    LOCALE_DATE(LocalDate::class.java, object : TypeAdapter<LocalDate>() {
+        override fun write(out: JsonWriter, value: LocalDate) { out.value(value.toString()) }
+        override fun read(reader: JsonReader): LocalDate = LocalDate.parse(reader.nextString())
+    }),
+    SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
+    COMPONENT(Component::class.java, object : TypeAdapter<Component>() {
+        override fun write(out: JsonWriter, value: Component) {
+            out.jsonValue(ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, value).getOrThrow().toString())
+        }
 
-    val SESSION_UPTIME: TypeAdapter<SessionUptime> = SessionUptimeTypeAdapter()
-
-    val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
+        override fun read(reader: JsonReader): Component =
+            ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow().first
+    }),
+    SKYBLOCK_STAT(SkyblockStat::class.java, SimpleStringTypeAdapter(
         { name.lowercase() },
         { SkyblockStat.getValue(this.uppercase()) },
-    )
+    )),
+}
 
-    val NEU_RECIPE_COMPONENT: TypeAdapter<NeuRecipeComponent> = SimpleStringTypeAdapter(
-        { this.toJsonString() },
-        {
-            NeuRecipeComponent.fromJsonStringOrNull(this)
-                ?: NeuRecipeComponent.EMPTY
-        }
-    )
-
-    val NEU_RECIPE_TYPE: TypeAdapter<NeuRecipeType> = SimpleStringTypeAdapter(
-        { neuRepoId.orEmpty() },
-        { NeuRecipeType.fromNeuId(this) },
-    )
-
-    val NEU_ABSTRACT_RECIPE = object : TypeAdapter<NeuAbstractRecipe>() {
-        override fun write(writer: JsonWriter, value: NeuAbstractRecipe) {
-            writer.value(value.toString())
-        }
-
-        override fun read(reader: JsonReader): NeuAbstractRecipe {
-            val obj = JsonParser.parseReader(reader).asJsonObject
-            val typeId = obj.get("type").asString
-            val recipeType = NeuRecipeType.fromNeuIdOrNull(typeId)
-                ?: throw IllegalArgumentException("Unknown recipe type: $typeId")
-            return ConfigManager.gson.fromJson(obj, recipeType.castClazz)
-        }
-    }
-
-    val NEU_RARITY_SPECIFIC_PET_NUMS = object : TypeAdapter<NEURaritySpecificPetNums>() {
-        override fun write(writer: JsonWriter, value: NEURaritySpecificPetNums) {
-            writer.value(value.toString())
-        }
-
-        override fun read(reader: JsonReader): NEURaritySpecificPetNums {
-            val obj = JsonParser.parseReader(reader).asJsonObject
-            val neuPetNumsAdapter = ConfigManager.gson.getAdapter(NeuPetNums::class.java)
-            val min = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("1"))
-            val max = neuPetNumsAdapter.fromJsonTree(obj.getAsJsonObject("100"))
-            val curve = obj.get("stats_levelling_curve")?.asString
-            return NEURaritySpecificPetNums(min, max, curve)
-        }
-
-    }
-
-    val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
-
-    val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
-    val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)
-    val CROP_TYPE = SimpleStringTypeAdapter.forEnum<CropType>(CropType.WHEAT)
-    val PEST_TYPE = SimpleStringTypeAdapter.forEnum<PestType>(PestType.UNKNOWN)
-    val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
-
-    val LOCALE_DATE = object : TypeAdapter<LocalDate>() {
-        override fun write(out: JsonWriter, value: LocalDate) {
-            out.value(value.toString())
-        }
-
-        override fun read(reader: JsonReader): LocalDate {
-            return LocalDate.parse(reader.nextString())
-        }
-    }
-
-    val COMPONENT = object : TypeAdapter<Component>() {
-        override fun write(out: JsonWriter, value: Component) {
-            val encodeStart = ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, value).getOrThrow()
-            out.jsonValue(encodeStart.toString())
-        }
-
-        override fun read(reader: JsonReader): Component {
-            return ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow().first
-        }
-    }
-
-    inline fun <reified T> GsonBuilder.registerTypeAdapter(
-        crossinline write: (JsonWriter, T) -> Unit,
-        crossinline read: (JsonReader) -> T,
-    ): GsonBuilder {
-        this.registerTypeAdapter(
-            T::class.java,
-            object : TypeAdapter<T>() {
-                override fun write(out: JsonWriter, value: T) = write(out, value)
-                override fun read(reader: JsonReader) = read(reader)
-            }.nullSafe(),
-        )
-        return this
+@Suppress("UNCHECKED_CAST")
+fun GsonBuilder.registerSkyHanniAdapters(): GsonBuilder = apply {
+    SkyHanniTypeAdapters.entries.forEach {
+        val adapter = (it.adapter as TypeAdapter<Any>).nullSafe()
+        registerTypeAdapter(it.clazz, adapter)
     }
 }
