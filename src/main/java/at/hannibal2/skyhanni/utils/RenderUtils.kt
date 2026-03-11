@@ -159,26 +159,21 @@ object RenderUtils {
     }
 
     @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
-    private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
-        val display = "§f$string"
-        DrawContextUtils.pushMatrix()
-        transform()
-        val fr = Minecraft.getInstance().font
+    private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int =
+        DrawContextUtils.pushPopResult {
+            val display = "§f$string"
+            transform()
+            val fr = Minecraft.getInstance().font
 
-        DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0)
+            DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0)
 
-        if (centered) {
-            val strLen: Int = fr.width(string)
-            val x2 = offsetX - strLen / 2f
-            GuiRenderUtils.drawString(display, x2, 0f, -1)
-        } else {
-            GuiRenderUtils.drawString(display, 0f, 0f, -1)
+            val finalX = if (centered) {
+                offsetX - (fr.width(string) / 2f)
+            } else 0f
+            GuiRenderUtils.drawString(display, finalX, 0f, -1)
+
+            return fr.width(display)
         }
-
-        DrawContextUtils.popMatrix()
-
-        return fr.width(display)
-    }
 
     @Deprecated("Use renderRenderables instead", ReplaceWith("renderRenderables(renderables)"))
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
