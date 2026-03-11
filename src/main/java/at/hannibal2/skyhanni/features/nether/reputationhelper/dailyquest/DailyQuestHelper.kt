@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
@@ -39,7 +38,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -197,7 +195,8 @@ object DailyQuestHelper {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
+        val count =
+            InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
         updateProcessQuest(fetchQuest, count)
     }
 
