@@ -13,7 +13,5 @@ object MovableHeldItemTooltip : MovableHudOverlay(
     anchorOffsetX = 91,
     anchorOffsetY = 59,
 ) {
-    private val config get() = SkyHanniMod.feature.gui.heldItemTooltip
-    override val position get() = config.position
-    override fun isEnabled() = isInSkyBlockOrEnabled(config.showOutsideSkyblock, config.enabled)
+    override val config get() = SkyHanniMod.feature.gui.heldItemTooltip
 }

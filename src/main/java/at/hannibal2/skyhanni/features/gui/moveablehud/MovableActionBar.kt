@@ -13,7 +13,5 @@ object MovableActionBar : MovableHudOverlay(
     anchorOffsetX = 91,
     anchorOffsetY = 72,
 ) {
-    private val config get() = SkyHanniMod.feature.gui.actionBar
-    override val position get() = config.position
-    override fun isEnabled() = isInSkyBlockOrEnabled(config.showOutsideSkyblock, config.enabled)
+    override val config get() = SkyHanniMod.feature.gui.actionBar
 }

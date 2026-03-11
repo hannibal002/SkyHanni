@@ -15,14 +15,14 @@ abstract class MoveableHudConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    open var enabled: Boolean = false
 
     @Expose
     @ConfigLink(owner = MoveableHudConfig::class, field = "enabled")
-    val position: Position = Position(20, 20)
+    open val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Shows the [HUD] outside of SkyBlock.")
     @ConfigEditorBoolean
-    var showOutsideSkyblock: Boolean = false
+    open var showOutsideSkyblock: Boolean = false
 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.moveablehud
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.MoveableHudConfig
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -27,10 +28,10 @@ abstract class MovableHudOverlay(
     private val anchorOffsetX: Int,
     private val anchorOffsetY: Int,
 ) {
-
-    abstract val position: Position
-    abstract fun isEnabled(): Boolean
-
+    abstract val config: MoveableHudConfig
+    private val position: Position get() = config.position
+    private fun isEnabled(): Boolean = config.enabled && inSbEnabled()
+    private fun inSbEnabled() = SkyBlockUtils.inSkyBlock || (MinecraftCompat.localPlayerExists && config.showOutsideSkyblock)
     private var matrixPushed = false
 
     @HandleEvent(priority = HandleEvent.LOWEST)
