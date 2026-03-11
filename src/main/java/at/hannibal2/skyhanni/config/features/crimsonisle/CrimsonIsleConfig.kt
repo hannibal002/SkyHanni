@@ -94,13 +94,4 @@ class CrimsonIsleConfig {
     @ConfigOption(name = "Magma Boss Phase", desc = "Show the current phase of the Magma Boss.")
     @ConfigEditorBoolean
     var magmaBossDisplay: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Share Vanquishers in Party Chat",
-        desc = "Sends a Party Chat Message when Spawning a Vanquisher."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var shareVanquishersInParty: Boolean = false
 }
