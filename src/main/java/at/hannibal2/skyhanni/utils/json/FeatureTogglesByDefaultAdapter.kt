@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.json
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import com.google.gson.Gson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.TypeAdapter
@@ -21,6 +22,16 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         return InternalGsonTypes.resolve(typeToken.type, typeToken.rawType, field.genericType)
     }
 
+    private fun Class<*>.getFieldInHierarchyOrNull(name: String): Field? {
+        var clazz: Class<*>? = this
+        while (clazz != null) {
+            val field = clazz.getDeclaredFieldOrNull(name)
+            if (field != null) return field
+            clazz = clazz.superclass
+        }
+        return null
+    }
+
     class Adapter<T>(
         val originalWrite: TypeAdapter<T>,
         val clazz: Class<T>,
@@ -28,24 +39,22 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         val type: TypeToken<T>,
     ) : TypeAdapter<T>() {
         override fun write(out: JsonWriter, value: T) {
-            // Delegate the original config write, since that one is unchanged
             originalWrite.write(out, value)
         }
 
         override fun read(reader: JsonReader): T {
             reader.beginObject()
             // Create a default initialized instance
-            val obj = clazz.newInstance()
+            val obj = clazz.getDeclaredConstructor().newInstance()
 
             // Overwrite the default with true (or false) for feature toggles
             for (field in clazz.fields) {
                 val featureToggle = field.getAnnotation(FeatureToggle::class.java)
                 val adapt = gson.getAdapter(TypeToken.get(getType(type, field)))
-                if (featureToggle != null)
-                    field.set(obj, adapt.read(JsonTreeReader(JsonPrimitive(featureToggle.trueIsEnabled))))
-                if (adapt is Adapter) {
-                    field.set(obj, adapt.read(JsonTreeReader(JsonObject())))
-                }
+                fun JsonElement.adaptRead() = field.set(obj, adapt.read(JsonTreeReader(this)))
+
+                if (featureToggle != null) JsonPrimitive(featureToggle.trueIsEnabled).adaptRead()
+                if (adapt is Adapter) JsonObject().adaptRead()
             }
 
             // Read the actual JSON Object
@@ -55,16 +64,18 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
                     reader.skipValue()
                     continue
                 }
-                val name = reader.nextName()
-                val field = clazz.getDeclaredFieldOrNull(name)
+                val fieldName = reader.nextName()
+                val field = clazz.getFieldInHierarchyOrNull(fieldName)
                 if (field == null) {
-                    println("field is in config file, but not in object file: $name")
+                    reader.skipValue()
+                    println("field is in config file, but not in object file: $fieldName")
                     continue
                 }
                 val fieldType = gson.getAdapter(TypeToken.get(getType(type, field)))
                 // Read the field data
                 val data = fieldType.read(reader)
-                // Set the field or override the feature toggle with the saved data, leaving only the unset feature toggles to deviate from their defaults
+                // Set the field or override the feature toggle with the saved data,
+                // leaving only the unset feature toggles to deviate from their defaults
                 field.set(obj, data)
             }
 
@@ -73,18 +84,17 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         }
     }
 
-    override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>): TypeAdapter<T>? {
-        gson!!
-        val t = type.rawType
-
-        // Check if this object has any feature toggles present
-        if (t.fields.none {
-                it.isAnnotationPresent(FeatureToggle::class.java) ||
-                    gson.getAdapter(TypeToken.get(getType(type, it))) is Adapter
+    override fun <T> create(gson: Gson?, type: TypeToken<T>): TypeAdapter<T>? {
+        require(gson != null)
+        val rawType = type.rawType?.takeIf {
+            it.fields.any { field ->
+                field.isAnnotationPresent(FeatureToggle::class.java) ||
+                    gson.getAdapter(TypeToken.get(getType(type, field))) is Adapter
             }
-        ) return null
+        } ?: return null
 
         val originalWrite = gson.getDelegateAdapter(this, type)
-        return Adapter(originalWrite, t as Class<T>, gson, type)
+        @Suppress("UNCHECKED_CAST")
+        return Adapter(originalWrite, rawType as Class<T>, gson, type)
     }
 }

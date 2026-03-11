@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.json
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
@@ -70,5 +71,8 @@ object BaseGsonBuilder {
         return gson()
             .registerTypeAdapterFactory(SkippingTypeAdapterFactory)
             .registerTypeAdapterFactory(ListEnumSkippingTypeAdapterFactory)
+            .apply {
+                if (SkyHanniMod.isBetaVersion) registerTypeAdapterFactory(FeatureTogglesByDefaultAdapter)
+            }
     }
 }
