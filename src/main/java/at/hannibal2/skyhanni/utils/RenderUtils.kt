@@ -19,8 +19,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.world.inventory.Slot
 import java.awt.Color
 import java.util.concurrent.CompletableFuture
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
