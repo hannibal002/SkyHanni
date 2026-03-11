@@ -34,27 +34,27 @@ fun Renderable.Companion.fakePlayer(
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
         val mouse = currentRenderPassMousePosition ?: return
-        DrawContextUtils.pushMatrix()
-        val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
-        val translationX = peeked.m20().toInt()
-        val translationY = peeked.m21().toInt()
-        val averageScale = (peeked.m00() + peeked.m11()) / 2
-        val adjustedPadding = (padding * averageScale).toInt()
-        val adjustedWidth = (width * averageScale).toInt()
-        val adjustedHeight = (height * averageScale).toInt()
-        drawEntityWithoutScissor(
-            DrawContextUtils.drawContext,
-            adjustedPadding + translationX,
-            adjustedPadding + translationY,
-            adjustedPadding + adjustedWidth + translationX,
-            adjustedPadding + adjustedHeight + translationY,
-            (entityScale * averageScale).toInt(),
-            0.0625f * averageScale,
-            if (followMouse) (mouse.first - mouseOffsetX.toFloat()) * averageScale + translationX else eyesX,
-            if (followMouse) (mouse.second - mouseOffsetY.toFloat()) * averageScale + translationY else eyesY,
-            player,
-        )
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
+            val translationX = peeked.m20().toInt()
+            val translationY = peeked.m21().toInt()
+            val averageScale = (peeked.m00() + peeked.m11()) / 2
+            val adjustedPadding = (padding * averageScale).toInt()
+            val adjustedWidth = (width * averageScale).toInt()
+            val adjustedHeight = (height * averageScale).toInt()
+            drawEntityWithoutScissor(
+                DrawContextUtils.drawContext,
+                adjustedPadding + translationX,
+                adjustedPadding + translationY,
+                adjustedPadding + adjustedWidth + translationX,
+                adjustedPadding + adjustedHeight + translationY,
+                (entityScale * averageScale).toInt(),
+                0.0625f * averageScale,
+                if (followMouse) (mouse.first - mouseOffsetX.toFloat()) * averageScale + translationX else eyesX,
+                if (followMouse) (mouse.second - mouseOffsetY.toFloat()) * averageScale + translationY else eyesY,
+                player,
+            )
+        }
     }
 }
 

@@ -57,6 +57,8 @@ class DefaultConfigOptionGui(
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(width / 2F, (height - ySize) / 2F)
             DrawContextUtils.scale(2f, 2f)
+            // Todo, this is the only usage of this function.
+            //  If this is reusable, make it a renderable, if not, re-implement.
             GuiRenderUtils.drawStringCenteredScaledMaxWidth(
                 guiTitle,
                 0F,
