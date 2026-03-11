@@ -6,11 +6,9 @@ import at.hannibal2.skyhanni.data.repo.RepoLogger
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
@@ -18,7 +16,11 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
-class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, DisposableHandle {
+class MemoryRepoFileSystem(
+    override val root: File,
+    override val logger: RepoLogger,
+    private val coroutineConfig: CoroutineConfig,
+) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
 
     /**
@@ -44,20 +46,15 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
     /**
      * Loads entries from [zipFile] into in-memory storage (via [loadFromZip]), then
-     * kicks off a background [flushResult] job to persist those bytes to [diskRoot].
+     * kicks off a background [flushResult] job to persist those bytes to [root].
      *
      * The flush is intentionally deferred to after the reload event fires, so that event
      * handlers benefit from fast in-memory reads without waiting for disk I/O. Call
      * [transitionAfterReload] to wait for the flush and switch to [DiskRepoFileSystem].
      */
-    override suspend fun loadFromZip(
-        progress: ChatProgressUpdates,
-        zipFile: File,
-        logger: RepoLogger,
-        coroutineConfig: CoroutineConfig,
-    ): Boolean {
+    override suspend fun loadFromZip(progress: ChatProgressUpdates, zipFile: File): Boolean {
         progress.update("repo file system loadFromZip")
-        val success = super.loadFromZip(progress, zipFile, logger, coroutineConfig)
+        val success = super.loadFromZip(progress, zipFile)
         check(flushResult == null) { "loadFromZip called twice on the same MemoryRepoFileSystem instance" }
 
         // Snapshot the category reference now — storage may be cleared before the flush job reads it.
@@ -69,9 +66,9 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
         // awaited later in transitionAfterReload.
         // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
         // through runWithErrorHandling which would otherwise swallow exceptions silently.
-        coroutineConfig.launchUnScoped {
+        coroutineConfig.withIOContext().launchUnScoped {
             try {
-                saveToDisk(progressCategory, diskRoot)
+                saveToDisk(progressCategory, root)
                 deferred.complete(Unit)
             } catch (e: CancellationException) {
                 deferred.completeExceptionally(e)
@@ -90,7 +87,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
     /**
      * Waits for the background disk flush to complete, then disposes in-memory storage and
-     * returns a [DiskRepoFileSystem] backed by [diskRoot].
+     * returns a [DiskRepoFileSystem] backed by [root].
      *
      * If the flush failed, the error is logged and the transition still proceeds — callers
      * should treat unsuccessful repo constants as the signal that something went wrong on disk.
@@ -110,7 +107,7 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
 
         progress.update("dispose in-memory storage")
         dispose()
-        return DiskRepoFileSystem(diskRoot)
+        return DiskRepoFileSystem(root, logger)
     }
 
     /**
@@ -122,13 +119,10 @@ class MemoryRepoFileSystem(private val diskRoot: File) : RepoFileSystem, Disposa
      *  - a failure in any single write cancels siblings and propagates to the caller
      *  - cancellation of the parent automatically cancels all writes
      */
-    @Suppress("InjectDispatcher")
     private suspend fun saveToDisk(
         group: ChatProgressUpdates.ChatProgressCategory,
         root: File,
-    ) = withContext(Dispatchers.IO) {
-        val progress = group.start("saveToDisk")
-
+    ) = group.startSuspendBlock("saveToDisk") { progress ->
         val base = root.toPath()
         progress.update("createDirectoriesFor")
         base.createDirectoriesFor(storage.keys)

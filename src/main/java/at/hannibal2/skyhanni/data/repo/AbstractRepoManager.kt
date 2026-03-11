@@ -105,7 +105,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
     private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
 
-    var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory) }
+    var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
         private set
 
     var localRepoCommit: RepoCommit = RepoCommit()
@@ -282,7 +282,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         withContext(Dispatchers.IO) {
             Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger, repoIOCoroutineConfig)) {
+        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
             logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
         }
@@ -454,7 +454,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger, repoIOCoroutineConfig)) {
+        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to unpack the downloaded zip file.")
             logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
@@ -473,8 +473,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
-            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory)
-            else DiskRepoFileSystem(repoDirectory)
+            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory, logger, repoIOCoroutineConfig)
+            else DiskRepoFileSystem(repoDirectory, logger)
         }.apply { deleteRecursively("") }
 
         progress.update("mkdirs")
