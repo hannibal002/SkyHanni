@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -10,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphEditor {
 
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = DevApi.config.devTool.graph
 
     var state = GraphEditorState()
         set(value) {

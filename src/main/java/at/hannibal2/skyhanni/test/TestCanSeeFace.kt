@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -154,7 +153,7 @@ object TestCanSeeFace {
 
     private var currentVisibilityState: RayVisibilityState = RayVisibilityState.ALL
     private var lastRenderable: Renderable? = null
-    private val config get() = SkyHanniMod.feature.dev.devTool.canSeeFace
+    private val config get() = DevApi.config.devTool.canSeeFace
     private val rayConfig get() = config.rays
     private val faceHighlightConfig get() = config.faceHighlight
     private val enabled get() = config.enabled.get()

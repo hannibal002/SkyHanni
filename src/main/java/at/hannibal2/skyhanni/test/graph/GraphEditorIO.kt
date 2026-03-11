@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -18,7 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphEditorIO {
 
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = DevApi.config.devTool.graph
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes

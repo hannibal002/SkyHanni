@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ParkourWaypointSaver {
 
-    private val config get() = SkyHanniMod.feature.dev.waypoint
+    private val config get() = DevApi.config.waypoint
     private var timeLastSaved = SimpleTimeMark.farPast()
     private var locations = mutableListOf<LorenzVec>()
     private var parkourHelper: ParkourHelper? = null
@@ -33,7 +33,7 @@ object ParkourWaypointSaver {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getInstance().screen != null) return
-        if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
+        if (DevApi.config.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
         when (event.keyCode) {

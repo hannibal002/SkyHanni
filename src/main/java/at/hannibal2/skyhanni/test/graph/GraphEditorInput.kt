@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
@@ -30,7 +31,7 @@ import org.lwjgl.glfw.GLFW
 @SkyHanniModule
 object GraphEditorInput {
 
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = DevApi.config.devTool.graph
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 
