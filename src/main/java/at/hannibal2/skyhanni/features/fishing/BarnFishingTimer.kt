@@ -33,7 +33,7 @@ object BarnFishingTimer {
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private const val GLOBAL_CAP = 60
     private val warningDelay = 5.seconds
-    private val barnLocation = LorenzVec(108, 89, -252)
+    private val hubBarnFishingLocation = LorenzVec(108, 89, -252)
 
     private enum class FishingCap(val island: IslandType, islandPersonalCap: Int? = null) {
         CRIMSON_ISLE(IslandType.CRIMSON_ISLE, 5),
@@ -125,6 +125,7 @@ object BarnFishingTimer {
             lastWarning = ServerTimeMark.now()
             SoundUtils.plingSound.playSound()
             TitleManager.sendTitle(reason.display, duration = 2.seconds)
+            ChatUtils.chat(reason.display, replaceSameMessage = true)
         }
 
         val timeColor = if (reason == AlertReason.TIME) "§c" else "§a"
@@ -192,10 +193,7 @@ object BarnFishingTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        enabledInIsland = if (config.showAnywhere) true else when (SkyBlockUtils.currentIsland) {
-            IslandType.HUB -> barnLocation.distanceToPlayer() < 50
-            else -> false
-        }
+        enabledInIsland = if (config.showAnywhere) true else hubBarnFishingLocation.distanceToPlayer() < 50
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get() && enabledInIsland
