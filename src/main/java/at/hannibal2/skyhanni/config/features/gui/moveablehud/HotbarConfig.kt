@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class HotbarConfig : MoveableHudConfig() {
+class HotbarConfig : MoveableHudConfig {
     @Expose
     @ConfigOption(
         name = "Editable",

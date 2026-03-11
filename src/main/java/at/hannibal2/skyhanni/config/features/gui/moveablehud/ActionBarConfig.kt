@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ActionBarConfig : MoveableHudConfig() {
+class ActionBarConfig : MoveableHudConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

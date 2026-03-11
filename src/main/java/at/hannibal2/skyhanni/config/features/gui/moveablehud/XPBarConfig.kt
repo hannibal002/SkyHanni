@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class XPBarConfig : MoveableHudConfig() {
+class XPBarConfig : MoveableHudConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Allows for moving and scaling the XP bar in the SkyHanni GUI Editor.")
     @ConfigEditorBoolean
