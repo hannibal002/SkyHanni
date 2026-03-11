@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -49,13 +51,14 @@ object FastFairySoulsPathfinder {
 
     private var data: Data? = null
 
+    private val soulPathFindConfig = CoroutineConfig("fairy souls pathfind")
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
      * REGEX-TEST: §dYou have already found that Fairy Soul!
      */
     private val duplicatePattern by patternGroup.pattern(
-        "chat.duplicat",
+        "chat.duplicate",
         "§dYou have already found that Fairy Soul!",
     )
 
@@ -71,8 +74,8 @@ object FastFairySoulsPathfinder {
      * REGEX-TEST: §7Fairy Souls: §e11§7/§d11
      */
     private val loreSoulPattern by patternGroup.pattern(
-        "new",
-        "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
+        "new.colorless",
+        "Fairy Souls: (?<have>.*)\\/(?<total>.*)",
     )
 
     private class Data(
@@ -211,16 +214,16 @@ object FastFairySoulsPathfinder {
 
         for (stack in event.inventoryItems.values) {
             val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
-            val have = stack.getLore().firstOrNull()?.let {
-                loreSoulPattern.matchMatcher(it) {
-                    group("have").toIntOrNull()
+            val found = stack.getLoreComponent().firstOrNull()?.let {
+                loreSoulPattern.matchMatcher(it.string) {
+                    group("total").toIntOrNull()
                 }
             } ?: continue
 
             if (island.isCurrent()) {
                 data?.checkHaveAll()
             }
-            totalFound[island] = have
+            totalFound[island] = found
         }
     }
 
@@ -262,7 +265,7 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        SkyHanniMod.launchCoroutine("fairy souls pathfind") {
+        soulPathFindConfig.launch {
             val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
