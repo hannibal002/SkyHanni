@@ -25,7 +25,7 @@ object SlayerItemsOnGround {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
+        for (entityItem in EntityUtils.getEntitiesNearby<ItemEntity>(15.0)) {
             val itemStack = entityItem.item
             if (itemStack.item is SpawnEggItem) continue
             if (itemStack.getInternalName() == NeuInternalName.NONE) continue

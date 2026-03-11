@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -84,7 +85,7 @@ object HighlightVisitorsOutsideOfGarden {
         }
 
     private fun isVisitorNearby(location: LorenzVec) =
-        EntityUtils.getEntitiesNearby<LivingEntity>(location, 2.0).any { isVisitor(it) }
+        location.getEntitiesNearby<LivingEntity>(2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {

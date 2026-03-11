@@ -12,7 +12,7 @@ class PestTimerSoundSettings {
     @Expose
     @ConfigOption(name = "Notification Sound", desc = "The sound played for the notification.")
     @ConfigEditorText
-    var name: String = "note.pling"
+    var name: String = "block.note_block.pling"
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the notification sound.")

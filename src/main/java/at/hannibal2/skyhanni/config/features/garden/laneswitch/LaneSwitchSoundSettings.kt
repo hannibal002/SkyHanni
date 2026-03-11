@@ -12,7 +12,7 @@ class LaneSwitchSoundSettings {
     @Expose
     @ConfigOption(name = "Notification Sound", desc = "The sound played for the notification.")
     @ConfigEditorText
-    var name: String = "random.orb"
+    var name: String = "entity.experience_orb.pickup"
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the notification sound.")

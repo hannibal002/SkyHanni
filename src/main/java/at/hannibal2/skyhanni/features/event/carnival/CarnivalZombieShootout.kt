@@ -233,7 +233,7 @@ object CarnivalZombieShootout {
     }
 
     private fun getZombies() =
-        EntityUtils.getEntitiesNextToPlayer<Zombie>(50.0).mapNotNull { zombie ->
+        EntityUtils.getEntitiesNearby<Zombie>(50.0).mapNotNull { zombie ->
             if (zombie.findHealthReal() <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
             val type = toType(helmet) ?: run {

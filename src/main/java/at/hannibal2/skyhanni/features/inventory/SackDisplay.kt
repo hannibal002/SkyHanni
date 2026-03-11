@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -69,7 +70,10 @@ object SackDisplay {
     }
 
     fun update(savingSacks: Boolean) {
-        display = drawDisplay(savingSacks)
+        // Ensure we're running on the render thread - this gets called from the network thread in SackApi
+        DelayedRun.runOrNextTick {
+            display = drawDisplay(savingSacks)
+        }
     }
 
     private fun drawDisplay(savingSacks: Boolean) = buildList {

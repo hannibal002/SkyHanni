@@ -12,7 +12,7 @@ class BroodmotherSpawnAlertConfig {
     @Expose
     @ConfigOption(name = "Alert Sound", desc = "The sound that plays for the alert.")
     @ConfigEditorText
-    var alertSound: String = "note.pling"
+    var alertSound: String = "block.note_block.pling"
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the alert sound.")

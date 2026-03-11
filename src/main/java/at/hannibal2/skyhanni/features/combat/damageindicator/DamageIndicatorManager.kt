@@ -77,7 +77,7 @@ import at.hannibal2.skyhanni.data.mob.Mob as ShMob
 
 typealias EntityData = DamageIndicatorEntityData
 
-// TODO cut class into smaller pieces
+// TODO cut class into definition, API, and display classes
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {

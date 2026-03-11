@@ -21,7 +21,8 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
     public void onRenderPre(EntityRenderState renderState, CameraRenderState cameraRenderState, double d, double e, double f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
         EntityRenderDispatcherHookKt.setEntity(renderState);
         Entity entity = EntityRenderDispatcherHookKt.getEntity();
-        if (entity instanceof LivingEntity livingEntity) {
+        if (entity instanceof LivingEntity livingEntity
+            && !EntityRenderDispatcherHookKt.getActiveHolographicEntities().contains(livingEntity)) {
             if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
                 ci.cancel();
             }

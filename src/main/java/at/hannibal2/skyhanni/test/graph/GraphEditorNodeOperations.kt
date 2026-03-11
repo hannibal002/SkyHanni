@@ -53,10 +53,11 @@ object GraphEditorNodeOperations {
         return edges.add(edge)
     }
 
-    fun handleDissolve() {
-        if (!state.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
+    fun handleDissolve(): Boolean {
+        if (!config.dissolveKey.isKeyClicked()) return false
 
-        val activeNode = state.activeNode ?: return
+        if (!state.dissolvePossible) return true
+        val activeNode = state.activeNode ?: return true
 
         GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
         val edgePair = edges.filter { it.isInEdge(activeNode) }
@@ -72,6 +73,7 @@ object GraphEditorNodeOperations {
         nodes.remove(activeNode)
         state.activeNode = null
         addEdge(neighbors1, neighbors2, direction)
+        return true
     }
 
     private fun getDirection(
@@ -93,8 +95,10 @@ object GraphEditorNodeOperations {
         }
     }
 
-    fun handleConnect() {
-        if (state.activeNode == state.closestNode || !config.connectKey.isKeyClicked()) return
+    fun handleConnect(): Boolean {
+        if (!config.connectKey.isKeyClicked()) return false
+
+        if (state.activeNode == state.closestNode) return true
         val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {
             GraphEditorHistory.save("added edge")
@@ -108,6 +112,7 @@ object GraphEditorNodeOperations {
             GraphEditor.feedBackInTutorial("Removed edge.")
             GraphEditor.updateRender()
         }
+        return true
     }
 
     fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {

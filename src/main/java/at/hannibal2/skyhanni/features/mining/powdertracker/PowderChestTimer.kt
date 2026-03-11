@@ -58,7 +58,7 @@ object PowderChestTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (event.soundName == "random.levelup" && event.pitch == 1f && event.volume == 1.0f) {
+        if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
         }
     }

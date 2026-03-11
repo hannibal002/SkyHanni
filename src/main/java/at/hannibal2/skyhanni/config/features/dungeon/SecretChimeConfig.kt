@@ -41,7 +41,7 @@ class SecretChimeConfig {
     @Expose
     @ConfigOption(name = "Secret Chime Sound", desc = "The sound played for the secret chime.")
     @ConfigEditorText
-    var soundName: String = "random.orb"
+    var soundName: String = "entity.experience_orb.pickup"
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the secret chime sound.")

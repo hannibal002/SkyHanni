@@ -28,7 +28,7 @@ class HoppityCallWarningConfig {
             "§cMust be a .ogg file",
     )
     @ConfigEditorText
-    val hoppityCallSound: Property<String> = Property.of("note.pling")
+    val hoppityCallSound: Property<String> = Property.of("block.note_block.pling")
 
     @Expose
     @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")

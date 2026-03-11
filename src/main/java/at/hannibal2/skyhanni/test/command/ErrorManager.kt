@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -169,7 +171,7 @@ object ErrorManager {
             *extraData,
             betaOnly = betaOnly,
             condition = condition,
-        )
+        ).crashIfNotYetOnAServer()
     }
 
     // log with stack trace from other try catch block
@@ -180,9 +182,15 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
-    ): Boolean = logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
+    ): Boolean = logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly).crashIfNotYetOnAServer()
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
+
+    enum class ErrorState {
+        LOGGED,
+        BLOCKED_NOT_NEEDED,
+        BLOCKED_CAN_NOT_SHOW,
+    }
 
     @Suppress("ReturnCount")
     private fun logError(
@@ -193,23 +201,22 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ): Boolean {
-        if (MinecraftCompat.localPlayerOrNull == null) {
-            println("extra data:\n${getExtraDataOrCached(extraData)}")
-        }
-        if (betaOnly && !SkyHanniMod.isBetaVersion) return false
+    ): ErrorState {
+        if (!condition()) return ErrorState.BLOCKED_NOT_NEEDED
+
+        // TODO add missing debug enabled check
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return ErrorState.BLOCKED_NOT_NEEDED
+
         val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
                 CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
             } ?: CachedError("<empty stack trace>", 0, message)
-            if (cachedError in cache) return false
+            if (cachedError in cache) return ErrorState.BLOCKED_NOT_NEEDED
             cache.add(cachedError)
         }
-        if (!condition()) return false
 
         Error(message, throwable).printStackTrace()
-        MinecraftCompat.localPlayerOrNull ?: return false
 
         val fullStackTrace: String
         val stackTrace: String
@@ -225,21 +232,70 @@ object ErrorManager {
 
         val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
-        val shVersion = SkyHanniMod.VERSION
-        val mcVersion = PlatformUtils.MC_VERSION
-        val label = "SkyHanni $shVersion $mcVersion"
+        val label = getLabel()
         errorMessages[randomId] = "```\n$label: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
             "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
-        val finalMessage = buildFinalMessage(message) ?: return false
+        val isConnected = MinecraftCompat.localPlayerOrNull != null
+
+        val finalMessage = buildFinalMessage(message) ?: return ErrorState.BLOCKED_CAN_NOT_SHOW
+        if (!isConnected) {
+            errorsToShowOnJoin[randomId] = finalMessage
+            return ErrorState.BLOCKED_CAN_NOT_SHOW
+        }
         ChatUtils.clickableChat(
             "§c[$label]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,
         )
-        return true
+        return ErrorState.LOGGED
+    }
+
+    private fun getLabel(): String {
+        val shVersion = SkyHanniMod.VERSION
+        val mcVersion = PlatformUtils.MC_VERSION
+        return "SkyHanni $shVersion $mcVersion"
+    }
+
+    // random id -> final message
+    private val errorsToShowOnJoin = mutableMapOf<String, String>()
+
+    private fun ErrorState.crashIfNotYetOnAServer(): Boolean {
+        if (this == ErrorState.BLOCKED_NOT_NEEDED) return false
+
+        // TODO find way to properly do this before the config loads
+        val devCrash = false
+        if (devCrash) {
+            if (!MinecraftData.hasLeftMainScreen) {
+                fullErrorMessages.entries.firstOrNull()?.value?.let {
+                    crashInDevEnv("error message in main screen: \n \n \n \n $it")
+                } ?: run {
+                    crashInDevEnv("error message in main screen")
+                }
+            }
+        }
+
+        return this == ErrorState.LOGGED
+    }
+
+    @HandleEvent(ClientConnectEvent::class)
+    fun onClientConnect() {
+        if (errorsToShowOnJoin.isEmpty()) return
+        val label = getLabel()
+        val state = if (MinecraftData.hasLeftMainScreen) "During startup" else "While not on a server"
+        ChatUtils.chat("§e$state, $label found ${errorsToShowOnJoin.size} errors!", prefix = false)
+        ChatUtils.chat("  §7(Click on the message to copy the error into the clipboard)", prefix = false)
+        for ((id, message) in errorsToShowOnJoin) {
+            ChatUtils.clickableChat(
+                "§7- §c$message",
+                onClick = { copyError(id) },
+                "§eClick to copy!",
+                prefix = false,
+            )
+        }
+        errorsToShowOnJoin.clear()
     }
 
     private fun getExtraDataOrCached(extraData: Array<out Pair<String, Any?>>): String {
