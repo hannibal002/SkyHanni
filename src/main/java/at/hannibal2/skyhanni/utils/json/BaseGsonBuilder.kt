@@ -71,8 +71,5 @@ object BaseGsonBuilder {
         return gson()
             .registerTypeAdapterFactory(SkippingTypeAdapterFactory)
             .registerTypeAdapterFactory(ListEnumSkippingTypeAdapterFactory)
-            .apply {
-                if (SkyHanniMod.isBetaVersion) registerTypeAdapterFactory(FeatureTogglesByDefaultAdapter)
-            }
     }
 }
