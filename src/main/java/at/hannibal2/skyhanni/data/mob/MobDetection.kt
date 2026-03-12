@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import at.hannibal2.skyhanni.data.mob.MobCategory as Category
 
+@Suppress("ReturnCount", "MaxLineLength")
 @SkyHanniModule
 object MobDetection {
 
@@ -176,7 +177,6 @@ object MobDetection {
         return isVisible
     }
 
-    @Suppress("ReturnCount")
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: LivingEntity, roughType: Category): Boolean {
         when (roughType) {
