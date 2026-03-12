@@ -5,6 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
@@ -51,16 +54,11 @@ private typealias DropCategory = ForagingTrackerConfig.TreeGiftBonusDropCategory
 @SkyHanniModule
 object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeType, ForagingTrackerLegacy.BucketData>(
     "Foraging Tracker",
-    { ForagingTrackerLegacy.BucketData() },
-    { it.foraging.trackerData },
-    { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.foraging.tracker.perTrackerConfig },
 ) {
-    private val config get() = SkyHanniMod.feature.foraging.tracker
-
-    init {
-        initRenderer({ config.position }) { isInIsland() && heldItemEnabled() && config.enabled }
-    }
+    override val storage: (ProfileSpecificStorage) -> ForagingTrackerLegacy.BucketData = { it.foraging.trackerData}
+    override val config get() = SkyHanniMod.feature.foraging.tracker
+    override val onlyOnIslandTag: IslandTypeTag = IslandTypeTags.FORAGING_CUSTOM_TREES
+    override val renderCondition: () -> Boolean = { heldItemEnabled() && config.enabled }
 
     private fun heldItemEnabled() = !config.onlyHoldingAxe ||
         (isHoldingAxe() || lastAxeHeldTime.passedSince() < config.disappearingDelay.seconds)
@@ -120,13 +118,13 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isInIsland() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!onlyOnIslandTag.inAny() || event.source != ItemAddManager.Source.COMMAND) return
         event.addItemFromEvent()
     }
 
     @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
-        if (!isInIsland()) return
+        if (!onlyOnIslandTag.inAny()) return
         event.addLogs()
     }
 
@@ -175,7 +173,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isInIsland()) return
+        if (!onlyOnIslandTag.inAny()) return
         event.tryReadLoot()
         event.tryBlock()
     }
@@ -185,7 +183,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent(OwnInventoryItemUpdateEvent::class)
     fun onOwnInventoryItemUpdate() {
-        if (!isInIsland()) return
+        if (!onlyOnIslandTag.inAny()) return
         val treeType = treeType ?: return
 
         val stretchingSticksNow = InventoryUtils.getItemsInOwnInventory().filter {
@@ -360,11 +358,9 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
-        if (!isInIsland()) return
+        if (!onlyOnIslandTag.inAny()) return
         firstUpdate()
     }
-
-    private fun isInIsland() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -377,7 +373,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
 
     @HandleEvent
     fun onItemChange(event: ItemInHandChangeEvent) {
-        if (!isInIsland()) return
+        if (!onlyOnIslandTag.inAny()) return
         val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
         if (isAxe != hasHeldAxe) {
             if (!isAxe) {

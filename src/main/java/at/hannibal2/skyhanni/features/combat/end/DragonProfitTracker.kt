@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -32,12 +33,9 @@ import java.util.EnumMap
 @SkyHanniModule
 object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfitTracker.BucketData>(
     "Dragon Profit Tracker",
-    ::BucketData,
-    { it.dragonProfitTracker },
-    { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker.perTrackerConfig }
 ) {
-    private val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
+    override val storage: (ProfileSpecificStorage) -> BucketData = { it.dragonProfitTracker }
+    override val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
 
     private var lastPlaced: Int = 0
     private val SUMMONING_EYE = "SUMMONING_EYE".toInternalName()
@@ -45,7 +43,7 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
     data class BucketData(
         @Expose var dragonKills: MutableMap<DragonType, Long> = EnumMap(DragonType::class.java),
         @Expose var eyesPlaced: Long = 0,
-    ) : BucketedItemTrackerData<DragonType, SessionUptime.Normal>(DragonType::class, SessionUptime.Normal::class) {
+    ) : BucketedItemTrackerData<DragonType, SessionUptime.Normal>() {
         override fun getCoinName(bucket: DragonType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: DragonType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
@@ -71,27 +69,27 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
         }
     }
 
-    private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
+    override fun drawDisplayF(data: BucketData): List<Searchable> = buildList {
         addSearchString("§b§lDragon Profit Tracker")
-        addBucketSelector(this, bucketData, "Dragon Type")
+        addBucketSelector(this, data, "Dragon Type")
 
-        val duration = bucketData.getTotalUptime()
+        val duration = data.getTotalUptime()
 
-        var profit = drawItems(bucketData, { true }, this)
+        var profit = drawItems(data, { true }, this)
 
         val eyePrice = getPricePer(SUMMONING_EYE)
-        val totalEyePrice = eyePrice * bucketData.eyesPlaced
+        val totalEyePrice = eyePrice * data.eyesPlaced
         profit -= totalEyePrice
-        val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c${(-totalEyePrice).shortFormat()}"
+        val eyeFormat = "§7${data.eyesPlaced}x §5Summoning Eye §c${(-totalEyePrice).shortFormat()}"
         addSearchString(eyeFormat, "Summoning Eye")
 
-        val colorCode = bucketData.selectedBucket?.color ?: LorenzColor.AQUA
-        val displayName = bucketData.selectedBucket?.displayName ?: "Total Dragon"
-        val killAmount = bucketData.getTotalDragonCount()
+        val colorCode = data.selectedBucket?.color ?: LorenzColor.AQUA
+        val displayName = data.selectedBucket?.displayName ?: "Total Dragon"
+        val killAmount = data.getTotalDragonCount()
         val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
         addSearchString(dragonString)
 
-        addAll(addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon", duration, "Dragons"))
+        addAll(addTotalProfit(profit, data.getTotalDragonCount(), "Dragon", duration, "Dragons"))
 
         addPriceFromButton(this)
     }
@@ -112,9 +110,8 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
         ChatUtils.debug("Added item to tracker: ${event.internalName} (amount: ${event.amount})")
     }
 
-    init {
-        initRenderer({ config.position }) { config.enabled && DragonFightAPI.inNestArea() }
-    }
+    override val onlyOnIsland: IslandType = IslandType.THE_END
+    override val renderCondition = { DragonFightAPI.inNestArea() }
 
     fun addEyes(amount: Int) {
         modify { it.eyesPlaced += amount }

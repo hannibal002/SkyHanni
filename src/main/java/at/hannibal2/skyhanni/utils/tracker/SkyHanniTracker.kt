@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -55,7 +56,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
         jClass.getConstructor()
     }
 
-    internal abstract val storage: Data
+    internal abstract val storage: (ProfileSpecificStorage) -> Data
     internal abstract val config: TopLevelTrackerConfig<*>
     internal val perTrackerConfig: GenericIndividualTrackerConfig<*> get() = config.perTrackerConfig
     @Suppress("UNCHECKED_CAST")
@@ -69,6 +70,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
     internal open val inventory = NO_INVENTORY
     internal open val renderCondition: () -> Boolean = { true }
     internal open val onlyOnIsland: IslandType? = null
+    internal open val onlyOnIslandTag: IslandTypeTag? = null
     internal open val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap()
 
     private var displayMode: DisplayMode? = null
@@ -87,6 +89,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
             inOwnInventory = true,
             condition = renderCondition,
             onlyOnIsland = onlyOnIsland,
+            onlyOnIslandTag = onlyOnIslandTag,
             onRender = {
                 renderDisplay(config.position)
             },
@@ -278,7 +281,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
-                DisplayMode.TOTAL to storage,
+                DisplayMode.TOTAL to storage(ps),
                 DisplayMode.SESSION to currentSessions.getOrPut(ps) { dataCtor.newInstance() },
             ) + extraDisplayModes.mapValues { it.value(ps) },
         )

@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
-import kotlin.reflect.KClass
+import java.lang.reflect.ParameterizedType
 
-abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KClass<E>, session: KClass<T>) : ItemTrackerData<T>(session) {
+abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTrackerData<T>() {
 
     final override fun getDescription(timesGained: Long): List<String> =
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
@@ -63,10 +63,14 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
     }
 
     abstract fun E.isBucketSelectable(): Boolean
-
     abstract fun bucketName(): String
 
-    private val buckets: Array<E> = clazz.java.enumConstants
+    @Suppress("UNCHECKED_CAST")
+    private val buckets: Array<E> by lazy {
+        val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
+        val jClass = genericSuper.actualTypeArguments[0] as Class<Enum<E>>
+        jClass.enumConstants as Array<E>
+    }
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 
     private val scrollValues: Map<E?, ScrollValue> = buckets.associateWith { ScrollValue() } + (null to ScrollValue())

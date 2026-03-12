@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -17,6 +18,8 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
  * @property outsideInventory Specifies if the display should render when not inside any inventory.
  * @property inOwnInventory Specifies if the display should render when the player is in their own inventory.
  * @property condition Should the display be rendered at all? Insert the isEnabled() function here.
+ * @property onlyOnIsland Should the display only render on a certain Skyblock Island?
+ * @property onlyOnIslandTag Should the display only render when on an island with a certain tag?
  * @property onRender This is getting called when the render should happen.
  */
 class RenderDisplayHelper(
@@ -25,6 +28,7 @@ class RenderDisplayHelper(
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
     private val onlyOnIsland: IslandType? = null,
+    private val onlyOnIslandTag: IslandTypeTag? = null,
     private val onRender: () -> Unit,
 ) {
 
@@ -70,13 +74,14 @@ class RenderDisplayHelper(
     }
 
     private fun checkCondition(): Boolean = try {
-        condition() && checkIslandCondition()
+        condition() && checkIslandCondition() && checkIslandTagCondition()
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(e, "Failed to check render display condition")
         false
     }
 
     private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isCurrent()
+    private fun checkIslandTagCondition(): Boolean = onlyOnIslandTag == null || onlyOnIslandTag.inAny()
 
     private fun render() {
         try {

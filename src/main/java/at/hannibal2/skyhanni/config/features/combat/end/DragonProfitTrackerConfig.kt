@@ -3,14 +3,15 @@ package at.hannibal2.skyhanni.config.features.combat.end
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class DragonProfitTrackerConfig {
-
+class DragonProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -19,11 +20,11 @@ class DragonProfitTrackerConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigLink(owner = DragonProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(20, 20)
+    override val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -40,5 +41,5 @@ class DragonProfitTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }

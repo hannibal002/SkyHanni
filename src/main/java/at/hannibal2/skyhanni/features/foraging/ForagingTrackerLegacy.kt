@@ -42,7 +42,7 @@ object ForagingTrackerLegacy {
         @Expose var hotfExperience: MutableMap<TreeType, Long> = enumMapOf(),
         @Expose var foragingExperience: MutableMap<TreeType, Long> = enumMapOf(),
         @Expose var forestWhispers: MutableMap<TreeType, Long> = enumMapOf(),
-    ) : BucketedItemTrackerData<TreeType, SessionUptime.Normal>(TreeType::class, SessionUptime.Normal::class) {
+    ) : BucketedItemTrackerData<TreeType, SessionUptime.Normal>() {
         override fun getDescription(bucket: TreeType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
