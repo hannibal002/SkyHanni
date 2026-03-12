@@ -46,6 +46,8 @@ object SlayerProfitTracker : SkyHanniItemTracker<SlayerProfitTracker.Data>("Slay
     override val renderCondition: () -> Boolean = { shouldShowDisplay() }
     override val outsideInventory = true
     override val inOwnInventory = true
+    override val name: String
+        get() = "$categoryName Profit Tracker"
 
     private var category = ""
     private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)

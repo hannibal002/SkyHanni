@@ -60,6 +60,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     // todo move to somewhere sensible, rename
     internal abstract fun drawDisplayF(data: Data): List<Searchable>
     internal open fun extraOnRender() = Unit
+    internal fun createNewSession() = dataCtor.newInstance()
 
     @Suppress("UNCHECKED_CAST")
     private val dataCtor by lazy {
@@ -72,7 +73,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
     internal abstract val config: TopLevelTrackerConfig<*>
     internal open val perTrackerConfig: GenericIndividualTrackerConfig<*> get() = config.perTrackerConfig
-    @Suppress("UNCHECKED_CAST")
     internal open val trackerConfig: TrackerGenericConfig get() = perTrackerConfig.let {
         if (it.useUniversalConfig) universalTracker
         else it.trackerConfig
@@ -200,7 +200,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         }
     }
 
-    private fun showSessionUptime() =
+    internal fun showSessionUptime() =
         trackerConfig.showUptime.get() && (!trackerConfig.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk() {

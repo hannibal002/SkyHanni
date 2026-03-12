@@ -26,26 +26,26 @@ open class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
         getData(displayMode, string)?.reset()
     }
 
-    fun getEntries(displayMode: DisplayMode): MutableMap<String, TrackerData<*>>? {
+    fun getEntries(displayMode: DisplayMode): MutableMap<String, TimedTrackerData<*>>? {
         return sessions[displayMode]
     }
 
-    fun getOrPutEntry(displayMode: DisplayMode): MutableMap.MutableEntry<String, TrackerData<*>> {
+    fun getOrPutEntry(displayMode: DisplayMode): MutableMap.MutableEntry<String, TimedTrackerData<*>> {
         return getOrPutEntry(displayMode, getDefaultName(displayMode))
     }
 
-    fun getOrPutEntry(displayMode: DisplayMode, string: String): MutableMap.MutableEntry<String, TrackerData<*>> {
+    fun getOrPutEntry(displayMode: DisplayMode, string: String): MutableMap.MutableEntry<String, TimedTrackerData<*>> {
         val display = sessions.getOrPut(displayMode) { mutableMapOf() }
         display.getOrPut(string) { createNewSession() }
         return display.entries.first { it.key == string }
     }
 
-    fun createEntry(displayMode: DisplayMode, string: String, data: TrackerData<*>) {
+    fun createEntry(displayMode: DisplayMode, string: String, data: TimedTrackerData<*>) {
         val display = sessions.getOrPut(displayMode) { mutableMapOf() }
         display[string] = data
     }
 
-    fun deleteEntry(displayMode: DisplayMode, string: String): TrackerData<*>? {
+    fun deleteEntry(displayMode: DisplayMode, string: String): TimedTrackerData<*>? {
         val display = sessions[displayMode] ?: return null
         val data = display[string]
         if (getCurrentName(DisplayMode.SESSION) == string) {
@@ -55,35 +55,35 @@ open class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
         return data
     }
 
-    fun getAllCurrentData(): Set<TrackerData<*>> {
-        val set = mutableSetOf<TrackerData<*>>()
+    fun getAllCurrentData(): Set<TimedTrackerData<*>> {
+        val set = mutableSetOf<TimedTrackerData<*>>()
         sessions.keys.forEach {
             getCurrentData(it)?.let { it1 -> set.add(it1) }
         }
         return set
     }
 
-    fun getOrPutData(displayMode: DisplayMode, string: String): TrackerData<*> {
+    fun getOrPutData(displayMode: DisplayMode, string: String): TimedTrackerData<*> {
         return getOrPutEntry(displayMode, string).value
     }
 
-    fun getOrPutData(displayMode: DisplayMode): TrackerData<*> {
+    fun getOrPutData(displayMode: DisplayMode): TimedTrackerData<*> {
         return getOrPutEntry(displayMode).value
     }
 
-    fun getData(displayMode: DisplayMode, string: String): TrackerData<*>? {
+    fun getData(displayMode: DisplayMode, string: String): TimedTrackerData<*>? {
         return getEntries(displayMode)?.get(string)
     }
 
-    fun getCurrentData(displayMode: DisplayMode): TrackerData<*>? {
+    fun getCurrentData(displayMode: DisplayMode): TimedTrackerData<*>? {
         return getCurrentName(displayMode)?.let { getData(displayMode, it) }
     }
 
-    fun getOrPutNewestData(displayMode: DisplayMode): TrackerData<*> {
+    fun getOrPutNewestData(displayMode: DisplayMode): TimedTrackerData<*> {
         return getOrPutEntry(displayMode, getDefaultName(displayMode)).value
     }
 
-    fun getOrPutCurrentData(displayMode: DisplayMode): TrackerData<*> {
+    fun getOrPutCurrentData(displayMode: DisplayMode): TimedTrackerData<*> {
         return getOrPutEntry(displayMode, getOrPutCurrentName(displayMode)).value
     }
 
@@ -118,15 +118,14 @@ open class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
         return (currentDisplays[displayMode] == "current" || currentDisplays.size == 1)
     }
 
-    fun getFromCurrent(displayMode: DisplayMode): String {
-        if (displayMode.isDate) return getCurrentDateName(displayMode)
-        return when (displayMode) {
-            DisplayMode.MAYOR -> return SkyBlockTime.now().year.toString()
-            DisplayMode.SESSION -> return getMostRecentName(DisplayMode.SESSION) ?: "1"
+    fun getFromCurrent(displayMode: DisplayMode): String =
+        if (displayMode.isDate) getCurrentDateName(displayMode)
+        else when (displayMode) {
+            DisplayMode.MAYOR -> SkyBlockTime.now().year.toString()
+            DisplayMode.SESSION -> getMostRecentName(DisplayMode.SESSION) ?: "1"
             // these should never be labeled as current since they don't dynamically change
             else -> getMostRecentName(displayMode) ?: "current"
         }
-    }
 
     fun getDefaultName(displayMode: DisplayMode): String {
         if (displayMode.isDate) return getCurrentDateName(displayMode)
@@ -201,7 +200,7 @@ open class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
     }
 
 
-    fun cleanEntries(map: MutableMap<String, TrackerData<*>>, keepAmount: Int, displayMode: DisplayMode) {
+    fun cleanEntries(map: MutableMap<String, TimedTrackerData<*>>, keepAmount: Int, displayMode: DisplayMode) {
         if (keepAmount <= 0) return
 
         val keysSorted = map.keys.sortedWith(
@@ -222,5 +221,5 @@ open class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
     private val currentDisplays: MutableMap<DisplayMode, String> = mutableMapOf()
 
     @Expose
-    private val sessions: MutableMap<DisplayMode, MutableMap<String, TrackerData<*>>> = EnumMap(DisplayMode::class.java)
+    private val sessions: MutableMap<DisplayMode, MutableMap<String, TimedTrackerData<*>>> = EnumMap(DisplayMode::class.java)
 }

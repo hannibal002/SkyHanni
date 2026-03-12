@@ -25,6 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("SpreadOperator", "TooManyFunctions")
 abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
     abstract override val perTrackerConfig: TimedGenericIndividualTrackerConfig<*>
+    abstract override val storageAccessor: (ProfileSpecificStorage) -> Data
 
     private val timedConfig: TimedTrackerConfig get() =
         if (perTrackerConfig.useUniversalConfig) universalTracker.timedTracker
@@ -63,7 +64,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
 
     // only modify latest data, regardless of what's being displayed
     override fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
-        SharedTracker(
+        SharedTracker<Data>(
             availableTrackers.associateWith { ps.getOrPutNewestData(it) }
         )
     }
@@ -100,19 +101,19 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         update()
     }
 
-    private fun getData(): TimedTrackerData<Data>? = ProfileStorageData.profileSpecific?.getData()
+    private fun getData(): Data? = ProfileStorageData.profileSpecific?.getData()
     private fun getOrPutCurrentData(displayMode: DisplayMode = getDisplayMode()): Data? = getData()?.getOrPutCurrentData(displayMode)
     private fun getOrPutCurrentName(displayMode: DisplayMode = getDisplayMode()): String? = getData()?.getOrPutCurrentName(displayMode)
     private fun getPrevNext(displayMode: DisplayMode, string: String): Pair<String?, String?> =
         ProfileStorageData.profileSpecific?.getData()?.getPrevNext(displayMode, string) ?: (null to null)
 
-    private fun ProfileSpecificStorage.getData() = storage(this)
+    private fun ProfileSpecificStorage.getData(): Data = storageAccessor(this)
     private fun ProfileSpecificStorage.getOrPutNewestData(displayMode: DisplayMode = getDisplayMode()) =
         this.getData().getOrPutNewestData(displayMode)
 
     override fun getDisplay(): List<Renderable> {
-        val searchables = getOrPutCurrentData()?.let { drawDisplay(it) } ?: return emptyList()
-        return if (config.trackerSearchEnabled.get()) {
+        val searchables = getOrPutCurrentData()?.let { drawDisplayF(it) } ?: return emptyList()
+        return if (trackerConfig.trackerSearchEnabled.get()) {
             buildFinalDisplay(searchables.buildSearchBox(textInput))
         } else {
             buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
@@ -120,7 +121,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
     }
 
     override fun buildFinalDisplay(searchBox: Renderable) = buildList {
-        if (inventoryOpen) {
+        if (isInventoryOpen()) {
             buildSwitcherView()?.let { dateSwitcherView ->
                 add(
                     Renderable.horizontal(
@@ -139,7 +140,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         add(searchBox)
         if (showSessionUptime()) add(buildSessionUptime(getOrPutCurrentData()))
         if (isEmpty()) return@buildList
-        if (inventoryOpen) {
+        if (isInventoryOpen()) {
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
                 if (getData()?.isCurrent(DisplayMode.SESSION) == true) {
@@ -151,12 +152,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         }
     }
 
-    private fun buildModeRenderable() = Renderable.vertical(
-        buildList {
-            val displayText: String = getDisplayText()
-            addString(displayText)
-        }
-    )
+    private fun buildModeRenderable() = Renderable.vertical { getDisplayText() }
 
     private fun getDisplayText(displayMode: DisplayMode = getDisplayMode(), string: String? = getOrPutCurrentName(displayMode)): String {
         if (string == null) return ""
