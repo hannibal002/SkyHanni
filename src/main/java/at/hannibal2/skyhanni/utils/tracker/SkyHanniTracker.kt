@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput

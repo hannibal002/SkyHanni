@@ -12,8 +12,8 @@ import kotlin.time.Duration.Companion.seconds
 abstract class TrackerData<T : SessionUptime>(
     private val uptimeClass: KClass<T>,
 ) : Resettable {
-    @Expose
 
+    @Expose
     private var migrated = false
     @SerializedName("sessionUptime")
     private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
