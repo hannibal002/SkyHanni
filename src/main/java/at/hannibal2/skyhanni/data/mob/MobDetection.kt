@@ -169,7 +169,7 @@ object MobDetection {
                 Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
                 Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
                 Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNpc(mob)
-                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER, Mob.Type.SLAYER_MINIBOSS -> MobEvent.FirstSeen.SkyblockMob(mob)
             }.post()
         }
         return isVisible
@@ -191,7 +191,7 @@ object MobDetection {
                         if (mob == null) return mobDetectionError("Mob is null even though result is Found")
                         when (mob.mobType) {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
-                            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(mob)
+                            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER, Mob.Type.SLAYER_MINIBOSS -> MobEvent.Spawn.SkyblockMob(mob)
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
                             Mob.Type.PROJECTILE -> MobEvent.Spawn.Projectile(mob)
                             Mob.Type.DISPLAY_NPC -> MobEvent.Spawn.DisplayNpc(mob) // Needed for some special cases
@@ -285,7 +285,7 @@ object MobDetection {
         Mob.Type.SPECIAL -> MobEvent.DeSpawn.Special(this)
         Mob.Type.PROJECTILE -> MobEvent.DeSpawn.Projectile(this)
         Mob.Type.DISPLAY_NPC -> MobEvent.DeSpawn.DisplayNpc(this)
-        Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.DeSpawn.SkyblockMob(this)
+        Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER, Mob.Type.SLAYER_MINIBOSS -> MobEvent.DeSpawn.SkyblockMob(this)
     }
 
     fun postMobHurtEvent(mob: Mob, source: DamageSource, amount: Float) = when (mob.mobType) {
@@ -294,7 +294,7 @@ object MobDetection {
         Mob.Type.SPECIAL -> MobEvent.Hurt.Special(mob, source, amount)
         Mob.Type.PROJECTILE -> MobEvent.Hurt.Projectile(mob, source, amount)
         Mob.Type.DISPLAY_NPC -> MobEvent.Hurt.DisplayNpc(mob, source, amount)
-        Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Hurt.SkyblockMob(mob, source, amount)
+        Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER, Mob.Type.SLAYER_MINIBOSS -> MobEvent.Hurt.SkyblockMob(mob, source, amount)
     }.post()
 
     private fun handleRetries() {

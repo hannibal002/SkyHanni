@@ -277,6 +277,7 @@ object MobFilter {
     ): Mob? =
         MobFactories.summon(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
+            ?: MobFactories.slayerMiniboss(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
             ?: if (DungeonApi.inDungeon()) MobFactories.dungeon(
                 baseEntity,

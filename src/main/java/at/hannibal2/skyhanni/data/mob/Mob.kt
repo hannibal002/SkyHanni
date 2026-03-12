@@ -118,13 +118,14 @@ class Mob(
         DUNGEON,
         BOSS,
         SLAYER,
+        SLAYER_MINIBOSS,
         PLAYER,
         PROJECTILE,
         SPECIAL,
         ;
 
         fun isSkyblockMob() = when (this) {
-            BASIC, DUNGEON, BOSS, SLAYER -> true
+            BASIC, DUNGEON, BOSS, SLAYER, SLAYER_MINIBOSS -> true
             else -> false
         }
     }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.features.slayer.SlayerMiniBossType.Companion.isMiniboss
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -26,6 +27,25 @@ object MobFactories {
                 levelOrTier = this.groupOrNull("tier")?.romanToDecimal() ?: 5,
                 hypixelTypes = this.groupOrNull("mobtype").orEmpty(),
             )
+        }
+
+    fun slayerMiniboss(
+        baseEntity: LivingEntity,
+        armorStand: ArmorStand,
+        extraEntityList: List<LivingEntity>,
+    ): Mob? =
+        MobFilter.mobNameFilter.matchMatcher(armorStand.cleanName()) {
+            return if (isMiniboss(armorStand.cleanName())) {
+                Mob(
+                    baseEntity = baseEntity,
+                    mobType = Mob.Type.SLAYER_MINIBOSS,
+                    armorStand = armorStand,
+                    name = this.group("name"),
+                    additionalEntities = extraEntityList,
+                    levelOrTier = -1, // Miniboss Level from Repo, maybe???
+                    hypixelTypes = this.groupOrNull("mobtype").orEmpty(),
+                )
+            } else null
         }
 
     fun boss(

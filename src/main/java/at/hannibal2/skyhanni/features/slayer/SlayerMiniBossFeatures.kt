@@ -25,7 +25,7 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
-        if (!SlayerMiniBossType.isMiniboss(mob.name)) return
+        if (mob.mobType != Mob.Type.SLAYER_MINIBOSS) return
         miniBosses += mob
         // TODO config option for color
         if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
@@ -39,7 +39,7 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onMobSpawn(event: CocoonSpawnEvent) {
         val cocoon = event.cocoonMob
-        if (!SlayerMiniBossType.isMiniboss(cocoon.mob.name)) return
+        if (cocoon.mob.mobType != Mob.Type.SLAYER_MINIBOSS) return
         cocoons += cocoon.cocoonEntity
         RenderLivingEntityHelper.setEntityColor(cocoon.cocoonEntity, LorenzColor.AQUA.toColor()) {
             config.slayerMinibossHighlight
