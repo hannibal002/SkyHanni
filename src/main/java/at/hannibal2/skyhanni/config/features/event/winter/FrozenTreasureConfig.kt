@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.config.features.event.winter
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -10,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FrozenTreasureConfig {
+class FrozenTreasureConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -19,7 +21,7 @@ class FrozenTreasureConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
@@ -90,9 +92,9 @@ class FrozenTreasureConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    override val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = FrozenTreasureConfig::class, field = "enabled")
-    val position: Position = Position(10, 80)
+    override val position: Position = Position(10, 80)
 }

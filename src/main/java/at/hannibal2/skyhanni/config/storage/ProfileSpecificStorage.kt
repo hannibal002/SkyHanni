@@ -210,7 +210,7 @@ class ProfileSpecificStorage(
 
     // -- year of the [___]
     @Expose
-    var shinyOrbTracker: ShinyOrbTracker.ShinyOrbData = ShinyOrbTracker.ShinyOrbData()
+    var shinyOrbTracker: ShinyOrbTracker.Data = ShinyOrbTracker.Data()
 
     // -- hoppity
     @Expose

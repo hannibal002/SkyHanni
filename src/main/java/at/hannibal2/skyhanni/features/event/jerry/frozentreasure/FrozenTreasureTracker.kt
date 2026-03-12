@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
@@ -24,9 +25,10 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object FrozenTreasureTracker {
-
-    private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
+object FrozenTreasureTracker : SkyHanniTracker<FrozenTreasureTracker.Data>("Frozen Treasure Tracker") {
+    override val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.frozenTreasureTracker }
+    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
 
     private val compactPattern by RepoPattern.pattern(
         "event.jerry.frozentreasure.compact",
@@ -38,14 +40,6 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker(
-        "Frozen Treasure Tracker",
-        ::Data,
-        { it.frozenTreasureTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) {
-        formatDisplay(drawDisplay(it))
-    }
 
     init {
         FrozenTreasure.entries.forEach { it.chatPattern }
@@ -55,14 +49,14 @@ object FrozenTreasureTracker {
         @Expose var treasuresMined: Long = 0,
         @Expose var compactProcs: Long = 0,
         @Expose var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf(),
-    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
+    ) : TrackerData<SessionUptime.Normal>()
 
     @HandleEvent
     fun onWorldChange() {
         icePerHour = 0
         stoppedChecks = 0
         icePerSecond = mutableListOf()
-        tracker.update()
+        update()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.WINTER)
@@ -109,14 +103,14 @@ object FrozenTreasureTracker {
         val message = event.cleanMessage.trim()
 
         compactPattern.matchMatcher(message) {
-            tracker.modify {
+            modify {
                 it.compactProcs += 1
             }
             if (config.hideMessages) event.blockedReason = "frozen treasure tracker"
         }
 
         for (treasure in FrozenTreasure.entries.filter { it.chatPattern.matches(message) }) {
-            tracker.modify {
+            modify {
                 it.treasuresMined += 1
                 it.treasureCount.addOrPut(treasure, 1)
             }
@@ -124,7 +118,8 @@ object FrozenTreasureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList {
+    // Todo clean this up to get rid of formatDisplay
+    override fun drawDisplayF(data: Data) = buildList {
         calculateIce(data)
         addSearchString("§e§lFrozen Treasure Tracker")
         addSearchString("§6${formatNumber(data.treasuresMined)} Treasures Mined")
@@ -138,7 +133,7 @@ object FrozenTreasureTracker {
             addSearchString("§b${formatNumber(count)} ${treasure.displayName}", treasure.displayName)
         }
         addSearchString("")
-    }
+    }.let { formatDisplay(it) }
 
     private fun formatNumber(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
@@ -152,10 +147,6 @@ object FrozenTreasureTracker {
             val amount = data.treasureCount[treasure] ?: 0
             estimatedIce += amount * treasure.defaultAmount * treasure.iceMultiplier
         }
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -176,7 +167,7 @@ object FrozenTreasureTracker {
         event.registerBrigadier("shresetfrozentreasuretracker") {
             description = "Resets the Frozen Treasure Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

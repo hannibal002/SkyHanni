@@ -83,6 +83,11 @@ class CFConfig {
     val hoppityCollectionStats: HoppityCollectionStatsConfig = HoppityCollectionStatsConfig()
 
     @Expose
+    @ConfigOption(name = "Stray Tracker", desc = "")
+    @Accordion
+    val strayTracker: CFStrayTrackerConfig = CFStrayTrackerConfig()
+
+    @Expose
     @ConfigOption(
         name = "Show Stack Sizes",
         desc = "Show additional info as many items in the chocolate menu as the stack size.",
@@ -235,24 +240,6 @@ class CFConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hotChocolateMixinRequirement: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var strayRabbitTracker: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Stray Tracker Settings",
-        desc = ""
-    )
-    @Accordion
-    val strayTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
-
-    @Expose
-    @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
-    val strayRabbitTrackerPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")

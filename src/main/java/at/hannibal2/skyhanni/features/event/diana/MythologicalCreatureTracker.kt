@@ -6,21 +6,18 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaJson
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper.genericMythologicalSpawnPattern
-import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker.tracker
-import at.hannibal2.skyhanni.features.itemabilities.CrownOfAvariceCounter.renderDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -34,16 +31,16 @@ import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object MythologicalCreatureTracker : SkyHanniTracker<MythologicalCreatureTracker.Data, IndividualTrackerConfig>(
-    "Mythological Creature Tracker",
-    ::Data,
-    { it.diana.mythologicalMobTracker },
-) {
-
+object MythologicalCreatureTracker : SkyHanniTracker<MythologicalCreatureTracker.Data>("Mythological Creature Tracker") {
     override val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.diana.mythologicalMobTracker }
+    override val renderCondition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) }
+    override fun extraOnRender() {
+        if (DianaApi.hasSpadeInHand()) firstUpdate()
+    }
 
     // TODO create a draggable list from repo one that can be done
-    private val shardMobs = listOf<String>(
+    private val shardMobs = listOf(
         "Cretan Bull",
         "Harpy",
         "Minotaur",
@@ -96,12 +93,10 @@ object MythologicalCreatureTracker : SkyHanniTracker<MythologicalCreatureTracker
         if (lastSinceAmount == null) return
         val creatureMatch = genericMythologicalSpawnPattern.matchGroups(event.message, "creatureType")?.getOrNull(0) ?: return
 
-        val type = DianaApi.mythologicalCreatures[creatureMatch] ?: run {
-            ErrorManager.skyHanniError(
-                "Unknown mythological creature $creatureMatch",
-                "message" to event.message,
-            )
-        }
+        val type = DianaApi.mythologicalCreatures[creatureMatch] ?: ErrorManager.skyHanniError(
+            "Unknown mythological creature $creatureMatch",
+            "message" to event.message,
+        )
 
         modify {
             for (creatureEntry in DianaApi.mythologicalCreatures.values) {
@@ -155,7 +150,7 @@ object MythologicalCreatureTracker : SkyHanniTracker<MythologicalCreatureTracker
     @HandleEvent
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showPercentage) {
-            tracker.update()
+            update()
         }
     }
 
@@ -170,26 +165,12 @@ object MythologicalCreatureTracker : SkyHanniTracker<MythologicalCreatureTracker
         }
     }
 
-    override val renderCondition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) }
-
-    init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
-            onRender = {
-                if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
-                renderDisplay(config.position)
-            },
-        )
-    }
-
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetmythologicalcreaturetracker") {
             description = "Resets the Mythological Creature Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

@@ -1,38 +1,34 @@
-package at.hannibal2.skyhanni.config.features.fishing
+package at.hannibal2.skyhanni.config.features.rift.area.mountaintop.timite
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FishingProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
+class TimiteTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Count all items you pick up while fishing.")
+    @ConfigOption(name = "Enabled", desc = "Tracks collected Timite ores and shows mote profit.")
     @ConfigEditorBoolean
     @FeatureToggle
     override var enabled: Boolean = false
 
     @Expose
-    @ConfigLink(owner = FishingProfitTrackerConfig::class, field = "enabled")
-    override val position: Position = Position(20, 20)
-
-    @Expose
-    @ConfigOption(
-        name = "Show When Pickup",
-        desc = "Show the fishing tracker for a couple of seconds after catching something even while moving."
-    )
+    @ConfigOption(name = "Only Show While Holding", desc = "Only shows the tracker while holding the Timite pickaxes or the Time Gun.")
     @ConfigEditorBoolean
-    var showWhenPickup: Boolean = true
+    var onlyShowWhileHolding: Boolean = false
 
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+
+    @Expose
+    @ConfigLink(owner = TimiteConfig::class, field = "tracker")
+    override val position: Position = Position(-201, -220)
 }
