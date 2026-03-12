@@ -71,7 +71,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     internal abstract val storageAccessor: (ProfileSpecificStorage) -> Data
     internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
     internal abstract val config: TopLevelTrackerConfig<*>
-    internal val perTrackerConfig: GenericIndividualTrackerConfig<*> get() = config.perTrackerConfig
+    internal open val perTrackerConfig: GenericIndividualTrackerConfig<*> get() = config.perTrackerConfig
     @Suppress("UNCHECKED_CAST")
     internal open val trackerConfig: TrackerGenericConfig get() = perTrackerConfig.let {
         if (it.useUniversalConfig) universalTracker

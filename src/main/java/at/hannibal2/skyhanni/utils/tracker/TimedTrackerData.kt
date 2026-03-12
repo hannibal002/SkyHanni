@@ -10,12 +10,11 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
 import java.util.EnumMap
+import kotlin.collections.getOrPut
 
 @Suppress("TooManyFunctions")
-open class TimedTrackerData<Data : TrackerData<*>>(
-    private val createNewSession: () -> Data,
-) {
-    fun reset() {
+open class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
+    override fun reset() {
         sessions.clear()
     }
 
@@ -27,26 +26,26 @@ open class TimedTrackerData<Data : TrackerData<*>>(
         getData(displayMode, string)?.reset()
     }
 
-    fun getEntries(displayMode: DisplayMode): MutableMap<String, Data>? {
+    fun getEntries(displayMode: DisplayMode): MutableMap<String, TrackerData<*>>? {
         return sessions[displayMode]
     }
 
-    fun getOrPutEntry(displayMode: DisplayMode): MutableMap.MutableEntry<String, Data> {
+    fun getOrPutEntry(displayMode: DisplayMode): MutableMap.MutableEntry<String, TrackerData<*>> {
         return getOrPutEntry(displayMode, getDefaultName(displayMode))
     }
 
-    fun getOrPutEntry(displayMode: DisplayMode, string: String): MutableMap.MutableEntry<String, Data> {
+    fun getOrPutEntry(displayMode: DisplayMode, string: String): MutableMap.MutableEntry<String, TrackerData<*>> {
         val display = sessions.getOrPut(displayMode) { mutableMapOf() }
         display.getOrPut(string) { createNewSession() }
         return display.entries.first { it.key == string }
     }
 
-    fun createEntry(displayMode: DisplayMode, string: String, data: Data) {
+    fun createEntry(displayMode: DisplayMode, string: String, data: TrackerData<*>) {
         val display = sessions.getOrPut(displayMode) { mutableMapOf() }
         display[string] = data
     }
 
-    fun deleteEntry(displayMode: DisplayMode, string: String): Data? {
+    fun deleteEntry(displayMode: DisplayMode, string: String): TrackerData<*>? {
         val display = sessions[displayMode] ?: return null
         val data = display[string]
         if (getCurrentName(DisplayMode.SESSION) == string) {
@@ -56,35 +55,35 @@ open class TimedTrackerData<Data : TrackerData<*>>(
         return data
     }
 
-    fun getAllCurrentData(): Set<Data> {
-        val set = mutableSetOf<Data>()
+    fun getAllCurrentData(): Set<TrackerData<*>> {
+        val set = mutableSetOf<TrackerData<*>>()
         sessions.keys.forEach {
             getCurrentData(it)?.let { it1 -> set.add(it1) }
         }
         return set
     }
 
-    fun getOrPutData(displayMode: DisplayMode, string: String): Data {
+    fun getOrPutData(displayMode: DisplayMode, string: String): TrackerData<*> {
         return getOrPutEntry(displayMode, string).value
     }
 
-    fun getOrPutData(displayMode: DisplayMode): Data {
+    fun getOrPutData(displayMode: DisplayMode): TrackerData<*> {
         return getOrPutEntry(displayMode).value
     }
 
-    fun getData(displayMode: DisplayMode, string: String): Data? {
+    fun getData(displayMode: DisplayMode, string: String): TrackerData<*>? {
         return getEntries(displayMode)?.get(string)
     }
 
-    fun getCurrentData(displayMode: DisplayMode): Data? {
+    fun getCurrentData(displayMode: DisplayMode): TrackerData<*>? {
         return getCurrentName(displayMode)?.let { getData(displayMode, it) }
     }
 
-    fun getOrPutNewestData(displayMode: DisplayMode): Data {
+    fun getOrPutNewestData(displayMode: DisplayMode): TrackerData<*> {
         return getOrPutEntry(displayMode, getDefaultName(displayMode)).value
     }
 
-    fun getOrPutCurrentData(displayMode: DisplayMode): Data {
+    fun getOrPutCurrentData(displayMode: DisplayMode): TrackerData<*> {
         return getOrPutEntry(displayMode, getOrPutCurrentName(displayMode)).value
     }
 
@@ -202,7 +201,7 @@ open class TimedTrackerData<Data : TrackerData<*>>(
     }
 
 
-    fun cleanEntries(map: MutableMap<String, Data>, keepAmount: Int, displayMode: DisplayMode) {
+    fun cleanEntries(map: MutableMap<String, TrackerData<*>>, keepAmount: Int, displayMode: DisplayMode) {
         if (keepAmount <= 0) return
 
         val keysSorted = map.keys.sortedWith(
@@ -223,5 +222,5 @@ open class TimedTrackerData<Data : TrackerData<*>>(
     private val currentDisplays: MutableMap<DisplayMode, String> = mutableMapOf()
 
     @Expose
-    private val sessions: MutableMap<DisplayMode, MutableMap<String, Data>> = EnumMap(DisplayMode::class.java)
+    private val sessions: MutableMap<DisplayMode, MutableMap<String, TrackerData<*>>> = EnumMap(DisplayMode::class.java)
 }

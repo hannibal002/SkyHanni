@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedGenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,24 +23,25 @@ import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("SpreadOperator", "TooManyFunctions")
-class SkyhanniTimedTracker<Data : TrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
+abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
+    abstract override val perTrackerConfig: TimedGenericIndividualTrackerConfig<*>
+
     private val timedConfig: TimedTrackerConfig get() =
-        if (tracker.useUniversalConfig) universalTracker.timedTracker else trackerSpecificConfig.timedTracker
-    override val availableTrackers = listOf(
-        DisplayMode.TOTAL,
-        DisplayMode.SESSION,
+        if (perTrackerConfig.useUniversalConfig) universalTracker.timedTracker
+        else perTrackerConfig.timedTracker
+
+    override val availableTrackers = super.availableTrackers + listOf(
         DisplayMode.DAY,
         DisplayMode.WEEK,
         DisplayMode.MONTH,
         DisplayMode.YEAR,
-    ) + extraDisplayModes
-    private val config: TrackerGenericConfig
-        get() = if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
+    )
+
     private val activeStopwatches = mutableSetOf<Data>()
 
     @SkyHanniModule
     companion object {
-        private val trackerSet: MutableSet<SkyhanniTimedTracker<*, *>> = mutableSetOf()
+        private val trackerSet: MutableSet<SkyhanniTimedTracker<*>> = mutableSetOf()
 
         @HandleEvent
         fun onConfigLoad() {
