@@ -19,10 +19,10 @@ class MinibossConfig {
     @Expose
     @ConfigOption(name = "Line to Miniboss Mob", desc = "")
     @Accordion
-    var minibossLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
+    val minibossLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
 
     @Expose
     @ConfigOption(name = "Line To Cocoon with Miniboss", desc = "")
     @Accordion
-    var cocoonLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
+    val cocoonLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
 }

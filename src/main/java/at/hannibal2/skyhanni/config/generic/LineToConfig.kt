@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class LineToConfig(
     defaultOn: Boolean = false,
@@ -29,6 +28,6 @@ open class LineToConfig(
     @Expose
     @ConfigOption(name = "Line Color", desc = "Color of the Line.")
     @ConfigEditorColour
-    val color: ChromaColour = defaultColor
+    var color: ChromaColour = defaultColor
     // This Color should be redefined per Feature, defaults to Yellow Color since it's the Skyhanni Color I, guess.
 }
