@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.mining.dwarves
+package at.hannibal2.skyhanni.config.features.mining.dwarves.monolith
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -15,13 +15,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class DarkMonolithConfig {
 
     @Expose
-    @ConfigOption(
-        name = "Tracker",
-        desc = "Track mithril powder, coins, and Rock the Fish drops obtained from collecting Dark Monoliths.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var tracker: Boolean = false
+    @ConfigOption(name = "Tracker", desc = "")
+    @Accordion
+    val tracker: DarkMonolithTrackerConfig = DarkMonolithTrackerConfig()
 
     @Expose
     @ConfigLink(owner = DarkMonolithConfig::class, field = "tracker")
@@ -60,7 +56,7 @@ class DarkMonolithConfig {
         @Expose
         @ConfigOption(name = "Highlight Color", desc = "What color to highlight the egg.")
         @ConfigEditorColour
-        var color: ChromaColour = ChromaColour.fromStaticRGB(155, 29, 194, 75)
+        var color: ChromaColour = ChromaColour.Companion.fromStaticRGB(155, 29, 194, 75)
     }
 
     @Expose
@@ -82,14 +78,6 @@ class DarkMonolithConfig {
         var text: String = "§5§lDark Monolith"
 
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = "",
-    )
-    @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     companion object {
         @Suppress("StorageVarOrVal")
