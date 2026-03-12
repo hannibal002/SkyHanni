@@ -48,12 +48,14 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     private val trackerConfig: () -> Config,
     private val customUptimeControl: Boolean = false,
     private val drawDisplay: (Data) -> List<Searchable>,
-
+    private val position: () -> Position,
+    private val inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY,
+    private val onlyOnIsland: IslandType? = null,
+    private val condition: () -> Boolean,
 ) {
     val trackerSpecificConfig: Config get() = trackerConfig()
     private val config: TrackerGenericConfig get() =
         if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
-    private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
@@ -62,6 +64,17 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     private var dirty = false
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
     val textInput = SearchTextInput()
+
+    init {
+        RenderDisplayHelper(
+            inventory = inventory,
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = condition,
+            onlyOnIsland = onlyOnIsland,
+            onRender = { renderDisplay(position()) },
+        )
+    }
 
     @SkyHanniModule
     companion object {
@@ -72,11 +85,8 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         @HandleEvent
         fun onTick(event: SkyHanniTickEvent) {
             if (!event.isMod(10)) return
-
             unpausedTrackers.toList().forEach { tracker ->
-                if (tracker.trackUptime) {
-                    tracker.checkAfk()
-                }
+                if (tracker.trackUptime) tracker.checkAfk()
             }
         }
     }
@@ -102,8 +112,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     }
 
     fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-        val sharedTracker = getSharedTracker() ?: return
-        sharedTracker.modify(mode, modifyFunction)
+        getSharedTracker()?.modify(mode, modifyFunction)
         update()
     }
 
@@ -122,22 +131,22 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         { update() },
     ) { true }
 
-    fun renderDisplay(position: Position) {
+    private fun renderDisplay(position: Position) {
         if (hideInEstimatedValue && EstimatedItemValue.isCurrentlyShowing()) return
         if (!InventoryUtils.inAnyInventory() && hideOutsideInventory && this is SkyHanniItemTracker) return
 
         val searchEnabled = config.trackerSearchEnabled.get()
-        if (dirty || TrackerManager.dirty || (searchEnabled != wasSearchEnabled)) {
+        if (dirty || TrackerManager.dirty || searchEnabled != wasSearchEnabled) {
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
-                if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-                else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
+                val content = if (searchEnabled) searchables.buildSearchBox(textInput)
+                else Renderable.vertical(searchables.toRenderable())
+                buildFinalDisplay(content)
             }.orEmpty()
             dirty = false
         }
         wasSearchEnabled = searchEnabled
-
         position.renderRenderables(display, posLabel = name)
     }
 
@@ -151,21 +160,16 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         if (showSessionUptime()) add(buildSessionUptime())
         if (isInventoryOpen()) {
             buildDisplayModeView()
-            if (getDisplayMode() == DisplayMode.SESSION) {
-                add(buildSessionResetButton())
-            }
+            if (getDisplayMode() == DisplayMode.SESSION) add(buildSessionResetButton())
         }
     }
 
-    private fun showSessionUptime(): Boolean =
+    private fun showSessionUptime() =
         config.showUptime.get() && (!config.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk() {
-        if (getCurrentStopwatch()?.isPaused() == true) {
-            return
-        }
+        if (getCurrentStopwatch()?.isPaused() == true) return
         val sharedTracker = getSharedTracker() ?: return
-        // Afk time should be the same for all valid displays
         val afkTime = sharedTracker.get(DisplayMode.TOTAL).getActiveStopwatch()?.getLapTime()
         if (afkTime == null || afkTime > config.afkTimeout.seconds) {
             pauseSessionUptime()
@@ -179,7 +183,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
 
     fun startSessionUptime() {
-        if (!this.trackUptime) return
+        if (!trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
         if (!customUptimeControl) unpausedTrackers.add(this)
@@ -187,7 +191,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     }
 
     fun pauseSessionUptime() {
-        if (!this.trackUptime) return
+        if (!trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
         if (!customUptimeControl) unpausedTrackers.remove(this)
@@ -195,7 +199,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     }
 
     fun swapActiveSession(session: SessionUptime, swapExtraTime: Boolean = true) {
-        if (!this.customUptimeControl) return
+        if (!customUptimeControl) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.setActiveStopwatch(session, swapExtraTime) }
         update()
@@ -205,33 +209,27 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         val sessionUptime = getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
-        val sessionList: List<String> = buildList {
+        val sessionList = buildList {
             getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
                 if (it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
             }
         }
-
         return Renderable.hoverTips(
             Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
             tips = buildList {
                 addAll(sessionList)
                 if (!isTotalDisplay) return@buildList
-                // Uptime added after trackers already had data
                 addAll(
                     "§eⓘ §7Uptime tracked only from",
                     "§7SkyHanni version 6.0.0 onwards",
                 )
-            }
+            },
         )
     }
 
     private fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
-        tips = listOf(
-            "§cThis will reset your",
-            "§ccurrent session of",
-            "§c$name",
-        ),
+        tips = listOf("§cThis will reset your", "§ccurrent session of", "§c$name"),
         onLeftClick = {
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
@@ -256,6 +254,10 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
+    protected fun getDisplayMode() = displayMode ?: run {
+        config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
+    }.also { displayMode = it }
+
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
@@ -265,55 +267,20 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
-    private fun reset(displayMode: DisplayMode, message: String) {
-        getSharedTracker()?.let {
-            it.get(displayMode).reset()
-            ChatUtils.chat(message)
-            update()
-        }
-    }
-
-    protected fun getDisplayMode() = displayMode ?: run {
-        val newValue = config.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
-        displayMode = newValue
-        newValue
+    private fun reset(displayMode: DisplayMode, message: String) = getSharedTracker()?.let {
+        it.get(displayMode).reset()
+        ChatUtils.chat(message)
+        update()
     }
 
     fun firstUpdate() = if (display.isEmpty()) update() else Unit
 
-    fun initRenderer(
-        position: () -> Position,
-        inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY,
-        onlyOnIsland: IslandType? = null,
-        condition: () -> Boolean,
-    ) {
-        RenderDisplayHelper(
-            inventory,
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = condition,
-            onlyOnIsland = onlyOnIsland,
-            onRender = {
-                renderDisplay(position())
-            },
-        )
-    }
-
     inner class SharedTracker<Data : TrackerData<*>>(
         private val entries: Map<DisplayMode, Data>,
     ) {
-
-        fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-            get(mode).let(modifyFunction)
-        }
-
-        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-            entries[mode]?.let(modifyFunction)
-        }
-
-        fun modify(modifyFunction: (Data) -> Unit) {
-            entries.values.forEach(modifyFunction)
-        }
+        fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) = get(mode).let(modifyFunction)
+        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) = entries[mode]?.let(modifyFunction)
+        fun modify(modifyFunction: (Data) -> Unit) = entries.values.forEach(modifyFunction)
 
         fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
             "Unregistered display mode accessed on tracker",
@@ -329,7 +296,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         MAYOR("This Mayor", "Mayor"),
         ;
 
-        override fun toString(): String = displayName
+        override fun toString() = displayName
     }
 
     enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {
