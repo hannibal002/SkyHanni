@@ -72,7 +72,7 @@ object CopyNearbyEntitiesCommand {
             if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
             add("displayName: '${displayName.formattedTextCompat()}'")
             add("entityId: ${entity.id}")
-            add("Type of Mob: ${getType(entity, mob)}")
+            add("Category of Mob: ${getCategory(entity, mob)}")
             add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
             add("location data:")
             add("-  vec: $vec")
@@ -282,7 +282,7 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun getType(entity: Entity, mob: Mob?) = buildString {
+    private fun getCategory(entity: Entity, mob: Mob?) = buildString {
         if (entity is LivingEntity && entity.isDisplayNpc()) append("DisplayNPC, ")
         if (entity is Player && entity.isNpc()) append("NPC, ")
         if (entity is Player && entity.isRealPlayer()) append("RealPlayer, ")
@@ -312,7 +312,7 @@ object CopyNearbyEntitiesCommand {
 
     fun getMobInfo(mob: Mob) = buildList<String> {
         add("Name: ${mob.name}")
-        add("Type: ${mob.category}")
+        add("Category: ${mob.category}")
         add("Base Entity: ${mob.baseEntity.asString()}")
         add("ArmorStand: ${mob.armorStand?.asString()}")
         if (mob.extraEntities.isNotEmpty()) {
