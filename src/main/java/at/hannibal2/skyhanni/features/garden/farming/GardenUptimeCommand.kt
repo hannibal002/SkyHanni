@@ -54,8 +54,11 @@ object GardenUptimeCommand {
         event.registerBrigadier("shgardenuptime") {
             description = "Shows garden uptime history for past x days, defaults to 7"
             category = CommandCategory.USERS_ACTIVE
-            arg("days", BrigadierArguments.integer(1, 30)) { days ->
-                callback { onCommand(getArg(days)) }
+            argCallback("days", BrigadierArguments.integer(1, 30)) { days ->
+                callback { onCommand(days) }
+            }
+            simpleCallback {
+                callback { onCommand(7) }
             }
         }
     }
