@@ -46,7 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("TooManyFunctions")
 abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
     // todo move to somewhere sensible, rename
-    abstract fun drawDisplayF(data: Data): List<Searchable>
+    internal abstract fun drawDisplayF(data: Data): List<Searchable>
     internal open fun extraOnRender() = Unit
 
     @Suppress("UNCHECKED_CAST")

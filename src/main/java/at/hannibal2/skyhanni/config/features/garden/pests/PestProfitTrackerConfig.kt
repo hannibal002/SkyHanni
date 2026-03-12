@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
@@ -13,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class PestProfitTrackerConfig : TopLevelTrackerConfig {
+class PestProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count all items you pick up when killing pests.")
     @ConfigEditorBoolean

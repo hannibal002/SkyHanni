@@ -17,8 +17,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -49,24 +47,14 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
 
         override fun DragonType.isBucketSelectable(): Boolean = this.selectable
 
-        override fun getDescription(bucket: DragonType?, timesGained: Long): List<String> {
-            val percentage = timesGained.toDouble() / getTotalDragonCount()
-            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
-            return listOf(
-                "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate.",
-            )
-        }
+        override fun getDescription(bucket: DragonType?, timesGained: Long): List<String> =
+            super.getDropRate(dragonKills, bucket, timesGained)
 
         override fun bucketName(): String = "Dragon"
 
-        fun getTotalDragonCount(): Long {
-            return if (selectedBucket == null || selectedBucket !in DragonType.entries) {
-                dragonKills.values.sum()
-            } else {
-                dragonKills[selectedBucket] ?: 0
-            }
-        }
+        fun getTotalDragonCount(): Long = selectedBucket?.let {
+            dragonKills[it] ?: 0
+        } ?: dragonKills.values.sum()
     }
 
     override fun drawDisplayF(data: BucketData): List<Searchable> = buildList {

@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import java.lang.reflect.ParameterizedType
@@ -11,6 +13,20 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTra
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
 
     abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
+
+    internal fun getDropRate(dataMap: Map<E, Number>, bucket: E?, timesGained: Long): List<String> {
+        val divisor = 1.coerceAtLeast(
+            bucket?.let {
+                dataMap[it]?.toInt()
+            } ?: dataMap.values.sumOf { it.toInt() },
+        )
+        val percentage = timesGained.toDouble() / divisor
+        val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
+        return listOf(
+            "§7Dropped §e${timesGained.addSeparators()} §7times.",
+            "§7Your drop rate: §c$dropRate.",
+        )
+    }
 
     final override fun getCoinName(item: TrackedItem): String =
         throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
@@ -62,7 +78,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTra
         }
     }
 
-    abstract fun E.isBucketSelectable(): Boolean
+    open fun E.isBucketSelectable(): Boolean = this in buckets
     abstract fun bucketName(): String
 
     @Suppress("UNCHECKED_CAST")
