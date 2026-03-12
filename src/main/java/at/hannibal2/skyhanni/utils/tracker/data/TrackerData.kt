@@ -1,8 +1,11 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
+import at.hannibal2.skyhanni.utils.tracker.GardenSession
+import at.hannibal2.skyhanni.utils.tracker.NormalSession
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.lang.reflect.ParameterizedType

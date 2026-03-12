@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 
 @Suppress("SpreadOperator")
 abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E, *>>(

@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedGenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -12,13 +10,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.weekTextFormatter
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
+import at.hannibal2.skyhanni.utils.tracker.data.TimedTrackerData
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
@@ -102,7 +100,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
     }
 
     private fun getData(): Data? = ProfileStorageData.profileSpecific?.getData()
-    private fun getOrPutCurrentData(displayMode: DisplayMode = getDisplayMode()): Data? = getData()?.getOrPutCurrentData(displayMode)
+    private fun getOrPutCurrentData(displayMode: DisplayMode = getDisplayMode()): TimedTrackerData<*>? = getData()?.getOrPutCurrentData(displayMode)
     private fun getOrPutCurrentName(displayMode: DisplayMode = getDisplayMode()): String? = getData()?.getOrPutCurrentName(displayMode)
     private fun getPrevNext(displayMode: DisplayMode, string: String): Pair<String?, String?> =
         ProfileStorageData.profileSpecific?.getData()?.getPrevNext(displayMode, string) ?: (null to null)

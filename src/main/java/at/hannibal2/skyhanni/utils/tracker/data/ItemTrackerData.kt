@@ -1,7 +1,9 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData<T : SessionUptime> : TrackerData<T>() {

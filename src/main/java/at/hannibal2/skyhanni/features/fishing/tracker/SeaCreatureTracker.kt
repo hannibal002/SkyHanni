@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule

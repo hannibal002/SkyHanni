@@ -1,9 +1,10 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
 import java.lang.reflect.ParameterizedType
 

@@ -41,6 +41,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import net.minecraft.ChatFormatting
 import kotlin.math.absoluteValue
 import kotlin.math.min
