@@ -69,12 +69,9 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         handlePossibleRareDrop(internalName, amount, message)
     }
 
-    open fun ItemAddEvent.addItemFromEvent() {
-        val command = source == ItemAddManager.Source.COMMAND
-        modify { data ->
-            data.addItem(internalName, amount, command)
-            logCompletedAddEvent()
-        }
+    open fun ItemAddEvent.addItemFromEvent() = modify { data ->
+        data.addItem(internalName, amount, command = (source == ItemAddManager.Source.COMMAND))
+        logCompletedAddEvent()
     }
 
     fun logCommandAdd(internalName: NeuInternalName, amount: Int) {

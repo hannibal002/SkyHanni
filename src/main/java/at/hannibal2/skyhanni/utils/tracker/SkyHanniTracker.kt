@@ -44,7 +44,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
-abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
+abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: String) {
+    // This is needed because of Slayer Profit Tracker
+    open val name get() = staticName
     // todo move to somewhere sensible, rename
     internal abstract fun drawDisplayF(data: Data): List<Searchable>
     internal open fun extraOnRender() = Unit
@@ -117,7 +119,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
     fun getPricePer(name: NeuInternalName) = name.getPrice(trackerConfig.priceSource)
     fun getPricePerOrNull(name: NeuInternalName) = name.getPriceOrNull(trackerConfig.priceSource)
     fun isInventoryOpen() = inventoryDetector.isInside()
-    fun resetCommand() = ChatUtils.clickableChat(
+    open fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")

@@ -589,7 +589,7 @@ object DamageIndicatorManager {
             entity.getNameTagWith(3, shield.name)?.let { armorStand ->
                 val number = armorStand.name.formattedTextCompatLessResets().split(" ♨")[1].substring(0, 1)
                 entity.setHellionShield(shield)
-                if (SlayerApi.config.blazes.hellion.coloredMobs) {
+                if (SlayerApi.config.blaze.hellion.coloredMobs) {
                     entityData.nameAbove = shield.formattedName + " $number"
                 }
                 found = true
@@ -600,7 +600,7 @@ object DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SlayerApi.config.blazes.phaseDisplay) return ""
+        if (!SlayerApi.config.blaze.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -771,7 +771,7 @@ object DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + calcHealth.shortFormat()
 
-        if (!SlayerApi.config.endermen.phaseDisplay) {
+        if (!SlayerApi.config.enderman.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }

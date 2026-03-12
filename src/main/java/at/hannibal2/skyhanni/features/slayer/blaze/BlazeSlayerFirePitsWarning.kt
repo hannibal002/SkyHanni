@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BlazeSlayerFirePitsWarning {
 
-    private val config get() = SlayerApi.config.blazes
+    private val config get() = SlayerApi.config.blaze
 
     private var lastFirePitsWarning = SimpleTimeMark.farPast()
 

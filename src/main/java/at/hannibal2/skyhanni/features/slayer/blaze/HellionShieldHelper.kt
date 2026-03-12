@@ -61,7 +61,7 @@ object HellionShieldHelper {
             RenderLivingEntityHelper.setEntityColor(
                 this,
                 it.color.toColor().addAlpha(80),
-            ) { SkyBlockUtils.inSkyBlock && SlayerApi.config.blazes.hellion.coloredMobs }
+            ) { SkyBlockUtils.inSkyBlock && SlayerApi.config.blaze.hellion.coloredMobs }
         } ?: run {
             hellionShieldMobs.remove(this)
             RenderLivingEntityHelper.removeEntityColor(this)

@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -43,7 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EndermanSlayerFeatures {
 
-    private val config get() = SlayerApi.config.endermen
+    private val config get() = SlayerApi.config.enderman
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EnderMan>()
     private val flyingBeacons = mutableSetOf<ArmorStand>()

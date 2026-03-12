@@ -3,13 +3,15 @@ package at.hannibal2.skyhanni.config.features.mining.glacite
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ExcavatorProfitTrackerConfig {
+class ExcavatorProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count all drops you gain while excavating in the Fossil Research Center.")
     @ConfigEditorBoolean

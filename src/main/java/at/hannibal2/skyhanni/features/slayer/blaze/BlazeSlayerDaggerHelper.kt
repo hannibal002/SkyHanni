@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BlazeSlayerDaggerHelper {
 
-    private val config get() = SlayerApi.config.blazes.hellion
+    private val config get() = SlayerApi.config.blaze.hellion
 
     private val attunementPattern by RepoPattern.pattern(
         "slayer.blaze.dagger.attunement",

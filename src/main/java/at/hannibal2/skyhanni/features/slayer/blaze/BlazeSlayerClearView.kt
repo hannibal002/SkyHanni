@@ -49,7 +49,7 @@ object BlazeSlayerClearView {
         }
     }
 
-    private fun isEnabled() = SlayerApi.config.blazes.clearView && nearBlaze
+    private fun isEnabled() = SlayerApi.config.blaze.clearView && nearBlaze
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

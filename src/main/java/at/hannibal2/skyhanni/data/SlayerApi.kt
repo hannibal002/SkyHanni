@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 object SlayerApi {
 
     val config get() = SkyHanniMod.feature.slayer
-    private val trackerConfig get() = config.itemProfitTracker
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
@@ -253,8 +252,8 @@ object SlayerApi {
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        with(trackerConfig) {
-            ConditionalUtils.onToggle(revenantInGraveyard, voidgloomInNest, voidgloomInNoArea) {
+        with(config) {
+            ConditionalUtils.onToggle(zombie.showInGraveyard, enderman.showInNest, enderman.showInNoArea) {
                 currentAreaType = checkTypeForCurrentArea()
                 updateArea()
             }
@@ -263,7 +262,7 @@ object SlayerApi {
 
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
-        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isCurrent()) Type.REVENANT else null
+        "Graveyard" -> if (config.zombie.showInGraveyard.get() && IslandType.HUB.isCurrent()) Type.REVENANT else null
         "Revenant Cave" -> Type.REVENANT
 
         "Spider Mound",
@@ -282,8 +281,8 @@ object SlayerApi {
         "Zealot Bruiser Hideout",
         -> Type.VOID
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
-        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
+        "Dragon's Nest" -> if (config.enderman.showInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
+        AreaNode.NO_AREA -> if (config.enderman.showInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
 
         "Stronghold",
         "The Wasteland", // TODO check if we can remove this
