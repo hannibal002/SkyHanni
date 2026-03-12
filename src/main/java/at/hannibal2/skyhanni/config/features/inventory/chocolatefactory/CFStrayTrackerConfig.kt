@@ -21,7 +21,7 @@ class CFStrayTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: IndividualTrackerConfig<*> = IndividualTrackerConfig()
+    override val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = CFStrayTrackerConfig::class, field = "enabled")

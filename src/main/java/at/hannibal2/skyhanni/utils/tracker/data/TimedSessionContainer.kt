@@ -14,6 +14,7 @@ import java.util.EnumMap
 /**
  * Owns all session storage and navigation for a [TimedTrackerData] leaf.
  */
+@Suppress("TooManyFunctions")
 class TimedSessionContainer {
 
     @Expose
@@ -22,14 +23,12 @@ class TimedSessionContainer {
     @Expose
     val sessions: MutableMap<DisplayMode, MutableMap<String, TimedTrackerData<*>>> = EnumMap(DisplayMode::class.java)
 
-    fun reset() = sessions.clear()
-
-    fun reset(displayMode: DisplayMode) {
-        sessions[displayMode]?.clear()
-    }
-
-    fun reset(displayMode: DisplayMode, string: String) {
-        getData(displayMode, string)?.reset()
+    fun reset(displayMode: DisplayMode? = null, string: String? = null) = when (displayMode) {
+        null -> sessions.clear()
+        else -> when (string) {
+            null -> sessions[displayMode] = mutableMapOf()
+            else -> getData(displayMode, string)?.reset()
+        }
     }
 
     fun getEntries(displayMode: DisplayMode): MutableMap<String, TimedTrackerData<*>>? = sessions[displayMode]
