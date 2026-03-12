@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findSuperClassTypeParameters
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -167,5 +168,15 @@ object ReflectionUtils {
         } catch (e: Throwable) {
             throw IllegalArgumentException("Method ${instance.javaClass.name}#${method.name} is not a valid runnable", e)
         }
+    }
+
+    inline fun <reified Stop : Any, T> Any.findGenericSuperclassTypeArgument(index: Int = 0): Class<T> {
+        var type = javaClass.genericSuperclass
+        while (type !is ParameterizedType || (type.rawType as Class<*>) != Stop::class.java) {
+            type = (type as? Class<*>)?.genericSuperclass
+                ?: error("Reached top of hierarchy without finding ${Stop::class.simpleName}")
+        }
+        @Suppress("UNCHECKED_CAST")
+        return type.actualTypeArguments[index] as Class<T>
     }
 }

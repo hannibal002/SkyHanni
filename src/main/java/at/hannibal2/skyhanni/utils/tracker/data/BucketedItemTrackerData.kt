@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.utils.tracker.data
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
-import java.lang.reflect.ParameterizedType
 
 abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTrackerData<T>() {
 
@@ -82,11 +82,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTra
     open fun E.isBucketSelectable(): Boolean = this in buckets
     abstract fun bucketName(): String
 
-    @Suppress("UNCHECKED_CAST")
-    private val buckets: Array<E> by lazy {
-        val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
-        val jClass = genericSuper.actualTypeArguments[0] as Class<Enum<E>>
-        jClass.enumConstants as Array<E>
+    private val buckets by lazy {
+        val enumClass = findGenericSuperclassTypeArgument<BucketedItemTrackerData<*, *>, Enum<E>>(index = 0)
+        @Suppress("UNCHECKED_CAST")
+        enumClass.enumConstants as? Array<E> ?: error("Enum enum contains not an instance of ${enumClass.name}")
     }
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 

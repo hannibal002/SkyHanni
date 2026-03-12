@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGen
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.lang.reflect.ParameterizedType
 
 open class IndividualTrackerConfig : GenericIndividualTrackerConfig<TrackerGenericConfig>()
 open class IndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGenericConfig>()
@@ -19,11 +19,8 @@ abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig> {
         configSet.add(this)
     }
 
-    @Suppress("UNCHECKED_CAST")
     private val outTypeCtor by lazy {
-        val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
-        val jClass = genericSuper.actualTypeArguments[0] as Class<Type>
-        jClass.getConstructor()
+        findGenericSuperclassTypeArgument<GenericIndividualTrackerConfig<*>, Type>().getConstructor()
     }
 
     @Expose

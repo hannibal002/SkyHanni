@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper.Companion.NO_INVENTORY
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -46,10 +47,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
-import java.lang.reflect.ParameterizedType
 import java.time.LocalDate
-import kotlin.collections.forEach
-import kotlin.collections.toList
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -63,11 +61,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     internal open fun extraOnRender() = Unit
     internal fun createNewSession() = dataCtor.newInstance()
 
-    @Suppress("UNCHECKED_CAST")
     private val dataCtor by lazy {
-        val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
-        val jClass = genericSuper.actualTypeArguments[0] as Class<Data>
-        jClass.getConstructor()
+        findGenericSuperclassTypeArgument<SkyHanniTracker<*>, Data>().getConstructor()
     }
 
     internal abstract val storageAccessor: (ProfileSpecificStorage) -> Data
