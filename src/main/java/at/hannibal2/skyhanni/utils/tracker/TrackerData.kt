@@ -5,13 +5,19 @@ import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class TrackerData<T : SessionUptime>(
-    private val uptimeClass: KClass<T>,
-) : Resettable {
+abstract class TrackerData<T : SessionUptime> : Resettable {
+    @Suppress("UNCHECKED_CAST")
+    private val uptimeClass: KClass<T> by lazy {
+        val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
+        val jClass = genericSuper.actualTypeArguments[0] as Class<T>
+        jClass.kotlin
+    }
+
     @Expose
     @SerializedName("sessionUptime")
     private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
@@ -34,20 +40,14 @@ abstract class TrackerData<T : SessionUptime>(
         addSessionUptime()
     }
 
-    private fun addSessionUptime() {
-        when (uptimeClass) {
-            SessionUptime.Normal::class -> {
-                NormalSession.entries.forEach { session ->
-                    sessionUptime[SessionUptime.Normal(session)] = Stopwatch()
-                }
-            }
-
-            SessionUptime.Garden::class -> {
-                GardenSession.entries.forEach { session ->
-                    sessionUptime[SessionUptime.Garden(session)] = Stopwatch()
-                }
-            }
+    private fun addSessionUptime() = when (uptimeClass) {
+        SessionUptime.Normal::class -> NormalSession.entries.forEach { session ->
+            sessionUptime[SessionUptime.Normal(session)] = Stopwatch()
         }
+        SessionUptime.Garden::class -> GardenSession.entries.forEach { session ->
+            sessionUptime[SessionUptime.Garden(session)] = Stopwatch()
+        }
+        else -> { }
     }
 
     fun getSessionMap() = sessionUptime.toMap()

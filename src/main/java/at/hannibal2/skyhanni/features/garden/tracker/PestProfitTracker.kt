@@ -126,14 +126,14 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             }
         }
 
-        private fun getBitsPrice(): Double {
-            return if (SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL) 0.0 else config.coinsPerBit.get()
-                .toDouble()
-        }
+        private fun getBitsPrice(): Double =
+            if (SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL) 0.0
+            else config.coinsPerBit.get().toDouble()
 
-        override val selectedBucketItems
-            get() = if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
-                .toMutableMap()
+        override val selectedBucketItems get() = super.selectedBucketItems.let {
+            if (config.includeBits.get()) it
+            else it.filter { entry -> entry.key != BITS }.toMutableMap()
+        }
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
 
@@ -304,10 +304,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         addAll(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
 
         addPriceFromButton(this)
-    }
-
-    init {
-        initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

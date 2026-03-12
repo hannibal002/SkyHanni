@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.launch
-import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -49,39 +47,14 @@ import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-open class
-SkyHanniItemTracker<Data : ItemTrackerData<*>>(
-    name: String,
-    createNewSession: () -> Data,
-    getStorage: (ProfileSpecificStorage) -> Data,
-    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
-    trackerConfig: () -> GenericIndividualTrackerConfig<ItemTrackerGenericConfig>,
-    customUptimeControl: Boolean = false,
-    drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data, GenericIndividualTrackerConfig<ItemTrackerGenericConfig>>(
-    name,
-    createNewSession,
-    getStorage,
-    extraDisplayModes,
-    customUptimeControl = customUptimeControl,
-    drawDisplay = drawDisplay,
-    trackerConfig = { trackerConfig() }
-) {
-    companion object {
-        private val universalTracker get() = SkyHanniMod.feature.misc.tracker
-    }
+abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
+    abstract override val storage: Data
+    abstract override val config: TopLevelTrackerConfig<ItemTrackerGenericConfig>
+    override val trackerConfig: ItemTrackerGenericConfig get() = config.perTrackerConfig.trackerConfig
+    private val scrollValue = ScrollValue()
 
-    private val config: ItemTrackerGenericConfig get() =
-        if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
-
-    private val itemTrackerConfig: ItemTrackerGenericConfig.ItemTrackerConfig get() = config.itemTracker
-
-    private var scrollValue = ScrollValue()
-
-    open fun addCoins(amount: Int, command: Boolean) {
-        modify {
-            it.addItem(SKYBLOCK_COIN, amount, command)
-        }
+    open fun addCoins(amount: Int, command: Boolean) = modify {
+        it.addItem(SKYBLOCK_COIN, amount, command)
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
@@ -154,6 +127,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
         val dataItems = itemsAccessor.invoke()
+        val itemTrackerConfig = trackerConfig.itemTracker
         for ((internalName, itemProfit) in dataItems) {
             if (!filter(internalName)) continue
 
@@ -171,7 +145,6 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         }
 
         val table = mutableMapOf<List<Renderable>, String>()
-
         for ((internalName, price) in items.sortedDesc()) {
             val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
@@ -325,7 +298,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     }
 
     private fun shouldShowProfitPerHour() =
-        config.itemTracker.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
+        trackerConfig.itemTracker.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && trackerConfig.onlyShowSession.get())
 
     private fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
         if (duration == 0.seconds) return Renderable.empty()
@@ -363,32 +336,35 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         else ChatUtils.chat("§cFailed to copy $name $type to clipboard!")
     }
 
-    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
+    fun handlePossibleRareDrop(
+        internalName: NeuInternalName,
+        amount: Int,
+        message: Boolean = true
+    ) = with(trackerConfig.itemTracker) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
+        if (warnings.chat && price >= warnings.minimumChat && message) {
             componentBuilder {
                 appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
                 appendWithColor(": ", ChatFormatting.GRAY)
                 append("§r$itemName")
             }.let(ChatUtils::chat)
         }
-        if (itemTrackerConfig.warnings.title && price >= itemTrackerConfig.warnings.minimumTitle) {
+        if (warnings.title && price >= warnings.minimumTitle) {
             TitleManager.sendTitle("§a+ $itemName", weight = price)
         }
     }
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
-        if (isInventoryOpen()) {
-            lists.addButton<ItemPriceSource>(
-                label = "Price Source",
-                current = config.priceSource,
-                getName = { it.sellName },
-                onChange = {
-                    config.priceSource = it
-                    update()
-                },
-                universe = ItemPriceSource.entries,
-            )
-        }
+        if (!isInventoryOpen()) return
+        lists.addButton(
+            label = "Price Source",
+            current = trackerConfig.priceSource,
+            getName = { it.sellName },
+            onChange = {
+                trackerConfig.priceSource = it
+                update()
+            },
+            universe = ItemPriceSource.entries,
+        )
     }
 }
