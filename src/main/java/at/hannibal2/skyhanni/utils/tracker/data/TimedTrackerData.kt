@@ -44,11 +44,6 @@ abstract class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
 
     fun getAllCurrentData() = sessionContainer.getAllCurrentData()
 
-    fun getOrPutData(displayMode: DisplayMode): TimedTrackerData<*> = getOrPutEntry(displayMode).value
-
-    fun getOrPutData(displayMode: DisplayMode, string: String): TimedTrackerData<*> =
-        getOrPutEntry(displayMode, string).value
-
     fun getData(displayMode: DisplayMode, string: String) = sessionContainer.getData(displayMode, string)
 
     fun getCurrentData(displayMode: DisplayMode) = sessionContainer.getCurrentData(displayMode)
@@ -57,11 +52,11 @@ abstract class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
         getOrPutEntry(displayMode, sessionContainer.getDefaultName(displayMode)).value
 
     fun getOrPutCurrentData(displayMode: DisplayMode): TimedTrackerData<*> =
-        getOrPutEntry(displayMode, sessionContainer.getOrPutCurrentName(displayMode)).value
+        getOrPutEntry(displayMode, sessionContainer.resolveCurrentName(displayMode)).value
 
-    fun setCurrentName(displayMode: DisplayMode, string: String) = sessionContainer.setCurrentName(displayMode, string)
+    fun setCurrentName(displayMode: DisplayMode, string: String?) = sessionContainer.setCurrentName(displayMode, string)
 
-    fun getOrPutCurrentName(displayMode: DisplayMode) = sessionContainer.getOrPutCurrentName(displayMode)
+    fun resolveCurrentName(displayMode: DisplayMode) = sessionContainer.resolveCurrentName(displayMode)
 
     fun getCurrentName(displayMode: DisplayMode) = sessionContainer.getCurrentName(displayMode)
 
