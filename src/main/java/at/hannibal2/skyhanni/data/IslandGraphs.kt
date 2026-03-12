@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -268,27 +270,23 @@ object IslandGraphs {
         }
     }
 
-    private fun reloadFromJson(islandName: String) {
+    private fun reloadFromJson(islandName: String) = runCatching {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
-            try {
-                val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
-                IslandAreaFeatures.display = null
-                DelayedRun.runNextTick {
-                    setNewGraph(graph)
-                }
-            } catch (e: Error) {
-                currentIslandGraph = null
-                if (SkyBlockUtils.debug) {
-                    ErrorManager.logErrorWithData(
-                        e,
-                        "failed to load graph data for island $islandName",
-                        "island name" to islandName,
-                    )
-                }
+        CoroutineConfig("load island graph data for $islandName").launch {
+            val graph = SkyHanniRepoManager.getRepoDataAsync<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+            IslandAreaFeatures.display = null
+            DelayedRun.runNextTick {
+                setNewGraph(graph)
             }
         }
+    }.getOrElse {
+        currentIslandGraph = null
+        if (SkyBlockUtils.debug) ErrorManager.logErrorWithData(
+            it,
+            "failed to load graph data for island $islandName",
+            "island name" to islandName,
+        )
     }
 
     fun setNewGraph(graph: Graph) {

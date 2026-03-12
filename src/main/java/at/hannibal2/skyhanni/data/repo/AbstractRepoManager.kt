@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.Dispatchers
@@ -110,8 +111,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val progressCategory: ChatProgressCategory
 
     open fun reportExtraStatusInfo(): Unit = Unit
-    fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
-    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
+    fun addSuccessfulConstant(constant: String) = successfulConstants.add(constant)
+    fun addUnsuccessfulConstant(constant: String, e: Throwable): Nothing {
+        unsuccessfulConstants.add(constant)
+        logger.throwErrorWithCause("Could not load constant '$constant'", e)
+    }
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
@@ -167,27 +171,15 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
     @PublishedApi
-    @Deprecated("Use suspended version of function instead", replaceWith = ReplaceWith("getRepoDataAsync(path)"))
-    internal inline fun <reified T : Any> getRepoData(
-        directory: String,
-        fileName: String,
-    ): T = runCatching {
-        val path = resolvePath(directory, fileName)
-        val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
-        ConfigManager.gson.fromJson<T>(json)
-    }.getOrElse { e ->
-        logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
-    }
-
-    @PublishedApi
     internal suspend inline fun <reified T : Any> getRepoDataAsync(
         directory: String,
         fileName: String,
+        gson: Gson = ConfigManager.gson,
     ): T = runCatching {
         val path = resolvePath(directory, fileName)
         val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
         withContext(Dispatchers.Default) {
-            ConfigManager.gson.fromJson<T>(json)
+            gson.fromJson<T>(json)
         }
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)

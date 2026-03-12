@@ -21,36 +21,35 @@ import net.minecraft.world.item.ItemStack
 object CopyItemCommand {
 
     private val copyItemConfig = CoroutineConfig("copy item command")
-
-    private suspend fun command() {
-        val itemStack = InventoryUtils.getItemInHand()
-        if (itemStack == null) {
-            ChatUtils.userError("No item in hand!")
-            return
+    private val itemPropertyMap: Map<String, (ItemStack.() -> String)> = buildMap {
+        fun String.quoteWrap(leadingSpace: Boolean = false) = "${if (leadingSpace) " " else ""}'$this'"
+        put("internal name") { getInternalName().asString() }
+        put("display name") { hoverName.formattedTextCompatLeadingWhiteLessResets().quoteWrap() }
+        put("minecraft id") { getMinecraftId().toString().quoteWrap() }
+        put("lore") {
+            getLoreComponent().joinToString("\n") { it.formattedTextCompat().quoteWrap(true) }
         }
-        copyItemToClipboard(itemStack)
+        put ("_spacer") { "" }
+        put("nbt attributes") {
+            val attributeNBT = extraAttributes.getReadableNBTDump()
+            if (attributeNBT.isEmpty()) "no tag compound"
+            else buildString {
+                appendLine("getTagCompound")
+            }
+        }
     }
 
     suspend fun copyItemToClipboard(itemStack: ItemStack) {
-        val resultList = mutableListOf<String>()
-        resultList.add("internal name: " + itemStack.getInternalName().asString())
-        resultList.add("display name: '" + itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() + "'")
-        resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
-        resultList.add("lore:")
-        for (line in itemStack.getLoreComponent()) {
-            resultList.add(" '${line.formattedTextCompat()}'")
-        }
-        resultList.add("")
-        val attributes = itemStack.extraAttributes.getReadableNBTDump()
-        if (attributes.isEmpty()) {
-            resultList.add("no tag compound")
-        } else {
-            resultList.add("getTagCompound")
-            resultList.addAll(attributes)
+        val itemInfoString = buildString {
+            itemPropertyMap.forEach { (property, calculation) ->
+                val propertyValue = calculation(itemStack)
+                val propertyPrintName = if (property.startsWith("_")) "" else "$property:"
+                val separator = if (propertyValue.contains("\n")) "\n" else " "
+                appendLine("$propertyPrintName:${separator}$propertyValue")
+            }
         }
 
-        val string = resultList.joinToString("\n")
-        val copied = OSUtils.copyToClipboardAsync(string) ?: false
+        val copied = OSUtils.copyToClipboardAsync(itemInfoString) ?: false
         if (!copied) ChatUtils.chat("Failed to copy item to clipboard!")
         else ChatUtils.chat("Item info copied into the clipboard!")
     }
@@ -60,7 +59,11 @@ object CopyItemCommand {
         event.registerBrigadier("shcopyitem") {
             description = "Copies information about the item in hand to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            coroutineSimpleCallback(copyItemConfig) { command() }
+            coroutineSimpleCallback(copyItemConfig) {
+                val itemStack = InventoryUtils.getItemInHand()
+                    ?: return@coroutineSimpleCallback ChatUtils.userError("No item in hand!")
+                copyItemToClipboard(itemStack)
+            }
         }
     }
 }
