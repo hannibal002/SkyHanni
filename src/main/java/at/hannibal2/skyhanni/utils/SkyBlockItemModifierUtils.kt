@@ -27,7 +27,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.util.Locale
@@ -103,11 +103,8 @@ object SkyBlockItemModifierUtils {
         @Expose val noMove: Boolean? = null,
         @Expose val extraData: JsonObject? = null,
     ) {
-        @Suppress("PropertyName")
-        @Deprecated("Do not use, does not reflect Tier Boost, use PetData(petInfo).fauxInternalName instead")
-        val _internalName = "$type;${tier.id}".toInternalName()
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
-        fun getSkinVariantIndex() = properSkinItem?.let { PetUtils.getVariantIndexOrNull(it) }
+        fun getSkinVariantIndex() = extraData?.let { PetUtils.getVariantIndexOrNull(it) }
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
@@ -142,8 +139,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
-    val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
-    var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
+    private val warnedAboutPetParseFailure: MutableSet<String> = mutableSetOf()
+    private var lastWarnedParseFailure: SimpleTimeMark = SimpleTimeMark.farPast()
 
     fun ItemStack.getPetInfo(): PetInfo? {
         val colorlessName = hoverName.string.removeColor()
@@ -304,7 +301,7 @@ object SkyBlockItemModifierUtils {
 
     fun isVanillaItem(itemId: String): Boolean {
         if (!identifierPattern.matches(itemId)) return false
-        return BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(itemId)) != Items.AIR
+        return BuiltInRegistries.ITEM.getValue(Identifier.parse(itemId)) != Items.AIR
     }
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

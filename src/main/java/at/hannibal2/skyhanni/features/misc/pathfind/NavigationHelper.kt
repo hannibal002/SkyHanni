@@ -110,6 +110,7 @@ object NavigationHelper {
 
         val distances = mutableMapOf<GraphNode, Double>()
         for (node in graph) {
+            if (!node.enabled) continue
             val name = node.name ?: continue
             val remainingTags = node.tags.filter { it in allowedTags }
             if (remainingTags.isEmpty()) continue
@@ -139,12 +140,15 @@ object NavigationHelper {
                     doCommandAsync(it.lowercase())
                 }
             }
+            simpleCallback {
+                doCommandAsync("")
+            }
         }
     }
 
     private fun getNames(): List<String> {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyList()
-        return graph.filter { it.isValidAreaNode() }.mapNotNull { it.name }
+        return graph.filterByActive { it.isValidAreaNode() }.mapNotNull { it.name }
     }
 
     private fun GraphNode.isValidAreaNode(): Boolean {

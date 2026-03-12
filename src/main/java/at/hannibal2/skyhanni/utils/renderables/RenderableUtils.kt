@@ -94,14 +94,14 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    private fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
+    fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
         HorizontalAlignment.LEFT -> 0
         HorizontalAlignment.CENTER -> (xSpace - renderable.width) / 2
         HorizontalAlignment.RIGHT -> xSpace - renderable.width
         else -> 0
     }
 
-    private fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
+    fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
         VerticalAlignment.TOP -> 0
         VerticalAlignment.CENTER -> (ySpace - renderable.height) / 2
         VerticalAlignment.BOTTOM -> ySpace - renderable.height
@@ -131,14 +131,14 @@ internal object RenderableUtils {
             Renderable.currentRenderPassMousePosition =
                 ((preScaleMouse.first - padding) * inverseScale).toInt() to ((preScaleMouse.second - padding) * inverseScale).toInt()
 
-            DrawContextUtils.translate(xOffsetRender, yOffsetRender, 0f)
-            DrawContextUtils.scale(scale, scale, 1f)
+            DrawContextUtils.translate(xOffsetRender, yOffsetRender)
+            DrawContextUtils.scale(scale, scale)
             render(
                 mouseOffsetX + (xOffset * inverseScale).toInt(),
                 mouseOffsetY + (yOffset * inverseScale).toInt(),
             )
-            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
-            DrawContextUtils.translate(-xOffsetRender, -yOffsetRender, 0f)
+            DrawContextUtils.scale(inverseScale, inverseScale)
+            DrawContextUtils.translate(-xOffsetRender, -yOffsetRender)
         } finally {
             Renderable.currentRenderPassMousePosition = preScaleMouse
         }
@@ -147,25 +147,25 @@ internal object RenderableUtils {
     fun Renderable.renderXYAligned(mouseOffsetX: Int, mouseOffsetY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        DrawContextUtils.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(xOffset.toFloat(), yOffset.toFloat())
         this.render(mouseOffsetX + xOffset, mouseOffsetY + yOffset)
-        DrawContextUtils.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(-xOffset.toFloat(), -yOffset.toFloat())
         return xOffset to yOffset
     }
 
     fun Renderable.renderXAligned(mouseOffsetX: Int, mouseOffsetY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
-        DrawContextUtils.translate(xOffset.toFloat(), 0f, 0f)
+        DrawContextUtils.translate(xOffset.toFloat(), 0f)
         this.render(mouseOffsetX + xOffset, mouseOffsetY)
-        DrawContextUtils.translate(-xOffset.toFloat(), 0f, 0f)
+        DrawContextUtils.translate(-xOffset.toFloat(), 0f)
         return xOffset
     }
 
     fun Renderable.renderYAligned(mouseOffsetX: Int, mouseOffsetY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        DrawContextUtils.translate(0f, yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, yOffset.toFloat())
         this.render(mouseOffsetX, mouseOffsetY + yOffset)
-        DrawContextUtils.translate(0f, -yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, -yOffset.toFloat())
         return yOffset
     }
 
@@ -175,11 +175,11 @@ internal object RenderableUtils {
         color: Color = Color.WHITE,
         inverseScale: Double = 1 / scale,
     ) {
-        DrawContextUtils.translate(1.0, 1.0, 0.0)
-        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+        DrawContextUtils.translate(1.0, 1.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat())
         GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
-        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
-        DrawContextUtils.translate(-1.0, -1.0, 0.0)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat())
+        DrawContextUtils.translate(-1.0, -1.0)
     }
 
     fun renderString(
@@ -188,11 +188,11 @@ internal object RenderableUtils {
         color: Color = Color.WHITE,
         inverseScale: Double = 1 / scale,
     ) {
-        DrawContextUtils.translate(1.0, 1.0, 0.0)
-        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+        DrawContextUtils.translate(1.0, 1.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat())
         GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
-        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
-        DrawContextUtils.translate(-1.0, -1.0, 0.0)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat())
+        DrawContextUtils.translate(-1.0, -1.0)
     }
 
     inline fun <T> MutableList<Searchable>.addNullableButton(
@@ -441,7 +441,7 @@ internal object RenderableUtils {
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
-                Renderable.item(it, scale = itemScale)
+                Renderable.item(it) { scale = itemScale }
             } ?: continue
             val left = hoverTips(
                 entry.left,

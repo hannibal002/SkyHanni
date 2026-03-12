@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
-import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -112,12 +111,12 @@ object CustomWardrobe {
         }
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 100f)
+        DrawContextUtils.translate(0f, 0f)
 
         position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
-            DrawContextUtils.translate(0f, 0f, 400f)
+            DrawContextUtils.translate(0f, 0f)
             EstimatedItemValue.tryRendering()
         }
         DrawContextUtils.popMatrix()
@@ -131,9 +130,8 @@ object CustomWardrobe {
         if (!editMode) return
         val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
-        val accessorGui = gui as AccessorHandledScreen
-        val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
-        val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
+        val posX = gui.leftPos + (1.05 * gui.imageWidth).toInt()
+        val posY = gui.topPos + (gui.imageHeight - renderable.height) / 2
         inventoryButtonPosition.moveTo(posX, posY)
             .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
@@ -287,7 +285,7 @@ object CustomWardrobe {
             if (armorOrdinal < 0 || armorOrdinal > 3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
             if (stack == null) stack = ItemStack.EMPTY
-            fakePlayer.inventory.equipment.set(equipment, stack)
+            fakePlayer.equipment.set(equipment, stack)
         }
 
         val playerColor = if (!slot.isInCurrentPage()) {

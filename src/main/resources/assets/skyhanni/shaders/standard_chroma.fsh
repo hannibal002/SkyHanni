@@ -2,10 +2,12 @@
 
 in vec4 vertexColor;
 
-uniform float chromaSize;
-uniform float timeOffset;
-uniform float saturation;
-uniform bool forwardDirection;
+layout(std140) uniform SkyHanniChromaUniforms {
+    float chromaSize;
+    float timeOffset;
+    float saturation;
+    int forwardDirection;
+};
 
 out vec4 fragColor;
 
@@ -22,7 +24,7 @@ vec3 hsb2rgb_smooth(vec3 c) {
 void main() {
     // Determine the direction chroma moves
     float fragCoord;
-    if (forwardDirection) {
+    if (forwardDirection == 1) {
         fragCoord = gl_FragCoord.x - gl_FragCoord.y;
     } else {
         fragCoord = gl_FragCoord.x + gl_FragCoord.y;

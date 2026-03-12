@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
 import java.util.UUID
@@ -31,7 +31,6 @@ data class PetDataStorage(
 }
 
 @KSerializable
-@Suppress("DEPRECATION")
 data class PetData(
     @Expose private val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
@@ -41,7 +40,7 @@ data class PetData(
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     constructor(petInfo: SkyBlockItemModifierUtils.PetInfo) : this(
-        petInfo._internalName,
+        petInfo.let { "${it.type};${it.tier.id}".toInternalName() },
         petInfo.properSkinItem,
         petInfo.getSkinVariantIndex(),
         petInfo.heldItem,
@@ -96,17 +95,17 @@ data class PetData(
     fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
         getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
 
-    fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimationFrame>? {
+    fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimatedFrame>? {
         val baseStack = getSkinItemStackOrNull(0) ?: run {
             return null
         }
-        val firstFrame = ItemStackAnimationFrame(baseStack)
+        val firstFrame = ItemStackAnimatedFrame(baseStack)
         val animationJson = getAnimatedJsonOrNull()
         if (firstFrameOnly || animationJson == null) {
             return listOf(firstFrame)
         }
         return animationJson.textures.map {
-            ItemStackAnimationFrame(
+            ItemStackAnimatedFrame(
                 it.buildTextureItemStack(),
                 ticks = animationJson.ticks,
             )

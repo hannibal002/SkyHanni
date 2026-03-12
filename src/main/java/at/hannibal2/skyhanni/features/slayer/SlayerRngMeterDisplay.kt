@@ -31,8 +31,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
@@ -91,7 +95,7 @@ object SlayerRngMeterDisplay {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (config.hideChat && SlayerApi.isInCorrectArea) {
@@ -147,7 +151,15 @@ object SlayerRngMeterDisplay {
                         "timesUpdatedSinceLastDrop" to timesUpdatedSinceLastDrop,
                     )
                 }
-                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
+                ChatUtils.chat(
+                    componentBuilder {
+                        appendWithColor("RNG Meter ", ChatFormatting.LIGHT_PURPLE)
+                        withColor(ChatFormatting.GRAY)
+                        append("dropped at ")
+                        appendWithColor("$percentage ", ChatFormatting.YELLOW)
+                        append("XP ($from/$to)")
+                    }
+                )
                 lastItemDroppedTime = SimpleTimeMark.now()
                 timesUpdatedSinceLastDrop = 0
             }

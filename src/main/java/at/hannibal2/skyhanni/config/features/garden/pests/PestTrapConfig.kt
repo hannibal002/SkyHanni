@@ -69,7 +69,7 @@ class PestTrapConfig {
         @Expose
         @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a warning.\nClear to disable sound.")
         @ConfigEditorText
-        val warningSound: Property<String> = Property.of("note.pling")
+        val warningSound: Property<String> = Property.of("block.note_block.pling")
 
 
         @Expose

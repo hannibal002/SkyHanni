@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -77,7 +77,7 @@ object HoppityEggLocations {
     }
 
     @HandleEvent
-    fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
+    fun onProfileViewerDataLoaded(event: ProfileViewerDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.waypoints.loadFromNeuPv) return
 
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return

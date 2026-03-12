@@ -2,6 +2,7 @@ name: Detekt
 
 on:
     pull_request_target:
+        types: [opened, synchronize, reopened]
         branches:
             - "*"
     workflow_dispatch:
@@ -142,3 +143,6 @@ jobs:
                             repo: context.repo.repo,
                             body: commentBody
                         })
+
+            -   name: Try to fail
+                run: exit 1

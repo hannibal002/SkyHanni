@@ -2,15 +2,21 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpLocationData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -22,8 +28,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -36,11 +45,22 @@ object BurrowWarpHelper {
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
 
+    private var cannotWarpUntil: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var warpQueued = false
+
+    fun blockWarp(duration: Duration) {
+        val until = SimpleTimeMark.now().plus(duration)
+        if (until.minus(cannotWarpUntil) > 0.milliseconds) {
+            cannotWarpUntil = until
+        }
+    }
+
     @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.HUB)
     fun onRenderOverlay() {
         if (!config.burrowNearestWarp) return
         if (!DianaApi.isDoingDiana()) return
         val warp = currentWarp ?: return
+        if (GriffinBurrowHelper.mobAlive) return
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != GLFW.GLFW_KEY_UNKNOWN) {
@@ -55,27 +75,42 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
+        if (event.keyCode != config.keyBindWarp) return
+        if (warpQueued) return
+
+        if (cannotWarpUntil.isInFuture()) {
+            GriffinBurrowHelper.addDebug("delaying warp for ${cannotWarpUntil.timeUntil()}")
+            warpQueued = true
+            DelayedRun.runDelayed(cannotWarpUntil.timeUntil(), { warp() })
+        } else warp()
+    }
+
+    private fun warp() {
+        warpQueued = false
         if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
-
-        if (event.keyCode != config.keyBindWarp) return
         if (Minecraft.getInstance().screen != null) return
-
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
+
+        GriffinBurrowHelper.addDebug("warping to $warp count of bezierFitter ${PreciseGuessBurrow.getBezierFitterCount()}")
         lastWarpTime = SimpleTimeMark.now()
         HypixelCommands.warp(warp.name)
         lastWarp = currentWarp
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message != "§cYou haven't unlocked this fast travel destination!") return
         if (lastWarpTime.passedSince() > 1.seconds) return
         lastWarp?.let {
             it.unlocked = false
             ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
             ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+            ChatUtils.chatAndOpenConfig(
+                "Click Here to permanently ignore this warp.",
+                SkyHanniMod.feature.event.diana::ignoredWarpsList,
+            )
             lastWarp = null
             currentWarp = null
         }
@@ -147,22 +182,88 @@ object BurrowWarpHelper {
         }
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(119, "event.diana.inquisitorSharing", "event.diana.rareMobsSharing") {
+            val sharing = it.asJsonObject
+            val focus = sharing.remove("focusInquisitor")
+            sharing.add("focus", focus)
+            it
+        }
+        event.move(119, "event.diana.highlightInquisitors", "event.diana.highlightRareMobs")
+
+        event.transform(119, "event.diana") { element ->
+            val oldWarps = element.asJsonObject.getAsJsonObject("ignoredWarps")
+            val newWarps = JsonArray()
+
+            if (oldWarps.getAsJsonPrimitive("crypt")?.asBoolean == true) {
+                newWarps.add("CRYPT")
+            }
+            if (oldWarps.getAsJsonPrimitive("wizard")?.asBoolean == true) {
+                newWarps.add("WIZARD")
+            }
+            if (oldWarps.getAsJsonPrimitive("stonks")?.asBoolean == true) {
+                newWarps.add("STONKS")
+            }
+            newWarps.add("TAYLOR")
+            element.asJsonObject.add("ignoredWarpsList", newWarps)
+            element
+        }
+    }
+
+    var warpLocationData: Map<String, WarpLocationData>? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val constant = event.getConstant<WarpsJson>("Warps")
+        warpLocationData = constant.warpLocation
+    }
+
     enum class WarpPoint(
-        val displayName: String,
-        val location: LorenzVec,
-        private val extraBlocks: Int,
-        val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
-        HUB("Hub", LorenzVec(-3, 70, -70), 2),
-        CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
-        CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
-        DA("Dark Auction", LorenzVec(91, 74, 173), 2),
-        MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
-        WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
-        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
+        HUB,
+        CASTLE,
+        CRYPT,
+        DA,
+        MUSEUM,
+        WIZARD,
+        STONKS,
+        TAYLOR,
         ;
 
+        val displayName: String get() {
+            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+            for (entry in locationData) {
+                if (entry.key.equals(this.name, true)) {
+                    return entry.value.displayName
+                }
+            }
+            ErrorManager.skyHanniError("repo invalid for diana warp")
+        }
+
+        val location: LorenzVec get() {
+            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+            for (entry in locationData) {
+                if (entry.key.equals(this.name, true)) {
+                    return LorenzVec(entry.value.x, entry.value.y, entry.value.z)
+                }
+            }
+            ErrorManager.skyHanniError("repo invalid for diana warp")
+        }
+
+        private val extraBlocks: Int get() {
+            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+            for (entry in locationData) {
+                if (entry.key.equals(this.name, true)) {
+                    return entry.value.extraDianaWarpBlocks
+                }
+            }
+            ErrorManager.skyHanniError("repo invalid for diana warp")
+        }
+
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
+
+        fun ignored(): Boolean = config.ignoredWarpsList.contains(this)
     }
 }

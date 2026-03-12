@@ -103,6 +103,13 @@ object CroesusChestTracker {
 
     private var display: List<Renderable>? = null
 
+    private val chestSlots = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    )
+
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
     @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, priority = HandleEvent.LOW, onlyOnSkyblock = true)
@@ -110,16 +117,10 @@ object CroesusChestTracker {
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (!inCroesusInventory || croesusEmpty) return
-        for ((run, slot) in InventoryUtils.getItemsInOpenChest()
-            .mapNotNull { slot -> runSlots(slot.containerSlot, slot) }) {
-
-            // If one chest is null every followup chest is null. Therefore, an early return is possible
-            if (run.floor == null) return
-
-            val state = run.openState ?: OpenedState.UNOPENED
-
-            if (state != OpenedState.KEY_USED) {
-                slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
+        InventoryUtils.getItemsInOpenChest().forEach { slot ->
+            if (chestSlots.any { it.contains(slot.containerSlot) }) {
+                val color = (OpenedState.getOpenState(slot.item.getLore()) ?: return@forEach).color ?: return@forEach
+                slot.highlight(color)
             }
         }
     }
@@ -169,18 +170,7 @@ object CroesusChestTracker {
                     )
             if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) run.floor =
                 ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
-            run.openState = when {
-                keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
-                openedPattern.anyMatches(lore) -> OpenedState.OPENED
-                unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
-                else -> ErrorManager.logErrorStateWithData(
-                    "Croesus Chest couldn't be read correctly.",
-                    "Open state check failed for chest.",
-                    "run" to run,
-                    "lore" to lore,
-                ).run { null }
-            }
-            run.kismetUsed = kismetUsedInCroesusPattern.anyMatches(lore)
+            run.openState = OpenedState.getOpenState(lore)
         }
     }
 
@@ -196,7 +186,6 @@ object CroesusChestTracker {
     private fun DungeonRunInfo.setValuesNull() {
         floor = null
         openState = null
-        kismetUsed = null
     }
 
     @HandleEvent(InventoryCloseEvent::class)
@@ -241,8 +230,8 @@ object CroesusChestTracker {
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
-        val run = croesusSlotMapToRun(event.slot.containerSlot) ?: return
-        if (!getKismetUsed(run)) return
+        croesusSlotMapToRun(event.slot.containerSlot) ?: return
+        if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getLore())) return
         event.offsetY = -1
         event.offsetX = -9
         event.stackTip = "§a✔"
@@ -332,8 +321,6 @@ object CroesusChestTracker {
 
     private fun getRun0(run: Int = currentRunIndex) = croesusChests?.takeIf { run < it.size }?.get(run)
 
-    private fun getKismetUsed(runIndex: Int) = getRun0(runIndex)?.kismetUsed ?: false
-
     private fun getKismetAmount() = kismetInternalName.getAmountInSacks() + kismetInternalName.getAmountInInventory()
 
     private fun croesusSlotMapToRun(slotId: Int) = when (slotId) {
@@ -360,9 +347,30 @@ object CroesusChestTracker {
         } ?: -1
         ) + 1
 
-    enum class OpenedState {
-        UNOPENED,
-        OPENED,
-        KEY_USED,
+    enum class OpenedState(val color: LorenzColor?) {
+        UNOPENED(LorenzColor.DARK_PURPLE),
+        OPENED(LorenzColor.DARK_AQUA),
+        KEY_USED(null),
+        ;
+
+        companion object {
+            fun getOpenState(lore: List<String>): OpenedState? {
+                return when {
+                    keyUsedPattern.anyMatches(lore) -> KEY_USED
+                    openedPattern.anyMatches(lore) -> OPENED
+                    unopenedPattern.anyMatches(lore) -> UNOPENED
+                    kuudraPattern.anyMatches(lore) -> UNOPENED
+                    // Kuudra doesn't have an unopened line, but it DOES have opened line, this has to be after opened in when branch.
+                    else -> {
+                        ErrorManager.logErrorStateWithData(
+                            "Croesus Chest couldn't be read correctly.",
+                            "Open state check failed for chest.",
+                            "lore" to lore,
+                        )
+                        null
+                    }
+                }
+            }
+        }
     }
 }

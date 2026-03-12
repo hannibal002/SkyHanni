@@ -134,7 +134,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
@@ -369,6 +369,12 @@ object HoppityEventSummary {
                 val boughtCount = stats.getBoughtCount().takeIf { it > 0 } ?: return@put
                 val rabbitFormat = StringUtils.pluralize(boughtCount, "Rabbit")
                 statList.addStr("§7You bought §b${boughtCount.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
+            }
+
+            put(HoppityStat.VISITOR_RABBITS) { statList, stats, _ ->
+                val visitorCount = stats.mealsFound[HoppityEggType.VISITOR]?.takeIf { it > 0 } ?: return@put
+                val rabbitFormat = StringUtils.pluralize(visitorCount, "Rabbit")
+                statList.addStr("§6Hoppity §7gave you §b$visitorCount §d$rabbitFormat §r§7on your §aGarden§7.")
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->

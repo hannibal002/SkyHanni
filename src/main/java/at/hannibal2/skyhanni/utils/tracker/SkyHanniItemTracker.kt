@@ -30,6 +30,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
@@ -39,6 +41,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import net.minecraft.ChatFormatting
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.time.Duration
@@ -265,7 +268,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         totalAmount: Long,
         action: String,
         duration: Duration,
-        actionPluralized: String = ""
+        actionPluralized: String = "",
+        actionShorten: Boolean = true,
     ): List<Searchable> {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
@@ -283,7 +287,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
 
             if (totalAmount > 0 && duration > 0.seconds && actionPluralized != "") {
                 val amountPerHour = totalAmount / duration.inPartialHours
-                add("§7$actionPluralized per hour: §e${amountPerHour.shortFormat()}")
+                val amount = if (actionShorten) amountPerHour.shortFormat() else amountPerHour
+                add("§7$actionPluralized per hour: §e$amount")
             }
         }
 
@@ -355,7 +360,13 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+            ChatUtils.chat(
+                componentBuilder {
+                    appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                    appendWithColor(": ", ChatFormatting.GRAY)
+                    append("§r$itemName")
+                }
+            )
         }
         if (itemTrackerConfig.warnings.title && price >= itemTrackerConfig.warnings.minimumTitle) {
             TitleManager.sendTitle("§a+ $itemName", weight = price)
@@ -375,5 +386,13 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
                 universe = ItemPriceSource.entries,
             )
         }
+    }
+
+    override fun hideInEstimatedItemValue(): Boolean {
+        return config.itemTracker.hideInEstimatedItemValue
+    }
+
+    override fun hideOutsideInventory(): Boolean {
+        return config.itemTracker.hideOutsideInventory
     }
 }

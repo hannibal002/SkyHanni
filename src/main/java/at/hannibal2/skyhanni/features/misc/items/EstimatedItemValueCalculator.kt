@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
+import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -53,6 +54,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOverclockerCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
@@ -164,6 +166,7 @@ object EstimatedItemValueCalculator {
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
     private val FREE_WILL = "FREE_WILL".toInternalName()
 
+    // TODO Extend this to actually take a price source instead of having price source be decided by Estimated Item Value config
     fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
         val (totalPrice, basePrice) = calculate(stack, mutableListOf())
         if (ignoreBasePrice && totalPrice == basePrice) {
@@ -853,11 +856,12 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
+        val petLevelInclusiveInternalName = stack.getPetInternalNameWithLevel().removeKuudraTier()
 
         // ignore cases where players put bugged items in ah/trade/chest to break mods
         if (internalName == NeuInternalName.NONE) return 0.0
 
-        var price = internalName.getPrice()
+        var price = petLevelInclusiveInternalName.getPrice()
         if (price == -1.0) {
             price = 0.0
         }
@@ -872,8 +876,9 @@ object EstimatedItemValueCalculator {
                 }
             }
         }
+        val level = if (stack.getPetInternalNameWithLevel() != stack.getInternalName()) " LVL ${stack.getPetLevel()}" else ""
 
-        val name = internalName.repoItemName
+        val name = "${internalName.repoItemName}$level"
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0

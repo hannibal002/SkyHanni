@@ -53,10 +53,10 @@ class SearchableTable private constructor(
                 xShift - emptySpaceX,
                 yShift - emptySpaceY,
             )
-            DrawContextUtils.translate(xShift.toFloat(), 0f, 0f)
+            DrawContextUtils.translate(xShift.toFloat(), 0f)
             renderX += xShift
         }
-        DrawContextUtils.translate(-renderX.toFloat(), yShift.toFloat(), 0f)
+        DrawContextUtils.translate(-renderX.toFloat(), yShift.toFloat())
         renderY += yShift
     }
 
@@ -66,7 +66,7 @@ class SearchableTable private constructor(
             renderRow(mouseOffsetX, mouseOffsetY, -1, header)
         }
         super.render(mouseOffsetX, mouseOffsetY)
-        DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
+        DrawContextUtils.translate(0f, -renderY.toFloat())
     }
 
     companion object {

@@ -435,7 +435,7 @@ object StringUtils {
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
-    fun SystemMessageEvent.applyIfPossible(
+    fun SystemMessageEvent.Modify.applyIfPossible(
         transformationReason: String? = null,
         transform: (String) -> String,
     ) {
@@ -513,6 +513,8 @@ object StringUtils {
     }
 
     fun Component.contains(string: String): Boolean = formattedTextCompat().contains(string)
+
+    fun Component.startsWith(string: String): Boolean = formattedTextCompat().startsWith(string)
 
     fun String.width(): Int {
         return Minecraft.getInstance().font.width(this)
@@ -600,4 +602,6 @@ object StringUtils {
             this.substring(matcher.end())
         } else this
     }
+
+    fun String.addSkyHanniUtm(): String = "$this?utm_source=SkyHanni"
 }

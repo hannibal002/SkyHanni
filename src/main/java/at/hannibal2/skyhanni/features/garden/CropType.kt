@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTime
-import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
@@ -19,62 +20,114 @@ enum class CropType(
     val farmingItem: FarmingItemType,
     val replenish: Boolean = false,
     val enchantName: String = cropName.lowercase(),
+    val eliteLbName: String = simpleName,
+    val cropColor: LorenzColor = LorenzColor.GREEN,
+    val cropShortName: String = cropName.substring(0..1),
 ) {
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.WHEAT) }, "wheat", FarmingItemType.WHEAT,
+        { ItemStack(Items.WHEAT).overrideId("WHEAT") }, "wheat", FarmingItemType.WHEAT,
+        cropColor = LorenzColor.GOLD,
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.CARROT) }, "carrot", FarmingItemType.CARROT, replenish = true,
+        { ItemStack(Items.CARROT).overrideId("CARROT_ITEM") }, "carrot", FarmingItemType.CARROT, replenish = true,
+        cropColor = LorenzColor.GOLD,
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.POTATO) }, "potato", FarmingItemType.POTATO, replenish = true,
+        { ItemStack(Items.POTATO).overrideId("POTATO_ITEM") }, "potato", FarmingItemType.POTATO, replenish = true,
+        cropColor = LorenzColor.GOLD,
     ),
     NETHER_WART(
-        "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.NETHER_WART) }, "wart", FarmingItemType.NETHER_WART, replenish = true,
+        "Nether Wart",
+        "THEORETICAL_HOE_WARTS",
+        "FERMENTO",
+        2.5,
+        { ItemStack(Items.NETHER_WART).overrideId("NETHER_STALK") },
+        "wart",
+        FarmingItemType.NETHER_WART,
+        replenish = true,
         enchantName = "warts",
+        eliteLbName = "netherwart",
+        cropColor = LorenzColor.RED,
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Blocks.CARVED_PUMPKIN) }, "pumpkin", FarmingItemType.PUMPKIN,
+        { ItemStack(Items.CARVED_PUMPKIN).overrideId("PUMPKIN") }, "pumpkin", FarmingItemType.PUMPKIN,
+        cropColor = LorenzColor.GOLD,
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.MELON_SLICE) }, "melon", FarmingItemType.MELON,
+        { ItemStack(Items.MELON_SLICE).overrideId("MELON") }, "melon", FarmingItemType.MELON,
+        cropColor = LorenzColor.GREEN,
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
-        { DyeCompat.BROWN.createStack() }, "cocoa",
+        { ItemStack(Items.COCOA_BEANS).overrideId("INK_SACK:3") }, "cocoa",
         FarmingItemType.COCOA_BEANS, replenish = true, enchantName = "coco",
+        cropColor = LorenzColor.GOLD,
     ),
     SUGAR_CANE(
-        "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.SUGAR_CANE) }, "cane", FarmingItemType.SUGAR_CANE, enchantName = "cane",
+        "Sugar Cane",
+        "THEORETICAL_HOE_CANE",
+        "FERMENTO",
+        2.0,
+        { ItemStack(Items.SUGAR_CANE).overrideId("SUGAR_CANE") },
+        "cane",
+        FarmingItemType.SUGAR_CANE,
+        enchantName = "cane",
+        eliteLbName = "sugarcane",
+        cropColor = LorenzColor.GREEN,
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Blocks.CACTUS) }, "cactus", FarmingItemType.CACTUS,
+        { ItemStack(Items.CACTUS).overrideId("CACTUS") }, "cactus", FarmingItemType.CACTUS,
+        cropColor = LorenzColor.GREEN,
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Blocks.RED_MUSHROOM_BLOCK) }, "mushroom", FarmingItemType.MUSHROOM,
+        { ItemStack(Items.RED_MUSHROOM_BLOCK).overrideId("HUGE_MUSHROOM_2") }, "mushroom", FarmingItemType.MUSHROOM,
         enchantName = "mushrooms",
+        cropColor = LorenzColor.RED,
     ),
     SUNFLOWER(
-        "Sunflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.SUNFLOWER) }, "sunflower", FarmingItemType.SUNFLOWER,
+        "Sunflower",
+        "THEORETICAL_HOE_SUNFLOWER",
+        "HELIANTHUS",
+        2.0,
+        { ItemStack(Items.SUNFLOWER).overrideId("DOUBLE_PLANT") },
+        "sunflower",
+        FarmingItemType.SUNFLOWER,
+        replenish = true,
+        cropColor = LorenzColor.GOLD,
+        cropShortName = "Sf",
     ),
     MOONFLOWER(
-        "Moonflower", "THEORETICAL_HOE_SUNFLOWER", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.BLUE_ORCHID) }, "moonflower", FarmingItemType.MOONFLOWER,
+        "Moonflower",
+        "THEORETICAL_HOE_SUNFLOWER",
+        "HELIANTHUS",
+        2.0,
+        { ItemStack(Items.BLUE_ORCHID).overrideId("MOONFLOWER") },
+        "moonflower",
+        FarmingItemType.MOONFLOWER,
+        replenish = true,
+        cropColor = LorenzColor.AQUA,
+        cropShortName = "Mf",
     ),
     WILD_ROSE(
-        "Wild Rose", "THEORETICAL_HOE_WILD_ROSE", "HELIANTHUS", 2.0,
-        { ItemStack(Blocks.ROSE_BUSH) }, "rose", FarmingItemType.WILD_ROSE,
+        "Wild Rose",
+        "THEORETICAL_HOE_WILD_ROSE",
+        "HELIANTHUS",
+        2.0,
+        { ItemStack(Items.ROSE_BUSH).overrideId("WILD_ROSE") },
+        "rose",
+        FarmingItemType.WILD_ROSE,
+        replenish = true,
+        eliteLbName = "wildrose",
+        cropColor = LorenzColor.RED,
+        cropShortName = "Wr",
     ),
     ;
 
@@ -93,9 +146,10 @@ enum class CropType(
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
             if (itemName == "Seeds") return WHEAT
             return entries.firstOrNull {
-                it.cropName.equals(itemName, ignoreCase = true) ||
-                    it.simpleName.equals(itemName, ignoreCase = true) ||
-                    it.enchantName.equals(itemName, ignoreCase = true)
+                it.cropName.equals(itemName, ignoreCase = true) || it.simpleName.equals(
+                    itemName,
+                    ignoreCase = true
+                ) || it.enchantName.equals(itemName, ignoreCase = true)
             }
         }
 

@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
-import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.DeltaTracker;
@@ -27,19 +25,8 @@ public class MixinGameRenderer {
        if (MinecraftCompat.INSTANCE.getLocalPlayerExists()) new RenderingTickEvent(context, false).post();
    }
 
-    //#if MC < 1.21.6
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
-    //#else
-    //$$ @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
-    //#endif
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
     private void onRenderTail(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphics context) {
         GuiEditManager.renderLast(context);
     }
-
-    //#if MC < 1.21.6
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderWithTooltip(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"))
-    private void onRenderTooltip(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphics context) {
-         new ScreenDrawnEvent(context, Minecraft.getInstance().screen).post();
-    }
-    //#endif
 }

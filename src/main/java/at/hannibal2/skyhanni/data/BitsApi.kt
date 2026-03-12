@@ -239,7 +239,7 @@ object BitsApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 

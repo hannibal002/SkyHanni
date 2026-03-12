@@ -8,8 +8,9 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -18,10 +19,15 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object MineshaftDetection {
@@ -46,13 +52,11 @@ object MineshaftDetection {
 
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
-        if (!config.mineshaftDetection) return
         found = false
     }
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.MINESHAFT)
-    fun onSecondPassed() {
-        if (!config.mineshaftDetection) return
+    @HandleEvent(ScoreboardUpdateEvent::class, onlyOnIsland = IslandType.MINESHAFT)
+    fun onScoreboardLineChange() {
         if (found) return
 
         val matchingLine = ScoreboardData.sidebarLinesFormatted
@@ -67,7 +71,12 @@ object MineshaftDetection {
         found = true
 
         ChatUtils.debug("Found a ${type.name} mineshaft! [$areaName]")
+        GlaciteMineshaftDetectEvent(type).post()
+    }
 
+    @HandleEvent
+    fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
+        val type = event.type
         val sinceThis = getSinceMineshaftType(type)
         val timeSinceThis = getTimeSinceMineshaftType(type)
         val formattedTime = if (!timeSinceThis.isFarPast()) {
@@ -75,17 +84,23 @@ object MineshaftDetection {
         } else {
             "Unknown (no data yet)"
         }
-
-        ChatUtils.chat("You entered a ${type.displayName} mineshaft!")
+        if (config.mineshaftDetection) ChatUtils.chat("You entered a ${type.displayName} mineshaft!".asComponent())
 
         if (type in config.mineshaftsToTrack) {
             TitleManager.sendTitle(type.displayName)
-
-            val message = "§aIt took §e$formattedTime §aand" +
-                " §e$sinceThis ${"§amineshaft".pluralize(sinceThis)}" +
-                " entered to get a §e${type.displayName} §amineshaft."
-
-            ChatUtils.chat(message)
+            ChatUtils.chat(
+                componentBuilder {
+                    withColor(ChatFormatting.GREEN)
+                    append("It took ")
+                    appendWithColor(formattedTime, ChatFormatting.YELLOW)
+                    append(" and ")
+                    appendWithColor("$sinceThis ", ChatFormatting.YELLOW)
+                    append("mineshaft".pluralize(sinceThis))
+                    append(" entered to get a ")
+                    append(type.displayName)
+                    append(" mineshaft.")
+                }
+            )
         }
 
         handleShaftData(type)

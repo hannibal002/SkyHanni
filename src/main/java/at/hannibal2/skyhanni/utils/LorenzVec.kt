@@ -63,6 +63,11 @@ data class LorenzVec(
         return (dx * dx + dz * dz)
     }
 
+    fun distanceSqOnlyY(other: LorenzVec): Double {
+        val dy = other.y - y
+        return (dy * dy)
+    }
+
     operator fun plus(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
 
     operator fun minus(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
@@ -278,7 +283,7 @@ data class LorenzVec(
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(position().x, position().y, position().z)
+fun Entity.getLorenzVec(): LorenzVec = position().toLorenzVec()
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(xOld, yOld, zOld)
 fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(positionCodec.base.x, positionCodec.base.y, positionCodec.base.z)
 

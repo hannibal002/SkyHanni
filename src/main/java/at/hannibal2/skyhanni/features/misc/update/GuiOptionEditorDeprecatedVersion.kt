@@ -11,7 +11,7 @@ class GuiOptionEditorDeprecatedVersion(option: ProcessedOption) : GuiOptionEdito
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         if (!isDiscontinued()) return
-        val versionData = UpdateManager.discontinuedVersions.get(PlatformUtils.MC_VERSION)?.configInfo ?: return
+        val versionData = UpdateManager.discontinuedVersions[PlatformUtils.MC_VERSION]?.configInfo ?: return
         val fr = context.minecraft.defaultFontRenderer
         context.drawColoredRect(x.toFloat(), y.toFloat(), (x + width).toFloat(), y + 2f, Color.RED.rgb)
         context.drawColoredRect(x.toFloat(), y + 55f - 2, (x + width).toFloat(), y + 55f, Color.RED.rgb)
@@ -33,6 +33,6 @@ class GuiOptionEditorDeprecatedVersion(option: ProcessedOption) : GuiOptionEdito
     }
 
     private fun isDiscontinued(): Boolean {
-        return UpdateManager.discontinuedVersions.containsKey(PlatformUtils.MC_VERSION)
+        return UpdateManager.discontinuedVersions[PlatformUtils.MC_VERSION]?.configInfo != null
     }
 }

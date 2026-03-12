@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -16,7 +18,6 @@ import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -59,12 +59,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DailyQuestHelper {
-
-    private val questBoardMage = LorenzVec(-138, 92, -755)
-    private val questBoardBarbarian = LorenzVec(-572, 100, -687)
-
     val quests = mutableListOf<Quest>()
-    var greatSpook = false
 
     val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
 
@@ -158,7 +153,7 @@ object DailyQuestHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         val type = chatCompletedPattern.matchMatcher(event.message) {
@@ -200,7 +195,8 @@ object DailyQuestHelper {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
+        val count =
+            InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -235,20 +231,18 @@ object DailyQuestHelper {
         renderTownBoard(event)
     }
 
-    fun getQuestBoardLocation(): LorenzVec {
-        val factionType = CrimsonIsleReputationHelper.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
-        return when (factionType) {
-            FactionType.BARBARIAN -> questBoardBarbarian
-            FactionType.MAGE -> questBoardMage
-        }
+    fun getQuestBoardLocation(): GraphNode {
+        val factionType = CrimsonIsleReputationApi.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
+
+        return factionType.getQuestBoardNode()
     }
 
     private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
 
         // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
-        if (CrimsonIsleReputationHelper.factionType == null && SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
-        val location = getQuestBoardLocation()
+        if (CrimsonIsleReputationApi.factionType == null && SkyBlockUtils.lastWorldSwitch.passedSince() < 5.seconds) return
+        val location = getQuestBoardLocation().position
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
     }
@@ -258,12 +252,6 @@ object DailyQuestHelper {
             (state == QuestState.ACCEPTED && (this is FetchQuest || this is RescueMissionQuest))
 
     fun MutableList<Renderable>.addQuests() {
-        if (greatSpook) {
-            addString("")
-            addString("§7Daily Quests (§cdisabled§7)")
-            addString(" §5§lThe Great Spook §7happened :O")
-            return
-        }
         val done = quests.count { it.state == QuestState.COLLECTED }
         addString("")
         addString("§7Daily Quests (§e$done§8/§e5 collected§7)")

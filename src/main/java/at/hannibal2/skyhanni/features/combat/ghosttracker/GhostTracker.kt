@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -140,20 +141,20 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 21§r§f: §r§b29,614/40,000
-     * REGEX-TEST:  Ghost 15§r§f: §r§b12,449/12,500
+     * REGEX-TEST:  Ghost 21: 29,614/40,000
+     * REGEX-TEST:  Ghost 15: 12,449/12,500
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
-        "tablist.bestiary",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
+        "tablist.bestiary-no-color",
+        "\\s*Ghost (?<level>\\d+|[XVI]+): (?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
     )
 
     /**
-     * REGEX-TEST:  Ghost 25§r§f: §r§b§lMAX
+     * REGEX-TEST:  Ghost 25: MAX
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
-        "tablist.bestiarymax",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX",
+        "tablist.bestiarymax-no-color",
+        "\\s*Ghost (?<level>\\d+|[XVI]+): MAX",
     )
 
     private val SORROW = "SORROW".toInternalName()
@@ -238,7 +239,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
@@ -269,7 +270,7 @@ object GhostTracker {
         }
     }
 
-    private fun parseBestiaryWidget(lines: List<String>) {
+    private fun parseBestiaryWidget(lines: List<Component>) {
         foundGhostBestiary = false
         for (line in lines) {
             if (maxBestiaryTablistPattern.matches(line)) {
@@ -278,7 +279,7 @@ object GhostTracker {
                 return
             }
 
-            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.formatLong() ?: continue
+            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.string?.formatLong() ?: continue
             foundGhostBestiary = true
             if (kills <= currentBestiaryKills) return
             val difference = kills - currentBestiaryKills

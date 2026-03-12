@@ -201,7 +201,7 @@ object SkillProgress {
         if (goalReached)
             chat("§lYou have reached your goal level of §b§l${skill.customGoalLevel} §e§lin the §b§l$skillName §e§lskill!")
 
-        SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
+        SoundUtils.createSound("entity.player.levelup", 1f, 1f).playSound()
     }
 
     @HandleEvent
@@ -497,7 +497,7 @@ object SkillProgress {
 
         if (xpInfo.lastTotalXP > 0) {
             val delta = totalXP - xpInfo.lastTotalXP
-            if (delta > 0 && delta < 1000) {
+            if (delta > 0) {
 
                 xpInfo.timer = when (SkillApi.activeSkill) {
                     SkillType.FARMING -> etaConfig.farmingPauseTime

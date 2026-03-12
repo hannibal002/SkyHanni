@@ -18,7 +18,7 @@ class ItemAbilityConfig {
     @Expose
     @ConfigOption(
         name = "Ability Cooldown Background",
-        desc = "Show the cooldown color of item abilities in the background."
+        desc = "Show the cooldown color of item abilities in the background.",
     )
     @ConfigEditorBoolean
     var itemAbilityCooldownBackground: Boolean = false
@@ -44,9 +44,14 @@ class ItemAbilityConfig {
     val crownOfAvarice: CrownOfAvariceConfig = CrownOfAvariceConfig()
 
     @Expose
+    @ConfigOption(name = "Fire Freeze", desc = "")
+    @Accordion
+    val fireFreeze: FireFreezeConfig = FireFreezeConfig()
+
+    @Expose
     @ConfigOption(
         name = "Depleted Bonzo's Masks",
-        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background."
+        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

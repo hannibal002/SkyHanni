@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -41,7 +42,7 @@ object CustomTodosGui {
         todos.forEach { todo ->
             if (todo.triggerTarget != CustomTodo.TriggerTarget.TAB_LIST) return@forEach
             event.tabList.forEach { line ->
-                if (matchString(todo, line)) todo.setDoneNow()
+                if (matchString(todo, line.formattedTextCompat())) todo.setDoneNow()
             }
         }
     }
@@ -65,7 +66,7 @@ object CustomTodosGui {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         todos.forEach { todo ->
             if (todo.triggerTarget != CustomTodo.TriggerTarget.CHAT) return@forEach
             if (matchString(todo, event.message)) todo.setDoneNow()

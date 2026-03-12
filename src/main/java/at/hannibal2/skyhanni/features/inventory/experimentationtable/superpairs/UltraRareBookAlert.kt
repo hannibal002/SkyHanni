@@ -14,13 +14,17 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.obfuscated
+import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object UltraRareBookAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
-    private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
+    private val dragonSound by lazy { createSound("entity.ender_dragon.growl", 1f) }
 
     private var enchantsFound = false
 
@@ -29,7 +33,20 @@ object UltraRareBookAlert {
     private fun notification(enchantsName: String) {
         lastNotificationTime = SimpleTimeMark.now()
         dragonSound.playSound()
-        ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName")
+        ChatUtils.chat(
+            componentBuilder {
+                append("You have uncovered a ")
+                appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
+                    obfuscated = true
+                }
+                appendWithColor(" ULTRA-RARE BOOK! ", ChatFormatting.DARK_PURPLE)
+                appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
+                    obfuscated = true
+                }
+                append("! You found: ")
+                appendWithColor(enchantsName, ChatFormatting.BLUE)
+            }
+        )
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)

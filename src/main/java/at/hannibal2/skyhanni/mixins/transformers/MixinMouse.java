@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
@@ -13,9 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#if MC > 1.21.8
-//$$ import net.minecraft.client.input.MouseButtonInfo;
-//#endif
+import net.minecraft.client.input.MouseButtonInfo;
 
 @Mixin(MouseHandler.class)
 public class MixinMouse {
@@ -41,24 +37,9 @@ public class MixinMouse {
         });
     }
 
-    @Inject(method = "onPress", at = @At("HEAD"))
-    //#if MC < 1.21.9
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        //#else
-        //$$ private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
-        //$$     int button = input.button();
-        //#endif
-        if (action == 1) {
-            MouseCompat.INSTANCE.setLastEventButton(button);
-            new KeyDownEvent(button).post();
-            new KeyPressEvent(button).post();
-        } else {
-            new KeyPressEvent(button).post();
-            DelayedRun.INSTANCE.runNextTickOld(() -> {
-                MouseCompat.INSTANCE.setLastEventButton(-1);
-                return null;
-            });
-        }
+    @Inject(method = "onButton", at = @At("HEAD"))
+    private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
+        MouseCompat.INSTANCE.handleMouseButton(input, action);
     }
 
     @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isWindowActive()Z"))

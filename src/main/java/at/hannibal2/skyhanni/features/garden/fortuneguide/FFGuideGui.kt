@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -67,7 +68,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
                         ChatUtils.clickableLinkChat(
                             "§cSkyHannis /ff display is no longer being developed! " +
                                 "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on elitebot.dev instead!",
-                            "https://elitebot.dev/@$name/${profile}fortune?utm_source=SkyHanni#fortune"
+                            "https://elitebot.dev/@$name/${profile}fortune".addSkyHanniUtm() + "#fortune",
                         )
                     }
                 }

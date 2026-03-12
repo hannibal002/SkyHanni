@@ -231,7 +231,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (foundPattern.matches(event.cleanMessage.trim())) {
             hideClosestSoul()

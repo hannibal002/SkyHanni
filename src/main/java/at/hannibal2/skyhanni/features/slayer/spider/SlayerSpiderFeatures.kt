@@ -12,57 +12,57 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
-import net.minecraft.world.entity.monster.Spider
+import net.minecraft.world.entity.monster.spider.Spider
 
 @SkyHanniModule
 object SlayerSpiderFeatures {
     private val config get() = SlayerApi.config.spider
-    private val allTier5 = mutableSetOf<Mob>()
-    private var lastClickedTier5: Mob? = null
-    val stuckTier5 = mutableSetOf<Mob>()
+    private val allTier = mutableSetOf<Mob>()
+    private var lastClicked: Mob? = null
+    val stuckMobs = mutableSetOf<Mob>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
-        if (mob.isTier5()) {
-            allTier5.add(mob)
+        if (mob.isRightTier()) {
+            allTier.add(mob)
         }
     }
 
-    private fun Mob.isTier5() = mobType == Mob.Type.SLAYER && levelOrTier == 5 && name == "Tarantula Broodfather"
+    private fun Mob.isRightTier() = mobType == Mob.Type.SLAYER && (levelOrTier in 3..5) && name == "Tarantula Broodfather"
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
         if (event.action != ServerboundInteractPacket.ActionType.ATTACK) return
         val mob = event.clickedEntity.mob ?: return
-        if (mob in allTier5) {
-            lastClickedTier5 = mob
+        if (mob in allTier) {
+            lastClicked = mob
         }
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         if (event.message != "§cYou need to kill the Broodfather's hatchlings before it can be damaged again!") return
 
-        val mob = lastClickedTier5 ?: return
-        mob.highlight(config.highlightInvincibleColor, condition = { config.highlightInvincible && mob in stuckTier5 })
-        stuckTier5.add(mob)
+        val mob = lastClicked ?: return
+        mob.highlight(config.highlightInvincibleColor, condition = { config.highlightInvincible && mob in stuckMobs })
+        stuckMobs.add(mob)
         EntityMovementData.addToTrack(mob)
     }
 
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<Spider>) {
         val mob = event.entity.mob ?: return
-        if (mob in stuckTier5) {
-            stuckTier5.remove(mob)
+        if (mob in stuckMobs) {
+            stuckMobs.remove(mob)
             mob.removeHighlight()
         }
     }
 
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
-        allTier5.clear()
-        lastClickedTier5 = null
-        stuckTier5.clear()
+        allTier.clear()
+        lastClicked = null
+        stuckMobs.clear()
     }
 }

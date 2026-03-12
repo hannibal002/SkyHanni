@@ -156,13 +156,13 @@ object MinionCraftHelper {
         return false
     }
 
+    // TODO add neu repo reload support
     private fun init() {
         if (tierOneMinions.isNotEmpty()) return
 
         allIngredients.clear()
 
-        for (internalId in NeuItems.allNeuRepoItems().keys) {
-            val internalName = internalId.toInternalName()
+        for (internalName in NeuItems.allNeuRepoInternalNames()) {
             if (internalName.endsWith("_GENERATOR_1")) {
                 if (internalName == "REVENANT_GENERATOR_1".toInternalName() ||
                     internalName == "TARANTULA_GENERATOR_1".toInternalName() ||

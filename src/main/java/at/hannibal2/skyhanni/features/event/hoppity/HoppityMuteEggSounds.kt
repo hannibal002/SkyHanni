@@ -28,7 +28,7 @@ object HoppityMuteEggSounds {
         when (config.soundMode) {
             HoppityEggsConfig.EggSoundMode.NO_MODIFICATION -> return
             HoppityEggsConfig.EggSoundMode.MUTE -> return event.cancel()
-            HoppityEggsConfig.EggSoundMode.REVERT -> return event.replaceWithOther("random.eat")
+            HoppityEggsConfig.EggSoundMode.REVERT -> return event.replaceWithOther("entity.generic.eat")
         }
     }
 

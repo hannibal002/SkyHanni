@@ -23,6 +23,11 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
+            - name: Disable preprocessor
+              run: |
+                  mkdir -p .gradle
+                  echo skyhanni.multi-version=off > .gradle/private.properties
+
             -   name: Run ChangeLog verification w/retry
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
@@ -52,7 +57,7 @@ jobs:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
                     script: |
                         const fs = require('fs');
-                        const test = fs.readFileSync('build/changelog_errors.txt', 'utf8');
+                        const test = fs.readFileSync('versions/1.21.10/build/changelog_errors.txt', 'utf8');
                         const commentBody = `${test}`
                         
                         github.rest.issues.createComment({
