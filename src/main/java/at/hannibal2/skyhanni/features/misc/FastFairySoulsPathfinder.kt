@@ -71,11 +71,11 @@ object FastFairySoulsPathfinder {
     )
 
     /**
-     * REGEX-TEST: §7Fairy Souls: §e11§7/§d11
+     * REGEX-TEST: Fairy Souls: 11/11
      */
     private val loreSoulPattern by patternGroup.pattern(
         "new.colorless",
-        "Fairy Souls: (?<have>.*)\\/(?<total>.*)",
+        "Fairy Souls: (?<found>.*)\\/(?<total>.*)",
     )
 
     private class Data(
@@ -216,7 +216,7 @@ object FastFairySoulsPathfinder {
             val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
             val found = stack.getLoreComponent().firstOrNull()?.let {
                 loreSoulPattern.matchMatcher(it.string) {
-                    group("total").toIntOrNull()
+                    group("found").toIntOrNull()
                 }
             } ?: continue
 
