@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.Mob.Type
+import at.hannibal2.skyhanni.data.mob.MobType
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -76,7 +76,7 @@ import java.util.UUID
 @Suppress("TooManyFunctions")
 class Mob(
     var baseEntity: LivingEntity,
-    val mobType: Type,
+    val mobType: MobType,
     var armorStand: ArmorStand? = null,
     val name: String = "",
     additionalEntities: List<LivingEntity>? = null,
@@ -110,24 +110,6 @@ class Mob(
     private var relativeBoundingBox: AABB?
 
     val extraEntities: List<LivingEntity> = extraEntitiesList
-
-    enum class Type {
-        DISPLAY_NPC,
-        SUMMON,
-        BASIC,
-        DUNGEON,
-        BOSS,
-        SLAYER,
-        PLAYER,
-        PROJECTILE,
-        SPECIAL,
-        ;
-
-        fun isSkyblockMob() = when (this) {
-            BASIC, DUNGEON, BOSS, SLAYER -> true
-            else -> false
-        }
-    }
 
     /**
      * @property isCorrupted can change.
@@ -306,4 +288,22 @@ class Mob(
     val isAlive: Boolean get() = baseEntity.isAlive
 
     fun getLorenzVec() = baseEntity.getLorenzVec()
+}
+
+enum class MobType {
+    DISPLAY_NPC,
+    SUMMON,
+    BASIC,
+    DUNGEON,
+    BOSS,
+    SLAYER,
+    PLAYER,
+    PROJECTILE,
+    SPECIAL,
+    ;
+
+    fun isSkyblockMob() = when (this) {
+        BASIC, DUNGEON, BOSS, SLAYER -> true
+        else -> false
+    }
 }

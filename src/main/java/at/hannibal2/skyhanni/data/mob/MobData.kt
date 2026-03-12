@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.TreeMap
-import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
+import at.hannibal2.skyhanni.data.mob.MobType as MobType
 
 @SkyHanniModule
 object MobData {

@@ -343,7 +343,7 @@ object MobFilter {
             return MobResult.found(
                 Mob(
                     baseEntity,
-                    Mob.Type.BASIC,
+                    MobType.BASIC,
                     armorStand,
                     name = name,
                     ownerName = owner,

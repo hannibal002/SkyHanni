@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobType
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
@@ -19,7 +20,7 @@ object OtherPlayersSlayerApi {
         // no death, rather despawn because too far away
         if (mob.baseEntity.findHealthReal() != 0f) return
 
-        if (mob.mobType != Mob.Type.SLAYER) return
+        if (mob.mobType != MobType.SLAYER) return
 
         val owner = mob.owner?.ownerName
         val tier = mob.levelOrTier

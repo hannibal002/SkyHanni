@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
+import at.hannibal2.skyhanni.data.mob.MobType
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
@@ -63,7 +64,7 @@ object ActiveBossTransparency {
             if (mob == lastClickedMob) return
 
             val type = mob.mobType
-            if (type == Mob.Type.SLAYER) {
+            if (type == MobType.SLAYER) {
                 // hide own slayer boss
                 if (mob.belongsToPlayer()) return
 
@@ -73,13 +74,13 @@ object ActiveBossTransparency {
             }
 
             // maybe also hide other players
-            if (type == Mob.Type.PLAYER) {
+            if (type == MobType.PLAYER) {
                 // always show current slayer carry customers
                 if (CarryTracker.isCustomer(mob.name)) return
 
                 if (!config.applyToPlayers) return
             }
-            if (type == Mob.Type.PLAYER && !config.applyToPlayers) return
+            if (type == MobType.PLAYER && !config.applyToPlayers) return
         }
 
         event.newTransparency = config.transparencyLevel.coerceIn(15, 70)

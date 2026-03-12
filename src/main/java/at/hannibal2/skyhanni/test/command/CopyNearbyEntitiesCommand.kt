@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.data.mob.MobType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -128,7 +129,7 @@ object CopyNearbyEntitiesCommand {
                 is Display.BlockDisplay -> addBlockDisplayEntity(entity)
                 is Frog -> addFrogEntity(entity)
             }
-            if (mob != null && mob.mobType != Mob.Type.PLAYER) {
+            if (mob != null && mob.mobType != MobType.PLAYER) {
                 add("MobInfo: ")
                 addAll(getMobInfo(mob).map { "-  $it" })
             }
@@ -285,7 +286,7 @@ object CopyNearbyEntitiesCommand {
         if (entity is LivingEntity && entity.isDisplayNpc()) append("DisplayNPC, ")
         if (entity is Player && entity.isNpc()) append("NPC, ")
         if (entity is Player && entity.isRealPlayer()) append("RealPlayer, ")
-        if (mob?.mobType == Mob.Type.SUMMON) append("Summon, ")
+        if (mob?.mobType == MobType.SUMMON) append("Summon, ")
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
 
@@ -328,7 +329,7 @@ object CopyNearbyEntitiesCommand {
             add("Owner: ${mob.owner.ownerName}")
         }
         add("Level or Tier: ${mob.levelOrTier.takeIf { it != -1 }}")
-        if (mob.mobType == Mob.Type.DUNGEON) {
+        if (mob.mobType == MobType.DUNGEON) {
             add("Is Starred: ${mob.hasStar}")
             add("Attribute: ${mob.attribute ?: "NONE"}")
         }
