@@ -19,7 +19,7 @@ class SuperCraftPresetsConfig {
     var enabled: Boolean = false
 
     @Expose
-    var presets: MutableList<Int> = mutableListOf(4, 8, 16, 32, 64, 128, 256, 512)
+    val presets: MutableList<Int> = mutableListOf(4, 8, 16, 32, 64, 128, 256, 512)
 
     @Expose
     @ConfigLink(owner = SuperCraftPresetsConfig::class, field = "enabled")
