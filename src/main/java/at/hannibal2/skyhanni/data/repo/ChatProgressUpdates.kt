@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -42,6 +43,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     var currentText: ProgressText? = null
 
     data class ProgressText(val text: String, val hoverText: String)
+    private val logger = LorenzLogger("debug/mc_console/filtered")
 
     init {
         updates.add(this)
@@ -110,10 +112,9 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         }
         innerProgress = ""
 
-        val time = SimpleTimeMark.now().toLocalDateTime()
         currentStep = nextStep
         startOfCurrent = SimpleTimeMark.now()
-        println("$time: $nextStep")
+        category.log(nextStep)
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {
@@ -188,6 +189,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     class ChatProgressCategory(val categoryName: String) {
         val updates = mutableListOf<ChatProgressUpdates>()
         var enabled = false
+        private val logger = LorenzLogger("debug/chat_progress_updates/$categoryName")
 
         fun start(label: String): ChatProgressUpdates {
             val progress = ChatProgressUpdates(this)
@@ -199,6 +201,10 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         fun toggle() {
             enabled = !enabled
             dirty = true
+        }
+
+        fun log(string: String) {
+            logger.log(string)
         }
     }
 

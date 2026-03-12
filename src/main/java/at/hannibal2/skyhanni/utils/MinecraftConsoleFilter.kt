@@ -37,6 +37,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
                 val loggerName = loggerConfig.name
                 loggerConfig.addFilter(MinecraftConsoleFilter(loggerName))
             }
+            ctx.configuration.rootLogger.addFilter(MinecraftConsoleFilter("root"))
         }
     }
 
@@ -122,6 +123,48 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
                 filterConsole("Biome ID bounds")
                 return Filter.Result.DENY
             }
+        }
+
+        if (filterConfig.filterInvalidSkinSignature && (formattedMessage.startsWith("Failed to verify signature on property")
+                || formattedMessage.startsWith("Profile contained invalid signature for textures property")
+                || formattedMessage.startsWith("Malformed signature encoding on property"))
+        ) {
+            filterConsole("invalid skin signature")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterDynamicTransformsUbo &&
+            formattedMessage.startsWith("Resizing Dynamic Transforms UBO")
+        ) {
+            filterConsole("dynamic transforms UBO resize")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterCommandAmbiguity &&
+            loggerName.endsWith("ClientCommandInternals") &&
+            formattedMessage.startsWith("Ambiguity between arguments [")
+        ) {
+            filterConsole("command ambiguity")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterNarratorError &&
+            formattedMessage.startsWith("Error while loading the narrator")
+        ) {
+            filterConsole("narrator load error")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterMixinMessages && loggerName == "FabricLoader/Mixin") {
+            filterConsole("mixin message")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterUnknownTeam &&
+            formattedMessage.startsWith("Received packet for unknown team ")
+        ) {
+            filterConsole("unknown team packet")
+            return Filter.Result.DENY
         }
 
         if (filterScoreboardErrors(event)) return Filter.Result.DENY
