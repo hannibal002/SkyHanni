@@ -176,11 +176,11 @@ object MobDetection {
         return isVisible
     }
 
+    @Suppress("ReturnCount")
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: LivingEntity, roughType: Category): Boolean {
         when (roughType) {
             Category.PLAYER -> MobEvent.Spawn.Player(MobFactories.player(entity)).post()
-
             Category.DISPLAY_NPC -> return MobFilter.createDisplayNpc(entity)
             Category.BASIC -> {
                 val (result, mob) = MobFilter.createSkyblockEntity(entity)

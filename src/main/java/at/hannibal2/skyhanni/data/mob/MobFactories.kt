@@ -38,7 +38,7 @@ object MobFactories {
             return if (isMiniboss(armorStand.cleanName())) {
                 Mob(
                     baseEntity = baseEntity,
-                    mobType = Mob.Type.SLAYER_MINIBOSS,
+                    category = MobCategory.SLAYER_MINIBOSS,
                     armorStand = armorStand,
                     name = this.group("name"),
                     additionalEntities = extraEntityList,

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -25,7 +26,7 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
-        if (mob.mobType != Mob.Type.SLAYER_MINIBOSS) return
+        if (mob.category != MobCategory.SLAYER_MINIBOSS) return
         miniBosses += mob
         // TODO config option for color
         if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
@@ -39,7 +40,7 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onMobSpawn(event: CocoonSpawnEvent) {
         val cocoon = event.cocoonMob
-        if (cocoon.mob.mobType != Mob.Type.SLAYER_MINIBOSS) return
+        if (cocoon.mob.category != MobCategory.SLAYER_MINIBOSS) return
         cocoons += cocoon.cocoonEntity
         RenderLivingEntityHelper.setEntityColor(cocoon.cocoonEntity, LorenzColor.AQUA.toColor()) {
             config.slayerMinibossHighlight
