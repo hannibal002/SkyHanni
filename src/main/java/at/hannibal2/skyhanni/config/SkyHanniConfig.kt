@@ -31,7 +31,7 @@ import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
-class Features : Config() {
+class SkyHanniConfig : Config() {
     private val discord = MyResourceLocation("skyhanni", "social/discord.png")
     private val github = MyResourceLocation("skyhanni", "social/github.png")
     private val patreon = MyResourceLocation("skyhanni", "social/patreon.png")
