@@ -1,17 +1,20 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.async
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
@@ -19,6 +22,10 @@ import kotlin.time.Duration.Companion.seconds
 object GraphEditorIO {
 
     val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+
+    private val copyGraphConfig = CoroutineConfig("copy-graph").withIOContext()
+    private val bridgeGraphNetworksConfig = CoroutineConfig("bridge-graph-networks")
+    private val mergeJsonConfig = CoroutineConfig("merge-json").withIOContext()
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
@@ -72,6 +79,7 @@ object GraphEditorIO {
         return newState
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun save() {
         if (nodes.isEmpty()) {
             ChatUtils.chat("Copied nothing since the graph is empty.")
@@ -79,19 +87,21 @@ object GraphEditorIO {
         }
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
-        OSUtils.copyToClipboard(json)
+        val copied = copyGraphConfig.async {
+            OSUtils.copyToClipboardAsync(json) ?: false
+        }.getCompleted() ?: false
+        if (!copied) return ChatUtils.chat("Failed to copy graph to clipboard.")
+
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
 
-        if (config.useAsIslandArea) {
-            SkyHanniMod.launchCoroutine("bridge graph networks") {
-                GraphEditorNetworks.bridgeNetworks(compileGraph)
-                Minecraft.getInstance().execute {
-                    IslandGraphs.setNewGraph(compileGraph)
-                    GraphEditorBugFinder.runTests()
-                    if (GraphEditorNodeFinder.active) {
-                        GraphEditorNodeFinder.calculateNewAllNodeFind()
-                    }
+        if (config.useAsIslandArea) bridgeGraphNetworksConfig.launch {
+            GraphEditorNetworks.bridgeNetworks(compileGraph)
+            Minecraft.getInstance().execute {
+                IslandGraphs.setNewGraph(compileGraph)
+                GraphEditorBugFinder.runTests()
+                if (GraphEditorNodeFinder.active) {
+                    GraphEditorNodeFinder.calculateNewAllNodeFind()
                 }
             }
         }
@@ -117,12 +127,7 @@ object GraphEditorIO {
     }
 
     fun loadThisIsland() {
-        val graph = IslandGraphs.currentIslandGraph
-        if (graph == null) {
-            ChatUtils.userError("This island does not have graph data!")
-            return
-        }
-
+        val graph = IslandGraphs.currentIslandGraph ?: return ChatUtils.userError("This island does not have graph data!")
         IslandGraphs.disabledNodesReason?.let {
             if (GraphEditor.bypassTempRemoveTimer.isInPast()) {
                 IslandGraphs.enableAllNodes()
@@ -141,51 +146,36 @@ object GraphEditorIO {
         ChatUtils.chat("Graph Editor loaded this island!")
     }
 
-    fun mergeFromClipboard() {
-        val json = OSUtils.readFromClipboard()
-        if (json == null) {
-            ChatUtils.userError("Clipboard is empty!")
-            return
-        }
+    fun mergeFromClipboard() = mergeJsonConfig.launch {
+        val json = OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard is empty!")
+        runCatching {
+            val graph = Graph.fromJson(json)
+            Minecraft.getInstance().execute {
+                GraphEditorHistory.save("merge from clipboard")
 
-        SkyHanniMod.launchIOCoroutine("merge graph json") {
-            try {
-                val graph = Graph.fromJson(json)
+                var nextId = state.id
+                val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
+                nodes.addAll(newNodes)
+                edges.addAll(newEdges)
+                state.id = nextId
 
-                Minecraft.getInstance().execute {
-                    GraphEditorHistory.save("merge from clipboard")
+                GraphEditorNetworks.recalculate()
+                GraphEditor.updateCache()
 
-                    var nextId = state.id
-                    val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
-                    nodes.addAll(newNodes)
-                    edges.addAll(newEdges)
-                    state.id = nextId
-
-                    GraphEditorNetworks.recalculate()
-                    GraphEditor.updateCache()
-
-                    val nodeCount = newNodes.size.addSeparators()
-                    val edgeCount = newEdges.size.addSeparators()
-                    ChatUtils.chat("Merged $nodeCount nodes and $edgeCount edges from clipboard.")
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
+                val nodeCount = newNodes.size.addSeparators()
+                val edgeCount = newEdges.size.addSeparators()
+                ChatUtils.chat("Merged $nodeCount nodes and $edgeCount edges from clipboard.")
             }
+        }.getOrElse { e ->
+            ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
         }
     }
 
     private fun convertToGraphingData(graph: Graph, idProvider: (GraphNode) -> Int): Pair<List<GraphingNode>, List<GraphingEdge>> {
         val importedNodes = graph.map { graphNode ->
-            GraphingNode(
-                idProvider(graphNode),
-                graphNode.position,
-                graphNode.name,
-                graphNode.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
-                graphNode.extraWeight,
-            )
+            GraphingNode(graphNode, idProvider(graphNode))
         }
         val translation = graph.zip(importedNodes).toMap()
-
         val rawEdges = graph.flatMap { node ->
             node.neighbours.mapNotNull { (neighbor, _) ->
                 val node1 = translation[node] ?: error("Invalid node in translation: ${node.id}")
