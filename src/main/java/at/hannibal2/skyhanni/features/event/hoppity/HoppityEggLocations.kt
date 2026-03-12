@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -38,6 +39,18 @@ object HoppityEggLocations {
 
     fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
         return collectedEggStorage[islandType].orEmpty()
+    }
+
+    var foundAllOnThisIsland = false
+        private set
+
+    fun setFoundAll() {
+        foundAllOnThisIsland = true
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: IslandChangeEvent) {
+        foundAllOnThisIsland = false
     }
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)

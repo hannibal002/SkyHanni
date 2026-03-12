@@ -90,6 +90,9 @@ object HoppityEggDisplayManager {
                     ChatUtils.debug("removeInvalidCollectedEggs! $collectedEggs/$totalEggs in ${SkyBlockUtils.currentIsland}")
                     HoppityEggLocations.removeInvalidCollectedEggs()
                 }
+                if (percentage >= 1) {
+                    HoppityEggLocations.setFoundAll()
+                }
             }
         }.map { CFApi.partyModeReplace(it) }
 
