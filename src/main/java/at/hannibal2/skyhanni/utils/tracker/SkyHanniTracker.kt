@@ -56,7 +56,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
         jClass.getConstructor()
     }
 
-    internal abstract val storage: (ProfileSpecificStorage) -> Data
+    internal abstract val storageAccessor: (ProfileSpecificStorage) -> Data
+    internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
     internal abstract val config: TopLevelTrackerConfig<*>
     internal val perTrackerConfig: GenericIndividualTrackerConfig<*> get() = config.perTrackerConfig
     @Suppress("UNCHECKED_CAST")
@@ -68,6 +69,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
     internal open val trackUptime: Boolean = true
     internal open val customUptimeControl: Boolean = false
     internal open val inventory = NO_INVENTORY
+    internal open val outsideInventory: Boolean = false
+    internal open val inOwnInventory: Boolean = false
     internal open val renderCondition: () -> Boolean = { true }
     internal open val onlyOnIsland: IslandType? = null
     internal open val onlyOnIslandTag: IslandTypeTag? = null
@@ -281,7 +284,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(val name: String) {
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
-                DisplayMode.TOTAL to storage(ps),
+                DisplayMode.TOTAL to storageAccessor(ps),
                 DisplayMode.SESSION to currentSessions.getOrPut(ps) { dataCtor.newInstance() },
             ) + extraDisplayModes.mapValues { it.value(ps) },
         )

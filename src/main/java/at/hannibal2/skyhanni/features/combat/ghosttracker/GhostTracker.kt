@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker.tracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -51,16 +53,16 @@ import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
-object GhostTracker {
-
-    private val config get() = SkyHanniMod.feature.combat.ghostCounter
-
-    private val storage get() = ProfileStorageData.profileSpecific?.ghostStorage
+object GhostTracker : SkyHanniItemTracker<GhostTracker.Data>("Ghost Tracker") {
+    override val config get() = SkyHanniMod.feature.combat.ghostCounter
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.ghostStorage.ghostTracker }
+    override val renderCondition: () -> Boolean = { isEnabled() }
+    private val ghostStorage get() = ProfileStorageData.profileSpecific?.ghostStorage
 
     private var currentBestiaryKills: Long
-        get() = storage?.bestiaryKills ?: 0
+        get() = ghostStorage?.bestiaryKills ?: 0
         set(value) {
-            storage?.bestiaryKills = value
+            ghostStorage?.bestiaryKills = value
         }
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
@@ -78,14 +80,6 @@ object GhostTracker {
 
     private val ghostShard = "ATTRIBUTE_SHARD_VEIL;1".toInternalName()
 
-    private val tracker = SkyHanniItemTracker(
-        "Ghost Tracker",
-        ::Data,
-        { it.ghostStorage.ghostTracker },
-        drawDisplay = { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
-    )
-
     data class Data(
         @Expose var kills: Long = 0L,
         @Expose var ghostsSinceSorrow: Long = 0L,
@@ -94,7 +88,7 @@ object GhostTracker {
         @Expose var combatXpGained: Long = 0L,
         @Expose var totalMagicFind: Long = 0L,
         @Expose var totalMagicFindKills: Long = 0L,
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / kills
             val perKill = percentage.coerceAtMost(1.0).formatPercentage()
@@ -159,22 +153,21 @@ object GhostTracker {
 
     private val SORROW = "SORROW".toInternalName()
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lGhost Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this)
+        val profit = drawItems(data, { true }, this)
         config.ghostTrackerText.forEach { line ->
             addSearchString(line.line(data))
         }
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
+        addAll(addTotalProfit(profit, data.kills, "kill", duration, "Kills"))
     }
 
     @HandleEvent
     fun onSkillExp(event: SkillExpGainEvent) {
-        if (!inArea) return
-        if (event.gained > 10_000) return
-        tracker.modify {
+        if (!inArea || event.gained > 10_000) return
+        modify {
             it.combatXpGained += event.gained.toLong()
         }
     }
@@ -210,7 +203,7 @@ object GhostTracker {
             it.internalName in allowedSackDrops && it.delta > 0
         }
 
-        tracker.modify { storage ->
+        modify { storage ->
             allowedChanges.forEach { sackChange ->
                 storage.addItem(sackChange.internalName, sackChange.delta, false)
             }
@@ -220,14 +213,13 @@ object GhostTracker {
     @HandleEvent
     fun onShard(event: ShardGainEvent) {
         if (event.shardInternalName != ghostShard) return
-        tracker.addItem(ghostShard, event.amount, false)
+        addItem(ghostShard, event.amount, false)
     }
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
-
-        tracker.addItem(event.internalName, event.amount, command = true)
+        addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
@@ -235,7 +227,7 @@ object GhostTracker {
         if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..15_000.0) return
-        tracker.addCoins(event.coins.toInt(), false)
+        addCoins(event.coins.toInt(), false)
     }
 
     @HandleEvent
@@ -246,8 +238,8 @@ object GhostTracker {
             val mf = group("mf").formatInt()
             if (internalName !in allowedDrops) return
 
-            tracker.addItem(internalName, 1, false)
-            tracker.modify {
+            addItem(internalName, 1, false)
+            modify {
                 it.totalMagicFind += mf
                 it.totalMagicFindKills++
 
@@ -259,13 +251,13 @@ object GhostTracker {
         }
         killComboEndPattern.matchMatcher(event.message) {
             val kill = group("kill").formatLong()
-            tracker.modify {
+            modify {
                 it.maxKillCombo = kill.coerceAtLeast(it.maxKillCombo)
             }
             return
         }
         if (bagOfCashPattern.matches(event.message)) {
-            tracker.addCoins(1_000_000, false)
+            addCoins(1_000_000, false)
             return
         }
     }
@@ -291,7 +283,7 @@ object GhostTracker {
 
             currentBestiaryKills = kills
 
-            tracker.modify {
+            modify {
                 it.kills += difference
                 it.ghostsSinceSorrow += difference
             }
@@ -303,10 +295,6 @@ object GhostTracker {
         if (!event.isWidget(TabWidget.BESTIARY)) return
         if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { isEnabled() }
     }
 
     @HandleEvent
@@ -369,12 +357,12 @@ object GhostTracker {
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        val storage = storage ?: return
-        if (storage.migratedTotalKills) return
-        tracker.modify {
+        val ghostStorage = ghostStorage ?: return
+        if (ghostStorage.migratedTotalKills) return
+        modify {
             it.totalMagicFindKills = it.items.values.sumOf { item -> item.timesGained }
         }
-        storage.migratedTotalKills = true
+        ghostStorage.migratedTotalKills = true
     }
 
     @HandleEvent

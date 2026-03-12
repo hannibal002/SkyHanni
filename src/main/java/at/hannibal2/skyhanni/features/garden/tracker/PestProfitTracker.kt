@@ -64,7 +64,7 @@ import kotlin.time.Duration.Companion.seconds
 object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTracker.BucketData>(
     "Pest Profit Tracker",
 ) {
-    override val storage: (ProfileSpecificStorage) -> BucketData = { it.garden.pestProfitTracker }
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.garden.pestProfitTracker }
     override val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")

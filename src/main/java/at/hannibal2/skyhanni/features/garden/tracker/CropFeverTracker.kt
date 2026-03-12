@@ -45,7 +45,7 @@ import kotlin.time.Duration
 object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker.BucketData>(
     "Crop Fever Tracker",
 ) {
-    override val storage: (ProfileSpecificStorage) -> BucketData = { it.garden.cropFeverTracker }
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.garden.cropFeverTracker }
     override val config get() = SkyHanniMod.feature.garden.cropFeverTracker
     override val customUptimeControl: Boolean = true
     override val onlyOnIsland: IslandType = IslandType.GARDEN

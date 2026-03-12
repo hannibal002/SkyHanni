@@ -61,7 +61,7 @@ private typealias DropCategory = ForagingTrackerConfig.TreeGiftBonusDropCategory
 object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.BucketData>(
     "Foraging Tracker",
 ) {
-    override val storage: (ProfileSpecificStorage) -> BucketData = { it.foraging.trackerData}
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.foraging.trackerData}
     override val config get() = SkyHanniMod.feature.foraging.tracker
     override val onlyOnIslandTag: IslandTypeTag = IslandTypeTags.FORAGING_CUSTOM_TREES
     override val renderCondition: () -> Boolean = { heldItemEnabled() && config.enabled }

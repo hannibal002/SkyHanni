@@ -36,7 +36,7 @@ import com.google.gson.annotations.Expose
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
     "Corpse Tracker",
 ) {
-    override val storage: (ProfileSpecificStorage) -> BucketData = { it.mining.mineshaft.corpseProfitTracker }
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.mining.mineshaft.corpseProfitTracker }
     override val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
     override val renderCondition: () -> Boolean = { isEnabled() }
 

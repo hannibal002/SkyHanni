@@ -59,7 +59,7 @@ object SlayerProfitTracker {
     data class Data(
         @Expose var slayerSpawnCost: Long = 0L,
         @Expose var slayerCompletedCount: Long = 0L,
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / slayerCompletedCount
             val perBoss = percentage.coerceAtMost(1.0).formatPercentage()

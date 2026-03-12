@@ -32,7 +32,7 @@ import java.util.EnumMap
 object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfitTracker.BucketData>(
     "Dragon Profit Tracker",
 ) {
-    override val storage: (ProfileSpecificStorage) -> BucketData = { it.dragonProfitTracker }
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.dragonProfitTracker }
     override val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
 
     private var lastPlaced: Int = 0

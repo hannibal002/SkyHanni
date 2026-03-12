@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.config.features.combat.ghostcounter
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker.GhostTrackerLines
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -12,12 +14,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class GhostProfitTrackerConfig {
+class GhostProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enables the Ghost Profit Tracker.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Display Text", desc = "Drag text to change the appearance of the overlay.")
@@ -44,9 +46,9 @@ class GhostProfitTrackerConfig {
         desc = ""
     )
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = GhostProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(50, 50)
+    override val position: Position = Position(50, 50)
 }
