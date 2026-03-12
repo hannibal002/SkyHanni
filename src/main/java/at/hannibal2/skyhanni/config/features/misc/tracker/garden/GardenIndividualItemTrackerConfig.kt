@@ -7,12 +7,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class GardenIndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGenericConfig>(
-    { ItemTrackerGenericConfig() },
-) {
-    init {
-        configSet.add(this)
-    }
+class GardenIndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGenericConfig>() {
     @ConfigOption(
         name = "Open Uptime Settings",
         desc = "The AFK timeout setting does not work for this tracker. Set in Garden Uptime Settings instead"

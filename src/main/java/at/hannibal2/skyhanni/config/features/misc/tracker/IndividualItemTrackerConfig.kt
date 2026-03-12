@@ -4,12 +4,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class IndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGenericConfig>(
-    { ItemTrackerGenericConfig() }
-) {
-    init {
-        configSet.add(this)
-    }
+class IndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGenericConfig>() {
     @ConfigOption(
         name = "Universal Settings",
         desc = "Click to open the universal tracker settings."
