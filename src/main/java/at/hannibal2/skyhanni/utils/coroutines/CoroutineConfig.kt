@@ -25,7 +25,9 @@ open class CoroutineConfig(
     val timeout: Duration = 10.seconds,
     internal val withIOContext: Boolean = false,
 ) {
-    fun withMutex(mutex: Mutex): MutexedCoroutineConfig = MutexedCoroutineConfig(name, mutex, timeout, withIOContext)
+    fun withMutex(mutex: Mutex?): CoroutineConfig = mutex?.let {
+        MutexedCoroutineConfig(name, it, timeout, withIOContext)
+    } ?: this
     open fun withIOContext(): CoroutineConfig = CoroutineConfig(name, timeout, withIOContext = true)
 }
 

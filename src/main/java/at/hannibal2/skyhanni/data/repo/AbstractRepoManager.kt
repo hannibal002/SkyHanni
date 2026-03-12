@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.Dispatchers
@@ -34,16 +33,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-    open fun getGson() = ConfigManager.gson
-
-    @Suppress("UNCHECKED_CAST")
-    private val eventClass: Class<E> by lazy {
-        (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
-    }
-
-    private val eventCtor by lazy {
-        eventClass.getConstructor(AbstractRepoManager::class.java)
-    }
 
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
@@ -56,7 +45,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * Gets used in command registration, and as a prefix for constants, etc.
      */
     abstract val commonShortNameCased: String
-    private val commonShortName by lazy { commonShortNameCased.lowercase() }
 
     /**
      * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.zip")
@@ -64,14 +52,22 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open val backupRepoResourcePath: String? = null
 
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug
     abstract val config: AbstractRepoConfig<*>
     abstract val configDirectory: File
 
-    val logger by lazy { RepoLogger("[Repo - $commonName]") }
+    @PublishedApi
+    internal val logger by lazy { RepoLogger("[Repo - $commonName]") }
     val repoDirectory by lazy {
         // ~/.minecraft/config/[...]/repo
         File(configDirectory, "repo")
+    }
+    @Suppress("UNCHECKED_CAST")
+    private val eventClass: Class<E> by lazy {
+        (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
+    }
+
+    private val eventCtor by lazy {
+        eventClass.getConstructor(AbstractRepoManager::class.java)
     }
     private val repoZipFile by lazy {
         // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].zip
@@ -82,28 +78,21 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         // ~/.minecraft/config/[...]/currentCommit.json
         RepoCommitStorage(File(configDirectory, "currentCommit.json"))
     }
+    private val commonShortName by lazy { commonShortNameCased.lowercase() }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
     private val githubRepoLocation: GitHubUtils.RepoLocation
-        get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
-    val repoMutex = Mutex()
-
-    abstract val updateCommand: String
-    abstract val statusCommand: String
-    abstract val reloadCommand: String
-
-    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineConfig(
-        name = "$commonName Repo $repoAction Coroutine",
-        timeout = 2.minutes,
-        withIOContext = true,
-    ).let {
-        if (repoMutex != null) it.withMutex(repoMutex) else it
-    }
-
+        get() = GitHubUtils.RepoLocation(config.location,  SkyHanniMod.feature.dev.debug.logRepoErrors)
+    private val repoMutex = Mutex()
     private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
     private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
+    private val commandConfig = CoroutineConfig("$commonName command")
+
+    abstract val updateCommand: String
+    abstract val statusCommand: String
+    abstract val reloadCommand: String
 
     var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
         private set
@@ -120,8 +109,17 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     abstract val progressCategory: ChatProgressCategory
 
+    open fun reportExtraStatusInfo(): Unit = Unit
+    fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
+    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
+
+    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineConfig(
+        name = "$commonName Repo $repoAction Coroutine",
+        timeout = 2.minutes,
+        withIOContext = true,
+    ).withMutex(repoMutex)
 
     // Will be invoked by the implementation of this class
     internal fun registerCommands(event: CommandRegistrationEvent) {
@@ -137,7 +135,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            coroutineSimpleCallback {
+            coroutineSimpleCallback(commandConfig) {
                 val progress = progressCategory.start("showing status via /$statusCommand")
                 displayRepoStatus(progress, joinEvent = false, command = true)
                 progress.end("done showing status")
@@ -157,9 +155,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
-    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
-
     @PublishedApi
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
 
@@ -172,14 +167,28 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
     @PublishedApi
+    @Deprecated("Use suspended version of function instead", replaceWith = ReplaceWith("getRepoDataAsync(path)"))
     internal inline fun <reified T : Any> getRepoData(
         directory: String,
         fileName: String,
-        gson: Gson = getGson(),
     ): T = runCatching {
         val path = resolvePath(directory, fileName)
         val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
-        gson.fromJson<T>(json)
+        ConfigManager.gson.fromJson<T>(json)
+    }.getOrElse { e ->
+        logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
+    }
+
+    @PublishedApi
+    internal suspend inline fun <reified T : Any> getRepoDataAsync(
+        directory: String,
+        fileName: String,
+    ): T = runCatching {
+        val path = resolvePath(directory, fileName)
+        val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
+        withContext(Dispatchers.Default) {
+            ConfigManager.gson.fromJson<T>(json)
+        }
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
     }
@@ -297,8 +306,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("reason: ${e.message ?: "no reason"}")
         progress.end("Failed to switch to backup repo")
     }.getOrDefault(FetchUnpackResult.FAILED)
-
-    open fun reportExtraStatusInfo(): Unit = Unit
 
     private suspend fun isRepeatErrorOrFixed(progress: ChatProgressUpdates): Boolean {
         progress.update("isRepeatErrorOrFixed")

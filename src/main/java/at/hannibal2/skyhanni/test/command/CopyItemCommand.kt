@@ -8,17 +8,21 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CopyItemCommand {
 
-    private fun command() {
+    private val copyItemConfig = CoroutineConfig("copy item command")
+
+    private suspend fun command() {
         val itemStack = InventoryUtils.getItemInHand()
         if (itemStack == null) {
             ChatUtils.userError("No item in hand!")
@@ -27,14 +31,14 @@ object CopyItemCommand {
         copyItemToClipboard(itemStack)
     }
 
-    fun copyItemToClipboard(itemStack: ItemStack) {
+    suspend fun copyItemToClipboard(itemStack: ItemStack) {
         val resultList = mutableListOf<String>()
         resultList.add("internal name: " + itemStack.getInternalName().asString())
-        resultList.add("display name: '" + itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().toString() + "'")
+        resultList.add("display name: '" + itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets() + "'")
         resultList.add("minecraft id: '" + itemStack.getMinecraftId() + "'")
         resultList.add("lore:")
-        for (line in itemStack.getLore()) {
-            resultList.add(" '$line'")
+        for (line in itemStack.getLoreComponent()) {
+            resultList.add(" '${line.formattedTextCompat()}'")
         }
         resultList.add("")
         val attributes = itemStack.extraAttributes.getReadableNBTDump()
@@ -46,8 +50,9 @@ object CopyItemCommand {
         }
 
         val string = resultList.joinToString("\n")
-        OSUtils.copyToClipboard(string)
-        ChatUtils.chat("Item info copied into the clipboard!")
+        val copied = OSUtils.copyToClipboardAsync(string) ?: false
+        if (!copied) ChatUtils.chat("Failed to copy item to clipboard!")
+        else ChatUtils.chat("Item info copied into the clipboard!")
     }
 
     @HandleEvent
@@ -55,7 +60,7 @@ object CopyItemCommand {
         event.registerBrigadier("shcopyitem") {
             description = "Copies information about the item in hand to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { command() }
+            coroutineSimpleCallback(copyItemConfig) { command() }
         }
     }
 }
