@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -82,14 +81,10 @@ object HoppityEggDisplayManager {
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
-                val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
+                val collectedEggs = HoppityEggLocations.islandCollectedLocations.count { it in HoppityEggLocations.islandLocations }
                 val percentage = collectedEggs.toDouble() / totalEggs.toDouble()
                 val collectedFormat = formatEggsCollected(percentage)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
-                if (percentage > 1) {
-                    ChatUtils.debug("removeInvalidCollectedEggs! $collectedEggs/$totalEggs in ${SkyBlockUtils.currentIsland}")
-                    HoppityEggLocations.removeInvalidCollectedEggs()
-                }
                 if (percentage >= 1) {
                     HoppityEggLocations.setFoundAll()
                 }
