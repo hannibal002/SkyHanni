@@ -13,17 +13,17 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
-import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
 object LineToSpiderSlayer {
     private val config get() = SlayerApi.config.spider
-    private var bosses = mutableSetOf<Mob>()
+    private val bosses = mutableSetOf<Mob>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         if (SlayerType.getByName(mob.name) != SlayerType.TARANTULA) return
+        if (!mob.belongsToPlayer()) return
         bosses += mob
     }
 
@@ -32,17 +32,16 @@ object LineToSpiderSlayer {
         bosses -= event.mob
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed() {
-        bosses.removeIf { it.baseEntity.deceased }
-    }
+    @HandleEvent
+    fun onWorldChange() = bosses.clear()
+
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!SlayerApi.isInAnyArea) return
-        if (!config.LineToSpiderSlayer) return
+        if (!config.lineToBoss) return
         for (mob in bosses) {
-            if (!mob.baseEntity.canBeSeen(30) || !mob.belongsToPlayer()) continue
+            if (!mob.baseEntity.canBeSeen(30) || !mob.isAlive) continue
             event.drawLineToEye(
                 mob.baseEntity.getLorenzVec().up(),
                 LorenzColor.AQUA.toChromaColor(),

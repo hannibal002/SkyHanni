@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.slayer.spider
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.features.slayer.spider.LineToSpiderSlayer
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -32,7 +31,7 @@ class SpiderConfig {
     @ConfigOption(name = "Line to Tarantula Boss", desc = "Adds a line to your Tarantula Broodfather Boss.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var LineToSpiderSlayer: Boolean = false
+    var lineToBoss: Boolean = false
 
     @Expose
     @ConfigOption(
