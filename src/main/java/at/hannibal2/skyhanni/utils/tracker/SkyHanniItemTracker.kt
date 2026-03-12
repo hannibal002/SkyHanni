@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod.launch
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerApi

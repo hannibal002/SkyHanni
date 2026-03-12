@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.GardenIndividualTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean

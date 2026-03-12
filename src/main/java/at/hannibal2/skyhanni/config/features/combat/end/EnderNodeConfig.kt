@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.combat.end
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion

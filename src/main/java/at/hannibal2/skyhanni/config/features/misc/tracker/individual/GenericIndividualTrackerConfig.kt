@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker.individual
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
@@ -11,9 +12,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import java.lang.reflect.ParameterizedType
 
-// have to make this an abstract class and make subclasses that specify the types and add buttons
-// or else moulconfig causes a crash when the user clicks a button
 open class IndividualTrackerConfig : GenericIndividualTrackerConfig<TrackerGenericConfig>()
+open class IndividualItemTrackerConfig : GenericIndividualTrackerConfig<ItemTrackerGenericConfig>()
 abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig> {
     init {
         configSet.add(this)

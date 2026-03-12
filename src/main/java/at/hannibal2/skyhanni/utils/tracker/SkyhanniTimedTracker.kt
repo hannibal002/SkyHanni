@@ -2,8 +2,7 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.timed.TimedGenericIndividualConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,7 +12,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.weekTextFormatter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -23,25 +21,9 @@ import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("SpreadOperator", "TooManyFunctions")
-class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualConfig<*>>(
-    name: String,
-    createNewSession: () -> Data,
-    private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
-    drawDisplay: (Data) -> List<Searchable>,
-    extraDisplayModes: Set<DisplayMode> = emptySet(),
-    customUptimeControl: Boolean = false,
-    trackerConfig: () -> Type
-) : SkyHanniTracker<Data, Type>(
-    name,
-    createNewSession,
-    { throw UnsupportedOperationException("getStorage not used") },
-    extraDisplayModes = emptyMap(), // not used here
-    drawDisplay = drawDisplay,
-    trackerConfig = trackerConfig,
-    customUptimeControl = customUptimeControl
-) {
+class SkyhanniTimedTracker<Data : TrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
     private val timedConfig: TimedTrackerConfig get() =
-        if (trackerSpecificConfig.useUniversalConfig) universalTracker.timedTracker else trackerSpecificConfig.timedTracker
+        if (tracker.useUniversalConfig) universalTracker.timedTracker else trackerSpecificConfig.timedTracker
     override val availableTrackers = listOf(
         DisplayMode.TOTAL,
         DisplayMode.SESSION,

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc.tracker
+package at.hannibal2.skyhanni.config.features.misc.tracker.generic
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemPriceSource

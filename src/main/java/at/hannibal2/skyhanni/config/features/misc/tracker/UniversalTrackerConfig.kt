@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker
 
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig.TrackerSync.setUseUniversalConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig.TrackerSync.syncAllTrackers
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig.TrackerSync.setUseUniversalConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig.TrackerSync.syncAllTrackers
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
