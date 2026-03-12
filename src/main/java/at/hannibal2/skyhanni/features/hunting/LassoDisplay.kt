@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -47,7 +48,7 @@ object LassoDisplay {
             if (entity !is net.minecraft.world.entity.Leashable) continue
             val leashEntity = entity.leashHolder ?: continue
             if (!leashEntity.isLocalPlayer) continue
-            val entitiesNearby = EntityUtils.getEntitiesNearby<ArmorStand>(entity.blockPosition().toLorenzVec().up(2), 2.0)
+            val entitiesNearby = entity.blockPosition().toLorenzVec().up(2).getEntitiesNearby<ArmorStand>(2.0)
             for (armorStandEntity in entitiesNearby) {
                 val name = armorStandEntity.displayName.formattedTextCompat()
                 if (name.contains("§l§m")) {

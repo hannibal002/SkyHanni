@@ -322,7 +322,7 @@ object SackApi {
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!event.cleanMessage.startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
@@ -479,6 +479,10 @@ object SackApi {
         fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
+
+    fun NeuInternalName.isMissingSackItem(): Boolean {
+        return fetchSackItem(this).getStatus() == SackStatus.MISSING
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

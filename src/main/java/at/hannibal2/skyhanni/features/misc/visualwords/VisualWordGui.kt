@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -70,7 +71,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
 
         @JvmStatic
         fun onCommand() {
-            if (!SkyBlockUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
                 ChatUtils.userError("You need to join Hypixel to use this feature!")
             } else {
                 if (sbeConfigPath.exists()) drawImport = true
@@ -142,7 +143,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
                 GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
-            DrawContextUtils.scale(scale, scale, 1f)
+            DrawContextUtils.scale(scale, scale)
 
             drawUnmodifiedStringCentered(
                 "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
@@ -213,7 +214,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
                     ColoredBlockCompat.RED.createStainedClay()
                 }
 
-                DrawContextUtils.scale(inverseScale, inverseScale, 1f)
+                DrawContextUtils.scale(inverseScale, inverseScale)
 
                 if (index != 0) {
                     GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
@@ -224,7 +225,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
 
                 GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
 
-                DrawContextUtils.scale(scale, scale, 1f)
+                DrawContextUtils.scale(scale, scale)
 
                 if (inBox) {
                     drawUnmodifiedString(
@@ -261,7 +262,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
                 saveChanges()
             }
 
-            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
+            DrawContextUtils.scale(inverseScale, inverseScale)
 
             scrollScreen()
         } else {

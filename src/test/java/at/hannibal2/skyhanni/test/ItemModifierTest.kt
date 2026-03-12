@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -17,7 +17,7 @@ class ItemModifierTest {
         assert(!itemStack.isRecombobulated())
         assert(itemStack.getReforgeModifier() == "ancient")
         assert(itemStack.getItemUuid() == "2810b7fe-33af-4dab-bb41-b4815f5847af")
-        assert(itemStack.isEnchanted())
+        assert(itemStack.hasEnchantGlint())
         assert(itemStack.getHotPotatoCount() == 15)
         assert(itemStack.getHypixelEnchantments()?.size == 11)
         assert(itemStack.hasArtOfPeace())

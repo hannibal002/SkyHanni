@@ -22,12 +22,13 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 import java.util.UUID
@@ -184,18 +185,18 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color) { !this.isInvisible() && condition() }
+            RenderLivingEntityHelper.setEntityColor(baseEntity, color) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color) { !this.isInvisible() && condition() }
+                RenderLivingEntityHelper.setEntityColor(it, color) { !this.isInvisible() && condition() }
             }
         }
     }
 
     private fun internalRemoveColor() {
         if (highlightColor == null) return
-        RenderLivingEntityHelper.removeCustomRender(baseEntity)
+        RenderLivingEntityHelper.removeEntityColor(baseEntity)
         extraEntities.forEach {
-            RenderLivingEntityHelper.removeCustomRender(it)
+            RenderLivingEntityHelper.removeEntityColor(it)
         }
     }
 
@@ -303,4 +304,6 @@ class Mob(
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 
     val isAlive: Boolean get() = baseEntity.isAlive
+
+    fun getLorenzVec() = baseEntity.getLorenzVec()
 }

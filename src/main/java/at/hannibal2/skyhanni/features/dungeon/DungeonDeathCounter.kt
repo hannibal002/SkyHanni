@@ -52,7 +52,7 @@ object DungeonDeathCounter {
         deathPatternsList.any { it.matches(message) }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         if (isDeathMessage(event.message)) {

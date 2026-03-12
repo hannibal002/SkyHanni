@@ -25,22 +25,22 @@ Describe what this pull request does, including technical details, screenshots, 
 </details>
 
 ## Changelog New Features
-+ Cool new feature. - your_name_here
-    * Extra info.
++ Added Cool new feature. - your_name_here
+    * Optional extra info.
 
 ## Changelog Improvements
 + Improved cool feature. - your_name_here
-    * Extra info.
+    * Optional extra info.
 
 ## Changelog Fixes
 + Fixed cool feature. - your_name_here
-    * Extra info.
+    * Optional extra info.
 
 ## Changelog Technical Details
 + Something technical you changed in the backend. - your_name_here
-    * Extra info.
+    * Optional extra info.
 
 ## Changelog Removed Features
 + Removed cool feature. - your_name_here
-    * Extra info.
+    * Optional extra info.
 

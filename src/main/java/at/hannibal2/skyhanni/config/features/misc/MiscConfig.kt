@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
-import at.hannibal2.skyhanni.config.OnlyModern
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig
@@ -340,18 +339,19 @@ class MiscConfig {
     @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
-    @Expose
-    @ConfigOption(
+    // doesnt work properly
+    /*@ConfigOption(
         name = "Fix Ghost Entities",
         desc = "Remove ghost entities caused by a Hypixel bug.\n" +
             "This includes Diana, Dungeon and Crimson Isle mobs and nametags.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
+    @FeatureToggle*/
+    @Expose
     var fixGhostEntities: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals in some SkyHanni displays.")
     @ConfigEditorBoolean
     @FeatureToggle
     val replaceRomanNumerals: Property<Boolean> = Property.of(false)
@@ -435,7 +435,6 @@ class MiscConfig {
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var coralFishHelper: Boolean = true
 
     @Expose
@@ -473,7 +472,6 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    @OnlyModern
     var fixDoubleClicks: Boolean = true
 
 
@@ -491,4 +489,12 @@ class MiscConfig {
     @FeatureToggle
     @SearchTag("Colour Spell Spawn Specific")
     var fixColorParticles: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Rainbow Action Bar",
+        desc = "Makes the Action bar rainbow. Why? For fun!"
+    )
+    @ConfigEditorBoolean
+    var rainbowActionBar: Boolean = false
 }

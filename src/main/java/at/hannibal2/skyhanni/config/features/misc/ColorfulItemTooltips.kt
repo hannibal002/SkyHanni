@@ -9,20 +9,12 @@ class ColorfulItemTooltips {
 
     @Expose
     @ConfigOption(
-        name = "Color Item Stat Numbers",
-        desc = "Changes the color of the numbers in item lore to the color they are in the SkyBlock stats menu.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var enabled: Boolean = false
-
-    @Expose
-    @ConfigOption(
         name = "Add Stat Icons",
         desc = "Adds in the stat icons after the stat number.",
     )
     @ConfigEditorBoolean
-    var statIcons: Boolean = true
+    @FeatureToggle
+    var statIcons: Boolean = false
 
     @Expose
     @ConfigOption(

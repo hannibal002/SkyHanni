@@ -15,9 +15,8 @@ class NeuRepositoryConfig : AbstractRepoConfig<NeuRepositoryConfig.NeuRepository
     @Expose
     @ConfigOption(
         name = "NEU Repo Auto Update",
-        desc = "Update the NEU repository on every startup and tries to auto fix bugs.\n" +
-            "§cOnly disable this if you know what you are doing!\n " +
-            "§eThis only works if NEU is not installed, if it is use their settings.",
+        desc = "Update the NEU repository on every startup and try to auto fix bugs.\n" +
+            "§cOnly disable this if you know what you are doing!",
     )
     @ConfigEditorBoolean
     override var repoAutoUpdate: Boolean = true

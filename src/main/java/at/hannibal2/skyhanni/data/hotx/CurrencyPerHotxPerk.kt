@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hotx
 
-import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -14,8 +15,8 @@ import org.lwjgl.glfw.GLFW
 abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {
 
     fun handleHotxCurrency(
-        event: ToolTipEvent,
-        showWhispersSpent: Boolean,
+        event: ToolTipTextEvent,
+        showCurrencySpent: Boolean,
         showCurrencyFor10Levels: Boolean,
         showCurrentCurrency: Boolean,
         currencySpentDesign: CurrencySpentDesign,
@@ -24,23 +25,24 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
         val perk = hotx.getPerkByNameOrNull(itemName.removeColor()) ?: return
 
         if (perk.getLevelUpCost() == null) return
-        if (showWhispersSpent) event.toolTip.add(2, handleCurrencySpent(currencySpentDesign, perk))
+        if (showCurrencySpent) event.toolTip.add(2, handleCurrencySpent(currencySpentDesign, perk))
         if (showCurrencyFor10Levels) handleCurrencyFor10Levels(event, perk)
         if (showCurrentCurrency) handleCurrentCurrency(event, perk)
     }
 
-    private fun handleCurrentCurrency(event: ToolTipEvent, perk: HotxData<*>) {
+    private fun handleCurrentCurrency(event: ToolTipTextEvent, perk: HotxData<*>) {
         if (!perk.isUnlocked || perk.isMaxLevel) return
         val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }
+        if (indexOfCost == -1) return
         val currentCurrencyLine = currentCurrencyLineString(perk) ?: return
         event.toolTip.add(indexOfCost + 2, " ")
-        event.toolTip.add(indexOfCost + 3, "You have")
+        event.toolTip.add(indexOfCost + 3, "§7You have")
         event.toolTip.add(indexOfCost + 4, currentCurrencyLine)
     }
 
     abstract fun currentCurrencyLineString(perk: HotxData<*>): String?
 
-    private fun handleCurrencyFor10Levels(event: ToolTipEvent, perk: HotxData<*>) {
+    private fun handleCurrencyFor10Levels(event: ToolTipTextEvent, perk: HotxData<*>) {
         if (!GLFW.GLFW_KEY_LEFT_SHIFT.isKeyHeld()) return
         val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }
         if (indexOfCost == -1) return

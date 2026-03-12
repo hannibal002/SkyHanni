@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -30,7 +34,9 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
@@ -43,6 +49,7 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
@@ -67,6 +74,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
@@ -102,6 +110,9 @@ class ProfileSpecificStorage(
         @Expose
         var migratedTotalKills: Boolean = false
     }
+
+    @Expose
+    var instanceChestFavoriteItems: MutableList<NeuInternalName> = mutableListOf()
 
     // - commands
     @Expose
@@ -143,9 +154,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var openState: OpenedState? = null
-
-            @Expose
-            var kismetUsed: Boolean? = null
         }
     }
 
@@ -434,6 +442,12 @@ class ProfileSpecificStorage(
         var lastGainedCrop: CropType? = null
 
         @Expose
+        var lastGainedCropCollectionTime: SimpleTimeMark = farPast()
+
+        @Expose
+        var cropCollectionCounter: MutableMap<CropType, CropCollectionApi.CropCollection> = enumMapOf()
+
+        @Expose
         var cropMilestoneCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
 
         @Expose
@@ -556,9 +570,6 @@ class ProfileSpecificStorage(
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
-
-            @Expose
             var farmingLevel: Int = -1
 
             @Expose
@@ -584,9 +595,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
-
-            @Expose
-            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
@@ -600,7 +608,24 @@ class ProfileSpecificStorage(
 
         class FarmingWeightConfig {
             @Expose
-            var lastLeaderboard: Int = -1
+            var lastLeaderboardPosMap: MutableMap<EliteLeaderboardType, Int> = mutableMapOf()
+
+            @Expose
+            var leaderboardAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
+            @Expose
+            var cropDisplayType: CropLeaderboardStorage = CropLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var pestDisplayType: PestLeaderboardStorage = PestLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var weightDisplayType: WeightLeaderboardStorage =
+                WeightLeaderboardStorage(FarmingWeight.FARMING_WEIGHT, EliteLeaderboardMode.ALL_TIME)
+
+            @Expose
+            var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
+
         }
 
         @Expose
@@ -623,6 +648,13 @@ class ProfileSpecificStorage(
 
         @Expose
         var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
+
+        @Expose
+        var greenhouse: GreenHouseStorage = GreenHouseStorage()
+
+        class GreenHouseStorage(
+            @Expose var nextCycle: SimpleTimeMark = farPast(),
+        )
     }
 
     // - gui
@@ -634,7 +666,7 @@ class ProfileSpecificStorage(
         var beaconPowerExpiryTime: SimpleTimeMark? = null
 
         @Expose
-        var boostedStat: String? = null
+        var boostedStat: Component? = null
     }
 
     // - inventory
@@ -771,6 +803,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var flowstatePersonalBest = 0
+
+        @Expose
+        var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
     }
 
     @Expose
@@ -778,7 +813,7 @@ class ProfileSpecificStorage(
 
     // - minion
     @Expose
-    var minions: Map<LorenzVec, MinionConfig>? = mutableMapOf()
+    var minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
 
     class MinionConfig {
         @Expose
@@ -842,6 +877,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+
+        @Expose
+        var reputation: MutableMap<FactionType, Int> = mutableMapOf()
     }
 
     // - rift

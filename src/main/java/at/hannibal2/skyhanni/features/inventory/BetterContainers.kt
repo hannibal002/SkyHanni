@@ -24,7 +24,7 @@ import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.renderer.texture.DynamicTexture
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.Slot
@@ -48,14 +48,14 @@ object BetterContainers {
 
     private val config get() = SkyHanniMod.feature.inventory.improvedSBMenus
 
-    private val x: ResourceLocation = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54")
+    private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")
 
-    private val toggleOff = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_off.png")
-    private val toggleOn = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_on.png")
-    private val dynamic54Base = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54.png")
-    private val dynamic54Slot = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
-    private val dynamic54Button = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
-    private val customDynamicChest = ResourceLocation.fromNamespaceAndPath("skyhanni", "dynamic_chest_inventory.png")
+    private val toggleOff = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_off.png")
+    private val toggleOn = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/toggle_on.png")
+    private val dynamic54Base = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54.png")
+    private val dynamic54Slot = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_slot_ctm.png")
+    private val dynamic54Button = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54/style1/dynamic_54_button_ctm.png")
+    private val customDynamicChest = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_chest_inventory.png")
 
     /**
      * REGEX-TEST: navigate the maze
@@ -147,17 +147,17 @@ object BetterContainers {
     }
 
     // <editor-fold desc="Resource Reading">
-    private fun readImageResources(id: ResourceLocation, altId: ResourceLocation): BufferedImage? =
+    private fun readImageResources(id: Identifier, altId: Identifier): BufferedImage? =
         readImageResource(id) ?: readImageResource(altId)
 
-    private fun readImageResource(id: ResourceLocation): BufferedImage? = runCatching {
+    private fun readImageResource(id: Identifier): BufferedImage? = runCatching {
         val mcResource = Minecraft.getInstance().resourceManager.getResource(id).get()
         ImageIO.read(mcResource.open())
     }.onFailure {
         ErrorManager.logErrorWithData(it, "Could not read image resource: ${id.path}")
     }.getOrNull()
 
-    private fun readJsonResource(id: ResourceLocation): BufferedReader? = runCatching {
+    private fun readJsonResource(id: Identifier): BufferedReader? = runCatching {
         val mcResource = Minecraft.getInstance().resourceManager.getResource(id).get()
         val streamReader = InputStreamReader(mcResource.open(), StandardCharsets.UTF_8)
         BufferedReader(streamReader)
@@ -232,7 +232,7 @@ object BetterContainers {
         return hasText && stack.isDye()
     }
 
-    fun getTextureIdentifier(original: ResourceLocation): ResourceLocation {
+    fun getTextureIdentifier(original: Identifier): Identifier {
         if (!chestOpen) return original
         val inv = (Minecraft.getInstance().screen as? ContainerScreen)?.container
             ?: return original

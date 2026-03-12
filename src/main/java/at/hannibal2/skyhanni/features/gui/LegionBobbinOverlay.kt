@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -78,8 +77,8 @@ object LegionBobbinOverlay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!isEnabled()) return
-        val bobbers = EntityUtils.getEntitiesNextToPlayer<FishingHook>(BOBBERS_DISTANCE).size
-        val players = EntityUtils.getEntitiesNextToPlayer<Player>(LEGION_DISTANCE).count {
+        val bobbers = EntityUtils.getEntitiesNearby<FishingHook>(BOBBERS_DISTANCE).size
+        val players = EntityUtils.getEntitiesNearby<Player>(LEGION_DISTANCE).count {
             !it.isLocalPlayer && it.isRealPlayer()
         }
         nearbyBobbers = modifyValue(nearbyBobbers, bobbers.coerceAtMost(BOBBERS_LIMIT))

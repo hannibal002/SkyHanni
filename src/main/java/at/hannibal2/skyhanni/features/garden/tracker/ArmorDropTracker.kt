@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -47,7 +48,9 @@ object ArmorDropTracker {
         "(?:HELIANTHUS|FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
-    private var hasArmor = false
+    val hasArmor by RecalculatingValue(1.seconds) {
+        GardenApi.inGarden() && checkArmor()
+    }
 
     val tracker = SkyHanniTracker(
         "Armor Drop Tracker",
@@ -83,12 +86,7 @@ object ArmorDropTracker {
     }
 
     @HandleEvent
-    fun onProfileJoin() {
-        hasArmor = false
-    }
-
-    @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         for (dropType in ArmorDropType.entries) {
             if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)
@@ -132,18 +130,6 @@ object ArmorDropTracker {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed() {
-        checkArmor()
-    }
-
-    private fun checkArmor() {
-        val armorPieces = InventoryUtils.getArmor()
-            .mapNotNull { it?.getInternalName()?.asString() }
-            .count { armorPattern.matcher(it).matches() }
-        hasArmor = armorPieces > 1
-    }
-
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
@@ -153,6 +139,13 @@ object ArmorDropTracker {
     private var armorDropInfo = mapOf<String, ArmorDropInfo>()
     private var currentArmorDropChance = 0.0
     private var lastCalculationTime = SimpleTimeMark.farPast()
+
+    private fun checkArmor(): Boolean {
+        val armorPieces = InventoryUtils.getArmor()
+            .mapNotNull { it?.getInternalName()?.asString() }
+            .count { armorPattern.matcher(it).matches() }
+        return armorPieces > 1
+    }
 
     fun getDropsPerHour(crop: CropType?): Double {
         if (crop == null) return 0.0

@@ -16,9 +16,10 @@ object ScoreboardEventActiveTablist : ScoreboardEvent() {
     override fun getDisplay(): List<String>? {
         val name = getTablistEvent() ?: return null
         if (name.removeColor() in blockedEvents) return null
-        val currentActiveEventTime = ScoreboardPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines) {
-            group("time")
-        } ?: return null
+        val currentActiveEventTime =
+            ScoreboardPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines.map { it.string }) {
+                group("time")
+            } ?: return null
 
         return listOf(name, " Ends in: §e$currentActiveEventTime")
     }

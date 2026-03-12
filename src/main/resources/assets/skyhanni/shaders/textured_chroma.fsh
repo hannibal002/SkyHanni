@@ -3,10 +3,12 @@
 in vec4 vertexColor;
 in vec2 texCoord0;
 
-uniform float chromaSize;
-uniform float timeOffset;
-uniform float saturation;
-uniform int forwardDirection;
+layout(std140) uniform SkyHanniChromaUniforms {
+    float chromaSize;
+    float timeOffset;
+    float saturation;
+    int forwardDirection;
+};
 
 uniform sampler2D Sampler0;
 

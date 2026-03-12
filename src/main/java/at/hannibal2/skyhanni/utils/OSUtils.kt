@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.Util
+import net.minecraft.util.Util
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -59,9 +59,13 @@ object OSUtils {
         openBrowser(url)
     }
 
-    fun copyToClipboard(text: String) {
-        ClipboardUtils.copyToClipboard(text)
-    }
+    @Deprecated(
+        "Use copyToClipboardAsync instead for a success boolean return",
+        ReplaceWith("copyToClipboardAsync(text)"),
+    )
+    fun copyToClipboard(text: String) = ClipboardUtils.copyToClipboard(text)
+
+    suspend fun copyToClipboardAsync(text: String): Boolean? = ClipboardUtils.copyToClipboardAsync(text).await()
 
     fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 

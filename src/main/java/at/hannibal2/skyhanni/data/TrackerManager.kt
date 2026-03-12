@@ -140,12 +140,15 @@ object TrackerManager {
             "textOrder"
         )
         for (entry in movedList) {
-            event.move(107, "$oldBase.$entry", "$newBase.$entry")
+            event.move(121, "$oldBase.$entry", "$newBase.$entry")
         }
         // if we don't include the transformation it bricks the config
-        event.move(107, "$oldBase.warnings", "$newBase.warnings") { entry ->
+        event.move(121, "$oldBase.warnings", "$newBase.warnings") { entry ->
             entry
         }
-        if (event.oldVersion < 107) shouldSyncTrackers = true
+        if (event.oldVersion < 121) shouldSyncTrackers = true
+
+        event.move(121, "misc.tracker.hideItemTrackersOutsideInventory", "misc.tracker.hideOutsideInventory")
+
     }
 }

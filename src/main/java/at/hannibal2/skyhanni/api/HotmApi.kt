@@ -89,13 +89,13 @@ object HotmApi {
 
         fun resetTree() {
             current = total
-            PowderEvent(this).post()
+            PowderEvent.Reset(this).post()
         }
 
         fun resetFull() {
             current = 0L
             total = 0L
-            PowderEvent(this).post()
+            PowderEvent.Reset(this).post()
         }
 
         companion object {

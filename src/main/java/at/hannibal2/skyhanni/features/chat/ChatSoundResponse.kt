@@ -23,7 +23,7 @@ object ChatSoundResponse {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         for (soundType in SoundResponseTypes.entries) {
@@ -61,6 +61,13 @@ object ChatSoundResponse {
             }
             array
         }
+        event.transform(117, "chat.soundResponse.soundResponses") { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive("FROG"))
+                add(JsonPrimitive("HORSE"))
+                add(JsonPrimitive("GOAT"))
+            }
+        }
     }
 
 
@@ -71,17 +78,20 @@ private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"
 private const val END_PATTERN = "(?: |§.|!|\\?|\\.)*(?:\$| .*\$)"
 
 enum class SoundResponseTypes(private val displayName: String, soundLocation: String, triggersOn: List<String>) {
-    CAT("Cat Meow", "mob.cat.meow", listOf("m+e*o*w+", "m+e*a+o+w+")),
-    CATPURR("Cat Purr", "mob.cat.purr", listOf("p+u*rr+")),
-    CATPURREOW("Cat Purreow", "mob.cat.purreow", listOf("m+r+e*o*w+", "m+r+e*a+o+w+")),
-    CATHISS("Cat Hiss", "mob.cat.hiss", listOf("h+i+ss+")),
-    DOG("Dog Bark", "mob.wolf.bark", listOf("bark", "a*w*r+u*f+", "w+oo+f+")),
-    DOGGROWL("Dog Growl", "mob.wolf.growl", listOf("g+rr+")),
-    DOGHOWL("Dog Howl", "mob.wolf.howl", listOf("a+w+oo+")),
-    SHEEP("Sheep", "mob.sheep.say", listOf("baa+h*")),
-    COW("Cow", "mob.cow.say", listOf("moo+")),
-    PIG("Pig", "mob.pig.say", listOf("o+i+n+k+")),
-    CHICKEN("Chicken", "mob.chicken.say", listOf("cl+u+c+k+")),
+    CAT("Cat Meow", "entity.cat.ambient", listOf("m+e*o*w+", "m+e*a+o+w+")),
+    CATPURR("Cat Purr", "entity.cat.purr", listOf("p+u*rr+")),
+    CATPURREOW("Cat Purreow", "entity.cat.purreow", listOf("m+r+e*o*w+", "m+r+e*a+o+w+")),
+    CATHISS("Cat Hiss", "entity.cat.hiss", listOf("h+i+ss+")),
+    DOG("Dog Bark", "entity.wolf.ambient", listOf("bark", "a*w*r+u*f+", "w+oo+f+")),
+    DOGGROWL("Dog Growl", "entity.wolf.growl", listOf("g+rr+")),
+    DOGHOWL("Dog Howl", "entity.wolf.death", listOf("a+w+oo+")),
+    SHEEP("Sheep", "entity.sheep.ambient", listOf("baa+h*")),
+    COW("Cow", "entity.cow.ambient", listOf("moo+")),
+    PIG("Pig", "entity.pig.ambient", listOf("o+i+n+k+")),
+    CHICKEN("Chicken", "entity.chicken.ambient", listOf("cl+u+c+k+")),
+    FROG("Frog", "entity.frog.hurt", listOf("ribbit")),
+    HORSE("Horse", "entity.horse.angry", listOf("neigh")),
+    GOAT("Goat", "entity.goat.screaming.ambient", listOf("bleat")),
     ;
 
     val sound by lazy { SoundUtils.createSound(soundLocation, 1f) }

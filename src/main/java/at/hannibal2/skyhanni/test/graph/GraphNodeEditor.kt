@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -25,6 +28,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphNodeEditor {
+
+    private val state get() = GraphEditor.state
 
     private val scrollValueNodes = ScrollValue()
     private val scrollValueTags = ScrollValue()
@@ -54,11 +59,11 @@ object GraphNodeEditor {
         return nodesDisplay
     }
 
-    private fun updateNodeNames() {
+    fun updateNodeNames() {
         lastUpdate = SimpleTimeMark.now()
         nodesDisplay = buildList {
             val list = drawNodeNames()
-            val total = GraphEditor.nodes.count { it.name?.isNotBlank() ?: false }
+            val total = state.nodes.count { it.name?.isNotBlank() ?: false }
             val shown = list.size
             add(
                 Renderable.clickable(
@@ -74,6 +79,7 @@ object GraphNodeEditor {
                 add(list.buildSearchableScrollable(height, textInput, scrollValueNodes, velocity = 10.0))
             }
         }
+        updateDisabledNames()
     }
 
     private fun updateToggleTags() {
@@ -82,12 +88,12 @@ object GraphNodeEditor {
             addString("§eToggle Visible Tags")
             val map = mutableMapOf<GraphNodeTag, Int>()
             for (tag in GraphNodeTag.entries) {
-                val nodes = GraphEditor.nodes.count { tag in it.tags }
+                val nodes = state.nodes.count { tag in it.tags }
                 map[tag] = nodes
             }
             for (tag in map.sortedDesc().keys) {
                 val isVisible = tag in tagsToShow
-                val nodes = GraphEditor.nodes.count { tag in it.tags }
+                val nodes = state.nodes.count { tag in it.tags }
                 val visibilityText = if (isVisible) " §aVisible" else " §7Invisible"
                 val name = " - ${tag.displayName} §8($nodes nodes) $visibilityText"
                 add(
@@ -194,14 +200,18 @@ object GraphNodeEditor {
     )
 
     private fun drawNodeNames(): List<Searchable> = buildList {
-        for ((node, distance: Double) in GraphEditor.nodes.map {
+        for ((node, distance: Double) in state.nodes.map {
             it to it.distanceSqToPlayer()
         }.sortedBy { it.second }) {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
             }
-            val name = node.name?.takeIf { it.isNotBlank() } ?: continue
-            val color = if (node == GraphEditor.activeNode) "§a" else "§7"
+            val name = if (state.inTextMode && node == state.activeNode) {
+                state.textBox.finalText().takeIf { it.isNotBlank() }
+            } else {
+                node.name?.takeIf { it.isNotBlank() }
+            } ?: continue
+            val color = if (node == state.activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
             val tagText = node.tags.let { tags ->
                 if (tags.isEmpty()) {
@@ -243,13 +253,52 @@ object GraphNodeEditor {
             if (KeyboardManager.isModifierKeyDown()) {
                 updateTagView(node)
             } else {
-                GraphEditor.activeNode = node
+                state.activeNode = node
                 updateNodeNames()
             }
         },
     ).toSearchable(name)
 
-    fun isEnabled() = GraphEditor.isEnabled()
+    private var disabledLocations = setOf<LorenzVec>()
+
+    fun handleDisabled(graph: Graph) {
+        val newDisabled = mutableSetOf<LorenzVec>()
+        for (node in graph) {
+            if (!node.enabled) {
+                newDisabled.add(node.position)
+            }
+        }
+
+        disabledLocations = newDisabled
+        updateDisabledNames()
+    }
+
+    private fun updateDisabledNames() {
+        for (node in state.nodes) {
+            node.enabled = node.position !in disabledLocations
+        }
+    }
+
+    fun getWeight() {
+        val node = state.activeNode ?: run {
+            ChatUtils.userError("No node selected!")
+            return
+        }
+        ChatUtils.chat("Extra weight of this node: §e${node.extraWeight}")
+    }
+
+    fun setWeight(weight: Int) {
+        val node = state.activeNode ?: run {
+            ChatUtils.userError("No node selected!")
+            return
+        }
+        GraphEditorHistory.save("set weight ${node.id}")
+        node.extraWeight = weight
+        ChatUtils.chat("Set extra weight to §e$weight§e.")
+    }
+
+    private fun isEnabled() = GraphEditor.isEnabled()
+
     private val config get() = GraphEditor.config
 
 }

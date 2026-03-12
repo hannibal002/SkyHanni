@@ -15,9 +15,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.IronGolem
+import net.minecraft.world.entity.animal.golem.IronGolem
 import net.minecraft.world.entity.monster.Endermite
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Slime
@@ -62,7 +61,7 @@ object HighlightMiningCommissionMobs {
         val entities = EntityUtils.getEntities<LivingEntity>()
         for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
             if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                RenderLivingEntityHelper.setEntityColor(
                     entity,
                     LorenzColor.YELLOW.toColor().addAlpha(127),
                 ) { isEnabled() && type in active }
@@ -76,8 +75,8 @@ object HighlightMiningCommissionMobs {
 
         // TODO Commissin API
         MobType.entries.filter { type ->
-            event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
-                ?.let { !it.endsWith("§aDONE") }
+            event.tabList.findLast { line -> line.string.removeColor().trim().startsWith(type.commissionName) }
+                ?.let { !it.string.endsWith("DONE") }
                 ?: false
         }.let {
             if (it != active) {
@@ -93,7 +92,7 @@ object HighlightMiningCommissionMobs {
         val entity = event.entity
         for (type in active) {
             if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                RenderLivingEntityHelper.setEntityColor(
                     entity,
                     LorenzColor.YELLOW.toColor().addAlpha(127),
                 ) { isEnabled() && type in active }

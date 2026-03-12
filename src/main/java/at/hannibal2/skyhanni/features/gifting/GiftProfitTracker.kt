@@ -240,7 +240,7 @@ object GiftProfitTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         northStarsPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
             tracker.modify {

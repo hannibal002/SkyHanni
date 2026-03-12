@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.SoundCompat
 import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 
 @SkyHanniModule
@@ -19,9 +20,9 @@ object SoundUtils {
 
     private val config get() = SkyHanniMod.feature.misc
     private val beepSoundCache = mutableMapOf<Float, SoundInstance>()
-    private val clickSound by lazy { createSound("gui.button.press", 1f) }
-    private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
-    val plingSound by lazy { createSound("note.pling", 1f) }
+    private val clickSound by lazy { createSound("ui.button.click", 1f) }
+    private val errorSound by lazy { createSound("entity.enderman.teleport", 0f) }
+    val plingSound by lazy { createSound("block.note_block.pling", 1f) }
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun SoundInstance.playSound() {
@@ -38,13 +39,13 @@ object SoundUtils {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",
-                    "soundLocation" to this.location,
+                    "soundLocation" to this.identifier,
                 )
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to play a sound",
-                    "soundLocation" to this.location,
+                    "soundLocation" to this.identifier,
                 )
             } finally {
                 if (!config.maintainGameVolume) this.setLevel(oldLevel)
@@ -53,20 +54,19 @@ object SoundUtils {
     }
 
     private fun SoundInstance.setLevel(level: Float) =
-        //#if MC < 1.21.9
-        Minecraft.getInstance().soundManager.updateSourceVolume(this.source, level)
-    //#else
-    //$$ Minecraft.getInstance().soundManager.setVolume(this, level)
-    //#endif
+        //? if < 1.21.11 {
+        Minecraft.getInstance().soundManager.setVolume(this, level)
+    //?} else
+    //Minecraft.getInstance().soundManager.updateCategoryVolume(this.source, level)
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
-        val newSound = at.hannibal2.skyhanni.utils.compat.SoundCompat.getModernSoundName(name)
-        val identifier = ResourceLocation.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
+        val newSound = SoundCompat.getModernSoundName(name)
+        val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
     }
 
     fun playBeepSound(pitch: Float = 1f) {
-        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("random.orb", pitch) }
+        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("entity.experience_orb.pickup", pitch) }
         beepSound.playSound()
     }
 

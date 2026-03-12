@@ -3,15 +3,20 @@
 in vec4 vertexColor;
 
 // Rect specific uniforms
-uniform float scaleFactor;
-uniform float radius;
-uniform vec2 halfSize;
-uniform vec2 centerPos;
-uniform mat4 modelViewMatrix;
+layout(std140) uniform SkyHanniRoundedUniforms {
+    float scaleFactor;
+    float radius;
+    float smoothness;
+    vec2 halfSize;
+    vec2 centerPos;
+    mat4 modelViewMatrix;
+};
 
 // Outline specific uniforms
-uniform float borderThickness;
-uniform float borderBlur;
+layout(std140) uniform SkyHanniRoundedOutlineUniforms {
+    float borderThickness;
+    float borderBlur;
+};
 
 out vec4 outColor;
 

@@ -30,7 +30,7 @@ enum class ElectionCandidate(
     DIANA(
         "Diana",
         "§2",
-        Perk.LUCKY,
+        Perk.HUNTRESS_INTUITION,
         Perk.MYTHOLOGICAL_RITUAL,
         Perk.PET_XP_BUFF,
         Perk.SHARING_IS_CARING,
@@ -171,7 +171,7 @@ enum class Perk(val perkName: String) {
     MOLTEN_FORGE("Molten Forge"),
 
     // Diana
-    LUCKY("Lucky!"),
+    HUNTRESS_INTUITION("Huntress' Intuition"),
     MYTHOLOGICAL_RITUAL("Mythological Ritual"),
     PET_XP_BUFF("Pet XP Buff"),
     SHARING_IS_CARING("Sharing is Caring"),

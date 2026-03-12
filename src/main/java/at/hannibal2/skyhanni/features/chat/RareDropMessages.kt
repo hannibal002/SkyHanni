@@ -113,7 +113,7 @@ object RareDropMessages {
     private val config get() = SkyHanniMod.feature.chat.rareDropMessages
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!config.petRarity) return
 
         petPatterns.matchMatchers(event.message) {
@@ -126,7 +126,10 @@ object RareDropMessages {
             if (start.endsWith("a ") && rarityName.first().isVowel())
                 start = start.substring(0..start.length - 2) + "n "
 
-            event.chatComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
+
+            val newComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
+            event.replaceComponent(newComponent, "pet_rarity")
+
         }
     }
 

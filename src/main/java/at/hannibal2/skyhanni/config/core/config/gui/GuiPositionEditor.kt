@@ -62,12 +62,9 @@ class GuiPositionEditor(
     }
 
     override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
-            //#if MC > 1.21.5
-            //$$ oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
-            //#endif
+            oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
             oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
         }
 

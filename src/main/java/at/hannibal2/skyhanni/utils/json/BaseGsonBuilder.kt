@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NEURaritySpecificPetNums
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeComponent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -19,6 +24,7 @@ import com.google.gson.GsonBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
@@ -34,6 +40,10 @@ object BaseGsonBuilder {
         .registerTypeAdapter(NbtBoolean::class.java, SkyHanniTypeAdapters.NBT_BOOLEAN.nullSafe())
         .registerTypeAdapter(LorenzVec::class.java, SkyHanniTypeAdapters.VEC_STRING.nullSafe())
         .registerTypeAdapter(TrophyRarity::class.java, SkyHanniTypeAdapters.TROPHY_RARITY.nullSafe())
+        .registerTypeAdapter(NeuRecipeComponent::class.java, SkyHanniTypeAdapters.NEU_RECIPE_COMPONENT.nullSafe())
+        .registerTypeAdapter(NeuAbstractRecipe::class.java, SkyHanniTypeAdapters.NEU_ABSTRACT_RECIPE.nullSafe())
+        .registerTypeAdapter(NeuRecipeType::class.java, SkyHanniTypeAdapters.NEU_RECIPE_TYPE.nullSafe())
+        .registerTypeAdapter(NEURaritySpecificPetNums::class.java, SkyHanniTypeAdapters.NEU_RARITY_SPECIFIC_PET_NUMS.nullSafe())
         .registerTypeAdapter(ItemStack::class.java, SkyHanniTypeAdapters.NEU_ITEMSTACK.nullSafe())
         .registerTypeAdapter(NeuInternalName::class.java, SkyHanniTypeAdapters.INTERNAL_NAME.nullSafe())
         .registerTypeAdapter(LorenzRarity::class.java, SkyHanniTypeAdapters.RARITY.nullSafe())
@@ -42,6 +52,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(PestType::class.java, SkyHanniTypeAdapters.PEST_TYPE.nullSafe())
         .registerTypeAdapter(ModVersion::class.java, SkyHanniTypeAdapters.MOD_VERSION.nullSafe())
         .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
+        .registerTypeAdapter(EliteLeaderboardType::class.java, SkyHanniTypeAdapters.ELITE_LEADERBOARD_TYPE.nullSafe())
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),
@@ -51,6 +62,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(Stopwatch::class.java, SkyHanniTypeAdapters.STOPWATCH.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
         .registerTypeAdapter(SessionUptime::class.java, SkyHanniTypeAdapters.SESSION_UPTIME.nullSafe())
+        .registerTypeAdapter(Component::class.java, SkyHanniTypeAdapters.COMPONENT.nullSafe())
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder {

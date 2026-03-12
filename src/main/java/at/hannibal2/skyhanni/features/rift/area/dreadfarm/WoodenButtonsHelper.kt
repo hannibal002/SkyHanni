@@ -141,7 +141,7 @@ object WoodenButtonsHelper {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!checkButtons()) return
 
         buttonHitPattern.matchMatcher(event.message) {

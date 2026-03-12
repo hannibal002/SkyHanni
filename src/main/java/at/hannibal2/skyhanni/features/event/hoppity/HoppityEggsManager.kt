@@ -68,10 +68,11 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
      * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§aBubbles§r§a!
      */
     val eggBoughtPattern by CFApi.patternGroup.pattern(
         "egg.bought",
-        "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6(?<cost>[\\d,]*) Coins§r§a!",
+        "§aYou bought §r(?<rabbitname>.*?)(?: §r§afor §r§6(?<cost>[\\d,]*) Coins)?§r§a!",
     )
 
     /**
@@ -100,6 +101,14 @@ object HoppityEggsManager {
     val duplicateRabbitFound by CFApi.patternGroup.pattern(
         "rabbit.duplicate",
         "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate",
+    )
+
+    /**
+     * REGEX-TEST: [NPC] Hoppity: Simply exquisite! I don't think I'll ever get tired of chocolate.
+     */
+    val hoppityVisitorAccepted by CFApi.patternGroup.pattern(
+        "hoppity.visitor.accepted",
+        "\\[NPC\\] Hoppity: Simply exquisite.+"
     )
 
     private val noEggsLeftPattern by CFApi.patternGroup.pattern(
@@ -183,7 +192,7 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
-    private fun SkyHanniChatEvent.sendNextEggAvailable() {
+    private fun SkyHanniChatEvent.Allow.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
         val currentYear = SkyBlockTime.now().year
         val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
@@ -194,7 +203,7 @@ object HoppityEggsManager {
         blockedReason = "hoppity_egg"
     }
 
-    private fun SkyHanniChatEvent.sendNextHuntIn(
+    private fun SkyHanniChatEvent.Allow.sendNextHuntIn(
         reason: String = "Hoppity's Hunt is not active",
     ) {
         val currentYear = SkyBlockTime.now().year
@@ -204,7 +213,7 @@ object HoppityEggsManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         hoppityEventNotOn.matchMatcher(event.message) {
             if (!chatConfig.eggLocatorTimeInChat) return@matchMatcher
             return event.sendNextHuntIn()
@@ -289,6 +298,7 @@ object HoppityEggsManager {
 
     private fun warn() {
         if (!unclaimedEggsConfig.warningsEnabled) return
+        if (SkyBlockUtils.isStrandedProfile) return
         if (ReminderUtils.isBusy() && !unclaimedEggsConfig.warnWhileBusy) return
         if (lastWarnTime.passedSince() < 1.minutes) return
 

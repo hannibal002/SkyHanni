@@ -263,7 +263,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         shardSyphonedPattern.matchMatcher(event.message) {
             val attributeName = group("attributeName")
             val level = group("level").toInt()

@@ -54,7 +54,7 @@ object DebugEntitySkinCommand {
     }
 
     private fun updateSkinEntities(skin: String) {
-        foundEntities = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(30.0)
+        foundEntities = EntityUtils.getEntitiesNearby<ArmorStand>(30.0)
             .filter { it.holdingSkullTexture(skin) || it.wearingSkullTexture(skin) }
             .toSet()
     }

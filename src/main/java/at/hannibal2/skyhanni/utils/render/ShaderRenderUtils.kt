@@ -10,14 +10,17 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
+import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectOutlineRenderState
+import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectRenderState
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
-//#if MC > 1.21.5
-//$$ import org.joml.Matrix3x2f
-//#endif
+import org.joml.Matrix3x2f
+
+private typealias GuiRenderState = net.minecraft.client.gui.render.state.GuiRenderState
 
 object ShaderRenderUtils {
 
@@ -52,15 +55,10 @@ object ShaderRenderUtils {
         this.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         this.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        //#if MC < 1.21.6
-        this.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.pose().last().pose())
-        //#endif
-        //#if MC > 1.21.6
-        //$$ val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
-        //$$ this.modelViewMatrix = Matrix4f()
-        //$$     .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
-        //$$     .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
-        //#endif
+        val matrix3x2f = Matrix3x2f(DrawContextUtils.drawContext.pose())
+        this.modelViewMatrix = Matrix4f()
+            .setTranslation(matrix3x2f.m20(), matrix3x2f.m21(), -11000.0f)
+            .scale(matrix3x2f.m00(), matrix3x2f.m11(), 1.0f)
     }.also { extraApplies?.invoke(this) }
 
     /**
@@ -70,7 +68,6 @@ object ShaderRenderUtils {
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
      * is called **BEFORE** [DrawContextUtils.scale], otherwise the textured rect will not be rendered correctly
      *
-     * @param filter the texture filter to use
      * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
      * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
@@ -81,14 +78,13 @@ object ShaderRenderUtils {
         y: Int,
         width: Int,
         height: Int,
-        filter: Int,
         radius: Int = 10,
         smoothness: Float = 1f,
-        texture: ResourceLocation,
+        texture: Identifier,
         alpha: Float = 1f,
     ) {
         // if radius is 0 then just draw a normal textured rect
-        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
+        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
 
         RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
 
@@ -281,5 +277,86 @@ object ShaderRenderUtils {
 
         RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
 
+    }
+
+    private fun buildRoundedStateParams(x: Int, y: Int, width: Int, height: Int, radius: Int): RoundedRenderStateParams {
+        val scaleFactor = GuiScreenUtils.scaleFactor
+        val halfSizeX = (width * scaleFactor) / 2f
+        val halfSizeY = (height * scaleFactor) / 2f
+        val centerPosX = (x * scaleFactor) + halfSizeX
+        val centerPosY = GuiScreenUtils.displayHeight - ((y * scaleFactor) + halfSizeY)
+        val matrix = Matrix3x2f(DrawContextUtils.drawContext.pose())
+        val xScale = matrix.m00()
+        val yScale = matrix.m11()
+        val xTranslation = matrix.m20()
+        val yTranslation = matrix.m21()
+        return RoundedRenderStateParams(
+            radius = radius.toFloat(),
+            adjustedHalfSizeX = halfSizeX * xScale,
+            adjustedHalfSizeY = halfSizeY * yScale,
+            adjustedCenterPosX = (centerPosX * xScale) + (xTranslation * scaleFactor),
+            // Y-Scaling affects the center-point of the rounded rect differently than X-Scaling, as it scales from the top edge rather
+            // than the center, so we need to adjust the center Y position accordingly before applying translation
+            adjustedCenterPosY = (if (yScale != 1f) centerPosY - (halfSizeY * (yScale - 1)) else centerPosY) - (yTranslation * scaleFactor),
+            matXScale = xScale,
+            matYScale = yScale,
+            matXTranslation = xTranslation,
+            matYTranslation = yTranslation,
+        )
+    }
+
+    /**
+     * Deferred equivalent of [drawRoundRect]. Captures all shader parameters from the
+     * current pose matrix and submits a [SkyHanniRoundedRectRenderState] to the
+     * [GuiRenderState] queue, ensuring correct ordering over all other GUI elements.
+     */
+    fun drawRoundRectDeferred(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
+        val state = buildRoundedRectState(x, y, width, height, color, radius, smoothness)
+        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+    }
+
+    /**
+     * Deferred equivalent of [drawRoundRectOutline]. Captures all shader parameters from
+     * the current pose matrix and submits a [SkyHanniRoundedRectOutlineRenderState] to the
+     * [GuiRenderState] queue.
+     */
+    fun drawRoundRectOutlineDeferred(
+        x: Int, y: Int, width: Int, height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        borderThickness: Int,
+        radius: Int = 10,
+        blur: Float = 0.7f,
+    ) {
+        val state = buildRoundedRectOutlineState(x, y, width, height, topColor, bottomColor, borderThickness, radius, blur)
+        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+    }
+
+    private fun buildRoundedRectState(
+        x: Int, y: Int, width: Int, height: Int,
+        color: Int,
+        radius: Int,
+        smoothness: Float,
+    ): SkyHanniRoundedRectRenderState {
+        val params = buildRoundedStateParams(x, y, width, height, radius)
+        return SkyHanniRoundedRectRenderState(
+            x, y, width, height, color, smoothness, params,
+            DrawContextUtils.drawContext.scissorStack.peek(),
+        )
+    }
+
+    private fun buildRoundedRectOutlineState(
+        x: Int, y: Int, width: Int, height: Int,
+        topColor: Int, bottomColor: Int,
+        borderThickness: Int,
+        radius: Int,
+        blur: Float,
+    ): SkyHanniRoundedRectOutlineRenderState {
+        val params = buildRoundedStateParams(x, y, width, height, radius)
+        return SkyHanniRoundedRectOutlineRenderState(
+            x, y, width, height, topColor, bottomColor,
+            borderThickness.toFloat(), max(1 - blur, 0f), params,
+            DrawContextUtils.drawContext.scissorStack.peek(),
+        )
     }
 }

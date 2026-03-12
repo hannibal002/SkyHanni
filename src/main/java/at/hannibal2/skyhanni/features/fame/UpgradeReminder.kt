@@ -155,7 +155,7 @@ object UpgradeReminder {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (upgradeStartedPattern.matches(event.message)) {
             startUpgrade(clickedUpgradeType, clickedUpgrade)
             return

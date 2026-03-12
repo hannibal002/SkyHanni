@@ -38,7 +38,7 @@ object AtomHitBox {
     fun onTick() {
         if (!config.enabled) return
 
-        for (entity in EntityUtils.getEntitiesNextToPlayer<ArmorStand>(50.0)) {
+        for (entity in EntityUtils.getEntitiesNearby<ArmorStand>(50.0)) {
             val atom = entity.getWornSkullTexture()?.let(AtomType::fromTexture) ?: continue
             if (!atom.isSelected()) continue
             atomsList[entity] = atom

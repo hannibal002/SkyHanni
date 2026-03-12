@@ -11,6 +11,9 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object NoBitsWarning {
@@ -28,12 +31,18 @@ object NoBitsWarning {
             )
             // TODO use reminder utils
             TitleManager.sendTitle("§bNo Bits Available")
-            if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
+            if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("block.note_block.pling", 0.6f))
         }
 
         if (config.bitsGainChatMessage) {
             if (event.bits < config.messageThreshold) return
-            ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
+            ChatUtils.chat(
+                componentBuilder {
+                    append("You have gained ")
+                    appendWithColor(event.difference.addSeparators(), ChatFormatting.AQUA)
+                    append(" Bits.")
+                }
+            )
         }
     }
 

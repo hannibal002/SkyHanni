@@ -10,12 +10,11 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,11 +33,11 @@ object UniqueGiftingOpportunitiesFeatures {
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
 
     /**
-     * REGEX-TEST: §6+1 Unique Gift given! To oBlazin§r§6!
+     * REGEX-TEST: +1 Unique Gift given! To oBlazin!
      */
     private val giftedPattern by patternGroup.pattern(
-        "gifted",
-        "§6\\+1 Unique Gift given! To (?<player>[^§]+)§r§6!",
+        "gifted.colorless",
+        "\\+1 Unique Gift given! To (?<player>.+)!",
     )
 
     private fun hasGiftedPlayer(player: Player) = playerList?.contains(player.name.formattedTextCompatLessResets()) == true
@@ -60,7 +59,7 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!config.useArmorStandDetection) return
         if (entity.name.formattedTextCompatLessResets() != HAS_GIFTED_NAMETAG) return
 
-        val matchedPlayer = EntityUtils.getEntitiesNearby<Player>(entity.getLorenzVec(), 2.0)
+        val matchedPlayer = entity.getLorenzVec().getEntitiesNearby<Player>(2.0)
             .singleOrNull { !it.isNpc() } ?: return
         addGiftedPlayer(matchedPlayer.name.formattedTextCompatLessResets())
     }
@@ -96,8 +95,8 @@ object UniqueGiftingOpportunitiesFeatures {
         !SkyBlockUtils.noTradeMode && entity.displayName?.string.orEmpty().endsWith("♲")
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent) {
-        giftedPattern.matchMatcher(event.message) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        giftedPattern.matchMatcher(event.cleanMessage) {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }

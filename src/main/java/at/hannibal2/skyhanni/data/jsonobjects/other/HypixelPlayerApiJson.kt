@@ -15,6 +15,7 @@ data class HypixelApiProfile(
 data class HypixelApiPlayer(
     @Expose @SerializedName("trophy_fish") val trophyFish: HypixelApiTrophyFish,
     @Expose val events: HypixelApiEvents,
+    @Expose @SerializedName("nether_island_player_data") val netherData: HypixelApiFactionInfo,
 )
 
 data class HypixelApiEvents(
@@ -32,4 +33,10 @@ data class HypixelApiRabbits(
 data class HypixelApiTrophyFish(
     val totalCaught: Int,
     val caught: Map<String, Int>,
+)
+
+data class HypixelApiFactionInfo(
+    @Expose @SerializedName("barbarians_reputation") val barbarianReputation: Int,
+    @Expose @SerializedName("mages_reputation") val mageReputation: Int,
+    @Expose @SerializedName("selected_faction") val currentFaction: String,
 )

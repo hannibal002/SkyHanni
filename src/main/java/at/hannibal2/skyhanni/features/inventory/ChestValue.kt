@@ -15,13 +15,18 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
+import at.hannibal2.skyhanni.utils.ItemUtils.isAnySoulbound
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -81,7 +86,9 @@ object ChestValue {
     fun onInventoryOpen() {
         if (!isEnabled()) return
         if (inInventory) {
-            update()
+            DelayedRun.runOrNextTick {
+                update()
+            }
         }
     }
 
@@ -111,12 +118,14 @@ object ChestValue {
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
         addString("§7$featureName: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
+            if (config.ignoreSoulbound && stack.isAnySoulbound()) continue
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getInstance().font.width(textAmount)
-            val displayName = stack.repoItemNameCompact
+            val level = if (stack.getPetInternalNameWithLevel() != stack.getInternalName()) " ${stack.getPetLevel()}" else ""
+            val displayName = "${stack.repoItemNameCompact}$level"
             val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"

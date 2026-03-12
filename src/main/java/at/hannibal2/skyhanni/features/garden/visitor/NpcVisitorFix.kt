@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -48,14 +47,12 @@ object NpcVisitorFix {
     }
 
     private fun saveStaticVisitor(name: String, entity: ArmorStand) {
-        // clicked on the real visitor, ignoring
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
         val storage = GardenApi.storage ?: return
 
         val location = entity.getLorenzVec()
         storage.npcVisitorLocations[name]?.let {
-            // alrady stored
             if (it.distance(location) < 1) return
         }
 
@@ -65,13 +62,13 @@ object NpcVisitorFix {
 
     private var lastVisitorOpen = SimpleTimeMark.farPast()
 
-    @HandleEvent
-    fun onVisitorOpen(event: VisitorOpenEvent) {
+    @HandleEvent(VisitorOpenEvent::class)
+    fun onVisitorOpen() {
         lastVisitorOpen = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         barnSkinChangePattern.matchMatcher(event.message) {
             GardenApi.storage?.npcVisitorLocations?.clear()
         }

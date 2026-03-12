@@ -112,7 +112,7 @@ open class TitleContext(
                 position.set(Position(translationX, translationY, scale = position.scale))
             }
 
-            DrawContextUtils.translate(translationX.toFloat(), translationY.toFloat(), 0f)
+            DrawContextUtils.translate(translationX.toFloat(), translationY.toFloat())
             targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
 
             if (intentionPosition != null) {
@@ -145,7 +145,7 @@ open class TitleContext(
         val translation = stringRenderable.height.toFloat() + 125f
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(0f, -translation, 500f)
+            DrawContextUtils.translate(0f, -translation)
             // TODO use Renderable.withMousePosition
             Renderable.drawInsideRoundedRect(
                 stringRenderable,
@@ -154,7 +154,7 @@ open class TitleContext(
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ).renderXYAligned(0, 125, gui.width, gui.height)
 
-            DrawContextUtils.translate(0f, translation, -500f)
+            DrawContextUtils.translate(0f, translation)
         }
     }
 

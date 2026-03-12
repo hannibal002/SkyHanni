@@ -41,7 +41,7 @@ object TerminalWaypoints {
     // Only calls getEntities when terminals get completed, so the performance impact is minimal
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inBoss()) return
 
         val playerName = DungeonBossApi.goldorTerminalPattern.matchMatcher(event.message) {

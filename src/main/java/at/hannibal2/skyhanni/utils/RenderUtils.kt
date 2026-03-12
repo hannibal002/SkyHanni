@@ -12,11 +12,13 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.world.inventory.Slot
 import java.awt.Color
+import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -44,23 +46,49 @@ object RenderUtils {
     }
 
     /**
+     * Runs a block on an asserted Render Thread.
+     * @param block the block to run
+     */
+    private fun <T> runOnRenderThread(
+        setupFor: Lighting.Entry? = null,
+        block: () -> T,
+    ): T {
+        RenderSystem.assertOnRenderThread()
+        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting.setupFor(it) }
+        return block()
+    }
+
+    /**
+     * Returns a [Thread] that schedules a block on the Render Thread when started.
+     * Useful for [Runtime.addShutdownHook].
+     */
+    fun threadOnRenderThread(
+        setupFor: Lighting.Entry? = null,
+        block: () -> Any,
+    ) = Thread { scheduleOnRenderThread(setupFor, block) }
+
+    /**
+     * Runs or schedules a block on the Render Thread.
+     * - If already on the render thread, executes immediately and returns a completed future.
+     * - Otherwise, queues via [Minecraft.submit] and returns a pending future.
+     */
+    fun <T> scheduleOnRenderThread(
+        setupFor: Lighting.Entry? = null,
+        block: () -> T,
+    ): CompletableFuture<T> =
+        if (RenderSystem.isOnRenderThread()) CompletableFuture.completedFuture(runOnRenderThread(setupFor, block))
+        else Minecraft.getInstance().submit<T> {
+            runOnRenderThread(setupFor, block)
+        }
+
+    /**
      * Used for some debugging purposes.
      */
     val absoluteTranslation
         get() = run {
-            //#if MC < 1.21.6
-            RenderSystem.assertOnRenderThread()
-            val posMatrix = DrawContextUtils.drawContext.pose().last().pose()
-            val tmp = org.joml.Vector3f()
-            posMatrix.getTranslation(tmp)
-            val xTranslate = tmp.x.toInt()
-            val yTranslate = tmp.y.toInt()
-            val zTranslate = tmp.z.toInt()
-            //#else
-            //$$ val xTranslate = 0
-            //$$ val yTranslate = 0
-            //$$ val zTranslate = 0
-            //#endif
+            val xTranslate = 0
+            val yTranslate = 0
+            val zTranslate = 0
             Triple(xTranslate, yTranslate, zTranslate)
         }
 
@@ -88,8 +116,6 @@ object RenderUtils {
 
     private fun highlight(color: Color, x: Int, y: Int) {
         DrawContextUtils.pushMatrix()
-        val zLevel = 50f
-        DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
     }
@@ -112,8 +138,6 @@ object RenderUtils {
 
     fun drawBorder(color: Color, x: Int, y: Int) {
         DrawContextUtils.pushMatrix()
-        val zLevel = 50f
-        DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
         GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
@@ -126,8 +150,8 @@ object RenderUtils {
     }
 
     fun Position.transform(): Pair<Int, Int> {
-        DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
-        DrawContextUtils.scale(effectiveScale, effectiveScale, 1F)
+        DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat())
+        DrawContextUtils.scale(effectiveScale, effectiveScale)
         val x = ((GuiScreenUtils.mouseX - getAbsX()) / effectiveScale).toInt()
         val y = ((GuiScreenUtils.mouseY - getAbsY()) / effectiveScale).toInt()
         return x to y
@@ -147,7 +171,7 @@ object RenderUtils {
         transform()
         val fr = Minecraft.getInstance().font
 
-        DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
+        DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0)
 
         if (centered) {
             val strLen: Int = fr.width(string)
@@ -190,7 +214,7 @@ object RenderUtils {
         for (line in renderables) {
             DrawContextUtils.pushMatrix()
             val (x, y) = transform()
-            DrawContextUtils.translate(0f, longestY.toFloat(), 0F)
+            DrawContextUtils.translate(0f, longestY.toFloat())
             Renderable.withMousePosition(x, y) {
                 line.renderXAligned(0, longestY, longestX)
             }
@@ -265,13 +289,13 @@ object RenderUtils {
         val fontRenderer = Minecraft.getInstance().font
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate((xPos - fontRenderer.width(text)).toFloat(), yPos.toFloat(), 200f)
-            DrawContextUtils.scale(scale, scale, 1f)
+            DrawContextUtils.translate((xPos - fontRenderer.width(text)).toFloat(), yPos.toFloat())
+            DrawContextUtils.scale(scale, scale)
             GuiRenderUtils.drawString(text, 0f, 0f, -1)
 
             val reverseScale = 1 / scale
 
-            DrawContextUtils.scale(reverseScale, reverseScale, 1f)
+            DrawContextUtils.scale(reverseScale, reverseScale)
         }
     }
 }

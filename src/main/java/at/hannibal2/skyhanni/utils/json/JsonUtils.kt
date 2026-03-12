@@ -20,6 +20,14 @@ import kotlin.reflect.typeOf
 
 inline fun <reified T : Any> Gson.fromJson(string: String): T = this.fromJson(string, typeOf<T>().javaType)
 
+inline fun <reified T : Any> Gson.fromJsonOrNull(string: String): T? = runCatching {
+    this.fromJson<T>(string)
+}.getOrNull()
+
+inline fun <reified T : Any> Gson.fromJsonOrNull(jsonElement: JsonElement): T? = runCatching {
+    this.fromJson<T>(jsonElement)
+}.getOrNull()
+
 inline fun <reified T : Any> Gson.fromJson(jsonElement: JsonElement): T =
     this.fromJson(jsonElement, typeOf<T>().javaType)
 
@@ -68,7 +76,7 @@ fun JsonElement.shDeepCopy(): JsonElement {
 
 fun JsonElement.addElementsAfter(elements: Array<out Enum<*>>, after: Enum<*>? = null): JsonArray {
     val newArray = JsonArray()
-    var found = after == null
+    var found = false
     this.asJsonArray.forEach {
         newArray.add(it)
         if (!found && it.asString == after?.name) {

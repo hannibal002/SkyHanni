@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -69,7 +70,10 @@ object SackDisplay {
     }
 
     fun update(savingSacks: Boolean) {
-        display = drawDisplay(savingSacks)
+        // Ensure we're running on the render thread - this gets called from the network thread in SackApi
+        DelayedRun.runOrNextTick {
+            display = drawDisplay(savingSacks)
+        }
     }
 
     private fun drawDisplay(savingSacks: Boolean) = buildList {
@@ -111,7 +115,7 @@ object SackDisplay {
                         name.replace("§k", ""),
                         onLeftClick = {
                             if (!SackApi.isTrophySack) {
-                                BazaarApi.searchForBazaarItem(internalName)
+                                BazaarApi.searchForBazaarItemOrRecipe(internalName)
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
@@ -282,7 +286,7 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onLeftClick = {
-                                BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
+                                BazaarApi.searchForBazaarItemOrRecipe(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
                         ),

@@ -67,7 +67,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.MagmaCube
-import net.minecraft.world.entity.monster.Zombie
+import net.minecraft.world.entity.monster.zombie.Zombie
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
@@ -77,7 +77,7 @@ import at.hannibal2.skyhanni.data.mob.Mob as ShMob
 
 typealias EntityData = DamageIndicatorEntityData
 
-// TODO cut class into smaller pieces
+// TODO cut class into definition, API, and display classes
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
@@ -137,7 +137,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         mobFinder?.handleChat(event.message)
     }
 
@@ -479,8 +479,8 @@ object DamageIndicatorManager {
                 return thorn
             }
 
-            BossType.SLAYER_SPIDER_5_1 -> {
-                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckTier5 && config.spiderSlayer.showInvincible) {
+            BossType.SLAYER_SPIDER_3, BossType.SLAYER_SPIDER_4, BossType.SLAYER_SPIDER_5_1 -> {
+                entityData.nameAbove = if (entity.mob in SlayerSpiderFeatures.stuckMobs && config.spiderSlayer.showInvincible) {
                     "§eKill hatchlings!"
                 } else ""
 
