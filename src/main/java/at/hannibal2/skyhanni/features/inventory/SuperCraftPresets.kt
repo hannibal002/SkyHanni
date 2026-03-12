@@ -2,9 +2,13 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -26,6 +30,50 @@ object SuperCraftPresets {
 
     private const val BUTTONS_PER_ROW = 4
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shsupercraftpreset") {
+            description = "Add or remove supercraft preset amounts"
+            category = CommandCategory.USERS_ACTIVE
+            argCallback("number", BrigadierArguments.integer(min = 1)) { number ->
+                togglePreset(number)
+            }
+            simpleCallback {
+                showCurrentPresets()
+                commandHelp()
+            }
+        }
+    }
+
+    private fun togglePreset(number: Int) {
+        val presets = config.presets
+        if (number in presets) {
+            presets.remove(number)
+            ChatUtils.chat("§cRemoved §e${number.addSeparators()} §cfrom supercraft presets.")
+        } else {
+            presets.add(number)
+            ChatUtils.chat("§aAdded §e${number.addSeparators()} §ato supercraft presets.")
+        }
+        presets.sort()
+        showCurrentPresets()
+    }
+
+    private fun commandHelp() {
+        ChatUtils.chat(
+            "§6/shsupercraftpreset <number> §7 - Add or remove a preset amount.",
+            prefix = false
+        )
+    }
+
+    private fun showCurrentPresets() {
+        val presets = config.presets
+        if (presets.isEmpty()) {
+            ChatUtils.chat("§7Current presets: §cnone")
+        } else {
+            ChatUtils.chat("§7Current presets: §e${presets.joinToString("§7, §e") { it.addSeparators() }}")
+        }
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiOpen(event: GuiScreenOpenEvent) {
         display = null
@@ -33,7 +81,7 @@ object SuperCraftPresets {
         val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isSupercraftAmountSetSign()) return
 
-        val presets = parsePresets()
+        val presets = config.presets
         if (presets.isEmpty()) return
 
         val title = Renderable.text(
@@ -97,10 +145,4 @@ object SuperCraftPresets {
     private fun setPresetAmount(amount: Int) {
         SignUtils.setTextIntoSign("$amount", 0)
     }
-
-    private fun parsePresets(): List<Int> = config.presets
-        .split(",")
-        .mapNotNull { it.trim().toIntOrNull() }
-        .filter { it > 0 }
-        .distinct()
 }
