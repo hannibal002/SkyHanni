@@ -18,7 +18,7 @@ import net.minecraft.world.entity.Entity
 @SkyHanniModule
 object SlayerMiniBossFeatures {
 
-    private val config get() = SlayerApi.config
+    private val config get() = SlayerApi.config.miniboss
     private var miniBosses = mutableSetOf<Mob>()
     private var cocoons = mutableSetOf<Entity>()
 
@@ -55,24 +55,27 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!SlayerApi.isInAnyArea) return
-        if (!config.slayerMinibossLine) return
-        for (mob in miniBosses) {
-            if (!mob.baseEntity.canBeSeen(10)) continue
-            event.drawLineToEye(
-                mob.baseEntity.getLorenzVec().up(),
-                LorenzColor.AQUA.toChromaColor(),
-                config.slayerMinibossLineWidth,
-                true,
-            )
+        if (config.minibossLine.showLine) {
+            for (mob in miniBosses) {
+                if (!mob.baseEntity.canBeSeen(10)) continue
+                event.drawLineToEye(
+                    mob.baseEntity.getLorenzVec().up(),
+                    config.minibossLine.color,
+                    config.minibossLine.lineWidth,
+                    true,
+                )
+            }
         }
-        for (mob in cocoons) {
-            if (!mob.canBeSeen(10)) continue
-            event.drawLineToEye(
-                mob.getLorenzVec().up(),
-                LorenzColor.AQUA.toChromaColor(),
-                config.slayerMinibossLineWidth,
-                true,
-            )
+        if (config.cocoonLine.showLine) {
+            for (mob in cocoons) {
+                if (!mob.canBeSeen(10)) continue
+                event.drawLineToEye(
+                    mob.getLorenzVec().up(),
+                    config.cocoonLine.color,
+                    config.cocoonLine.lineWidth,
+                    true,
+                )
+            }
         }
     }
 }

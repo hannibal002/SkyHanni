@@ -94,6 +94,11 @@ class SlayerConfig {
     val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
 
     @Expose
+    @ConfigOption(name = "Miniboss Settings", desc = "")
+    @Accordion
+    val miniboss: MinibossConfig = MinibossConfig()
+
+    @Expose
     @ConfigOption(
         name = "Block Not Spawnable",
         desc = "Prevent clicking slayer bosses that cannot be spawned in the current dimension in Maddox's menu.",
@@ -101,26 +106,6 @@ class SlayerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var blockNotSpawnable: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var slayerMinibossHighlight: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Line to Miniboss", desc = "Add a line to every Slayer Mini-Boss around you.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var slayerMinibossLine: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Line to Miniboss Width",
-        desc = "The width of the line pointing to every Slayer Mini-Boss around you.",
-    )
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
-    var slayerMinibossLineWidth: Int = 3
 
     @Expose
     @ConfigOption(
@@ -209,6 +194,9 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
+            event.move(127, "slayer.slayerMinibossHighlight", "slayer.miniboss.slayerMinibossHighlight")
+            event.move(127, "slayer.slayerMinibossLine", "slayer.miniboss.line.showLine")
+            event.move(127, "slayer.slayerMinibossLineWidth", "slayer.miniboss.line.lineWidth")
         }
     }
 }

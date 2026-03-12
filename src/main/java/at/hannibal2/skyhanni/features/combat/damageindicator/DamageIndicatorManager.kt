@@ -996,7 +996,7 @@ object DamageIndicatorManager {
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()
             }
-            if (SkyHanniMod.feature.slayer.damageSplashHider && entityData.bossType.isSlayer) {
+            if (SlayerApi.config.damageSplashHider && entityData.bossType.isSlayer) {
                 event.cancel()
             }
             if (entityData.bossType == BossType.DUMMY) {
