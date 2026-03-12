@@ -1008,6 +1008,7 @@ class ProfileSpecificStorage(
         @Expose
         var trackedAttributeShards: MutableMap<String, Int> = mutableMapOf()
 
+        // Todo rename to tracker
         @Expose
         var huntingProfitTracker: HuntingProfitTracker.Data = HuntingProfitTracker.Data()
     }
