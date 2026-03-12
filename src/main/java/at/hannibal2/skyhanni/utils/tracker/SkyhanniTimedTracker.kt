@@ -85,11 +85,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
 
     private fun reset(displayMode: DisplayMode? = null, string: String? = null) {
         val data = getData() ?: return
-        when {
-            displayMode != null && string != null -> data.reset(displayMode, string)
-            displayMode != null -> data.reset(displayMode)
-            else -> data.reset()
-        }
+        if (displayMode != null) data.reset(displayMode, string) else data.reset()
         ChatUtils.chat("Reset $name!")
         update()
     }
@@ -226,7 +222,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         val string = ((container.getMostRecentName(DisplayMode.SESSION)?.toIntOrNull() ?: 1) + 1).toString()
         val sessionData = container.getCurrentName(DisplayMode.SESSION)
             ?.let { container.deleteEntry(DisplayMode.SESSION, it) } ?: return
-        container.putEntry(DisplayMode.SESSION, string, sessionData)
+        container.sessions.getOrPut(DisplayMode.SESSION) { mutableMapOf() }[string] = sessionData
         container.setCurrentName(DisplayMode.SESSION, null)
         update()
     }

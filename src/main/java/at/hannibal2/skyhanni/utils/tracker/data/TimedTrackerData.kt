@@ -20,7 +20,8 @@ abstract class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
         sessionContainer.reset()
     }
 
-    fun reset(displayMode: DisplayMode, string: String? = null) = sessionContainer.reset(displayMode, string)
+    fun reset(displayMode: DisplayMode, string: String? = null) =
+        sessionContainer.reset(displayMode, string)
 
     fun createNewSession(): TimedTrackerData<*> = this.javaClass.getConstructor().newInstance()
 

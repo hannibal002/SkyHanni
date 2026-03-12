@@ -14,7 +14,6 @@ import java.util.EnumMap
 /**
  * Owns all session storage and navigation for a [TimedTrackerData] leaf.
  */
-@Suppress("TooManyFunctions")
 class TimedSessionContainer {
 
     @Expose
@@ -31,12 +30,6 @@ class TimedSessionContainer {
         }
     }
 
-    fun getEntries(displayMode: DisplayMode): MutableMap<String, TimedTrackerData<*>>? = sessions[displayMode]
-
-    fun putEntry(displayMode: DisplayMode, string: String, data: TimedTrackerData<*>) {
-        sessions.getOrPut(displayMode) { mutableMapOf() }[string] = data
-    }
-
     fun deleteEntry(displayMode: DisplayMode, string: String): TimedTrackerData<*>? {
         val display = sessions[displayMode] ?: return null
         val data = display[string] ?: return null
@@ -48,12 +41,10 @@ class TimedSessionContainer {
         return data
     }
 
-    fun getAllCurrentData(): Set<TimedTrackerData<*>> = sessions.keys.mapNotNull { getCurrentData(it) }.toSet()
+    fun getAllCurrentData(): Set<TimedTrackerData<*>> = sessions.keys.mapNotNull { getData(it) }.toSet()
 
-    fun getData(displayMode: DisplayMode, string: String): TimedTrackerData<*>? = getEntries(displayMode)?.get(string)
-
-    fun getCurrentData(displayMode: DisplayMode): TimedTrackerData<*>? =
-        getCurrentName(displayMode)?.let { getData(displayMode, it) }
+    fun getData(displayMode: DisplayMode, string: String? = getCurrentName(displayMode)): TimedTrackerData<*>? =
+        string?.let { sessions[displayMode]?.get(it) }
 
     /**
      * Sets the current pointer for [displayMode]. Pass null to follow the live name.
@@ -80,10 +71,9 @@ class TimedSessionContainer {
         return currentDisplays[displayMode] ?: getFromCurrent(displayMode)
     }
 
-    fun isCurrent(displayMode: DisplayMode, string: String): Boolean = string == getFromCurrent(displayMode)
-
-    fun isCurrent(displayMode: DisplayMode): Boolean =
-        !currentDisplays.containsKey(displayMode) || currentDisplays[displayMode] == null
+    fun isCurrent(displayMode: DisplayMode, string: String? = null): Boolean =
+        string?.let { it == getFromCurrent(displayMode) }
+            ?: (!currentDisplays.containsKey(displayMode) || currentDisplays[displayMode] == null)
 
     fun getFromCurrent(displayMode: DisplayMode): String =
         if (displayMode.isDate) getCurrentDateName(displayMode)
@@ -115,7 +105,7 @@ class TimedSessionContainer {
 
     @Suppress("UNCHECKED_CAST")
     fun getMostRecentName(displayMode: DisplayMode): String? {
-        val keys = getEntries(displayMode)?.keys ?: return null
+        val keys = sessions[displayMode]?.keys ?: return null
         val max = runCatching {
             keys.maxOfOrNull { displayMode.toValue(it) as Comparable<Any> }
         }.getOrElse { keys.firstOrNull() }
@@ -124,7 +114,7 @@ class TimedSessionContainer {
 
     @Suppress("UNCHECKED_CAST")
     fun getPrevNext(displayMode: DisplayMode, current: String): Pair<String?, String?> {
-        val keys = getEntries(displayMode)?.keys ?: return null to null
+        val keys = sessions[displayMode]?.keys ?: return null to null
         val sortedKeys = runCatching {
             keys.map { key -> key to (displayMode.toValue(key) as Comparable<Any>) }.sortedBy { it.second }
         }.getOrElse { keys.map { key -> key to key } }
