@@ -63,8 +63,8 @@ object ActiveBossTransparency {
             // always show last clicked mob
             if (mob == lastClickedMob) return
 
-            val type = mob.category
-            if (type == MobCategory.SLAYER) {
+            val category = mob.category
+            if (category == MobCategory.SLAYER) {
                 // hide own slayer boss
                 if (mob.belongsToPlayer()) return
 
@@ -74,13 +74,13 @@ object ActiveBossTransparency {
             }
 
             // maybe also hide other players
-            if (type == MobCategory.PLAYER) {
+            if (category == MobCategory.PLAYER) {
                 // always show current slayer carry customers
                 if (CarryTracker.isCustomer(mob.name)) return
 
                 if (!config.applyToPlayers) return
             }
-            if (type == MobCategory.PLAYER && !config.applyToPlayers) return
+            if (category == MobCategory.PLAYER && !config.applyToPlayers) return
         }
 
         event.newTransparency = config.transparencyLevel.coerceIn(15, 70)

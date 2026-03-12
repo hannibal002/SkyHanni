@@ -38,7 +38,7 @@ import java.util.UUID
  * @property baseEntity The main entity representing the Mob.
  *
  * Avoid caching, as it may change without notice.
- * @property category The type of the Mob.
+ * @property category The category of the Mob.
  * @property armorStand The armor stand entity associated with the Mob, if it has one.
  *
  * Avoid caching, as it may change without notice.
