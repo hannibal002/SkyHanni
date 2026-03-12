@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.WorldClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
@@ -27,7 +27,7 @@ object JacobContestStatsSummary {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN, priority = HandleEvent.HIGHEST)
     fun onCropClick(event: CropClickEvent) {
         if (!config.enabled) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != WorldClickType.LEFT_CLICK) return
 
         if (FarmingContestApi.inContest && event.crop == FarmingContestApi.contestCrop) {
             blocksBroken.addOrPut(event.crop, 1)

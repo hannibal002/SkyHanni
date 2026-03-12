@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.hunting
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.world.inventory.ClickType
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,12 +28,12 @@ object FusionKeybinds {
         when (InventoryUtils.openInventoryName()) {
             "Fusion Box" -> {
                 if (!config.repeatFusionKeybind.isKeyHeld() || config.confirmFusionKeybind.isKeyHeld()) return
-                InventoryUtils.clickSlot(47, mouseButton = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(47, mouseButton = 2, mode = ClickType.CLONE)
             }
 
             "Confirm Fusion" -> {
                 if (!config.confirmFusionKeybind.isKeyHeld() || config.repeatFusionKeybind.isKeyHeld()) return
-                InventoryUtils.clickSlot(33, mouseButton = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(33, mouseButton = 2, mode = ClickType.CLONE)
             }
         }
     }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.WorldClickType
 import net.minecraft.world.item.ItemStack
 
 // Left or right click into the world, with the item in hand
-class ItemClickEvent(itemInHand: ItemStack?, clickType: ClickType) : WorldClickEvent(itemInHand, clickType)
+class ItemClickEvent(itemInHand: ItemStack?, clickType: WorldClickType) : WorldClickEvent(itemInHand, clickType)

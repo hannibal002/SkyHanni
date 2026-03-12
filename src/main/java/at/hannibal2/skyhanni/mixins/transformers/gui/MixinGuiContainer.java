@@ -70,7 +70,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V", at = @At("HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo cir) {
-        skyhanni$hook.onMouseClick(slot, slotId, button, actionType.id(), cir);
+        skyhanni$hook.onMouseClick(slot, slotId, button, actionType, cir);
     }
 
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))

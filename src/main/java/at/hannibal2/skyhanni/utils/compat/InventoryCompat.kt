@@ -49,13 +49,12 @@ object InventoryCompat {
     /**
      * Internal method, not meant to be called directly. Prefer `InventoryUtils.mouseClickSlot()`.
      */
-    fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
+    fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: ClickType) {
         if (slot < 0) return
         val gui = Minecraft.getInstance().screen
         if (gui is AbstractContainerScreen<*>) {
             val slotObj = gui.menu.getSlot(slot)
-            val actionType = ClickType.entries[mode]
-            gui.slotClicked(slotObj, slot, mouseButton, actionType)
+            gui.slotClicked(slotObj, slot, mouseButton, mode)
         }
     }
 

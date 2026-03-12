@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.WorldClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -69,9 +69,9 @@ object WorldEdit {
         if (!isEnabled()) return
         if (event.itemInHand?.getItemId() != "WOOD_AXE") return
 
-        if (event.clickType == ClickType.LEFT_CLICK) {
+        if (event.clickType == WorldClickType.LEFT_CLICK) {
             leftPos = event.position.toBlockPos()
-        } else if (event.clickType == ClickType.RIGHT_CLICK) {
+        } else if (event.clickType == WorldClickType.RIGHT_CLICK) {
             rightPos = event.position.toBlockPos()
         }
     }

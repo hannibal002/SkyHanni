@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.WorldClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -496,7 +495,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !config.leftClickPigeon) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != WorldClickType.LEFT_CLICK) return
         if (event.itemInHand?.getInternalNameOrNull() != ROYAL_PIGEON) return
         nextSpot()
     }

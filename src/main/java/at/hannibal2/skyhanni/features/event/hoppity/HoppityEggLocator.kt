@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.WorldClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -185,7 +185,7 @@ object HoppityEggLocator {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
 
-        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem && lastClick.passedSince() >= 5.seconds) {
+        if (event.clickType == WorldClickType.RIGHT_CLICK && item.isLocatorItem && lastClick.passedSince() >= 5.seconds) {
             lastClick = SimpleTimeMark.now()
             MythicRabbitPetWarning.check()
             trySendingGraph()

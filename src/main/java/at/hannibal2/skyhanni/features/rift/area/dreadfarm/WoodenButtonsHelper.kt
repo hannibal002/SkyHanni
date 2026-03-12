@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.WorldClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftWoodenButtonsJson
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -113,7 +113,7 @@ object WoodenButtonsHelper {
     @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!checkButtons()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != WorldClickType.RIGHT_CLICK) return
         if (!event.itemInHand.isBlowgun) return
         lastBlowgunFire = SimpleTimeMark.now()
     }
