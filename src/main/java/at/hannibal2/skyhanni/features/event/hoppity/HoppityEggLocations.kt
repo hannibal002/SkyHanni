@@ -69,17 +69,6 @@ object HoppityEggLocations {
         locations += location
     }
 
-    fun removeInvalidCollectedEggs() {
-        val thisIsland = collectedEggStorage[SkyBlockUtils.currentIsland] ?: return
-
-        for (location in islandCollectedLocations) {
-            if (location !in islandLocations) {
-                ChatUtils.debug("removed $location")
-                thisIsland.remove(location)
-            }
-        }
-    }
-
     private var loadedNeuThisProfile = false
 
     @HandleEvent
