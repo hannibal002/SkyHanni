@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -23,7 +23,14 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
+import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.monthToLocalDate
+import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
+import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -37,6 +44,8 @@ import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import java.time.LocalDate
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,28 +56,27 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     private val getStorage: (ProfileSpecificStorage) -> Data,
     private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val trackUptime: Boolean = true,
-    private val trackerConfig: () -> Config,
     private val customUptimeControl: Boolean = false,
-    private val drawDisplay: (Data) -> List<Searchable>,
-
+    private val trackerConfig: () -> Config,
+    protected val drawDisplay: (Data) -> List<Searchable>,
 ) {
+    protected var inventoryOpen = false
+    internal var displayMode: DisplayMode? = null
     val trackerSpecificConfig: Config get() = trackerConfig()
     private val config: TrackerGenericConfig get() =
         if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
-    private var inventoryOpen = false
-    private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
+    protected val textInput = SearchTextInput()
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
-    val textInput = SearchTextInput()
 
     @SkyHanniModule
     companion object {
-        private val universalTracker get() = SkyHanniMod.feature.misc.tracker
-        private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+        internal val universalTracker get() = SkyHanniMod.feature.misc.tracker
+        internal val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
         private val unpausedTrackers: MutableSet<SkyHanniTracker<*, *>> = mutableSetOf()
 
         @HandleEvent
@@ -88,7 +96,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand() = ChatUtils.clickableChat(
+    open fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
@@ -140,12 +148,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
         val searchEnabled = config.trackerSearchEnabled.get()
         if (dirty || TrackerManager.dirty || (searchEnabled != wasSearchEnabled)) {
-            display = getSharedTracker()?.let {
-                val data = it.get(getDisplayMode())
-                val searchables = drawDisplay(data)
-                if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-                else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
-            }.orEmpty()
+            display = getDisplay()
             dirty = false
         }
         wasSearchEnabled = searchEnabled
@@ -157,7 +160,14 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         dirty = true
     }
 
-    private fun buildFinalDisplay(searchBox: Renderable) = buildList {
+    protected open fun getDisplay() = getSharedTracker()?.let {
+        val data = it.get(getDisplayMode())
+        val searchables = drawDisplay(data)
+        if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
+        else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
+    }.orEmpty()
+
+    protected open fun buildFinalDisplay(searchBox: Renderable) = buildList {
         add(searchBox)
         if (isEmpty()) return@buildList
         if (showSessionUptime()) add(buildSessionUptime())
@@ -169,7 +179,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         }
     }
 
-    private fun showSessionUptime(): Boolean =
+    fun showSessionUptime(): Boolean =
         config.showUptime.get() && (!config.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
 
     private fun checkAfk() {
@@ -192,7 +202,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
 
-    fun startSessionUptime() {
+    open fun startSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
@@ -200,7 +210,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    fun pauseSessionUptime() {
+    open fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
@@ -215,12 +225,14 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    private fun buildSessionUptime(): Renderable {
-        val sessionUptime = getTotalUptime() ?: return Renderable.empty()
+    fun isPaused(): Boolean = getCurrentStopwatch()?.isPaused() == true
+
+    fun buildSessionUptime(tracker: Data? = getDisplayModeTracker(getDisplayMode())): Renderable {
+        val sessionUptime = tracker?.getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
         val sessionList: List<String> = buildList {
-            getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
+            tracker.getSessionMap().entries.forEach {
                 if (it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
             }
         }
@@ -240,7 +252,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
-    private fun buildSessionResetButton() = Renderable.clickable(
+    protected fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
         tips = listOf(
             "§cThis will reset your",
@@ -255,11 +267,11 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         },
     )
 
-    private val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + extraDisplayModes.keys
+    protected open val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + this.extraDisplayModes.keys
 
-    private fun MutableList<Renderable>.buildDisplayModeView() {
+    protected open fun MutableList<Renderable>.buildDisplayModeView() {
         addRenderableNullableButton<DisplayMode>(
-            label = "Display Mode",
+            label = "Display Mode:",
             current = getDisplayMode(),
             onChange = { new ->
                 if (new == null) return@addRenderableNullableButton
@@ -271,7 +283,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
-    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
+    protected open fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
                 DisplayMode.TOTAL to ps.getTotal(),
@@ -346,10 +358,61 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         )
     }
 
-    enum class DisplayMode(private val displayName: String, val shortenedName: String = displayName) {
-        TOTAL("Total"),
-        SESSION("This Session", "Session"),
-        MAYOR("This Mayor", "Mayor"),
+    enum class DisplayMode(
+        val displayName: String,
+        val currentName: String = "This $displayName",
+        val alternateName: String = displayName,
+        val type: KClass<*>,
+        val toValue: (String) -> Comparable<*>?,
+        val fromValue: (Comparable<*>) -> String,
+        val isDate: Boolean = (type == LocalDate::class),
+    ) {
+        TOTAL(
+            "Total",
+            "Total",
+            type = String::class,
+            toValue = { it },
+            fromValue = { it as String }
+        ),
+        SESSION(
+            "Session",
+            type = Int::class,
+            toValue = { it.toIntOrNull() },
+            fromValue = { (it as Int).toString() }
+        ),
+        MAYOR(
+            "Mayor",
+            alternateName = "Mayor, Year",
+            type = Int::class,
+            toValue = { it.toIntOrNull() },
+            fromValue = { (it as Int).toString() }
+        ),
+        DAY(
+            "Day",
+            "Today",
+            alternateName = "Date",
+            type = LocalDate::class,
+            toValue = { it.dayToLocalDate() },
+            fromValue = { (it as LocalDate).toString() }
+        ),
+        WEEK(
+            "Week",
+            type = LocalDate::class,
+            toValue = { it.weekToLocalDate() },
+            fromValue = { (it as LocalDate).format(weekFormatter) }
+        ),
+        MONTH(
+            "Month",
+            type = LocalDate::class,
+            toValue = { it.monthToLocalDate() },
+            fromValue = { (it as LocalDate).format(monthFormatter) }
+        ),
+        YEAR(
+            "Year",
+            type = LocalDate::class,
+            toValue = { it.yearToLocalDate() },
+            fromValue = { (it as LocalDate).format(yearFormatter) }
+        )
         ;
 
         override fun toString(): String = displayName

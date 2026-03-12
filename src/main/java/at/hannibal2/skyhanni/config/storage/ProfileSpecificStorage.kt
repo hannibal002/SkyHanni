@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
@@ -570,9 +569,6 @@ class ProfileSpecificStorage(
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
-
-            @Expose
             var farmingLevel: Int = -1
 
             @Expose
@@ -598,9 +594,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
-
-            @Expose
-            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
