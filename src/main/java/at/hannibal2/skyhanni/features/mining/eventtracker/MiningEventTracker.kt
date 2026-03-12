@@ -197,6 +197,9 @@ object MiningEventTracker {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
+        val old = event.oldIsland
+        val new = event.newIsland
+        ChatUtils.chat("IslandChangeEvent: $old -> $new")
         if (apiError) canRequestAt = SimpleTimeMark.now()
     }
 
