@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
@@ -351,22 +353,24 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         )
     }
 
-    private fun copyOnClick(line: String, fullTipsLine: String, type: String) {
-        if (KeyboardManager.isShiftKeyDown()) ClipboardUtils.copyToClipboard(fullTipsLine)
-        else ClipboardUtils.copyToClipboard(line)
-        ChatUtils.chat("§eCopied $name $type to clipboard!")
+    private val copyOnClickConfig by lazy { CoroutineConfig("$name copy on click") }
+    private fun copyOnClick(line: String, fullTipsLine: String, type: String) = copyOnClickConfig.launch {
+        val copied = ClipboardUtils.copyToClipboardAsync(
+            if (KeyboardManager.isShiftKeyDown()) fullTipsLine
+            else line
+        ).await() ?: false
+        if (copied) ChatUtils.chat("§eCopied $name $type to clipboard!")
+        else ChatUtils.chat("§cFailed to copy $name $type to clipboard!")
     }
 
     fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
-            ChatUtils.chat(
-                componentBuilder {
-                    appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
-                    appendWithColor(": ", ChatFormatting.GRAY)
-                    append("§r$itemName")
-                }
-            )
+            componentBuilder {
+                appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                appendWithColor(": ", ChatFormatting.GRAY)
+                append("§r$itemName")
+            }.let(ChatUtils::chat)
         }
         if (itemTrackerConfig.warnings.title && price >= itemTrackerConfig.warnings.minimumTitle) {
             TitleManager.sendTitle("§a+ $itemName", weight = price)
@@ -386,13 +390,5 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
                 universe = ItemPriceSource.entries,
             )
         }
-    }
-
-    override fun hideInEstimatedItemValue(): Boolean {
-        return config.itemTracker.hideInEstimatedItemValue
-    }
-
-    override fun hideOutsideInventory(): Boolean {
-        return config.itemTracker.hideOutsideInventory
     }
 }

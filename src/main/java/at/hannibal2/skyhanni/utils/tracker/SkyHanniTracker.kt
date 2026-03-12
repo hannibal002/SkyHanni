@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -34,9 +35,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -85,9 +83,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     fun getPricePerOrNull(name: NeuInternalName) = name.getPriceOrNull(config.priceSource)
-
-    fun isInventoryOpen() = inventoryOpen
-
+    fun isInventoryOpen() = inventoryDetector.isInside()
     fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
@@ -119,24 +115,16 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    // used for Item tracker
-    open fun hideInEstimatedItemValue() = false
-    open fun hideOutsideInventory() = false
+    private val hideInEstimatedValue get() = (config as? ItemTrackerGenericConfig)?.itemTracker?.hideInEstimatedItemValue ?: false
+    private val hideOutsideInventory get() = (config as? ItemTrackerGenericConfig)?.itemTracker?.hideOutsideInventory ?: false
+    private val inventoryDetector = InventoryDetector(
+        { update() },
+        { update() },
+    ) { true }
 
     fun renderDisplay(position: Position) {
-        if (hideInEstimatedItemValue() && EstimatedItemValue.isCurrentlyShowing()) return
-
-        var currentlyOpen = Minecraft.getInstance().screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
-        if (!currentlyOpen && hideOutsideInventory() && this is SkyHanniItemTracker) {
-            return
-        }
-        if (RenderData.outsideInventory) {
-            currentlyOpen = false
-        }
-        if (inventoryOpen != currentlyOpen) {
-            inventoryOpen = currentlyOpen
-            update()
-        }
+        if (hideInEstimatedValue && EstimatedItemValue.isCurrentlyShowing()) return
+        if (!InventoryUtils.inAnyInventory() && hideOutsideInventory && this is SkyHanniItemTracker) return
 
         val searchEnabled = config.trackerSearchEnabled.get()
         if (dirty || TrackerManager.dirty || (searchEnabled != wasSearchEnabled)) {
@@ -161,7 +149,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         add(searchBox)
         if (isEmpty()) return@buildList
         if (showSessionUptime()) add(buildSessionUptime())
-        if (inventoryOpen) {
+        if (isInventoryOpen()) {
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
                 add(buildSessionResetButton())
@@ -186,10 +174,8 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    private fun getDisplayModeTracker(dispMode: DisplayMode? = displayMode) = dispMode?.let { getSharedTracker()?.get(it) }
-
+    private fun getDisplayModeTracker() = displayMode?.let { getSharedTracker()?.get(it) }
     fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
-
     fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
 
     fun startSessionUptime() {
@@ -229,13 +215,12 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
             Renderable.text("§eTotal Uptime: §b${sessionUptime.format()}$pausedText"),
             tips = buildList {
                 addAll(sessionList)
-                if (isTotalDisplay) {
-                    // Uptime added after trackers already had data
-                    addAll(
-                        "§eⓘ §7Uptime tracked only from",
-                        "§7SkyHanni version 6.0.0 onwards",
-                    )
-                }
+                if (!isTotalDisplay) return@buildList
+                // Uptime added after trackers already had data
+                addAll(
+                    "§eⓘ §7Uptime tracked only from",
+                    "§7SkyHanni version 6.0.0 onwards",
+                )
             }
         )
     }
@@ -274,15 +259,11 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
-                DisplayMode.TOTAL to ps.getTotal(),
-                DisplayMode.SESSION to ps.getCurrentSession(),
+                DisplayMode.TOTAL to getStorage(ps),
+                DisplayMode.SESSION to currentSessions.getOrPut(ps) { createNewSession() },
             ) + extraDisplayModes.mapValues { it.value(ps) },
         )
     }
-
-    private fun ProfileSpecificStorage.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
-
-    private fun ProfileSpecificStorage.getTotal(): Data = getStorage(this)
 
     private fun reset(displayMode: DisplayMode, message: String) {
         getSharedTracker()?.let {
@@ -298,11 +279,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         newValue
     }
 
-    fun firstUpdate() {
-        if (display.isEmpty()) {
-            update()
-        }
-    }
+    fun firstUpdate() = if (display.isEmpty()) update() else Unit
 
     fun initRenderer(
         position: () -> Position,
