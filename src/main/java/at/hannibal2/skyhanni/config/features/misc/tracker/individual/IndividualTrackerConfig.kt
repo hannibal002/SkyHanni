@@ -1,15 +1,19 @@
-package at.hannibal2.skyhanni.config.features.misc.tracker
+package at.hannibal2.skyhanni.config.features.misc.tracker.individual
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import java.lang.reflect.ParameterizedType
 
 // have to make this an abstract class and make subclasses that specify the types and add buttons
 // or else moulconfig causes a crash when the user clicks a button
+open class IndividualTrackerConfig : GenericIndividualTrackerConfig<TrackerGenericConfig>()
 abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig> {
     init {
         configSet.add(this)
@@ -23,12 +27,24 @@ abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig> {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Individual Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Individual Tracker Settings", desc = "")
     @Accordion
     val trackerConfig: Type = outTypeCtor.newInstance()
+
+    @ConfigOption(
+        name = "Universal Settings",
+        desc = "Click to open the universal tracker settings."
+    )
+    @ConfigEditorButton(buttonText = "OPEN")
+    open val universalTracker: Runnable = Runnable { config::tracker.jumpToEditor() }
+
+    @ConfigOption(
+        name = "Sync Settings",
+        desc = "Sync these settings with universal tracker settings. \n" +
+            "§c§lTHIS WILL OVERRIDE ALL OF YOUR CURRENT TRACKER SETTINGS!"
+    )
+    @ConfigEditorButton(buttonText = "SYNC")
+    open val syncButton: Runnable = Runnable { syncSettings() }
 
     // the first time a user launches the game with a build that includes individual tracker configs,
     // we sync every individual tracker with the universal tracker,
@@ -41,7 +57,7 @@ abstract class GenericIndividualTrackerConfig<out Type : TrackerGenericConfig> {
     @ConfigEditorBoolean
     var useUniversalConfig = false
 
-    fun syncSettings() {
+    open fun syncSettings() {
         trackerConfig.syncSettings()
         ChatUtils.debug("Synced tracker!")
     }

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualItemTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualItemTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -67,7 +67,7 @@ class CropFeverTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: GardenIndividualItemTrackerConfig = GardenIndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = CropFeverTrackerConfig::class, field = "enabled")

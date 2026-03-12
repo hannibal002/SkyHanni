@@ -27,7 +27,14 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper.Companion.NO_INVENTORY
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
+import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.monthToLocalDate
+import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
+import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -39,7 +46,10 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import java.lang.reflect.ParameterizedType
+import java.time.LocalDate
+import kotlin.collections.forEach
 import kotlin.collections.toList
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -84,8 +94,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = trackerConfig.trackerSearchEnabled.get()
     private var dirty = false
+    protected val textInput = SearchTextInput()
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
-    val textInput = SearchTextInput()
 
     init {
         RenderDisplayHelper(
@@ -103,8 +113,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
 
     @SkyHanniModule
     companion object {
-        private val universalTracker get() = SkyHanniMod.feature.misc.tracker
-        private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
+        internal val universalTracker get() = SkyHanniMod.feature.misc.tracker
+        internal val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
         private val unpausedTrackers: MutableSet<SkyHanniTracker<*>> = mutableSetOf()
 
         @HandleEvent
@@ -162,13 +172,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
 
         val searchEnabled = trackerConfig.trackerSearchEnabled.get()
         if (dirty || TrackerManager.dirty || searchEnabled != wasSearchEnabled) {
-            display = getSharedTracker()?.let {
-                val data = it.get(getDisplayMode())
-                val searchables = drawDisplayF(data)
-                val content = if (searchEnabled) searchables.buildSearchBox(textInput)
-                else Renderable.vertical(searchables.toRenderable())
-                buildFinalDisplay(content)
-            }.orEmpty()
+            display = getDisplay()
             dirty = false
         }
         wasSearchEnabled = searchEnabled
@@ -179,7 +183,14 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         dirty = true
     }
 
-    private fun buildFinalDisplay(searchBox: Renderable) = buildList {
+    protected open fun getDisplay() = getSharedTracker()?.let {
+        val data = it.get(getDisplayMode())
+        val searchables = drawDisplayF(data)
+        if (trackerConfig.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
+        else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
+    }.orEmpty()
+
+    protected open fun buildFinalDisplay(searchBox: Renderable) = buildList {
         add(searchBox)
         if (isEmpty()) return@buildList
         if (showSessionUptime()) add(buildSessionUptime())
@@ -203,20 +214,20 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         update()
     }
 
-    private fun getDisplayModeTracker() = displayMode?.let { getSharedTracker()?.get(it) }
-    fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
-    fun getCurrentStopwatch(): Stopwatch? = getDisplayModeTracker()?.getActiveStopwatch()
+    private fun DisplayMode?.getDisplayModeTracker() = this?.let { getSharedTracker()?.get(it) }
+    fun getTotalUptime(): Duration? = displayMode?.getDisplayModeTracker()?.getTotalUptime()
+    fun getCurrentStopwatch(): Stopwatch? = displayMode?.getDisplayModeTracker()?.getActiveStopwatch()
 
-    fun startSessionUptime() {
-        if (!trackUptime) return
+    open fun startSessionUptime() {
+        if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.start(true) }
         if (!customUptimeControl) unpausedTrackers.add(this)
         update()
     }
 
-    fun pauseSessionUptime() {
-        if (!trackUptime) return
+    open fun pauseSessionUptime() {
+        if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
         if (!customUptimeControl) unpausedTrackers.remove(this)
@@ -230,12 +241,14 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         update()
     }
 
-    private fun buildSessionUptime(): Renderable {
-        val sessionUptime = getTotalUptime() ?: return Renderable.empty()
+    fun isPaused(): Boolean = getCurrentStopwatch()?.isPaused() == true
+
+    fun buildSessionUptime(tracker: Data? = displayMode?.getDisplayModeTracker()): Renderable {
+        val sessionUptime = tracker?.getTotalUptime() ?: return Renderable.empty()
         val isTotalDisplay = displayMode == DisplayMode.TOTAL
         val pausedText = if (getCurrentStopwatch()?.isPaused() == true) " §c(Paused!)" else ""
         val sessionList = buildList {
-            getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
+            displayMode?.getDisplayModeTracker()?.getSessionMap()?.entries?.forEach {
                 if (it.value.getDuration() > 0.seconds) add("${it.key} Uptime: ${it.value.getDuration().format()}")
             }
         }
@@ -252,7 +265,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
-    private fun buildSessionResetButton() = Renderable.clickable(
+    protected fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
         tips = listOf("§cThis will reset your", "§ccurrent session of", "§c$name"),
         onLeftClick = {
@@ -263,11 +276,11 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         },
     )
 
-    private val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + extraDisplayModes.keys
+    protected open val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + this.extraDisplayModes.keys
 
-    private fun MutableList<Renderable>.buildDisplayModeView() {
+    protected open fun MutableList<Renderable>.buildDisplayModeView() {
         addRenderableNullableButton<DisplayMode>(
-            label = "Display Mode",
+            label = "Display Mode:",
             current = getDisplayMode(),
             onChange = { new ->
                 if (new == null) return@addRenderableNullableButton
@@ -283,7 +296,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         trackerConfig.defaultDisplayMode.get().mode ?: storedTrackers[name] ?: DisplayMode.TOTAL
     }.also { displayMode = it }
 
-    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
+    protected open fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
             mapOf(
                 DisplayMode.TOTAL to storageAccessor(ps),
@@ -315,10 +328,61 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
-    enum class DisplayMode(private val displayName: String, val shortenedName: String = displayName) {
-        TOTAL("Total"),
-        SESSION("This Session", "Session"),
-        MAYOR("This Mayor", "Mayor"),
+    enum class DisplayMode(
+        val displayName: String,
+        val currentName: String = "This $displayName",
+        val alternateName: String = displayName,
+        val type: KClass<*>,
+        val toValue: (String) -> Comparable<*>?,
+        val fromValue: (Comparable<*>) -> String,
+        val isDate: Boolean = (type == LocalDate::class),
+    ) {
+        TOTAL(
+            "Total",
+            "Total",
+            type = String::class,
+            toValue = { it },
+            fromValue = { it as String }
+        ),
+        SESSION(
+            "Session",
+            type = Int::class,
+            toValue = { it.toIntOrNull() },
+            fromValue = { (it as Int).toString() }
+        ),
+        MAYOR(
+            "Mayor",
+            alternateName = "Mayor, Year",
+            type = Int::class,
+            toValue = { it.toIntOrNull() },
+            fromValue = { (it as Int).toString() }
+        ),
+        DAY(
+            "Day",
+            "Today",
+            alternateName = "Date",
+            type = LocalDate::class,
+            toValue = { it.dayToLocalDate() },
+            fromValue = { (it as LocalDate).toString() }
+        ),
+        WEEK(
+            "Week",
+            type = LocalDate::class,
+            toValue = { it.weekToLocalDate() },
+            fromValue = { (it as LocalDate).format(weekFormatter) }
+        ),
+        MONTH(
+            "Month",
+            type = LocalDate::class,
+            toValue = { it.monthToLocalDate() },
+            fromValue = { (it as LocalDate).format(monthFormatter) }
+        ),
+        YEAR(
+            "Year",
+            type = LocalDate::class,
+            toValue = { it.yearToLocalDate() },
+            fromValue = { (it as LocalDate).format(yearFormatter) }
+        )
         ;
 
         override fun toString() = displayName

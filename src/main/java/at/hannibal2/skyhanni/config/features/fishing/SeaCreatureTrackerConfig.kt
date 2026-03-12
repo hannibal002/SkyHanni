@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.fishing
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
 import com.google.gson.annotations.Expose

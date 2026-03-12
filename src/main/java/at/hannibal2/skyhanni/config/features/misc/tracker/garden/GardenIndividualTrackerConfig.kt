@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class GardenIndividualTrackerConfig : GenericIndividualTrackerConfig<TrackerGenericConfig>() {
+class GardenIndividualTrackerConfig : IndividualTrackerConfig() {
     @ConfigOption(
         name = "Open Uptime Settings",
         desc = "The AFK timeout setting does not work for this tracker. Set in Garden Uptime Settings instead"
@@ -20,7 +20,7 @@ class GardenIndividualTrackerConfig : GenericIndividualTrackerConfig<TrackerGene
         desc = "Click to open the universal tracker settings."
     )
     @ConfigEditorButton(buttonText = "OPEN")
-    val universalTracker: Runnable = Runnable { config::tracker.jumpToEditor() }
+    override val universalTracker: Runnable = Runnable { config::tracker.jumpToEditor() }
 
     @ConfigOption(
         name = "Sync Settings",
@@ -28,5 +28,5 @@ class GardenIndividualTrackerConfig : GenericIndividualTrackerConfig<TrackerGene
             "§c§lTHIS WILL OVERRIDE ALL OF YOUR CURRENT TRACKER SETTINGS!"
     )
     @ConfigEditorButton(buttonText = "SYNC")
-    val syncButton: Runnable = Runnable { syncSettings() }
+    override val syncButton: Runnable = Runnable { syncSettings() }
 }

@@ -17,8 +17,8 @@ abstract class TrackerData<T : SessionUptime> : Resettable {
         val jClass = genericSuper.actualTypeArguments[0] as Class<T>
         jClass.kotlin
     }
-
     @Expose
+    private var migrated = false
     @SerializedName("sessionUptime")
     private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
 
@@ -27,7 +27,6 @@ abstract class TrackerData<T : SessionUptime> : Resettable {
         return sessionUptimeInternal as MutableMap<SessionUptime, Stopwatch>
     }
 
-    private var migrated = false
 
     override fun reset() {
         super.reset()

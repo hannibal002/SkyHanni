@@ -276,7 +276,7 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         }
 
         val coinFormat = "coin".pluralize(profit.toInt())
-        val text = "§e${getDisplayMode().shortenedName} Profit: $profitPrefix$profitFormat $coinFormat"
+        val text = "§e${getDisplayMode()} Profit: $profitPrefix$profitFormat $coinFormat"
 
         val profitRenderable = Renderable.clickable(
             text,
