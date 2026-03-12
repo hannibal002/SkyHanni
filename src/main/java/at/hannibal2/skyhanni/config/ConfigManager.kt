@@ -23,8 +23,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -43,19 +41,9 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.days
 
-private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
-    return if (SkyHanniMod.isBetaVersion) {
-        registerTypeAdapterFactory(create)
-    } else this
-}
-
 class ConfigManager {
     companion object {
-
-        val gson: Gson = BaseGsonBuilder.gson()
-//             .registerIfBeta(FeatureTogglesByDefaultAdapter)
-            .create()
-
+        val gson: Gson = BaseGsonBuilder.gson().create()
         val configDirectory = File("config/skyhanni")
     }
 
@@ -81,7 +69,8 @@ class ConfigManager {
 
 
         for (fileType in ConfigFileType.entries) {
-            setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance()))
+            val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
+            setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, clazzInstance))
         }
 
         // TODO use SecondPassedEvent
