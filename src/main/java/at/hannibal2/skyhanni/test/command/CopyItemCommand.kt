@@ -29,7 +29,7 @@ object CopyItemCommand {
         put("lore") {
             getLoreComponent().joinToString("\n") { it.formattedTextCompat().quoteWrap(true) }
         }
-        put ("_spacer") { "" }
+        put("_spacer") { "" }
         put("nbt attributes") {
             val attributeNBT = extraAttributes.getReadableNBTDump()
             if (attributeNBT.isEmpty()) "no tag compound"

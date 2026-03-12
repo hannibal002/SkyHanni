@@ -16,7 +16,7 @@ class ExcavatorProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericCon
     @ConfigOption(name = "Enabled", desc = "Count all drops you gain while excavating in the Fossil Research Center.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -32,14 +32,11 @@ class ExcavatorProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericCon
     var showFossilDust: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(-380, 150)
+    override val position: Position = Position(-380, 150)
 }

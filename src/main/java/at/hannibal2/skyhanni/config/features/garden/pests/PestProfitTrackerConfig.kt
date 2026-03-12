@@ -71,10 +71,7 @@ class PestProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> 
     val coinsPerBit: Property<Int> = Property.of(700)
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: GardenIndividualItemTrackerConfig = GardenIndividualItemTrackerConfig()
 

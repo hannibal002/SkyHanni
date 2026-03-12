@@ -45,7 +45,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object DarkMonolithFeatures :  SkyHanniItemTracker<DarkMonolithFeatures.Data>("Dark Monolith Tracker") {
+object DarkMonolithFeatures : SkyHanniItemTracker<DarkMonolithFeatures.Data>("Dark Monolith Tracker") {
     private val darkMonolithConfig get() = SkyHanniMod.feature.mining.darkMonolith
     override val config get() = darkMonolithConfig.tracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.darkMonolithTracker }

@@ -25,10 +25,7 @@ class ShinyOrbTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     var holdingItems: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 

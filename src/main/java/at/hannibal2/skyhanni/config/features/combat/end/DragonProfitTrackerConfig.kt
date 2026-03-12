@@ -36,10 +36,7 @@ class DragonProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig
     var countLeechedDragons: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }

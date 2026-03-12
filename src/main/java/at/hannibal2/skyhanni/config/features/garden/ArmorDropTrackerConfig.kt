@@ -2,11 +2,10 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.TrackerGenericConfig
-import com.google.gson.annotations.Expose
 import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualTrackerConfig
+import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -26,10 +25,7 @@ class ArmorDropTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     var hideChat: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: GardenIndividualTrackerConfig = GardenIndividualTrackerConfig()
 

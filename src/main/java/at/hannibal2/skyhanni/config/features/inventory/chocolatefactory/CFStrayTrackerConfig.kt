@@ -25,5 +25,5 @@ class CFStrayTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
 
     @Expose
     @ConfigLink(owner = CFStrayTrackerConfig::class, field = "enabled")
-    override  val position: Position = Position(300, 300)
+    override val position: Position = Position(300, 300)
 }

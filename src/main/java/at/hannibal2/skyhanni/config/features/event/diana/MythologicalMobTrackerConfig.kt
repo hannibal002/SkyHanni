@@ -42,10 +42,7 @@ class MythologicalMobTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig>
     var shardWarn: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 }

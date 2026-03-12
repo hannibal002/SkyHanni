@@ -66,7 +66,7 @@ object CrystalNucleusTracker : SkyHanniItemTracker<CrystalNucleusTracker.Data>("
      */
     private val balRarityPattern by patternGroup.pattern(
         "bal.rarity",
-        ".+§(?<raritycolor>[65])Bal.+"
+        ".*§(?<raritycolor>[65])Bal.*"
     )
 
     data class Data(

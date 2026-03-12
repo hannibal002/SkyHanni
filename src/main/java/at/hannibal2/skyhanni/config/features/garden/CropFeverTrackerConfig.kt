@@ -65,10 +65,7 @@ class CropFeverTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 

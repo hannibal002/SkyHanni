@@ -83,8 +83,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
     private val githubRepoLocation: GitHubUtils.RepoLocation
-        get() = GitHubUtils.RepoLocation(config.location,  SkyHanniMod.feature.dev.debug.logRepoErrors)
+        get() = GitHubUtils.RepoLocation(config.location, SkyHanniMod.feature.dev.debug.logRepoErrors)
     private val repoMutex = Mutex()
+    val repoLocked get() = repoMutex.isLocked
     private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
@@ -171,6 +172,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
 
     @PublishedApi
+    @Suppress("InjectDispatcher")
     internal suspend inline fun <reified T : Any> getRepoDataAsync(
         directory: String,
         fileName: String,

@@ -79,10 +79,7 @@ class ForagingTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     var showWholeTrees: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }

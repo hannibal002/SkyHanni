@@ -23,7 +23,7 @@ class EnderNodeConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    override var enabled: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -98,14 +98,11 @@ class EnderNodeConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    override val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 
     @Expose
     @ConfigLink(owner = EnderNodeConfig::class, field = "enabled")
-    val position: Position = Position(10, 80)
+    override val position: Position = Position(10, 80)
 }

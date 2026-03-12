@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -40,6 +41,7 @@ import java.util.ServiceLoader
 object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
     private val storage get() = ProfileStorageData.orderedWaypointsRoutes
+    private val loadConfig = CoroutineConfig("ordered waypoints load")
 
     private var orderedWaypointsList = Waypoints<SkyHanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
@@ -159,9 +161,9 @@ object OrderedWaypoints {
                 arg(
                     "name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { getRouteNames() },
                 ) { name ->
-                    coroutineSimpleCallback { load(getArg(name)) }
+                    coroutineSimpleCallback(loadConfig) { load(getArg(name)) }
                 }
-                coroutineSimpleCallback { load("") }
+                coroutineSimpleCallback(loadConfig) { load("") }
             }
             literal("unload", "clear") {
                 description = "Unloads the current ordered waypoints."

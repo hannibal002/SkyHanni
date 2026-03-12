@@ -87,10 +87,7 @@ class FrozenTreasureConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     var hideMessages: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
 

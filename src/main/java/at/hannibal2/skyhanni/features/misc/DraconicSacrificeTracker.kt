@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -27,11 +28,14 @@ import com.google.gson.annotations.Expose
 import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
-object DraconicSacrificeTracker {
+object DraconicSacrificeTracker : SkyHanniItemTracker<DraconicSacrificeTracker.Data>("Draconic Sacrifice Profit Tracker") {
+    override val config get() = SkyHanniMod.feature.combat.endIsland.draconicSacrificeTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.draconicSacrificeTracker }
+    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
 
-    private val config get() = SkyHanniMod.feature.combat.endIsland.draconicSacrificeTracker
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Boots §r§einto §r§d3 Dragon Essence§r§e!
      * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Helmet §r§einto §r§d3 Dragon Essence§r§e!
@@ -50,16 +54,7 @@ object DraconicSacrificeTracker {
         "bonus",
         "§c§lBONUS LOOT! §r§eYou also received §r(?:§\\w(?<amount>\\d+)?x)?(?: §r)?(?<item>.*) §r§efrom your sacrifice!",
     )
-
-    private val tracker =
-        SkyHanniItemTracker(
-            "Draconic Sacrifice Profit Tracker",
-            ::Data,
-            { it.draconicSacrificeTracker },
-            trackerConfig = { config.perTrackerConfig }
-        ) {
-            drawDisplay(it)
-        }
+    // </editor-fold>
 
     private val altarArea = AABB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
     private val ESSENCE_DRAGON = "ESSENCE_DRAGON".toInternalName()
@@ -67,7 +62,7 @@ object DraconicSacrificeTracker {
     data class Data(
         @Expose var itemsSacrificed: Long = 0L,
         @Expose var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf(),
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / itemsSacrificed
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -88,9 +83,9 @@ object DraconicSacrificeTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§5§lDraconic Sacrifice Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this)
+        val profit = drawItems(data, { true }, this)
 
         add(
             Renderable.hoverTips(
@@ -100,9 +95,9 @@ object DraconicSacrificeTracker {
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice", duration, "Sacrifices"))
+        addAll(addTotalProfit(profit, data.itemsSacrificed, "sacrifice", duration, "Sacrifices"))
 
-        tracker.addPriceFromButton(this)
+        addPriceFromButton(this)
     }
 
     @HandleEvent
@@ -110,8 +105,8 @@ object DraconicSacrificeTracker {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")
-            tracker.addItem(ESSENCE_DRAGON, amount, command = false)
-            tracker.modify {
+            addItem(ESSENCE_DRAGON, amount, command = false)
+            modify {
                 it.itemsSacrificed += 1
                 it.sacrificedItemsMap.addOrPut(item, 1)
             }
@@ -121,13 +116,9 @@ object DraconicSacrificeTracker {
             val item = group("item")
             val amount = groupOrNull("amount")?.toInt() ?: 1
             val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
-            tracker.addItem(internalName, amount, command = false)
+            addItem(internalName, amount, command = false)
         }
-        tracker.update()
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+        update()
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -142,7 +133,7 @@ object DraconicSacrificeTracker {
         event.registerBrigadier("shresetdraconicsacrificetracker") {
             description = "Resets the Draconic Sacrifice Tracker."
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

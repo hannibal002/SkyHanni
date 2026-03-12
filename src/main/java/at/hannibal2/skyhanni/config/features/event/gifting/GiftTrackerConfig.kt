@@ -31,10 +31,7 @@ class GiftTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig> {
     var holdingGift: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 

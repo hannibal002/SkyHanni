@@ -41,10 +41,7 @@ class ExperimentsProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericC
     var bottleWarnings: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 

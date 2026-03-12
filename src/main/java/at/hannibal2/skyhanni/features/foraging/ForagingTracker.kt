@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -38,7 +37,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -61,7 +59,7 @@ private typealias DropCategory = ForagingTrackerConfig.TreeGiftBonusDropCategory
 object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.BucketData>(
     "Foraging Tracker",
 ) {
-    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.foraging.trackerData}
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.foraging.trackerData }
     override val config get() = SkyHanniMod.feature.foraging.tracker
     override val onlyOnIslandTag: IslandTypeTag = IslandTypeTags.FORAGING_CUSTOM_TREES
     override val renderCondition: () -> Boolean = { heldItemEnabled() && config.enabled }

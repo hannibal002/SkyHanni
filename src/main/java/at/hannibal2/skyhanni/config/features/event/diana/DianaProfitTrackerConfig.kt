@@ -23,10 +23,7 @@ class DianaProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerGenericConfig>
     override var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
     override val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
