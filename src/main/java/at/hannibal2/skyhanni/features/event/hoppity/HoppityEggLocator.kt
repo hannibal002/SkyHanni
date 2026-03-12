@@ -130,6 +130,7 @@ object HoppityEggLocator {
                 // TODO add chroma color support via config
                 drawColor(eggLocation, LorenzColor.RED.toChromaColor(), false, alpha)
                 drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
+
             }
         }
     }
@@ -137,6 +138,7 @@ object HoppityEggLocator {
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
         val shouldMarkDuplicate = waypointsConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
+
         if (!shouldMarkDuplicate) {
             drawWaypointFilled(location, waypointsConfig.color.toColor(), seeThroughBlocks = true)
         } else {

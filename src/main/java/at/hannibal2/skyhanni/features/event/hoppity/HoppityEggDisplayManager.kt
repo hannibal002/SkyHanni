@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -82,8 +83,13 @@ object HoppityEggDisplayManager {
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
                 val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
-                val collectedFormat = formatEggsCollected(collectedEggs)
+                val percentage = collectedEggs.toDouble() / totalEggs.toDouble()
+                val collectedFormat = formatEggsCollected(percentage)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+                if (percentage > 1) {
+                    ChatUtils.debug("removeInvalidCollectedEggs! $collectedEggs/$totalEggs in ${SkyBlockUtils.currentIsland}")
+                    HoppityEggLocations.removeInvalidCollectedEggs()
+                }
             }
         }.map { CFApi.partyModeReplace(it) }
 
@@ -110,11 +116,11 @@ object HoppityEggDisplayManager {
         )
     }
 
-    private fun formatEggsCollected(collectedEggs: Int): String =
-        when (collectedEggs) {
-            in 0 until 5 -> "§c"
-            in 5 until 10 -> "§6"
-            in 10 until 15 -> "§e"
+    private fun formatEggsCollected(collectedEggs: Double): String =
+        when {
+            collectedEggs < 0.3 -> "§c"
+            collectedEggs < 0.6 -> "§6"
+            collectedEggs < 0.9 -> "§e"
             else -> "§a"
         }
 }
