@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.MobType
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -39,7 +38,7 @@ import java.util.UUID
  * @property baseEntity The main entity representing the Mob.
  *
  * Avoid caching, as it may change without notice.
- * @property mobType The type of the Mob.
+ * @property category The type of the Mob.
  * @property armorStand The armor stand entity associated with the Mob, if it has one.
  *
  * Avoid caching, as it may change without notice.
@@ -76,7 +75,7 @@ import java.util.UUID
 @Suppress("TooManyFunctions")
 class Mob(
     var baseEntity: LivingEntity,
-    val mobType: MobType,
+    val category: MobCategory,
     var armorStand: ArmorStand? = null,
     val name: String = "",
     additionalEntities: List<LivingEntity>? = null,
@@ -119,7 +118,7 @@ class Mob(
     /**
      * @property isRunic does not change.
      */
-    val isRunic = !RiftApi.inRift() && armorStand?.name.formattedTextCompatLessResets().startsWith("§5") && mobType == Type.BASIC
+    val isRunic = !RiftApi.inRift() && armorStand?.name.formattedTextCompatLessResets().startsWith("§5") && category == MobCategory.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
@@ -195,7 +194,7 @@ class Mob(
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
         owner = (
-            ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
+            ownerName ?: if (category == MobCategory.SLAYER) hologram2?.let {
                 summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
             )?.let { MobUtils.OwnerShip(it) }
@@ -290,7 +289,7 @@ class Mob(
     fun getLorenzVec() = baseEntity.getLorenzVec()
 }
 
-enum class MobType {
+enum class MobCategory {
     DISPLAY_NPC,
     SUMMON,
     BASIC,
