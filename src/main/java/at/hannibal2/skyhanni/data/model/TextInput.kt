@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import kotlinx.coroutines.runBlocking
-import net.minecraft.client.KeyMapping
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 open class TextInput {
 
@@ -81,23 +79,15 @@ open class TextInput {
             disable()
         }
 
-        @Suppress("UnusedParameter")
-        fun onMinecraftInput(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-            if (activeInstance != null) {
-                cir.returnValue = false
-                return
-            }
-        }
+        @JvmStatic
+        fun shouldCancelMinecraftInput(): Boolean = activeInstance != null
 
-        fun onGuiInput(ci: CallbackInfoReturnable<Boolean>) {
-            if (activeInstance != null) {
-                if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) {
-                    disable()
-                } else {
-                    ci.setReturnValue(false)
-                }
-                return
-            }
+        @JvmStatic
+        fun shouldCancelGuiInput(): Boolean {
+            if (activeInstance == null) return false
+            val escHeld = GLFW.GLFW_KEY_ESCAPE.isKeyHeld()
+            if (escHeld) disable()
+            return !escHeld
         }
 
         private var carriage

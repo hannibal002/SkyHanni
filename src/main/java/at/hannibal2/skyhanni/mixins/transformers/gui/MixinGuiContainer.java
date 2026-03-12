@@ -35,7 +35,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;onClose()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
-        skyhanni$hook.closeWindowPressed(cir);
+        if (skyhanni$hook.shouldCancelCloseWindow()) cir.setReturnValue(false);
     }
 
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V"))
@@ -45,7 +45,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyhanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
+        if (skyhanni$hook.shouldCancelPreDraw(context, mouseX, mouseY, deltaTicks)) ci.cancel();
     }
 
     @Inject(method = "render", at = @At("TAIL"))
@@ -60,7 +60,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(GuiGraphics guiGraphics, Slot slot, /*? if > 1.21.10 {*/ /*int i, int j, *//*?}*/ CallbackInfo ci) {
-        skyhanni$hook.onDrawSlot(slot, ci);
+        if (skyhanni$hook.shouldCancelDrawSlot(slot)) ci.cancel();
     }
 
     @Inject(method = "renderSlot", at = @At("RETURN"))
@@ -69,8 +69,8 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     }
 
     @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V", at = @At("HEAD"), cancellable = true)
-    private void onMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo cir) {
-        skyhanni$hook.onMouseClick(slot, slotId, button, actionType.id(), cir);
+    private void onMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
+        if (skyhanni$hook.shouldCancelMouseClick(slot, slotId, button, actionType.id())) ci.cancel();
     }
 
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))

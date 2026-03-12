@@ -15,7 +15,6 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -28,28 +27,28 @@ object GardenCustomKeybinds {
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
 
     @JvmStatic
-    fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
+    fun isKeyDown(keyBinding: KeyMapping): Boolean? {
+        if (!isActive()) return null
         val override = map[keyBinding] ?: run {
             if (map.containsValue(keyBinding.key.value)) {
-                cir.returnValue = false
+                return false
             }
-            return
+            return null
         }
 
-        cir.returnValue = override.isKeyHeld()
+        return override.isKeyHeld()
     }
 
     @JvmStatic
-    fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
+    fun isKeyPressed(keyBinding: KeyMapping): Boolean? {
+        if (!isActive()) return null
         val override = map[keyBinding] ?: run {
             if (map.containsValue(keyBinding.key.value)) {
-                cir.returnValue = false
+                return false
             }
-            return
+            return null
         }
-        cir.returnValue = override.isKeyClicked()
+        return override.isKeyClicked()
     }
 
     @HandleEvent

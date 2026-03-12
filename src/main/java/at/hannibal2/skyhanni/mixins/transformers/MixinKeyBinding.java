@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
 import at.hannibal2.skyhanni.test.graph.GraphEditor;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.ToggleKeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.ToggleKeyMapping;
 
 @Mixin(KeyMapping.class)
 public class MixinKeyBinding {
@@ -22,20 +22,22 @@ public class MixinKeyBinding {
     @Inject(method = "isDown", at = @At("HEAD"), cancellable = true)
     public void noIsKeyDown(CallbackInfoReturnable<Boolean> cir) {
         KeyMapping keyBinding = (KeyMapping) (Object) this;
-        GardenCustomKeybinds.isKeyDown(keyBinding, cir);
+        Boolean override = GardenCustomKeybinds.isKeyDown(keyBinding);
+        if (override != null)  cir.setReturnValue(override);
         if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
             if (stickyKeyBinding.needsToggle.getAsBoolean()) {
                 return;
             }
         }
-        TextInput.Companion.onMinecraftInput(keyBinding, cir);
-        GraphEditor.INSTANCE.onMinecraftInput(keyBinding, cir);
+        if (TextInput.shouldCancelMinecraftInput()) cir.setReturnValue(false);
+        if (GraphEditor.shouldCancelMinecraftInput(keyBinding)) cir.setReturnValue(false);
     }
 
     @Inject(method = "consumeClick", at = @At("HEAD"), cancellable = true)
     public void noIsPressed(CallbackInfoReturnable<Boolean> cir) {
         KeyMapping keyBinding = (KeyMapping) (Object) this;
-        GardenCustomKeybinds.isKeyPressed(keyBinding, cir);
+        Boolean override = GardenCustomKeybinds.isKeyPressed(keyBinding);
+        if (override != null) cir.setReturnValue(override);
         if (cir.isCancelled()) {
             this.clickCount = 0;
         }
@@ -44,7 +46,7 @@ public class MixinKeyBinding {
                 return;
             }
         }
-        TextInput.Companion.onMinecraftInput(keyBinding, cir);
-        GraphEditor.INSTANCE.onMinecraftInput(keyBinding, cir);
+        if (TextInput.shouldCancelMinecraftInput()) cir.setReturnValue(false);
+        if (GraphEditor.shouldCancelMinecraftInput(keyBinding)) cir.setReturnValue(false);
     }
 }

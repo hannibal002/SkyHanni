@@ -55,7 +55,7 @@ public abstract class MixinHandledScreen {
 
     @Inject(method = "render", at = @At(value = "TAIL"), cancellable = true)
     private void renderTail(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
+        if (new DrawScreenAfterEvent(context, mouseX, mouseY).post()) ci.cancel();
     }
 
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
@@ -76,7 +76,7 @@ public abstract class MixinHandledScreen {
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void keyPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
         int keyCode = input.input();
-        TextInput.Companion.onGuiInput(cir);
+        if (TextInput.shouldCancelGuiInput()) cir.setReturnValue(false);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
         if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
