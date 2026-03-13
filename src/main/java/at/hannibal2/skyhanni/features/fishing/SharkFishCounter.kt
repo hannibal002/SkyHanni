@@ -29,7 +29,6 @@ object SharkFishCounter {
         BLUE("Blue", LorenzColor.BLUE),
         TIGER("Tiger", LorenzColor.DARK_PURPLE),
         GREAT_WHITE("Great White", LorenzColor.GOLD),
-        ;
     }
 
     private val counterMap = enumMapOf<SharkType, Int>()
@@ -42,8 +41,7 @@ object SharkFishCounter {
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
-        val eventName = event.seaCreature.name
-        if (!eventName.contains("Shark")) return
+        val eventName = event.seaCreature.name.takeIf { it.contains("Shark") } ?: return
         val shark = SharkType.entries.find { shark ->
             eventName.contains(shark.displayName)
         } ?: return
