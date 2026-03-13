@@ -41,8 +41,7 @@ object SharkFishCounter {
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
-        val eventName = event.seaCreature.name
-        if (!eventName.contains("Shark")) return
+        val eventName = event.seaCreature.name.takeIf { it.contains("Shark") } ?: return
         val shark = SharkType.entries.find { shark ->
             eventName.contains(shark.displayName)
         } ?: return
