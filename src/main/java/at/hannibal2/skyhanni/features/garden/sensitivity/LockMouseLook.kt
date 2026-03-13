@@ -20,17 +20,16 @@ object LockMouseLook {
      * REGEX-TEST: §aTeleported you to §r§aPlot
      */
     private val gardenTeleportPattern by RepoPattern.pattern(
-        "chat.garden.teleport",
-        "§aTeleported you to .*",
+        "chat.garden.teleport.colorless",
+        "Teleported you to .*",
     )
 
     private val config get() = SkyHanniMod.feature.misc
     private val isActive get() = MouseSensitivityManager.SensitivityState.LOCKED.isActive()
+    private val lockedRenderable by lazy { Renderable.text("§eMouse Locked") }
 
     @HandleEvent
-    fun onWorldChange() {
-        unlockMouse()
-    }
+    fun onWorldChange() = unlockMouse()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
@@ -56,18 +55,10 @@ object LockMouseLook {
         }
     }
 
-    private fun toggleLock() {
-        if (isActive) {
-            unlockMouse()
-        } else {
-            lockMouse()
-        }
-    }
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive) return
-        config.lockedMouseDisplay.renderRenderable(Renderable.text("§eMouse Locked"), posLabel = "Mouse Locked")
+        config.lockedMouseDisplay.renderRenderable(lockedRenderable, posLabel = "Mouse Locked")
     }
 
     @HandleEvent
@@ -76,7 +67,9 @@ object LockMouseLook {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
-            simpleCallback { toggleLock() }
+            simpleCallback {
+                if (isActive) unlockMouse() else lockMouse()
+            }
         }
     }
 }

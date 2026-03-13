@@ -27,7 +27,7 @@ object DungeonMilestonesDisplay {
      * REGEX-TEST: Tank Milestone ❷: You have tanked and dealt 180,000 Total Damage so far! 16s
      */
     private val milestonePattern by RepoPattern.pattern(
-        "dungeon.milestone",
+        "dungeon.milestone.colorless",
         ".*Milestone .: You have (?:tanked and )?(?:dealt|healed) *.*so far! .*",
     )
 
