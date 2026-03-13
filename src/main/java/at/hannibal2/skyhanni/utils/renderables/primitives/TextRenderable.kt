@@ -20,6 +20,16 @@ fun Renderable.Companion.text(
 ) = StringRenderable(text, scale, color, horizontalAlign, verticalAlign)
 
 fun Renderable.Companion.text(
+    scale: Double = 1.0,
+    color: Color = Color.WHITE,
+    horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+    verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+    builder: StringBuilder.() -> Unit = {},
+) = builder.invoke(StringBuilder()).toString().let { constructed ->
+    StringRenderable(constructed, scale, color, horizontalAlign, verticalAlign)
+}
+
+fun Renderable.Companion.text(
     text: Component,
     scale: Double = 1.0,
     color: Color = Color.WHITE,

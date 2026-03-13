@@ -97,24 +97,22 @@ object CurrentChatDisplay {
         }
     }
 
-    private fun drawDisplay() = Renderable.text(
-        buildString {
-            val chat = currentChat ?: return@buildString
-            append("§aChat: ")
-            if (chat == ChatType.PRIVATE) {
-                append(privateMessagePlayer?.let { "§6$it " } ?: "§cUnknown ")
-                append(if (privateMessageEnd.isInPast()) "§c(EXPIRED)" else "§b${privateMessageEnd.timeUntil().format()}")
-                return@buildString
-            }
-            append(chat.displayName)
-            if (chat != ChatType.PARTY) return@buildString
-            val size = PartyApi.partyMembers.size
-            append(
-                if (size == 0) " §c(NOT IN PARTY)"
-                else " §a(${size + 1} members)", // Add 1 because the party list in PartyApi doesn't include yourself
-            )
-        },
-    )
+    private fun drawDisplay() = Renderable.text {
+        val chat = currentChat ?: return@text
+        append("§aChat: ")
+        if (chat == ChatType.PRIVATE) {
+            append(privateMessagePlayer?.let { "§6$it " } ?: "§cUnknown ")
+            append(if (privateMessageEnd.isInPast()) "§c(EXPIRED)" else "§b${privateMessageEnd.timeUntil().format()}")
+            return@text
+        }
+        append(chat.displayName)
+        if (chat != ChatType.PARTY) return@text
+        val size = PartyApi.partyMembers.size
+        append(
+            if (size == 0) " §c(NOT IN PARTY)"
+            else " §a(${size + 1} members)", // Add 1 because the party list in PartyApi doesn't include yourself
+        )
+    }
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
