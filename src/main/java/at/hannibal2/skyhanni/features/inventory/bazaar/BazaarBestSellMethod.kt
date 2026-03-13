@@ -82,6 +82,7 @@ object BazaarBestSellMethod {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
+        val display = display ?: return
         config.bestSellMethodPos.renderRenderable(display, posLabel = "Bazaar Best Sell Method")
     }
 

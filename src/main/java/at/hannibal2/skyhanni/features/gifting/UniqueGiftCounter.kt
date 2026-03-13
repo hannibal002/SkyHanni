@@ -35,7 +35,6 @@ object UniqueGiftCounter {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Generow") return
         val item = event.inventoryItems[40] ?: return
-
         val storage = storage ?: return
 
         giftedAmountPattern.firstMatcher(item.getLore()) {
@@ -69,6 +68,7 @@ object UniqueGiftCounter {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        val display = display ?: return
 
         config.position.renderRenderable(
             display,
