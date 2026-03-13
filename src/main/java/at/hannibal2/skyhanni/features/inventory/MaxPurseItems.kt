@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -86,14 +87,12 @@ object MaxPurseItems {
             (currentPurse / it).toInt()
         } ?: 0
 
-        config.maxPurseItemsPosition.renderStrings(
-            listOf(
-                "§7Max items with purse",
-                "§7Buy order +0.1: §e${buyOrders.addSeparators()}x",
-                "§7Instant buy: §e${buyInstant.addSeparators()}x",
-            ),
-            posLabel = "Max Items With Purse",
-        )
+        val display = buildList {
+            addString("§7Max items with purse")
+            addString("§7Buy order +0.1: §e${buyOrders.addSeparators()}x")
+            addString("§7Instant buy: §e${buyInstant.addSeparators()}x")
+        }
+        config.maxPurseItemsPosition.renderRenderables(display, posLabel = "Max Items With Purse")
     }
 
     fun isEnabled(): Boolean {
