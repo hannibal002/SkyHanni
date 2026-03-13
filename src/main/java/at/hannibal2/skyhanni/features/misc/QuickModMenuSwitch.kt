@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getPublicFieldValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -87,7 +87,7 @@ object QuickModMenuSwitch {
         else -> false
     }
 
-    private fun handleAbstractGuis(openGui: String): String {
+    private fun handleAbstractGuis(openGui: String): String =
         if (openGui == "gg.essential.vigilance.gui.SettingsGui") {
             val clazz = Class.forName("gg.essential.vigilance.gui.SettingsGui")
             val titleBarDelegate = clazz.getPrivateFieldValue("titleBar\$delegate", Minecraft.getInstance().screen)
@@ -95,28 +95,17 @@ object QuickModMenuSwitch {
             val gui = titleBar.getPrivateFieldValue("gui")
             val config = gui.getPrivateFieldValue("config")
 
-            return config.javaClass.name
-        }
-        if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
+            config.javaClass.name
+        } else if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
             val actualGui = Minecraft.getInstance().screen ?: return openGui
-            val currentPage = actualGui.javaClass.getDeclaredField("currentPage")
-                .makeAccessible()
-                .get(actualGui)
+            val currentPage = actualGui.getPrivateFieldValue("currentPage")
             if (currentPage.javaClass.simpleName == "ModConfigPage") {
-                val optionPage = currentPage.javaClass.getDeclaredField("page")
-                    .makeAccessible()
-                    .get(currentPage)
-                val mod = optionPage.javaClass.getField("mod")
-                    .makeAccessible()
-                    .get(optionPage)
-                val modName = mod.javaClass.getField("name")
-                    .get(mod) as String
-                return "cc.polyfrost.oneconfig.gui.OneConfigGui:$modName"
-            }
-        }
-
-        return openGui
-    }
+                val optionPage = currentPage.getPrivateFieldValue("page")
+                val mod = optionPage.getPublicFieldValue("mod")
+                val modName = mod.getPublicFieldValue("name") as String
+                "cc.polyfrost.oneconfig.gui.OneConfigGui:$modName"
+            } else openGui
+        } else openGui
 
     private fun renderDisplay(mods: List<Mod>) = buildList {
         for (mod in mods) {

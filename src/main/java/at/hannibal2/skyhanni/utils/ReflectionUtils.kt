@@ -14,9 +14,17 @@ import java.lang.reflect.WildcardType
 import java.util.function.Consumer
 
 object ReflectionUtils {
+    fun Any.getPublicField(name: String): Field = javaClass.getField(name)
+    fun Class<*>.getPublicField(name: String): Field = getField(name)
+    fun Any.getPublicFieldValue(name: String): Any = requireNotNull(getPublicField(name).get(this)) {
+        "Field '$name' on ${javaClass.name} is null"
+    }
+    fun Class<*>.getPublicFieldValue(name: String, instance: Any?): Any = requireNotNull(getPublicField(name).get(instance)) {
+        "Field '$name' on $name is null"
+    }
+
     /**
-     * Be aware that the 6 functions below for fetching & accessing private fields are fickle.
-     * They can, and will, throw:
+     * The 6 functions below for fetching & accessing private fields are fickle. They can, and will, throw:
      * - [NoSuchFieldException] - no field with that name/index exists on the class
      * - [SecurityException] - the security manager has denied reflective access to the field
      * - [NullPointerException] - the field exists but its value is null at the time of access
@@ -118,16 +126,19 @@ object ReflectionUtils {
         throw IllegalArgumentException(illegalMessage, e)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun createConsumerFromMethod(instance: Any, method: Method): Consumer<Any> =
-        if (method.parameterTypes.isEmpty()) throw IllegalArgumentException(
+    fun createConsumerFromMethod(instance: Any, method: Method): Consumer<Any> {
+        require(method.parameterTypes.isNotEmpty()) {
             "Method ${instance.javaClass.name}#${method.name} has no parameters, cannot be a Consumer"
-        ) else createFunctionalInterface(
+        }
+        val unScopedConsumer = createFunctionalInterface(
             instance, method,
             Consumer::class.java, "accept",
             MethodType.methodType(Nothing::class.javaPrimitiveType, Any::class.java),
             MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0]),
-        ) as Consumer<Any>
+        )
+        @Suppress("UNCHECKED_CAST")
+        return unScopedConsumer as Consumer<Any>
+    }
 
     fun createRunnableFromMethod(instance: Any, method: Method): Runnable = createFunctionalInterface(
         instance, method,
