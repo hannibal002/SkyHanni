@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -50,6 +49,7 @@ object GardenLevelDisplay {
 
     private val patternGroup = RepoPattern.group("garden.level")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §2§l§m                §f§l§m    §r §e7,891§6/§e10k
      */
@@ -93,6 +93,7 @@ object GardenLevelDisplay {
         "chat.increase",
         " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience",
     )
+    // </editor-fold>
 
     private var display: Renderable? = null
 
@@ -228,11 +229,11 @@ object GardenLevelDisplay {
         return if (useRomanNumerals) this.toRoman() else this.toString()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (GardenApi.hideExtraGuis()) return
+        if (!config.display || GardenApi.hideExtraGuis()) return
 
+        val display = display ?: return
         config.pos.renderRenderable(display, posLabel = "Garden Level")
     }
 
@@ -240,8 +241,6 @@ object GardenLevelDisplay {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.overflow) { update() }
     }
-
-    private fun isEnabled() = GardenApi.inGarden() && config.display
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
