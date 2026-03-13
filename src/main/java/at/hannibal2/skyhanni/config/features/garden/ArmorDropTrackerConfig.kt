@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenTrackerSettings
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
