@@ -276,7 +276,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
 
     protected open fun MutableList<Renderable>.buildDisplayModeView() {
         addRenderableNullableButton<DisplayMode>(
-            label = "Display Mode:",
+            label = "Display Mode",
             current = getDisplayMode(),
             onChange = { new ->
                 if (new == null) return@addRenderableNullableButton

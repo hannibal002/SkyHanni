@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -81,8 +82,13 @@ object HoppityEggDisplayManager {
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
-                val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
-                val collectedFormat = formatEggsCollected(collectedEggs)
+                val collectedEggs = if (ApiUtils.isLegacyHoppityLocationCountingDisabled()) {
+                    HoppityEggLocations.islandCollectedLocations.count { it in HoppityEggLocations.islandLocations }
+                } else {
+                    HoppityEggLocations.islandCollectedLocations.size.coerceAtMost(HoppityEggLocations.islandLocations.size)
+                }
+                val percentage = collectedEggs.toDouble() / totalEggs.toDouble()
+                val collectedFormat = formatEggsCollected(percentage)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
         }.map { CFApi.partyModeReplace(it) }
@@ -110,11 +116,11 @@ object HoppityEggDisplayManager {
         )
     }
 
-    private fun formatEggsCollected(collectedEggs: Int): String =
-        when (collectedEggs) {
-            in 0 until 5 -> "§c"
-            in 5 until 10 -> "§6"
-            in 10 until 15 -> "§e"
+    private fun formatEggsCollected(collectedEggs: Double): String =
+        when {
+            collectedEggs < 0.3 -> "§c"
+            collectedEggs < 0.6 -> "§6"
+            collectedEggs < 0.9 -> "§e"
             else -> "§a"
         }
 }
