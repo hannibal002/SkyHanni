@@ -169,14 +169,14 @@ object GraphEditorIO {
     private fun merging(graph: Graph) {
         GraphEditorHistory.save("merge from clipboard")
 
-                var nextId = state.id
-                val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
-                nodes.addAll(newNodes)
-                edges.addAll(newEdges)
-                state.id = nextId
+        var nextId = state.id
+        val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
+        nodes.addAll(newNodes)
+        edges.addAll(newEdges)
+        state.id = nextId
 
-                GraphEditorNetworks.recalculate()
-                GraphEditor.updateCache()
+        GraphEditorNetworks.recalculate()
+        GraphEditor.updateCache()
 
         val nodeCount = newNodes.size.addSeparators()
         val edgeCount = newEdges.size.addSeparators()
