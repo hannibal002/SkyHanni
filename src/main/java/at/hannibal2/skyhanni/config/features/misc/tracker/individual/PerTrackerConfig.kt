@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSetting
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.ReflectionUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -20,7 +21,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
  *   call to the companion [invoke] operator, which captures the reified type directly —
  *   no reflection required.
  * - `class Foo : PerTrackerConfig<SomeSettings>()` (proper subclass): Kotlin calls the
- *   protected constructor with `settingsClass = null`, falling back to [ReflectionUtils.resolveAnonymousSingleType]
+ *   protected constructor with `settingsClass = null`, falling back to [ReflectionUtils.findGenericSuperclassTypeArgument]
  *   which walks the hierarchy with type-variable substitution.
  *
  * Registering in [TrackerSync.configSet] on init allows bulk sync and universal-config
@@ -37,7 +38,7 @@ open class PerTrackerConfig<out Settings : TrackerSettings> protected constructo
     }
 
     @Suppress("UNCHECKED_CAST")
-    private val settingsClass = settingsClass ?: ReflectionUtils.
+    private val settingsClass = settingsClass ?: findGenericSuperclassTypeArgument<PerTrackerConfig<*>, Settings>()
 
     @Expose
     @ConfigOption(name = "Individual Tracker Settings", desc = "")
