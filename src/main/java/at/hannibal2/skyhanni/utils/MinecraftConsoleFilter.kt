@@ -41,7 +41,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         }
     }
 
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "CyclomaticComplexMethod", "ReturnCount")
     override fun filter(event: LogEvent?): Filter.Result {
         if (event == null) return Filter.Result.ACCEPT
 
