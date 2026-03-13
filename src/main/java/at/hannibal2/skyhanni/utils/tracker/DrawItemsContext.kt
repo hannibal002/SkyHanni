@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
  * Overridable accessor and action callbacks for [SkyHanniItemTracker.drawItems].
  *
  * The defaults suit any plain item tracker. [SkyHanniBucketedItemTracker] supplies its own
- * instance to redirect item reads and mutations through the currently selected bucket, without
- * needing to duplicate the entire draw loop.
+ * instance to redirect reads and mutations through the currently selected bucket without
+ * duplicating the draw loop.
  *
- * Construct via [DrawItemsContext.default] for the standard case, or by supplying all
- * parameters explicitly for bucketed or otherwise non-standard trackers.
+ * Construct via [default] for the standard case, or supply all parameters explicitly for
+ * bucketed or otherwise non-standard trackers.
  */
 class DrawItemsContext(
     val itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem>,
@@ -23,11 +23,6 @@ class DrawItemsContext(
     val getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String>,
 ) {
     companion object {
-        /**
-         * Builds the default [DrawItemsContext] for a plain item tracker.
-         *
-         * All accessors read directly from [data] and all mutations go through [tracker].
-         */
         fun <Data : ItemTrackerData<*>> default(
             data: Data,
             tracker: SkyHanniItemTracker<Data>,

@@ -36,6 +36,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         DisplayMode.YEAR,
     )
 
+    // TODO figure out why stopwatches don't stop running when swapping data, and fix it properly
     private val activeStopwatches = mutableSetOf<TimedTrackerData<*>>()
 
     @SkyHanniModule
@@ -64,8 +65,6 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         )
     }
 
-    // TODO figure out why this isn't working
-    // make sure stopwatches don't infinitely run when swapping data
     override fun startSessionUptime() {
         super.startSessionUptime()
         getData()?.sessionContainer?.getAllCurrentData()?.let { activeStopwatches.addAll(it) }
@@ -157,12 +156,8 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         )
 
         return listOfNotNull(
-            previous?.let {
-                switcherButton("§a[ §r§f§l<- §a]", it)
-            },
-            next?.let {
-                switcherButton("§a[ §r§f§l-> §a]", it)
-            },
+            previous?.let { switcherButton("§a[ §r§f§l<- §a]", it) },
+            next?.let { switcherButton("§a[ §r§f§l-> §a]", it) },
             container.getMostRecentName(getDisplayMode())?.takeIf { hasMoreAfterNext }?.let {
                 switcherButton("§a[ §r§f§l->> §r§a]", it)
             },

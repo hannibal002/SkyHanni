@@ -16,10 +16,9 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
 ) : SkyHanniItemTracker<BucketedData>(name) {
 
     // TODO these overrides exist because BucketedItemTrackerData deliberately breaks the
-    //  ItemTrackerData contract for bucket-unaware methods (liskov violation). the long-term
+    //  ItemTrackerData contract for bucket-unaware methods (Liskov violation). The long-term
     //  fix is to split ItemTrackerData so bucket-incompatible methods live on a separate
-    //  interface that BucketedItemTrackerData does not implement, but that seems
-    //  way too big of a scope for now, so.
+    //  interface that BucketedItemTrackerData does not implement.
 
     final override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")

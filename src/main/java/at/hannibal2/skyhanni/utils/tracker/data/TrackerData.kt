@@ -15,12 +15,9 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class TrackerData<T : SessionUptime> : Resettable {
 
-    //region Session uptime
-
     // Resolve the SessionUptime subtype from the generic parameter at runtime.
-    // This is necessary because type erasure means we cannot use T::class directly;
-    // the concrete subclass carries the type argument in its superclass signature,
-    // which ParameterizedType exposes via reflection.
+    // Type erasure means we cannot use T::class directly; the concrete subclass carries the
+    // type argument in its superclass signature, which ParameterizedType exposes via reflection.
     @Suppress("UNCHECKED_CAST")
     private val uptimeClass: KClass<T> by lazy {
         val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
@@ -28,16 +25,18 @@ abstract class TrackerData<T : SessionUptime> : Resettable {
         jClass.kotlin
     }
 
-    // Gson may deserialize null keys or null values from saves written by older builds
-    // that had bugs or incomplete migration. We store the internal map with nullable
-    // types to absorb those entries, then expose a non-nullable view via the cast below.
-    // migrateData() strips nulls before any real access occurs.
+    // Gson may deserialize null keys or null values from saves written by older builds that
+    // had bugs or incomplete migration. Storing with nullable types absorbs those entries;
+    // the non-nullable cast below is safe after migrateData() removes all nulls.
     @SerializedName("sessionUptime")
     private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
 
     @Suppress("UNCHECKED_CAST")
     private val sessionUptime: MutableMap<SessionUptime, Stopwatch>
         get() = sessionUptimeInternal as MutableMap<SessionUptime, Stopwatch>
+
+    @Expose
+    private var migrated = false
 
     private var activeSession: SessionUptime? = null
 
@@ -92,13 +91,6 @@ abstract class TrackerData<T : SessionUptime> : Resettable {
         return uptime
     }
 
-    //endregion
-
-    //region Migration
-
-    @Expose
-    private var migrated = false
-
     private fun migrateData() {
         migrated = true
         // Remove null keys and values that may have been written by older builds.
@@ -113,8 +105,8 @@ abstract class TrackerData<T : SessionUptime> : Resettable {
     /**
      * Merges any entries whose key is not an instance of [entryType] into [migratedSessionType].
      *
-     * This covers saves from older builds where the session type was stored differently;
-     * their accumulated durations are preserved rather than discarded.
+     * Preserves accumulated durations from saves written by older builds that stored session
+     * types differently, rather than silently discarding them.
      */
     private fun filterAndRemove(entryType: KClass<out SessionUptime>, migratedSessionType: SessionUptime) {
         val entries = sessionUptime.entries.filter { entry ->
@@ -127,6 +119,4 @@ abstract class TrackerData<T : SessionUptime> : Resettable {
             sessionUptime.remove(entry.key)
         }
     }
-
-    //endregion
 }

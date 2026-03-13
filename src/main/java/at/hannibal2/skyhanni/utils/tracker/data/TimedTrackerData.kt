@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TimedTrackerConfig
-import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
 
 /**

@@ -51,8 +51,6 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
 
-    //region Configuration
-
     abstract override val config: TopLevelTrackerConfig<ItemTrackerSettings>
 
     // Chains through the base useUniversalConfig check, then casts. The cast is safe because
@@ -60,17 +58,10 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
     // per-tracker config and universalTracker (which extends ItemTrackerSettings) satisfy it.
     override val trackerConfig: ItemTrackerSettings get() = super.trackerConfig as ItemTrackerSettings
 
-    override val hideInEstimatedValue: Boolean
-        get() = trackerConfig.itemTracker.hideInEstimatedItemValue
-
-    override val hideOutsideInventory: Boolean
-        get() = trackerConfig.itemTracker.hideOutsideInventory
-
-    //endregion
+    override val hideInEstimatedValue: Boolean get() = trackerConfig.itemTracker.hideInEstimatedItemValue
+    override val hideOutsideInventory: Boolean get() = trackerConfig.itemTracker.hideOutsideInventory
 
     private val scrollValue = ScrollValue()
-
-    //region Item management
 
     open fun addCoins(amount: Int, command: Boolean) = modify {
         it.addItem(SKYBLOCK_COIN, amount, command)
@@ -123,10 +114,6 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         }
     }
 
-    //endregion
-
-    //region Draw items
-
     private fun NeuInternalName.getCleanName(
         items: Map<NeuInternalName, ItemTrackerData.TrackedItem>,
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
@@ -139,8 +126,8 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
      * Renders the item list for this tracker and returns the total profit value.
      *
      * [context] provides overridable accessors and action callbacks. Use [DrawItemsContext.default]
-     * for standard trackers; bucketed trackers supply their own instance to route through the
-     * selected bucket.
+     * for standard trackers; bucketed trackers supply their own instance to route reads and
+     * mutations through the selected bucket.
      */
     open fun drawItems(
         data: Data,
@@ -261,10 +248,6 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         }
     }
 
-    //endregion
-
-    //region Profit display
-
     private val copyOnClickConfig by lazy { CoroutineConfig("$name copy on click") }
 
     private fun copyOnClick(line: String, fullTipsLine: String, type: String) = copyOnClickConfig.launch {
@@ -363,10 +346,6 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         )
     }
 
-    //endregion
-
-    //region UI helpers
-
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (!isInventoryOpen()) return
         lists.addButton(
@@ -380,6 +359,4 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             universe = ItemPriceSource.entries,
         )
     }
-
-    //endregion
 }

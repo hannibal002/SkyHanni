@@ -42,8 +42,6 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("TooManyFunctions")
 abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: String) {
 
-    //region Configuration
-
     // This is needed because of Slayer Profit Tracker
     open val name get() = staticName
 
@@ -63,34 +61,21 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     /**
      * Controls when this tracker's display is rendered.
      *
-     * Override to customize any combination of inventory presence, island filtering,
+     * Override to customise any combination of inventory presence, island filtering,
      * or an enable condition without needing to override six separate vals.
-     * The [RenderDisplayConfig] is forwarded directly to [RenderDisplayHelper].
      */
     open val renderConfig: RenderDisplayConfig = RenderDisplayConfig()
 
-    internal open val outsideInventory: Boolean = false
-    internal open val inOwnInventory: Boolean = false
-
-    /**
-     * Whether this tracker hides when the Estimated Item Value overlay is visible.
-     * Overridden to true in [SkyHanniItemTracker], which reads the value from its config.
-     */
+    /** Whether this tracker hides when the Estimated Item Value overlay is visible. */
     protected open val hideInEstimatedValue: Boolean = false
 
-    /**
-     * Whether this tracker hides when the player is outside any inventory GUI.
-     * Overridden in [SkyHanniItemTracker], which reads the value from its config.
-     */
+    /** Whether this tracker hides when the player is outside any inventory GUI. */
     protected open val hideOutsideInventory: Boolean = false
 
     internal open val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap()
 
-    //endregion
-
-    //region Internal display state
-
     private var displayMode: DisplayMode? = null
+    private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = trackerConfig.trackerSearchEnabled.get()
@@ -98,22 +83,18 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     protected val textInput = SearchTextInput()
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    // Separate detector used only to drive isInventoryOpen(); the RenderDisplayHelper
-    // manages its own inventory detection for the render condition.
+    // Separate detector used only to drive isInventoryOpen()
+    // Each tracker (optionally) manages its own inventory detection, by overriding renderConfig
     private val inventoryDetector = InventoryDetector(
         { update() },
         { update() },
     ) { true }
-
-    //endregion
 
     init {
         RenderDisplayHelper(renderConfig) {
             renderDisplay(config.position)
         }
     }
-
-    //region Companion
 
     @SkyHanniModule
     companion object {
@@ -129,10 +110,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
             }
         }
     }
-
-    //endregion
-
-    //region Shared tracker
 
     /**
      * A snapshot of all [DisplayMode] data instances for the current profile.
@@ -155,10 +132,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
-    //endregion
-
-    //region Public API
-
     internal abstract fun drawDisplayF(data: Data): List<Searchable>
     internal open fun extraOnRender() = Unit
 
@@ -167,7 +140,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     }
 
     internal fun createNewSession() = dataCtor.newInstance()
-
     internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
 
     fun getPricePer(name: NeuInternalName) = name.getPrice(trackerConfig.priceSource)
@@ -204,10 +176,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
 
     fun firstUpdate() = if (display.isEmpty()) update() else Unit
 
-    //endregion
-
-    //region Render pipeline
-
     private fun renderDisplay(position: at.hannibal2.skyhanni.config.core.config.Position) {
         if (hideInEstimatedValue && EstimatedItemValue.isCurrentlyShowing()) return
         if (!InventoryUtils.inAnyInventory() && hideOutsideInventory && this is SkyHanniItemTracker) return
@@ -241,10 +209,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
             if (getDisplayMode() == DisplayMode.SESSION) add(buildSessionResetButton())
         }
     }
-
-    //endregion
-
-    //region Session uptime
 
     internal fun showSessionUptime() =
         trackerConfig.showUptime.get() && (!trackerConfig.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
@@ -311,10 +275,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
-    //endregion
-
-    //region Display mode
-
     protected open val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + this.extraDisplayModes.keys
 
     protected open fun MutableList<Renderable>.buildDisplayModeView() {
@@ -344,8 +304,6 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
-    private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
-
     protected fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
         tips = listOf("§cThis will reset your", "§ccurrent session of", "§c$name"),
@@ -362,6 +320,4 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         ChatUtils.chat(message)
         update()
     }
-
-    //endregion
 }

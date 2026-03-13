@@ -11,9 +11,7 @@ import com.google.gson.annotations.Expose
 import java.time.LocalDate
 import java.util.EnumMap
 
-/**
- * Owns all session storage and navigation for a [TimedTrackerData] leaf.
- */
+/** Owns all session storage and navigation for a [TimedTrackerData] leaf. */
 class TimedSessionContainer {
 
     @Expose
@@ -46,16 +44,14 @@ class TimedSessionContainer {
     fun getData(displayMode: DisplayMode, string: String? = getCurrentName(displayMode)): TimedTrackerData<*>? =
         string?.let { sessions[displayMode]?.get(it) }
 
-    /**
-     * Sets the current pointer for [displayMode]. Pass null to follow the live name.
-     */
+    /** Sets the current pointer for [displayMode]. Pass null to follow the live name. */
     fun setCurrentName(displayMode: DisplayMode, string: String?) {
         currentDisplays[displayMode] = string?.takeUnless { isCurrent(displayMode, it) }
     }
 
     /**
-     * Returns the resolved current name for [displayMode], initializing the pointer to live if not
-     * yet set. Always returns a non-null string.
+     * Returns the resolved current name for [displayMode], initializing the pointer to live if
+     * not yet set. Always returns a non-null string.
      */
     fun resolveCurrentName(displayMode: DisplayMode): String {
         if (!currentDisplays.containsKey(displayMode)) currentDisplays[displayMode] = null

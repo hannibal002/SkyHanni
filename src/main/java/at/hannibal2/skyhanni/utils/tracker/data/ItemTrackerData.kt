@@ -8,7 +8,6 @@ import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData<T : SessionUptime> : TrackerData<T>() {
 
-    // default implementation, delegates to below
     open fun getDescription(item: TrackedItem) = getDescription(item.timesGained)
 
     abstract fun getDescription(timesGained: Long): List<String>
@@ -45,10 +44,10 @@ abstract class ItemTrackerData<T : SessionUptime> : TrackerData<T>() {
         command: Boolean,
         removalRunner: (NeuInternalName) -> Unit? = { removeItem(internalName) },
     ) = apply {
-        if (!command) { timesGained++ }
+        if (!command) timesGained++
         totalAmount += amount
         lastTimeUpdated = SimpleTimeMark.now()
-        if (command && totalAmount <= 0) { removalRunner(internalName) }
+        if (command && totalAmount <= 0) removalRunner(internalName)
     }
 
     @Expose
@@ -58,6 +57,6 @@ abstract class ItemTrackerData<T : SessionUptime> : TrackerData<T>() {
         @Expose var timesGained: Long = 0,
         @Expose var totalAmount: Long = 0,
         @Expose var hidden: Boolean = false,
-        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast()
+        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast(),
     )
 }
