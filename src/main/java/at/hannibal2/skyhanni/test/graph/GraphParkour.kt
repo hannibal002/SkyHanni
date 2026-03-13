@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 
 @SkyHanniModule
 object GraphParkour {
@@ -24,7 +25,7 @@ object GraphParkour {
             description = "Loads the current clipboard as parkour into the graph editor."
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                SkyHanniMod.launchCoroutine("shgraphloadparkour command") {
+                CoroutineConfig("shgraphloadparkour command").launchCoroutine {
                     loadParkour()
                 }
             }

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.SkyHanniConfig
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -54,7 +54,7 @@ object SkyHanniConfigSearchResetCommand {
         if (term.startsWith("profileSpecific")) return "§cCannot reset profileSpecific! Use §e/shconfig set §cinstead."
 
         try {
-            val (field, defaultObject, _) = getComplexField(term, Features())
+            val (field, defaultObject, _) = getComplexField(term, SkyHanniConfig())
             val (_, _, parent) = getComplexField(term, SkyHanniMod.feature)
             val affectedElements = findConfigElements({ it.startsWith("$term.") }, { true }).size
             if (affectedElements > 3 && !args.contentEquals(lastCommand)) {
