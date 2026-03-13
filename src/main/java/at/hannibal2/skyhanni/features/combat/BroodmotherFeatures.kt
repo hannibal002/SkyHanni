@@ -28,6 +28,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 
+// TODO clean this file up - there is a lot of state management that could utilize Resettable
+//  and other mechanisms to avoid the repetitive code.
 @SkyHanniModule
 object BroodmotherFeatures {
 
@@ -165,6 +167,7 @@ object BroodmotherFeatures {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         if (display == null) return
+        // Todo, this should not be happening in the render event.
         if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
             display = Renderable.text("§4Broodmother spawning now!")
         }
@@ -183,13 +186,6 @@ object BroodmotherFeatures {
         } else {
             val countdown = broodmotherSpawnTime.timeUntil().format()
             display = Renderable.text("§4Broodmother spawning in §b$countdown")
-        }
-    }
-
-    @JvmStatic
-    fun playTestSound() {
-        with(spawnAlertConfig) {
-            SoundUtils.createSound(alertSound, pitch).playSound()
         }
     }
 

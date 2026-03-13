@@ -51,16 +51,16 @@ object DungeonCopilot {
     private var nextStep: Renderable? = null
     private var searchForKey = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
-        copilot(event.message)?.let {
+        handleChatMessage(event.message)?.let {
             event.blockedReason = it
         }
     }
 
-    private fun copilot(message: String): String? {
+    private fun handleChatMessage(message: String): String? {
         countdownPattern.matchMatcher(message) {
             changeNextStep("Ready up")
         }
@@ -147,12 +147,10 @@ object DungeonCopilot {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.enabled
-
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-
+        if (!config.enabled) return
+        val nextStep = nextStep ?: return
         config.pos.renderRenderable(nextStep, posLabel = "Dungeon Copilot")
     }
 

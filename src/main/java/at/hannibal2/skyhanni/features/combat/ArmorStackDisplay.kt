@@ -26,20 +26,19 @@ object ArmorStackDisplay {
         " (?:§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         val stacks = armorStackPattern.findMatcher(event.actionBar) {
             "§6§l" + group("stack")
         }.orEmpty()
         display = Renderable.text(stacks)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
+        val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Armor Stack Display")
     }
-
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
