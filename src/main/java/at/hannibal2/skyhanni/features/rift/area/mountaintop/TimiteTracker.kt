@@ -20,20 +20,23 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TimiteTracker : SkyHanniItemTracker<TimiteTracker.Data>("Timite Tracker") {
     override val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite.tracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.rift.timiteTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() },
+    )
 
     private val HIGHLITE = "HIGHLITE".toInternalName()
     private val TIMITE = "TIMITE".toInternalName()

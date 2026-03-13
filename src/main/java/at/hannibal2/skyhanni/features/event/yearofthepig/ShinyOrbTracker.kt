@@ -15,14 +15,15 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -30,8 +31,11 @@ object ShinyOrbTracker : SkyHanniItemTracker<ShinyOrbTracker.Data>("Shiny Orb Tr
 
     override val config get() = SkyHanniMod.feature.event.yearOfThePig.shinyOrbTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.shinyOrbTracker }
-    override val onlyOnIsland: IslandType = IslandType.HUB
-    override val renderCondition: () -> Boolean = { passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        condition = { passesHoldingItem() && PigFeaturesApi.isYearOfThePig() },
+        onlyOnIsland = IslandType.HUB,
+    )
     private val SHINY_ORB_ITEM = "SHINY_ORB".toInternalName()
     private val SHINY_ROD_ITEM = "SHINY_ROD".toInternalName()
 

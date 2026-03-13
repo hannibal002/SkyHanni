@@ -17,15 +17,16 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -34,7 +35,9 @@ import net.minecraft.client.gui.screens.inventory.ContainerScreen
 object ExcavatorProfitTracker : SkyHanniItemTracker<ExcavatorProfitTracker.Data>("Fossil Excavation Profit Tracker") {
     override val config get() = SkyHanniMod.feature.mining.fossilExcavator.profitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.fossilExcavatorProfitTracker }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     data class Data(
         @Expose var timesExcavated: Long = 0L,

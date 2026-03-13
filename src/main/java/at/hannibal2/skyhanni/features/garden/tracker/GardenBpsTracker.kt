@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -28,7 +29,9 @@ object GardenBpsTracker : SkyhanniTimedTracker<GardenBpsTracker.TimedData>("Gard
     override val config get() = GardenApi.config.gardenBpsTracker
     override val perTrackerConfig: TimedPerTrackerConfig<GardenTrackerSettings> get() = config.perTrackerConfig
     override val storageAccessor: (ProfileSpecificStorage) -> TimedData = { it.garden.gardenBpsTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() },
+    )
     override val customUptimeControl: Boolean = true
 
     class TimedData : TimedTrackerData<SessionUptime.Garden>() {

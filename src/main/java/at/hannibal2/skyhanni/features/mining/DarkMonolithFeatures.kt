@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
@@ -49,10 +50,12 @@ object DarkMonolithFeatures : SkyHanniItemTracker<DarkMonolithFeatures.Data>("Da
     private val darkMonolithConfig get() = SkyHanniMod.feature.mining.darkMonolith
     override val config get() = darkMonolithConfig.tracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.darkMonolithTracker }
-    override val renderCondition: () -> Boolean = { config.enabled }
-    override val onlyOnIsland: IslandType = IslandType.DWARVEN_MINES
-    override val outsideInventory = true
-    override val inOwnInventory = true
+	override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { config.enabled },
+        onlyOnIsland = IslandType.DWARVEN_MINES,
+    )
 
     class Data(
         @Expose var monolithsLooted: Long = 0

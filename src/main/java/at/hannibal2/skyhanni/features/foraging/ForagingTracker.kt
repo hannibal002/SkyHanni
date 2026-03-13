@@ -6,8 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTags.FORAGING_CUSTOM_TREES
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -33,6 +32,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
@@ -46,9 +46,9 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
@@ -61,8 +61,10 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
 ) {
     override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.foraging.trackerData }
     override val config get() = SkyHanniMod.feature.foraging.tracker
-    override val onlyOnIslandTag: IslandTypeTag = IslandTypeTags.FORAGING_CUSTOM_TREES
-    override val renderCondition: () -> Boolean = { heldItemEnabled() && config.enabled }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { heldItemEnabled() && config.enabled },
+        onlyOnIslandTag = FORAGING_CUSTOM_TREES,
+    )
     private val patternGroup = RepoPattern.group("foraging.treegift")
 
     // <editor-fold desc="Patterns">
@@ -259,13 +261,13 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!onlyOnIslandTag.inAny() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!FORAGING_CUSTOM_TREES.inAny() || event.source != ItemAddManager.Source.COMMAND) return
         event.addItemFromEvent()
     }
 
     @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
-        if (!onlyOnIslandTag.inAny()) return
+        if (!FORAGING_CUSTOM_TREES.inAny()) return
         event.addLogs()
     }
 
@@ -314,7 +316,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!onlyOnIslandTag.inAny()) return
+        if (!FORAGING_CUSTOM_TREES.inAny()) return
         event.tryReadLoot()
         event.tryBlock()
     }
@@ -324,7 +326,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
 
     @HandleEvent(OwnInventoryItemUpdateEvent::class)
     fun onOwnInventoryItemUpdate() {
-        if (!onlyOnIslandTag.inAny()) return
+        if (!FORAGING_CUSTOM_TREES.inAny()) return
         val treeType = treeType ?: return
 
         val stretchingSticksNow = InventoryUtils.getItemsInOwnInventory().filter {
@@ -499,7 +501,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
 
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
-        if (!onlyOnIslandTag.inAny()) return
+        if (!FORAGING_CUSTOM_TREES.inAny()) return
         firstUpdate()
     }
 
@@ -514,7 +516,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
 
     @HandleEvent
     fun onItemChange(event: ItemInHandChangeEvent) {
-        if (!onlyOnIslandTag.inAny()) return
+        if (!FORAGING_CUSTOM_TREES.inAny()) return
         val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
         if (isAxe != hasHeldAxe) {
             if (!isAxe) {

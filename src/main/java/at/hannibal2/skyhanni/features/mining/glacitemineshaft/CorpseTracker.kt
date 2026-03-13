@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -24,9 +25,9 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -35,7 +36,9 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 ) {
     override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.mining.mineshaft.corpseProfitTracker }
     override val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
-    override val renderCondition: () -> Boolean = { isEnabled() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() },
+    )
 
     data class BucketData(
         @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()

@@ -38,13 +38,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -55,7 +56,9 @@ import kotlin.time.Duration.Companion.minutes
 object GhostTracker : SkyHanniItemTracker<GhostTracker.Data>("Ghost Tracker") {
     override val config get() = SkyHanniMod.feature.combat.ghostCounter
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.ghostStorage.ghostTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() },
+    )
     private val ghostStorage get() = ProfileStorageData.profileSpecific?.ghostStorage
 
     private var currentBestiaryKills: Long

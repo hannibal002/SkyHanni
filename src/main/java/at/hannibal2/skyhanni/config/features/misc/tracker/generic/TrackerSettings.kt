@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc.tracker.generic
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DefaultDisplayMode
+import at.hannibal2.skyhanni.utils.tracker.DefaultDisplayMode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown

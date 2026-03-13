@@ -18,15 +18,16 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
@@ -35,9 +36,11 @@ import kotlin.time.Duration.Companion.seconds
 object HuntingProfitTracker : SkyHanniItemTracker<HuntingProfitTracker.Data>("Hunting Profit Tracker") {
     override val config get() = SkyHanniMod.feature.hunting.huntingProfitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.hunting.huntingProfitTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) }
-    override val outsideInventory = true
-    override val inOwnInventory = true
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) },
+    )
 
     private var lastHuntTime = SimpleTimeMark.farPast()
 
@@ -59,9 +62,7 @@ object HuntingProfitTracker : SkyHanniItemTracker<HuntingProfitTracker.Data>("Hu
         }
 
         override fun getDescription(timesGained: Long) = listOf<String>()
-
         override fun getCoinName(item: TrackedItem) = ""
-
         override fun getCoinDescription(item: TrackedItem) = listOf<String>()
     }
 

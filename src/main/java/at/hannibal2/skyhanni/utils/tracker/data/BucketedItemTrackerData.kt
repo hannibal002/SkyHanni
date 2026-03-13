@@ -10,6 +10,10 @@ import com.google.gson.annotations.Expose
 
 abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTrackerData<T>() {
 
+    // TODO these final overrides that throw exist because this class deliberately breaks the
+    //  ItemTrackerData contract for bucket-unaware operations (Liskov violation).
+    //  See note in SkyHanniBucketedItemTracker.
+
     final override fun getDescription(timesGained: Long): List<String> =
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
 
@@ -89,6 +93,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTra
     }
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 
+    // The null key represents the "all buckets" / no-bucket-selected scroll state.
     private val scrollValues: Map<E?, ScrollValue> = buckets.associateWith { ScrollValue() } + (null to ScrollValue())
     val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: ScrollValue()
 

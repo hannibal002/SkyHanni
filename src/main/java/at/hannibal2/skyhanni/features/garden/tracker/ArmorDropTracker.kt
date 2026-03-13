@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -36,7 +37,9 @@ import kotlin.time.Duration.Companion.seconds
 object ArmorDropTracker : SkyHanniTracker<ArmorDropTracker.Data>("Armor Drop Tracker") {
     override val config get() = GardenApi.config.armorDropTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.garden.armorDropTracker }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+	override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
     override val customUptimeControl = true
     private val patternGroup = RepoPattern.group("garden.armordrops")
 

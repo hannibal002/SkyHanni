@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -50,9 +51,11 @@ typealias CategoryName = String
 object FishingProfitTracker : SkyHanniItemTracker<FishingProfitTracker.Data>("Fishing Profit Tracker") {
     override val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.fishing.fishingProfitTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() && config.enabled && shouldShow }
-    override val inOwnInventory: Boolean = true
-    override val outsideInventory: Boolean = true
+	override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { isEnabled() && config.enabled && shouldShow }
+    )
 
     /**
      * REGEX-TEST: §5⛃ §r§5§lGOOD CATCH! §r§fYou caught §r§636,064 Coins§r§f!

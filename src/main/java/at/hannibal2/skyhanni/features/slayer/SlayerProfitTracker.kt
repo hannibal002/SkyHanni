@@ -24,15 +24,16 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
@@ -43,7 +44,9 @@ object SlayerProfitTracker : SkyHanniItemTracker<SlayerProfitTracker.Data>("Slay
     override val storageAccessor: (ProfileSpecificStorage) -> Data = {
         it.slayerProfitData.getOrPut(category) { Data() }
     }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
     override val outsideInventory = true
     override val inOwnInventory = true
     override val name: String

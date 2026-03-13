@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -38,7 +39,9 @@ import kotlin.time.Duration.Companion.seconds
 object PowderTracker : SkyHanniTracker<PowderTracker.Data>("Powder Tracker") {
     override val config get() = SkyHanniMod.feature.mining.powderTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.powderTracker }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
     private val pickedPattern by patternGroup.pattern(

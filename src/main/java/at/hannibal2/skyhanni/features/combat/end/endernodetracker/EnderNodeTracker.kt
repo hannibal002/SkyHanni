@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
@@ -40,7 +41,9 @@ object EnderNodeTracker : SkyHanniTracker<EnderNodeTracker.Data>("Ender Node Tra
 
     override val config get() = SkyHanniMod.feature.combat.endIsland.enderNodeTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.enderNodeTracker }
-    override val renderCondition: () -> Boolean = { config.enabled && isEnabled() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { config.enabled && isEnabled() },
+    )
 
     private var miteGelInInventory = 0
 

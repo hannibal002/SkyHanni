@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -34,19 +35,21 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object CrystalNucleusTracker : SkyHanniItemTracker<CrystalNucleusTracker.Data>("Crystal Nucleus Tracker") {
     override val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.crystalNucleusTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() }
-    override val onlyOnIsland: IslandType = IslandType.CRYSTAL_HOLLOWS
-    override val inOwnInventory: Boolean = true
-    override val outsideInventory: Boolean = true
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { isEnabled() },
+        onlyOnIsland = IslandType.CRYSTAL_HOLLOWS,
+    )
     private val patternGroup = RepoPattern.group("mining.crystalnucleus.tracker")
 
     /**

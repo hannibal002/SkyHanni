@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod.launch
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings.ItemTrackerConfig.TextPart
-import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -50,9 +50,27 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
+
+    //region Configuration
+
     abstract override val config: TopLevelTrackerConfig<ItemTrackerSettings>
-    override val trackerConfig: ItemTrackerSettings get() = config.perTrackerConfig.trackerConfig
+
+    // Chains through the base useUniversalConfig check, then casts. The cast is safe because
+    // this class constrains config to TopLevelTrackerConfig<ItemTrackerSettings>, so both the
+    // per-tracker config and universalTracker (which extends ItemTrackerSettings) satisfy it.
+    override val trackerConfig: ItemTrackerSettings get() = super.trackerConfig as ItemTrackerSettings
+
+    override val hideInEstimatedValue: Boolean
+        get() = trackerConfig.itemTracker.hideInEstimatedItemValue
+
+    override val hideOutsideInventory: Boolean
+        get() = trackerConfig.itemTracker.hideOutsideInventory
+
+    //endregion
+
     private val scrollValue = ScrollValue()
+
+    //region Item management
 
     open fun addCoins(amount: Int, command: Boolean) = modify {
         it.addItem(SKYBLOCK_COIN, amount, command)
@@ -87,6 +105,28 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         logCommandAdd(internalName, amount)
     }
 
+    fun handlePossibleRareDrop(
+        internalName: NeuInternalName,
+        amount: Int,
+        message: Boolean = true,
+    ) = with(trackerConfig.itemTracker) {
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
+        if (warnings.chat && price >= warnings.minimumChat && message) {
+            componentBuilder {
+                appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                appendWithColor(": ", ChatFormatting.GRAY)
+                append("§r$itemName")
+            }.let(ChatUtils::chat)
+        }
+        if (warnings.title && price >= warnings.minimumTitle) {
+            TitleManager.sendTitle("§a+ $itemName", weight = price)
+        }
+    }
+
+    //endregion
+
+    //region Draw items
+
     private fun NeuInternalName.getCleanName(
         items: Map<NeuInternalName, ItemTrackerData.TrackedItem>,
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
@@ -95,36 +135,22 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemNameCompact
     }
 
+    /**
+     * Renders the item list for this tracker and returns the total profit value.
+     *
+     * [context] provides overridable accessors and action callbacks. Use [DrawItemsContext.default]
+     * for standard trackers; bucketed trackers supply their own instance to route through the
+     * selected bucket.
+     */
     open fun drawItems(
         data: Data,
         filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
-        /**
-         * Extensions to allow for BucketedTrackers to re-use this code block.
-         * The default values are for any 'normal' item tracker, but can in theory
-         * be overridden by any tracker that needs to.
-         */
-        itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem> = { data.items },
-        getCoinName: (ItemTrackerData.TrackedItem) -> String = { item -> data.getCoinName(item) },
-        itemRemover: (NeuInternalName, String) -> Unit = { item, cleanName ->
-            modify {
-                it.items.remove(item)
-            }
-            ChatUtils.chat("Removed $cleanName §efrom $name.")
-        },
-        itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
-            modify {
-                it.toggleItemHide(item, currentlyHidden)
-            }
-        },
-        getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
-            if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
-            else data.getDescription(item)
-        },
+        context: DrawItemsContext = DrawItemsContext.default(data, this),
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
-        val dataItems = itemsAccessor.invoke()
+        val dataItems = context.itemsAccessor.invoke()
         val itemTrackerConfig = trackerConfig.itemTracker
         for ((internalName, itemProfit) in dataItems) {
             if (!filter(internalName)) continue
@@ -149,7 +175,7 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
-            val cleanName = internalName.getCleanName(dataItems, getCoinName)
+            val cleanName = internalName.getCleanName(dataItems, context.getCoinName)
 
             val hidden = itemProfit.hidden
             val priceFormat = price.formatCoin(gray = hidden)
@@ -159,7 +185,7 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             val displayName = if (hidden) "§8§m$formattedName" else cleanName
 
-            val loreText = getLoreList.invoke(internalName, itemProfit)
+            val loreText = context.getLoreList.invoke(internalName, itemProfit)
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
 
             // TODO add row abstraction to api, with common click+hover behaviour
@@ -167,8 +193,8 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
                 string,
                 tips = lore,
                 onLeftClick = {
-                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
-                    else itemHider.invoke(internalName, hidden)
+                    if (KeyboardManager.isModifierKeyDown()) context.itemRemover.invoke(internalName, cleanName)
+                    else context.itemHider.invoke(internalName, hidden)
                     // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
@@ -204,7 +230,6 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             lists.add(it.toSearchable())
         }
 
-
         return profit
     }
 
@@ -236,6 +261,21 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         }
     }
 
+    //endregion
+
+    //region Profit display
+
+    private val copyOnClickConfig by lazy { CoroutineConfig("$name copy on click") }
+
+    private fun copyOnClick(line: String, fullTipsLine: String, type: String) = copyOnClickConfig.launch {
+        val copied = ClipboardUtils.copyToClipboardAsync(
+            if (KeyboardManager.isShiftKeyDown()) fullTipsLine
+            else line,
+        ).await() ?: false
+        if (copied) ChatUtils.chat("§eCopied $name $type to clipboard!")
+        else ChatUtils.chat("§cFailed to copy $name $type to clipboard!")
+    }
+
     fun addTotalProfit(
         profit: Double,
         totalAmount: Long,
@@ -265,15 +305,14 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             }
         }
 
-
         val tips: List<String> = buildList {
             addAll(profitTips)
             addAll(
                 listOf(
                     "",
                     "§eClick to copy line!",
-                    "§eShift Click to include stats in this tooltip!"
-                )
+                    "§eShift Click to include stats in this tooltip!",
+                ),
             )
         }
 
@@ -288,7 +327,7 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
                 val tipStats = profitTips.take(2)
                 val fullTipsLine = line + "\n " + tipStats.joinToString(" \n") { it.removeColor() }
                 copyOnClick(line, fullTipsLine, "profit")
-            }
+            },
         )
         val profitPerHourRenderable =
             if (shouldShowProfitPerHour()) profitPerHourRenderable(profit, duration) else Renderable.empty()
@@ -310,7 +349,7 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             "§7Uptime: §b${duration.format()}",
             "",
             "§eClick to copy line!",
-            "§eShift Click to include stats in this tooltip!"
+            "§eShift Click to include stats in this tooltip!",
         )
         return Renderable.clickable(
             text,
@@ -320,37 +359,13 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
                 val tipStats = tips[0]
                 val fullTipsLine = "$line\n${tipStats.removeColor()}"
                 copyOnClick(line, fullTipsLine, "profit per hour")
-            }
+            },
         )
     }
 
-    private val copyOnClickConfig by lazy { CoroutineConfig("$name copy on click") }
-    private fun copyOnClick(line: String, fullTipsLine: String, type: String) = copyOnClickConfig.launch {
-        val copied = ClipboardUtils.copyToClipboardAsync(
-            if (KeyboardManager.isShiftKeyDown()) fullTipsLine
-            else line
-        ).await() ?: false
-        if (copied) ChatUtils.chat("§eCopied $name $type to clipboard!")
-        else ChatUtils.chat("§cFailed to copy $name $type to clipboard!")
-    }
+    //endregion
 
-    fun handlePossibleRareDrop(
-        internalName: NeuInternalName,
-        amount: Int,
-        message: Boolean = true
-    ) = with(trackerConfig.itemTracker) {
-        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (warnings.chat && price >= warnings.minimumChat && message) {
-            componentBuilder {
-                appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
-                appendWithColor(": ", ChatFormatting.GRAY)
-                append("§r$itemName")
-            }.let(ChatUtils::chat)
-        }
-        if (warnings.title && price >= warnings.minimumTitle) {
-            TitleManager.sendTitle("§a+ $itemName", weight = price)
-        }
-    }
+    //region UI helpers
 
     fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (!isInventoryOpen()) return
@@ -365,4 +380,6 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
             universe = ItemPriceSource.entries,
         )
     }
+
+    //endregion
 }

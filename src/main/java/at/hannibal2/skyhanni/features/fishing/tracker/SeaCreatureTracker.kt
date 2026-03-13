@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -36,7 +37,9 @@ object SeaCreatureTracker : SkyHanniTracker<SeaCreatureTracker.Data>("Sea Creatu
 
     override val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.fishing.seaCreatureTracker }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     data class Data(
         @Expose var amount: MutableMap<String, Int> = mutableMapOf(),

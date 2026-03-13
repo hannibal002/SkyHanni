@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
 import java.util.EnumMap

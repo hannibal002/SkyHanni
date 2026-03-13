@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
@@ -36,7 +38,9 @@ object VerminTracker : SkyHanniTracker<VerminTracker.Data>("Vermin Tracker") {
 
     override val config get() = RiftApi.config.area.westVillage.verminTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.rift.verminTracker }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
 
     // <editor-fold desc="Patterns">

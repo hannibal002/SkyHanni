@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -29,17 +30,19 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object GiftProfitTracker : SkyHanniItemTracker<GiftProfitTracker.Data>("Gift Profit Tracker") {
     override val config get() = SkyHanniMod.feature.event.gifting.giftProfitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.giftProfitTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() && IsGiftingDetection.isCurrentlyGifting() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() && IsGiftingDetection.isCurrentlyGifting() },
+    )
     private val patternGroup = RepoPattern.group("misc.gifting")
 
     // <editor-fold desc="Patterns">
@@ -187,7 +190,7 @@ object GiftProfitTracker : SkyHanniItemTracker<GiftProfitTracker.Data>("Gift Pro
 
         companion object {
             fun getByNameOrNull(name: String) = entries.firstOrNull {
-                it.name.uppercase() == name.uppercase()
+                it.name.equals(name, ignoreCase = true)
             }
         }
     }

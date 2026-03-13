@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -28,7 +29,9 @@ import com.google.gson.annotations.Expose
 object FrozenTreasureTracker : SkyHanniTracker<FrozenTreasureTracker.Data>("Frozen Treasure Tracker") {
     override val config get() = SkyHanniMod.feature.event.winter.frozenTreasureTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.frozenTreasureTracker }
-    override val renderCondition: () -> Boolean = { shouldShowDisplay() }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     private val compactPattern by RepoPattern.pattern(
         "event.jerry.frozentreasure.compact",

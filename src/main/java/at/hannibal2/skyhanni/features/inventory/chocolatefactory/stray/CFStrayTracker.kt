@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -51,8 +51,10 @@ object CFStrayTracker : SkyHanniTracker<CFStrayTracker.Data>("Stray Tracker") {
     private val cfConfig get() = CFApi.config
     override val config get() = cfConfig.strayTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.chocolateFactory.strayTracker }
-    override val inventory: InventoryDetector = CFApi.mainInventory
-    override val renderCondition: () -> Boolean = { config.enabled && isEnabled() }
+    override val renderConfig = RenderDisplayConfig(
+        inventoryDetector = CFApi.mainInventory,
+        condition = { config.enabled && isEnabled() },
+    )
     private val claimedStraysSlots = mutableListOf<Int>()
 
     // <editor-fold desc="Patterns">

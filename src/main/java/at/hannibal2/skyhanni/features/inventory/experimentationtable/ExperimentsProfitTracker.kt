@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -40,9 +41,9 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -52,9 +53,11 @@ import kotlin.time.Duration.Companion.seconds
 object ExperimentsProfitTracker : SkyHanniItemTracker<ExperimentsProfitTracker.Data>("Experiments Profit Tracker") {
     override val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.experimentation.experimentsProfitTracker }
-    override val renderCondition: () -> Boolean = { isEnabled() }
-    override val inventory: InventoryDetector = ExperimentationTableApi.experimentationTableInventory
-    override val onlyOnIsland: IslandType = IslandType.PRIVATE_ISLAND
+    override val renderConfig = RenderDisplayConfig(
+        inventoryDetector = ExperimentationTableApi.experimentationTableInventory,
+        condition = { isEnabled() },
+        onlyOnIsland = IslandType.PRIVATE_ISLAND,
+    )
 
     // Warn once per session about tracking XP bottle usage
     private var warnedAboutTracking = false

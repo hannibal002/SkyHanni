@@ -2,14 +2,10 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -23,19 +19,12 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper.Companion.NO_INVENTORY
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
-import at.hannibal2.skyhanni.utils.TimeUtils.dayToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
-import at.hannibal2.skyhanni.utils.TimeUtils.monthToLocalDate
-import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
-import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
-import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
-import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -47,46 +36,61 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
-import java.time.LocalDate
-import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: String) {
 
+    //region Configuration
+
     // This is needed because of Slayer Profit Tracker
     open val name get() = staticName
-    // todo move to somewhere sensible, rename
-    internal abstract fun drawDisplayF(data: Data): List<Searchable>
-    internal open fun extraOnRender() = Unit
-    internal fun createNewSession() = dataCtor.newInstance()
-
-    private val dataCtor by lazy {
-        findGenericSuperclassTypeArgument<SkyHanniTracker<*>, Data>().getConstructor()
-    }
 
     internal abstract val storageAccessor: (ProfileSpecificStorage) -> Data
-    internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
     internal abstract val config: TopLevelTrackerConfig<*>
+
     internal open val perTrackerConfig: PerTrackerConfig<*> get() = config.perTrackerConfig
-    internal open val trackerConfig: TrackerSettings get() = perTrackerConfig.let {
-        if (it.useUniversalConfig) universalTracker
-        else it.trackerConfig
-    }
+    internal open val trackerConfig: TrackerSettings
+        get() = perTrackerConfig.let {
+            if (it.useUniversalConfig) universalTracker
+            else it.trackerConfig
+        }
 
     internal open val trackUptime: Boolean = true
     internal open val customUptimeControl: Boolean = false
-    internal open val inventory = NO_INVENTORY
+
+    /**
+     * Controls when this tracker's display is rendered.
+     *
+     * Override to customize any combination of inventory presence, island filtering,
+     * or an enable condition without needing to override six separate vals.
+     * The [RenderDisplayConfig] is forwarded directly to [RenderDisplayHelper].
+     */
+    open val renderConfig: RenderDisplayConfig = RenderDisplayConfig()
+
     internal open val outsideInventory: Boolean = false
     internal open val inOwnInventory: Boolean = false
-    internal open val renderCondition: () -> Boolean = { true }
-    internal open val onlyOnIsland: IslandType? = null
-    internal open val onlyOnIslandTag: IslandTypeTag? = null
+
+    /**
+     * Whether this tracker hides when the Estimated Item Value overlay is visible.
+     * Overridden to true in [SkyHanniItemTracker], which reads the value from its config.
+     */
+    protected open val hideInEstimatedValue: Boolean = false
+
+    /**
+     * Whether this tracker hides when the player is outside any inventory GUI.
+     * Overridden in [SkyHanniItemTracker], which reads the value from its config.
+     */
+    protected open val hideOutsideInventory: Boolean = false
+
     internal open val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap()
 
+    //endregion
+
+    //region Internal display state
+
     private var displayMode: DisplayMode? = null
-    private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = trackerConfig.trackerSearchEnabled.get()
@@ -94,19 +98,22 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     protected val textInput = SearchTextInput()
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    // Separate detector used only to drive isInventoryOpen(); the RenderDisplayHelper
+    // manages its own inventory detection for the render condition.
+    private val inventoryDetector = InventoryDetector(
+        { update() },
+        { update() },
+    ) { true }
+
+    //endregion
+
     init {
-        RenderDisplayHelper(
-            inventory = inventory,
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = renderCondition,
-            onlyOnIsland = onlyOnIsland,
-            onlyOnIslandTag = onlyOnIslandTag,
-            onRender = {
-                renderDisplay(config.position)
-            },
-        )
+        RenderDisplayHelper(renderConfig) {
+            renderDisplay(config.position)
+        }
     }
+
+    //region Companion
 
     @SkyHanniModule
     companion object {
@@ -123,14 +130,53 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         }
     }
 
+    //endregion
+
+    //region Shared tracker
+
+    /**
+     * A snapshot of all [DisplayMode] data instances for the current profile.
+     *
+     * Callers use [modify] and [get] rather than accessing tracker storage directly,
+     * so that uptime tracking and dirty-flagging are applied consistently.
+     */
+    inner class SharedTracker<Data : TrackerData<*>>(
+        private val entries: Map<DisplayMode, Data>,
+    ) {
+        fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) = get(mode).let(modifyFunction)
+        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) = entries[mode]?.let(modifyFunction)
+        fun modify(modifyFunction: (Data) -> Unit) = entries.values.forEach(modifyFunction)
+
+        fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
+            "Unregistered display mode accessed on tracker",
+            "tracker" to name,
+            "displayMode" to displayMode,
+            "availableModes" to entries.keys,
+        )
+    }
+
+    //endregion
+
+    //region Public API
+
+    internal abstract fun drawDisplayF(data: Data): List<Searchable>
+    internal open fun extraOnRender() = Unit
+
+    private val dataCtor by lazy {
+        findGenericSuperclassTypeArgument<SkyHanniTracker<*>, Data>().getConstructor()
+    }
+
+    internal fun createNewSession() = dataCtor.newInstance()
+
+    internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
+
     fun getPricePer(name: NeuInternalName) = name.getPrice(trackerConfig.priceSource)
     fun getPricePerOrNull(name: NeuInternalName) = name.getPriceOrNull(trackerConfig.priceSource)
     fun isInventoryOpen() = inventoryDetector.isInside()
+
     open fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
-        onClick = {
-            reset(DisplayMode.TOTAL, "Reset total $name!")
-        },
+        onClick = { reset(DisplayMode.TOTAL, "Reset total $name!") },
         "§eClick to confirm.",
         oneTimeClick = true,
     )
@@ -156,14 +202,13 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         update()
     }
 
-    private val hideInEstimatedValue get() = (trackerConfig as? ItemTrackerSettings)?.itemTracker?.hideInEstimatedItemValue ?: false
-    private val hideOutsideInventory get() = (trackerConfig as? ItemTrackerSettings)?.itemTracker?.hideOutsideInventory ?: false
-    private val inventoryDetector = InventoryDetector(
-        { update() },
-        { update() },
-    ) { true }
+    fun firstUpdate() = if (display.isEmpty()) update() else Unit
 
-    private fun renderDisplay(position: Position) {
+    //endregion
+
+    //region Render pipeline
+
+    private fun renderDisplay(position: at.hannibal2.skyhanni.config.core.config.Position) {
         if (hideInEstimatedValue && EstimatedItemValue.isCurrentlyShowing()) return
         if (!InventoryUtils.inAnyInventory() && hideOutsideInventory && this is SkyHanniItemTracker) return
 
@@ -196,6 +241,10 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
             if (getDisplayMode() == DisplayMode.SESSION) add(buildSessionResetButton())
         }
     }
+
+    //endregion
+
+    //region Session uptime
 
     internal fun showSessionUptime() =
         trackerConfig.showUptime.get() && (!trackerConfig.onlyShowSession.get() || displayMode != DisplayMode.TOTAL)
@@ -262,16 +311,9 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
-    protected fun buildSessionResetButton() = Renderable.clickable(
-        "§cReset session!",
-        tips = listOf("§cThis will reset your", "§ccurrent session of", "§c$name"),
-        onLeftClick = {
-            if (sessionResetTime.passedSince() > 3.seconds) {
-                reset(DisplayMode.SESSION, "Reset this session of $name!")
-                sessionResetTime = SimpleTimeMark.now()
-            }
-        },
-    )
+    //endregion
+
+    //region Display mode
 
     protected open val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + this.extraDisplayModes.keys
 
@@ -302,95 +344,24 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         )
     }
 
+    private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
+
+    protected fun buildSessionResetButton() = Renderable.clickable(
+        "§cReset session!",
+        tips = listOf("§cThis will reset your", "§ccurrent session of", "§c$name"),
+        onLeftClick = {
+            if (sessionResetTime.passedSince() > 3.seconds) {
+                reset(DisplayMode.SESSION, "Reset this session of $name!")
+                sessionResetTime = SimpleTimeMark.now()
+            }
+        },
+    )
+
     private fun reset(displayMode: DisplayMode, message: String) = getSharedTracker()?.let {
         it.get(displayMode).reset()
         ChatUtils.chat(message)
         update()
     }
 
-    fun firstUpdate() = if (display.isEmpty()) update() else Unit
-
-    inner class SharedTracker<Data : TrackerData<*>>(
-        private val entries: Map<DisplayMode, Data>,
-    ) {
-        fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) = get(mode).let(modifyFunction)
-        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) = entries[mode]?.let(modifyFunction)
-        fun modify(modifyFunction: (Data) -> Unit) = entries.values.forEach(modifyFunction)
-
-        fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
-            "Unregistered display mode accessed on tracker",
-            "tracker" to name,
-            "displayMode" to displayMode,
-            "availableModes" to entries.keys,
-        )
-    }
-
-    enum class DisplayMode(
-        val displayName: String,
-        val currentName: String = "This $displayName",
-        val alternateName: String = displayName,
-        val type: KClass<*>,
-        val toValue: (String) -> Comparable<*>?,
-        val fromValue: (Comparable<*>) -> String,
-        val isDate: Boolean = (type == LocalDate::class),
-    ) {
-        TOTAL(
-            "Total",
-            "Total",
-            type = String::class,
-            toValue = { it },
-            fromValue = { it as String }
-        ),
-        SESSION(
-            "Session",
-            type = Int::class,
-            toValue = { it.toIntOrNull() },
-            fromValue = { (it as Int).toString() }
-        ),
-        MAYOR(
-            "Mayor",
-            alternateName = "Mayor, Year",
-            type = Int::class,
-            toValue = { it.toIntOrNull() },
-            fromValue = { (it as Int).toString() }
-        ),
-        DAY(
-            "Day",
-            "Today",
-            alternateName = "Date",
-            type = LocalDate::class,
-            toValue = { it.dayToLocalDate() },
-            fromValue = { (it as LocalDate).toString() }
-        ),
-        WEEK(
-            "Week",
-            type = LocalDate::class,
-            toValue = { it.weekToLocalDate() },
-            fromValue = { (it as LocalDate).format(weekFormatter) }
-        ),
-        MONTH(
-            "Month",
-            type = LocalDate::class,
-            toValue = { it.monthToLocalDate() },
-            fromValue = { (it as LocalDate).format(monthFormatter) }
-        ),
-        YEAR(
-            "Year",
-            type = LocalDate::class,
-            toValue = { it.yearToLocalDate() },
-            fromValue = { (it as LocalDate).format(yearFormatter) }
-        )
-        ;
-
-        override fun toString() = displayName
-    }
-
-    enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {
-        TOTAL("Total", DisplayMode.TOTAL),
-        SESSION("This Session", DisplayMode.SESSION),
-        REMEMBER_LAST("Remember Last", null),
-        ;
-
-        override fun toString() = display
-    }
+    //endregion
 }

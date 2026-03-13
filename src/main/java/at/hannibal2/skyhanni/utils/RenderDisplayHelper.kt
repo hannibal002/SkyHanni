@@ -14,7 +14,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
  * conditions and context, such as whether the player is in their inventory or
  * outside an inventory GUI, or in a inventory defined by InventoryDetector.
  *
- * @property inventory set a InventoryDetector the display should be rendered in.
+ * @property inventoryDetector set a InventoryDetector the display should be rendered in.
  * @property outsideInventory Specifies if the display should render when not inside any inventory.
  * @property inOwnInventory Specifies if the display should render when the player is in their own inventory.
  * @property condition Should the display be rendered at all? Insert the isEnabled() function here.
@@ -23,7 +23,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
  * @property onRender This is getting called when the render should happen.
  */
 class RenderDisplayHelper(
-    private val inventory: InventoryDetector = NO_INVENTORY,
+    private val inventoryDetector: InventoryDetector = NO_INVENTORY,
     private val outsideInventory: Boolean = false,
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
@@ -32,13 +32,23 @@ class RenderDisplayHelper(
     private val onRender: () -> Unit,
 ) {
 
+    constructor(config: RenderDisplayConfig, onRender: () -> Unit) : this(
+        inventoryDetector = config.inventoryDetector,
+        outsideInventory = config.outsideInventory,
+        inOwnInventory = config.inOwnInventory,
+        condition = config.condition,
+        onlyOnIsland = config.onlyOnIsland,
+        onlyOnIslandTag = config.onlyOnIslandTag,
+        onRender = onRender,
+    )
+
     init {
         // Registers the instance to the list of all display helpers.
         allDisplays.add(this)
     }
 
     private fun renderIn(inOwnInventory: Boolean): Boolean {
-        return (this.inOwnInventory && inOwnInventory) || inventory.isInside()
+        return (this.inOwnInventory && inOwnInventory) || inventoryDetector.isInside()
     }
 
     @SkyHanniModule

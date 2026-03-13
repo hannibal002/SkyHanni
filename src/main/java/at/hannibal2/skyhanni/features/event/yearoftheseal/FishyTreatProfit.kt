@@ -215,7 +215,7 @@ object FishyTreatProfit {
     init {
         RenderDisplayHelper(
             condition = { config.fishyTreatProfit },
-            inventory = inventory,
+            inventoryDetector = inventory,
         ) {
             config.fishyTreatProfitPosition.renderRenderables(display, posLabel = "Fishy Treat Profit")
         }
