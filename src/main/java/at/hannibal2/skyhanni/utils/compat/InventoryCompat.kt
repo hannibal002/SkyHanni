@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.compat.ReiCompat
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -10,6 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
+import org.jetbrains.annotations.ApiStatus
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -38,8 +40,9 @@ val ContainerScreen.container: AbstractContainerMenu
 object InventoryCompat {
 
     /**
-     * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
+     * Internal method, not meant to be called directly. Prefer [InventoryUtils.clickSlot].
      */
+    @ApiStatus.Internal
     fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ClickType) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = Minecraft.getInstance().player ?: return
@@ -47,8 +50,9 @@ object InventoryCompat {
     }
 
     /**
-     * Internal method, not meant to be called directly. Prefer `InventoryUtils.mouseClickSlot()`.
+     * Internal method, not meant to be called directly. Prefer [InventoryUtils.mouseClickSlot].
      */
+    @ApiStatus.Internal
     fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: ClickType) {
         if (slot < 0) return
         val gui = Minecraft.getInstance().screen
