@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import at.hannibal2.skyhanni.utils.ReflectionUtils.findSuperClassTypeParameters
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
