@@ -105,6 +105,15 @@ object ChatUtils {
     }
 
     fun chat(
+        prefix: Boolean = true,
+        prefixColor: Int? = null,
+        replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
+        builder: MutableComponent.() -> Unit = { },
+    ) = chat(componentBuilder(builder), prefix, prefixColor, replaceSameMessage, onlySendOnce, messageId)
+
+    fun chat(
         message: Component,
         prefix: Boolean = true,
         prefixColor: Int? = null,

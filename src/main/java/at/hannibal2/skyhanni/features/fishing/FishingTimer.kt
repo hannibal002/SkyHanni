@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -40,6 +41,7 @@ object FishingTimer {
     private val barnLocation = LorenzVec(108, 89, -252)
     private val mobDespawnTime = mutableMapOf<Mob, SimpleTimeMark>()
 
+    // TODO: Form into data class, and use Resettable
     private var lastSeaCreatureFished = SimpleTimeMark.farPast()
     private var display: Renderable? = null
     private var lastNameFished: String? = null
@@ -64,9 +66,9 @@ object FishingTimer {
     private var currentCount = 0
     private var startTime = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled.get()) return
 
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 3.seconds) {
             babyMagmaSlugsToFind = 0
@@ -89,9 +91,9 @@ object FishingTimer {
 
     private fun playSound() = SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!isEnabled()) return
+        if (!config.enabled.get()) return
         val mob = event.mob
         if (mob.name == babySlugName) {
             recentBabyMagmaSlugs += mob
@@ -122,9 +124,9 @@ object FishingTimer {
         updateInfo()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled.get()) return
         if (!rightLocation) return
         lastSeaCreatureFished = SimpleTimeMark.now()
         lastNameFished = event.seaCreature.name
@@ -132,48 +134,87 @@ object FishingTimer {
         handle()
     }
 
-    private fun handle() {
-        if (lastSeaCreatureFished.passedSince() > 2.seconds) return
-        val name = lastNameFished ?: return
-        val mobs = recentMobs.filter { it.name == name && it !in mobDespawnTime }
-            .sortedBy { it.baseEntity.distanceToPlayer() }
-            .take(mobsToFind)
-        if (mobs.isEmpty()) return
-        mobsToFind -= mobs.size
-        mobs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
-        if (mobsToFind == 0) {
-            recentMobs.clear()
-            lastNameFished = null
-        }
-        updateInfo()
-    }
-
-    private fun handleBabySlugs() {
-        if (lastMagmaSlugTime.passedSince() > 2.seconds) return
-        if (babyMagmaSlugsToFind == 0) return
-        val location = lastMagmaSlugLocation ?: return
-        val slugs = recentBabyMagmaSlugs.filter { it !in mobDespawnTime }
-            .sortedBy { it.baseEntity.distanceTo(location) }
-            .take(babyMagmaSlugsToFind)
-        if (slugs.isEmpty()) return
-        babyMagmaSlugsToFind -= slugs.size
-        slugs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
-        if (babyMagmaSlugsToFind == 0) {
-            recentBabyMagmaSlugs.clear()
-            lastMagmaSlugLocation = null
-        }
-        updateInfo()
-    }
-
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeyDown(event: KeyDownEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled.get()) return
         if (Minecraft.getInstance().screen != null) return
         if (event.keyCode != config.manualResetTimer) return
 
         mobDespawnTime.replaceAll { _, _ ->
             SimpleTimeMark.now()
         }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick() {
+        if (!fishingDependentEnabled()) return
+        display = createDisplay()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!fishingDependentEnabled()) return
+        val display = display ?: return
+        config.pos.renderRenderable(display, posLabel = "BarnTimer")
+    }
+
+    @HandleEvent
+    fun onWorldChange() {
+        mobDespawnTime.clear()
+        recentMobs.clear()
+        babyMagmaSlugsToFind = 0
+        display = null
+        lastMagmaSlugLocation = null
+        lastMagmaSlugTime = SimpleTimeMark.farPast()
+        recentBabyMagmaSlugs.clear()
+        mobsToFind = 0
+        currentCount = 0
+        startTime = SimpleTimeMark.farPast()
+    }
+
+    private fun fishingDependentEnabled() = config.enabled.get() && rightLocation && currentCount > 0 && FishingApi.isFishing()
+
+    private fun handleFishedMobs(
+        lastEventTime: SimpleTimeMark,
+        mobList: TimeLimitedSet<Mob>,
+        toFind: KMutableProperty0<Int>,
+        filter: (Mob) -> Boolean = { true },
+        sortKey: (Mob) -> Double,
+        onAllFound: () -> Unit,
+    ) {
+        if (lastEventTime.passedSince() > 2.seconds) return
+        if (toFind.get() == 0) return
+        val filteredMobs = mobList.filter { filter(it) && it !in mobDespawnTime }
+        val mobs = filteredMobs.sortedBy { sortKey(it) }.take(toFind.get())
+        if (mobs.isEmpty()) return
+        toFind.set(toFind.get() - mobs.size)
+        mobs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
+        if (toFind.get() == 0) {
+            mobList.clear()
+            onAllFound()
+        }
+        updateInfo()
+    }
+
+    private fun handle() = lastNameFished?.let { lastName ->
+        handleFishedMobs(
+            lastEventTime = lastSeaCreatureFished,
+            mobList = recentMobs,
+            toFind = ::mobsToFind,
+            filter = { it.name == lastName },
+            sortKey = { it.baseEntity.distanceToPlayer() },
+            onAllFound = { lastNameFished = null },
+        )
+    }
+
+    private fun handleBabySlugs() = lastMagmaSlugLocation?.let { location ->
+        handleFishedMobs(
+            lastEventTime = lastMagmaSlugTime,
+            mobList = recentBabyMagmaSlugs,
+            toFind = ::babyMagmaSlugsToFind,
+            sortKey = { it.baseEntity.distanceTo(location) },
+            onAllFound = { lastMagmaSlugLocation = null },
+        )
     }
 
     private fun updateInfo() {
@@ -193,26 +234,6 @@ object FishingTimer {
             IslandType.PRIVATE_ISLAND -> config.forStranded.get() && SkyBlockUtils.isStrandedProfile
             else -> false
         }
-    }
-
-    @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
-        if (!rightLocation) return
-        if (currentCount == 0) return
-        if (!FishingApi.isFishing()) return
-
-        display = createDisplay()
-    }
-
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!rightLocation) return
-        if (currentCount == 0) return
-        if (!FishingApi.isFishing()) return
-
-        config.pos.renderRenderable(display, posLabel = "BarnTimer")
     }
 
     private fun createDisplay(): Renderable {
@@ -241,22 +262,6 @@ object FishingTimer {
             add("startTime: $startTime")
         }
     }
-
-    @HandleEvent
-    fun onWorldChange() {
-        mobDespawnTime.clear()
-        recentMobs.clear()
-        babyMagmaSlugsToFind = 0
-        display = null
-        lastMagmaSlugLocation = null
-        lastMagmaSlugTime = SimpleTimeMark.farPast()
-        recentBabyMagmaSlugs.clear()
-        mobsToFind = 0
-        currentCount = 0
-        startTime = SimpleTimeMark.farPast()
-    }
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
