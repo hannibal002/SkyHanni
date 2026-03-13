@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object FossilSolverDisplay {
 
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
-
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
+    private val labelRenderable by lazy { Renderable.text("§eExcavator solver GUI") }
 
     /**
      * REGEX-TEST: Chisel Charges Remaining: 3
@@ -72,15 +72,12 @@ object FossilSolverDisplay {
     var possibleFossilTypes = setOf<FossilType>()
 
     @HandleEvent
-    fun onWorldChange() {
-        clearData()
-    }
+    fun onWorldChange() = clearData()
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        clearData()
-    }
+    fun onInventoryClose(event: InventoryCloseEvent) = clearData()
 
+    // Todo reshape to a data class, use Resettable
     private fun clearData() {
         foundPercentage = false
         percentage = null
@@ -191,14 +188,10 @@ object FossilSolverDisplay {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (inExcavatorMenu) {
-            // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
-            config.position.renderRenderable(Renderable.text("§eExcavator solver GUI"), posLabel = "Fossil Excavator Solver")
-            return
-        }
+        // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
+        if (inExcavatorMenu) return config.position.renderRenderable(labelRenderable, posLabel = "Fossil Excavator Solver")
 
         val displayList = mutableListOf<String>()
-
         when {
             isNotPossible -> displayList.add(NOT_POSSIBLE_STRING)
             isCompleted -> displayList.add(SOLVED_STRING)

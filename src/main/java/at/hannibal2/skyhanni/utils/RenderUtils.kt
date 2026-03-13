@@ -158,13 +158,6 @@ object RenderUtils {
     }
 
     @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
-    fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
-        if (string.isNullOrBlank()) return
-        val x = renderString0(string, offsetX, offsetY, centerX)
-        GuiEditManager.add(this, posLabel, x, 10)
-    }
-
-    @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
     private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
         val display = "§f$string"
         DrawContextUtils.pushMatrix()

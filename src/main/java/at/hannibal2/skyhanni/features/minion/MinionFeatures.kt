@@ -112,9 +112,8 @@ object MinionFeatures {
     private val minions: MutableMap<LorenzVec, ProfileSpecificStorage.MinionConfig>?
         get() = ProfileStorageData.profileSpecific?.minions
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onPlayerInteraction(event: PlayerInteractionEvent) {
-        if (!isEnabled()) return
         if (event.action != ClickAction.RIGHT_CLICK_BLOCK) return
 
         val vec = event.face?.unitVec3i ?: return
@@ -276,9 +275,8 @@ object MinionFeatures {
 
     // Todo this calculation should not happen invariably when null.
     //  Use a "dirty" flag or something similar, and handle state management.
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTick() {
-        if (!isEnabled()) return
         if (coinsPerDay != null) return
 
         if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
@@ -320,6 +318,7 @@ object MinionFeatures {
         return "§7Coins/day with ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}§7: §6$format coins"
     }
 
+    // TODO reshape to data class, use Resettable
     @HandleEvent
     fun onWorldChange() {
         lastClickedEntity = null
@@ -329,10 +328,8 @@ object MinionFeatures {
         minionStorageInventoryOpen = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
-
         val message = event.message
         if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
@@ -367,10 +364,8 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onRenderLastEmptied(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
-
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
@@ -396,9 +391,9 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onRenderLiving(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (!isEnabled() || !config.hideMobsNametagNearby) return
+        if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity.takeIf {
             val nameMatch = it.customName?.string?.contains("❤") ?: false
@@ -412,9 +407,7 @@ object MinionFeatures {
         }
     }
 
-    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isCurrent()
-
-    private fun enableWithHub() = isEnabled() || IslandType.HUB.isCurrent()
+    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isCurrent() || IslandType.HUB.isCurrent()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
