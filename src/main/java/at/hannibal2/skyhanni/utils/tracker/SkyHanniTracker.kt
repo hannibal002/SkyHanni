@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
@@ -54,6 +54,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: String) {
+
     // This is needed because of Slayer Profit Tracker
     open val name get() = staticName
     // todo move to somewhere sensible, rename
@@ -68,8 +69,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     internal abstract val storageAccessor: (ProfileSpecificStorage) -> Data
     internal val storage: Data? get() = ProfileStorageData.profileSpecific?.let(storageAccessor)
     internal abstract val config: TopLevelTrackerConfig<*>
-    internal open val perTrackerConfig: GenericIndividualTrackerConfig<*> get() = config.perTrackerConfig
-    internal open val trackerConfig: TrackerGenericConfig get() = perTrackerConfig.let {
+    internal open val perTrackerConfig: PerTrackerConfig<*> get() = config.perTrackerConfig
+    internal open val trackerConfig: TrackerSettings get() = perTrackerConfig.let {
         if (it.useUniversalConfig) universalTracker
         else it.trackerConfig
     }
@@ -155,8 +156,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
         update()
     }
 
-    private val hideInEstimatedValue get() = (trackerConfig as? ItemTrackerGenericConfig)?.itemTracker?.hideInEstimatedItemValue ?: false
-    private val hideOutsideInventory get() = (trackerConfig as? ItemTrackerGenericConfig)?.itemTracker?.hideOutsideInventory ?: false
+    private val hideInEstimatedValue get() = (trackerConfig as? ItemTrackerSettings)?.itemTracker?.hideInEstimatedItemValue ?: false
+    private val hideOutsideInventory get() = (trackerConfig as? ItemTrackerSettings)?.itemTracker?.hideOutsideInventory ?: false
     private val inventoryDetector = InventoryDetector(
         { update() },
         { update() },

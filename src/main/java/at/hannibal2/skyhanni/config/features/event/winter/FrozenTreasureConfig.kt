@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.features.event.winter
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FrozenTreasureConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
+class FrozenTreasureConfig : TopLevelTrackerConfig<TrackerSettings> {
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -89,7 +89,7 @@ class FrozenTreasureConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<TrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = FrozenTreasureConfig::class, field = "enabled")

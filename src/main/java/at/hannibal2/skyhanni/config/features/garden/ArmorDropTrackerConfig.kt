@@ -3,15 +3,16 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.GardenIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ArmorDropTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
+class ArmorDropTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track all §aCropie§7, §9Squash§7, §5Fermento §7and §6Helianthus §7dropped.")
     @ConfigEditorBoolean
@@ -27,7 +28,7 @@ class ArmorDropTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: GardenIndividualTrackerConfig = GardenIndividualTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<GardenTrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ArmorDropTrackerConfig::class, field = "enabled")

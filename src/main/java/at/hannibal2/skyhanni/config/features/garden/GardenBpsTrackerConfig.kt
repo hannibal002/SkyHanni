@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedGenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedPerTrackerConfig
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -17,7 +17,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class GardenBpsTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
+class GardenBpsTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track crop block breaks in garden.")
     @ConfigEditorBoolean
@@ -32,8 +32,8 @@ class GardenBpsTrackerConfig : TopLevelTrackerConfig<TrackerGenericConfig> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: TimedGenericIndividualTrackerConfig<GardenTrackerGenericConfig> =
-        TimedGenericIndividualTrackerConfig()
+    override val perTrackerConfig: TimedPerTrackerConfig<GardenTrackerSettings> =
+        TimedPerTrackerConfig()
 
     enum class GardenUptimeDisplayText(private val displayName: String) {
         TITLE("Crop Break Tracker"),

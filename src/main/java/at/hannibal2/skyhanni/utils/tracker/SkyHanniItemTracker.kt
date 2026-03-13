@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod.launch
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings.ItemTrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -50,8 +50,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
-    abstract override val config: TopLevelTrackerConfig<ItemTrackerGenericConfig>
-    override val trackerConfig: ItemTrackerGenericConfig get() = config.perTrackerConfig.trackerConfig
+    abstract override val config: TopLevelTrackerConfig<ItemTrackerSettings>
+    override val trackerConfig: ItemTrackerSettings get() = config.perTrackerConfig.trackerConfig
     private val scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) = modify {

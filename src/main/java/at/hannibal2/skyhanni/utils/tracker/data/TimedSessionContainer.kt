@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker.data
 
-import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TimedTrackerConfig
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter

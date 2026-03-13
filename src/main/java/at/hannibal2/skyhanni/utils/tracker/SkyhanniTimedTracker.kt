@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.misc.tracker.TimedTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedGenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TimedTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedPerTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +22,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions")
 abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
-    abstract override val perTrackerConfig: TimedGenericIndividualTrackerConfig<*>
+
+    abstract override val perTrackerConfig: TimedPerTrackerConfig<*>
     abstract override val storageAccessor: (ProfileSpecificStorage) -> Data
 
     private val timedConfig: TimedTrackerConfig
@@ -59,7 +60,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
     @Suppress("UNCHECKED_CAST")
     override fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
-            availableTrackers.associateWith { ps.getData().getOrPutNewestData(it) as Data }
+            availableTrackers.associateWith { ps.getData().getOrPutNewestData(it) as Data },
         )
     }
 
@@ -152,7 +153,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
         fun switcherButton(label: String, string: String) = Renderable.clickable(
             label,
             onLeftClick = { updateDisplay(string) },
-            tips = listOf(getDisplayText(string = string))
+            tips = listOf(getDisplayText(string = string)),
         )
 
         return listOfNotNull(
@@ -164,7 +165,7 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
             },
             container.getMostRecentName(getDisplayMode())?.takeIf { hasMoreAfterNext }?.let {
                 switcherButton("§a[ §r§f§l->> §r§a]", it)
-            }
+            },
         )
     }
 

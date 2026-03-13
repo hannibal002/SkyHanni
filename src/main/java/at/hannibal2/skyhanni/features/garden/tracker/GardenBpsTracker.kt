@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenBpsTrackerConfig.GardenUptimeDisplayText
-import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedGenericIndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.TimedPerTrackerConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenBpsTracker : SkyhanniTimedTracker<GardenBpsTracker.TimedData>("Garden BPS Tracker") {
     override val config get() = GardenApi.config.gardenBpsTracker
-    override val perTrackerConfig: TimedGenericIndividualTrackerConfig<GardenTrackerGenericConfig> get() = config.perTrackerConfig
+    override val perTrackerConfig: TimedPerTrackerConfig<GardenTrackerSettings> get() = config.perTrackerConfig
     override val storageAccessor: (ProfileSpecificStorage) -> TimedData = { it.garden.gardenBpsTracker }
     override val renderCondition: () -> Boolean = { isEnabled() }
     override val customUptimeControl: Boolean = true
