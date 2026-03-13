@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 object SprayFeatures {
 
     private val config get() = PestApi.config.spray
-
+    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
     private var display: Renderable? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
 
@@ -34,26 +34,15 @@ object SprayFeatures {
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
 
-    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
-
-    private fun SprayType?.getSprayEffect(): String =
-        this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
-            pests.joinToString("§7, §6") { it.displayName }
-        } ?: when (this) {
-            SprayType.FINE_FLOUR -> "§6+20☘ Farming Fortune"
-            else -> "§cUnknown Effect"
-        }
-
-
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         display = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
-            val type = SprayType.getByNameOrNull(sprayName)
+            val type = SprayType.getByNameOrNull(sprayName) ?: return@matchMatcher null
             val sprayEffect = type.getSprayEffect()
-            Renderable.text("§a${type?.displayName ?: sprayName} §7(§6$sprayEffect§7)")
+            Renderable.text("§a${type.displayName} §7(§6$sprayEffect§7)")
         } ?: return
 
         lastChangeTime = SimpleTimeMark.now()
@@ -64,10 +53,11 @@ object SprayFeatures {
         if (!isEnabled()) return
 
         if (lastChangeTime.passedSince() > 5.seconds) {
-            this.display = null
+            display = null
             return
         }
 
+        val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Pest Spray Selector")
     }
 
