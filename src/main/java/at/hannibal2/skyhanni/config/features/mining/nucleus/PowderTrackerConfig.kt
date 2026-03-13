@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class PowderTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
+class PowderTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable the Powder Tracker overlay for mining.")
     @ConfigEditorBoolean

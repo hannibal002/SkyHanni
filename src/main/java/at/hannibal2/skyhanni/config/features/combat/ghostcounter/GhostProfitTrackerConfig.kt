@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class GhostProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class GhostProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enables the Ghost Profit Tracker.")
     @ConfigEditorBoolean

@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.seconds
 
 abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
 
-    abstract override val config: TopLevelTrackerConfig<ItemTrackerSettings>
+    abstract override val config: TopLevelTrackerConfig
 
     // Chains through the base useUniversalConfig check, then casts. The cast is safe because
     // this class constrains config to TopLevelTrackerConfig<ItemTrackerSettings>, so both the

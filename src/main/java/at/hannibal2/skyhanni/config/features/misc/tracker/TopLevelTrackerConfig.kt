@@ -7,20 +7,20 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerC
 /**
  * Marker interface for tracker feature configs that live at the top level of a feature's config block.
  *
- * The type parameter [T] constrains which [TrackerSettings] subclass the [perTrackerConfig]
- * wraps, ensuring the tracker implementation and its config agree on what settings are available.
+ * Holds the [TrackerSettings] subclass the [perTrackerConfig] wraps, ensuring the tracker implementation
+ * and its config agree on what settings are available.
  *
  * Example:
  * ```
- * class GardenBpsTrackerConfig : TopLevelTrackerConfig<GardenTrackerSettings> {
+ * class GardenBpsTrackerConfig : TopLevelTrackerConfig {
  *     override val perTrackerConfig: TimedPerTrackerConfig<GardenTrackerSettings> = TimedPerTrackerConfig()
  *     ...
  * }
  * ```
  */
 @Suppress("StorageNeedsExpose")
-interface TopLevelTrackerConfig<T : TrackerSettings> {
+interface TopLevelTrackerConfig {
     var enabled: Boolean
-    val perTrackerConfig: PerTrackerConfig<T>
+    val perTrackerConfig: PerTrackerConfig<TrackerSettings>
     val position: Position
 }

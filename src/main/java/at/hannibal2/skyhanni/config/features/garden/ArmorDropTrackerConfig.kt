@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ArmorDropTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
+class ArmorDropTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track all §aCropie§7, §9Squash§7, §5Fermento §7and §6Helianthus §7dropped.")
     @ConfigEditorBoolean

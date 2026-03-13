@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class SeaCreatureTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
+class SeaCreatureTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count the different sea creatures you catch.")
     @ConfigEditorBoolean

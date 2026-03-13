@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class TimiteTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class TimiteTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Tracks collected Timite ores and shows mote profit.")
     @ConfigEditorBoolean

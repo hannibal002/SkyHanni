@@ -15,7 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class PestProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class PestProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count all items you pick up when killing pests.")
     @ConfigEditorBoolean

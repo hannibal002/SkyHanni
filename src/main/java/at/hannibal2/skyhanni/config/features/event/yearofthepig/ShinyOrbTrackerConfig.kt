@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ShinyOrbTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class ShinyOrbTrackerConfig : TopLevelTrackerConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a tracker for Shiny Orb rewards.")

@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FishingProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class FishingProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count all items you pick up while fishing.")
     @ConfigEditorBoolean

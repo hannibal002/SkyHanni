@@ -15,7 +15,14 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
  *
  * @param Settings the [TrackerSettings] subclass whose options appear in the accordion.
  */
-open class TimedPerTrackerConfig<out Settings : TrackerSettings> : PerTrackerConfig<Settings>() {
+open class TimedPerTrackerConfig<out Settings : TrackerSettings> protected constructor(
+    settingsClass: Class<@UnsafeVariance Settings>? = null,
+) : PerTrackerConfig<Settings>(settingsClass) {
+
+    // Subclasses that don't pass a class explicitly fall back to reflection.
+    // This works for proper subclasses because the type argument is baked into
+    // the subclass bytecode and genericSuperclass can read it.
+    protected constructor() : this(null)
 
     @Expose
     @ConfigOption(name = "Timed Tracker", desc = "Timed Tracker Settings")
@@ -27,5 +34,11 @@ open class TimedPerTrackerConfig<out Settings : TrackerSettings> : PerTrackerCon
         // before the base sync runs and potentially triggers a new session.
         timedTracker.syncSettings()
         super.syncSettings()
+    }
+
+    companion object {
+        /** Creates a [TimedPerTrackerConfig] using the reified [S] directly, bypassing reflection. */
+        inline operator fun <reified S : TrackerSettings> invoke(): TimedPerTrackerConfig<S> =
+            object : TimedPerTrackerConfig<S>(S::class.java) {}
     }
 }

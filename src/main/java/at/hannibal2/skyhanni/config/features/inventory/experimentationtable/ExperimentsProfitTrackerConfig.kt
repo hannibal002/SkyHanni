@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ExperimentsProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class ExperimentsProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Tracker for drops/XP you get from experiments.")
     @ConfigEditorBoolean

@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ForagingTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class ForagingTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track drops from foraging.")
     @ConfigEditorBoolean

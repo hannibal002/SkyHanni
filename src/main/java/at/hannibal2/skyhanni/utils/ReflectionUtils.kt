@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import at.hannibal2.skyhanni.utils.ReflectionUtils.findSuperClassTypeParameters
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
@@ -178,5 +179,63 @@ object ReflectionUtils {
         }
         @Suppress("UNCHECKED_CAST")
         return type.actualTypeArguments[index] as Class<T>
+    }
+
+    /**
+     * Walks the superclass hierarchy from [javaClass] upward, tracking type-variable
+     * bindings at each step, until it finds [PerTrackerConfig] as a raw superclass.
+     *
+     * This is needed because reflection on a class like:
+     * ```
+     *   GardenBpsTrackerConfig : TimedPerTrackerConfig<GardenItemTrackerSettings>
+     * ```
+     * sees `TimedPerTrackerConfig`'s `genericSuperclass` as `PerTrackerConfig<S>` —
+     * `S` is still a [TypeVariable] at that level. We must record that `S` was bound
+     * to `GardenItemTrackerSettings` one step below before we can resolve it here.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun resolveAnonymousSingleType(instance: Any, stopClass: Class<*>): Class<*> {
+        val bindings = mutableMapOf<Pair<Class<*>, String>, Type>()
+
+        fun TypeVariable<*>.key(): Pair<Class<*>, String>? =
+            (genericDeclaration as? Class<*>)?.let { it to name }
+
+        fun resolve(t: Type): Type =
+            if (t is TypeVariable<*>) bindings[t.key()] ?: t else t
+
+        var current: Type = instance.javaClass.genericSuperclass
+            ?: error("No superclass found on ${instance.javaClass.name}")
+
+        while (true) {
+            when (current) {
+                is ParameterizedType -> {
+                    val raw = current.rawType as Class<*>
+
+                    raw.typeParameters.forEachIndexed { i, param ->
+                        param.key()?.let { key ->
+                            bindings[key] = resolve(current.actualTypeArguments[i])
+                        }
+                    }
+
+                    if (raw == stopClass) {
+                        return resolve(current.actualTypeArguments[0]) as? Class<*>
+                            ?: error(
+                                "Type argument of ${stopClass.name} did not resolve to a concrete class. " +
+                                    "Bindings: $bindings, arg: ${current.actualTypeArguments[0]}",
+                            )
+                    }
+
+                    current = raw.genericSuperclass
+                        ?: error("Reached top of hierarchy without finding ${stopClass.name} (at ${raw.name})")
+                }
+
+                is Class<*> -> {
+                    current = current.genericSuperclass
+                        ?: error("Reached top of hierarchy without finding ${stopClass.name} (at ${current.name})")
+                }
+
+                else -> error("Unexpected type in hierarchy: $current (${current::class.java.name})")
+            }
+        }
     }
 }

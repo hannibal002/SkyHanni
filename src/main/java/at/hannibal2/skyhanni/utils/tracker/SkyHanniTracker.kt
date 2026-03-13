@@ -44,7 +44,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     open val name get() = staticName
 
     internal abstract val storageAccessor: (ProfileSpecificStorage) -> Data
-    internal abstract val config: TopLevelTrackerConfig<*>
+    internal abstract val config: TopLevelTrackerConfig
 
     internal open val perTrackerConfig: PerTrackerConfig<*> get() = config.perTrackerConfig
     internal open val trackerConfig: TrackerSettings

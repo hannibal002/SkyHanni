@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class DianaProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class DianaProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

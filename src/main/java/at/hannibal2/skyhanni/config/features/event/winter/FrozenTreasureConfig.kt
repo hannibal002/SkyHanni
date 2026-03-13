@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FrozenTreasureConfig : TopLevelTrackerConfig<TrackerSettings> {
+class FrozenTreasureConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

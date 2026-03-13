@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SlayerProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class SlayerProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

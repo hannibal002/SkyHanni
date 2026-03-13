@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class DarkMonolithTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class DarkMonolithTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

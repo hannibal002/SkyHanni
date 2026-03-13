@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class MythologicalMobTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
+class MythologicalMobTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count the different mythological mobs you have dug up.")
     @ConfigEditorBoolean

@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class CrystalNucleusTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class CrystalNucleusTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable the Crystal Nucleus Tracker overlay.")
     @ConfigEditorBoolean

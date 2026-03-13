@@ -17,7 +17,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class GardenBpsTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
+class GardenBpsTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track crop block breaks in garden.")
     @ConfigEditorBoolean
@@ -32,8 +32,7 @@ class GardenBpsTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: TimedPerTrackerConfig<GardenTrackerSettings> =
-        TimedPerTrackerConfig()
+    override val perTrackerConfig: TimedPerTrackerConfig<GardenTrackerSettings> = TimedPerTrackerConfig()
 
     enum class GardenUptimeDisplayText(private val displayName: String) {
         TITLE("Crop Break Tracker"),

@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class EnderNodeConfig : TopLevelTrackerConfig<TrackerSettings> {
+class EnderNodeConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

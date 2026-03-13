@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class CFStrayTrackerConfig : TopLevelTrackerConfig<TrackerSettings> {
+class CFStrayTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track stray rabbits found in the Chocolate Factory menu.")
     @ConfigEditorBoolean

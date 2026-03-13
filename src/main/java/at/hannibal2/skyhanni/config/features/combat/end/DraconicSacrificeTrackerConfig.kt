@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class DraconicSacrificeTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
+class DraconicSacrificeTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Tracks items and profit while using the Draconic Altar in the End.")
     @ConfigEditorBoolean
