@@ -118,7 +118,8 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !inLimbo) return
+        if (!config.showTimeInLimbo || !inLimbo) return
+        @Suppress("InSkyBlockEarlyReturn")
         if (SkyBlockUtils.inSkyBlock) return leaveLimbo()
 
         val duration = limboJoinTime.passedSince().format()
@@ -128,7 +129,7 @@ object LimboTimeTracker {
 
     private fun leaveLimbo() {
         inLimbo = false
-        if (!isEnabled()) return
+        if (!config.showTimeInLimbo) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
         val currentPB = (storage?.personalBest ?: 0).seconds
@@ -202,8 +203,6 @@ object LimboTimeTracker {
             add("since: ${limboJoinTime.passedSince()}")
         }
     }
-
-    fun isEnabled() = config.showTimeInLimbo
 
     private fun tryTruncateFloat(input: Float): String = input.toString().let {
         if (it.endsWith(".0")) it.dropLast(2)

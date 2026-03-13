@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.combat.broodmother
 
-import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
