@@ -29,7 +29,6 @@ object SharkFishCounter {
         BLUE("Blue", LorenzColor.BLUE),
         TIGER("Tiger", LorenzColor.DARK_PURPLE),
         GREAT_WHITE("Great White", LorenzColor.GOLD),
-        ;
     }
 
     private val counterMap = enumMapOf<SharkType, Int>()
