@@ -74,14 +74,14 @@ object PigFeaturesApi {
     )
 
     /**
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§3+1,000 Mining XP §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§5Potato Spreading §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§b3x §r§aGrand Experience Bottle §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§6+9,721 Coins §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§5Farming for Dummies §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§3+1,000 Alchemy XP §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§9Harvesting VI §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§a8x Enchanted Pork §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§3+1,000 Mining XP §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§5Potato Spreading §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§b3x §r§aGrand Experience Bottle §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§6+9,721 Coins §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§5Farming for Dummies §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§3+1,000 Alchemy XP §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§9Harvesting VI §r§efrom the piglet's orb!
+     * @regexTest §6§lSHINY! §r§eYou extracted §r§a8x Enchanted Pork §r§efrom the piglet's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
@@ -89,8 +89,8 @@ object PigFeaturesApi {
     )
 
     /**
-     * REGEX-TEST: +3,000 Coins
-     * REGEX-TEST: +9,721 Coins
+     * @regexTest +3,000 Coins
+     * @regexTest +9,721 Coins
      */
     private val coinsRewardPattern by patternGroup.pattern(
         "orb.reward.coins",
@@ -98,8 +98,8 @@ object PigFeaturesApi {
     )
 
     /**
-     * REGEX-TEST: +1,000 Mining XP
-     * REGEX-TEST: +1,000 Alchemy XP
+     * @regexTest +1,000 Mining XP
+     * @regexTest +1,000 Alchemy XP
      */
     private val skillXpRewardPattern by patternGroup.pattern(
         "orb.reward.skillxp",

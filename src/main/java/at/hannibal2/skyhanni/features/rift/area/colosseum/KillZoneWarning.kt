@@ -27,10 +27,10 @@ object KillZoneWarning {
     private val patternGroup = RepoPattern.group("rift.colosseum.bacte")
 
     /**
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE! §r§a⚠
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE!!! §r§a⚠
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE!!!!!! §r§a⚠
-     * REGEX-TEST: §a⚠ §r§cGet back in the arena or you will DIE!!!!!!!!!!!! §r§a⚠
+     * @regexTest §a⚠ §r§cGet back in the arena or you will DIE! §r§a⚠
+     * @regexTest §a⚠ §r§cGet back in the arena or you will DIE!!! §r§a⚠
+     * @regexTest §a⚠ §r§cGet back in the arena or you will DIE!!!!!! §r§a⚠
+     * @regexTest §a⚠ §r§cGet back in the arena or you will DIE!!!!!!!!!!!! §r§a⚠
      */
     private val killZonePattern by patternGroup.pattern(
         "chat.kill-zone",

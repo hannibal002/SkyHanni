@@ -40,7 +40,7 @@ object CFDataLoader {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §674.15 §8per second
+     * @regexTest §674.15 §8per second
      */
     private val chocolatePerSecondPattern by CFApi.patternGroup.pattern(
         "chocolate.persecond",
@@ -48,7 +48,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7All-time Chocolate: §67,645,879,859
+     * @regexTest §7All-time Chocolate: §67,645,879,859
      */
     private val chocolateAllTimePattern by CFApi.patternGroup.pattern(
         "chocolate.alltime",
@@ -56,7 +56,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §6Chocolate Factory III
+     * @regexTest §6Chocolate Factory III
      */
     private val prestigeLevelPattern by CFApi.patternGroup.pattern(
         "prestige.level",
@@ -64,7 +64,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Chocolate this Prestige: §6330,382,389
+     * @regexTest §7Chocolate this Prestige: §6330,382,389
      */
     private val chocolateThisPrestigePattern by CFApi.patternGroup.pattern(
         "chocolate.thisprestige",
@@ -72,7 +72,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Max Chocolate: §660B
+     * @regexTest §7Max Chocolate: §660B
      */
     private val maxChocolatePattern by CFApi.patternGroup.pattern(
         "chocolate.max",
@@ -80,7 +80,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7§cRequires 4B Chocolate this Prestige!
+     * @regexTest §7§cRequires 4B Chocolate this Prestige!
      */
     private val chocolateForPrestigePattern by CFApi.patternGroup.pattern(
         "chocolate.forprestige",
@@ -88,7 +88,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Total Multiplier: §61.399x
+     * @regexTest §7Total Multiplier: §61.399x
      */
     private val chocolateMultiplierPattern by CFApi.patternGroup.pattern(
         "chocolate.multiplier",
@@ -96,9 +96,9 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7You are §8#§b114
-     * REGEX-TEST: §7§7You are §8#§b5,139 §7in all-time Chocolate.
-     * REGEX-TEST: §7§7You are §8#§b5,139 §7in all-time
+     * @regexTest §7You are §8#§b114
+     * @regexTest §7§7You are §8#§b5,139 §7in all-time Chocolate.
+     * @regexTest §7§7You are §8#§b5,139 §7in all-time
      */
     private val leaderboardPlacePattern by CFApi.patternGroup.pattern(
         "leaderboard.place",
@@ -106,7 +106,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7§8You are in the top §65.06%§8 of players!
+     * @regexTest §7§8You are in the top §65.06%§8 of players!
      */
     private val leaderboardPercentilePattern by CFApi.patternGroup.pattern(
         "leaderboard.percentile",
@@ -114,7 +114,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Your Barn: §a16§7/§a450 Rabbits
+     * @regexTest §7Your Barn: §a16§7/§a450 Rabbits
      */
     private val barnAmountPattern by CFApi.patternGroup.pattern(
         "barn.amount",
@@ -122,7 +122,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Charges: §e2§7/§a3
+     * @regexTest §7Charges: §e2§7/§a3
      */
     private val timeTowerAmountPattern by CFApi.patternGroup.pattern(
         "timetower.amount",
@@ -130,7 +130,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7What does it do? Nobody knows...
+     * @regexTest §7What does it do? Nobody knows...
      */
     private val timeTowerAmountEmptyPattern by CFApi.patternGroup.pattern(
         "timetower.amount.empty",
@@ -138,8 +138,8 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Status: §a§lACTIVE §f59m58s
-     * REGEX-TEST: §7Status: §c§lINACTIVE
+     * @regexTest §7Status: §a§lACTIVE §f59m58s
+     * @regexTest §7Status: §c§lINACTIVE
      */
     private val timeTowerStatusPattern by CFApi.patternGroup.pattern(
         "timetower.status",
@@ -147,7 +147,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Next Charge: §a7h59m58s
+     * @regexTest §7Next Charge: §a7h59m58s
      */
     private val timeTowerRechargePattern by CFApi.patternGroup.pattern(
         "timetower.recharge",
@@ -159,7 +159,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §6§lGolden Rabbit §8- §aStampede
+     * @regexTest §6§lGolden Rabbit §8- §aStampede
      */
     val clickMeGoldenRabbitPattern by CFApi.patternGroup.pattern(
         "rabbit.clickme.golden",
@@ -167,7 +167,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: Rabbit Bro - [14] Employee
+     * @regexTest Rabbit Bro - [14] Employee
      */
     private val rabbitAmountPattern by CFApi.patternGroup.pattern(
         "rabbit.amount",
@@ -175,7 +175,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: Time Tower I
+     * @regexTest Time Tower I
      */
     val upgradeTierPattern by CFApi.patternGroup.pattern(
         "upgradetier",
@@ -183,7 +183,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: Rabbit Bro - Unemployed
+     * @regexTest Rabbit Bro - Unemployed
      */
     private val unemployedRabbitPattern by CFApi.patternGroup.pattern(
         "rabbit.unemployed",
@@ -191,8 +191,8 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: Rabbit Shrine
-     * REGEX-TEST: Coach Jackrabbit
+     * @regexTest Rabbit Shrine
+     * @regexTest Coach Jackrabbit
      */
     private val otherUpgradePattern by CFApi.patternGroup.pattern(
         "other.upgrade",
@@ -200,7 +200,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Available eggs: §a0
+     * @regexTest §7Available eggs: §a0
      */
     val hitmanAvailableEggsPattern by CFApi.patternGroup.pattern(
         "hitman.availableeggs",
@@ -208,8 +208,8 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Purchased slots: §a28§7/§a28
-     * REGEX-TEST: §7Purchased slots: §e0§7/§a22
+     * @regexTest §7Purchased slots: §a28§7/§a28
+     * @regexTest §7Purchased slots: §e0§7/§a22
      */
     private val hitmanPurchasedSlotsPattern by CFApi.patternGroup.pattern(
         "hitman.purchasedslots",
@@ -217,7 +217,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7Slot cooldown: §a8m 6s
+     * @regexTest §7Slot cooldown: §a8m 6s
      */
     private val hitmanSingleSlotCooldownPattern by CFApi.patternGroup.pattern(
         "hitman.slotcooldown",
@@ -225,7 +225,7 @@ object CFDataLoader {
     )
 
     /**
-     * REGEX-TEST: §7All slots in: §a8h 8m 6s
+     * @regexTest §7All slots in: §a8h 8m 6s
      */
     private val hitmanAllSlotsCooldownPattern by CFApi.patternGroup.pattern(
         "hitman.allslotscooldown",

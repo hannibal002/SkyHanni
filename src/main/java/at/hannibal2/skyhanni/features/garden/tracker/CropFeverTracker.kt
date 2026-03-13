@@ -93,8 +93,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     private val patternGroup = RepoPattern.group("garden.cropfever")
 
     /**
-     * REGEX-TEST: RARE DROP! You dropped 48x Enchanted Melon Slice!
-     * REGEX-TEST: UNCOMMON DROP! You dropped 24x Enchanted Melon Slice!
+     * @regexTest RARE DROP! You dropped 48x Enchanted Melon Slice!
+     * @regexTest UNCOMMON DROP! You dropped 24x Enchanted Melon Slice!
      */
     private val rngDrop by patternGroup.pattern(
         "drop",
@@ -102,7 +102,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     )
 
     /**
-     * REGEX-TEST: WOAH! You caught a case of the CROP FEVER for 60 seconds!
+     * @regexTest WOAH! You caught a case of the CROP FEVER for 60 seconds!
      */
     private val cropFeverStart by patternGroup.pattern(
         "start",
@@ -110,7 +110,7 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     )
 
     /**
-     * REGEX-TEST: GONE! Your CROP FEVER has been cured!
+     * @regexTest GONE! Your CROP FEVER has been cured!
      */
     private val cropFeverEnd by patternGroup.pattern(
         "end",

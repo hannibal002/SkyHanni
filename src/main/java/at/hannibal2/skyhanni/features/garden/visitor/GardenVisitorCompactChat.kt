@@ -20,17 +20,17 @@ object GardenVisitorCompactChat {
     private val patternGroup = RepoPattern.group("garden.visitor.compact")
 
     /**
-     * REGEX-TEST:     §8+§f2x §dGold Essence
-     * REGEX-TEST:     §fDead Bush
-     * REGEX-TEST:     §8+§52 Pelts
-     * REGEX-TEST:     $8+§215 §7Garden Experience
-     * REGEX-TEST:     §8+§35k §7Farming XP
-     * REGEX-TEST:     §8+§311k §7Farming XP
-     * REGEX-TEST:     §8+§c32 Copper
-     * REGEX-TEST:     §7§aFine Flour §8x3
-     * REGEX-TEST:     §7§9Turbo-Carrot I Book
-     * REGEX-TEST:     §7§8+§d1,241 Gemstone Powder
-     * REGEX-TEST:     §7§8+§2Crystal Hollows Pass
+     * @regexTestWrapped "    §8+§f2x §dGold Essence"
+     * @regexTestWrapped "    §fDead Bush"
+     * @regexTestWrapped "    §8+§52 Pelts"
+     * @regexTestWrapped "    $8+§215 §7Garden Experience"
+     * @regexTestWrapped "    §8+§35k §7Farming XP"
+     * @regexTestWrapped "    §8+§311k §7Farming XP"
+     * @regexTestWrapped "    §8+§c32 Copper"
+     * @regexTestWrapped "    §7§aFine Flour §8x3"
+     * @regexTestWrapped "    §7§9Turbo-Carrot I Book"
+     * @regexTestWrapped "    §7§8+§d1,241 Gemstone Powder"
+     * @regexTestWrapped "    §7§8+§2Crystal Hollows Pass"
      */
     @Suppress("MaxLineLength")
     private val visitorRewardPattern by patternGroup.pattern(
@@ -39,9 +39,9 @@ object GardenVisitorCompactChat {
     )
 
     /**
-     * REGEX-TEST: §6§lOFFER ACCEPTED §8with §aLibrarian §8(§a§lUNCOMMON§8)
-     * REGEX-TEST: §6§lOFFER ACCEPTED §8with §6Sirius §8(§6§lLEGENDARY§8)
-     * REGEX-TEST: §6§lOFFER ACCEPTED §8with §cSpaceman §8(§c§lSPECIAL§8)
+     * @regexTest §6§lOFFER ACCEPTED §8with §aLibrarian §8(§a§lUNCOMMON§8)
+     * @regexTest §6§lOFFER ACCEPTED §8with §6Sirius §8(§6§lLEGENDARY§8)
+     * @regexTest §6§lOFFER ACCEPTED §8with §cSpaceman §8(§c§lSPECIAL§8)
      */
     private val fullyAcceptedPattern by patternGroup.pattern(
         "fullyaccepted",
@@ -49,11 +49,11 @@ object GardenVisitorCompactChat {
     )
 
     /**
-     * REGEX-TEST: Copper
-     * REGEX-TEST: Farming XP
-     * REGEX-TEST: Farming Experience
-     * REGEX-TEST: Garden Experience
-     * REGEX-TEST: Bits
+     * @regexTest Copper
+     * @regexTest Farming XP
+     * @regexTest Farming Experience
+     * @regexTest Garden Experience
+     * @regexTest Bits
      */
     private val discardRewardNamePattern by patternGroup.pattern(
         "disregardrewardname",
@@ -61,7 +61,7 @@ object GardenVisitorCompactChat {
     )
 
     /**
-     * REGEX-TEST:   §a§lREWARDS
+     * @regexTestWrapped "  §a§lREWARDS"
      */
     private val rewardsTextPattern by patternGroup.pattern(
         "rewardstext",

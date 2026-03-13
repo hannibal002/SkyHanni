@@ -53,7 +53,7 @@ object SuperpairDataDisplay {
     )
 
     /**
-     * REGEX-TEST: Remaining Clicks: 22
+     * @regexTest Remaining Clicks: 22
      */
     private val remainingClicksPattern by ExperimentationTableApi.patternGroup.pattern(
         "clicks",
@@ -61,7 +61,7 @@ object SuperpairDataDisplay {
     )
 
     /**
-     * REGEX-TEST: GUARDIAN;4
+     * @regexTest GUARDIAN;4
      */
     private val guardianPetInternalNamePattern by ExperimentationTableApi.patternGroup.pattern(
         "guardian.pet.internalname",
@@ -69,12 +69,12 @@ object SuperpairDataDisplay {
     )
 
     /**
-     * REGEX-TEST: 123k Enchanting Exp
-     * REGEX-TEST: [Lvl 1] Guardian
-     * REGEX-TEST: Enchanted Book
-     * REGEX-TEST: Experience Bottle
-     * REGEX-TEST: Grand Experience Bottle
-     * REGEX-TEST: Titanic Experience Bottle
+     * @regexTest 123k Enchanting Exp
+     * @regexTest [Lvl 1] Guardian
+     * @regexTest Enchanted Book
+     * @regexTest Experience Bottle
+     * @regexTest Grand Experience Bottle
+     * @regexTest Titanic Experience Bottle
      */
     @Suppress("MaxLineLength")
     private val rewardPattern by ExperimentationTableApi.patternGroup.pattern(
@@ -83,7 +83,7 @@ object SuperpairDataDisplay {
     )
 
     /**
-     * REGEX-TEST: Gained +3 Clicks
+     * @regexTest Gained +3 Clicks
      */
     private val powerUpPattern by ExperimentationTableApi.patternGroup.pattern(
         "powerups",
@@ -91,9 +91,9 @@ object SuperpairDataDisplay {
     )
 
     /**
-     * REGEX-TEST: Click any button!
-     * REGEX-TEST: Next button is instantly rewarded!
-     * REGEX-TEST: Click a second button!
+     * @regexTest Click any button!
+     * @regexTest Next button is instantly rewarded!
+     * @regexTest Click a second button!
      */
     private val waitingMessagesPattern by ExperimentationTableApi.patternGroup.pattern(
         "waiting.messages",

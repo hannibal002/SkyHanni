@@ -19,7 +19,7 @@ object GFSPiggyBank {
     private val group = RepoPattern.group("misc.piggybank")
 
     /**
-     * REGEX-TEST: §cYou died and your piggy bank cracked!
+     * @regexTest §cYou died and your piggy bank cracked!
      */
     private val crackedPattern by group.pattern(
         "cracked",
@@ -27,7 +27,7 @@ object GFSPiggyBank {
     )
 
     /**
-     * REGEX-TEST: §cYou died, lost 50,000 coins and your piggy bank broke!
+     * @regexTest §cYou died, lost 50,000 coins and your piggy bank broke!
      */
     private val brokePattern by group.pattern(
         "broke",

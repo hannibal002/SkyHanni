@@ -19,8 +19,8 @@ object PurseApi {
     private val patternGroup = RepoPattern.group("data.purse")
 
     /**
-     * REGEX-TEST: Piggy: §6423,085,766
-     * REGEX-TEST: Purse: §6423,085,776 §e(+5)
+     * @regexTest Piggy: §6423,085,766
+     * @regexTest Purse: §6423,085,776 §e(+5)
      */
     val coinsPattern by patternGroup.pattern(
         "coins",
@@ -28,8 +28,8 @@ object PurseApi {
     )
 
     /**
-     * REGEX-TEST: Piggy: §6423,085,766
-     * REGEX-TEST: §6§fPiggy: §6301,788§j§6,444
+     * @regexTest Piggy: §6423,085,766
+     * @regexTest §6§fPiggy: §6301,788§j§6,444
      */
     val piggyPattern by patternGroup.pattern(
         "piggy",

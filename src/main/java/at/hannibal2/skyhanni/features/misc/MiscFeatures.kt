@@ -21,7 +21,7 @@ import net.minecraft.core.particles.ParticleTypes
 object MiscFeatures {
 
     /**
-     * REGEX-TEST: §6§LCHICKEN RACING §e00:26.842     §b2/9   §a§lJUMP
+     * @regexTest §6§LCHICKEN RACING §e00:26.842     §b2/9   §a§lJUMP
      */
     private val chickenRacePattern by RepoPattern.pattern(
         "misc.chickenrace.active",

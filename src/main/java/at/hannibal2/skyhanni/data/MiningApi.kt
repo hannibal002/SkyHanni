@@ -45,20 +45,20 @@ object MiningApi {
     private val group = RepoPattern.group("data.miningapi")
 
     /**
-     * REGEX-TEST: Glacite Tunnels
-     * REGEX-TEST: Great Glacite Lake
+     * @regexTest Glacite Tunnels
+     * @regexTest Great Glacite Lake
      */
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
     /**
-     * REGEX-TEST: Mines of Divan
+     * @regexTest Mines of Divan
      */
     private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
 
     /**
-     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
-     * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
+     * @regexTest §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
+     * @regexTest §c ☠ §r§7You froze to death§r§7.
      */
     private val coldResetPattern by group.pattern(
         "cold.reset",
@@ -66,9 +66,9 @@ object MiningApi {
     )
 
     /**
-     * REGEX-TEST: Heat: §6IMMUNE
-     * REGEX-TEST: Heat: §c14♨
-     * REGEX-TEST: Heat: §c0♨
+     * @regexTest Heat: §6IMMUNE
+     * @regexTest Heat: §c14♨
+     * @regexTest Heat: §c0♨
      */
     val heatPattern by group.pattern(
         "heat.scoreboard",
@@ -76,7 +76,7 @@ object MiningApi {
     )
 
     /**
-     * REGEX-TEST: Cold: §b-1❄
+     * @regexTest Cold: §b-1❄
      */
     val coldPattern by group.pattern(
         "cold",
@@ -86,7 +86,7 @@ object MiningApi {
     private val pickbobulusGroup = group.group("pickobulus")
 
     /**
-     * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
+     * @regexTest §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
      */
 
     private val pickobulusUsePattern by pickbobulusGroup.pattern(
@@ -95,7 +95,7 @@ object MiningApi {
     )
 
     /**
-     * REGEX-TEST: §7Your §r§aPickobulus §r§7destroyed §r§e140 §r§7blocks!
+     * @regexTest §7Your §r§aPickobulus §r§7destroyed §r§e140 §r§7blocks!
      */
     private val pickobulusEndPattern by pickbobulusGroup.pattern(
         "end",
@@ -103,7 +103,7 @@ object MiningApi {
     )
 
     /**
-     * REGEX-TEST: §7Your §r§aPickobulus §r§7didn't destroy any blocks!
+     * @regexTest §7Your §r§aPickobulus §r§7didn't destroy any blocks!
      */
     private val pickobulusFailPattern by pickbobulusGroup.pattern(
         "fail",

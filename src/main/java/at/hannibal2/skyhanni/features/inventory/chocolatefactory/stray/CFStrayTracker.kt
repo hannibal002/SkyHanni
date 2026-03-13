@@ -52,9 +52,9 @@ object CFStrayTracker {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §9Zero §d§lCAUGHT!
-     * REGEX-TEST: §6§lGolden Rabbit §d§lCAUGHT!
-     * REGEX-TEST: §fAudi §d§lCAUGHT!
+     * @regexTest §9Zero §d§lCAUGHT!
+     * @regexTest §6§lGolden Rabbit §d§lCAUGHT!
+     * @regexTest §fAudi §d§lCAUGHT!
      */
     val strayCaughtPattern by CFApi.patternGroup.pattern(
         "stray.caught",
@@ -62,8 +62,8 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §fMandy §7and §7gained §6+283,574 Chocolate§7!
-     * REGEX-TEST: §7You caught a stray §aSven §7and gained §7§6+397,004 Chocolate§7!
+     * @regexTest §7You caught a stray §fMandy §7and §7gained §6+283,574 Chocolate§7!
+     * @regexTest §7You caught a stray §aSven §7and gained §7§6+397,004 Chocolate§7!
      */
     private val strayLorePattern by CFApi.patternGroup.pattern(
         "stray.loreinfo",
@@ -71,7 +71,7 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+13,566,571 Chocolate§7!
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+13,566,571 Chocolate§7!
      */
     private val goldenStrayJackpotMountainPattern by CFApi.patternGroup.pattern(
         "stray.goldenrawchoc",
@@ -79,9 +79,9 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, §7but he escaped and left behind §7§6313,780 Chocolate§7!
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6+324,364,585 Chocolate§7.
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, §7but he escaped and left behind §7§6313,780 Chocolate§7!
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6+324,364,585 Chocolate§7.
      */
     val strayDoradoPattern by CFApi.patternGroup.pattern(
         "stray.dorado",
@@ -89,7 +89,7 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has §7appeared!
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has §7appeared!
      */
     private val strayHoardPattern by CFApi.patternGroup.pattern(
         "stray.hoard",
@@ -97,7 +97,7 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+5 Chocolate §7until the §7end of the SkyBlock year!
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+5 Chocolate §7until the §7end of the SkyBlock year!
      */
     private val goldenStrayClick by CFApi.patternGroup.pattern(
         "stray.goldenclick",
@@ -105,8 +105,8 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
-     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7!
+     * @regexTest §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
+     * @regexTest §7You caught a stray §9Fish the Rabbit§7!
      */
     @Suppress("MaxLineLength")
     private val fishTheRabbitPattern by CFApi.patternGroup.pattern(
@@ -115,7 +115,7 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You have already found §9Fish the
+     * @regexTest §7You have already found §9Fish the
      */
     val duplicatePseudoStrayPattern by CFApi.patternGroup.pattern(
         "stray.pseudoduplicate",
@@ -123,7 +123,7 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7already have captured him before
+     * @regexTest §7already have captured him before
      */
     val duplicateDoradoStrayPattern by CFApi.patternGroup.pattern(
         "stray.doradoduplicate",
@@ -131,8 +131,8 @@ object CFStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7but he escaped and left behind
-     * REGEX-TEST: §7§6Legend of §6El Dorado §7grows!
+     * @regexTest §7but he escaped and left behind
+     * @regexTest §7§6Legend of §6El Dorado §7grows!
      */
     val doradoEscapeStrayPattern by CFApi.patternGroup.pattern(
         "stray.doradoescape",

@@ -27,8 +27,8 @@ object ItemStars {
     private val patternGroup = RepoPattern.group("inventory.itemstars")
 
     /**
-     * REGEX-TEST: §6Ancient Terror Leggings §d✪✪§6✪✪✪
-     * REGEX-TEST: §dRenowned Burning Crimson Helmet §6✪✪✪✪✪
+     * @regexTest §6Ancient Terror Leggings §d✪✪§6✪✪✪
+     * @regexTest §dRenowned Burning Crimson Helmet §6✪✪✪✪✪
      */
     private val starPattern by patternGroup.pattern(
         "stars",

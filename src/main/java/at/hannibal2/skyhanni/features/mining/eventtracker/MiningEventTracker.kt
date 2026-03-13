@@ -42,7 +42,7 @@ object MiningEventTracker {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §e§lPASSIVE EVENT §b§l§D§LBETTER TOGETHER §e§lRUNNING FOR §a§l06:34§r
+     * @regexTest §e§lPASSIVE EVENT §b§l§D§LBETTER TOGETHER §e§lRUNNING FOR §a§l06:34§r
      */
     private val bossbarPassivePattern by patternGroup.pattern(
         "bossbar.passive",
@@ -50,7 +50,7 @@ object MiningEventTracker {
     )
 
     /**
-     * REGEX-TEST: §e§lEVENT §6§LRAFFLE §e§lACTIVE IN §b§lFAR RESERVE §e§lfor §a§l01:03§r
+     * @regexTest §e§lEVENT §6§LRAFFLE §e§lACTIVE IN §b§lFAR RESERVE §e§lfor §a§l01:03§r
      */
     private val bossbarActivePattern by patternGroup.pattern(
         "bossbar.active",
@@ -58,7 +58,7 @@ object MiningEventTracker {
     )
 
     /**
-     * REGEX-TEST: §f                    §r§d§lBETTER TOGETHER STARTED!
+     * @regexTest §f                    §r§d§lBETTER TOGETHER STARTED!
      */
     private val eventStartedPattern by patternGroup.pattern(
         "started",
@@ -66,7 +66,7 @@ object MiningEventTracker {
     )
 
     /**
-     * REGEX-TEST: §f                      §r§d§lBETTER TOGETHER ENDED!
+     * @regexTest §f                      §r§d§lBETTER TOGETHER ENDED!
      */
     private val eventEndedPattern by patternGroup.pattern(
         "ended",

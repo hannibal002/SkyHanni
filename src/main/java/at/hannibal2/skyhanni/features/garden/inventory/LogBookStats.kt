@@ -27,7 +27,7 @@ object LogBookStats {
     private val groupPattern = RepoPattern.group("garden.inventory.logbook")
 
     /**
-     * REGEX-TEST: §7Times Visited: §a22
+     * @regexTest §7Times Visited: §a22
      */
     private val visitedPattern by groupPattern.pattern(
         "visited",
@@ -35,7 +35,7 @@ object LogBookStats {
     )
 
     /**
-     * REGEX-TEST: §7Offers Accepted: §a21
+     * @regexTest §7Offers Accepted: §a21
      */
     private val acceptedPattern by groupPattern.pattern(
         "accepted",
@@ -43,7 +43,7 @@ object LogBookStats {
     )
 
     /**
-     * REGEX-TEST: §ePage 3
+     * @regexTest §ePage 3
      */
     private val pagePattern by groupPattern.pattern(
         "page.current",

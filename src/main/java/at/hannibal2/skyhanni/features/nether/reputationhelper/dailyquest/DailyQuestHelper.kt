@@ -64,10 +64,10 @@ object DailyQuestHelper {
     val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
 
     /**
-     * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
-     * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
-     * REGEX-TEST: §7miniboss §a1 §7time!
-     * REGEX-TEST: §7Kill the §cBarbarian Duke X §7miniboss §a2
+     * @regexTest §7Kill the §cAshfang §7miniboss §a2 §7times!
+     * @regexTest §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
+     * @regexTest §7miniboss §a1 §7time!
+     * @regexTest §7Kill the §cBarbarian Duke X §7miniboss §a2
      */
     val minibossAmountPattern by patternGroup.pattern(
         "townboard.minibossamount",
@@ -75,7 +75,7 @@ object DailyQuestHelper {
     )
 
     /**
-     * REGEX-TEST: §a§lCOMPLETE
+     * @regexTest §a§lCOMPLETE
      */
     val townBoardCompletedPattern by patternGroup.pattern(
         "townboard.completed",
@@ -83,8 +83,8 @@ object DailyQuestHelper {
     )
 
     /**
-     * REGEX-TEST: §aYou completed your Dojo quest! Visit the Town Board to claim the rewards.
-     * REGEX-TEST: §aYou completed your rescue quest! Visit the Town Board to claim the rewards,
+     * @regexTest §aYou completed your Dojo quest! Visit the Town Board to claim the rewards.
+     * @regexTest §aYou completed your rescue quest! Visit the Town Board to claim the rewards,
      *   (yes, that is a comma at the end)
      */
     val chatCompletedPattern by patternGroup.pattern(

@@ -60,7 +60,7 @@ object ReforgeHelper {
     )
 
     /**
-     * REGEX-TEST: §aYou reforged your §r§9Gentle Dreadlord Sword §r§ainto a §r§9Heroic Dreadlord Sword§r§a!
+     * @regexTest §aYou reforged your §r§9Gentle Dreadlord Sword §r§ainto a §r§9Heroic Dreadlord Sword§r§a!
      */
     private val reforgeChatMessage by patternGroup.pattern(
         "chat.success",
@@ -68,7 +68,7 @@ object ReforgeHelper {
     )
 
     /**
-     * REGEX-TEST: §cWait a moment before reforging again!
+     * @regexTest §cWait a moment before reforging again!
      */
     private val reforgeChatFail by patternGroup.pattern(
         "chat.fail",

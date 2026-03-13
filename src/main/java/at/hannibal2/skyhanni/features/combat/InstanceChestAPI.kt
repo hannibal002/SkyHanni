@@ -12,10 +12,10 @@ object InstanceChestAPI {
     private val patternGroup = RepoPattern.group("combat.instance-chest-api")
 
     /**
-     * REGEX-TEST: §6Paid Chest
-     * REGEX-TEST: §6Paid
-     * REGEX-TEST: §fFree Chest
-     * REGEX-TEST: §fFree
+     * @regexTest §6Paid Chest
+     * @regexTest §6Paid
+     * @regexTest §fFree Chest
+     * @regexTest §fFree
      */
     /* Dungeon chests are just the chest Type for example just 'Emerald', Kuudra CURRENTLY has them as Free Chest/Paid Chest in the same UI
     if the Croesus main UI shows just Paid/Free this regex pattern should be removable mainly
@@ -26,9 +26,9 @@ object InstanceChestAPI {
     )
 
     /**
-     * REGEX-TEST: Master Catacombs - Floor II
-     * REGEX-TEST: Catacombs - Floor V
-     * REGEX-TEST: Kuudra - Infernal
+     * @regexTest Master Catacombs - Floor II
+     * @regexTest Catacombs - Floor V
+     * @regexTest Kuudra - Infernal
      */
     private val runNameCroesus by patternGroup.pattern(
         "runname",

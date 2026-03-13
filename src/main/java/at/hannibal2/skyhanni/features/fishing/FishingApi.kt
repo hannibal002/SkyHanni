@@ -54,10 +54,10 @@ object FishingApi {
     }
 
     /**
-     * REGEX-TEST: BRONZE_HUNTER_HELMET
-     * REGEX-TEST: SILVER_HUNTER_CHESTPLATE
-     * REGEX-TEST: GOLD_HUNTER_LEGGINGS
-     * REGEX-TEST: DIAMOND_HUNTER_BOOTS
+     * @regexTest BRONZE_HUNTER_HELMET
+     * @regexTest SILVER_HUNTER_CHESTPLATE
+     * @regexTest GOLD_HUNTER_LEGGINGS
+     * @regexTest DIAMOND_HUNTER_BOOTS
      */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
@@ -65,10 +65,10 @@ object FishingApi {
     )
 
     /**
-     * REGEX-TEST: EMBER_HELMET
-     * REGEX-TEST: EMBER_CHESTPLATE
-     * REGEX-TEST: EMBER_LEGGINGS
-     * REGEX-TEST: EMBER_BOOTS
+     * @regexTest EMBER_HELMET
+     * @regexTest EMBER_CHESTPLATE
+     * @regexTest EMBER_LEGGINGS
+     * @regexTest EMBER_BOOTS
      */
     private val emberArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.emberarmor",

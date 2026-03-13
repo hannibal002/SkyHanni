@@ -35,10 +35,10 @@ object RareDropMessages {
     private val petGroup = repoGroup.group("pet")
 
     /**
-     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
-     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168 §r§b✯ Magic Find§r§b)
-     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
-     * REGEX-TEST: §6§lPET DROP! §r§6Rat
+     * @regexTest §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * @regexTest §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168 §r§b✯ Magic Find§r§b)
+     * @regexTest §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * @regexTest §6§lPET DROP! §r§6Rat
      */
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
@@ -46,7 +46,7 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
+     * @regexTest §6⛃ §r§6§lGREAT CATCH! §r§fYou caught a §r§7[Lvl 1] §r§aSquid§r§f!
      */
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
@@ -54,7 +54,7 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §aYou claimed a §5Tarantula Pet§a! §r§aYou can manage your Pets in the §r§fPets Menu§r§a in your §r§fSkyBlock Menu§r§a.
+     * @regexTest §aYou claimed a §5Tarantula Pet§a! §r§aYou can manage your Pets in the §r§fPets Menu§r§a in your §r§fSkyBlock Menu§r§a.
      */
     private val petClaimedPattern by petGroup.pattern(
         "claimedmessage",
@@ -62,7 +62,7 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §b[MVP§r§c+§r§b] Empa_§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * @regexTest §b[MVP§r§c+§r§b] Empa_§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
      */
     private val petObtainedPattern by petGroup.pattern(
         "obtainedmessage",
@@ -70,9 +70,9 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: SMITE;6
-     * REGEX-TEST: ENDER_SLAYER;7
-     * REGEX-TEST: ULTIMATE_REITERATE;1
+     * @regexTest SMITE;6
+     * @regexTest ENDER_SLAYER;7
+     * @regexTest ULTIMATE_REITERATE;1
      */
     private val slayerBookIDPattern by repoGroup.pattern(
         "slayerbook",
@@ -80,8 +80,8 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §fBlue Whale Pet
-     * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §5Giraffe Pet
+     * @regexTest §e[NPC] Oringo§f: §b✆ §f§r§8• §fBlue Whale Pet
+     * @regexTest §e[NPC] Oringo§f: §b✆ §f§r§8• §5Giraffe Pet
      */
     private val oringoPattern by petGroup.pattern(
         "oringomessage",
@@ -89,8 +89,8 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
-     * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
+     * @regexTest §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
+     * @regexTest §6§lRARE DROP! §r§fEnchanted Book
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",

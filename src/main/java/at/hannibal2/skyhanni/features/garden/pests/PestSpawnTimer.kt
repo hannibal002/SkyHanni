@@ -55,11 +55,11 @@ object PestSpawnTimer {
     private val patternGroup = RepoPattern.group("garden.pests")
 
     /**
-     * WRAPPED-REGEX-TEST: " Cooldown: READY"
-     * WRAPPED-REGEX-TEST: " Cooldown: 1m 58s"
-     * WRAPPED-REGEX-TEST: " Cooldown: 1m"
-     * WRAPPED-REGEX-TEST: " Cooldown: 58s"
-     * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
+     * @regexTestWrapped " Cooldown: READY"
+     * @regexTestWrapped " Cooldown: 1m 58s"
+     * @regexTestWrapped " Cooldown: 1m"
+     * @regexTestWrapped " Cooldown: 58s"
+     * @regexTestWrapped " Cooldown: MAX PESTS"
      */
 
     private val pestCooldownPattern by patternGroup.pattern(

@@ -54,7 +54,7 @@ object CFApi {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: 46,559,892,200 Chocolate
+     * @regexTest 46,559,892,200 Chocolate
      */
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
@@ -62,8 +62,8 @@ object CFApi {
     )
 
     /**
-     * REGEX-TEST: Hoppity
-     * REGEX-TEST: Chocolate Factory Milestones
+     * @regexTest Hoppity
+     * @regexTest Chocolate Factory Milestones
      */
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
@@ -71,8 +71,8 @@ object CFApi {
     )
 
     /**
-     * REGEX-TEST: §a§lPROMOTE §8➜ §7[208§7] §dExecutive
-     * REGEX-TEST: §a§lUPGRADE §8➜ §aRabbit Barn CCXXI
+     * @regexTest §a§lPROMOTE §8➜ §7[208§7] §dExecutive
+     * @regexTest §a§lUPGRADE §8➜ §aRabbit Barn CCXXI
      */
     private val upgradeLorePattern by patternGroup.pattern(
         "item.lore.upgrade",
@@ -80,9 +80,9 @@ object CFApi {
     )
 
     /**
-     * REGEX-TEST: §bRabbit Bro§8 - §7[220§7] §bBoard Member
-     * REGEX-TEST: §6Rabbit Dog§8 - §7[190§7] §6Director
-     * REGEX-TEST: §dRabbit Daddy§8 - §7[201§7] §dExecutive
+     * @regexTest §bRabbit Bro§8 - §7[220§7] §bBoard Member
+     * @regexTest §6Rabbit Dog§8 - §7[190§7] §6Director
+     * @regexTest §dRabbit Daddy§8 - §7[201§7] §dExecutive
      */
     private val employeeNamePattern by patternGroup.pattern(
         "item.name.employee",
@@ -90,8 +90,8 @@ object CFApi {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, ...
-     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7
+     * @regexTest §7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, ...
+     * @regexTest §7You caught a stray §9Fish the Rabbit§7
      */
     val caughtRabbitPattern by patternGroup.pattern(
         "rabbit.caught",

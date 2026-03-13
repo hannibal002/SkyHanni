@@ -74,12 +74,12 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §6(§6+1,344☘)
-     * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810☘)
-     * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
-     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
-     * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
-     * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
+     * @regexTest §6§lRARE DROP! §9Mutant Nether Wart §8x9 §6(§6+1,344☘)
+     * @regexTest §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810☘)
+     * @regexTest §6§lPET DROP! §r§5Slug §6(§6+1300☘)
+     * @regexTest §6§lPET DROP! §r§6Slug §6(§6+1300☘)
+     * @regexTest §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
+     * @regexTest §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
@@ -87,11 +87,11 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     /**
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aPlant Matter§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aDung§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aHoney Jar§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aTasty Cheese§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aCompost§r§7!
+     * @regexTest §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aPlant Matter§r§7!
+     * @regexTest §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aDung§r§7!
+     * @regexTest §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aHoney Jar§r§7!
+     * @regexTest §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aTasty Cheese§r§7!
+     * @regexTest §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aCompost§r§7!
      */
     private val sprayonatorUsedPattern by patternGroup.pattern(
         "sprayonator",

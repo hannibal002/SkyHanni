@@ -31,9 +31,9 @@ object PlayerChatManager {
     private val patternGroup = RepoPattern.group("data.chat.player")
 
     /**
-     * REGEX-TEST: [58] §7nea89o§7: haiiiii
-     * REGEX-TEST: [266] ♫ §b[MVP§d+§b] lrg89§f: a
-     * REGEX-TEST: [302] ♫ [MVP+] lrg89: problematic
+     * @regexTest [58] §7nea89o§7: haiiiii
+     * @regexTest [266] ♫ §b[MVP§d+§b] lrg89§f: a
+     * @regexTest [302] ♫ [MVP+] lrg89: problematic
      */
     private val globalPattern by patternGroup.pattern(
         "global",
@@ -41,8 +41,8 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: §9Party §8> §b[MVP§d+§b] lrg89§f: peee
-     * REGEX-TEST: §9Party §8> §7nea89o§f: peee
+     * @regexTest §9Party §8> §b[MVP§d+§b] lrg89§f: peee
+     * @regexTest §9Party §8> §7nea89o§f: peee
      */
     private val partyPattern by patternGroup.pattern(
         "party",
@@ -50,7 +50,7 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: §bCo-op > §7nea89o§f: hallooooo
+     * @regexTest §bCo-op > §7nea89o§f: hallooooo
      */
     private val coopPattern by patternGroup.pattern(
         "coop",
@@ -58,11 +58,11 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: §2Guild > §b[MVP§d+§b] infave §e[Em]§f: CEMENT DRINKERS INCORPORATED
-     * REGEX-TEST: §2Guild > §6⚔ §6[MVP§3++§6] RealBacklight§f: !warp
-     * REGEX-TEST: §2Guild > §b[MVP§d+§b] lrg89 §e[Iron]§f: h
-     * REGEX-TEST: §2Guild > §b[MVP§c+§b] B2Square1 §3[IRON]§f: §r700 to go
-     * REGEX-TEST: §2Guild > §6[MVP§5++§6] Throwpo §3[IRON]§f: §rbat pet clueless
+     * @regexTest §2Guild > §b[MVP§d+§b] infave §e[Em]§f: CEMENT DRINKERS INCORPORATED
+     * @regexTest §2Guild > §6⚔ §6[MVP§3++§6] RealBacklight§f: !warp
+     * @regexTest §2Guild > §b[MVP§d+§b] lrg89 §e[Iron]§f: h
+     * @regexTest §2Guild > §b[MVP§c+§b] B2Square1 §3[IRON]§f: §r700 to go
+     * @regexTest §2Guild > §6[MVP§5++§6] Throwpo §3[IRON]§f: §rbat pet clueless
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
@@ -70,13 +70,13 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: To nea89o: lol
-     * REGEX-TEST: From nea89o: hiii
-     * REGEX-FAIL: From stash: Pufferfish
-     * REGEX-FAIL: From stash: Wheat
-     * REGEX-TEST: To [MVP+] Eisengolem: Boop!
-     * REGEX-TEST: From [MVP+] Eisengolem: Boop!
-     * REGEX-TEST: To [MVP+] Eisengolem: danke
+     * @regexTest To nea89o: lol
+     * @regexTest From nea89o: hiii
+     * @regexFail From stash: Pufferfish
+     * @regexFail From stash: Wheat
+     * @regexTest To [MVP+] Eisengolem: Boop!
+     * @regexTest From [MVP+] Eisengolem: Boop!
+     * @regexTest To [MVP+] Eisengolem: danke
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
@@ -84,15 +84,15 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is holding §8[§6Heroic Aspect of the Void§8]
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is holding §8[§7[Lvl 2] §dSpider§8]
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is friends with a §8[§7[Lvl 200] §8[§6103§8§4✦§8] §6Golden Dragon§8]
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is wearing §8[§5Glistening Implosion Belt§8]
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is friends with a §8[§7[Lvl 100] §dEnderman§8]
-     * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 has §8[§6Heroic Aspect of the Void§8]
-     * REGEX-TEST: §8[§b209§8] §b[MVP§d+§b] lrg89§f§7 is holding §8[§5Heroic Aspect of the Void§8]
-     * REGEX-TEST: §8[§2179§8] §r§b[MVP§c+§b] Frogthink§f §7♲§7 is holding §r§8[§dBlessed Melon Dicer 3.0§8]
-     * REGEX-TEST: §8[§2164§8] §6§lᛝ §r§7Vinc1x§7§7 is holding §r§8[§dStellar Titanium Drill DR-X655§8]
+     * @regexTest §b[MVP§c+§b] hannibal2§f§7 is holding §8[§6Heroic Aspect of the Void§8]
+     * @regexTest §b[MVP§c+§b] hannibal2§f§7 is holding §8[§7[Lvl 2] §dSpider§8]
+     * @regexTest §b[MVP§c+§b] hannibal2§f§7 is friends with a §8[§7[Lvl 200] §8[§6103§8§4✦§8] §6Golden Dragon§8]
+     * @regexTest §b[MVP§c+§b] hannibal2§f§7 is wearing §8[§5Glistening Implosion Belt§8]
+     * @regexTest §b[MVP§c+§b] hannibal2§f§7 is friends with a §8[§7[Lvl 100] §dEnderman§8]
+     * @regexTest §b[MVP§c+§b] hannibal2§f§7 has §8[§6Heroic Aspect of the Void§8]
+     * @regexTest §8[§b209§8] §b[MVP§d+§b] lrg89§f§7 is holding §8[§5Heroic Aspect of the Void§8]
+     * @regexTest §8[§2179§8] §r§b[MVP§c+§b] Frogthink§f §7♲§7 is holding §r§8[§dBlessed Melon Dicer 3.0§8]
+     * @regexTest §8[§2164§8] §6§lᛝ §r§7Vinc1x§7§7 is holding §r§8[§dStellar Titanium Drill DR-X655§8]
      */
     @Suppress("MaxLineLength")
     private val itemShowPattern by patternGroup.pattern(
@@ -101,8 +101,8 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: ♫ §c[Buddy ツ] §b[MVP§d+§b] lrg89
-     * REGEX-FAIL: ℻ §b[MVP§5+§b] Alea1337
+     * @regexTest ♫ §c[Buddy ツ] §b[MVP§d+§b] lrg89
+     * @regexFail ℻ §b[MVP§5+§b] Alea1337
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
@@ -110,9 +110,9 @@ object PlayerChatManager {
     )
 
     /**
-     * REGEX-TEST: ♫ §a[✌] §f[Gamer] §b[MVP§d+§b] lrg89
-     * REGEX-FAIL: ℻ §b[MVP§5+§b] Alea1337
-     * REGEX-TEST: ♫ §a[✌] §c[Buddy ツ] §b[MVP§d+§b] lrg89
+     * @regexTest ♫ §a[✌] §f[Gamer] §b[MVP§d+§b] lrg89
+     * @regexFail ℻ §b[MVP§5+§b] Alea1337
+     * @regexTest ♫ §a[✌] §c[Buddy ツ] §b[MVP§d+§b] lrg89
      */
     private val privateIslandGuestPattern by patternGroup.pattern(
         "privateislandguest",

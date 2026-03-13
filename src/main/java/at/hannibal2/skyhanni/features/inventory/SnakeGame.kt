@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object SnakeGame {
 
     /**
-     * REGEX-TEST: Snake
+     * @regexTest Snake
      */
     private val pattern by RepoPattern.pattern(
         "abiphone.snake.name",

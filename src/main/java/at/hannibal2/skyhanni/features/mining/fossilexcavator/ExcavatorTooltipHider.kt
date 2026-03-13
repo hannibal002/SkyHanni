@@ -15,7 +15,7 @@ object ExcavatorTooltipHider {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.tooltipHider
 
     /**
-     * REGEX-TEST: §6Dirt
+     * @regexTest §6Dirt
      */
     private val dirtPattern by RepoPattern.pattern(
         "excavator.dirt.name",

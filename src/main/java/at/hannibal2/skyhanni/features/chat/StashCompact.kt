@@ -29,11 +29,11 @@ object StashCompact {
     private val patternGroup = RepoPattern.group("stash.compact")
 
     /**
-     * REGEX-TEST: §f                 §7You have §3226 §7materials stashed away!
-     * REGEX-TEST: §f                 §7You have §322 §7materials stashed away!
-     * REGEX-TEST: §f                 §7You have §a1,000 §7items stashed away!
-     * REGEX-TEST: §f                     §7You have §a2 §7items stashed away!
-     * REGEX-TEST: §f                   §7You have §a109 §7items stashed away!
+     * @regexTest §f                 §7You have §3226 §7materials stashed away!
+     * @regexTest §f                 §7You have §322 §7materials stashed away!
+     * @regexTest §f                 §7You have §a1,000 §7items stashed away!
+     * @regexTest §f                     §7You have §a2 §7items stashed away!
+     * @regexTest §f                   §7You have §a109 §7items stashed away!
      */
     private val materialCountPattern by patternGroup.pattern(
         "material.count",
@@ -41,11 +41,11 @@ object StashCompact {
     )
 
     /**
-     * REGEX-TEST: §f               §8(This totals 1 type of material stashed!)
-     * REGEX-TEST: §f               §8(This totals 2 types of items stashed!)
-     * REGEX-TEST: §f               §8(This totals 3 types of materials stashed!)
-     * REGEX-TEST: §f               §8(This totals 4 types of items stashed!)
-     * REGEX-TEST: §f              §8(This totals 8 types of materials stashed!)
+     * @regexTest §f               §8(This totals 1 type of material stashed!)
+     * @regexTest §f               §8(This totals 2 types of items stashed!)
+     * @regexTest §f               §8(This totals 3 types of materials stashed!)
+     * @regexTest §f               §8(This totals 4 types of items stashed!)
+     * @regexTest §f              §8(This totals 8 types of materials stashed!)
      */
     private val differingMaterialsCountPattern by patternGroup.pattern(
         "differing.materials.count",
@@ -53,9 +53,9 @@ object StashCompact {
     )
 
     /**
-     * REGEX-TEST: §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
-     * REGEX-TEST: §f                §6§l>>> §6§lCLICK HERE§e to pick them up! §6§l<<<
-     * REGEX-TEST: §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
+     * @regexTest §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
+     * @regexTest §f                §6§l>>> §6§lCLICK HERE§e to pick them up! §6§l<<<
+     * @regexTest §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
      */
     private val pickupStashPattern by patternGroup.pattern(
         "pickup.stash",
@@ -63,8 +63,8 @@ object StashCompact {
     )
 
     /**
-     * REGEX-TEST: §eOne or more items didn't fit in your inventory and were added to your item stash! §6Click here §eto pick them up!
-     * REGEX-TEST: §eOne or more materials didn't fit in your inventory and were added to your material stash! §6Click here §eto pick them up!
+     * @regexTest §eOne or more items didn't fit in your inventory and were added to your item stash! §6Click here §eto pick them up!
+     * @regexTest §eOne or more materials didn't fit in your inventory and were added to your material stash! §6Click here §eto pick them up!
      */
     @Suppress("MaxLineLength")
     private val genericAddedToStashPattern by patternGroup.pattern(

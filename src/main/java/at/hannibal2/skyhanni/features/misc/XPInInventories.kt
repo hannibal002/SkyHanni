@@ -15,9 +15,9 @@ object XPInInventories {
     private val config get() = SkyHanniMod.feature.misc
 
     /**
-     * REGEX-TEST: 0 Exp Levels
-     * REGEX-TEST: 10 XP Levels
-     * REGEX-TEST: Starting cost: 350 XP Levels
+     * @regexTest 0 Exp Levels
+     * @regexTest 10 XP Levels
+     * @regexTest Starting cost: 350 XP Levels
      */
     private val xpLevelsPattern by RepoPattern.list(
         "misc.xp-in-inventory.exp-levels.new",

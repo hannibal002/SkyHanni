@@ -22,7 +22,7 @@ object PabloHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
     /**
-     * REGEX-TEST: §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!
+     * @regexTest §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!
      */
     private val patterns by RepoPattern.list(
         "crimson.pablo.helper",

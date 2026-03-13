@@ -21,8 +21,8 @@ object KuudraApi {
     private val patternGroup = RepoPattern.group("data.kuudra")
 
     /**
-     * REGEX-TEST:  §7⏣ §cKuudra's Hollow §8(T5)
-     * REGEX-TEST:  §7⏣ §cKuudra's Hollow §8(T2)
+     * @regexTestWrapped " §7⏣ §cKuudra's Hollow §8(T5)"
+     * @regexTestWrapped " §7⏣ §cKuudra's Hollow §8(T2)"
      */
     private val tierPattern by patternGroup.pattern(
         "scoreboard.tier",
@@ -34,10 +34,10 @@ object KuudraApi {
     )
 
     /**
-     * REGEX-TEST: BURNING_AURORA_CHESTPLATE
-     * REGEX-TEST: CRIMSON_LEGGINGS
-     * REGEX-TEST: FIERY_CRIMSON_LEGGINGS
-     * REGEX-TEST: TERROR_CHESTPLATE
+     * @regexTest BURNING_AURORA_CHESTPLATE
+     * @regexTest CRIMSON_LEGGINGS
+     * @regexTest FIERY_CRIMSON_LEGGINGS
+     * @regexTest TERROR_CHESTPLATE
      */
     private val kuudraArmorPattern by patternGroup.pattern(
         "internalname.armor",
@@ -46,10 +46,10 @@ object KuudraApi {
 
     /**
      * Hypixel currently duplicate the word Chest in the inventory name (NOT ITEM STACKS) of Kuudra chests in Croesus/Vesuvius
-     * REGEX-TEST: Paid Chest
-     * REGEX-TEST: Paid Chest Chest
-     * REGEX-TEST: Free Chest
-     * REGEX-TEST: Free Chest Chest
+     * @regexTest Paid Chest
+     * @regexTest Paid Chest Chest
+     * @regexTest Free Chest
+     * @regexTest Free Chest Chest
      */
     private val kuudraChestPattern by patternGroup.pattern(
         "kuudrachest",

@@ -49,7 +49,7 @@ object FruitBowlFeatures {
     private val chatGroup = RepoPattern.group("misc.fruit-bowl")
 
     /**
-     * REGEX-TEST: FRUIT BOWL! [MVP+] L1nker01's profile name is Grapes!
+     * @regexTest FRUIT BOWL! [MVP+] L1nker01's profile name is Grapes!
      */
     private val chatClickedPlayerPattern by chatGroup.pattern(
         "chat-message.clicked-player",
@@ -57,7 +57,7 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: You already found this profile name in your bowl!
+     * @regexTest You already found this profile name in your bowl!
      */
     private val chatDuplicatePattern by chatGroup.pattern(
         "chat-message.duplicate",
@@ -65,7 +65,7 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: Grapes has been added to the fruit bowl!
+     * @regexTest Grapes has been added to the fruit bowl!
      */
     private val chatFoundMissingPattern by chatGroup.pattern(
         "chat-message.found-missing",
@@ -73,7 +73,7 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: §2§lFRUITALICIOUS! §r§aYou completed your fruit bowl!
+     * @regexTest §2§lFRUITALICIOUS! §r§aYou completed your fruit bowl!
      */
     private val chatFoundAllPattern by chatGroup.pattern(
         "chat-message.found-all",
@@ -81,8 +81,8 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: §7Names missing:
-     * REGEX-TEST: §7Name missing:
+     * @regexTest §7Names missing:
+     * @regexTest §7Name missing:
      */
     private val itemMissingLineSeparatorPattern by chatGroup.pattern(
         "item-lore.missing-names-separator",
@@ -90,9 +90,9 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: §7§bPapaya§7
-     * REGEX-TEST: §bLime§7, §bMango§7
-     * REGEX-TEST: §7§bBlueberry§7, §bCucumber§7, §bGrapes§7, §bKiwi§7, §bLime§7, §bMango§7,
+     * @regexTest §7§bPapaya§7
+     * @regexTest §bLime§7, §bMango§7
+     * @regexTest §7§bBlueberry§7, §bCucumber§7, §bGrapes§7, §bKiwi§7, §bLime§7, §bMango§7,
      */
     private val itemMissingNameLinePattern by chatGroup.pattern(
         "item-lore.missing-name-line",

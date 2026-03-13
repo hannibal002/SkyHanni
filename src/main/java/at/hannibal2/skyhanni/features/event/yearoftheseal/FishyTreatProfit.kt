@@ -48,7 +48,7 @@ object FishyTreatProfit {
     private val patternGroup = RepoPattern.group("event.year-of-the-seal.fishy-treat")
 
     /**
-     * REGEX-TEST: §62,000,000 Coins
+     * @regexTest §62,000,000 Coins
      */
     private val coinsPattern by patternGroup.pattern(
         "coins",

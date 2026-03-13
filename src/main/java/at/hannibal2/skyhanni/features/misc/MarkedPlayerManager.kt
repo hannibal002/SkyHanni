@@ -36,11 +36,11 @@ object MarkedPlayerManager {
     private val patternGroup = RepoPattern.group("misc.markedplayer")
 
     /**
-     * REGEX-TEST: [400] HiZe_ ▒
-     * REGEX-TEST: [318] wings_wacr ᛝ
-     * REGEX-TEST: [321] botbob21 ᛝ
-     * REGEX-TEST: [42] VoidW_
-     * REGEX-TEST: [151] Phoenix_325
+     * @regexTest [400] HiZe_ ▒
+     * @regexTest [318] wings_wacr ᛝ
+     * @regexTest [321] botbob21 ᛝ
+     * @regexTest [42] VoidW_
+     * @regexTest [151] Phoenix_325
      */
     private val tabPlayerName by patternGroup.pattern(
         "tabplayername-no-color",

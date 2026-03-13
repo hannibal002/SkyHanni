@@ -52,8 +52,8 @@ object UserLuckBreakdown {
     private var showAllStats = true
 
     /**
-     * REGEX-TEST: §7Show all stats: §aYes
-     * REGEX-TEST: §7Show all stats: §cNope
+     * @regexTest §7Show all stats: §aYes
+     * @regexTest §7Show all stats: §cNope
      */
     private val showAllStatsPattern by RepoPattern.pattern(
         "misc.statsbreakdown.showallstats",

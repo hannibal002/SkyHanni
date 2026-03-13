@@ -16,8 +16,8 @@ object CrimsonIsleReputationApi {
     private val patternGroup = RepoPattern.group("crimson.reputationapi")
 
     /**
-     * REGEX-TEST:  19,130
-     * REGEX-TEST:  635
+     * @regexTestWrapped " 19,130"
+     * @regexTestWrapped " 635"
      */
     private val tablistReputationCountPattern by patternGroup.pattern(
         "tablistreputation",

@@ -36,10 +36,10 @@ object GrowthCycle {
     val patternGroup = RepoPattern.group("garden.greenhouse.growthcycle")
 
     /**
-     * REGEX-TEST: Next Stage: 1h 40m 20s
-     * REGEX-TEST: Next Stage: 40m 20s
-     * REGEX-TEST: Next Stage: 20m 1s
-     * REGEX-TEST: Next Stage: 20s
+     * @regexTest Next Stage: 1h 40m 20s
+     * @regexTest Next Stage: 40m 20s
+     * @regexTest Next Stage: 20m 1s
+     * @regexTest Next Stage: 20s
      */
     val nextStagePattern by patternGroup.pattern(
         "nextstage",

@@ -24,10 +24,10 @@ object CruxTalismanDisplay {
     private val config get() = RiftApi.config.cruxTalisman
 
     /**
-     * WRAPPED-REGEX-TEST: "  §23 §2Shy§7: §e88§7/§a100 §7kills"
-     * WRAPPED-REGEX-TEST: "  §82 §8Shadow§7: §e42§7/§a50 §7kills"
-     * WRAPPED-REGEX-TEST: "  §e- §eVolt§7: §e6§7/§a10 §7kills"
-     * WRAPPED-REGEX-TEST: "  4 Puff§7: §a§lMAXED"
+     * @regexTestWrapped "  §23 §2Shy§7: §e88§7/§a100 §7kills"
+     * @regexTestWrapped "  §82 §8Shadow§7: §e42§7/§a50 §7kills"
+     * @regexTestWrapped "  §e- §eVolt§7: §e6§7/§a10 §7kills"
+     * @regexTestWrapped "  4 Puff§7: §a§lMAXED"
      */
     @Suppress("MaxLineLength")
     private val progressPattern by RepoPattern.pattern(

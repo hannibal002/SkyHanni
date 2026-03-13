@@ -62,8 +62,8 @@ object ExperimentsAddonsHelper {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §7Round: §e1
-     * REGEX-TEST: §7Round: §e2
+     * @regexTest §7Round: §e1
+     * @regexTest §7Round: §e2
      */
     private val roundItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.round-item",
@@ -71,8 +71,8 @@ object ExperimentsAddonsHelper {
     )
 
     /**
-     * REGEX-TEST: §7Timer: §a3s
-     * REGEX-TEST: §7Timer: §a10s
+     * @regexTest §7Timer: §a3s
+     * @regexTest §7Timer: §a10s
      */
     private val replicatePhaseItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.replicate-phase-item",
@@ -85,8 +85,8 @@ object ExperimentsAddonsHelper {
     )
 
     /**
-     * REGEX-TEST: minecraft:stained_hardened_clay
-     * REGEX-TEST: minecraft:orange_terracotta
+     * @regexTest minecraft:stained_hardened_clay
+     * @regexTest minecraft:orange_terracotta
      */
     private val nextChronomatronItemPattern by ExperimentationTableApi.patternGroup.pattern(
         "addons.chronomatron.read-item",

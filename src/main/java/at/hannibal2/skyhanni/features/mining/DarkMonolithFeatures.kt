@@ -67,10 +67,10 @@ object DarkMonolithFeatures {
 
     // Todo: need chat pattern for rock the fish drop
     /**
-     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 50,000 Coins!
-     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 2,500 Coins and 1,000 ᠅ Mithril Powder!
-     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 100 ᠅ Mithril Powder!
-     * REGEX-TEST: MONOLITH! You found a mysterious Dark Monolith and were rewarded 3,000 ᠅ Mithril Powder!
+     * @regexTest MONOLITH! You found a mysterious Dark Monolith and were rewarded 50,000 Coins!
+     * @regexTest MONOLITH! You found a mysterious Dark Monolith and were rewarded 2,500 Coins and 1,000 ᠅ Mithril Powder!
+     * @regexTest MONOLITH! You found a mysterious Dark Monolith and were rewarded 100 ᠅ Mithril Powder!
+     * @regexTest MONOLITH! You found a mysterious Dark Monolith and were rewarded 3,000 ᠅ Mithril Powder!
      */
     private val dropPattern by patternGroup.pattern(
         "drop.chat.colorless",

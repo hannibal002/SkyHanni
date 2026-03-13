@@ -35,7 +35,7 @@ object MiningCommissionsBlocksColor {
     private val patternGroup = RepoPattern.group("mining.commissions")
 
     /**
-     * REGEX-TEST: §a§lCITRINE GEMSTONE COLLECTOR §r§eCommission Complete! Visit the King §r§eto claim your rewards!
+     * @regexTest §a§lCITRINE GEMSTONE COLLECTOR §r§eCommission Complete! Visit the King §r§eto claim your rewards!
      */
     private val commissionCompletePattern by patternGroup.pattern(
         "complete",

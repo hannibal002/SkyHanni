@@ -29,7 +29,7 @@ object GriffinBurrowParticleFinder {
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
     /**
-     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(4/4)
+     * @regexTest §eYou finished the Griffin burrow chain! §r§7(4/4)
      */
     private val finishedChainPattern by patternGroup.pattern(
         "chain-finished",

@@ -24,7 +24,7 @@ object PestSpawn {
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7A §2ൠ Pest §7has appeared in §aPlot §7- §bS 4§7!
+     * @regexTest §6§lGROSS! §7A §2ൠ Pest §7has appeared in §aPlot §7- §bS 4§7!
      */
     private val onePestPattern by patternGroup.pattern(
         "one",
@@ -32,7 +32,7 @@ object PestSpawn {
     )
 
     /**
-     * REGEX-TEST: §6§lYUCK! §24 §2ൠ Pest §7have spawned in §aPlot §7- §b14§7!
+     * @regexTest §6§lYUCK! §24 §2ൠ Pest §7have spawned in §aPlot §7- §b14§7!
      */
     private val multiplePestsPattern by patternGroup.pattern(
         "multiple",
@@ -40,14 +40,14 @@ object PestSpawn {
     )
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7While you were offline, §2ൠ §2Pest §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
+     * @regexTest §6§lGROSS! §7While you were offline, §2ൠ §2Pest §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
      */
     private val offlinePestsPattern by patternGroup.pattern(
         "offline",
         "§6§l.*! §7While you were offline, §2ൠ §2Pests? §7spawned in §aPlots (?<plots>.*)!",
     )
     /**
-     * WRAPPED-REGEX-TEST: "  §r§e§lCLICK HERE §eto teleport to the plot!"
+     * @regexTestWrapped "  §r§e§lCLICK HERE §eto teleport to the plot!"
      */
     private val clickToTPPattern by patternGroup.pattern(
         "teleport",

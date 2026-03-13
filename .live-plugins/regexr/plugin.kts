@@ -20,9 +20,7 @@ if (!isIdeStartup) show("Reloaded Regex intentions")
 val logger =
     Logger.getInstance("SkyHanni")
 
-val regexTestPrefix = "REGEX-TEST: "
-val regexTestFailPrefix = "REGEX-FAIL: "
-val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
+val wrappedRegexTestPattern = "\"(?<test>.*)\"".toPattern()
 
 class RegexInfo(
     val regex: KtValueArgument,
@@ -41,26 +39,26 @@ class RegexInfo(
         return sb.toString()
     }
 
-    val commentText by lazy {
-        comment?.text
-            ?.replace("/*", "")
-            ?.replace("*/", "")
-            ?.lines()
-            ?.map {
-                it.trim().trimStart('*').trim()
+    // NOTE: If you update this code, remember to also update detekt/src/main/kotlin/RepoPatternElement.kt
+    fun getExamples() = buildList {
+        comment?.getAllSections()?.forEach { section ->
+            for (tag in section.findTagsByName("regexTest")) {
+                add(tag.getContent().trim())
             }
-    }
-
-    fun getExamples(): List<String> = buildList {
-        val examples = commentText?.filter { it.startsWith(regexTestPrefix) || it.startsWith(regexTestFailPrefix) }
-            ?.map { it.substring(regexTestPrefix.length) }.orEmpty()
-        addAll(examples)
-        val wrappedExamples = commentText?.filter { it.startsWith("WRAPPED-REGEX-TEST:") }
-            ?.mapNotNull {
-                val matcher = wrappedRegexTestPattern.matcher(it)
-                if (matcher.matches()) matcher.group("test") else null
-            }.orEmpty()
-        addAll(wrappedExamples)
+            for (tag in section.findTagsByName("regexFail")) {
+                add(tag.getContent().trim())
+            }
+            for (tag in section.findTagsByName("regexTestWrapped")) {
+                val matcher = wrappedRegexTestPattern.matcher(tag.getContent().trim())
+                if (!matcher.find()) continue
+                matcher.group("test")?.let(::add)
+            }
+            for (tag in section.findTagsByName("regexFailWrapped")) {
+                val matcher = wrappedRegexTestPattern.matcher(tag.getContent().trim())
+                if (!matcher.find()) continue
+                matcher.group("test")?.let(::add)
+            }
+        }
     }
 }
 

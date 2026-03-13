@@ -34,12 +34,12 @@ object CFBlockOpen {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: /cf
-     * REGEX-TEST: /cf test
-     * REGEX-TEST: /chocolatefactory
-     * REGEX-TEST: /chocolatefactory123456789
-     * REGEX-TEST: /factory
-     * REGEX-TEST: /CF
+     * @regexTest /cf
+     * @regexTest /cf test
+     * @regexTest /chocolatefactory
+     * @regexTest /chocolatefactory123456789
+     * @regexTest /factory
+     * @regexTest /CF
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
@@ -47,8 +47,8 @@ object CFBlockOpen {
     )
 
     /**
-     * REGEX-TEST: §6Chocolate Factory
-     * REGEX-TEST: §6Open Chocolate Factory
+     * @regexTest §6Chocolate Factory
+     * @regexTest §6Open Chocolate Factory
      */
     private val openCfItemPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.openitem",

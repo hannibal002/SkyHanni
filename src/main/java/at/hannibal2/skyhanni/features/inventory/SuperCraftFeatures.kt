@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object SuperCraftFeatures {
 
     /**
-     * REGEX-TEST: §eYou Supercrafted §r§r§r§aEnchanted Ender Pearl§r§e!
-     * REGEX-TEST: §eYou Supercrafted §r§r§r§9Enchanted Mithril §r§8x3§r§e!
+     * @regexTest §eYou Supercrafted §r§r§r§aEnchanted Ender Pearl§r§e!
+     * @regexTest §eYou Supercrafted §r§r§r§9Enchanted Mithril §r§8x3§r§e!
      */
     val craftedPattern by RepoPattern.pattern(
         "inventory.supercrafting.craft.new",

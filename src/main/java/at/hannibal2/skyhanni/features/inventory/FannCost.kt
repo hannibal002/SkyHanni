@@ -69,8 +69,8 @@ object FannCost {
     private var lastStartTrainingLoreHash: Int = 0
 
     /**
-     * REGEX-TEST: §7§8Will earn a total of 55,000 EXP
-     * REGEX-TEST: §7§8Will earn a total of 550,000 EXP
+     * @regexTest §7§8Will earn a total of 55,000 EXP
+     * @regexTest §7§8Will earn a total of 550,000 EXP
      */
     private val expEarnedPattern by patternGroup.pattern(
         "exp.total",
@@ -78,10 +78,10 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: §7EXP Per Day: §b1,000
-     * REGEX-TEST: §7EXP Per Day: §b1,230,000 §8(+3.4%)
-     * REGEX-TEST: §7EXP Per Day: §b1,623,000 §8(+9.1%)
-     * REGEX-TEST: §7EXP Per Day: §b55,000 §8(+10%)
+     * @regexTest §7EXP Per Day: §b1,000
+     * @regexTest §7EXP Per Day: §b1,230,000 §8(+3.4%)
+     * @regexTest §7EXP Per Day: §b1,623,000 §8(+9.1%)
+     * @regexTest §7EXP Per Day: §b55,000 §8(+10%)
      */
     private val expDailyPattern by patternGroup.pattern(
         "exp.daily",
@@ -89,9 +89,9 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: §7Will take: §e0d 0h 10m 29s
-     * REGEX-TEST: §7Will take: §e44d 6h 14m 40s
-     * REGEX-TEST: §7Will take: §e442d 14h 26m 31s
+     * @regexTest §7Will take: §e0d 0h 10m 29s
+     * @regexTest §7Will take: §e44d 6h 14m 40s
+     * @regexTest §7Will take: §e442d 14h 26m 31s
      */
     private val durationPattern by patternGroup.pattern(
         "training.duration.pattern",
@@ -99,10 +99,10 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: §622,795.5 Coins §8(5% off)
-     * REGEX-TEST: §613,492,398.8 Coins
-     * REGEX-TEST: §61,000,000.3 Coins §8(1% off)
-     * REGEX-TEST: §612,345,678 Coins §8(5% off)
+     * @regexTest §622,795.5 Coins §8(5% off)
+     * @regexTest §613,492,398.8 Coins
+     * @regexTest §61,000,000.3 Coins §8(1% off)
+     * @regexTest §612,345,678 Coins §8(5% off)
      */
     private val coinsPattern by patternGroup.pattern(
         "coin",
@@ -110,9 +110,9 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: §b5,024.3 Bits
-     * REGEX-TEST: §b1,000 Bits
-     * REGEX-TEST: §b139 Bits
+     * @regexTest §b5,024.3 Bits
+     * @regexTest §b1,000 Bits
+     * @regexTest §b139 Bits
      */
     private val bitsPattern by patternGroup.pattern(
         "bits",
@@ -121,8 +121,8 @@ object FannCost {
 
 
     /**
-     * REGEX-TEST: §b▶ Amount of Days
-     * REGEX-TEST: §b▶ Until Specific Level
+     * @regexTest §b▶ Amount of Days
+     * @regexTest §b▶ Until Specific Level
      */
     private val trainingModeLorePattern by patternGroup.pattern(
         "lore.training-mode",
@@ -130,12 +130,12 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: §f▶ Free
-     * REGEX-TEST: §a▶ Light
-     * REGEX-TEST: §9▶ Moderate
-     * REGEX-TEST: §5▶ Expert
-     * REGEX-TEST: §6▶ Ultra
-     * REGEX-TEST: §d▶ Turbo!
+     * @regexTest §f▶ Free
+     * @regexTest §a▶ Light
+     * @regexTest §9▶ Moderate
+     * @regexTest §5▶ Expert
+     * @regexTest §6▶ Ultra
+     * @regexTest §d▶ Turbo!
      */
     private val trainingTypeLorePattern by patternGroup.pattern(
         "lore.training-type",
@@ -143,9 +143,9 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: §b▶ 1 Day
-     * REGEX-TEST: §b▶ 5 Days
-     * REGEX-TEST: §b▶ 20 Days
+     * @regexTest §b▶ 1 Day
+     * @regexTest §b▶ 5 Days
+     * @regexTest §b▶ 20 Days
      */
     private val dayUserInputLorePattern by patternGroup.pattern(
         "lore.day-user-input",

@@ -25,7 +25,7 @@ object DungeonsRaceGuide {
     private val CANCEL_RACE_ITEM = "CANCEL_RACE_ITEM".toInternalName()
 
     /**
-     * REGEX-TEST: §D§LPRECURSOR RUINS RACE §e00:05.443            §b1577/1577✎ Mana
+     * @regexTest §D§LPRECURSOR RUINS RACE §e00:05.443            §b1577/1577✎ Mana
      */
     private val raceActivePattern by RepoPattern.pattern(
         "dungeon.race.active",

@@ -19,8 +19,8 @@ object CFInventory {
     private val config get() = CFApi.config
 
     /**
-     * REGEX-TEST: §7§aYou have 1 unclaimed reward!
-     * REGEX-TEST: §7§aYou have 2 unclaimed rewards!
+     * @regexTest §7§aYou have 1 unclaimed reward!
+     * @regexTest §7§aYou have 2 unclaimed rewards!
      */
     private val unclaimedRewardsPattern by CFApi.patternGroup.pattern(
         "unclaimedrewards",

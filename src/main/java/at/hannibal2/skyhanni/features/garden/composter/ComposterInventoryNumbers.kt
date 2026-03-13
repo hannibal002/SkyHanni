@@ -20,7 +20,7 @@ object ComposterInventoryNumbers {
     private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
 
     /**
-     * REGEX-TEST: §2§l§m      §f§l§m              §r §e37,547.5§6/§e130k
+     * @regexTest §2§l§m      §f§l§m              §r §e37,547.5§6/§e130k
      */
     private val valuePattern by patternGroup.pattern(
         "value",
@@ -28,7 +28,7 @@ object ComposterInventoryNumbers {
     )
 
     /**
-     * REGEX-TEST: §7§7Compost Available: §a62
+     * @regexTest §7§7Compost Available: §a62
      */
     private val amountPattern by patternGroup.pattern(
         "amount",

@@ -63,9 +63,9 @@ object HoppityApi {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §f1st Chocolate Milestone
-     * REGEX-TEST: §915th Chocolate Milestone
-     * REGEX-TEST: §622nd Chocolate Milestone
+     * @regexTest §f1st Chocolate Milestone
+     * @regexTest §915th Chocolate Milestone
+     * @regexTest §622nd Chocolate Milestone
      */
     private val milestoneNamePattern by CFApi.patternGroup.pattern(
         "rabbit.milestone",
@@ -73,7 +73,7 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: §6§lGolden Rabbit §8- §aSide Dish
+     * @regexTest §6§lGolden Rabbit §8- §aSide Dish
      */
     private val sideDishNamePattern by CFApi.patternGroup.pattern(
         "rabbit.sidedish",
@@ -81,8 +81,8 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: §7Reach §6300B Chocolate §7all-time to
-     * REGEX-TEST: §7Reach §61k Chocolate §7all-time to unlock
+     * @regexTest §7Reach §6300B Chocolate §7all-time to
+     * @regexTest §7Reach §61k Chocolate §7all-time to unlock
      */
     private val allTimeLorePattern by CFApi.patternGroup.pattern(
         "milestone.alltime",
@@ -90,8 +90,8 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: §7Spend §6150B Chocolate §7in the
-     * REGEX-TEST: §7Spend §62M Chocolate §7in the §6Chocolate
+     * @regexTest §7Spend §6150B Chocolate §7in the
+     * @regexTest §7Spend §62M Chocolate §7in the §6Chocolate
      */
     private val shopLorePattern by CFApi.patternGroup.pattern(
         "milestone.shop",
@@ -99,7 +99,7 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: /selectnpcoption hoppity r_2_1
+     * @regexTest /selectnpcoption hoppity r_2_1
      */
     val pickupOutgoingCommandPattern by CFApi.patternGroup.pattern(
         "hoppity.call.pickup.outgoing",
@@ -107,7 +107,7 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: §eClick to claim!
+     * @regexTest §eClick to claim!
      */
     private val claimableMilestonePattern by CFApi.patternGroup.pattern(
         "milestone.claimable",
@@ -115,9 +115,9 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: Chocolate Factory
-     * REGEX-TEST: Chocolate Shop Milestones
-     * REGEX-TEST: Chocolate Factory Milestones
+     * @regexTest Chocolate Factory
+     * @regexTest Chocolate Shop Milestones
+     * @regexTest Chocolate Factory Milestones
      */
     private val miscProcessInvPattern by CFApi.patternGroup.pattern(
         "inventory.misc",
@@ -125,7 +125,7 @@ object HoppityApi {
     )
 
     /**
-     * REGEX-TEST: Rabbit Hitman
+     * @regexTest Rabbit Hitman
      */
     val hitmanInventoryPattern by CFApi.patternGroup.pattern(
         "hitman.inventory",

@@ -36,8 +36,8 @@ object MinionCraftHelper {
     private val config get() = SkyHanniMod.feature.event.bingo
 
     /**
-     * REGEX-TEST: Sheep Minion X
-     * REGEX-TEST: Wheat Minion IV
+     * @regexTest Sheep Minion X
+     * @regexTest Wheat Minion IV
      */
     private val minionNamePattern by RepoPattern.pattern(
         "bingo.minion.name",

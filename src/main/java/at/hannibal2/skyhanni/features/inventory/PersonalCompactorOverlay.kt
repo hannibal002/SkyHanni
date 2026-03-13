@@ -36,8 +36,8 @@ object PersonalCompactorOverlay {
     private val group = RepoPattern.group("inventory.personalcompactor")
 
     /**
-     * REGEX-TEST: PERSONAL_COMPACTOR_4000
-     * REGEX-TEST: PERSONAL_DELETOR_7000
+     * @regexTest PERSONAL_COMPACTOR_4000
+     * @regexTest PERSONAL_DELETOR_7000
      */
     private val internalNamePattern by group.pattern(
         "internalname",

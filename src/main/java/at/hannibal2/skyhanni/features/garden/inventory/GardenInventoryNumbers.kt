@@ -24,7 +24,7 @@ object GardenInventoryNumbers {
     private val config get() = GardenApi.config.number
 
     /**
-     * REGEX-TEST: §7Current Tier: §e6§7/§a9
+     * @regexTest §7Current Tier: §e6§7/§a9
      */
     private val upgradeTierPattern by RepoPattern.pattern(
         "garden.inventory.numbers.upgradetier",

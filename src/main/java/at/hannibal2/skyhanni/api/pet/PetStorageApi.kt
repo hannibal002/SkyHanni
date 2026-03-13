@@ -61,10 +61,10 @@ object PetStorageApi {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: Pets
-     * REGEX-TEST: Pets (1/3)
-     * REGEX-TEST: Pets: "a"
-     * REGEX-TEST: Pets: "e" (1/2)
+     * @regexTest Pets
+     * @regexTest Pets (1/3)
+     * @regexTest Pets: "a"
+     * @regexTest Pets: "e" (1/2)
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
@@ -72,13 +72,13 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST:  [Lvl 100] Hedgehog
-     * REGEX-TEST:  [Lvl 68] Blaze
-     * REGEX-TEST:  [Lvl 51] Kuudra
-     * REGEX-TEST:  [Lvl 100] Flying Fish
-     * REGEX-TEST:  [Lvl 100] Chicken ✦
-     * REGEX-TEST:  [Lvl 200] [122✦] Golden Dragon
-     * REGEX-FAIL:  No pet selected
+     * @regexTestWrapped " [Lvl 100] Hedgehog"
+     * @regexTestWrapped " [Lvl 68] Blaze"
+     * @regexTestWrapped " [Lvl 51] Kuudra"
+     * @regexTestWrapped " [Lvl 100] Flying Fish"
+     * @regexTestWrapped " [Lvl 100] Chicken ✦"
+     * @regexTestWrapped " [Lvl 200] [122✦] Golden Dragon"
+     * @regexFailWrapped " No pet selected"
      */
     @Suppress("MaxLineLength")
     private val petTabWidgetNamePattern by patternGroup.pattern(
@@ -87,13 +87,13 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST:  +163,119,730.2 XP
-     * REGEX-TEST:  33,915/179.7k XP (18.9%)
-     * REGEX-TEST:  2,877.5/9.7k XP (29.7%)
-     * REGEX-TEST:  931,886.2/1.4M XP (67.2%)
-     * REGEX-TEST:  251,016.4/561.7k XP (44.7%)
-     * REGEX-TEST:  3,138.4/9.7k XP (32.4%)
-     * REGEX-TEST:  MAX LEVEL
+     * @regexTestWrapped " +163,119,730.2 XP"
+     * @regexTestWrapped " 33,915/179.7k XP (18.9%)"
+     * @regexTestWrapped " 2,877.5/9.7k XP (29.7%)"
+     * @regexTestWrapped " 931,886.2/1.4M XP (67.2%)"
+     * @regexTestWrapped " 251,016.4/561.7k XP (44.7%)"
+     * @regexTestWrapped " 3,138.4/9.7k XP (32.4%)"
+     * @regexTestWrapped " MAX LEVEL"
      */
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
@@ -102,10 +102,10 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST: §7§7Selected pet: §6Chicken§5 ✦
-     * REGEX-TEST: §7§7Selected pet: §5Rift Ferret
-     * REGEX-TEST: §7§7Selected pet: §dEndermite
-     * REGEX-FAIL: §7§7Selected pet: §cNone
+     * @regexTest §7§7Selected pet: §6Chicken§5 ✦
+     * @regexTest §7§7Selected pet: §5Rift Ferret
+     * @regexTest §7§7Selected pet: §dEndermite
+     * @regexFail §7§7Selected pet: §cNone
      */
     private val petMenuSelectedPetNamePattern by patternGroup.pattern(
         "menu.selected.name",
@@ -113,10 +113,10 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST: §7Progress to Level 52: §e29.7%
-     * REGEX-TEST: §7Progress to Level 2: §e0%
-     * REGEX-TEST: §7Progress to Level 69: §e18.9%
-     * REGEX-TEST: §b§lMAX LEVEL
+     * @regexTest §7Progress to Level 52: §e29.7%
+     * @regexTest §7Progress to Level 2: §e0%
+     * @regexTest §7Progress to Level 69: §e18.9%
+     * @regexTest §b§lMAX LEVEL
      */
     private val petMenuSelectedPetProgressPattern by patternGroup.pattern(
         "menu.selected.progress",
@@ -124,11 +124,11 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST: §2§l§m        §f§l§m                 §r §e2,877.5§6/§e9.7k
-     * REGEX-TEST: §2§l§m     §f§l§m                    §r §e33,915§6/§e179.7k
-     * REGEX-TEST: §2§l§m                 §f§l§m        §r §e931,886.2§6/§e1.4M
-     * REGEX-TEST: §f§l§m                         §r §e0§6/§e660
-     * REGEX-TEST: §8▸ 25,353,248 XP
+     * @regexTest §2§l§m        §f§l§m                 §r §e2,877.5§6/§e9.7k
+     * @regexTest §2§l§m     §f§l§m                    §r §e33,915§6/§e179.7k
+     * @regexTest §2§l§m                 §f§l§m        §r §e931,886.2§6/§e1.4M
+     * @regexTest §f§l§m                         §r §e0§6/§e660
+     * @regexTest §8▸ 25,353,248 XP
      */
     private val petMenuSelectedPetXpPattern by patternGroup.pattern(
         "menu.selected.xp",
@@ -136,11 +136,11 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dEnderman§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6Golden Dragon§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dRabbit§9 ✦§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §8[§634§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
+     * @regexTest §cAutopet §eequipped your §7[Lvl 100] §dEnderman§e! §a§lVIEW RULE
+     * @regexTest §cAutopet §eequipped your §7[Lvl 200] §6Golden Dragon§e! §a§lVIEW RULE
+     * @regexTest §cAutopet §eequipped your §7[Lvl 100] §dRabbit§9 ✦§e! §a§lVIEW RULE
+     * @regexTest §cAutopet §eequipped your §7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon§e! §a§lVIEW RULE
+     * @regexTest §cAutopet §eequipped your §7[Lvl 200] §8[§634§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
      */
     @Suppress("MaxLineLength")
     private val autoPetMessagePattern by patternGroup.pattern(
@@ -149,7 +149,7 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST: §aHeld Item: §9Farming Exp Boost
+     * @regexTest §aHeld Item: §9Farming Exp Boost
      */
     private val autoPetHoverHeldItemPattern by patternGroup.pattern(
         "autopet.hover.helditem",

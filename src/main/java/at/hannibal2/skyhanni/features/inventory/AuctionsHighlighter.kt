@@ -24,7 +24,7 @@ object AuctionsHighlighter {
     private val patternGroup = RepoPattern.group("auctions.highlight")
 
     /**
-     * REGEX-TEST: §7Buy it now: §62,599,999,999 coins
+     * @regexTest §7Buy it now: §62,599,999,999 coins
      */
     val buyItNowPattern by patternGroup.pattern(
         "buyitnow",
@@ -32,8 +32,8 @@ object AuctionsHighlighter {
     )
 
     /**
-     * REGEX-TEST: §7Starting bid: §6985,000,000 coins
-     * REGEX-TEST: §7Top bid: §667 coins
+     * @regexTest §7Starting bid: §6985,000,000 coins
+     * @regexTest §7Top bid: §667 coins
      */
     val auctionPattern by patternGroup.pattern(
         "auction",

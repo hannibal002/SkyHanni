@@ -46,7 +46,7 @@ object CurrentChatDisplay {
     private val patternGroup = RepoPattern.group("chat.current-chat")
 
     /**
-     * REGEX-TEST: §aYou are now in the §r§6OFFICER§r§a channel
+     * @regexTest §aYou are now in the §r§6OFFICER§r§a channel
      */
     private val changedChatPattern by patternGroup.pattern(
         "changed",
@@ -54,8 +54,8 @@ object CurrentChatDisplay {
     )
 
     /**
-     * REGEX-TEST: §cYou are not in a party and were moved to the ALL channel.
-     * REGEX-TEST: §cThe conversation you were in expired and you have been moved back to the ALL channel.
+     * @regexTest §cYou are not in a party and were moved to the ALL channel.
+     * @regexTest §cThe conversation you were in expired and you have been moved back to the ALL channel.
      */
     @Suppress("MaxLineLength")
     private val allChatPattern by patternGroup.pattern(
@@ -64,7 +64,7 @@ object CurrentChatDisplay {
     )
 
     /**
-     * REGEX-TEST: §aOpened a chat conversation with §r§b[MVP§r§5+§r§b] martimavocado§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave
+     * @regexTest §aOpened a chat conversation with §r§b[MVP§r§5+§r§b] martimavocado§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave
      */
     @Suppress("MaxLineLength")
     private val openPrivateMessagePattern by patternGroup.pattern(

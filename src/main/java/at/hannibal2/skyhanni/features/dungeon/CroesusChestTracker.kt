@@ -56,28 +56,28 @@ object CroesusChestTracker {
     private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
 
     /**
-     * REGEX-TEST: §eFloor V
+     * @regexTest §eFloor V
      */
     private val floorPattern by patternGroup.pattern("chest.floor", "§eFloor (?<floor>[IV]+)")
     private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
 
     /**
-     * REGEX-TEST: §eInfernal Tier
+     * @regexTest §eInfernal Tier
      */
     private val kuudraPattern by patternGroup.pattern("chest.kuudra", "§e(?<tier>Basic|Hot|Burning|Fiery|Infernal) Tier")
 
     /**
-     * REGEX-TEST: §aNo more chests to open!
+     * @regexTest §aNo more chests to open!
      */
     private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more chests to open!")
 
     /**
-     * REGEX-TEST: §7Opened Chest: §fWood
+     * @regexTest §7Opened Chest: §fWood
      */
     private val openedPattern by patternGroup.pattern("chest.state.opened", "§.Opened [cC]hest:.*")
 
     /**
-     * REGEX-TEST: §cNo chests opened yet!
+     * @regexTest §cNo chests opened yet!
      */
     private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§cNo chests opened yet!")
 

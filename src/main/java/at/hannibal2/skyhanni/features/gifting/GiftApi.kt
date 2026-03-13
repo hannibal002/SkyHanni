@@ -14,9 +14,9 @@ object GiftApi {
     private val patternGroup = RepoPattern.group("event.winter.giftapi")
 
     /**
-     * REGEX-TEST: WHITE_GIFT
-     * REGEX-TEST: RED_GIFT
-     * REGEX-TEST: GREEN_GIFT
+     * @regexTest WHITE_GIFT
+     * @regexTest RED_GIFT
+     * @regexTest GREEN_GIFT
      */
     private val giftNamePattern by patternGroup.pattern(
         "giftname",

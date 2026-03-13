@@ -73,9 +73,9 @@ object HoppityCollectionStats {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: (1/17) Hoppity's Collection
-     * REGEX-TEST: (12/17) Hoppity's Collection
-     * REGEX-TEST: Hoppity's Collection
+     * @regexTest (1/17) Hoppity's Collection
+     * @regexTest (12/17) Hoppity's Collection
+     * @regexTest Hoppity's Collection
      */
     private val pagePattern by patternGroup.pattern(
         "page.current",
@@ -83,8 +83,8 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7Duplicates Found: §a9
-     * REGEX-TEST: §7Duplicates Found: §a0
+     * @regexTest §7Duplicates Found: §a9
+     * @regexTest §7Duplicates Found: §a0
      */
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
@@ -92,8 +92,8 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§8You cannot find this rabbit until you
-     * REGEX-TEST: §7§8You have not found this rabbit yet!
+     * @regexTest §7§8You cannot find this rabbit until you
+     * @regexTest §7§8You have not found this rabbit yet!
      */
     private val rabbitNotFoundPattern by patternGroup.pattern(
         "rabbit.notfound",
@@ -101,7 +101,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e395§6/§e457
+     * @regexTest §2§l§m                      §f§l§m   §r §e395§6/§e457
      */
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
@@ -109,7 +109,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §a✔ §7Requirement
+     * @regexTest §a✔ §7Requirement
      */
     private val requirementMet by patternGroup.pattern(
         "rabbit.requirement.met",
@@ -117,9 +117,9 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
-     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
-     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     * @regexTest §c✖ §7Requirement §e0§7/§a15
+     * @regexTest §c✖ §7Requirement §e6§7/§a20
+     * @regexTest §c✖ §7Requirement §e651§7/§a1,000
      */
     private val requirementNotMet by patternGroup.pattern(
         "rabbit.requirement.notmet",
@@ -127,9 +127,9 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §c✖ §7Requirement §e0§7/§a15
-     * REGEX-TEST: §c✖ §7Requirement §e6§7/§a20
-     * REGEX-TEST: §c✖ §7Requirement §e651§7/§a1,000
+     * @regexTest §c✖ §7Requirement §e0§7/§a15
+     * @regexTest §c✖ §7Requirement §e6§7/§a20
+     * @regexTest §c✖ §7Requirement §e651§7/§a1,000
      */
     private val requirementAmountNotMet by patternGroup.pattern(
         "rabbit.requirement.notmet.amount",
@@ -137,7 +137,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §6Factory Milestones§7.
+     * @regexTest §6Factory Milestones§7.
      */
     private val factoryMilestone by RepoPattern.pattern(
         "rabbit.requirement.factory",
@@ -145,7 +145,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §6Shop Milestones§7.
+     * @regexTest §6Shop Milestones§7.
      */
     private val shopMilestone by RepoPattern.pattern(
         "rabbit.requirement.shop",
@@ -153,7 +153,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§7Obtained by finding a §6Golden Stray
+     * @regexTest §7§7Obtained by finding a §6Golden Stray
      */
     private val strayRabbit by RepoPattern.pattern(
         "rabbit.requirement.stray",
@@ -161,7 +161,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
+     * @regexTest Find 15 unique egg locations in the Deep Caverns.
      */
     private val locationRequirementDescription by patternGroup.pattern(
         "rabbit.requirement.location",
@@ -169,17 +169,17 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§2Dwarven Mines Resident
-     * REGEX-TEST: §7§5Crystal Hollows Resident
-     * REGEX-TEST: §7§eThe Farming Islands Resident
-     * REGEX-TEST: §7§cDungeon Hub Resident
-     * REGEX-TEST: §7§dThe End Resident
-     * REGEX-TEST: §7§6Gold Mine Resident
-     * REGEX-TEST: §7§aThe Park Resident
-     * REGEX-TEST: §7§cSpider's Den Resident
-     * REGEX-TEST: §7§bDeep Caverns Resident
-     * REGEX-TEST: §7§cCrimson Isle Resident
-     * REGEX-TEST: §7§bHub Resident
+     * @regexTest §7§2Dwarven Mines Resident
+     * @regexTest §7§5Crystal Hollows Resident
+     * @regexTest §7§eThe Farming Islands Resident
+     * @regexTest §7§cDungeon Hub Resident
+     * @regexTest §7§dThe End Resident
+     * @regexTest §7§6Gold Mine Resident
+     * @regexTest §7§aThe Park Resident
+     * @regexTest §7§cSpider's Den Resident
+     * @regexTest §7§bDeep Caverns Resident
+     * @regexTest §7§cCrimson Isle Resident
+     * @regexTest §7§bHub Resident
      */
     private val residentRabbitPattern by patternGroup.pattern(
         "rabbit.requirement.resident",
@@ -187,8 +187,8 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7Current Hotspot: §dThe End
-     * REGEX-TEST: §7Current Hotspot: §cDungeon Hub
+     * @regexTest §7Current Hotspot: §dThe End
+     * @regexTest §7Current Hotspot: §cDungeon Hub
      */
     private val hotspotLocationPattern by patternGroup.pattern(
         "rabbit.hotspot",
@@ -196,7 +196,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7Obtained by spending §6800B
+     * @regexTest §7Obtained by spending §6800B
      * REGEX_TEST: §7Obtained by reaching §6400B
      */
     private val milestoneRabbitLorePattern by patternGroup.pattern(

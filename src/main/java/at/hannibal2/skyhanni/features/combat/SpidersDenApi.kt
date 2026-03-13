@@ -12,7 +12,7 @@ object SpidersDenApi {
     private val patternGroup = RepoPattern.group("combat.spidersden")
 
     /**
-     * REGEX-TEST: §4Broodmother§7: §6Soon
+     * @regexTest §4Broodmother§7: §6Soon
      */
     val broodmotherPattern by patternGroup.pattern(
         "broodmother",

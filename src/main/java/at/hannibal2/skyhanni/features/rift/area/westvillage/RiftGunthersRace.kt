@@ -27,7 +27,7 @@ object RiftGunthersRace {
     private val patternGroup = RepoPattern.group("rift.area.westvillage.riftrace")
 
     /**
-     * REGEX-TEST: §3§lRIFT RACING §r§eRace started! Good luck!
+     * @regexTest §3§lRIFT RACING §r§eRace started! Good luck!
      */
     private val raceStartedPattern by patternGroup.pattern(
         "start",
@@ -35,8 +35,8 @@ object RiftGunthersRace {
     )
 
     /**
-     * REGEX-TEST: §3§lRIFT RACING §r§eRace finished in 00:36.539!
-     * REGEX-TEST: §3§lRIFT RACING §r§eRace finished in §r§300:32.794§r§e! §r§3§lPERSONAL BEST!
+     * @regexTest §3§lRIFT RACING §r§eRace finished in 00:36.539!
+     * @regexTest §3§lRIFT RACING §r§eRace finished in §r§300:32.794§r§e! §r§3§lPERSONAL BEST!
      */
     private val raceFinishedPattern by patternGroup.pattern(
         "finish",
@@ -44,9 +44,9 @@ object RiftGunthersRace {
     )
 
     /**
-     * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled!
-     * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled! Time limit reached!
-     * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled! You left the racing area!
+     * @regexTest §3§lRIFT RACING §r§cRace cancelled!
+     * @regexTest §3§lRIFT RACING §r§cRace cancelled! Time limit reached!
+     * @regexTest §3§lRIFT RACING §r§cRace cancelled! You left the racing area!
      */
     private val raceCancelledPattern by patternGroup.pattern(
         "cancel",

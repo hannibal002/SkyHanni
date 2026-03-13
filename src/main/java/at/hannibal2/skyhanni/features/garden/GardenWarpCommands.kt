@@ -20,8 +20,8 @@ object GardenWarpCommands {
     private val config get() = GardenApi.config.gardenCommands
 
     /**
-     * REGEX-TEST: /tp 3
-     * REGEX-TEST: /tp barn
+     * @regexTest /tp 3
+     * @regexTest /tp barn
      */
     private val tpPlotPattern by RepoPattern.pattern(
         "garden.warpcommand.tpplot",

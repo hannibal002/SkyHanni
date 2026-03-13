@@ -99,7 +99,7 @@ object MineshaftPityDisplay {
 
 
     /**
-     * REGEX-TEST:  Glacite Mineshafts: 124/2,000
+     * @regexTestWrapped " Glacite Mineshafts: 124/2,000"
      */
     private val tabPityPattern by group.pattern(
         "tablist",

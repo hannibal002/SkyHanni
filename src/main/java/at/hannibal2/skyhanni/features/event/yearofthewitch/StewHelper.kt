@@ -38,7 +38,7 @@ import net.minecraft.world.item.Items
 object StewHelper {
 
     /**
-     * REGEX-TEST: Warmed Flakes x64
+     * @regexTest Warmed Flakes x64
      */
     private val stewItemNamePattern by RepoPattern.pattern(
         "event.year-of-the-witch.stew-item",

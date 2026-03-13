@@ -37,7 +37,7 @@ object KingTalismanHelper {
     private val patternGroup = RepoPattern.group("mining.kingtalisman")
 
     /**
-     * REGEX-TEST: §7You have received a §r§fKing Talisman§r§7!
+     * @regexTest §7You have received a §r§fKing Talisman§r§7!
      */
     private val talismanPattern by patternGroup.pattern(
         "talisman",

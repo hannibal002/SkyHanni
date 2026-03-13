@@ -29,8 +29,8 @@ object NpcVisitorFix {
     private val staticVisitors = listOf("Jacob", "Anita")
 
     /**
-     * REGEX-TEST: §aChanging Barn skin to §r§fDefault§r§a!
-     * REGEX-TEST: §aChanging Barn skin to §r§5Mansion Heights§r§a!
+     * @regexTest §aChanging Barn skin to §r§fDefault§r§a!
+     * @regexTest §aChanging Barn skin to §r§5Mansion Heights§r§a!
      */
     private val barnSkinChangePattern by RepoPattern.pattern(
         "garden.barn.skin.change",

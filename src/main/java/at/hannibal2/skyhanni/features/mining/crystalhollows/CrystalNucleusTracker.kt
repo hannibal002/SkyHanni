@@ -44,10 +44,10 @@ object CrystalNucleusTracker {
     private val patternGroup = RepoPattern.group("mining.crystalnucleus.tracker")
 
     /**
-     * REGEX-TEST: §b[MVP§r§2+§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-     * REGEX-TEST: §6[MVP§r§2++§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-     * REGEX-TEST: oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-     * REGEX-TEST: §c[§fYOUTUBE§c] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * @regexTest §b[MVP§r§2+§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * @regexTest §6[MVP§r§2++§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * @regexTest oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * @regexTest §c[§fYOUTUBE§c] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
      */
     @Suppress("MaxLineLength")
     private val balObtainedPattern by patternGroup.pattern(

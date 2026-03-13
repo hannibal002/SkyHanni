@@ -100,8 +100,8 @@ object ItemPickupLog {
     private val patternGroup = RepoPattern.group("itempickuplog")
 
     /**
-     * REGEX-TEST: Mite Gel x33
-     * REGEX-TEST: Sludge Juice
+     * @regexTest Mite Gel x33
+     * @regexTest Sludge Juice
      */
     private val shopPattern by patternGroup.pattern(
         "shoppattern",

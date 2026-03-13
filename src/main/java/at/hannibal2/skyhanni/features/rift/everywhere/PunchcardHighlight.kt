@@ -49,9 +49,9 @@ object PunchcardHighlight {
     private val patternGroup = RepoPattern.group("rift.punchcard")
 
     /**
-     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§b[MVP§r§c+§r§b] ThorQOM§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
-     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§7Metafighter§r§7 §r§eand both regained §r§a+25ф Rift Time§r§e!
-     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] RickyLafleur22§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
+     * @regexTest §5§lPUNCHCARD! §r§eYou punched §r§b[MVP§r§c+§r§b] ThorQOM§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
+     * @regexTest §5§lPUNCHCARD! §r§eYou punched §r§7Metafighter§r§7 §r§eand both regained §r§a+25ф Rift Time§r§e!
+     * @regexTest §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] RickyLafleur22§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
      */
     private val punchedPattern by patternGroup.pattern(
         "new",
@@ -59,7 +59,7 @@ object PunchcardHighlight {
     )
 
     /**
-     * REGEX-TEST: §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
+     * @regexTest §c§lAWKWARD! §r§cThis player has already been punched by you... somehow!
      */
     private val repeatPattern by patternGroup.pattern(
         "repeat",
@@ -67,7 +67,7 @@ object PunchcardHighlight {
     )
 
     /**
-     * REGEX-TEST: §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
+     * @regexTest §c§lUH OH! §r§cYou reached the limit of 20 players you can punch in one session!
      */
     private val limitPattern by patternGroup.pattern(
         "limit",

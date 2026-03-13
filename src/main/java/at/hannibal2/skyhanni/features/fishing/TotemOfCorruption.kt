@@ -58,8 +58,8 @@ object TotemOfCorruption {
     )
 
     /**
-     * REGEX-TEST: Remaining: 2m 30s
-     * REGEX-TEST: Remaining: 5s
+     * @regexTest Remaining: 2m 30s
+     * @regexTest Remaining: 5s
      */
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining-nocolor",
@@ -67,7 +67,7 @@ object TotemOfCorruption {
     )
 
     /**
-     * REGEX-TEST: Owner: hannibal2
+     * @regexTest Owner: hannibal2
      */
     private val ownerPattern by patternGroup.pattern(
         "owner-nocolor",

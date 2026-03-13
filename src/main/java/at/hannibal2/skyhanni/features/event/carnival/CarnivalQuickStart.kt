@@ -22,7 +22,7 @@ object CarnivalQuickStart {
     private val patternGroup = RepoPattern.group("carnival")
 
     /**
-     * WRAPPED-REGEX-TEST: "Select an option: \n  ➜ [Sure thing, partner!] \n  ➜ [Could ya tell me the rules again?] \n  ➜ [I'd like to do somthin' else fer now.] "
+     * @regexTestWrapped "Select an option: \n  ➜ [Sure thing, partner!] \n  ➜ [Could ya tell me the rules again?] \n  ➜ [I'd like to do somthin' else fer now.] "
      */
     private val chatPattern by patternGroup.pattern(
         "select.option.chat-nocolor",

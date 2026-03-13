@@ -26,7 +26,7 @@ object CarrolynHelper {
     private val patternGroup = RepoPattern.group("garden.carrolyn")
 
     /**
-     * REGEX-TEST: §7Bring §63,000 §7of these to §5Carrolyn §7in
+     * @regexTest §7Bring §63,000 §7of these to §5Carrolyn §7in
      */
     private val lorePattern by patternGroup.pattern(
         "lore",

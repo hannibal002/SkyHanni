@@ -39,8 +39,8 @@ import kotlin.time.Duration.Companion.seconds
 object GemstoneMoneyPerHour {
 
     /**
-     * REGEX-TEST: §d§lPRISTINE! §r§fYou found §r§a☘ Flawed Jade Gemstone §r§8x20§r§f!
-     * REGEX-TEST: §d§lPRISTINE! §r§fYou found §r§a❈ Flawed Amethyst Gemstone §r§8x16§r§f!
+     * @regexTest §d§lPRISTINE! §r§fYou found §r§a☘ Flawed Jade Gemstone §r§8x20§r§f!
+     * @regexTest §d§lPRISTINE! §r§fYou found §r§a❈ Flawed Amethyst Gemstone §r§8x16§r§f!
      */
     private val pristineMessagePattern by RepoPattern.pattern(
         "mining.pristine",
@@ -48,7 +48,7 @@ object GemstoneMoneyPerHour {
     )
 
     /**
-     * REGEX-TEST: rough jade gem
+     * @regexTest rough jade gem
      */
     private val roughGemstoneNamePattern by RepoPattern.pattern(
         "mining.roughgemstone",

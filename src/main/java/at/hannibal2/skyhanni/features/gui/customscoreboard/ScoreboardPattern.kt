@@ -25,7 +25,7 @@ object ScoreboardPattern {
     private val mainSB = scoreboardGroup.group("main")
 
     /**
-     * REGEX-TEST: Motes: §5137,242
+     * @regexTest Motes: §5137,242
      */
     val motesPattern by mainSB.pattern(
         "motes",
@@ -33,7 +33,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Copper: §c3,416
+     * @regexTest Copper: §c3,416
      */
     val copperPattern by mainSB.pattern(
         "copper",
@@ -41,8 +41,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Sowdust: §230,210,307
-     * WRAPPED-REGEX-TEST: " Sowdust: §r§230,120,093"
+     * @regexTest Sowdust: §230,210,307
+     * @regexTestWrapped " Sowdust: §r§230,120,093"
      */
     val sowdustPattern by mainSB.pattern(
         "sowdust",
@@ -50,11 +50,11 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Sowdust: §26.5k §7(+912)
-     * REGEX-TEST: Sowdust: §230.1M §7(+798)
-     * REGEX-TEST: Sowdust: §22.7B §7(+12)
-     * REGEX-TEST: Sowdust: §210.7k §7(+3.3k)
-     * REGEX-TEST: Sowdust: §210.7k §7(+1.2M)
+     * @regexTest Sowdust: §26.5k §7(+912)
+     * @regexTest Sowdust: §230.1M §7(+798)
+     * @regexTest Sowdust: §22.7B §7(+12)
+     * @regexTest Sowdust: §210.7k §7(+3.3k)
+     * @regexTest Sowdust: §210.7k §7(+1.2M)
      */
     val sowdustGainedPattern by mainSB.pattern(
         "sowdust-gained",
@@ -62,7 +62,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Gems: §a350
+     * @regexTest Gems: §a350
      */
     val gemsPattern by mainSB.pattern(
         "gems",
@@ -70,7 +70,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  §5ф §dWizard Tower
+     * @regexTestWrapped " §5ф §dWizard Tower"
      */
     val locationPattern by mainSB.pattern(
         "location",
@@ -78,7 +78,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §711/15/24 §8m10DH
+     * @regexTest §711/15/24 §8m10DH
      */
     val lobbyCodePattern by mainSB.pattern(
         "lobbycode",
@@ -86,7 +86,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  Early Spring 13th
+     * @regexTestWrapped " Early Spring 13th"
      */
     val datePattern by mainSB.pattern(
         "date",
@@ -94,8 +94,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  §78:50am
-     * REGEX-TEST:  §75:50am §b☽
+     * @regexTestWrapped " §78:50am"
+     * @regexTestWrapped " §75:50am §b☽"
      */
     val timePattern by mainSB.pattern(
         "time",
@@ -103,8 +103,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §ewww.hypixel.net
-     * REGEX-TEST: §ealpha.hypixel.net
+     * @regexTest §ewww.hypixel.net
+     * @regexTest §ealpha.hypixel.net
      */
     val footerPattern by mainSB.pattern(
         "footer",
@@ -112,7 +112,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §6Year 384 Votes
+     * @regexTest §6Year 384 Votes
      */
     val yearVotesPattern by mainSB.pattern(
         "yearvotes",
@@ -120,8 +120,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §f||||||||||||||| §aFoxy
-     * REGEX-TEST: §d|§f|||||||||||||| §dDiaz
+     * @regexTest §f||||||||||||||| §aFoxy
+     * @regexTest §d|§f|||||||||||||| §dDiaz
      */
     val votesPattern by mainSB.pattern(
         "votes",
@@ -129,8 +129,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §7Waiting for
-     * REGEX-TEST: §7your vote...
+     * @regexTest §7Waiting for
+     * @regexTest §7your vote...
      */
     val waitingForVotePattern by mainSB.pattern(
         "waitingforvote",
@@ -138,7 +138,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: North Stars: §d1,539
+     * @regexTest North Stars: §d1,539
      */
     val northstarsPattern by mainSB.pattern(
         "northstars",
@@ -146,9 +146,9 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  §7♲ §7Ironman
-     * REGEX-TEST:  §a☀ §aStranded
-     * REGEX-TEST:  §9Ⓑ §9Bingo
+     * @regexTestWrapped " §7♲ §7Ironman"
+     * @regexTestWrapped " §a☀ §aStranded"
+     * @regexTestWrapped " §9Ⓑ §9Bingo"
      */
     val profileTypePattern by mainSB.pattern(
         "profiletype",
@@ -159,7 +159,7 @@ object ScoreboardPattern {
     private val multiUseSB = scoreboardGroup.group("multiuse")
 
     /**
-     * REGEX-TEST: Auto-closing in: §c1:58
+     * @regexTest Auto-closing in: §c1:58
      */
     val autoClosingPattern by multiUseSB.pattern(
         "autoclosing",
@@ -167,7 +167,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Starting in: §a0:02
+     * @regexTest Starting in: §a0:02
      */
     val startingInPattern by multiUseSB.pattern(
         "startingin",
@@ -175,7 +175,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Time Elapsed: §a48s
+     * @regexTest Time Elapsed: §a48s
      */
     val timeElapsedPattern by multiUseSB.pattern(
         "timeelapsed",
@@ -183,7 +183,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Instance Shutdown In: §a01m 59s
+     * @regexTest Instance Shutdown In: §a01m 59s
      */
     val instanceShutdownPattern by multiUseSB.pattern(
         "instanceshutdown",
@@ -191,7 +191,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Time Left: §b11
+     * @regexTest Time Left: §b11
      */
     val timeLeftPattern by multiUseSB.pattern(
         "timeleft",
@@ -202,8 +202,8 @@ object ScoreboardPattern {
     private val dungeonSB = scoreboardGroup.group("dungeon")
 
     /**
-     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M§c❤
-     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M
+     * @regexTest §8- §c§4Power Dragon§a 497.3M§c❤
+     * @regexTest §8- §c§4Power Dragon§a 497.3M
      */
     val m7dragonsPattern by dungeonSB.pattern(
         "m7dragons",
@@ -223,8 +223,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
-     * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     * @regexTest §a[H] §6Eisengolem §7[Lv48]
+     * @regexTest §e[M] §b04032006 §a7,361§c❤
      */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
@@ -233,7 +233,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §8 - §cChaos§a 1
+     * @regexTest §8 - §cChaos§a 1
      */
     val floor3GuardiansPattern by dungeonSB.pattern(
         "floor3guardians",
@@ -244,7 +244,7 @@ object ScoreboardPattern {
     private val kuudraSB = scoreboardGroup.group("kuudra")
 
     /**
-     * REGEX-TEST: §f§lWave: §c§l2 §8- §a0:09
+     * @regexTest §f§lWave: §c§l2 §8- §a0:09
      */
     val wavePattern by kuudraSB.pattern(
         "wave",
@@ -252,7 +252,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fTokens: §565
+     * @regexTest §fTokens: §565
      */
     val tokensPattern by kuudraSB.pattern(
         "tokens",
@@ -260,8 +260,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Submerges In: §e01m 00s
-     * REGEX-TEST: Submerges In: §e???
+     * @regexTest Submerges In: §e01m 00s
+     * @regexTest Submerges In: §e???
      */
     val submergesPattern by kuudraSB.pattern(
         "submerges",
@@ -272,9 +272,9 @@ object ScoreboardPattern {
     private val farmingSB = scoreboardGroup.group("farming")
 
     /**
-     * REGEX-TEST: §6§lGOLD §fmedals: §6111
-     * REGEX-TEST: §f§lSILVER §fmedals: §f1,154
-     * REGEX-TEST: §c§lBRONZE §fmedals: §c268
+     * @regexTest §6§lGOLD §fmedals: §6111
+     * @regexTest §f§lSILVER §fmedals: §f1,154
+     * @regexTest §c§lBRONZE §fmedals: §c268
      */
     val medalsPattern by farmingSB.pattern(
         "medals",
@@ -282,7 +282,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:    §cLocked
+     * @regexTestWrapped "   §cLocked"
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
@@ -290,8 +290,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:    §fCleanup§7: §e0.3%
-     * REGEX-TEST:    §fCleanup§7: §b2 §4§lൠ§7 x1
+     * @regexTestWrapped "   §fCleanup§7: §e0.3%"
+     * @regexTestWrapped "   §fCleanup§7: §b2 §4§lൠ§7 x1"
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
@@ -299,8 +299,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:    §fPasting§7: §e41.9%
-     * REGEX-TEST:    §fBarn Pasting§7: §e10.2%
+     * @regexTestWrapped "   §fPasting§7: §e41.9%"
+     * @regexTestWrapped "   §fBarn Pasting§7: §e10.2%"
      */
     val pastingPattern by farmingSB.pattern(
         "pasting",
@@ -308,7 +308,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Pelts: §5160
+     * @regexTest Pelts: §5160
      */
     val peltsPattern by farmingSB.pattern(
         "pelts",
@@ -316,7 +316,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Tracker Mob Location:
+     * @regexTest Tracker Mob Location:
      */
     val mobLocationPattern by farmingSB.pattern(
         "moblocation",
@@ -328,7 +328,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:    §aPlot §7- §b3 §4§lൠ§7 x8
+     * @regexTestWrapped "   §aPlot §7- §b3 §4§lൠ§7 x8"
      */
     val plotPattern by farmingSB.pattern(
         "plot",
@@ -339,12 +339,12 @@ object ScoreboardPattern {
     private val miningSB = scoreboardGroup.group("mining")
 
     /**
-     * REGEX-TEST: §2᠅ §fMithril§f: §235,448
-     * REGEX-TEST: §d᠅ §fGemstone§f: §d36,758
-     * REGEX-TEST: §b᠅ §fGlacite§f: §b29,537
-     * REGEX-TEST: §2᠅ §fMithril Powder§f: §235,448
-     * REGEX-TEST: §d᠅ §fGemstone Powder§f: §d36,758
-     * REGEX-TEST: §b᠅ §fGlacite Powder§f: §b29,537
+     * @regexTest §2᠅ §fMithril§f: §235,448
+     * @regexTest §d᠅ §fGemstone§f: §d36,758
+     * @regexTest §b᠅ §fGlacite§f: §b29,537
+     * @regexTest §2᠅ §fMithril Powder§f: §235,448
+     * @regexTest §d᠅ §fGemstone Powder§f: §d36,758
+     * @regexTest §b᠅ §fGlacite Powder§f: §b29,537
      */
     val powderPattern by miningSB.pattern(
         "powder",
@@ -357,7 +357,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:   ≈
+     * @regexTestWrapped "  ≈"
      */
     val windCompassArrowPattern by miningSB.pattern(
         "windcompassarrow",
@@ -365,9 +365,9 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Event: §6§LRAFFLE
-     * REGEX-TEST: Event: §C§LGOBLIN RAID
-     * REGEX-TEST: Event: §B§LMITHRIL GOURMAND
+     * @regexTest Event: §6§LRAFFLE
+     * @regexTest Event: §C§LGOBLIN RAID
+     * @regexTest Event: §B§LMITHRIL GOURMAND
      */
     val miningEventPattern by miningSB.pattern(
         "miningevent",
@@ -375,7 +375,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Zone: §bGoblin Burrows
+     * @regexTest Zone: §bGoblin Burrows
      */
     val miningEventZonePattern by miningSB.pattern(
         "miningeventzone",
@@ -383,9 +383,9 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Find tickets on the
-     * REGEX-TEST: ground and bring them
-     * REGEX-TEST: to the raffle box
+     * @regexTest Find tickets on the
+     * @regexTest ground and bring them
+     * @regexTest to the raffle box
      */
     val raffleUselessPattern by miningSB.pattern(
         "raffleuseless",
@@ -393,7 +393,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Tickets: §a8 §7(17.4%)
+     * @regexTest Tickets: §a8 §7(17.4%)
      */
     val raffleTicketsPattern by miningSB.pattern(
         "raffletickets",
@@ -401,7 +401,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Pool: §646
+     * @regexTest Pool: §646
      */
     val rafflePoolPattern by miningSB.pattern(
         "rafflepool",
@@ -413,8 +413,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Remaining: §a80 Tasty Mithril
-     * REGEX-TEST: Remaining: §aFULL
+     * @regexTest Remaining: §a80 Tasty Mithril
+     * @regexTest Remaining: §aFULL
      */
     val mithrilRemainingPattern by miningSB.pattern(
         "mithrilremaining",
@@ -422,7 +422,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Your Tasty Mithril: §c70 §a(+70)
+     * @regexTest Your Tasty Mithril: §c70 §a(+70)
      */
     val mithrilYourMithrilPattern by miningSB.pattern(
         "mithrilyourmithril",
@@ -430,10 +430,10 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Nearby Players: §a0
-     * REGEX-TEST: Nearby Players: §a1
-     * REGEX-TEST: Nearby Players: §a5 §cMAX
-     * REGEX-TEST: Nearby Players: §cN/A
+     * @regexTest Nearby Players: §a0
+     * @regexTest Nearby Players: §a1
+     * @regexTest Nearby Players: §a5 §cMAX
+     * @regexTest Nearby Players: §cN/A
      */
     val nearbyPlayersPattern by miningSB.pattern(
         "nearbyplayers",
@@ -445,8 +445,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Remaining: §a1 goblin
-     * REGEX-TEST: Remaining: §a2 goblins
+     * @regexTest Remaining: §a1 goblin
+     * @regexTest Remaining: §a2 goblins
      */
     val remainingGoblinPattern by miningSB.pattern(
         "remaininggoblin",
@@ -454,7 +454,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Your kills: §c85 ☠
+     * @regexTest Your kills: §c85 ☠
      */
     val yourGoblinKillsPattern by miningSB.pattern(
         "yourgoblin",
@@ -462,7 +462,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §7§lNot started.§7§l..
+     * @regexTest §7§lNot started.§7§l..
      */
     val mineshaftNotStartedPattern by miningSB.pattern(
         "mineshaft.notstarted",
@@ -470,7 +470,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Event Bonus: §6+4☘
+     * @regexTest Event Bonus: §6+4☘
      */
     val fortunateFreezingBonusPattern by miningSB.pattern(
         "fortunatefreezing.bonus",
@@ -478,8 +478,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Fossil Dust: §f3,281 §e(+1)
-     * REGEX-TEST: Fossil Dust: 405 §e(+1)
+     * @regexTest Fossil Dust: §f3,281 §e(+1)
+     * @regexTest Fossil Dust: 405 §e(+1)
      */
     val fossilDustPattern by miningSB.pattern(
         "fossildust",
@@ -494,7 +494,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §7Boss: §c45%
+     * @regexTest §7Boss: §c45%
      */
     val magmaBossPattern by combatSB.pattern(
         "magmaboss",
@@ -510,8 +510,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §a▎▎▎▎▎§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
-     * REGEX-TEST: §a§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
+     * @regexTest §a▎▎▎▎▎§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
+     * @regexTest §a§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
      */
     val killMagmasDamagedSoakedBarPattern by combatSB.pattern(
         "killmagmasbar",
@@ -519,8 +519,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §cThe boss is reforming!
-     * REGEX-TEST: §cThe boss is forming!
+     * @regexTest §cThe boss is reforming!
+     * @regexTest §cThe boss is forming!
      */
     val reformingPattern by combatSB.pattern(
         "magmareforming",
@@ -532,7 +532,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §e389.6k§f/§a10M§c❤
+     * @regexTest §e389.6k§f/§a10M§c❤
      */
     val bossHealthBarPattern by combatSB.pattern(
         "magmabosshealthbar",
@@ -540,8 +540,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Dragon HP: §a2,317,156 §c❤
-     * REGEX-TEST: Dragon HP: §a8,612,684 §c❤
+     * @regexTest Dragon HP: §a2,317,156 §c❤
+     * @regexTest Dragon HP: §a8,612,684 §c❤
      */
     val bossHPPattern by combatSB.pattern(
         "bosshp",
@@ -549,8 +549,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Your Damage: §c0
-     * REGEX-TEST: Your Damage: §c439,753.6
+     * @regexTest Your Damage: §c0
+     * @regexTest Your Damage: §c439,753.6
      */
     val bossDamagePattern by combatSB.pattern(
         "bossdamage",
@@ -565,7 +565,7 @@ object ScoreboardPattern {
     private val miscSB = scoreboardGroup.group("misc")
 
     /**
-     * REGEX-TEST: Dragon Essence: §d2,442
+     * @regexTest Dragon Essence: §d2,442
      */
     val essencePattern by miscSB.pattern(
         "essence",
@@ -573,7 +573,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  §e§l⚡ §cRedstone: §e§b4%
+     * @regexTestWrapped " §e§l⚡ §cRedstone: §e§b4%"
      */
     val redstonePattern by miscSB.pattern(
         "redstone",
@@ -581,7 +581,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  §a✌ §7(§a9§7/20)
+     * @regexTestWrapped " §a✌ §7(§a9§7/20)"
      */
     val visitingPattern by miscSB.pattern(
         "visiting",
@@ -589,7 +589,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Flight Duration: §a202:46:12
+     * @regexTest Flight Duration: §a202:46:12
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
@@ -597,7 +597,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Challenge: §6Force
+     * @regexTest Challenge: §6Force
      */
     val dojoChallengePattern by miscSB.pattern(
         "dojochallenge",
@@ -605,7 +605,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Difficulty: §aEasy
+     * @regexTest Difficulty: §aEasy
      */
     val dojoDifficultyPattern by miscSB.pattern(
         "dojodifficulty",
@@ -613,8 +613,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Points: §a0
-     * REGEX-TEST: Points: §a10 §7(§a+§a10§7)
+     * @regexTest Points: §a0
+     * @regexTest Points: §a10 §7(§a+§a10§7)
      */
     val dojoPointsPattern by miscSB.pattern(
         "dojopoints",
@@ -622,8 +622,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Time: §a20s
-     * REGEX-TEST: Time: §a7s §7(§a0s§7)
+     * @regexTest Time: §a20s
+     * @regexTest Time: §a7s §7(§a0s§7)
      */
     val dojoTimePattern by miscSB.pattern(
         "dojotime",
@@ -631,8 +631,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Objective
-     * REGEX-TEST: Objective §a§l⬇
+     * @regexTest Objective
+     * @regexTest Objective §a§l⬇
      */
     val objectivePattern by miscSB.pattern(
         "objective",
@@ -640,7 +640,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Queued: §aThe Catacombs
+     * @regexTest Queued: §aThe Catacombs
      */
     val queuePattern by miscSB.pattern(
         "queued",
@@ -648,7 +648,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Tier: §eFloor VI
+     * @regexTest Tier: §eFloor VI
      */
     val queueTierPattern by miscSB.pattern(
         "queuetier",
@@ -656,7 +656,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Position: §b#2 §fSince: §a00:01
+     * @regexTest Position: §b#2 §fSince: §a00:01
      */
     val queuePositionPattern by miscSB.pattern(
         "queueposition",
@@ -669,8 +669,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §d5th Anniversary§f 167:59:54
-     * REGEX-TEST: §bCentury Raffle§f 124:00:00
+     * @regexTest §d5th Anniversary§f 167:59:54
+     * @regexTest §bCentury Raffle§f 124:00:00
      */
     val anniversaryPattern by miscSB.pattern(
         "anniversary",
@@ -679,10 +679,10 @@ object ScoreboardPattern {
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
     /**
-     * REGEX-TEST: §eProtect Elle §7(§a98%§7)
-     * REGEX-TEST: §fFish 1 Flyfish §c✖
-     * REGEX-TEST: §fFish 1 Skeleton Fish §c✖
-     * REGEX-TEST:   §7(§e1§7/§a100§7)
+     * @regexTest §eProtect Elle §7(§a98%§7)
+     * @regexTest §fFish 1 Flyfish §c✖
+     * @regexTest §fFish 1 Skeleton Fish §c✖
+     * @regexTestWrapped "  §7(§e1§7/§a100§7)"
      */
     @Suppress("MaxLineLength")
     val thirdObjectiveLinePattern by miscSB.pattern(
@@ -692,13 +692,13 @@ object ScoreboardPattern {
 
     /**
      * collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
-     * REGEX-TEST: §eKill 100 Automatons
-     * REGEX-TEST: §eMine 10 Rubies
-     * REGEX-TEST: §eFind a Jungle Key
-     * REGEX-TEST: §eFind the 4 Missing Pieces
-     * REGEX-TEST: §eTalk to the Goblin King
-     * REGEX-TEST: §eBring items to Moby
-     * REGEX-TEST:  Glowing Mushroom §8x8
+     * @regexTest §eKill 100 Automatons
+     * @regexTest §eMine 10 Rubies
+     * @regexTest §eFind a Jungle Key
+     * @regexTest §eFind the 4 Missing Pieces
+     * @regexTest §eTalk to the Goblin King
+     * @regexTest §eBring items to Moby
+     * @regexTestWrapped " Glowing Mushroom §8x8"
      */
     @Suppress("MaxLineLength")
     val wtfAreThoseLinesPattern by miscSB.pattern(
@@ -714,7 +714,7 @@ object ScoreboardPattern {
     private val eventsSB = scoreboardGroup.group("events")
 
     /**
-     * REGEX-TEST: §aTraveling Zoo§f 43:41
+     * @regexTest §aTraveling Zoo§f 43:41
      */
     val travelingZooPattern by eventsSB.pattern(
         "travelingzoo",
@@ -722,7 +722,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §dNew Year Event!§f 17:53
+     * @regexTest §dNew Year Event!§f 17:53
      */
     val newYearPattern by eventsSB.pattern(
         "newyear",
@@ -730,7 +730,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §6Spooky Festival§f 50:54
+     * @regexTest §6Spooky Festival§f 50:54
      */
     val spookyPattern by eventsSB.pattern(
         "spooky",
@@ -738,7 +738,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Event Start: §a2:38
+     * @regexTest Event Start: §a2:38
      */
     val winterEventStartPattern by eventsSB.pattern(
         "wintereventstart",
@@ -746,7 +746,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Next Wave: §a§aSoon!
+     * @regexTest Next Wave: §a§aSoon!
      */
     val winterNextWavePattern by eventsSB.pattern(
         "wintereventnextwave",
@@ -754,7 +754,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §cWave 5
+     * @regexTest §cWave 5
      */
     val winterWavePattern by eventsSB.pattern(
         "wintereventwave",
@@ -762,8 +762,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Magma Cubes Left: §c-4
-     * REGEX-TEST: Magma Cubes Left: §c3
+     * @regexTest Magma Cubes Left: §c-4
+     * @regexTest Magma Cubes Left: §c3
      */
     val winterMagmaLeftPattern by eventsSB.pattern(
         "wintereventmagmaleft",
@@ -771,7 +771,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Your Total Damage: §c13,804 §e(#
+     * @regexTest Your Total Damage: §c13,804 §e(#
      */
     val winterTotalDmgPattern by eventsSB.pattern(
         "wintereventtotaldmg",
@@ -779,7 +779,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Your Cube Damage: §c303
+     * @regexTest Your Cube Damage: §c303
      */
     val winterCubeDmgPattern by eventsSB.pattern(
         "wintereventcubedmg",
@@ -790,7 +790,7 @@ object ScoreboardPattern {
     private val riftSB = scoreboardGroup.group("rift")
 
     /**
-     * REGEX-TEST:  §fRift Dimension
+     * @regexTestWrapped " §fRift Dimension"
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
@@ -802,7 +802,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Eaten: §c2/50
+     * @regexTest Eaten: §c2/50
      */
     val riftHotdogEatenPattern by riftSB.pattern(
         "hotdogeaten",
@@ -810,8 +810,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Time spent sitting
-     * REGEX-TEST: with Ävaeìkx: §a32m15s
+     * @regexTest Time spent sitting
+     * @regexTest with Ävaeìkx: §a32m15s
      */
     val riftAveikxPattern by riftSB.pattern(
         "aveikx",
@@ -819,7 +819,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Hay Eaten: §e2,477/3,000
+     * @regexTest Hay Eaten: §e2,477/3,000
      */
     val riftHayEatenPattern by riftSB.pattern(
         "hayeaten",
@@ -827,7 +827,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Clues: §a0/8
+     * @regexTest Clues: §a0/8
      */
     val cluesPattern by riftSB.pattern(
         "clues",
@@ -835,8 +835,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §eFirst Up
-     * REGEX-TEST: Find and talk with Barry
+     * @regexTest §eFirst Up
+     * @regexTest Find and talk with Barry
      */
     val barryProtestorsQuestlinePattern by riftSB.pattern(
         "protestors.quest",
@@ -844,7 +844,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Protestors handled: §b5/7
+     * @regexTest Protestors handled: §b5/7
      */
     val barryProtestorsHandledPattern by riftSB.pattern(
         "protestors.handled",
@@ -857,7 +857,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  Big damage in: §d2m 59s
+     * @regexTestWrapped " Big damage in: §d2m 59s"
      */
     val bigDamagePattern by riftSB.pattern(
         "bigdamage",
@@ -867,8 +867,8 @@ object ScoreboardPattern {
     private val carnivalSB = scoreboardGroup.group("carnival")
 
     /**
-     * REGEX-TEST: §eCarnival§f 85:33:57
-     * REGEX-TEST: §eCarnival§f 118:41:05
+     * @regexTest §eCarnival§f 85:33:57
+     * @regexTest §eCarnival§f 118:41:05
      */
     val carnivalPattern by carnivalSB.pattern(
         "carnival",
@@ -876,9 +876,9 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §3§lCatch a Fish
-     * REGEX-TEST: §6§lFruit Digging
-     * REGEX-TEST: §c§lZombie Shootout
+     * @regexTest §3§lCatch a Fish
+     * @regexTest §6§lFruit Digging
+     * @regexTest §c§lZombie Shootout
      */
     val carnivalTasksPattern by carnivalSB.pattern(
         "tasks",
@@ -886,8 +886,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fCarnival Tokens: §e129
-     * REGEX-TEST: §fCarnival Tokens: §e1,031
+     * @regexTest §fCarnival Tokens: §e129
+     * @regexTest §fCarnival Tokens: §e1,031
      */
     val carnivalTokensPattern by carnivalSB.pattern(
         "tokens",
@@ -895,7 +895,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fFruits: §a2§7/§c10
+     * @regexTest §fFruits: §a2§7/§c10
      */
     val carnivalFruitsPattern by carnivalSB.pattern(
         "fruits",
@@ -903,8 +903,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fScore: §e600 §6(+300)
-     * REGEX-TEST: §fScore: §e600
+     * @regexTest §fScore: §e600 §6(+300)
+     * @regexTest §fScore: §e600
      */
     val carnivalScorePattern by carnivalSB.pattern(
         "score",
@@ -912,7 +912,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fCatch Streak: §a0
+     * @regexTest §fCatch Streak: §a0
      */
     val carnivalCatchStreakPattern by carnivalSB.pattern(
         "catchstreak",
@@ -920,8 +920,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fAccuracy: §a81.82%
-     * REGEX-TEST: §fAccuracy: §a81%
+     * @regexTest §fAccuracy: §a81.82%
+     * @regexTest §fAccuracy: §a81%
      */
     val carnivalAccuracyPattern by carnivalSB.pattern(
         "accuracy",
@@ -929,7 +929,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §fKills: §a8
+     * @regexTest §fKills: §a8
      */
     val carnivalKillsPattern by carnivalSB.pattern(
         "kills",
@@ -940,9 +940,9 @@ object ScoreboardPattern {
     private val galateaSB = scoreboardGroup.group("galatea")
 
     /**
-     * REGEX-TEST: Whispers: §3141§b (+1)
-     * REGEX-TEST: Whispers: §317.5k§b (+50)
-     * REGEX-TEST: §fWhispers: §317k§b (+40)
+     * @regexTest Whispers: §3141§b (+1)
+     * @regexTest Whispers: §317.5k§b (+50)
+     * @regexTest §fWhispers: §317k§b (+40)
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
@@ -950,8 +950,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:     §aHOTF§f: §a28k§3.7k§b (+35)
-     * REGEX-TEST:     §aHOTF§f: §a28k§9 (+29 Exp)
+     * @regexTestWrapped "    §aHOTF§f: §a28k§3.7k§b (+35)"
+     * @regexTestWrapped "    §aHOTF§f: §a28k§9 (+29 Exp)"
      */
     val hotfPattern by galateaSB.pattern(
         "hotf",
@@ -959,7 +959,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §eAgatha's Contest §a5m28s
+     * @regexTest §eAgatha's Contest §a5m28s
      */
     val agathasContestPattern by galateaSB.pattern(
         "agathas-contest",
@@ -973,12 +973,12 @@ object ScoreboardPattern {
      * This pattern is to catch those lines.
      */
     /**
-     * REGEX-TEST:  §e§l⚡ §cRedston
-     * REGEX-TEST:       §ce: §e§b0%
-     * REGEX-TEST: Starting in: §a0 §c1:55
-     * REGEX-TEST: §2᠅ §fMithril§f:§695
-     * REGEX-TEST: §d᠅ §fGemstone§f
-     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
+     * @regexTestWrapped " §e§l⚡ §cRedston"
+     * @regexTestWrapped "      §ce: §e§b0%"
+     * @regexTest Starting in: §a0 §c1:55
+     * @regexTest §2᠅ §fMithril§f:§695
+     * @regexTest §d᠅ §fGemstone§f
+     * @regexTest §d᠅ §fGemstone§f§e(+1)
      */
     val brokenPatterns by group.list(
         "broken",
@@ -992,7 +992,7 @@ object ScoreboardPattern {
     private val tablistGroup = group.group("tablist-no-color")
 
     /**
-     * REGEX-TEST:  Ends In: 27h
+     * @regexTestWrapped " Ends In: 27h"
      */
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
@@ -1000,7 +1000,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:  Starts In: 7h
+     * @regexTestWrapped " Starts In: 7h"
      */
     val eventTimeStartsPattern by tablistGroup.pattern(
         "eventtimestarts",

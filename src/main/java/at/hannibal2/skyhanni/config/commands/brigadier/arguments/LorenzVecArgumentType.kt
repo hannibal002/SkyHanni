@@ -67,10 +67,10 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         private val patternGroup = RepoPattern.group("commands.brigadier.arguments.lorenzvec")
 
         /**
-         * REGEX-TEST: LorenzVec(-91.7, 70.0, 29.3)
-         * REGEX-TEST: LorenzVec(1, 2, 3)
-         * REGEX-TEST: LorenzVec(0.0, 0.0, 0.0)
-         * REGEX-TEST: LorenzVec(-78.8, 68.0, -28.7)
+         * @regexTest LorenzVec(-91.7, 70.0, 29.3)
+         * @regexTest LorenzVec(1, 2, 3)
+         * @regexTest LorenzVec(0.0, 0.0, 0.0)
+         * @regexTest LorenzVec(-78.8, 68.0, -28.7)
          */
         private val lorenzVecPattern by patternGroup.pattern(
             "lorenz",
@@ -78,10 +78,10 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         )
 
         /**
-         * REGEX-TEST: -78.8:68.0:-28.7
-         * REGEX-TEST: 1:2:3
-         * REGEX-TEST: ~:64:~
-         * REGEX-TEST: ~:~:~
+         * @regexTest -78.8:68.0:-28.7
+         * @regexTest 1:2:3
+         * @regexTest ~:64:~
+         * @regexTest ~:~:~
          */
         private val colonPattern by patternGroup.pattern(
             "colon",
@@ -89,12 +89,12 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         )
 
         /**
-         * REGEX-TEST: 1 2 3
-         * REGEX-TEST: -4 0 5
-         * REGEX-TEST: ~ 64 ~
-         * REGEX-TEST: 1.0 2.5 -3
-         * REGEX-TEST: -1.7 ~ ~
-         * REGEX-TEST: 0.0 0.0 0.0
+         * @regexTest 1 2 3
+         * @regexTest -4 0 5
+         * @regexTest ~ 64 ~
+         * @regexTest 1.0 2.5 -3
+         * @regexTest -1.7 ~ ~
+         * @regexTest 0.0 0.0 0.0
          */
         private val spacePattern by patternGroup.pattern(
             "space",

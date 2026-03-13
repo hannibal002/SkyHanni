@@ -14,10 +14,10 @@ object CFTooltipStray {
     private val config get() = CFApi.config
 
     /**
-     * REGEX-TEST: You gained +2,465,018 Chocolate!
-     * REGEX-TEST: gained +30,292 Chocolate!
-     * REGEX-TEST: +36,330 Chocolate!
-     * REGEX-TEST: Rabbit, so you received 55,935,257
+     * @regexTest You gained +2,465,018 Chocolate!
+     * @regexTest gained +30,292 Chocolate!
+     * @regexTest +36,330 Chocolate!
+     * @regexTest Rabbit, so you received 55,935,257
      */
     private val chocolateGainedPattern by CFApi.patternGroup.pattern(
         "rabbit.stray.new",

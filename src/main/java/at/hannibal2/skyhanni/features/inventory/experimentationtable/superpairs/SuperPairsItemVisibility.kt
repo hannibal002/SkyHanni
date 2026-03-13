@@ -24,10 +24,10 @@ object SuperPairsItemVisibility {
     private val superpairsSlotsToRead: MutableSet<Int> = mutableSetOf()
 
     /**
-     * REGEX-TEST: §8?
-     * REGEX-TEST: §eClick any button!
-     * REGEX-TEST: §bClick a second button!
-     * REGEX-TEST: §dNext button is instantly rewarded!
+     * @regexTest §8?
+     * @regexTest §eClick any button!
+     * @regexTest §bClick a second button!
+     * @regexTest §dNext button is instantly rewarded!
      */
     private val unknownSuperpairsClickPattern by ExperimentationTableApi.patternGroup.pattern(
         "superpairs.unknown-click",

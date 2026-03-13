@@ -25,12 +25,12 @@ object HoppityRabbitTheFishChecker {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: Chocolate Breakfast Egg
-     * REGEX-TEST: Chocolate Lunch Egg
-     * REGEX-TEST: Chocolate Dinner Egg
-     * REGEX-TEST: Chocolate Brunch Egg
-     * REGEX-TEST: Chocolate Déjeuner Egg
-     * REGEX-TEST: Chocolate Supper Egg
+     * @regexTest Chocolate Breakfast Egg
+     * @regexTest Chocolate Lunch Egg
+     * @regexTest Chocolate Dinner Egg
+     * @regexTest Chocolate Brunch Egg
+     * @regexTest Chocolate Déjeuner Egg
+     * @regexTest Chocolate Supper Egg
      */
     val mealEggInventoryPattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.name",
@@ -38,7 +38,7 @@ object HoppityRabbitTheFishChecker {
     )
 
     /**
-     * REGEX-TEST: §cRabbit the Fish
+     * @regexTest §cRabbit the Fish
      */
     private val rabbitTheFishItemPattern by CFApi.patternGroup.pattern(
         "item.rabbitthefish",
@@ -46,7 +46,7 @@ object HoppityRabbitTheFishChecker {
     )
 
     /**
-     * REGEX-TEST: Click to open Chocolate Factory!
+     * @regexTest Click to open Chocolate Factory!
      */
     private val openCfSlotLorePattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.continue",

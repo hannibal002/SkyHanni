@@ -89,8 +89,8 @@ object DungeonLividFinder {
     )
 
     /**
-     * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
-     * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
+     * @regexTest §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
+     * @regexTest §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
      */
     private val lividArmorStandNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.armorstand",
@@ -98,7 +98,7 @@ object DungeonLividFinder {
     )
 
     /**
-     * REGEX-TEST: Doctor Livid
+     * @regexTest Doctor Livid
      */
     private val lividNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.name",

@@ -46,7 +46,7 @@ object BingoNextStepHelper {
     )
 
     /**
-     * REGEX-TEST: Reach 1,000 Ink Sac Collection.
+     * @regexTest Reach 1,000 Ink Sac Collection.
      */
     private val collectionPattern by patternGroup.pattern(
         "collection",
@@ -59,7 +59,7 @@ object BingoNextStepHelper {
     )
 
     /**
-     * REGEX-TEST: Obtain level 10 in the Foraging Skill.
+     * @regexTest Obtain level 10 in the Foraging Skill.
      */
     private val skillPattern by patternGroup.pattern(
         "skill",

@@ -51,7 +51,7 @@ object TrevorFeatures {
     private val patternGroup = RepoPattern.group("misc.trevor")
 
     /**
-     * REGEX-TEST: [NPC] Trevor: You can find your TRACKABLE animal near the §eDesert Mountain.
+     * @regexTest [NPC] Trevor: You can find your TRACKABLE animal near the §eDesert Mountain.
      */
     private val trapperPattern by patternGroup.pattern(
         "trapper",
@@ -59,7 +59,7 @@ object TrevorFeatures {
     )
 
     /**
-     * REGEX-TEST: The target is around 40 blocks above, at a 45 degrees angle!
+     * @regexTest The target is around 40 blocks above, at a 45 degrees angle!
      */
     private val talbotPatternAbove by patternGroup.pattern(
         "above",
@@ -67,7 +67,7 @@ object TrevorFeatures {
     )
 
     /**
-     * REGEX-TEST: The target is around 15 blocks below, at a 30 degrees angle!
+     * @regexTest The target is around 15 blocks below, at a 30 degrees angle!
      */
     private val talbotPatternBelow by patternGroup.pattern(
         "below",
@@ -79,7 +79,7 @@ object TrevorFeatures {
     )
 
     /**
-     * REGEX-TEST: Location: Mushroom Gorge
+     * @regexTest Location: Mushroom Gorge
      */
     private val locationPattern by patternGroup.pattern(
         "zone",

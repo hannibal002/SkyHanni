@@ -87,8 +87,8 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  §7⏣ §aPlot §7- §b22a
-     * REGEX-TEST:  §7⏣ §aThe Garden
+     * @regexTestWrapped " §7⏣ §aPlot §7- §b22a"
+     * @regexTestWrapped " §7⏣ §aThe Garden"
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.no-pests",
@@ -96,7 +96,7 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:    §aPlot §7- §b4 §4§lൠ§7 x1
+     * @regexTestWrapped "   §aPlot §7- §b4 §4§lൠ§7 x1"
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
@@ -104,14 +104,14 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  §aPlot §7- §b3
+     * @regexTestWrapped " §aPlot §7- §b3"
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.no-pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
     /**
-     * REGEX-TEST: §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
+     * @regexTest §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
@@ -119,7 +119,7 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  Plots: 4, 12, 13, 18, 20
+     * @regexTestWrapped " Plots: 4, 12, 13, 18, 20"
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
         "tablist.infected-plots-no-color",
@@ -127,9 +127,9 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §2Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §2Moth§e!
-     * REGEX-TEST: §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
+     * @regexTest §eYou received §a7x Enchanted Potato §efor killing a §2Locust§e!
+     * @regexTest §eYou received §a6x Enchanted Cocoa Beans §efor killing a §2Moth§e!
+     * @regexTest §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
      */
     val pestDeathChatPattern by patternGroup.pattern(
         "chat.pest-death",
@@ -141,9 +141,9 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §9§lPEST TRAP #3§r
-     * REGEX-TEST: §5§lMOUSE TRAP #2§r
-     * REGEX-TEST: §6§lVERMIN TRAP #2
+     * @regexTest §9§lPEST TRAP #3§r
+     * @regexTest §5§lMOUSE TRAP #2§r
+     * @regexTest §6§lVERMIN TRAP #2
      */
     private val pestTrapPattern by patternGroup.pattern(
         "entity.pest-trap",
@@ -151,7 +151,7 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: Stereo Harmony
+     * @regexTest Stereo Harmony
      */
     private val stereoInventoryPattern by patternGroup.pattern(
         "stereo.inventory",
@@ -160,8 +160,8 @@ object PestApi {
     val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
 
     /**
-     * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)
-     * REGEX-TEST: §7Now Playing: §a§cNone
+     * @regexTest §7Now Playing: §aWings of Harmony §8(Moth)
+     * @regexTest §7Now Playing: §a§cNone
      */
     val stereoPlayingPattern by patternGroup.pattern(
         "stereo.playing",
@@ -169,7 +169,7 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: PLAYING
+     * @regexTest PLAYING
      */
     val stereoPlayingItemPattern by patternGroup.pattern(
         "stereo.playing.item",

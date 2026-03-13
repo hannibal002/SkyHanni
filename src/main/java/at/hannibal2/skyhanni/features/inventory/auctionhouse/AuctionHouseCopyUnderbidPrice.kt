@@ -29,9 +29,9 @@ object AuctionHouseCopyUnderbidPrice {
     private val patternGroup = RepoPattern.group("auctions.underbid")
 
     /**
-     * REGEX-TEST: §7Buy it now: §61,000,000,000 coins
-     * REGEX-TEST: §7Starting bid: §6200,000,000 coins
-     * REGEX-TEST: §7Top bid: §6220,000 coins
+     * @regexTest §7Buy it now: §61,000,000,000 coins
+     * @regexTest §7Starting bid: §6200,000,000 coins
+     * @regexTest §7Top bid: §6220,000 coins
      */
     private val auctionPricePattern by patternGroup.pattern(
         "price",
@@ -39,9 +39,9 @@ object AuctionHouseCopyUnderbidPrice {
     )
 
     /**
-     * REGEX-TEST: Auctions Browser
-     * REGEX-TEST: Manage Auctions
-     * REGEX-TEST: Auctions: "aaa"
+     * @regexTest Auctions Browser
+     * @regexTest Manage Auctions
+     * @regexTest Auctions: "aaa"
      */
     private val allowedInventoriesPattern by patternGroup.pattern(
         "allowedinventories",

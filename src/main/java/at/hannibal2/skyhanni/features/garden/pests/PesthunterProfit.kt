@@ -42,8 +42,8 @@ object PesthunterProfit {
     private var inInventory = false
 
     /**
-     * REGEX-TEST: §2100 Pests
-     * REGEX-TEST: §21,500 Pests
+     * @regexTest §2100 Pests
+     * @regexTest §21,500 Pests
      */
     private val pestCostPattern by patternGroup.pattern(
         "garden.pests.pesthunter.cost",

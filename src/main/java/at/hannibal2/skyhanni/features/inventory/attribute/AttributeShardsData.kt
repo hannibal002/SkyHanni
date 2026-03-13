@@ -76,10 +76,10 @@ object AttributeShardsData {
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
     /**
-     * REGEX-TEST: §6Nature Elemental
-     * REGEX-TEST: §6Berry Eater IX
-     * REGEX-TEST: §6Essence of Ice I
-     * REGEX-TEST: §6Advanced Mode
+     * @regexTest §6Nature Elemental
+     * @regexTest §6Berry Eater IX
+     * @regexTest §6Essence of Ice I
+     * @regexTest §6Advanced Mode
      */
     val attributeShardNamePattern by patternGroup.pattern(
         "name",
@@ -87,8 +87,8 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7Enabled: §aYes
-     * REGEX-TEST: §7Enabled: §cNo
+     * @regexTest §7Enabled: §aYes
+     * @regexTest §7Enabled: §cNo
      */
     private val attributeStatePattern by patternGroup.pattern(
         "state",
@@ -96,9 +96,9 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7Syphon §b3 §7more to level up!
-     * REGEX-TEST: §7Syphon §b1 §7shard to unlock!
-     * REGEX-TEST: §7Syphon §b1 §7more to level up!
+     * @regexTest §7Syphon §b3 §7more to level up!
+     * @regexTest §7Syphon §b1 §7shard to unlock!
+     * @regexTest §7Syphon §b1 §7more to level up!
      */
     private val syphonAmountPattern by patternGroup.pattern(
         "syphon.amount",
@@ -106,8 +106,8 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §6Veil §8(Combat)
-     * REGEX-TEST: §6Yummy X §8(Foraging)
+     * @regexTest §6Veil §8(Combat)
+     * @regexTest §6Yummy X §8(Foraging)
      */
     private val attributeShardNameLorePattern by patternGroup.pattern(
         "name.lore",
@@ -115,10 +115,10 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7Owned: §b1 Shard
-     * REGEX-TEST: §7Owned: §b3 Shards
-     * REGEX-TEST: §7Owned: §b71 Shards
-     * REGEX-TEST: §7Owned: §b1,729 Shards
+     * @regexTest §7Owned: §b1 Shard
+     * @regexTest §7Owned: §b3 Shards
+     * @regexTest §7Owned: §b71 Shards
+     * @regexTest §7Owned: §b1,729 Shards
      */
     val amountOwnedPattern by patternGroup.pattern(
         "owned",
@@ -126,7 +126,7 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7Required to fuse: §b5
+     * @regexTest §7Required to fuse: §b5
      */
     val requiredToFusePattern by patternGroup.pattern(
         "fuse.required",
@@ -134,11 +134,11 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §a+1 Arthropod Ruler Attribute §r§7(Level 1) - 2 more to upgrade!
-     * REGEX-TEST: §a+1 Arthropod Ruler Attribute §r§7(Level 2) - 3 more to upgrade!
-     * REGEX-TEST: §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
-     * REGEX-TEST: §a+6 Ender Ruler Attribute §r§7(Level 3) - 3 more to upgrade!
-     * REGEX-FAIL: §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
+     * @regexTest §a+1 Arthropod Ruler Attribute §r§7(Level 1) - 2 more to upgrade!
+     * @regexTest §a+1 Arthropod Ruler Attribute §r§7(Level 2) - 3 more to upgrade!
+     * @regexTest §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
+     * @regexTest §a+6 Ender Ruler Attribute §r§7(Level 3) - 3 more to upgrade!
+     * @regexFail §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
      */
     private val shardSyphonedPattern by patternGroup.pattern(
         "chat.syphoned",
@@ -146,8 +146,8 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
-     * REGEX-FAIL: §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
+     * @regexTest §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
+     * @regexFail §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
      */
     private val shardSyphonedMaxedPattern by patternGroup.pattern(
         "chat.syphoned.maxed",
@@ -155,7 +155,7 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §aand 7 more...
+     * @regexTest §aand 7 more...
      */
     private val andMoreMessagePattern by patternGroup.pattern(
         "chat.and.more",
@@ -168,7 +168,7 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §6Nature Elemental §r§ais now enabled!
+     * @regexTest §6Nature Elemental §r§ais now enabled!
      */
     private val attributeEnabledPattern by patternGroup.pattern(
         "chat.enabled",
@@ -176,7 +176,7 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §6Nature Elemental §r§cis now disabled!
+     * @regexTest §6Nature Elemental §r§cis now disabled!
      */
     private val attributeDisabledPattern by patternGroup.pattern(
         "chat.disabled",
@@ -184,12 +184,12 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §aYou caught §7x2 §5Bal §aShards§a!
-     * REGEX-TEST: §aYou caught a §fBirries §aShard!
-     * REGEX-TEST: §aYou caught an §9Invisibug §aShard!
-     * REGEX-TEST: §aYou caught an §9Invisibug §aShard!
-     * REGEX-TEST: §aYou caught §7x2 §fHideonleaf §aShards§a!
-     * REGEX-TEST: §aYou caught §7x2 §fVoracious Spider §aShards§a!
+     * @regexTest §aYou caught §7x2 §5Bal §aShards§a!
+     * @regexTest §aYou caught a §fBirries §aShard!
+     * @regexTest §aYou caught an §9Invisibug §aShard!
+     * @regexTest §aYou caught an §9Invisibug §aShard!
+     * @regexTest §aYou caught §7x2 §fHideonleaf §aShards§a!
+     * @regexTest §aYou caught §7x2 §fVoracious Spider §aShards§a!
      */
     private val caughtShardsPattern by patternGroup.pattern(
         "caught.shards",
@@ -197,8 +197,8 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §e§lLOOT SHARE §fYou received a §9Glacite Walker §fShard for assisting §bMealoan§f!
-     * REGEX-TEST: §e§lLOOT SHARE §fYou received §b2 §aMossybit §fShards for assisting §bFallenYeti§f!
+     * @regexTest §e§lLOOT SHARE §fYou received a §9Glacite Walker §fShard for assisting §bMealoan§f!
+     * @regexTest §e§lLOOT SHARE §fYou received §b2 §aMossybit §fShards for assisting §bFallenYeti§f!
      */
     private val lootShareShardPattern by patternGroup.pattern(
         "loot.share.shard",
@@ -206,10 +206,10 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7!
-     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7! §d§lNEW!
-     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7!
-     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7! §d§lNEW!
+     * @regexTest §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7!
+     * @regexTest §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7! §d§lNEW!
+     * @regexTest §5§lFUSION! §7You obtained a §fTadgang Shard§7!
+     * @regexTest §5§lFUSION! §7You obtained a §fTadgang Shard§7! §d§lNEW!
      */
     private val fusionShardPattern by patternGroup.pattern(
         "fusion.shard",
@@ -217,10 +217,10 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §d§lSALT§7 You charmed a §aMagma Slug§7 and captured §93 Shards §7from it.§r
-     * REGEX-TEST: §d§lSALT§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
-     * REGEX-TEST: §5§lCHARM§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
-     * REGEX-TEST: §6§lNAGA§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
+     * @regexTest §d§lSALT§7 You charmed a §aMagma Slug§7 and captured §93 Shards §7from it.§r
+     * @regexTest §d§lSALT§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
+     * @regexTest §5§lCHARM§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
+     * @regexTest §6§lNAGA§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
      */
     @Suppress("MaxLineLength")
     private val charmedShardPattern by patternGroup.pattern(
@@ -229,10 +229,10 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7You sent §aan §9Invisibug Shard §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent §a6 §fVoracious Spider Shards §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent §aa §fVoracious Spider Shard §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent a §fVerdant Shard §7to your §aHunting Box§7.
+     * @regexTest §7You sent §aan §9Invisibug Shard §7to your §aHunting Box§7.
+     * @regexTest §7You sent §a6 §fVoracious Spider Shards §7to your §aHunting Box§7.
+     * @regexTest §7You sent §aa §fVoracious Spider Shard §7to your §aHunting Box§7.
+     * @regexTest §7You sent a §fVerdant Shard §7to your §aHunting Box§7.
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
         "sent.to.hunting.box",

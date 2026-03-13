@@ -38,7 +38,7 @@ object EffectApi {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: God Potion: 4d
+     * @regexTest God Potion: 4d
      */
     private val godPotTabPattern by RepoPattern.pattern(
         "stats.tabpatterns.godpot-no-color",
@@ -46,7 +46,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: §a§lSCHLURP! §r§eThe effects of the §r§9Hot Chocolate Mixin §r§ehave been extended by §r§986h 24m§r§e!
+     * @regexTest §a§lSCHLURP! §r§eThe effects of the §r§9Hot Chocolate Mixin §r§ehave been extended by §r§986h 24m§r§e!
      * They will pause if your §r§cGod Potion §r§eexpires.
      */
     private val hotChocolateMixinConsumePattern by RepoPattern.pattern(
@@ -55,9 +55,9 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: §a§lGULP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     * REGEX-TEST: §a§lSIP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     * REGEX-TEST: §a§lSLURP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
+     * @regexTest §a§lGULP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
+     * @regexTest §a§lSIP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
+     * @regexTest §a§lSLURP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
      */
     private val godPotConsumePattern by RepoPattern.pattern(
         "stats.chatpatterns.godpotconsume",
@@ -65,7 +65,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: (1/2) Active Effects
+     * @regexTest (1/2) Active Effects
      */
     private val effectsInventoryPattern by RepoPattern.pattern(
         "inventory.effects",
@@ -73,7 +73,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: §aFilter
+     * @regexTest §aFilter
      */
     private val filterPattern by RepoPattern.pattern(
         "inventory.effects.filter",
@@ -81,7 +81,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: §b▶ God Potion Effects
+     * @regexTest §b▶ God Potion Effects
      */
     private val godPotEffectsFilterSelectPattern by RepoPattern.pattern(
         "inventory.effects.filtergodpotselect",
@@ -89,7 +89,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: §7Remaining: §f105:01:34
+     * @regexTest §7Remaining: §f105:01:34
      */
     private val potionRemainingLoreTimerPattern by RepoPattern.pattern(
         "inventory.effects.effecttimeleft",
@@ -97,7 +97,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST:  Repellent: MAX (12s)
+     * @regexTestWrapped " Repellent: MAX (12s)"
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",
@@ -105,10 +105,10 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST:  Smoldering Polarization I: 58s
-     * REGEX-TEST:  Wisp's Ice-Flavored Water I: 29m
-     * REGEX-TEST:      Mushed Glowy Tonic I 43m
-     * REGEX-TEST: Wisp's Ice-Flavored Water I 10m
+     * @regexTestWrapped " Smoldering Polarization I: 58s"
+     * @regexTestWrapped " Wisp's Ice-Flavored Water I: 29m"
+     * @regexTestWrapped "     Mushed Glowy Tonic I 43m"
+     * @regexTest Wisp's Ice-Flavored Water I 10m
      */
     private val tabEffectPattern by RepoPattern.pattern(
         "tab.effects-no-color",
@@ -116,9 +116,9 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: Lushlilac Bonbon: 12h
-     * REGEX-TEST: Prime Lushlilac Bonbon: 18h
-     * REGEX-TEST: Prime Lushlilac Bonbon: 17h 58m
+     * @regexTest Lushlilac Bonbon: 12h
+     * @regexTest Prime Lushlilac Bonbon: 18h
+     * @regexTest Prime Lushlilac Bonbon: 17h 58m
      */
     private val saltTabPattern by RepoPattern.pattern(
         "tab.salts-no-color",

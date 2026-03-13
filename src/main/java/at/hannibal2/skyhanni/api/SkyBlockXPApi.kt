@@ -22,12 +22,12 @@ object SkyBlockXPApi {
     private val itemNamePattern by group.pattern("itemname", "§aSkyBlock Leveling")
 
     /**
-     * REGEX-TEST: §7Your SkyBlock Level: §8[§9287§8]
+     * @regexTest §7Your SkyBlock Level: §8[§9287§8]
      */
     private val levelPattern by group.pattern("level", "§7Your SkyBlock Level: §8\\[§.(?<level>\\d+)§8\\]")
 
     /**
-     * REGEX-TEST: §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
+     * @regexTest §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
      */
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 

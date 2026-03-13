@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object ModernPatterns {
 
     /**
-     * REGEX-TEST: §7Current color: §a§4Red
+     * @regexTest §7Current color: §a§4Red
      */
     val beaconCurrentColorPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.color",
@@ -19,7 +19,7 @@ object ModernPatterns {
     )
 
     /**
-     * REGEX-TEST: §7Current speed: §a3
+     * @regexTest §7Current speed: §a3
      */
     val beaconCurrentSpeedPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.speed",
@@ -27,7 +27,7 @@ object ModernPatterns {
     )
 
     /**
-     * REGEX-TEST: §7Current pitch: §aLow
+     * @regexTest §7Current pitch: §aLow
      */
     val beaconCurrentPitchPattern by RepoPattern.pattern(
         "foraging.moonglade.beacon.pitch",
@@ -35,8 +35,8 @@ object ModernPatterns {
     )
 
     /**
-     * REGEX-TEST: §a§lFIG TREE §r§b§l88%
-     * REGEX-TEST: §2§lMANGROVE TREE §r§b§l5%
+     * @regexTest §a§lFIG TREE §r§b§l88%
+     * @regexTest §2§lMANGROVE TREE §r§b§l5%
      */
     val currentTreeProgressPattern by RepoPattern.pattern(
         "foraging.tree.progress",
@@ -44,9 +44,9 @@ object ModernPatterns {
     )
 
     /**
-     * REGEX-TEST: §cNope the Fish
-     * REGEX-TEST: §cCluck the Fish
-     * REGEX-TEST: §cHerring the Fish
+     * @regexTest §cNope the Fish
+     * @regexTest §cCluck the Fish
+     * @regexTest §cHerring the Fish
      */
     val coralFishNamePattern by RepoPattern.pattern(
         "misc.coral.fish.name",
@@ -54,8 +54,8 @@ object ModernPatterns {
     )
 
     /**
-     * REGEX-TEST: Fish Shown: 1/31
-     * REGEX-TEST: Fish Shown: 15/31
+     * @regexTest Fish Shown: 1/31
+     * @regexTest Fish Shown: 15/31
      */
     val coralFishFoundPattern by RepoPattern.pattern(
         "misc.coral.fish.shown",

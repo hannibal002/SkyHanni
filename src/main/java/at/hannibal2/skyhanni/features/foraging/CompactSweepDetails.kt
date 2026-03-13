@@ -25,11 +25,11 @@ object CompactSweepDetails {
     private val patternGroup = RepoPattern.group("foraging.sweep-details")
 
     /**
-     * REGEX-TEST: §6Sweep Details: §r§2442∮ Sweep
-     * REGEX-TEST: §6Sweep Details: §r§2442.76∮ Sweep
-     * REGEX-TEST: §6Sweep Details: §r§2451.65∮ Sweep
-     * REGEX-TEST: §6Sweep Details: §r§2430.65∮ Sweep
-     * REGEX-TEST: §6Sweep Details: §r§234,442.2∮ Sweep
+     * @regexTest §6Sweep Details: §r§2442∮ Sweep
+     * @regexTest §6Sweep Details: §r§2442.76∮ Sweep
+     * @regexTest §6Sweep Details: §r§2451.65∮ Sweep
+     * @regexTest §6Sweep Details: §r§2430.65∮ Sweep
+     * @regexTest §6Sweep Details: §r§234,442.2∮ Sweep
      */
     @Suppress("MaxLineLength")
     private val sweepDetailsPattern by patternGroup.pattern(
@@ -38,12 +38,12 @@ object CompactSweepDetails {
     )
 
     /**
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§a18.13 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§a18.19 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.19 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.04 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818 Logs
-     * REGEX-TEST:   §r§7Dark Oak Tree Toughness: §r§60 §r§a35 Logs
+     * @regexTestWrapped "  §r§7Fig Tree Toughness: §r§63.5 §r§a18.13 Logs"
+     * @regexTestWrapped "  §r§7Fig Tree Toughness: §r§63.5 §r§a18.19 Logs"
+     * @regexTestWrapped "  §r§7Fig Tree Toughness: §r§63.5 §r§818.19 Logs"
+     * @regexTestWrapped "  §r§7Fig Tree Toughness: §r§63.5 §r§818.04 Logs"
+     * @regexTestWrapped "  §r§7Fig Tree Toughness: §r§63.5 §r§818 Logs"
+     * @regexTestWrapped "  §r§7Dark Oak Tree Toughness: §r§60 §r§a35 Logs"
      */
     @Suppress("MaxLineLength")
     private val sweepToughnessLogsPattern by patternGroup.pattern(
@@ -52,12 +52,12 @@ object CompactSweepDetails {
     )
 
     /**
-     * REGEX-TEST:   §r§7Axe throw: §r§c-50% Sweep §r§a9.02 Logs
-     * REGEX-TEST:   §r§7Axe throw: §r§c-50% Sweep §r§89.02 Logs
-     * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a9.1 Logs §r§cCut the trunk first!!
-     * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a4.51 Logs §r§cCut the trunk first!!
-     * REGEX-TEST:   §r§7Wrong Style: §c-50% Sweep §a2.38 Logs §cCut branches and trunk first!!
-     * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a2.38 Logs §r§cCut branches and trunk first!!
+     * @regexTestWrapped "  §r§7Axe throw: §r§c-50% Sweep §r§a9.02 Logs"
+     * @regexTestWrapped "  §r§7Axe throw: §r§c-50% Sweep §r§89.02 Logs"
+     * @regexTestWrapped "  §r§7Wrong Style: §r§c-50% Sweep §r§a9.1 Logs §r§cCut the trunk first!!"
+     * @regexTestWrapped "  §r§7Wrong Style: §r§c-50% Sweep §r§a4.51 Logs §r§cCut the trunk first!!"
+     * @regexTestWrapped "  §r§7Wrong Style: §c-50% Sweep §a2.38 Logs §cCut branches and trunk first!!"
+     * @regexTestWrapped "  §r§7Wrong Style: §r§c-50% Sweep §r§a2.38 Logs §r§cCut branches and trunk first!!"
      */
     @Suppress("MaxLineLength")
     private val penaltyPattern by patternGroup.pattern(

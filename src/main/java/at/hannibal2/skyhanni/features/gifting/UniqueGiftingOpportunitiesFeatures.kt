@@ -33,7 +33,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
 
     /**
-     * REGEX-TEST: +1 Unique Gift given! To oBlazin!
+     * @regexTest +1 Unique Gift given! To oBlazin!
      */
     private val giftedPattern by patternGroup.pattern(
         "gifted.colorless",

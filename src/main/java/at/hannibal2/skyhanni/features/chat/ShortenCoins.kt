@@ -17,14 +17,14 @@ object ShortenCoins {
     private val patternGroup = RepoPattern.group("chat.coins")
 
     /**
-     * REGEX-TEST: [Auction] EuropaPlus bought Atmospheric Filter for 2,650,000 coins §lCLICK
-     * REGEX-TEST: You sold Cicada Symphony Vinyl x1 for 650,000 Coins!
-     * REGEX-TEST: ALLOWANCE! You earned 50,000 coins!
-     * REGEX-TEST: [Bazaar] Sell Offer Setup! 5x Enchanted Melon Block for 250,303 coins.
-     * REGEX-TEST: [NPC] Sirius: The highest bidder was LOMENJUICE with a bid of 8,620,000 Coins!
-     * REGEX-FAIL: You have withdrawn 10.5k coins§r§a! You now have 991.1M coins in your account!
-     * REGEX-FAIL: :typing:  -  ✎...
-     * REGEX-FAIL: Profile ID: 23a8da75-5655-49b2-89e7-31b9d2a7ab7b
+     * @regexTest [Auction] EuropaPlus bought Atmospheric Filter for 2,650,000 coins §lCLICK
+     * @regexTest You sold Cicada Symphony Vinyl x1 for 650,000 Coins!
+     * @regexTest ALLOWANCE! You earned 50,000 coins!
+     * @regexTest [Bazaar] Sell Offer Setup! 5x Enchanted Melon Block for 250,303 coins.
+     * @regexTest [NPC] Sirius: The highest bidder was LOMENJUICE with a bid of 8,620,000 Coins!
+     * @regexFail You have withdrawn 10.5k coins§r§a! You now have 991.1M coins in your account!
+     * @regexFail :typing:  -  ✎...
+     * @regexFail Profile ID: 23a8da75-5655-49b2-89e7-31b9d2a7ab7b
      */
     private val coinsPattern by patternGroup.pattern(
         "format-no-color",

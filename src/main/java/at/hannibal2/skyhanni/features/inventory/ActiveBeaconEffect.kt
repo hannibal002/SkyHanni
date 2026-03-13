@@ -21,7 +21,7 @@ object ActiveBeaconEffect {
     private val patternGroup = RepoPattern.group("inventory.activebeaconeffect")
 
     /**
-     * REGEX-TEST: Profile Stat Upgrades
+     * @regexTest Profile Stat Upgrades
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
@@ -29,7 +29,7 @@ object ActiveBeaconEffect {
     )
 
     /**
-     * REGEX-TEST: §aActive stat boost!
+     * @regexTest §aActive stat boost!
      */
     private val slotPattern by patternGroup.pattern(
         "slot.active",

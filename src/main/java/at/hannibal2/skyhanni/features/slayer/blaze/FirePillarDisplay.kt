@@ -18,7 +18,7 @@ object FirePillarDisplay {
     private val config get() = SlayerApi.config.blazes
 
     /**
-     * REGEX-TEST: §6§l2s §c§l8 hits
+     * @regexTest §6§l2s §c§l8 hits
      */
     private val entityNamePattern by RepoPattern.pattern(
         "slayer.blaze.firepillar.entityname",

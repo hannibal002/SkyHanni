@@ -18,7 +18,7 @@ object ArachneChatMessageHider {
     private val patternGroup = RepoPattern.group("chat.arachne")
 
     /**
-     * REGEX-TEST: §4☄ §r§7littlegremlins §r§eplaced an §r§9Arachne's Calling§r§e! Something is awakening! §r§e(§r§a4§r§e/§r§a4§r§e)
+     * @regexTest §4☄ §r§7littlegremlins §r§eplaced an §r§9Arachne's Calling§r§e! Something is awakening! §r§e(§r§a4§r§e/§r§a4§r§e)
      */
     val arachneCallingPattern by patternGroup.pattern(
         "calling",
@@ -26,7 +26,7 @@ object ArachneChatMessageHider {
     )
 
     /**
-     * REGEX-TEST: §4☄ §r§7SultanHakeem §r§eplaced an Arachne Crystal! Something is awakening!
+     * @regexTest §4☄ §r§7SultanHakeem §r§eplaced an Arachne Crystal! Something is awakening!
      */
     val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
@@ -34,7 +34,7 @@ object ArachneChatMessageHider {
     )
 
     /**
-     * REGEX-TEST: §c[BOSS] Arachne§r§f: The Era of Spiders begins now.
+     * @regexTest §c[BOSS] Arachne§r§f: The Era of Spiders begins now.
      */
     private val arachneSpawnPattern by patternGroup.pattern(
         "spawn",
@@ -42,9 +42,9 @@ object ArachneChatMessageHider {
     )
 
     /**
-     * REGEX-TEST: §dArachne's Keeper used §r§2Venom Shot §r§don you hitting you for §r§c87.7 damage §r§dand infecting you with venom.
-     * REGEX-TEST: §dArachne used §r§2Venom Shot §r§don you hitting you for §r§c58 damage §r§dand infecting you with venom.
-     * REGEX-TEST: §dArachne's Brood used §r§2Venom Shot §r§don you hitting you for §r§c19.8 damage §r§dand infecting you with venom.
+     * @regexTest §dArachne's Keeper used §r§2Venom Shot §r§don you hitting you for §r§c87.7 damage §r§dand infecting you with venom.
+     * @regexTest §dArachne used §r§2Venom Shot §r§don you hitting you for §r§c58 damage §r§dand infecting you with venom.
+     * @regexTest §dArachne's Brood used §r§2Venom Shot §r§don you hitting you for §r§c19.8 damage §r§dand infecting you with venom.
      */
     @Suppress("MaxLineLength")
     private val venomShotPattern by patternGroup.pattern(

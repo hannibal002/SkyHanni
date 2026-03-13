@@ -19,8 +19,8 @@ object TabWidgetSettings {
     private val patternGroup = RepoPattern.group("tab.widget.setting")
 
     /**
-     * REGEX-TEST: Widgets on Private Island
-     * REGEX-TEST: Widgets in Crystal Hollows
+     * @regexTest Widgets on Private Island
+     * @regexTest Widgets in Crystal Hollows
      */
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
@@ -28,8 +28,8 @@ object TabWidgetSettings {
     )
 
     /**
-     * REGEX-TEST: §7Currently: §aALWAYS ENABLED
-     * REGEX-TEST: §7Currently: §cDISABLED
+     * @regexTest §7Currently: §aALWAYS ENABLED
+     * @regexTest §7Currently: §cDISABLED
      */
     private val mainPageWidgetPattern by patternGroup.pattern(
         "main",
@@ -37,8 +37,8 @@ object TabWidgetSettings {
     )
 
     /**
-     * REGEX-TEST: §eClick to disable!
-     * REGEX-TEST: §eClick to edit!
+     * @regexTest §eClick to disable!
+     * @regexTest §eClick to edit!
      */
     private val subPageWidgetPattern by patternGroup.pattern(
         "sub",
@@ -46,7 +46,7 @@ object TabWidgetSettings {
     )
 
     /**
-     * REGEX-TEST: Profile Widget Settings
+     * @regexTest Profile Widget Settings
      */
     private val shownSettingPattern by patternGroup.pattern(
         "show",
@@ -54,7 +54,7 @@ object TabWidgetSettings {
     )
 
     /**
-     * REGEX-TEST: §eClick to disable!
+     * @regexTest §eClick to disable!
      */
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
@@ -62,7 +62,7 @@ object TabWidgetSettings {
     )
 
     /**
-     * REGEX-TEST: §7Currently: §aENABLED
+     * @regexTest §7Currently: §aENABLED
      */
     private val enabledPattern by patternGroup.pattern(
         "is.enabled",

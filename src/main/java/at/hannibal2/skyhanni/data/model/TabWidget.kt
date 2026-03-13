@@ -267,20 +267,20 @@ enum class TabWidget(
     ),
     FULL_TRAPS(
         /**
-         * REGEX-TEST: Full Traps: #1, #2, #3
-         * REGEX-TEST: Full Traps: #2, #3
-         * REGEX-TEST: Full Traps: #3
-         * REGEX-TEST: Full Traps: None
+         * @regexTest Full Traps: #1, #2, #3
+         * @regexTest Full Traps: #2, #3
+         * @regexTest Full Traps: #3
+         * @regexTest Full Traps: None
          */
         // language=RegExp
         "Full Traps: (?:None|(?<traps>#\\d(?:, #\\d(?:, #\\d)?)?))",
     ),
     NO_BAIT(
         /**
-         * REGEX-TEST: No Bait: #1, #2, #3
-         * REGEX-TEST: No Bait: #2, #3
-         * REGEX-TEST: No Bait: #3
-         * REGEX-TEST: No Bait: None
+         * @regexTest No Bait: #1, #2, #3
+         * @regexTest No Bait: #2, #3
+         * @regexTest No Bait: #3
+         * @regexTest No Bait: None
          */
         // language=RegExp
         "No Bait: (?:None|(?<traps>#\\d(?:, #\\d(?:, #\\d)?)?))"

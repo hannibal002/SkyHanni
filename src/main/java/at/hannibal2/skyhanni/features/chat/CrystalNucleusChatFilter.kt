@@ -33,7 +33,7 @@ object CrystalNucleusChatFilter {
     private var inCompListPreamble = false
 
     /**
-     * REGEX-TEST: §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+     * @regexTest §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
      */
     private val runCompletedWrapperPattern by patternGroup.pattern(
         "run.completed",
@@ -41,7 +41,7 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §5§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+     * @regexTest §5§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
      */
     private val crystalCollectedWrapperPattern by patternGroup.pattern(
         "crystal.collected.wrapper",
@@ -49,7 +49,7 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §f                       §r§5§l✦ CRYSTAL FOUND §r§7(1§r§7/5§r§7)
+     * @regexTest §f                       §r§5§l✦ CRYSTAL FOUND §r§7(1§r§7/5§r§7)
      */
     private val crystalCollectedCountPattern by patternGroup.pattern(
         "crystal.collected.count",
@@ -57,11 +57,11 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §f                              §r§5Amethyst Crystal
-     * REGEX-TEST: §f                              §r§bSapphire Crystal
-     * REGEX-TEST: §f                                §r§6Amber Crystal
-     * REGEX-TEST: §f                                §r§eTopaz Crystal
-     * REGEX-TEST: §f                                §r§aJade Crystal
+     * @regexTest §f                              §r§5Amethyst Crystal
+     * @regexTest §f                              §r§bSapphire Crystal
+     * @regexTest §f                                §r§6Amber Crystal
+     * @regexTest §f                                §r§eTopaz Crystal
+     * @regexTest §f                                §r§aJade Crystal
      */
     private val crystalCollectedIdentifierPattern by patternGroup.pattern(
         "crystal.collected.id",
@@ -69,7 +69,7 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §5§l✦ §r§dYou placed the §r§bSapphire Crystal§r§d!
+     * @regexTest §5§l✦ §r§dYou placed the §r§bSapphire Crystal§r§d!
      */
     private val crystalPlacedPattern by patternGroup.pattern(
         "crystal.placed",
@@ -77,9 +77,9 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §aYou found §r§cScavenged Diamond Axe §r§awith your §r§cMetal Detector§r§a!
-     * REGEX-TEST: §aYou found §r§cScavenged Emerald Hammer §r§awith your §r§cMetal Detector§r§a!
-     * REGEX-TEST: §aYou found §r§a☘ Flawed Jade Gemstone §r§8x2 §r§awith your §r§cMetal Detector§r§a!
+     * @regexTest §aYou found §r§cScavenged Diamond Axe §r§awith your §r§cMetal Detector§r§a!
+     * @regexTest §aYou found §r§cScavenged Emerald Hammer §r§awith your §r§cMetal Detector§r§a!
+     * @regexTest §aYou found §r§a☘ Flawed Jade Gemstone §r§8x2 §r§awith your §r§cMetal Detector§r§a!
      */
     private val scavengeLootPattern by patternGroup.pattern(
         "divan.scavenge",
@@ -87,7 +87,7 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §6§lPICK IT UP!
+     * @regexTest §6§lPICK IT UP!
      */
     private val scavengeSecondaryPattern by patternGroup.pattern(
         "divan.scavenge.secondary",
@@ -95,10 +95,10 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §6Keeper of Gold§f: §rExcellent! You have returned the §cScavenged Golden Hammer §rto its rightful place!
-     * REGEX-TEST: §e[NPC] §6Keeper of Diamond§f: §rExcellent! You have returned the §cScavenged Diamond Axe §rto its rightful place!
-     * REGEX-TEST: §e[NPC] §6Keeper of Emerald§f: §rExcellent! You have returned the §cScavenged Emerald Hammer §rto its rightful place!
-     * REGEX-TEST: §e[NPC] §6Keeper of Lapis§f: §rYou found all of the items! Behold... the §aJade Crystal§r!
+     * @regexTest §e[NPC] §6Keeper of Gold§f: §rExcellent! You have returned the §cScavenged Golden Hammer §rto its rightful place!
+     * @regexTest §e[NPC] §6Keeper of Diamond§f: §rExcellent! You have returned the §cScavenged Diamond Axe §rto its rightful place!
+     * @regexTest §e[NPC] §6Keeper of Emerald§f: §rExcellent! You have returned the §cScavenged Emerald Hammer §rto its rightful place!
+     * @regexTest §e[NPC] §6Keeper of Lapis§f: §rYou found all of the items! Behold... the §aJade Crystal§r!
      */
     private val genericKeeperMessage by patternGroup.pattern(
         "npc.keeper",
@@ -106,15 +106,15 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: Thanks for bringing me the §9Synthetic Heart§r! Bring me 5 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Robotron Reflector§r! Bring me 5 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Superlite Motor§r! Bring me 4 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Synthetic Heart§r! Bring me 3 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9FTX 3070§r! Bring me 2 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Electron Transmitter§r! Bring me one more component to fix the giant!
-     * REGEX-TEST: §rYou've brought me all of the components!
-     * REGEX-TEST: §rYou've brought me all of the components... I think? To be honest, I kind of lost count...
-     * REGEX-TEST: Wait a minute. This will work just fine.
+     * @regexTest Thanks for bringing me the §9Synthetic Heart§r! Bring me 5 more components to fix the giant!
+     * @regexTest Thanks for bringing me the §9Robotron Reflector§r! Bring me 5 more components to fix the giant!
+     * @regexTest Thanks for bringing me the §9Superlite Motor§r! Bring me 4 more components to fix the giant!
+     * @regexTest Thanks for bringing me the §9Synthetic Heart§r! Bring me 3 more components to fix the giant!
+     * @regexTest Thanks for bringing me the §9FTX 3070§r! Bring me 2 more components to fix the giant!
+     * @regexTest Thanks for bringing me the §9Electron Transmitter§r! Bring me one more component to fix the giant!
+     * @regexTest §rYou've brought me all of the components!
+     * @regexTest §rYou've brought me all of the components... I think? To be honest, I kind of lost count...
+     * @regexTest Wait a minute. This will work just fine.
      */
     @Suppress("MaxLineLength")
     private val componentSubmittedPattern by patternGroup.pattern(
@@ -123,7 +123,7 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §rThat's not one of the components I need! Bring me one of the missing components:
+     * @regexTest §rThat's not one of the components I need! Bring me one of the missing components:
      */
     private val componentListPreamblePattern by patternGroup.pattern(
         "component.list.preamble",
@@ -131,12 +131,12 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST:   §r§9FTX 3070
-     * REGEX-TEST:   §r§9Electron Transmitter
-     * REGEX-TEST:   §r§9Superlite Motor
-     * REGEX-TEST:   §r§9Synthetic Heart
-     * REGEX-TEST:   §r§9Control Switch
-     * REGEX-TEST:   §r§9Robotron Reflector
+     * @regexTestWrapped "  §r§9FTX 3070"
+     * @regexTestWrapped "  §r§9Electron Transmitter"
+     * @regexTestWrapped "  §r§9Superlite Motor"
+     * @regexTestWrapped "  §r§9Synthetic Heart"
+     * @regexTestWrapped "  §r§9Control Switch"
+     * @regexTestWrapped "  §r§9Robotron Reflector"
      */
     private val componentListPattern by patternGroup.pattern(
         "component.list",
@@ -144,8 +144,8 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST: §8§oWhew! That was a close one, better get out of here...
-     * REGEX-TEST: §cThe Goblin King's §r§afoul stench §r§chas dissipated!
+     * @regexTest §8§oWhew! That was a close one, better get out of here...
+     * @regexTest §cThe Goblin King's §r§afoul stench §r§chas dissipated!
      */
     private val goblinGuardExitMessagePattern by patternGroup.pattern(
         "goblin.guard.exit",

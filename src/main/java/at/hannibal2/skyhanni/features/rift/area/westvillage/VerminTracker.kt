@@ -36,7 +36,7 @@ object VerminTracker {
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
 
     /**
-     * REGEX-TEST: §eYou vacuumed a §r§aSilverfish§r§e!
+     * @regexTest §eYou vacuumed a §r§aSilverfish§r§e!
      */
     private val silverfishPattern by patternGroup.pattern(
         "silverfish",
@@ -44,7 +44,7 @@ object VerminTracker {
     )
 
     /**
-     * REGEX-TEST: §eYou vacuumed a §r§aSpider§r§e!
+     * @regexTest §eYou vacuumed a §r§aSpider§r§e!
      */
     private val spiderPattern by patternGroup.pattern(
         "spider",
@@ -52,7 +52,7 @@ object VerminTracker {
     )
 
     /**
-     * REGEX-TEST: §eYou vacuumed a §r§aFly§r§e!
+     * @regexTest §eYou vacuumed a §r§aFly§r§e!
      */
     private val flyPattern by patternGroup.pattern(
         "fly",
@@ -60,8 +60,8 @@ object VerminTracker {
     )
 
     /**
-     * REGEX-TEST: Vermin Bin: 27 Silverfishes
-     * REGEX-TEST: Vermin Bin: 19 Flies
+     * @regexTest Vermin Bin: 27 Silverfishes
+     * @regexTest Vermin Bin: 19 Flies
      */
     private val verminBinPattern by patternGroup.pattern(
         "binline-nocolor",

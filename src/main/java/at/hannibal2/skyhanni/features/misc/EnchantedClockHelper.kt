@@ -39,7 +39,7 @@ object EnchantedClockHelper {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: Enchanted Time Clock
+     * @regexTest Enchanted Time Clock
      */
     val enchantedClockPattern by patternGroup.pattern(
         "inventory.name",
@@ -47,12 +47,12 @@ object EnchantedClockHelper {
     )
 
     /**
-     * REGEX-TEST: §6§lTIME WARP! §r§aYou have successfully warped time for your Chocolate Factory!
-     * REGEX-TEST: §6§lTIME WARP! §r§aYou have successfully warped time for your minions!
-     * REGEX-TEST: §6§lTIME WARP! §r§aYou have successfully warped time for your forges!
-     * REGEX-TEST: §6§lTIME WARP! §r§aYou have successfully warped time for your aging items!
-     * REGEX-TEST: §6§lTIME WARP! §r§aYou have successfully warped time for your training pets!
-     * REGEX-TEST: §6§lTIME WARP! §r§aYou have successfully warped time for your pets being taken care of by Kat!
+     * @regexTest §6§lTIME WARP! §r§aYou have successfully warped time for your Chocolate Factory!
+     * @regexTest §6§lTIME WARP! §r§aYou have successfully warped time for your minions!
+     * @regexTest §6§lTIME WARP! §r§aYou have successfully warped time for your forges!
+     * @regexTest §6§lTIME WARP! §r§aYou have successfully warped time for your aging items!
+     * @regexTest §6§lTIME WARP! §r§aYou have successfully warped time for your training pets!
+     * @regexTest §6§lTIME WARP! §r§aYou have successfully warped time for your pets being taken care of by Kat!
      */
     private val boostUsedChatPattern by patternGroup.pattern(
         "chat.boostused",
@@ -60,9 +60,9 @@ object EnchantedClockHelper {
     )
 
     /**
-     * REGEX-TEST: §7Status: §c§lCHARGING
-     * REGEX-TEST: §7Status: §e§lPROBLEM
-     * REGEX-TEST: §7Status: §a§lREADY
+     * @regexTest §7Status: §c§lCHARGING
+     * @regexTest §7Status: §e§lPROBLEM
+     * @regexTest §7Status: §a§lREADY
      */
     private val statusLorePattern by patternGroup.pattern(
         "boost.status",
@@ -70,9 +70,9 @@ object EnchantedClockHelper {
     )
 
     /**
-     * REGEX-TEST: §7§cOn cooldown: 20 hours
-     * REGEX-TEST: §7§cOn cooldown: 41 minutes
-     * REGEX-TEST: §7§cOn cooldown: 0 minutes
+     * @regexTest §7§cOn cooldown: 20 hours
+     * @regexTest §7§cOn cooldown: 41 minutes
+     * @regexTest §7§cOn cooldown: 0 minutes
      */
     private val cooldownLorePattern by patternGroup.pattern(
         "boost.cooldown",

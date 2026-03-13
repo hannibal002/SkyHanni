@@ -49,7 +49,7 @@ object SlayerProfitTracker {
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
 
     /**
-     * REGEX-TEST: §7Took 1.9k coins from your bank for auto-slayer...
+     * @regexTest §7Took 1.9k coins from your bank for auto-slayer...
      */
     private val autoSlayerBankPattern by RepoPattern.pattern(
         "slayer.autoslayer.bank.chat",

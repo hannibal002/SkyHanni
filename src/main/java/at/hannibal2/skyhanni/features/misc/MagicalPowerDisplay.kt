@@ -38,12 +38,12 @@ object MagicalPowerDisplay {
     private val riftPrism = "RIFT_PRISM".toInternalName()
 
     /**
-     * REGEX-TEST: Accessory Bag
-     * REGEX-TEST: Accessory Bag (1/75)
-     * REGEX-TEST: Accessory Bag (909/394294)
-     * REGEX-TEST: Auctions Browser
-     * REGEX-TEST: Auctions: "ligma"
-     * REGEX-TEST: Auctions: ""sugoma""
+     * @regexTest Accessory Bag
+     * @regexTest Accessory Bag (1/75)
+     * @regexTest Accessory Bag (909/394294)
+     * @regexTest Auctions Browser
+     * @regexTest Auctions: "ligma"
+     * @regexTest Auctions: ""sugoma""
      * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
@@ -53,13 +53,13 @@ object MagicalPowerDisplay {
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
 
     /**
-     * REGEX-TEST: Abiphone X Plus
-     * REGEX-TEST: Abiphone X Plus Special Edition
-     * REGEX-TEST: Abiphone XI Ultra Style
-     * REGEX-TEST: Abiphone XII Mega Color
-     * REGEX-TEST: Abiphone XIII Pro
-     * REGEX-TEST: Abiphone XIV Enormous Purple
-     * REGEX-TEST: Abiphone Flip
+     * @regexTest Abiphone X Plus
+     * @regexTest Abiphone X Plus Special Edition
+     * @regexTest Abiphone XI Ultra Style
+     * @regexTest Abiphone XII Mega Color
+     * @regexTest Abiphone XIII Pro
+     * @regexTest Abiphone XIV Enormous Purple
+     * @regexTest Abiphone Flip
      * */
     private val abiphoneNamePattern by abiphoneGroup.pattern(
         "name",
@@ -67,9 +67,9 @@ object MagicalPowerDisplay {
     )
 
     /**
-     * REGEX-TEST: Your contacts: 0/0
-     * REGEX-TEST: Your contacts: 1/75
-     * REGEX-TEST: Your contacts: 52/60
+     * @regexTest Your contacts: 0/0
+     * @regexTest Your contacts: 1/75
+     * @regexTest Your contacts: 52/60
      * */
     private val yourContactPattern by abiphoneGroup.pattern(
         "contacts",

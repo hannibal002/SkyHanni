@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.detektrules
 
+import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtEscapeStringTemplateEntry
@@ -27,7 +28,7 @@ class RepoPatternElement private constructor(
     }
 
     companion object {
-        private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
+        private val wrappedRegexTestPattern = "\"(?<test>.*)\"".toPattern()
 
         fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
             val expression = this.expression as? KtDotQualifiedExpression ?: return null
@@ -51,29 +52,34 @@ class RepoPatternElement private constructor(
             val parent = parent as? KtProperty ?: return null
             val variableName = parent.name ?: "unknownPattern"
 
-            val (regexTests, failingRegexTests) = findRegexTestInKDoc(parent)
+            val (regexTests, failingRegexTests) = findRegexTestInKDoc(parent.docComment)
             return RepoPatternElement(variableName, rawPattern, regexTests, failingRegexTests)
         }
 
-        private fun findRegexTestInKDoc(property: KtProperty): Pair<List<String>, List<String>> {
-            val kDoc = property.docComment ?: return listOf<String>() to listOf()
-
+        // NOTE: If you update this code, remember to also update .live-plugins/regexr/plugin.kts
+        fun findRegexTestInKDoc(kDoc: KDoc?): Pair<List<String>, List<String>> {
             val regexTests = mutableListOf<String>()
             val failingRegexTests = mutableListOf<String>()
 
-            kDoc.getDefaultSection().getContent().lines().forEach { line ->
-                if (line.contains("REGEX-TEST: ")) {
-                    regexTests.add(line.substringAfter("REGEX-TEST: "))
+            kDoc?.getAllSections()?.forEach { section ->
+                for (tag in section.findTagsByName("regexTest")) {
+                    regexTests.add(tag.getContent().trim())
                 }
-                if (line.contains("REGEX-FAIL: ")) {
-                    failingRegexTests.add(line.substringAfter("REGEX-FAIL: "))
+                for (tag in section.findTagsByName("regexFail")) {
+                    failingRegexTests.add(tag.getContent().trim())
                 }
-                wrappedRegexTestPattern.matcher(line).let { matcher ->
-                    if (!matcher.find()) return@forEach
-                    val test = matcher.group("test") ?: return@forEach
-                    regexTests.add(test)
+                for (tag in section.findTagsByName("regexTestWrapped")) {
+                    val matcher = wrappedRegexTestPattern.matcher(tag.getContent().trim())
+                    if (!matcher.find()) continue
+                    matcher.group("test")?.let(regexTests::add)
+                }
+                for (tag in section.findTagsByName("regexFailWrapped")) {
+                    val matcher = wrappedRegexTestPattern.matcher(tag.getContent().trim())
+                    if (!matcher.find()) continue
+                    matcher.group("test")?.let(failingRegexTests::add)
                 }
             }
+
             return regexTests to failingRegexTests
         }
     }

@@ -53,8 +53,8 @@ object DragonFeatures {
     private val tabListGroup = repoGroup.group("tablist-nocolor")
 
     /**
-     * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
-     * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)
+     * @regexTest §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
+     * @regexTest §5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)
      */
     @Suppress("MaxLineLength")
     private val eyePlacedPattern by chatGroup.pattern(
@@ -63,17 +63,17 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: §5You recovered a Summoning Eye!
+     * @regexTest §5You recovered a Summoning Eye!
      */
     private val eyeRemovedPattern by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
 
     /**
-     * REGEX-TEST: §5☬ §r§dThe Dragon Egg has spawned!
+     * @regexTest §5☬ §r§dThe Dragon Egg has spawned!
      */
     private val eggSpawnedPattern by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
 
     /**
-     * REGEX-TEST: §f                      §r§6§lPROTECTOR DRAGON DOWN!
+     * @regexTest §f                      §r§6§lPROTECTOR DRAGON DOWN!
      */
     private val endStartLineDragonPattern by chatGroup.pattern(
         "end.boss",
@@ -81,7 +81,7 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: §f                    §r§6§lENDSTONE PROTECTOR DOWN!
+     * @regexTest §f                    §r§6§lENDSTONE PROTECTOR DOWN!
      */
     private val endStartLineProtectorPattern by protectorRepoGroup.pattern(
         "chat.end.boss",
@@ -89,8 +89,8 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
-     * REGEX-TEST: §f                 §r§eYour Damage: §r§a3,198,068 §r§7(Position #1)
+     * @regexTest §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
+     * @regexTest §f                 §r§eYour Damage: §r§a3,198,068 §r§7(Position #1)
      */
     @Suppress("MaxLineLength")
     private val endPositionPattern by chatGroup.pattern(
@@ -99,10 +99,10 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
-     * REGEX-TEST: §f          §r§6§l2nd Damager §r§7- §r§b[MVP§r§9+§r§b] FlamingZoom§r§f §r§7- §r§e1,459,691
-     * REGEX-TEST: §f          §r§c§l3rd Damager §r§7- §r§b[MVP§r§f+§r§b] Dustbringer§r§f §r§7- §r§e1,091,163
-     * REGEX-TEST: §f              §r§e§l1st Damager §r§7- §r§a[VIP] filip_zd§r§f §r§7- §r§e3,965,533
+     * @regexTest §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
+     * @regexTest §f          §r§6§l2nd Damager §r§7- §r§b[MVP§r§9+§r§b] FlamingZoom§r§f §r§7- §r§e1,459,691
+     * @regexTest §f          §r§c§l3rd Damager §r§7- §r§b[MVP§r§f+§r§b] Dustbringer§r§f §r§7- §r§e1,091,163
+     * @regexTest §f              §r§e§l1st Damager §r§7- §r§a[VIP] filip_zd§r§f §r§7- §r§e3,965,533
      */
     @Suppress("MaxLineLength")
     private val endLeaderboardPattern by chatGroup.pattern(
@@ -111,7 +111,7 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: §f                       §r§eZealots Contributed: §r§a27§r§e/100
+     * @regexTest §f                       §r§eZealots Contributed: §r§a27§r§e/100
      */
     private val endZealotsPattern by protectorRepoGroup.pattern(
         "chat.end.zealot",
@@ -119,8 +119,8 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
-     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lYoung Dragon§r§d§l has spawned!
+     * @regexTest §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
+     * @regexTest §5☬ §r§d§lThe §r§5§c§lYoung Dragon§r§d§l has spawned!
      */
     private val dragonSpawnPattern by chatGroup.pattern(
         "spawn",
@@ -128,20 +128,20 @@ object DragonFeatures {
     )
 
     /**
-     * REGEX-TEST: Your Damage: §c2,003.2
+     * @regexTest Your Damage: §c2,003.2
      */
     private val scoreDamagePattern by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<damage>[\\w,.]+)")
 
     /**
-     * REGEX-TEST: Dragon HP: §a14,659,354 §c❤
+     * @regexTest Dragon HP: §a14,659,354 §c❤
      */
     private val scoreDragonPattern by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     /**
-     * REGEX-TEST:  JamBeastie: 7.4M❤
-     * REGEX-TEST:  42069HzMonitor: 3M❤
-     * REGEX-TEST:  ItsJxxxxx2001: 457k❤
-     * REGEX-TEST:  Thunderblade73: 12.3k❤
+     * @regexTestWrapped " JamBeastie: 7.4M❤"
+     * @regexTestWrapped " 42069HzMonitor: 3M❤"
+     * @regexTestWrapped " ItsJxxxxx2001: 457k❤"
+     * @regexTestWrapped " Thunderblade73: 12.3k❤"
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",

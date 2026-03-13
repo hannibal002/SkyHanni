@@ -81,14 +81,14 @@ object HideNotClickableItems {
     )
 
     /**
-     * REGEX-TEST: SEEDS
-     * REGEX-TEST: CARROT_ITEM
-     * REGEX-TEST: POTATO_ITEM
-     * REGEX-TEST: PUMPKIN_SEEDS
-     * REGEX-TEST: SUGAR_CANE
-     * REGEX-TEST: MELON_SEEDS
-     * REGEX-TEST: CACTUS
-     * REGEX-TEST: INK_SACK-3
+     * @regexTest SEEDS
+     * @regexTest CARROT_ITEM
+     * @regexTest POTATO_ITEM
+     * @regexTest PUMPKIN_SEEDS
+     * @regexTest SUGAR_CANE
+     * @regexTest MELON_SEEDS
+     * @regexTest CACTUS
+     * @regexTest INK_SACK-3
      */
     private val seedsPattern by patternGroup.pattern(
         "inventory.hidenotclickable.seeds",

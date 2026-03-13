@@ -80,7 +80,7 @@ sealed class RepoPattern : CommonPatternInfo<String, Pattern>() {
          * This method supports "Open regex101.com" using [LivePlugin](https://plugins.jetbrains.com/plugin/7282-liveplugin).
          * To use it, install LivePlugin, enable "Run plugins on IDE start" and "Run project specific plugins".
          * Now you can use ALT+ENTER while hovering over a [pattern] call using your text cursor to access the "Open in regex101.com" intention.
-         * Add a KDoc comment to the associated variable containing lines starting with `REGEX-TEST: ` to pre-fill examples.
+         * Add a KDoc comment to the associated variable containing lines starting with `@regexTest ` to pre-fill examples.
          */
         fun pattern(key: String, @Language("RegExp") fallback: String): RepoPattern {
             return RepoPatternManager.of(key, fallback)

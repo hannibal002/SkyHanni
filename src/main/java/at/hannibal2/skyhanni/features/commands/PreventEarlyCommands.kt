@@ -32,7 +32,7 @@ object PreventEarlyCommands {
     private var lastCommand: String? = null
 
     /**
-     * REGEX-TEST: §cYou may only use this command after 4s on the server!
+     * @regexTest §cYou may only use this command after 4s on the server!
      */
     private val cooldownPattern by RepoPattern.pattern(
         "commands.cooldown",

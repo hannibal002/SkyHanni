@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 object GreenhouseUtils {
 
     /**
-     * REGEX-TEST: Crop Diagnostics
+     * @regexTest Crop Diagnostics
      */
     val inventoryPattern by patternGroup.pattern(
         "inventory",

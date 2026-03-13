@@ -16,8 +16,8 @@ object BlockNotSpawnable {
     private val config get() = SlayerApi.config
 
     /**
-     * REGEX-TEST: §cOnly inside The Rift!
-     * REGEX-TEST: §cDoesn't exist here!
+     * @regexTest §cOnly inside The Rift!
+     * @regexTest §cDoesn't exist here!
      */
     private val notSpawnablePattern by RepoPattern.pattern(
         "slayer.notspawnable",

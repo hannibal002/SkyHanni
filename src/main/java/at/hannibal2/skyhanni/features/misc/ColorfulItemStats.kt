@@ -17,11 +17,11 @@ object ColorfulItemStats {
     private val group = RepoPattern.group("misc.itemstats")
 
     /**
-     * REGEX-TEST: Crit Chance: +30%
-     * REGEX-TEST: Magic Find: +54.52
-     * REGEX-TEST: Rift Time: +60s
-     * REGEX-TEST: Strength: +60 (+20) (+40) (+199.2)
-     * REGEX-FAIL: Health: +1000❤
+     * @regexTest Crit Chance: +30%
+     * @regexTest Magic Find: +54.52
+     * @regexTest Rift Time: +60s
+     * @regexTest Strength: +60 (+20) (+40) (+199.2)
+     * @regexFail Health: +1000❤
      */
     private val genericStat by group.pattern(
         "generic-stats-no-color",

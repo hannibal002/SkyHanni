@@ -39,7 +39,7 @@ object HideExCoopMembers {
     private val patternGroup = RepoPattern.group("data.hiddenmembers")
 
     /**
-     * REGEX-TEST: Historic Members
+     * @regexTest Historic Members
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory.historic",

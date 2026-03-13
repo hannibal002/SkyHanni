@@ -44,7 +44,7 @@ object SummoningMobManager {
     private val patternGroup = RepoPattern.group("summoning.mobs")
 
     /**
-     * REGEX-TEST: §aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
+     * @regexTest §aYou have spawned your Tank Zombie §r§asoul! §r§d(249 Mana)
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
@@ -52,8 +52,8 @@ object SummoningMobManager {
     )
 
     /**
-     * REGEX-TEST: §cYou have despawned your monster!
-     * REGEX-TEST: §cYou have despawned your monsters!
+     * @regexTest §cYou have despawned your monster!
+     * @regexTest §cYou have despawned your monsters!
      */
     private val despawnPattern by patternGroup.pattern(
         "despawn",
@@ -61,8 +61,8 @@ object SummoningMobManager {
     )
 
     /**
-     * REGEX-TEST: §cThe Seraph recalled your 3 summoned allies!
-     * REGEX-TEST: §cThe Seraph recalled your 10 summoned allies!
+     * @regexTest §cThe Seraph recalled your 3 summoned allies!
+     * @regexTest §cThe Seraph recalled your 10 summoned allies!
      */
     private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",

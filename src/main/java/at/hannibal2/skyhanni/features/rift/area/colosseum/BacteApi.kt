@@ -17,7 +17,7 @@ object BacteApi {
     private val group = RepoPattern.group("rift.colosseum.bacte")
 
     /**
-     * REGEX-TEST: §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c❤ §2﴿
+     * @regexTest §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c❤ §2﴿
      */
     private val namePattern by group.pattern(
         "name",
@@ -25,8 +25,8 @@ object BacteApi {
     )
 
     /**
-     * REGEX-TEST: §aBac §r§eis growing into §r§aBact§r§e!
-     * REGEX-TEST: §aB §r§eis growing into §r§aBa§r§e!
+     * @regexTest §aBac §r§eis growing into §r§aBact§r§e!
+     * @regexTest §aB §r§eis growing into §r§aBa§r§e!
      */
     private val nameChatPattern by group.pattern(
         "chat.name",

@@ -47,12 +47,12 @@ object PlayerNameFormatter {
     private val patternGroup = RepoPattern.group("data.chat.player.name")
 
     /**
-     * REGEX-TEST: §7☢ §r§b[MVP§d+§b] hannibal2
-     * REGEX-TEST: §7☢ §r§b[MVP§d+§b] hannibal2
-     * REGEX-TEST: §7☢ §r§bhannibal2
-     * REGEX-TEST: §7☢ §rhannibal2
-     * REGEX-TEST: §7☢ §b[MVP§c+§b] hannibal2
-     * REGEX-TEST: ♫ §b[MVP§d+§b] lrg89
+     * @regexTest §7☢ §r§b[MVP§d+§b] hannibal2
+     * @regexTest §7☢ §r§b[MVP§d+§b] hannibal2
+     * @regexTest §7☢ §r§bhannibal2
+     * @regexTest §7☢ §rhannibal2
+     * @regexTest §7☢ §b[MVP§c+§b] hannibal2
+     * @regexTest ♫ §b[MVP§d+§b] lrg89
      */
     private val emblemPattern by patternGroup.pattern(
         "emblem",

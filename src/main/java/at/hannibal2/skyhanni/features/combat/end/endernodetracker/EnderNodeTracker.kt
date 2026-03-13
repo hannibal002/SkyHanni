@@ -44,7 +44,7 @@ object EnderNodeTracker {
     private val patternGroup = RepoPattern.group("combat.endernodetracker.chat")
 
     /**
-     * REGEX-TEST: §5§lENDER NODE! §r§fYou found §r§8§r§aEnchanted Obsidian§r§f!
+     * @regexTest §5§lENDER NODE! §r§fYou found §r§8§r§aEnchanted Obsidian§r§f!
      */
     private val patternOne by patternGroup.pattern(
         "one",
@@ -52,7 +52,7 @@ object EnderNodeTracker {
     )
 
     /**
-     * REGEX-TEST: §5§lENDER NODE! §r§fYou found §r§85x §r§aEnchanted Ender Pearl§r§f!
+     * @regexTest §5§lENDER NODE! §r§fYou found §r§85x §r§aEnchanted Ender Pearl§r§f!
      */
     private val patternMulti by patternGroup.pattern(
         "multi",

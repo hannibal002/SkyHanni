@@ -40,12 +40,12 @@ object SunGeckoHelper {
     private val patternGroup = RepoPattern.group("rift.area.mountaintop.sun-gecko")
 
     /**
-     * REGEX-TEST: §a[⬛⬛⬛⬜§c⬜ §e§lx2 §c⬜⬜⬜⬜⬜]
-     * REGEX-TEST: §c[⬜⬜⬜⬜⬜ §e§lx1 §c⬜⬜⬜⬜⬜]
-     * REGEX-TEST: §a[⬛⬛⬛⬛§c⬛ §e§lx1 §c⬛⬜⬜⬜⬜]
-     * REGEX-TEST: §a[⬛⬛⬛⬛⬛ §e§lx1 §a⬛§c⬛⬛⬜⬜]
-     * REGEX-TEST: §a[⬛⬛⬛⬛⬛ §e§lx1 §c§c⬛⬛⬜⬜⬜]
-     * REGEX-TEST: §a[⬛⬛⬛§c⬛⬛ §e§lx2 §c⬛⬛⬛⬜⬜]
+     * @regexTest §a[⬛⬛⬛⬜§c⬜ §e§lx2 §c⬜⬜⬜⬜⬜]
+     * @regexTest §c[⬜⬜⬜⬜⬜ §e§lx1 §c⬜⬜⬜⬜⬜]
+     * @regexTest §a[⬛⬛⬛⬛§c⬛ §e§lx1 §c⬛⬜⬜⬜⬜]
+     * @regexTest §a[⬛⬛⬛⬛⬛ §e§lx1 §a⬛§c⬛⬛⬜⬜]
+     * @regexTest §a[⬛⬛⬛⬛⬛ §e§lx1 §c§c⬛⬛⬜⬜⬜]
+     * @regexTest §a[⬛⬛⬛§c⬛⬛ §e§lx2 §c⬛⬛⬛⬜⬜]
      */
     private val sunGeckoActionBar by patternGroup.pattern(
         "actionbar",
@@ -53,12 +53,12 @@ object SunGeckoHelper {
     )
 
     /**
-     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
-     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
-     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
-     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
-     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
-     * WRAPPED-REGEX-TEST: "                           §r§c§lACTIVE MODIFIERS!"
+     * @regexTest §f                           §r§c§lACTIVE MODIFIERS!
+     * @regexTest §f                           §r§c§lACTIVE MODIFIERS!
+     * @regexTest §f                           §r§c§lACTIVE MODIFIERS!
+     * @regexTest §f                           §r§c§lACTIVE MODIFIERS!
+     * @regexTest §f                           §r§c§lACTIVE MODIFIERS!
+     * @regexTestWrapped "                           §r§c§lACTIVE MODIFIERS!"
      */
     private val sunGeckoActiveModifiers by patternGroup.pattern(
         "modifiers",

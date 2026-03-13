@@ -20,7 +20,7 @@ object ServerRestartTitle {
     private var timerTitleContext: TitleContext? = null
 
     /**
-     * REGEX-TEST: §cServer closing: 03:11 §8m77A
+     * @regexTest §cServer closing: 03:11 §8m77A
      */
     private val restartingPattern by patternGroup.pattern(
         "time",
@@ -28,7 +28,7 @@ object ServerRestartTitle {
     )
 
     /**
-     * REGEX-TEST: §cServer closing: 03:11 §8m77A
+     * @regexTest §cServer closing: 03:11 §8m77A
      */
     val restartingGreedyPattern by patternGroup.pattern(
         "greedy",

@@ -31,8 +31,8 @@ object HoppityCallWarning {
      * Test messages (and the real ones from Hypixel) have a space at the end of
      * them that the IDE kills. So it's "§r§e ✆ "
      *
-     * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
-     * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
+     * @regexTest §e✆ §r§bHoppity§r§e ✆
+     * @regexTest §e✆ §r§aHoppity§r§e ✆
      */
     private val initHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.init",
@@ -40,7 +40,7 @@ object HoppityCallWarning {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
+     * @regexTest §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
      */
     private val pickupHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.pickup",

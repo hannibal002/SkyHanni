@@ -16,8 +16,8 @@ object SpookyChestAlert {
     private val patternGroup = RepoPattern.group("event.spooky")
 
     /**
-     * REGEX-TEST: §6§lSPOOKY! §r§7A §r§6Trick or Treat Chest §r§7has appeared!
-     * REGEX-TEST: §c§lPARTY! §r§7A §r§cParty Chest §r§7has appeared!
+     * @regexTest §6§lSPOOKY! §r§7A §r§6Trick or Treat Chest §r§7has appeared!
+     * @regexTest §c§lPARTY! §r§7A §r§cParty Chest §r§7has appeared!
      */
     private val chestMessagePattern by patternGroup.pattern(
         "chat.chest",

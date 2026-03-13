@@ -19,8 +19,8 @@ object HoppityEggsShared {
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
 
     /**
-     * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
-     * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453 (hidden note)
+     * @regexTest CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
+     * @regexTest CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453 (hidden note)
      */
     private val sharedEggPattern by CFApi.patternGroup.pattern(
         "egg.shared",

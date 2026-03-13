@@ -58,7 +58,7 @@ object BetterContainers {
     private val customDynamicChest = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_chest_inventory.png")
 
     /**
-     * REGEX-TEST: navigate the maze
+     * @regexTest navigate the maze
      */
     private val disallowedInventoryPattern by patternGroup.pattern(
         "disallowed",

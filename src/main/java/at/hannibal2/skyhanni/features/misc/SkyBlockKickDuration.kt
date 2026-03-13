@@ -29,9 +29,9 @@ object SkyBlockKickDuration {
     private val patternGroup = RepoPattern.group("misc.kickduration")
 
     /**
-     * REGEX-TEST: §cYou were kicked while joining that server!
-     * REGEX-TEST: §cA kick occurred in your connection, so you were put in the SkyBlock lobby!
-     * REGEX-TEST: §cAn exception occurred in your connection, so you were put in the SkyBlock Lobby!
+     * @regexTest §cYou were kicked while joining that server!
+     * @regexTest §cA kick occurred in your connection, so you were put in the SkyBlock lobby!
+     * @regexTest §cAn exception occurred in your connection, so you were put in the SkyBlock Lobby!
      */
     @Suppress("MaxLineLength")
     private val kickPattern by patternGroup.pattern(
@@ -40,7 +40,7 @@ object SkyBlockKickDuration {
     )
 
     /**
-     * REGEX-TEST: §cThere was a problem joining SkyBlock, try again in a moment!
+     * @regexTest §cThere was a problem joining SkyBlock, try again in a moment!
      */
     private val problemJoiningPattern by patternGroup.pattern(
         "problemjoining",

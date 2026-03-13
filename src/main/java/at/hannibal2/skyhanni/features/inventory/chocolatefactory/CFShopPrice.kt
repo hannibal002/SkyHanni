@@ -50,8 +50,8 @@ object CFShopPrice {
     )
 
     /**
-     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§a!
-     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
+     * @regexTest §aYou bought §r§aSupreme Chocolate Bar§r§a!
+     * @regexTest §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
      */
     private val itemBoughtPattern by CFApi.patternGroup.pattern(
         "shop.bought",
@@ -59,7 +59,7 @@ object CFShopPrice {
     )
 
     /**
-     * REGEX-TEST: §7Chocolate Spent: §60
+     * @regexTest §7Chocolate Spent: §60
      */
     private val chocolateSpentPattern by CFApi.patternGroup.pattern(
         "shop.spent",

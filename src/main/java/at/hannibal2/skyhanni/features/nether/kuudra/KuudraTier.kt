@@ -38,8 +38,8 @@ enum class KuudraTier(val displayName: String) {
         private val patternGroup = RepoPattern.group("crimson.kuudra")
 
         /**
-         * REGEX-TEST: Kill Kuudra Basic Tier
-         * REGEX-TEST: Kill Kuudra Fiery Tier
+         * @regexTest Kill Kuudra Basic Tier
+         * @regexTest Kill Kuudra Fiery Tier
          */
         private val kuudraQuestPattern by patternGroup.pattern(
             "quest.identifier",

@@ -20,11 +20,11 @@ object TestCopyRngMeterValues {
     private val patternGroup = RepoPattern.group("test.dev.copyrng")
 
     /**
-     * REGEX-TEST: Slayer XP: 20,625/7,917
-     * REGEX-TEST: Dungeon Score: 489,850/75,000
-     * REGEX-TEST: Frozen Corpse XP: 20,625/60,000
-     * REGEX-TEST: Experimental XP: 20,105/150,000
-     * REGEX-TEST: Nucleus XP: 202,105/320,000
+     * @regexTest Slayer XP: 20,625/7,917
+     * @regexTest Dungeon Score: 489,850/75,000
+     * @regexTest Frozen Corpse XP: 20,625/60,000
+     * @regexTest Experimental XP: 20,105/150,000
+     * @regexTest Nucleus XP: 202,105/320,000
      */
     private val rngScorePattern by patternGroup.pattern(
         "rngscore",

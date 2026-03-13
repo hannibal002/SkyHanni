@@ -39,7 +39,7 @@ object MinionUpgradeHelper {
     private var itemsInSacks: Int = 0
 
     /**
-     * REGEX-TEST: §7§cYou need §6512 §cmore Nether Quartz.
+     * @regexTest §7§cYou need §6512 §cmore Nether Quartz.
      */
     private val requiredItemsPattern by RepoPattern.pattern(
         "minion.items.upgrade",

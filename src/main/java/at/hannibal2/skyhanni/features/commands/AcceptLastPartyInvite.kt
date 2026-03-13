@@ -20,9 +20,9 @@ object AcceptLastPartyInvite {
     private val patternGroup = RepoPattern.group("party.invite")
 
     /**
-     * REGEX-TEST: §r§b[MVP§r§c+§r§b] STPREAPER §r§ehas invited you to join their party!
-     * REGEX-TEST: §r§a[VIP] VrxyOwnsYou_ §r§ehas invited you to join their party!
-     * REGEX-TEST: §r§7SkyLime1213 §r§ehas invited you to join their party!
+     * @regexTest §r§b[MVP§r§c+§r§b] STPREAPER §r§ehas invited you to join their party!
+     * @regexTest §r§a[VIP] VrxyOwnsYou_ §r§ehas invited you to join their party!
+     * @regexTest §r§7SkyLime1213 §r§ehas invited you to join their party!
      */
     private val inviteReceivedPattern by patternGroup.pattern(
         "received",
@@ -30,9 +30,9 @@ object AcceptLastPartyInvite {
     )
 
     /**
-     * REGEX-TEST: §eThe party invite from §r§b[MVP§r§f+§r§b] OE07 §r§ehas expired.
-     * REGEX-TEST: §eThe party invite from §r§a[VIP] VrxyOwnsYou_ §r§ehas expired.
-     * REGEX-TEST: §eThe party invite from §r§7TMOffline96 §r§ehas expired.
+     * @regexTest §eThe party invite from §r§b[MVP§r§f+§r§b] OE07 §r§ehas expired.
+     * @regexTest §eThe party invite from §r§a[VIP] VrxyOwnsYou_ §r§ehas expired.
+     * @regexTest §eThe party invite from §r§7TMOffline96 §r§ehas expired.
      */
     private val inviteExpiredPattern by patternGroup.pattern(
         "expired",

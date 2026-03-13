@@ -21,7 +21,7 @@ object ArachneKillTimer {
     private val patternGroup = RepoPattern.group("chat.arachne")
 
     /**
-     * REGEX-TEST: §c[BOSS] Arachne§r§f: A befitting welcome!
+     * @regexTest §c[BOSS] Arachne§r§f: A befitting welcome!
      */
     private val arachneCallingSpawnedPattern by patternGroup.pattern(
         "calling.spawned",
@@ -29,7 +29,7 @@ object ArachneKillTimer {
     )
 
     /**
-     * REGEX-TEST: §c[BOSS] Arachne§r§f: With your sacrifice.
+     * @regexTest §c[BOSS] Arachne§r§f: With your sacrifice.
      */
     private val arachneCrystalSpawnedPattern by patternGroup.pattern(
         "crystal.spawned",
@@ -37,7 +37,7 @@ object ArachneKillTimer {
     )
 
     /**
-     * REGEX-TEST: §f                              §r§6§lARACHNE DOWN!
+     * @regexTest §f                              §r§6§lARACHNE DOWN!
      */
     private val arachneDeathPattern by patternGroup.pattern(
         "dead",
@@ -45,7 +45,7 @@ object ArachneKillTimer {
     )
 
     /**
-     * REGEX-TEST: §f                 §r§eYour Damage: §r§a1,155,000 §r§7(Position #1)
+     * @regexTest §f                 §r§eYour Damage: §r§a1,155,000 §r§7(Position #1)
      */
     private val arachneDamagePattern by patternGroup.pattern(
         "damage",

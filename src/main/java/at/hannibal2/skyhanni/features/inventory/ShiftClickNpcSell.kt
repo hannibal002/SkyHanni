@@ -21,7 +21,7 @@ object ShiftClickNpcSell {
     private const val SELL_SLOT = -4
 
     /**
-     * REGEX-TEST: §eClick to buyback!
+     * @regexTest §eClick to buyback!
      */
     private val lastLoreLineOfSellPattern by RepoPattern.pattern(
         "inventory.npc.sell.lore",

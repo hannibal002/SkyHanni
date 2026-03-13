@@ -203,14 +203,14 @@ object MiningEventsApi {
 
         companion object {
             /**
-             * REGEX-TEST: Ends in: 5m 30s
+             * @regexTest Ends in: 5m 30s
              */
             val widgetDurationPattern by RepoPattern.pattern(
                 "mining.mining.event.widget.duration-no-color",
                 "Ends in: (?<duration>.*)"
             )
             /**
-             * REGEX-TEST: Mining Event: Not announced
+             * @regexTest Mining Event: Not announced
              */
             val widgetEventNotAnnouncedPattern by RepoPattern.pattern(
                 "mining.mining.event.widget.not.announced-no-color",

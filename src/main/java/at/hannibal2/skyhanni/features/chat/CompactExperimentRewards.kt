@@ -28,8 +28,8 @@ object CompactExperimentRewards {
     private val patternGroup = RepoPattern.group("chat.experiments.compact")
 
     /**
-     * REGEX-TEST: Superpairs (Metaphysical)
-     * REGEX-TEST: Superpairs Rewards
+     * @regexTest Superpairs (Metaphysical)
+     * @regexTest Superpairs Rewards
      */
     private val experimentInventoriesPattern by patternGroup.pattern(
         "inventories",
@@ -37,8 +37,8 @@ object CompactExperimentRewards {
     )
 
     /**
-     * REGEX-TEST: §eYou claimed the §r§dUltrasequencer §r§erewards!
-     * REGEX-TEST: §eYou claimed the §r§cUltrasequencer §r§erewards!
+     * @regexTest §eYou claimed the §r§dUltrasequencer §r§erewards!
+     * @regexTest §eYou claimed the §r§cUltrasequencer §r§erewards!
      */
     private val claimMessagePattern by patternGroup.pattern(
         "message",
@@ -46,12 +46,12 @@ object CompactExperimentRewards {
     )
 
     /**
-     * REGEX-TEST: §8 +§r§3600k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§3132k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§aThunderlord V
-     * REGEX-TEST:  §r§8+§r§3143k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§aGrand Experience Bottle
-     * REGEX-TEST:  §r§8+§r§aCaster V
+     * @regexTest §8 +§r§3600k Enchanting Exp
+     * @regexTestWrapped " §r§8+§r§3132k Enchanting Exp"
+     * @regexTestWrapped " §r§8+§r§aThunderlord V"
+     * @regexTestWrapped " §r§8+§r§3143k Enchanting Exp"
+     * @regexTestWrapped " §r§8+§r§aGrand Experience Bottle"
+     * @regexTestWrapped " §r§8+§r§aCaster V"
      */
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",

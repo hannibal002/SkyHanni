@@ -22,7 +22,7 @@ object DragonFightAPI {
     private val group = RepoPattern.group("combat.end-dragon-fight")
 
     /**
-     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lOld Dragon§r§d§l has spawned!§r
+     * @regexTest §5☬ §r§d§lThe §r§5§c§lOld Dragon§r§d§l has spawned!§r
      */
     private val chatSpawnPattern by group.pattern(
         "chat.spawn",
@@ -30,7 +30,7 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: §r§f                           §r§6§lOLD DRAGON DOWN!§r
+     * @regexTest §r§f                           §r§6§lOLD DRAGON DOWN!§r
      */
     private val chatDeath by group.pattern(
         "chat.death",
@@ -38,7 +38,7 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: Dragon HP: 4,824,217 ❤
+     * @regexTest Dragon HP: 4,824,217 ❤
      */
     private val scoreboardHPPattern by group.pattern(
         "scoreboard.hp",
@@ -46,7 +46,7 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: Your Damage: 0
+     * @regexTest Your Damage: 0
      */
     private val scoreboardYourDamagePattern by group.pattern(
         "scoreboard.your-damage",

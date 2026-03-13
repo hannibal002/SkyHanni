@@ -30,7 +30,7 @@ object DungeonCopilot {
     )
 
     /**
-     * REGEX-TEST: §a§r§bCalMWolfs§r§a opened a §r§8§lWITHER §r§adoor!
+     * @regexTest §a§r§bCalMWolfs§r§a opened a §r§8§lWITHER §r§adoor!
      */
     private val witherDoorPattern by patternGroup.pattern(
         "wither.door",

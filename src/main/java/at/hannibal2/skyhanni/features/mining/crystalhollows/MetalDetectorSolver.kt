@@ -46,7 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 object MetalDetectorSolver {
 
     /**
-     * REGEX-TEST: §7§65,453/5,078❤     §a927§a❈ Defense     §3§lTREASURE: §b79.2m§r
+     * @regexTest §7§65,453/5,078❤     §a927§a❈ Defense     §3§lTREASURE: §b79.2m§r
      */
     private val metalDetectorDistancePattern by RepoPattern.pattern(
         "mining.crystalnucleus.metaldetector.treasure",
@@ -54,9 +54,9 @@ object MetalDetectorSolver {
     )
 
     /**
-     * REGEX-TEST: §aYou found §r§a☘ Flawed Jade Gemstone §r§8x4 §r§awith your §r§cMetal Detector§r§a!
-     * REGEX-TEST: §aYou found §r§dGemstone Powder §r§8x147 §r§awith your §r§cMetal Detector§r§a!
-     * REGEX-TEST: §aYou found §r§cScavenged Diamond Axe §r§awith your §r§cMetal Detector§r§a!
+     * @regexTest §aYou found §r§a☘ Flawed Jade Gemstone §r§8x4 §r§awith your §r§cMetal Detector§r§a!
+     * @regexTest §aYou found §r§dGemstone Powder §r§8x147 §r§awith your §r§cMetal Detector§r§a!
+     * @regexTest §aYou found §r§cScavenged Diamond Axe §r§awith your §r§cMetal Detector§r§a!
      */
     private val treasureFoundPattern by RepoPattern.pattern(
         "mining.crystalnucleus.metaldetector.treasurefound",

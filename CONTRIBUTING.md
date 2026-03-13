@@ -254,8 +254,10 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Define patterns using `RepoPattern.pattern(key, fallback)` with Kotlin delegation (`by`).
     - When a file contains more than one pattern, use `RepoPattern.group(prefix)` to group them under a shared key prefix.
     - Pattern variables should be named in the scheme `variableNamePattern`.
-    - All repo patterns must be accompanied by a regex test. Add lines starting with `REGEX-TEST: `
+    - All repo patterns must be accompanied by a regex test. Add lines starting with `@regexTest`
       in a KDoc comment above the pattern variable to provide test examples.
+    - Failing test cases can be added using `@regexFail`.
+    - If you need leading or trailing spaces, use `@regexTestWrapped` or `@regexFailWrapped` and double quote the test string.
     - Look at existing patterns in the codebase for reference.
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on

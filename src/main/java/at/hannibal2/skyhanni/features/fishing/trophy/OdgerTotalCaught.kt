@@ -18,7 +18,7 @@ object OdgerTotalCaught {
     private val patternGroup = RepoPattern.group("fishing.trophy.odger")
 
     /**
-     * REGEX-TEST: Discovered
+     * @regexTest Discovered
      */
     private val discoveredPattern by patternGroup.pattern(
         "discovered.new",
@@ -26,9 +26,9 @@ object OdgerTotalCaught {
     )
 
     /**
-     * REGEX-TEST: Bronze ✖
-     * REGEX-TEST: Bronze ✔ (4)
-     * REGEX-TEST: Bronze ✔ (4)
+     * @regexTest Bronze ✖
+     * @regexTest Bronze ✔ (4)
+     * @regexTest Bronze ✔ (4)
      */
     private val bronzePattern by patternGroup.pattern(
         "bronze.new",

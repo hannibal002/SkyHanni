@@ -26,7 +26,7 @@ object ArachneSpawnTimer {
     private val patternGroup = RepoPattern.group("combat.mobs.spawntime.arachne")
 
     /**
-     * REGEX-TEST: ☄ littlegremlins placed an arachne's calling! something is awakening! (4/4)
+     * @regexTest ☄ littlegremlins placed an arachne's calling! something is awakening! (4/4)
      */
     private val arachneFragmentPattern by patternGroup.pattern(
         "fragment",
@@ -34,7 +34,7 @@ object ArachneSpawnTimer {
     )
 
     /**
-     * REGEX-TEST: ☄ littlegremlins placed an arachne crystal! something is awakening!
+     * @regexTest ☄ littlegremlins placed an arachne crystal! something is awakening!
      */
     private val arachneCrystalPattern by patternGroup.pattern(
         "crystal",

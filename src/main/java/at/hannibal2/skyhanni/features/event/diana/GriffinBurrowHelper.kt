@@ -80,8 +80,8 @@ object GriffinBurrowHelper {
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
     /**
-     * REGEX-TEST: §eYou finished the Griffin burrow chain! §r§7(8/8)
-     * REGEX-TEST: §eYou dug out a Griffin Burrow! §r§7(4/8)
+     * @regexTest §eYou finished the Griffin burrow chain! §r§7(8/8)
+     * @regexTest §eYou dug out a Griffin Burrow! §r§7(4/8)
      */
     private val burrowDugPattern by patternGroup.pattern(
         "burrow-dug-capture",
@@ -89,11 +89,11 @@ object GriffinBurrowHelper {
     )
 
     /**
-     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Gaia Construct§r§e!
-     * REGEX-TEST: §c§lOi! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
-     * REGEX-TEST: §c§lOi! §r§eYou dug out §r§2Siamese Lynxes§r§e!
-     * REGEX-TEST: §c§lWoah! §r§eYou dug out a §r§2Cretan Bull§r§e!
-     * REGEX-TEST: §c§lDanger! §r§eYou dug out a §r§2Cretan Bull§r§e!
+     * @regexTest §c§lUh oh! §r§eYou dug out a §r§2Gaia Construct§r§e!
+     * @regexTest §c§lOi! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     * @regexTest §c§lOi! §r§eYou dug out §r§2Siamese Lynxes§r§e!
+     * @regexTest §c§lWoah! §r§eYou dug out a §r§2Cretan Bull§r§e!
+     * @regexTest §c§lDanger! §r§eYou dug out a §r§2Cretan Bull§r§e!
      */
     val genericMythologicalSpawnPattern by patternGroup.pattern(
         "generic-spawn",
@@ -101,9 +101,9 @@ object GriffinBurrowHelper {
     )
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §r§eYou dug out a §r§9Mythos Fragment§r§e!
-     * REGEX-TEST: §6§lWow! §r§eYou dug out §r§6120,000 coins§r§e!
-     * REGEX-TEST: §6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!
+     * @regexTest §6§lRARE DROP! §r§eYou dug out a §r§9Mythos Fragment§r§e!
+     * @regexTest §6§lWow! §r§eYou dug out §r§6120,000 coins§r§e!
+     * @regexTest §6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!
      * braided griffin feather may be crazy rare or smth
      */
     val treasureDugPattern by patternGroup.pattern(

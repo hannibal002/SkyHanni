@@ -31,7 +31,7 @@ object FossilSolverDisplay {
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
 
     /**
-     * REGEX-TEST: Chisel Charges Remaining: 3
+     * @regexTest Chisel Charges Remaining: 3
      */
     private val chargesRemainingPattern by patternGroup.pattern(
         "chargesremaining",
@@ -39,7 +39,7 @@ object FossilSolverDisplay {
     )
 
     /**
-     * REGEX-TEST: Fossil Excavation Progress: 8.3%
+     * @regexTest Fossil Excavation Progress: 8.3%
      */
     private val fossilProgressPattern by patternGroup.pattern(
         "fossilprogress",

@@ -38,8 +38,8 @@ object WoodenButtonsHelper {
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
 
     /**
-     * REGEX-TEST: §eYou have hit §r§b1/56 §r§eof the wooden buttons!
-     * REGEX-TEST: §eYou have hit §r§b10/56 §r§eof the wooden buttons!
+     * @regexTest §eYou have hit §r§b1/56 §r§eof the wooden buttons!
+     * @regexTest §eYou have hit §r§b10/56 §r§eof the wooden buttons!
      */
     private val buttonHitPattern by patternGroup.pattern(
         "hit",

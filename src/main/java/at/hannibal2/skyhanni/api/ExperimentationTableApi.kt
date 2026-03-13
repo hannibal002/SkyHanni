@@ -68,12 +68,12 @@ object ExperimentationTableApi {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: Superpairs (Metaphysical)
-     * REGEX-TEST: Chronomatron (Metaphysical)
-     * REGEX-TEST: Ultrasequencer (Metaphysical)
-     * REGEX-TEST: Experimentation Table
-     * REGEX-TEST: Experiment Over
-     * REGEX-TEST: Superpairs Rewards
+     * @regexTest Superpairs (Metaphysical)
+     * @regexTest Chronomatron (Metaphysical)
+     * @regexTest Ultrasequencer (Metaphysical)
+     * @regexTest Experimentation Table
+     * @regexTest Experiment Over
+     * @regexTest Superpairs Rewards
      */
     private val inventoriesPattern by patternGroup.pattern(
         "inventories",
@@ -81,11 +81,11 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST:  §r§8+§r§5Metaphysical Serum
-     * REGEX-TEST:  §r§8+§r§3149k Enchanting Exp
-     * REGEX-TEST: §8 +§r§3400k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§327k Enchanting Exp
-     * REGEX-TEST: §r§8+§r§7[Lvl 1] §r§5Guardian
+     * @regexTestWrapped " §r§8+§r§5Metaphysical Serum"
+     * @regexTestWrapped " §r§8+§r§3149k Enchanting Exp"
+     * @regexTest §8 +§r§3400k Enchanting Exp
+     * @regexTestWrapped " §r§8+§r§327k Enchanting Exp"
+     * @regexTest §r§8+§r§7[Lvl 1] §r§5Guardian
      */
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
@@ -93,7 +93,7 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: You claimed the Superpairs rewards!
+     * @regexTest You claimed the Superpairs rewards!
      */
     private val claimMessagePattern by patternGroup.pattern(
         "claim",
@@ -101,10 +101,10 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: 131k Enchanting Exp
-     * REGEX-TEST: 42,000 Enchanting Exp
-     * REGEX-TEST: 300,000 Enchanting Exp
-     * REGEX-TEST: 151,000 Enchanting Exp
+     * @regexTest 131k Enchanting Exp
+     * @regexTest 42,000 Enchanting Exp
+     * @regexTest 300,000 Enchanting Exp
+     * @regexTest 151,000 Enchanting Exp
      */
     private val enchantingExpPattern by patternGroup.pattern(
         "exp",
@@ -112,8 +112,8 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: Titanic Experience Bottle
-     * REGEX-TEST: Grand Experience Bottle
+     * @regexTest Titanic Experience Bottle
+     * @regexTest Grand Experience Bottle
      */
     private val experienceBottleChatPattern by patternGroup.pattern(
         "chat.xpbottle",
@@ -121,7 +121,7 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: TITANIC_EXP_BOTTLE
+     * @regexTest TITANIC_EXP_BOTTLE
      */
     val experienceBottlePattern by patternGroup.pattern(
         "xpbottle",
@@ -129,7 +129,7 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: ☕ You bought a bonus charge for the Experimentation Table! (1/3)
+     * @regexTest ☕ You bought a bonus charge for the Experimentation Table! (1/3)
      */
     val experimentRenewPattern by patternGroup.pattern(
         "renew",
@@ -137,7 +137,7 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §d§kXX§5 ULTRA-RARE BOOK! §d§kXX
+     * @regexTest §d§kXX§5 ULTRA-RARE BOOK! §d§kXX
      */
     private val ultraRarePattern by patternGroup.pattern(
         "ultrarare",
@@ -145,7 +145,7 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §9Smite VII
+     * @regexTest §9Smite VII
      */
     private val bookPattern by patternGroup.pattern(
         "book",
@@ -153,9 +153,9 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     * REGEX-TEST: §5Guardian
+     * @regexTest §dGuardian
+     * @regexTest §9Guardian§e
+     * @regexTest §5Guardian
      */
     private val guardianPetNamePattern by patternGroup.pattern(
         "guardianpet",
@@ -163,7 +163,7 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §7Stakes: §dMetaphysical
+     * @regexTest §7Stakes: §dMetaphysical
      */
     private val expOverStakesLorePattern by patternGroup.pattern(
         "inventory.experiment-over.stakes",
@@ -181,17 +181,17 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §8 +§8 §7[Lvl 1] §5Guardian
-     * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
-     * REGEX-TEST: §8 +§3151,000 Enchanting Exp (Pairs)
-     * REGEX-TEST: §8 +§8 §9Growth VI
-     * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
-     * REGEX-TEST: §8 +§3172,000 Enchanting Exp (Pairs)
-     * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
-     * REGEX-TEST: §8 +§8 §9Titanic Experience Bottle
-     * REGEX-TEST: §8 +§8 §7[Lvl 1] §6Guardian
-     * REGEX-TEST: §8 +§8 §aGrand Experience Bottle
-     * REGEX-TEST: §8 +§8 §9Blast Protection VI
+     * @regexTest §8 +§8 §7[Lvl 1] §5Guardian
+     * @regexTest §8 +§3300,000 Enchanting Exp (Stakes)
+     * @regexTest §8 +§3151,000 Enchanting Exp (Pairs)
+     * @regexTest §8 +§8 §9Growth VI
+     * @regexTest §8 +§3300,000 Enchanting Exp (Stakes)
+     * @regexTest §8 +§3172,000 Enchanting Exp (Pairs)
+     * @regexTest §8 +§3300,000 Enchanting Exp (Stakes)
+     * @regexTest §8 +§8 §9Titanic Experience Bottle
+     * @regexTest §8 +§8 §7[Lvl 1] §6Guardian
+     * @regexTest §8 +§8 §aGrand Experience Bottle
+     * @regexTest §8 +§8 §9Blast Protection VI
      */
     private val expOverRewardsLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards",
@@ -199,9 +199,9 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: Superpairs (Metaphysical)
-     * REGEX-TEST: Chronomatron (Metaphysical)
-     * REGEX-TEST: Ultrasequencer (Metaphysical)
+     * @regexTest Superpairs (Metaphysical)
+     * @regexTest Chronomatron (Metaphysical)
+     * @regexTest Ultrasequencer (Metaphysical)
      */
     private val currentTypeAndTierPattern by patternGroup.pattern(
         "inventory.experiment.current-type-and-tier",
@@ -209,8 +209,8 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: Superpairs Rewards
-     * REGEX-TEST: Experiment Over
+     * @regexTest Superpairs Rewards
+     * @regexTest Experiment Over
      */
     val expOverInventoryPattern by patternGroup.pattern(
         "inventory.experiment-over",

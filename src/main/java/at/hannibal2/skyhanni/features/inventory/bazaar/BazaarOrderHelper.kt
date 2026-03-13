@@ -28,7 +28,7 @@ object BazaarOrderHelper {
     private var highlightedSlots = mapOf<Int, LorenzColor>()
 
     /**
-     * REGEX-TEST: §a§lBUY §fWheat
+     * @regexTest §a§lBUY §fWheat
      */
     private val bazaarItemNamePattern by patternGroup.pattern(
         "itemname",
@@ -36,7 +36,7 @@ object BazaarOrderHelper {
     )
 
     /**
-     * REGEX-TEST: §7Filled: §a200§7/200 §a§l100%!
+     * @regexTest §7Filled: §a200§7/200 §a§l100%!
      */
     private val filledPattern by patternGroup.pattern(
         "filled",
@@ -44,7 +44,7 @@ object BazaarOrderHelper {
     )
 
     /**
-     * REGEX-TEST: §7Price per unit: §63.1 coins
+     * @regexTest §7Price per unit: §63.1 coins
      */
     private val pricePattern by patternGroup.pattern(
         "price",

@@ -24,7 +24,7 @@ object FriendApi {
     private val patternGroup = RepoPattern.group("data.friends")
 
     /**
-     * REGEX-TEST: §r§eYou removed §r§b[MVP§r§d+§r§b] Throwpo§r§e from your friends list!§r§9§m
+     * @regexTest §r§eYou removed §r§b[MVP§r§d+§r§b] Throwpo§r§e from your friends list!§r§9§m
      */
     private val removedFriendPattern by patternGroup.pattern(
         "remove",
@@ -32,7 +32,7 @@ object FriendApi {
     )
 
     /**
-     * REGEX-TEST: §aYou are now friends with §r§b[MVP§r§d+§r§b] Throwpo
+     * @regexTest §aYou are now friends with §r§b[MVP§r§d+§r§b] Throwpo
      */
     private val addedFriendPattern by patternGroup.pattern(
         "add",
@@ -40,7 +40,7 @@ object FriendApi {
     )
 
     /**
-     * REGEX-TEST: §r§b[MVP§r§c+§r§b] hannibal2§r§e is no longer a best friend!§r§9§m
+     * @regexTest §r§b[MVP§r§c+§r§b] hannibal2§r§e is no longer a best friend!§r§9§m
      */
     private val noBestFriendPattern by patternGroup.pattern(
         "removebest",
@@ -48,7 +48,7 @@ object FriendApi {
     )
 
     /**
-     * REGEX-TEST: §r§b[MVP§r§c+§r§b] hannibal2§r§a is now a best friend!§r§9§m
+     * @regexTest §r§b[MVP§r§c+§r§b] hannibal2§r§a is now a best friend!§r§9§m
      */
     private val bestFriendPattern by patternGroup.pattern(
         "addbest",
@@ -56,7 +56,7 @@ object FriendApi {
     )
 
     /**
-     * REGEX-TEST: §eClick here to view §bThrowpo§e's profile
+     * @regexTest §eClick here to view §bThrowpo§e's profile
      */
     private val rawNamePattern by patternGroup.pattern(
         "rawname",
@@ -64,7 +64,7 @@ object FriendApi {
     )
 
     /**
-     * REGEX-TEST: /viewprofile 503450fc-72c2-4e87-8243-94e264977437
+     * @regexTest /viewprofile 503450fc-72c2-4e87-8243-94e264977437
      */
     private val readFriendListPattern by patternGroup.pattern(
         "readfriends",

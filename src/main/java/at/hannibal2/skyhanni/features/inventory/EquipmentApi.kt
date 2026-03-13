@@ -50,7 +50,7 @@ object EquipmentApi {
     private val repoGroup = RepoPattern.group("data.equipment")
 
     /**
-     * REGEX-TEST: §aYou equipped a §r§dSnowy Gillsplash Cloak§r§a!
+     * @regexTest §aYou equipped a §r§dSnowy Gillsplash Cloak§r§a!
      */
     private val chatEquipRegex by repoGroup.pattern(
         "chat.equip",

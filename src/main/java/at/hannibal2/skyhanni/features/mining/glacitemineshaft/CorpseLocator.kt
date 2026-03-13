@@ -30,9 +30,9 @@ object CorpseLocator {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
 
     /**
-     * REGEX-TEST: x: -164, y: 8, z: -154 | (Lapis Corpse)
-     * REGEX-TEST: x: 141, y: 14, z: -131
-     * REGEX-TEST: x: -9, y: 135, z: 20 | (Tungsten Corpse)
+     * @regexTest x: -164, y: 8, z: -154 | (Lapis Corpse)
+     * @regexTest x: 141, y: 14, z: -131
+     * @regexTest x: -9, y: 135, z: 20 | (Tungsten Corpse)
      */
     private val mineshaftCoordsPattern by RepoPattern.pattern(
         "mineshaft.corpse.coords",

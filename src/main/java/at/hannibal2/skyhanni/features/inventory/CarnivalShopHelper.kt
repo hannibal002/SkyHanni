@@ -49,8 +49,8 @@ object CarnivalShopHelper {
     private val patternGroup = RepoPattern.group("inventory.carnival-shop-helper")
 
     /**
-     * REGEX-TEST: §7Your Tokens: §a1,234,567
-     * REGEX-TEST: §7Your Tokens: §a0
+     * @regexTest §7Your Tokens: §a1,234,567
+     * @regexTest §7Your Tokens: §a0
      */
     private val currentTokenCountPattern by patternGroup.pattern(
         "carnival.tokens.current",
@@ -58,8 +58,8 @@ object CarnivalShopHelper {
     )
 
     /**
-     * REGEX-TEST: §8Souvenir Shop
-     * REGEX-TEST: §8Carnival Perks
+     * @regexTest §8Souvenir Shop
+     * @regexTest §8Carnival Perks
      */
     private val overviewInventoryNamesPattern by patternGroup.pattern(
         "carnival.overviewinventories",

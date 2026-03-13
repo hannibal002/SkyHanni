@@ -34,7 +34,7 @@ import net.minecraft.world.item.ItemStack
 object CommunityFix {
 
     /**
-     * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
+     * @regexTest §2§l§m       §f§l§m             §r §e676,985§6/§e2M
      */
     private val amountPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",

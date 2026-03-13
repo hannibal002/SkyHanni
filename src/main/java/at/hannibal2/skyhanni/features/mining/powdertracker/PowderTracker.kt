@@ -43,7 +43,7 @@ object PowderTracker {
     )
 
     /**
-     * REGEX-TEST: §b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!
+     * @regexTest §b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!
      */
     private val compactedPattern by patternGroup.pattern(
         "compacted",

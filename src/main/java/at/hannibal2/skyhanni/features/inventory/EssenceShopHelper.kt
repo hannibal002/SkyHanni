@@ -69,8 +69,8 @@ object EssenceShopHelper {
     private val patternGroup = RepoPattern.group("inventory.essence-shop-helper")
 
     /**
-     * REGEX-TEST: Gold Essence Shop
-     * REGEX-TEST: Wither Essence Shop
+     * @regexTest Gold Essence Shop
+     * @regexTest Wither Essence Shop
      */
     private val essenceShopPattern by patternGroup.pattern(
         "essence.shop",
@@ -78,8 +78,8 @@ object EssenceShopHelper {
     )
 
     /**
-     * REGEX-TEST: §7Your Undead Essence: §d12,664
-     * REGEX-TEST: §7Your Wither Essence: §d2,275
+     * @regexTest §7Your Undead Essence: §d12,664
+     * @regexTest §7Your Wither Essence: §d2,275
      */
     private val currentEssenceCountPattern by patternGroup.pattern(
         "essence.current",
@@ -87,7 +87,7 @@ object EssenceShopHelper {
     )
 
     /**
-     * REGEX-TEST: §a§lUNLOCKED
+     * @regexTest §a§lUNLOCKED
      */
     val maxedUpgradeLorePattern by patternGroup.pattern(
         "essence.maxedupgrade",
@@ -95,9 +95,9 @@ object EssenceShopHelper {
     )
 
     /**
-     * REGEX-TEST: §aHigh Roller I
-     * REGEX-TEST: §aForbidden Speed III
-     * REGEX-TEST: §aReturn to Sender X
+     * @regexTest §aHigh Roller I
+     * @regexTest §aForbidden Speed III
+     * @regexTest §aReturn to Sender X
      */
     val essenceUpgradePattern by patternGroup.pattern(
         "essence.upgrade",

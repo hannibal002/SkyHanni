@@ -45,11 +45,11 @@ object RareMobWaypointShare {
     private val patternGroup = RepoPattern.group("diana.waypoints.inquisitor")
 
     /**
-     * REGEX-TEST: §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: -6.7
-     * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 -3
-     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
-     * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
-     * REGEX-TEST: §9Party §8> §b[MVP§5+§b] Throwpo§f: §rx: -144, y: 59, z: -119 | Sphinx
+     * @regexTest §9Party §8> User Name§f: §rx: 2.3, y: 4.5, z: -6.7
+     * @regexTest §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 -3
+     * @regexTest §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     * @regexTest §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
+     * @regexTest §9Party §8> §b[MVP§5+§b] Throwpo§f: §rx: -144, y: 59, z: -119 | Sphinx
      */
     @Suppress("MaxLineLength")
     private val rareMobCoordsPattern by patternGroup.list(
@@ -59,8 +59,8 @@ object RareMobWaypointShare {
     )
 
     /**
-     * REGEX-TEST: §9Party §8> User Name§f: §rInquisitor dead!
-     * REGEX-TEST: §9Party §8> User Name§f: §rRare Diana Mob dead!
+     * @regexTest §9Party §8> User Name§f: §rInquisitor dead!
+     * @regexTest §9Party §8> User Name§f: §rRare Diana Mob dead!
      */
     private val diedPattern by patternGroup.pattern(
         "died",
@@ -68,7 +68,7 @@ object RareMobWaypointShare {
     )
 
     /**
-     * REGEX-TEST: §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
+     * @regexTest §c§lUh oh! §r§eYou dug out a §r§2Minos Inquisitor§r§e!
      */
     private val rareMobFoundChatPattern by patternGroup.pattern(
         "dug",

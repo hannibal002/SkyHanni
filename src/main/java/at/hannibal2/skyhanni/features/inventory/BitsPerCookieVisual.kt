@@ -26,24 +26,24 @@ object BitsPerCookieVisual {
     private val patternGroup = RepoPattern.group("cookie.bits.new")
 
     /**
-     * REGEX-TEST: §dBooster Cookie
-     * REGEX-FAIL: §6Booster Cookie
+     * @regexTest §dBooster Cookie
+     * @regexFail §6Booster Cookie
      */
     private val wrongCookiePattern by patternGroup.pattern(
         "wrong", "§[de]Booster Cookie",
     )
 
     /**
-     * REGEX-TEST: Amount: 1x
-     * REGEX-TEST: Amount: 1x
-     * REGEX-TEST: Booster Cookie x6
+     * @regexTest Amount: 1x
+     * @regexTest Amount: 1x
+     * @regexTest Booster Cookie x6
      */
     private val amountPattern by patternGroup.pattern(
         "amount", "(?:Booster Cookie x|Amount: )(?<amount>\\d+).*",
     )
 
     /**
-     * REGEX-TEST: 4 days:
+     * @regexTest 4 days:
      */
     private val timePattern by patternGroup.pattern(
         "time", "4 days:",

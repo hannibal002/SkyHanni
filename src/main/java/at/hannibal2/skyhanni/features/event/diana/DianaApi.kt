@@ -53,10 +53,10 @@ object DianaApi {
     private val group = RepoPattern.group("event-diana")
 
     /**
-     * REGEX-TEST: Minos Inquisitor
-     * REGEX-TEST: Sphinx
-     * REGEX-TEST: King Minos
-     * REGEX-TEST: Manticore
+     * @regexTest Minos Inquisitor
+     * @regexTest Sphinx
+     * @regexTest King Minos
+     * @regexTest Manticore
      */
     private val rareDianaMobNamePattern by group.pattern(
         "rare-mob-name",

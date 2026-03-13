@@ -44,7 +44,7 @@ object NonGodPotEffectDisplay {
     fun isActive(effect: NonGodPotEffect): Boolean = effectDuration.any { it.key == effect && !it.value.ended }
 
     /**
-     * REGEX-TEST: You have 10 non-god effects.
+     * @regexTest You have 10 non-god effects.
      */
     private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects.colorless",

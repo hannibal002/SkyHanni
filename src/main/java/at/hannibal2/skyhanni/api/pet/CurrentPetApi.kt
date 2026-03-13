@@ -23,8 +23,8 @@ object CurrentPetApi {
     val patternGroup = RepoPattern.group("misc.pet")
 
     /**
-     * REGEX-TEST: §aYou summoned your §r§dRabbit§r§9 ✦§r§a!
-     * REGEX-TEST: §aYou summoned your §r§6Golden Dragon§r§a!
+     * @regexTest §aYou summoned your §r§dRabbit§r§9 ✦§r§a!
+     * @regexTest §aYou summoned your §r§6Golden Dragon§r§a!
      */
     private val chatSummonPattern by patternGroup.pattern(
         "chat.summon",

@@ -32,7 +32,7 @@ object WardrobeApi {
     private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
-     * REGEX-TEST: Wardrobe (2/2)
+     * @regexTest Wardrobe (2/2)
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory.name",
@@ -40,7 +40,7 @@ object WardrobeApi {
     )
 
     /**
-     * REGEX-TEST: §7Slot 4: §aEquipped
+     * @regexTest §7Slot 4: §aEquipped
      */
     private val equippedSlotPattern by patternGroup.pattern(
         "equippedslot",

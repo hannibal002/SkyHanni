@@ -49,7 +49,7 @@ object FrogMaskFeatures {
     private val patternGroup = RepoPattern.group("misc.frogmask")
 
     /**
-     * REGEX-TEST: §7Today's region: §aDark Thicket
+     * @regexTest §7Today's region: §aDark Thicket
      */
     private val activeRegionPattern by patternGroup.pattern(
         "description.active",

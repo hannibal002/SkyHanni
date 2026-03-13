@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object LockMouseLook {
     /**
-     * REGEX-TEST: §aTeleported you to §r§aPlot
+     * @regexTest §aTeleported you to §r§aPlot
      */
     private val gardenTeleportPattern by RepoPattern.Companion.pattern(
         "chat.garden.teleport",

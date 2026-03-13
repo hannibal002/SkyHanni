@@ -452,8 +452,8 @@ enum class HotmData(
 
         // <editor-fold desc="Patterns">
         /**
-         * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
-         * REGEX-TEST: §7Level 1§8/50
+         * @regexTest §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
+         * @regexTest §7Level 1§8/50
          */
         override val levelPattern by patternGroup.pattern(
             "perk.level",
@@ -461,10 +461,10 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST: §7§cRequires Mining Speed
-         * REGEX-TEST: §7§cRequires Tier 10
-         * REGEX-TEST: §5Mountain§c!
-         * REGEX-TEST: §7§eClick to unlock!
+         * @regexTest §7§cRequires Mining Speed
+         * @regexTest §7§cRequires Tier 10
+         * @regexTest §5Mountain§c!
+         * @regexTest §7§eClick to unlock!
          */
         override val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
@@ -472,8 +472,8 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST: §a§lSELECTED
-         * REGEX-TEST: §a§lENABLED
+         * @regexTest §a§lSELECTED
+         * @regexTest §a§lENABLED
          */
         override val enabledPattern by patternGroup.pattern(
             "perk.enable",
@@ -481,8 +481,8 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST: §eClick to select!
-         * REGEX-TEST: §c§lDISABLED
+         * @regexTest §eClick to select!
+         * @regexTest §c§lDISABLED
          */
         @Suppress("UnusedPrivateProperty")
         private val disabledPattern by patternGroup.pattern(
@@ -492,7 +492,7 @@ enum class HotmData(
         // but the value might be useful in the future or for debugging
 
         /**
-         * REGEX-TEST: Cost
+         * @regexTest Cost
          */
         val perkCostPattern by patternGroup.pattern(
             "perk.cost.new",
@@ -514,7 +514,7 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST: §7Token of the Mountain: §515
+         * @regexTest §7Token of the Mountain: §515
          */
         override val heartTokensPattern by patternGroup.pattern(
             "inventory.heart.token",
@@ -522,7 +522,7 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:   §8- §54 Token of the Mountain
+         * @regexTestWrapped "  §8- §54 Token of the Mountain"
          */
         override val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
@@ -535,8 +535,8 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: 99,918
-         * REGEX-TEST:  Gemstone: 37,670
+         * @regexTestWrapped " Mithril: 99,918"
+         * @regexTestWrapped " Gemstone: 37,670"
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder-nocolor",

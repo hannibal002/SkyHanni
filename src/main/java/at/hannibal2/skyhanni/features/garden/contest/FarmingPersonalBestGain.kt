@@ -26,7 +26,7 @@ object FarmingPersonalBestGain {
     private var personalBestIncrements = mapOf<CropType, Int>()
 
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
+     * @regexTest §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
      */
     private val newPattern by patternGroup.pattern(
         "collection.new",
@@ -34,7 +34,7 @@ object FarmingPersonalBestGain {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour previous Personal Best was §e1,176,372§f.
+     * @regexTest §e[NPC] Jacob§f: §rYour previous Personal Best was §e1,176,372§f.
      */
     private val oldPattern by patternGroup.pattern(
         "collection.old",
@@ -42,7 +42,7 @@ object FarmingPersonalBestGain {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69☘ Potato Fortune§f!
+     * @regexTest §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69☘ Potato Fortune§f!
      *
      */
     private val newFFPattern by patternGroup.pattern(

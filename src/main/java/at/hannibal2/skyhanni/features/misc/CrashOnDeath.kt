@@ -15,7 +15,7 @@ object CrashOnDeath {
     private val config get() = SkyHanniMod.feature.misc
 
     /**
-     * REGEX-TEST: §c ☠ §r§7You were killed by §r§4§lMagma Boss§r§7§r§7.
+     * @regexTest §c ☠ §r§7You were killed by §r§4§lMagma Boss§r§7§r§7.
      */
     private val pattern by RepoPattern.pattern(
         "ownplayer.death.chat",

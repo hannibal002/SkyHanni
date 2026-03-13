@@ -10,16 +10,16 @@ object UtilsPatterns {
     private val patternGroup = RepoPattern.group("utils")
 
     /**
-     * REGEX-TEST: §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
-     * REGEX-TEST: §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
-     * REGEX-TEST: §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
-     * REGEX-TEST: §6§lSHINY LEGENDARY DUNGEON BOOTS
-     * REGEX-TEST: §6§lLEGENDARY DUNGEON BOOTS
-     * REGEX-TEST: §5§lEPIC BOOTS
-     * REGEX-TEST: §f§lCOMMON
-     * REGEX-TEST: §f§lCOMMON COMBAT SHARD §8(ID C9)
-     * REGEX-TEST: §7Rarity: §6§lLEGENDARY
-     * REGEX-TEST: §7Rarity: §9§lRARE
+     * @regexTest §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
+     * @regexTest §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+     * @regexTest §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
+     * @regexTest §6§lSHINY LEGENDARY DUNGEON BOOTS
+     * @regexTest §6§lLEGENDARY DUNGEON BOOTS
+     * @regexTest §5§lEPIC BOOTS
+     * @regexTest §f§lCOMMON
+     * @regexTest §f§lCOMMON COMBAT SHARD §8(ID C9)
+     * @regexTest §7Rarity: §6§lLEGENDARY
+     * @regexTest §7Rarity: §9§lRARE
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
@@ -29,7 +29,7 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §5Abiphone XIII Pro Giga
+     * @regexTest §5Abiphone XIII Pro Giga
      */
     val abiPhonePattern by patternGroup.pattern(
         "item.name.abiphone",
@@ -37,8 +37,8 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §fEnchanted Book
-     * REGEX-TEST: §f§f§fEnchanted Book
+     * @regexTest §fEnchanted Book
+     * @regexTest §f§f§fEnchanted Book
      */
     val enchantedBookPattern by patternGroup.pattern(
         "item.name.enchanted.book",
@@ -46,8 +46,8 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: Obfuscated
-     * REGEX-TEST: Hot Bait
+     * @regexTest Obfuscated
+     * @regexTest Hot Bait
      */
     val baitPattern by patternGroup.pattern(
         "item.name.bait",
@@ -60,9 +60,9 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: duplex i
-     * REGEX-TEST: ultimate wise v
-     * REGEX-TEST: chimera 2
+     * @regexTest duplex i
+     * @regexTest ultimate wise v
+     * @regexTest chimera 2
      */
     val cleanEnchantedNamePattern by patternGroup.pattern(
         "item.enchantment.clean.name",
@@ -75,8 +75,8 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: 8x Enchanted Pork
-     * REGEX-TEST:   §810x §r§bGlacite Jewel
+     * @regexTest 8x Enchanted Pork
+     * @regexTestWrapped "  §810x §r§bGlacite Jewel"
      */
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
@@ -88,7 +88,7 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §7Cost
+     * @regexTest §7Cost
      */
     val costLinePattern by patternGroup.pattern(
         "item.cost.line",
@@ -107,7 +107,7 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: 8[§r§2164§r§8] §r§7❤ §r§a[VIP§6+§a] Heaven_Reaper§f§r§f: stop
+     * @regexTest 8[§r§2164§r§8] §r§7❤ §r§a[VIP§6+§a] Heaven_Reaper§f§r§f: stop
      */
     val chatUsernamePattern by patternGroup.pattern(
         "string.chatusername",
@@ -119,7 +119,7 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §5Large Enchanted Husbandry Sack
+     * @regexTest §5Large Enchanted Husbandry Sack
      */
     val sackPattern by patternGroup.pattern(
         "item.sack",
@@ -127,15 +127,15 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §5§kX§5 Rift-Transferable §kX
+     * @regexTest §5§kX§5 Rift-Transferable §kX
      */
     val riftTransferablePattern by patternGroup.pattern(
         "item.rift.transferable",
         "§5§kX§5 Rift-Transferable §kX",
     )
     /**
-     * REGEX-TEST: §5§kX§5 Rift-Exportable §kX
-     * REGEX-TEST: §5§kX§5 Rift-Exported §kX
+     * @regexTest §5§kX§5 Rift-Exportable §kX
+     * @regexTest §5§kX§5 Rift-Exported §kX
      */
     val riftExportablePattern by patternGroup.pattern(
         "item.rift.exportable",
@@ -143,9 +143,9 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: Late Winter
-     * REGEX-TEST: Early Spring
-     * REGEX-TEST: Summer
+     * @regexTest Late Winter
+     * @regexTest Early Spring
+     * @regexTest Summer
      */
     val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
@@ -153,8 +153,8 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §l§r§e§lProfile: §r§aApple §r§7♲
-     * REGEX-TEST: §l§r§e§lProfile: §r§aNot Allowed To Quit Skyblock Ever Again
+     * @regexTest §l§r§e§lProfile: §r§aApple §r§7♲
+     * @regexTest §l§r§e§lProfile: §r§aNot Allowed To Quit Skyblock Ever Again
      */
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
@@ -162,8 +162,8 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: oxsss
-     * REGEX-TEST: Gillsplash
+     * @regexTest oxsss
+     * @regexTest Gillsplash
      */
     val playerNamePattern by patternGroup.pattern(
         "string.playername",
@@ -181,12 +181,12 @@ object UtilsPatterns {
     )
 
     /**
-     * REGEX-TEST: §7Source: §fVerdant Shard §8(C11)
-     * REGEX-TEST: §7Source: §9Drowned Shard §8(R18)
-     * REGEX-TEST: §7Source: §5Barbarian Duke X Shard §8(E27)
-     * REGEX-TEST: §7Source: §6Galaxy Fish Shard §8(L41)
-     * REGEX-TEST: §7Source: §6Starborn Shard §8(L44)
-     * REGEX-TEST: §7Source: §fSea Archer Shard §8(C14)
+     * @regexTest §7Source: §fVerdant Shard §8(C11)
+     * @regexTest §7Source: §9Drowned Shard §8(R18)
+     * @regexTest §7Source: §5Barbarian Duke X Shard §8(E27)
+     * @regexTest §7Source: §6Galaxy Fish Shard §8(L41)
+     * @regexTest §7Source: §6Starborn Shard §8(L44)
+     * @regexTest §7Source: §fSea Archer Shard §8(C14)
      */
     val attributeSourcePattern by patternGroup.pattern(
         "attribute.shard.source",

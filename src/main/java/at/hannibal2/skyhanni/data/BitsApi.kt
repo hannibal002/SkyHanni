@@ -68,7 +68,7 @@ object BitsApi {
 
     // Scoreboard patterns
     /**
-     * REGEX-TEST: Bits: §b140,965
+     * @regexTest Bits: §b140,965
      */
     val bitsScoreboardPattern by bitsDataGroup.pattern(
         "scoreboard",
@@ -79,7 +79,7 @@ object BitsApi {
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
     /**
-     * REGEX-TEST: §eYou gained §317,664 Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!
+     * @regexTest §eYou gained §317,664 Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!
      */
     @Suppress("MaxLineLength")
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
@@ -88,7 +88,7 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §6  §6§lFAME RANK UP §eStatesperson
+     * @regexTest §6  §6§lFAME RANK UP §eStatesperson
      */
     private val fameRankUpPattern by bitsChatGroup.pattern(
         "rankup.rank",
@@ -96,9 +96,9 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §eYou consumed a §6Booster Cookie§e! §dYummy!
-     * REGEX-TEST: §eYou consumed a §6Booster Cookie§e!
-     * REGEX-TEST: §eYou consumed a §6Booster Cookie§e! §dDivine!
+     * @regexTest §eYou consumed a §6Booster Cookie§e! §dYummy!
+     * @regexTest §eYou consumed a §6Booster Cookie§e!
+     * @regexTest §eYou consumed a §6Booster Cookie§e! §dDivine!
      */
     private val boosterCookieAte by bitsChatGroup.pattern(
         "boostercookieate",
@@ -109,7 +109,7 @@ object BitsApi {
     private val bitsGuiGroup = bitsDataGroup.group("gui")
 
     /**
-     * REGEX-TEST: §7Bits Available: §b19,176
+     * @regexTest §7Bits Available: §b19,176
      */
     private val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
         "availablemenu",
@@ -117,7 +117,7 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §7Bits Purse: §b283,149
+     * @regexTest §7Bits Purse: §b283,149
      */
     private val bitsPurseMenuPattern by bitsGuiGroup.pattern(
         "bitsmenu",
@@ -125,7 +125,7 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §7Your rank: §eAttaché
+     * @regexTest §7Your rank: §eAttaché
      */
     private val fameRankSBMenuPattern by bitsGuiGroup.pattern(
         "sbmenufamerank",
@@ -133,7 +133,7 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST:  §7Duration: §a140d 8h 35m 36s
+     * @regexTestWrapped " §7Duration: §a140d 8h 35m 36s"
      */
     private val cookieDurationPattern by bitsGuiGroup.pattern(
         "cookieduration",
@@ -146,8 +146,8 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §7§cYou do not currently have a
-     * REGEX-TEST: §cBooster Cookie active!
+     * @regexTest §7§cYou do not currently have a
+     * @regexTest §cBooster Cookie active!
      */
     private val noCookieActiveCookieMenuPattern by bitsGuiGroup.pattern(
         "cookiemenucookieactive",
@@ -155,7 +155,7 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §7Fame Rank: §eAttaché
+     * @regexTest §7Fame Rank: §eAttaché
      */
     private val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
         "communityshopfamerank",
@@ -173,8 +173,8 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: Community Shop
-     * REGEX-TEST: Booster Cookie
+     * @regexTest Community Shop
+     * @regexTest Booster Cookie
      */
     private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
         "famerankmenuname",
@@ -182,8 +182,8 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: Community Shop
-     * REGEX-TEST: Fame Rank
+     * @regexTest Community Shop
+     * @regexTest Fame Rank
      */
     private val fameRankGuiStackPattern by bitsGuiGroup.pattern(
         "famerankmenustack",
@@ -201,8 +201,8 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST: §7§7Milestone: §e11§6/§e30
-     * REGEX-TEST: §7§7Milestone: §e20§6/§e40
+     * @regexTest §7§7Milestone: §e11§6/§e30
+     * @regexTest §7§7Milestone: §e20§6/§e40
      */
     private val museumMilestonePattern by bitsGuiGroup.pattern(
         "museummilestone",

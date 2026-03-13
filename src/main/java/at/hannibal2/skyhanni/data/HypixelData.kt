@@ -56,8 +56,8 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §ewww.hypixel.net
-     * REGEX-TEST: §ealpha.hypixel.net
+     * @regexTest §ewww.hypixel.net
+     * @regexTest §ealpha.hypixel.net
      */
     private val serverNameScoreboardPattern by patternGroup.pattern(
         "servername.scoreboard",
@@ -65,8 +65,8 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §711/15/24 §8m19CJ
-     * REGEX-TEST: §711/15/24 §8m1F
+     * @regexTest §711/15/24 §8m19CJ
+     * @regexTest §711/15/24 §8m1F
      */
     private val serverIdScoreboardPattern by patternGroup.pattern(
         "serverid.scoreboard",
@@ -78,7 +78,7 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: [441] Throwpo ♲
+     * @regexTest [441] Throwpo ♲
      */
     private val playerAmountOnIslandPattern by patternGroup.pattern(
         "playeramount.onisland-nocolor",
@@ -86,8 +86,8 @@ object HypixelData {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §a✌ §7(§a11§7/20)"
-     * WRAPPED-REGEX-TEST: " §a✌ §7(§e1/1§7)"
+     * @regexTestWrapped " §a✌ §7(§a11§7/20)"
+     * @regexTestWrapped " §a✌ §7(§e1/1§7)"
      */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
@@ -99,12 +99,12 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: SKYBLOCK
-     * REGEX-TEST: SKYBLOCK GUEST
-     * REGEX-TEST: SKYBLOCK CO-OP
-     * REGEX-TEST: SKYBLOCK ♲
-     * REGEX-TEST: SKYBLOCK ☀
-     * REGEX-TEST: SKYBLOCK Ⓑ
+     * @regexTest SKYBLOCK
+     * @regexTest SKYBLOCK GUEST
+     * @regexTest SKYBLOCK CO-OP
+     * @regexTest SKYBLOCK ♲
+     * @regexTest SKYBLOCK ☀
+     * @regexTest SKYBLOCK Ⓑ
      *
      */
     private val scoreboardTitlePattern by patternGroup.pattern(
@@ -113,8 +113,8 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:  §7⏣ §bVillage
-     * REGEX-TEST:  §5ф §dWizard Tower
+     * @regexTestWrapped " §7⏣ §bVillage"
+     * @regexTestWrapped " §5ф §dWizard Tower"
      */
     private val skyblockAreaPattern by patternGroup.pattern(
         "skyblock.area",

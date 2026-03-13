@@ -64,11 +64,11 @@ object BazaarApi {
     private val patternGroup = RepoPattern.group("inventory.bazaar")
 
     /**
-     * REGEX-TEST: [Bazaar] Bought 1x Small Storage for 3,999.5 coins!
-     * REGEX-TEST: [Bazaar] Sold 1x Coal for 4.2 coins!
-     * REGEX-TEST: [Bazaar] Buy Order Setup! 1x Coal for 4.4 coins.
-     * REGEX-TEST: [Bazaar] Order Flipped! 5x Coal for 13.0 coins of total expected profit.
-     * REGEX-TEST: [Bazaar] Sell Offer Setup! 447,199x Spider Essence for 486,999,711 coins.
+     * @regexTest [Bazaar] Bought 1x Small Storage for 3,999.5 coins!
+     * @regexTest [Bazaar] Sold 1x Coal for 4.2 coins!
+     * @regexTest [Bazaar] Buy Order Setup! 1x Coal for 4.4 coins.
+     * @regexTest [Bazaar] Order Flipped! 5x Coal for 13.0 coins of total expected profit.
+     * @regexTest [Bazaar] Sell Offer Setup! 447,199x Spider Essence for 486,999,711 coins.
      */
     @Suppress("MaxLineLength")
     private val transactionPattern by patternGroup.pattern(
@@ -77,11 +77,11 @@ object BazaarApi {
     )
 
     /**
-     * REGEX-TEST: Bazaar ➜ Coal
-     * REGEX-TEST: How many do you want?
-     * REGEX-TEST: Confirm Buy Order
-     * REGEX-TEST: Confirm Buy Order
-     * REGEX-TEST: Order options
+     * @regexTest Bazaar ➜ Coal
+     * @regexTest How many do you want?
+     * @regexTest Confirm Buy Order
+     * @regexTest Confirm Buy Order
+     * @regexTest Order options
      */
     private val inventoryNamePattern by patternGroup.list(
         "inventory-name",
@@ -96,8 +96,8 @@ object BazaarApi {
     )
 
     /**
-     * REGEX-TEST: Your Bazaar Orders
-     * REGEX-TEST: Co-op Bazaar Orders
+     * @regexTest Your Bazaar Orders
+     * @regexTest Co-op Bazaar Orders
      */
     private val inventoryBazaarOrdersPattern by patternGroup.list(
         "inventory-bazaar-orders",
@@ -106,7 +106,7 @@ object BazaarApi {
     )
 
     /**
-     * REGEX-TEST: §8Current tax: 1%
+     * @regexTest §8Current tax: 1%
      */
     private val taxPattern by patternGroup.pattern(
         "instantsell.tax",

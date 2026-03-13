@@ -25,7 +25,7 @@ object AnitaExtraFarmingFortune {
     private val config get() = GardenApi.config.anitaShop
 
     /**
-     * REGEX-TEST: Jacob's Ticket x450
+     * @regexTest Jacob's Ticket x450
      */
     private val realAmountPattern by RepoPattern.pattern(
         "garden.inventory.anita.extrafortune.realamount.new",

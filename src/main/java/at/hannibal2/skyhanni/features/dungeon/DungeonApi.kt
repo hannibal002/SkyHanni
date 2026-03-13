@@ -78,8 +78,8 @@ object DungeonApi {
     private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
 
     /**
-     * REGEX-TEST: Time Elapsed: §a01m 17s
-     * REGEX-TEST: Time Elapsed: §a14s
+     * @regexTest Time Elapsed: §a01m 17s
+     * @regexTest Time Elapsed: §a14s
      */
     private val timePattern by patternGroup.pattern(
         "time",
@@ -87,7 +87,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
+     * @regexTestWrapped "                                 Master Mode The Catacombs - Floor V"
      */
     private val dungeonComplete by patternGroup.pattern(
         "completecolorless",
@@ -95,7 +95,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: §711/15/24 §8m4F 830,-420
+     * @regexTest §711/15/24 §8m4F 830,-420
      */
     val dungeonRoomPattern by patternGroup.pattern(
         "room",
@@ -103,7 +103,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: §r§r§fBlessing of Power V§r
+     * @regexTest §r§r§fBlessing of Power V§r
      */
     private val blessingPattern by patternGroup.pattern(
         "blessings.colorless",
@@ -115,10 +115,10 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: [319] Empa_ α (Mage XXXIV)
-     * REGEX-TEST: [393] [YOUTUBE] Remittal Σ♲ (Mage XL)
-     * REGEX-TEST: [273] Ovi_1 Ӄ (Mage XXXVI)
-     * REGEX-TEST: [273] Ovi_1 Ӄ (DEAD)
+     * @regexTest [319] Empa_ α (Mage XXXIV)
+     * @regexTest [393] [YOUTUBE] Remittal Σ♲ (Mage XL)
+     * @regexTest [273] Ovi_1 Ӄ (Mage XXXVI)
+     * @regexTest [273] Ovi_1 Ӄ (DEAD)
      */
     @Suppress("MaxLineLength")
     val playerDungeonTeamPattern by patternGroup.pattern(

@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack
 object CropAccessoryData {
 
     /**
-     * REGEX-TEST: Accessory Bag (1/2)
+     * @regexTest Accessory Bag (1/2)
      */
     private val accessoryBagNamePattern by RepoPattern.pattern(
         "data.accessory.bagname.new",

@@ -33,10 +33,10 @@ object DraconicSacrificeTracker {
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
 
     /**
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Boots §r§einto §r§d3 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Helmet §r§einto §r§d3 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Old Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Wise Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
+     * @regexTest §c§lSACRIFICE! §r§eYou turned §r§5Ender Boots §r§einto §r§d3 Dragon Essence§r§e!
+     * @regexTest §c§lSACRIFICE! §r§eYou turned §r§5Ender Helmet §r§einto §r§d3 Dragon Essence§r§e!
+     * @regexTest §c§lSACRIFICE! §r§eYou turned §r§6Old Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
+     * @regexTest §c§lSACRIFICE! §r§eYou turned §r§6Wise Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
      */
     private val sacrificeLoot by patternGroup.pattern(
         "sacrifice",
@@ -44,7 +44,7 @@ object DraconicSacrificeTracker {
     )
 
     /**
-     * REGEX-TEST: §c§lBONUS LOOT! §r§eYou also received §r§817x §r§5Wise Dragon Fragment §r§efrom your sacrifice!
+     * @regexTest §c§lBONUS LOOT! §r§eYou also received §r§817x §r§5Wise Dragon Fragment §r§efrom your sacrifice!
      */
     private val bonusLoot by patternGroup.pattern(
         "bonus",

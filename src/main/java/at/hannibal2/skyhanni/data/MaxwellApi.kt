@@ -62,7 +62,7 @@ object MaxwellApi {
     private val patternGroup = RepoPattern.group("data.maxwell")
 
     /**
-     * REGEX-TEST: §eYou selected the §aSighted §epower for your §aAccessory Bag§e!
+     * @regexTest §eYou selected the §aSighted §epower for your §aAccessory Bag§e!
      */
     private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
@@ -70,7 +70,7 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §eYour selected power was set to §r§aSighted§r§e!
+     * @regexTest §eYour selected power was set to §r§aSighted§r§e!
      */
     private val chatPowerUnlockedPattern by patternGroup.pattern(
         "chat.power.unlocked",
@@ -78,7 +78,7 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7Selected Power: §aSighted
+     * @regexTest §7Selected Power: §aSighted
      */
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
@@ -86,7 +86,7 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7Magical Power: §6419
+     * @regexTest §7Magical Power: §6419
      */
     private val inventoryMPPattern by patternGroup.pattern(
         "inventory.magicalpower",
@@ -106,7 +106,7 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7Total: §6419 Magical Power
+     * @regexTest §7Total: §6419 Magical Power
      */
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
@@ -118,8 +118,8 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7You have: §b1,347 §7+ §b6 ✎
-     * REGEX-TEST: §7You have: §a812 §7+ §a3 ❈
+     * @regexTest §7You have: §b1,347 §7+ §b6 ✎
+     * @regexTest §7You have: §a812 §7+ §a3 ❈
      */
     private val statsTuningDataPattern by patternGroup.pattern(
         "thaumaturgy.statstuning",
@@ -143,7 +143,7 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §aAccessory Bag
+     * @regexTest §aAccessory Bag
      */
     private val accessoryBagStack by patternGroup.pattern(
         "stack.accessorybag",
@@ -151,7 +151,7 @@ object MaxwellApi {
     )
 
     /**
-     * REGEX-TEST: §7§c§cRequires §aRedstone Collection II§c.
+     * @regexTest §7§c§cRequires §aRedstone Collection II§c.
      */
     private val redstoneCollectionRequirementPattern by patternGroup.pattern(
         "collection.redstone.requirement",

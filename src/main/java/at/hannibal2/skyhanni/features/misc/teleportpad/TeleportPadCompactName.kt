@@ -15,7 +15,7 @@ object TeleportPadCompactName {
     private val patternGroup = RepoPattern.group("misc.teleportpad")
 
     /**
-     * REGEX-TEST: §a✦ §aWarp To §9Blue
+     * @regexTest §a✦ §aWarp To §9Blue
      */
     private val namePattern by patternGroup.pattern(
         "name",
@@ -23,7 +23,7 @@ object TeleportPadCompactName {
     )
 
     /**
-     * REGEX-TEST: §c✦ §cNo Destination
+     * @regexTest §c✦ §cNo Destination
      */
     private val noNamePattern by patternGroup.pattern(
         "noname",

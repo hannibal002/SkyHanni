@@ -31,7 +31,7 @@ object GardenVisitorChat {
     private val patternGroup = RepoPattern.group("garden.visitor.chat")
 
     /**
-     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
+     * @regexTest §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
      */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
@@ -39,8 +39,8 @@ object GardenVisitorChat {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §6Madame Eleanor Q. Goldsworth III§f: §r§fI'm here to put a value on your farm.
-     * REGEX-TEST: §e[NPC] §aRhys§f: §r§fI found an unexplored cave while mining for titanium.
+     * @regexTest §e[NPC] §6Madame Eleanor Q. Goldsworth III§f: §r§fI'm here to put a value on your farm.
+     * @regexTest §e[NPC] §aRhys§f: §r§fI found an unexplored cave while mining for titanium.
      */
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
@@ -48,7 +48,7 @@ object GardenVisitorChat {
     )
 
     /**
-     * REGEX-TEST: §aYou gave some of the required items!
+     * @regexTest §aYou gave some of the required items!
      */
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",

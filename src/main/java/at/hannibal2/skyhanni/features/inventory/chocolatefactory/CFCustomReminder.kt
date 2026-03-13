@@ -58,7 +58,7 @@ object CFCustomReminder {
     private val patternGroup = RepoPattern.group("inventory.chocolate.factory")
 
     /**
-     * REGEX-TEST: §cRequires 400B all-time Chocolate!
+     * @regexTest §cRequires 400B all-time Chocolate!
      */
     private val milestoneCostLorePattern by patternGroup.pattern(
         "milestone.cost",
@@ -66,9 +66,9 @@ object CFCustomReminder {
     )
 
     /**
-     * REGEX-TEST: §cYou don't have enough Chocolate!
-     * REGEX-TEST: §cYou don't have the required items!
-     * REGEX-TEST: §cYou must collect 300B all-time Chocolate!
+     * @regexTest §cYou don't have enough Chocolate!
+     * @regexTest §cYou don't have the required items!
+     * @regexTest §cYou must collect 300B all-time Chocolate!
      */
     private val chatMessagePattern by patternGroup.list(
         "chat.hide",

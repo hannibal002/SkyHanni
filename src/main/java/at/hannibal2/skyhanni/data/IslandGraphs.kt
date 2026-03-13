@@ -157,9 +157,9 @@ object IslandGraphs {
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
     /**
-     * REGEX-TEST: Dwarven Base Camp
-     * REGEX-FAIL: Forge
-     * REGEX-TEST: Fossil Research Center
+     * @regexTest Dwarven Base Camp
+     * @regexFail Forge
+     * @regexTest Fossil Research Center
      */
     private val glaciteTunnelsPattern by patternGroup.pattern(
         "glacitetunnels",

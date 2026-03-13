@@ -29,8 +29,8 @@ object CollectionApi {
     private val patternGroup = RepoPattern.group("data.collection.api")
 
     /**
-     * REGEX-TEST: Farming Collections
-     * REGEX-TEST: Carrot Collection
+     * @regexTest Farming Collections
+     * @regexTest Carrot Collection
      */
     private val collectionInventoryPattern by patternGroup.pattern(
         "collections",
@@ -38,8 +38,8 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST:                           43,649/50k
-     * REGEX-TEST: Total collected: 277,252
+     * @regexTestWrapped "                          43,649/50k"
+     * @regexTest Total collected: 277,252
      */
     private val counterPattern by patternGroup.pattern(
         "counter.new",
@@ -47,8 +47,8 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST: Total collected: 261,390
-     * REGEX-TEST: Total Collected: 2,012,418
+     * @regexTest Total collected: 261,390
+     * @regexTest Total Collected: 2,012,418
      */
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter.new",
@@ -56,9 +56,9 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST: [MVP+] oxsss: 1.9M
-     * REGEX-TEST: [VIP] oxsss: 0
-     * REGEX-TEST: oxsss: 0
+     * @regexTest [MVP+] oxsss: 1.9M
+     * @regexTest [VIP] oxsss: 0
+     * @regexTest oxsss: 0
      */
     val playerCounterPattern by patternGroup.pattern(
         "playercounter.new",
@@ -66,8 +66,8 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST: Progress to Raw Chicken IX: 25.7§6%
-     * REGEX-TEST: Total Collected: 1,917,287
+     * @regexTest Progress to Raw Chicken IX: 25.7§6%
+     * @regexTest Total Collected: 1,917,287
      */
     val collectionNotMaxedPattern by patternGroup.pattern(
         "collections.notmaxed.new",
@@ -75,7 +75,7 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST: §7Progress to Nether Wart I: §e46§6%
+     * @regexTest §7Progress to Nether Wart I: §e46§6%
      */
     private val collectionTier0Pattern by patternGroup.pattern(
         "tierzero",

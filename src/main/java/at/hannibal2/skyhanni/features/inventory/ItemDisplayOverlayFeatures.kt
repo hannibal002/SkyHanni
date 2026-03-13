@@ -72,8 +72,8 @@ object ItemDisplayOverlayFeatures {
     private var lastSize = 0
 
     /**
-     * REGEX-TEST: MASTER_SKULL_TIER_1
-     * REGEX-TEST: MASTER_SKULL_TIER_6
+     * @regexTest MASTER_SKULL_TIER_1
+     * @regexTest MASTER_SKULL_TIER_6
      */
     private val masterSkullIDPattern by patternGroup.pattern(
         "masterskull.id",
@@ -81,9 +81,9 @@ object ItemDisplayOverlayFeatures {
     )
 
     /**
-     * REGEX-TEST: §7Vacuum Bag: §21 Pest
-     * REGEX-TEST: §7Vacuum Bag: §2444 Pests
-     * REGEX-TEST: §7Vacuum Bag: §21,652 Pests
+     * @regexTest §7Vacuum Bag: §21 Pest
+     * @regexTest §7Vacuum Bag: §2444 Pests
+     * @regexTest §7Vacuum Bag: §21,652 Pests
      */
     private val gardenVacuumPattern by patternGroup.pattern(
         "vacuum",
@@ -95,8 +95,8 @@ object ItemDisplayOverlayFeatures {
     )
 
     /**
-     * REGEX-TEST: Dungeon VII Potion
-     * REGEX-TEST: Dungeon VII Potion x1
+     * @regexTest Dungeon VII Potion
+     * @regexTest Dungeon VII Potion x1
      */
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
@@ -108,8 +108,8 @@ object ItemDisplayOverlayFeatures {
     )
 
     /**
-     * REGEX-TEST: §7Your SkyBlock Level: §8[§a156§8]
-     * REGEX-TEST: §7Your SkyBlock Level: §8[§5399§8]
+     * @regexTest §7Your SkyBlock Level: §8[§a156§8]
+     * @regexTest §7Your SkyBlock Level: §8[§5399§8]
      */
     private val skyblockLevelPattern by patternGroup.pattern(
         "skyblocklevel",

@@ -26,9 +26,9 @@ object BazaarCancelledBuyOrderClipboard {
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
 
     /**
-     * REGEX-TEST: §6§7from §a50§7x §7missing items.
-     * REGEX-TEST: §7§a22§7x §7missing items.
-     * REGEX-TEST: §6coins §7from §a2,000§7x §7missing items.
+     * @regexTest §6§7from §a50§7x §7missing items.
+     * @regexTest §7§a22§7x §7missing items.
+     * @regexTest §6coins §7from §a2,000§7x §7missing items.
      */
     private val lastAmountPattern by patternGroup.pattern(
         "lastamount",

@@ -40,9 +40,9 @@ object Year400Features {
     private val chatGroup = RepoPattern.group("event.anniversary-celebration.400.team-finder")
 
     /**
-     * REGEX-TEST: §r§8[§2172§8] §b_EliteNefarious §9⛃§r
-     * REGEX-TEST: §r§8[§f72§8] §bBee181204 §a⛃§r
-     * REGEX-TEST: §r§8[§729§8] §ajeeerzy §e⛃§7♲§r
+     * @regexTest §r§8[§2172§8] §b_EliteNefarious §9⛃§r
+     * @regexTest §r§8[§f72§8] §bBee181204 §a⛃§r
+     * @regexTest §r§8[§729§8] §ajeeerzy §e⛃§7♲§r
      */
     private val playerColorNametagPattern by chatGroup.pattern(
         "player-color-nametag",
@@ -50,7 +50,7 @@ object Year400Features {
     )
 
     /**
-     * REGEX-TEST: This person has had too much cake today!
+     * @regexTest This person has had too much cake today!
      */
     private val fatPlayerMessagePattern by chatGroup.pattern(
         "player-full-message",

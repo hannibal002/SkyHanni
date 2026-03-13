@@ -530,8 +530,8 @@ object ItemUtils {
     }
 
     /**
-     * REGEX-TEST: §fEnchanted Book (Lapidary I)
-     * REGEX-TEST: §fEnchanted Book (Ice Cold I§r§f)
+     * @regexTest §fEnchanted Book (Lapidary I)
+     * @regexTest §fEnchanted Book (Ice Cold I§r§f)
      */
     private val enchantedBookPattern by RepoPattern.pattern(
         "item.enchantedbook",

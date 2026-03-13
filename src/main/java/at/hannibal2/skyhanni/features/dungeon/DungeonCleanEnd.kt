@@ -27,9 +27,9 @@ object DungeonCleanEnd {
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
 
     /**
-     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
-     * REGEX-TEST: §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
-     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor II
+     * @regexTest §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
+     * @regexTest §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
+     * @regexTest §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor II
      */
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",

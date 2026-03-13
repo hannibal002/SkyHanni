@@ -19,8 +19,8 @@ object GoldenGoblinHighlight {
     private val config get() = SkyHanniMod.feature.mining
 
     /**
-     * REGEX-TEST: Golden Goblin
-     * REGEX-TEST: Diamond Goblin
+     * @regexTest Golden Goblin
+     * @regexTest Diamond Goblin
      */
     private val goblinPattern by RepoPattern.pattern("mining.mob.golden.goblin", "Golden Goblin|Diamond Goblin")
 

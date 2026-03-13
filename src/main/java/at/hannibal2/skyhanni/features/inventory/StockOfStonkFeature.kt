@@ -26,7 +26,7 @@ object StockOfStonkFeature {
     private val patternGroup = RepoPattern.group("inventory.stockofstonks")
 
     /**
-     * REGEX-TEST: Stonks Auction
+     * @regexTest Stonks Auction
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
@@ -34,9 +34,9 @@ object StockOfStonkFeature {
     )
 
     /**
-     * REGEX-TEST: ▶ TOP 5,000 - Stock of Stonks x2
-     * REGEX-TEST: ▶ TOP 5,000 - Stock of Stonks x2
-     * REGEX-TEST: ▶ TOP 100 - Stock of Stonks x25
+     * @regexTest ▶ TOP 5,000 - Stock of Stonks x2
+     * @regexTest ▶ TOP 5,000 - Stock of Stonks x2
+     * @regexTest ▶ TOP 100 - Stock of Stonks x25
      */
     private val topPattern by patternGroup.pattern(
         "top.new",
@@ -44,8 +44,8 @@ object StockOfStonkFeature {
     )
 
     /**
-     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
-     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
+     * @regexTestWrapped "   Minimum Bid: 2,400,002 Coins"
+     * @regexTestWrapped "   Minimum Bid: 2,400,002 Coins"
      */
     private val bidPattern by patternGroup.pattern(
         "bid.new",

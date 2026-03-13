@@ -33,7 +33,7 @@ object CakeCounterFeatures {
     private val patternGroup = RepoPattern.group("misc.cakecounter")
 
     /**
-     * REGEX-TEST: You placed a Cake Counter. (9/15)
+     * @regexTest You placed a Cake Counter. (9/15)
      */
     private val cakeCounterPlacedPattern by patternGroup.pattern(
         "placed.colorless",
@@ -41,7 +41,7 @@ object CakeCounterFeatures {
     )
 
     /**
-     * REGEX-TEST: You removed a Cake Counter. (4/15)
+     * @regexTest You removed a Cake Counter. (4/15)
      */
     private val cakeCounterRemovedPattern by patternGroup.pattern(
         "removed.colorless",
@@ -49,7 +49,7 @@ object CakeCounterFeatures {
     )
 
     /**
-     * REGEX-TEST: Cakes Eaten: 9,453,416
+     * @regexTest Cakes Eaten: 9,453,416
      */
     private val cakesEatenPattern by patternGroup.pattern(
         "cakeseaten.colorless",
@@ -57,7 +57,7 @@ object CakeCounterFeatures {
     )
 
     /**
-     * REGEX-TEST: Souls Found: 9,341
+     * @regexTest Souls Found: 9,341
      */
     private val soulsFoundPattern by patternGroup.pattern(
         "soulsfound.colorless",
@@ -65,7 +65,7 @@ object CakeCounterFeatures {
     )
 
     /**
-     * REGEX-TEST: You found a Cake Soul!
+     * @regexTest You found a Cake Soul!
      */
     private val cakeSoulFoundPattern by RepoPattern.pattern(
         "misc.cakesoul.found.colorless",

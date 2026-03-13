@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object PlayerDeathManager {
 
     /**
-     * WRAPPED-REGEX-TEST: " ☠ ZeroHazel was killed by Ashfang."
-     * WRAPPED-REGEX-TEST: " ☠ You fell into the void."
-     * WRAPPED-REGEX-TEST: " ☠ You burned to death."
-     * WRAPPED-REGEX-TEST: " ☠ You were killed by Bladesoul."
+     * @regexTestWrapped " ☠ ZeroHazel was killed by Ashfang."
+     * @regexTestWrapped " ☠ You fell into the void."
+     * @regexTestWrapped " ☠ You burned to death."
+     * @regexTestWrapped " ☠ You were killed by Bladesoul."
      */
     private val deathMessagePattern by RepoPattern.pattern(
         "chat.player.death-nocolor",

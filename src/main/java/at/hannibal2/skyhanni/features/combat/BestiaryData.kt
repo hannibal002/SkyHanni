@@ -42,8 +42,8 @@ object BestiaryData {
     private val patternGroup = RepoPattern.group("combat.bestiary.data")
 
     /**
-     * REGEX-TEST: §7Progress to Tier 14: §b26%
-     * REGEX-TEST: §7Progress to Tier XV: §b57.1%
+     * @regexTest §7Progress to Tier 14: §b26%
+     * @regexTest §7Progress to Tier XV: §b57.1%
      */
     private val tierProgressPattern by patternGroup.pattern(
         "tierprogress",
@@ -51,8 +51,8 @@ object BestiaryData {
     )
 
     /**
-     * REGEX-TEST: §7Overall Progress: §b55.2%
-     * REGEX-TEST: §7Overall Progress: §b100% §7(§c§lMAX!§7)
+     * @regexTest §7Overall Progress: §b55.2%
+     * @regexTest §7Overall Progress: §b100% §7(§c§lMAX!§7)
      */
     private val overallProgressPattern by patternGroup.pattern(
         "overallprogress",
@@ -60,8 +60,8 @@ object BestiaryData {
     )
 
     /**
-     * REGEX-TEST: 9/10
-     * REGEX-TEST: 6/6
+     * @regexTest 9/10
+     * @regexTest 6/6
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
@@ -69,8 +69,8 @@ object BestiaryData {
     )
 
     /**
-     * REGEX-TEST: (1/2) Bestiary ➜ The Catacombs
-     * REGEX-TEST: Bestiary ➜ Dwarven Mines
+     * @regexTest (1/2) Bestiary ➜ The Catacombs
+     * @regexTest Bestiary ➜ Dwarven Mines
      */
     private val titlePattern by patternGroup.pattern(
         "title",

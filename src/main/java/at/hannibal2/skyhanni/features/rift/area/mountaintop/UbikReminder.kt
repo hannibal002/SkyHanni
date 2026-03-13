@@ -40,7 +40,7 @@ object UbikReminder {
     private val storage get() = ProfileStorageData.profileSpecific?.rift
 
     /**
-     * REGEX-TEST: Split or Steal
+     * @regexTest Split or Steal
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
@@ -48,11 +48,11 @@ object UbikReminder {
     )
 
     /**
-     * REGEX-TEST: SPLIT! You need to wait 1h 23m 45s before you can play again.
-     * REGEX-TEST: SPLIT! You need to wait 1h 23m before you can play again.
-     * REGEX-TEST: SPLIT! You need to wait 12m 34s before you can play again.
-     * REGEX-TEST: SPLIT! You need to wait 12m before you can play again.
-     * REGEX-TEST: SPLIT! You need to wait 12s before you can play again.
+     * @regexTest SPLIT! You need to wait 1h 23m 45s before you can play again.
+     * @regexTest SPLIT! You need to wait 1h 23m before you can play again.
+     * @regexTest SPLIT! You need to wait 12m 34s before you can play again.
+     * @regexTest SPLIT! You need to wait 12m before you can play again.
+     * @regexTest SPLIT! You need to wait 12s before you can play again.
      */
     private val cooldownPattern by patternGroup.pattern(
         "cooldown",

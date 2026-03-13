@@ -23,9 +23,9 @@ object ViewRecipeCommand {
     private val config get() = SkyHanniMod.feature.misc.commands
 
     /**
-     * REGEX-TEST: /viewrecipe aspect of the end
-     * REGEX-TEST: /viewrecipe aspect_of_the_end
-     * REGEX-TEST: /viewrecipe ASPECT_OF_THE_END
+     * @regexTest /viewrecipe aspect of the end
+     * @regexTest /viewrecipe aspect_of_the_end
+     * @regexTest /viewrecipe ASPECT_OF_THE_END
      */
     private val pattern by RepoPattern.pattern(
         "commands.viewrecipe",

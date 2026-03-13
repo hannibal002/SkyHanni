@@ -22,8 +22,8 @@ object InGameDateDisplay {
     private val patternGroup = RepoPattern.group("misc.ingametime")
 
     /**
-     * REGEX-TEST: Spring 26th
-     * REGEX-TEST: Early Winter 1st
+     * @regexTest Spring 26th
+     * @regexTest Early Winter 1st
      */
     private val monthAndDatePattern by patternGroup.pattern(
         "date",
@@ -31,8 +31,8 @@ object InGameDateDisplay {
     )
 
     /**
-     * REGEX-TEST: 8:30am ☀
-     * REGEX-TEST: 11:40pm ☽
+     * @regexTest 8:30am ☀
+     * @regexTest 11:40pm ☽
      */
     private val timeSymbolsPattern by patternGroup.pattern(
         "symbols",

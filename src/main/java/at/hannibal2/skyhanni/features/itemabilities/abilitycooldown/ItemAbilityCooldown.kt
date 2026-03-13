@@ -53,7 +53,7 @@ object ItemAbilityCooldown {
     )
 
     /**
-     * REGEX-TEST: §63,848/3,473❤     §b-24 Mana (§6Instant Transmission§b)     §b2,507/2,507✎ Mana
+     * @regexTest §63,848/3,473❤     §b-24 Mana (§6Instant Transmission§b)     §b2,507/2,507✎ Mana
      */
     private val abilityUsePattern by patternGroup.pattern(
         "abilityuse",

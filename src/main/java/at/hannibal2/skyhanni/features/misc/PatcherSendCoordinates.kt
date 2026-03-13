@@ -28,9 +28,9 @@ object PatcherSendCoordinates {
     private val logger = LorenzLogger("misc/patchercoords")
 
     /**
-     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4
-     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4broken
-     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4 extra text
+     * @regexTest hannibal2: x: 2, y: 3, z: 4
+     * @regexTest hannibal2: x: 2, y: 3, z: 4broken
+     * @regexTest hannibal2: x: 2, y: 3, z: 4 extra text
      */
     private val coordinatePattern by RepoPattern.pattern(
         "misc.patchercoords.coords",

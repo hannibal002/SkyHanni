@@ -26,8 +26,8 @@ object RiftMotesOrb {
     private val enabled get() = config.enabled
 
     /**
-     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+10 Motes§r§d!
-     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+25 Motes§r§d, recovered §r§a+2ф Rift Time§r§d!
+     * @regexTest §5§lORB! §r§dPicked up §r§5+10 Motes§r§d!
+     * @regexTest §5§lORB! §r§dPicked up §r§5+25 Motes§r§d, recovered §r§a+2ф Rift Time§r§d!
      */
     private val motesPattern by RepoPattern.pattern(
         "rift.everywhere.motesorb",

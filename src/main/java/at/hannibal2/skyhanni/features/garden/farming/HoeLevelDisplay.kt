@@ -50,7 +50,7 @@ object HoeLevelDisplay {
     private val patternGroup = RepoPattern.group("hoe.levels")
 
     /**
-     * REGEX-TEST: OVERFLOW! Your Turing Sugar Cane Hoe Mk. III has just dropped a Tool Exp Capsule!
+     * @regexTest OVERFLOW! Your Turing Sugar Cane Hoe Mk. III has just dropped a Tool Exp Capsule!
      */
     val levelUpPattern by patternGroup.pattern(
         "levelup-nocolor",

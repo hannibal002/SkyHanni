@@ -67,7 +67,7 @@ object QuiverApi {
     private val chatGroup = group.group("chat")
 
     /**
-     * REGEX-TEST: §aYou set your selected arrow type to §r§fFlint Arrow§r§a!
+     * @regexTest §aYou set your selected arrow type to §r§fFlint Arrow§r§a!
      */
     private val selectPattern by chatGroup.pattern(
         "select",
@@ -75,7 +75,7 @@ object QuiverApi {
     )
 
     /**
-     * REGEX-TEST: §aJax forged §r§fFlint Arrow§r§8 x386 §r§afor §r§61,930 Coins§r§a!
+     * @regexTest §aJax forged §r§fFlint Arrow§r§8 x386 §r§afor §r§61,930 Coins§r§a!
      */
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
@@ -83,7 +83,7 @@ object QuiverApi {
     )
 
     /**
-     * REGEX-TEST: §aYou filled your quiver with §f1,253 §aextra arrows!
+     * @regexTest §aYou filled your quiver with §f1,253 §aextra arrows!
      */
     private val fillUpPattern by chatGroup.pattern(
         "fillup",
@@ -95,7 +95,7 @@ object QuiverApi {
     )
 
     /**
-     * REGEX-TEST: §c§lQUIVER! §cYou have run out of §fFlint Arrows§c!
+     * @regexTest §c§lQUIVER! §cYou have run out of §fFlint Arrows§c!
      */
     private val arrowRanOutPattern by chatGroup.pattern(
         "ranout",
@@ -112,14 +112,14 @@ object QuiverApi {
 
     // Bows that don't use the players arrows, checked using the SkyBlock ID
     /**
-     * REGEX-TEST: BOSS_SPIRIT_BOW
-     * REGEX-TEST: CRYPT_BOW
+     * @regexTest BOSS_SPIRIT_BOW
+     * @regexTest CRYPT_BOW
      */
     private val fakeBowsPattern by group.pattern("fakebows", "BOSS_SPIRIT_BOW|CRYPT_BOW")
     private val quiverInventoryNamePattern by group.pattern("quivername", "Quiver")
 
     /**
-     * REGEX-TEST: §7Active Arrow: §fFlint Arrow §7(§e2880§7)
+     * @regexTest §7Active Arrow: §fFlint Arrow §7(§e2880§7)
      */
     private val quiverInventoryPattern by group.pattern(
         "quiver.inventory",

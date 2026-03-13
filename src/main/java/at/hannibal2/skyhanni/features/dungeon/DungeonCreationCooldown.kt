@@ -25,8 +25,8 @@ object DungeonCreationCooldown {
     private val config get() = SkyHanniMod.feature.dungeon.creationCooldown
 
     /**
-     * REGEX-TEST: §r§b[MVP§r§5+§r§b] Chissl§r§f §r§eentered §r§aThe Catacombs§r§e, §r§eFloor I§r§e!
-     * REGEX-TEST: §r§b[MVP§r§5+§r§b] Chissl§r§f §r§eentered §r§c§lMM§r§c The Catacombs§r§e, §r§eFloor I§r§e!
+     * @regexTest §r§b[MVP§r§5+§r§b] Chissl§r§f §r§eentered §r§aThe Catacombs§r§e, §r§eFloor I§r§e!
+     * @regexTest §r§b[MVP§r§5+§r§b] Chissl§r§f §r§eentered §r§c§lMM§r§c The Catacombs§r§e, §r§eFloor I§r§e!
      */
     private val join by RepoPattern.group("dungeon.join").pattern(
         "dungeon.join",

@@ -43,11 +43,11 @@ object CarnivalReminder {
 
     private val patternGroup = RepoPattern.group("carnival.tickets")
 
-    /** REGEX-TEST: §aYou claimed §r§aCarnival Ticket §r§8x25§r§a!
+    /** @regexTest §aYou claimed §r§aCarnival Ticket §r§8x25§r§a!
      */
     private val ticketClaimedPattern by patternGroup.pattern("claimed", "§aYou claimed §r§aCarnival Ticket §r§8x25§r§a!")
 
-    /** REGEX-TEST: §e[NPC] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.
+    /** @regexTest §e[NPC] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.
      */
     @Suppress("MaxLineLength")
     private val alreadyClaimedPattern by patternGroup.pattern(

@@ -43,7 +43,7 @@ object GardenVisitorTooltip {
     private val patternGroup = RepoPattern.group("garden.visitor.tooltip")
 
     /**
-     * REGEX-TEST:  §8+§c20 Copper
+     * @regexTestWrapped " §8+§c20 Copper"
      */
     private val copperPattern by patternGroup.pattern(
         "copper",
@@ -51,7 +51,7 @@ object GardenVisitorTooltip {
     )
 
     /**
-     * REGEX-TEST:  §8+§215 §7Garden Experience
+     * @regexTestWrapped " §8+§215 §7Garden Experience"
      */
     private val gardenExperiencePattern by patternGroup.pattern(
         "gardenexperience",

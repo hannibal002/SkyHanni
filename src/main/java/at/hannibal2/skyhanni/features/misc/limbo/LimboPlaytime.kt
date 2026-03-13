@@ -29,7 +29,7 @@ object LimboPlaytime {
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
 
     /**
-     * REGEX-TEST: 28 minutes
+     * @regexTest 28 minutes
      */
     private val minutesPattern by patternGroup.pattern(
         "minutes.new",
@@ -37,10 +37,10 @@ object LimboPlaytime {
     )
 
     /**
-     * REGEX-TEST: 687.7 hours
-     * REGEX-TEST: 304.7 hours
-     * REGEX-TEST: 61 hours
-     * REGEX-TEST: 21.1 hours
+     * @regexTest 687.7 hours
+     * @regexTest 304.7 hours
+     * @regexTest 61 hours
+     * @regexTest 21.1 hours
      */
     private val hoursPattern by patternGroup.pattern(
         "hours.new",

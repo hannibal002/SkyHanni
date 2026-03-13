@@ -24,7 +24,7 @@ object PartyApi {
     private val patternGroup = RepoPattern.group("data.party")
 
     /**
-     * REGEX-TEST: §eYou have joined §b[MVP§d+§b] Throwpo's §eparty!
+     * @regexTest §eYou have joined §b[MVP§d+§b] Throwpo's §eparty!
      */
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
@@ -32,7 +32,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §b[MVP§d+§b] Throwpo §ejoined the party.
+     * @regexTest §b[MVP§d+§b] Throwpo §ejoined the party.
      */
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",
@@ -40,7 +40,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §eYou'll be partying with: §a[VIP] FungalBeatle550
+     * @regexTest §eYou'll be partying with: §a[VIP] FungalBeatle550
      */
     private val othersInThePartyPattern by patternGroup.pattern(
         "others.inparty",
@@ -48,7 +48,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §7246sweets §ehas left the party.
+     * @regexTest §7246sweets §ehas left the party.
      */
     private val otherLeftPattern by patternGroup.pattern(
         "others.left",
@@ -56,7 +56,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §7riblets §ehas been removed from the party.
+     * @regexTest §7riblets §ehas been removed from the party.
      */
     private val otherKickedPattern by patternGroup.pattern(
         "others.kicked",
@@ -64,7 +64,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §eKicked §b[MVP§d+§b] Throwpo§e because they were offline.
+     * @regexTest §eKicked §b[MVP§d+§b] Throwpo§e because they were offline.
      */
     private val otherOfflineKickedPattern by patternGroup.pattern(
         "others.offline",
@@ -72,7 +72,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §b[MVP§d+§b] Throwpo §ewas removed from your party because they disconnected.
+     * @regexTest §b[MVP§d+§b] Throwpo §ewas removed from your party because they disconnected.
      */
     private val otherDisconnectedPattern by patternGroup.pattern(
         "others.disconnect",
@@ -80,7 +80,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: The party was transferred to [MVP+] CalMWolfs because [MVP+] Throwpo left
+     * @regexTest The party was transferred to [MVP+] CalMWolfs because [MVP+] Throwpo left
      */
     private val transferOnLeavePattern by patternGroup.pattern(
         "others.transfer.leave",
@@ -88,7 +88,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: The party was transferred to [MVP+] Throwpo by [MVP+] CalMWolfs
+     * @regexTest The party was transferred to [MVP+] Throwpo by [MVP+] CalMWolfs
      */
     val transferVoluntaryPattern by patternGroup.pattern(
         "others.transfer.voluntary",
@@ -96,7 +96,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §b[MVP§d+§b] Throwpo §ehas disbanded the party!
+     * @regexTest §b[MVP§d+§b] Throwpo §ehas disbanded the party!
      */
     private val disbandedPattern by patternGroup.pattern(
         "others.disband",
@@ -104,7 +104,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §eYou have been kicked from the party by §b[MVP§d+§b] Throwpo §e
+     * @regexTest §eYou have been kicked from the party by §b[MVP§d+§b] Throwpo §e
      */
     private val kickedPattern by patternGroup.pattern(
         "you.kicked",
@@ -112,7 +112,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §6Party Members (2)
+     * @regexTest §6Party Members (2)
      */
     private val partyMembersStartPattern by patternGroup.pattern(
         "members.start",
@@ -120,8 +120,8 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: Party Members: [MVP+] Throwpo ●
-     * REGEX-TEST: Party Leader: [MVP+] CalMWolfs ●
+     * @regexTest Party Members: [MVP+] Throwpo ●
+     * @regexTest Party Leader: [MVP+] CalMWolfs ●
      */
     private val partyMemberListPattern by patternGroup.pattern(
         "members.list.withkind",
@@ -133,7 +133,7 @@ object PartyApi {
     )
 
     /**
-     * REGEX-TEST: §dParty Finder §f> §bGhostsTM §ejoined the dungeon group! (§bArcher Level 9§e)
+     * @regexTest §dParty Finder §f> §bGhostsTM §ejoined the dungeon group! (§bArcher Level 9§e)
      */
     private val dungeonFinderJoinPattern by patternGroup.pattern(
         "dungeonfinder.join",

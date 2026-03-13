@@ -63,10 +63,10 @@ private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
 object HoppityLiveDisplay {
 
     /**
-     * REGEX-TEST: Hoppity's Collection
-     * REGEX-TEST: (1/2) Hoppity's Collection
-     * REGEX-TEST: Chocolate Factory Milestones
-     * REGEX-TEST: Chocolate Shop Milestones
+     * @regexTest Hoppity's Collection
+     * @regexTest (1/2) Hoppity's Collection
+     * @regexTest Chocolate Factory Milestones
+     * @regexTest Chocolate Shop Milestones
      */
     private val miscCfInventoryPatterns by CFApi.patternGroup.pattern(
         "cf.inventory",

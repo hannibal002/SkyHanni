@@ -32,7 +32,7 @@ object FusionDisplay {
     private var pureReptiles = 0
 
     /**
-     * REGEX-TEST: §b§lPURE REPTILE
+     * @regexTest §b§lPURE REPTILE
      */
     private val pureReptilePattern by RepoPattern.group("attributeshards").pattern(
         "pure-reptile-chat",

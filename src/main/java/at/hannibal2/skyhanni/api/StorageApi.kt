@@ -41,8 +41,8 @@ object StorageApi {
     private val saveMutex = Mutex()
 
     /**
-     * REGEX-TEST: Ender Chest
-     * REGEX-TEST: Ender Chest (1/9)
+     * @regexTest Ender Chest
+     * @regexTest Ender Chest (1/9)
      */
     private val enderchestPattern by RepoPattern.pattern(
         "storage.enderchest",
@@ -50,7 +50,7 @@ object StorageApi {
     )
 
     /**
-     * REGEX-TEST: Jumbo Backpack§r (Slot #2)
+     * @regexTest Jumbo Backpack§r (Slot #2)
      */
     private val backpackPattern by RepoPattern.pattern(
         "storage.backpack",
@@ -58,8 +58,8 @@ object StorageApi {
     )
 
     /**
-     * REGEX-TEST: Rift Storage (1/2)
-     * REGEX-TEST: Rift Storage
+     * @regexTest Rift Storage (1/2)
+     * @regexTest Rift Storage
      */
     private val riftStoragePattern by RepoPattern.pattern(
         "storage.rift",

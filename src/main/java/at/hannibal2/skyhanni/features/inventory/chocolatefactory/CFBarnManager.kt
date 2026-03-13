@@ -30,7 +30,7 @@ object CFBarnManager {
     private val virtualCountHolder = TimeLimitedCache<String, Int>(5.seconds)
 
     /**
-     * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
+     * @regexTest §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
      */
     private val rabbitCrashedPattern by CFApi.patternGroup.pattern(
         "rabbit.crushed",

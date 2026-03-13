@@ -49,7 +49,7 @@ object ElectionApi {
     private val assumeMayorConfig get() = config.assumeMayor
 
     /**
-     * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
+     * @regexTest Schedules an extra §bFishing Festival §7event during the year.
      */
     val foxyExtraEventPattern by group.pattern(
         "foxy.extraevent",
@@ -57,7 +57,7 @@ object ElectionApi {
     )
 
     /**
-     * REGEX-TEST: The election room is now closed. Clerk Seraphine is doing a final count of the votes...
+     * @regexTest The election room is now closed. Clerk Seraphine is doing a final count of the votes...
      */
     private val electionOverPattern by group.pattern(
         "election.over",
@@ -65,7 +65,7 @@ object ElectionApi {
     )
 
     /**
-     * REGEX-TEST: Calendar and Events
+     * @regexTest Calendar and Events
      */
     val calendarGuiPattern by group.pattern(
         "calendar.gui",
@@ -73,8 +73,8 @@ object ElectionApi {
     )
 
     /**
-     * REGEX-TEST: §dMayor Jerry
-     * REGEX-TEST: §cMayor Aatrox
+     * @regexTest §dMayor Jerry
+     * @regexTest §cMayor Aatrox
      */
     private val mayorHeadPattern by group.pattern(
         "mayor.head",
@@ -82,7 +82,7 @@ object ElectionApi {
     )
 
     /**
-     * REGEX-TEST: §9Perkpocalypse Perks:
+     * @regexTest §9Perkpocalypse Perks:
      */
     private val perkpocalypsePerksPattern by group.pattern(
         "perkpocalypse",

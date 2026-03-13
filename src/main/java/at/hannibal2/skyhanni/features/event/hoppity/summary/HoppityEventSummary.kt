@@ -52,7 +52,7 @@ typealias MappedStatStrings = Map<HoppityStat, MutableList<StatString>>
 @Suppress("LargeClass")
 object HoppityEventSummary {
     /**
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
+     * @regexTest §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
      */
     private val rabbitTheFishPattern by CFApi.patternGroup.pattern(
         "rabbit.thefish",

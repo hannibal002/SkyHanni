@@ -18,8 +18,8 @@ object ColorHexInLore {
     private val patternGroup = RepoPattern.group("color.item.hex.lore")
 
     /**
-     * REGEX-TEST: #702963
-     * REGEX-TEST: Hex #002FA7
+     * @regexTest #702963
+     * @regexTest Hex #002FA7
      */
     private val hexPattern by patternGroup.pattern(
         "code",

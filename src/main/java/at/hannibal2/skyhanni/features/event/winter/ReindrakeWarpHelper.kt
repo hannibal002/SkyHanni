@@ -18,8 +18,8 @@ object ReindrakeWarpHelper {
     private val patternGroup = RepoPattern.group("event.winter.reindrakewarphelper")
 
     /**
-     * REGEX-TEST: §c§lWOAH! §cA §4Reindrake §cwas summoned from the depths!
-     * REGEX-TEST: §c§lWOAH! §r§cA §r§4Reindrake §r§cwas summoned from the depths!
+     * @regexTest §c§lWOAH! §cA §4Reindrake §cwas summoned from the depths!
+     * @regexTest §c§lWOAH! §r§cA §r§4Reindrake §r§cwas summoned from the depths!
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn.message",

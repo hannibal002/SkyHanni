@@ -46,7 +46,7 @@ object SkillApi {
     private val patternGroup = RepoPattern.group("api.skilldisplay")
 
     /**
-     * REGEX-TEST: +1.1 Mining (48.39%)
+     * @regexTest +1.1 Mining (48.39%)
      */
     private val skillPercentPattern by patternGroup.pattern(
         "skill.percent",
@@ -54,7 +54,7 @@ object SkillApi {
     )
 
     /**
-     * REGEX-TEST: +6.3 Foraging (24/750)
+     * @regexTest +6.3 Foraging (24/750)
      */
     private val skillMultiplierPattern by patternGroup.pattern(
         "skill.multiplier",
@@ -63,7 +63,7 @@ object SkillApi {
 
     // TODO find out whats going on here
     /**
-     * REGEX-TEST:  Farming 35: 12.4%
+     * @regexTestWrapped " Farming 35: 12.4%"
      */
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab.colorless",
@@ -71,8 +71,8 @@ object SkillApi {
     )
 
     /**
-     * REGEX-TEST:  Farming 60: MAX
-     * REGEX-TEST:  Mining 60: MAX
+     * @regexTestWrapped " Farming 60: MAX"
+     * @regexTestWrapped " Mining 60: MAX"
      */
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max.colorless",
@@ -80,8 +80,8 @@ object SkillApi {
     )
 
     /**
-     * REGEX-TEST:  Mining 14: 22,922/75k
-     * REGEX-TEST:  Combat 49: 7,678/4M
+     * @regexTestWrapped " Mining 14: 22,922/75k"
+     * @regexTestWrapped " Combat 49: 7,678/4M"
      */
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent.colorless",

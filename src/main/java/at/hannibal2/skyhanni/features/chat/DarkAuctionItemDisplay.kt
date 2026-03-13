@@ -18,9 +18,9 @@ object DarkAuctionItemDisplay {
     private val patternGroup = RepoPattern.group("chat.darkauction.itemdisplay")
 
     /**
-     * REGEX-TEST: [NPC] Sirius: First up we have a Nether Artifact, the starting bid is 50,000 Coins!
-     * REGEX-TEST: [NPC] Sirius: Next up we have a Protection VII Book, the starting bid is 100,000 Coins!
-     * REGEX-TEST: [NPC] Sirius: Next up we have an Ender Artifact, the starting bid is 50,000 Coins!
+     * @regexTest [NPC] Sirius: First up we have a Nether Artifact, the starting bid is 50,000 Coins!
+     * @regexTest [NPC] Sirius: Next up we have a Protection VII Book, the starting bid is 100,000 Coins!
+     * @regexTest [NPC] Sirius: Next up we have an Ender Artifact, the starting bid is 50,000 Coins!
      */
     private val nextItemPattern by patternGroup.pattern(
         "next-item",
@@ -28,8 +28,8 @@ object DarkAuctionItemDisplay {
     )
 
     /**
-     * REGEX-TEST: [NPC] Sirius: The highest bidder was qtLuna with a bid of 25,950,000 Coins!
-     * REGEX-TEST: [NPC] Sirius: No one made any bids!
+     * @regexTest [NPC] Sirius: The highest bidder was qtLuna with a bid of 25,950,000 Coins!
+     * @regexTest [NPC] Sirius: No one made any bids!
      */
     private val highestBidPattern by patternGroup.pattern(
         "highest-bid",

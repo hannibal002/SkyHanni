@@ -151,8 +151,8 @@ object DungeonChatFilter {
     )
 
     /**
-     * REGEX-TEST: §a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
-     * REGEX-TEST: §a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
+     * @regexTest §a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
+     * @regexTest §a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
      */
     private val startPatterns = listOf(
         "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern(),

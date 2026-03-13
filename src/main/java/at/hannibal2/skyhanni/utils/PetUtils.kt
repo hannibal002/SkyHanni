@@ -92,17 +92,17 @@ object PetUtils {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: PET_SKIN_ENDERMAN
-     * REGEX-TEST: PET_SKIN_PARROT_TOUCAN
-     * REGEX-TEST: PET_SKIN_PHEONIX_FLAMINGO
-     * REGEX-TEST: PET_SKIN_PHOENIX_ICE
-     * REGEX-TEST: PET_SKIN_PIGMAN_LUNAR_PIG
-     * REGEX-TEST: PET_SKIN_RABBIT
-     * REGEX-TEST: PET_SKIN_RABBIT_AQUAMARINE
-     * REGEX-TEST: PET_SKIN_RABBIT_LUNAR
-     * REGEX-TEST: PET_SKIN_RABBIT_LUNAR_BABY
-     * REGEX-TEST: PET_SKIN_RABBIT_PLUSHIE
-     * REGEX-TEST: PET_SKIN_RABBIT_ROSE
+     * @regexTest PET_SKIN_ENDERMAN
+     * @regexTest PET_SKIN_PARROT_TOUCAN
+     * @regexTest PET_SKIN_PHEONIX_FLAMINGO
+     * @regexTest PET_SKIN_PHOENIX_ICE
+     * @regexTest PET_SKIN_PIGMAN_LUNAR_PIG
+     * @regexTest PET_SKIN_RABBIT
+     * @regexTest PET_SKIN_RABBIT_AQUAMARINE
+     * @regexTest PET_SKIN_RABBIT_LUNAR
+     * @regexTest PET_SKIN_RABBIT_LUNAR_BABY
+     * @regexTest PET_SKIN_RABBIT_PLUSHIE
+     * @regexTest PET_SKIN_RABBIT_ROSE
      */
     private val petSkinNamePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.skin",
@@ -110,9 +110,9 @@ object PetUtils {
     )
 
     /**
-     * REGEX-TEST: §7§eRight-click to add this pet to
-     * REGEX-TEST: §7§eRight-click to add this pet to your
-     * REGEX-TEST: §eRight-click to add this pet to your
+     * @regexTest §7§eRight-click to add this pet to
+     * @regexTest §7§eRight-click to add this pet to your
+     * @regexTest §eRight-click to add this pet to your
      */
     private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.lore",

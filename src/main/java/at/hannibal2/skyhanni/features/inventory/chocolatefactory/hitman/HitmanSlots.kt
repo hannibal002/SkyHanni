@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack
 object HitmanSlots {
 
     /**
-     * REGEX-TEST: §7Hitman can store more eggs you miss! §7Cost §620,000,000 Coins §eClick to purchase!
+     * @regexTest §7Hitman can store more eggs you miss! §7Cost §620,000,000 Coins §eClick to purchase!
      */
     private val slotCostPattern by CFApi.patternGroup.pattern(
         "hitman.slotcost",

@@ -24,8 +24,8 @@ object ToolTooltipTweaks {
     private val config get() = GardenApi.config.tooltipTweak
 
     /**
-     * REGEX-TEST: §7Farming Fortune: §6+88.5 §9(+8)
-     * REGEX-TEST: §7Farming Fortune: §6+73 §9(+30) §d(+8)
+     * @regexTest §7Farming Fortune: §6+88.5 §9(+8)
+     * @regexTest §7Farming Fortune: §6+73 §9(+30) §d(+8)
      */
     private val farmingFortunePattern by RepoPattern.pattern(
         "garden.tooltip.farmingfortune",

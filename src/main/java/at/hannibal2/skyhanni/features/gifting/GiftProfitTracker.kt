@@ -41,11 +41,11 @@ object GiftProfitTracker {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §f§lCOMMON!
-     * REGEX-TEST: §9§lRARE!
-     * REGEX-TEST: §e§lSWEET!
-     * REGEX-TEST: §c§lSANTA TIER!
-     * REGEX-TEST: §c§lPARTY TIER!
+     * @regexTest §f§lCOMMON!
+     * @regexTest §9§lRARE!
+     * @regexTest §e§lSWEET!
+     * @regexTest §c§lSANTA TIER!
+     * @regexTest §c§lPARTY TIER!
      */
     private val giftRewardRarityPattern by patternGroup.pattern(
         "reward.rarity",
@@ -53,9 +53,9 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §f§lCOMMON! §r§3+500 Enchanting XP §r§egift with §r§b[MVP§r§d+§r§b] paysley§r§f§r§e!
-     * REGEX-TEST: §f§lCOMMON! §r§3+500 Combat XP §r§egift with §r§b[MVP§r§f+§r§b] m640§r§f§r§e!
-     * REGEX-TEST: §f§lCOMMON! §r§3+500 Enchanting XP §r§egift with §r§7CreationV3§r§7§r§e!
+     * @regexTest §f§lCOMMON! §r§3+500 Enchanting XP §r§egift with §r§b[MVP§r§d+§r§b] paysley§r§f§r§e!
+     * @regexTest §f§lCOMMON! §r§3+500 Combat XP §r§egift with §r§b[MVP§r§f+§r§b] m640§r§f§r§e!
+     * @regexTest §f§lCOMMON! §r§3+500 Enchanting XP §r§egift with §r§7CreationV3§r§7§r§e!
      */
     val xpGainedPattern by patternGroup.pattern(
         "reward.skillxp",
@@ -63,11 +63,11 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §9§lRARE! §r§6+5,000 Coins §r§egift with §r§b[MVP§r§d+§r§b] kizzazz§r§f§r§e!
-     * REGEX-TEST: §f§lCOMMON! §r§6+5,000 Coins §r§egift with §r§a[VIP] Deato_Wez§r§f§r§e!
-     * REGEX-TEST: §9§lRARE! §r§6+20,000 Coins §r§egift with §r§a[VIP§r§6+§r§a] Grazma§r§f§r§e!
-     * REGEX-TEST: §e§lSWEET! §r§6+100,000 Coins §r§egift with §r§a[VIP] Destrudot§r§f§r§e!
-     * REGEX-TEST: §f§lCOMMON! §r§6+5,000 Coins §r§egift with §r§a[VIP] KralingenBoys§r§f§r§e!
+     * @regexTest §9§lRARE! §r§6+5,000 Coins §r§egift with §r§b[MVP§r§d+§r§b] kizzazz§r§f§r§e!
+     * @regexTest §f§lCOMMON! §r§6+5,000 Coins §r§egift with §r§a[VIP] Deato_Wez§r§f§r§e!
+     * @regexTest §9§lRARE! §r§6+20,000 Coins §r§egift with §r§a[VIP§r§6+§r§a] Grazma§r§f§r§e!
+     * @regexTest §e§lSWEET! §r§6+100,000 Coins §r§egift with §r§a[VIP] Destrudot§r§f§r§e!
+     * @regexTest §f§lCOMMON! §r§6+5,000 Coins §r§egift with §r§a[VIP] KralingenBoys§r§f§r§e!
      */
     val coinsGainedPattern by patternGroup.pattern(
         "reward.coins",
@@ -75,9 +75,9 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §5§lEXTRA! §d+5 North Stars
-     * REGEX-TEST: §5§lEXTRA! §d+4 North Stars
-     * REGEX-TEST: §5§lEXTRA! §d+1 North Star
+     * @regexTest §5§lEXTRA! §d+5 North Stars
+     * @regexTest §5§lEXTRA! §d+4 North Stars
+     * @regexTest §5§lEXTRA! §d+1 North Star
      */
     val northStarsPattern by patternGroup.pattern(
         "reward.northstars",
@@ -85,9 +85,9 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §9§lRARE! §r§aForaging XP Boost III Potion §r§egift with §r§b[MVP§r§f+§r§b] m640§r§f§r§e!
-     * REGEX-TEST: §9§lRARE! §r§aFarming XP Boost III Potion §r§egift with §r§7gay_player§r§7§r§e!
-     * REGEX-TEST: §9§lRARE! §r§aEnchanting XP Boost III Potion §r§egift with §r§7cfitz24§r§7§r§e!
+     * @regexTest §9§lRARE! §r§aForaging XP Boost III Potion §r§egift with §r§b[MVP§r§f+§r§b] m640§r§f§r§e!
+     * @regexTest §9§lRARE! §r§aFarming XP Boost III Potion §r§egift with §r§7gay_player§r§7§r§e!
+     * @regexTest §9§lRARE! §r§aEnchanting XP Boost III Potion §r§egift with §r§7cfitz24§r§7§r§e!
      */
     val boostPotionPattern by patternGroup.pattern(
         "reward.boostpotion",
@@ -95,9 +95,9 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §9§lRARE! §r§9Scavenger IV §r§egift with ...
-     * REGEX-TEST: §9§lRARE! §r§9Looting IV §r§egift with ...
-     * REGEX-TEST: §9§lRARE! §r§9Luck VI §r§egift with ...
+     * @regexTest §9§lRARE! §r§9Scavenger IV §r§egift with ...
+     * @regexTest §9§lRARE! §r§9Looting IV §r§egift with ...
+     * @regexTest §9§lRARE! §r§9Luck VI §r§egift with ...
      */
     val enchantmentBookPattern by patternGroup.pattern(
         "reward.enchantmentbook",
@@ -105,10 +105,10 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §e§lSWEET! §r§5Snow Suit Helmet §r§egift with §r§b[MVP§r§4+§r§b] FearNotMyName§r§f§r§e!
-     * REGEX-TEST: §9§lRARE! §r§f◆ Ice Rune §r§egift with §r§b[MVP§r§2+§r§b] TravisScotties§r§f§r§e!
-     * REGEX-TEST: §e§lSWEET! §r§5Snow Suit Chestplate §r§egift with §r§7Sanstin21§r§7§r§e!
-     * REGEX-TEST: §c§lSANTA TIER! §r§6Cryopowder Shard §r§egift with §r§7MicrosoftDotInc§r§7§r§e!
+     * @regexTest §e§lSWEET! §r§5Snow Suit Helmet §r§egift with §r§b[MVP§r§4+§r§b] FearNotMyName§r§f§r§e!
+     * @regexTest §9§lRARE! §r§f◆ Ice Rune §r§egift with §r§b[MVP§r§2+§r§b] TravisScotties§r§f§r§e!
+     * @regexTest §e§lSWEET! §r§5Snow Suit Chestplate §r§egift with §r§7Sanstin21§r§7§r§e!
+     * @regexTest §c§lSANTA TIER! §r§6Cryopowder Shard §r§egift with §r§7MicrosoftDotInc§r§7§r§e!
      */
     val genericRewardPattern by patternGroup.pattern(
         "reward.generic",

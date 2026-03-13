@@ -20,7 +20,7 @@ object CropUpgrades {
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
 
     /**
-     * REGEX-TEST: §7Current Tier: §e7§7/§a9
+     * @regexTest §7Current Tier: §e7§7/§a9
      */
     private val tierPattern by patternGroup.pattern(
         "tier",
@@ -28,7 +28,7 @@ object CropUpgrades {
     )
 
     /**
-     * REGEX-TEST:   §r§6§lCROP UPGRADE §eNether Wart§7 #7
+     * @regexTestWrapped "  §r§6§lCROP UPGRADE §eNether Wart§7 #7"
      */
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",

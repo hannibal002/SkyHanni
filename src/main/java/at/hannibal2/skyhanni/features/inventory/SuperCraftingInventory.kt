@@ -40,7 +40,7 @@ object SuperCraftingInventory {
     private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
 
     /**
-     * REGEX-TEST: Crafting 1,111 items into your sacks!
+     * @regexTest Crafting 1,111 items into your sacks!
      */
     private val craftingCount by craftingPatternGroup.pattern(
         "crafting.count",
@@ -48,9 +48,9 @@ object SuperCraftingInventory {
     )
 
     /**
-     * REGEX-TEST: ✔ 177,889/32 (5,559x) Enchanted Glowstone Dust
-     * REGEX-TEST: ✔ 2,067/320 Enchanted Cocoa Beans
-     * REGEX-TEST: ✔ 1,747/1,600 Enchanted Cocoa Beans
+     * @regexTest ✔ 177,889/32 (5,559x) Enchanted Glowstone Dust
+     * @regexTest ✔ 2,067/320 Enchanted Cocoa Beans
+     * @regexTest ✔ 1,747/1,600 Enchanted Cocoa Beans
      */
     private val craftingResourcePattern by craftingPatternGroup.pattern(
         "crafting.resource",
@@ -58,7 +58,7 @@ object SuperCraftingInventory {
     )
 
     /**
-     * REGEX-TEST: Enchanted Redstone Recipe
+     * @regexTest Enchanted Redstone Recipe
      */
     private val inventoryPattern by craftingPatternGroup.pattern(
         "inventory.name",

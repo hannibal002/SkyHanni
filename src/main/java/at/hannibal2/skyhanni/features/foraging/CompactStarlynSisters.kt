@@ -25,11 +25,11 @@ object CompactStarlynSisters {
     private val patternGroup = RepoPattern.group("foraging.agatha")
 
     /**
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §r§lCOMMON §fBracket in my contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §a§lUNCOMMON §fBracket in my contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §9§lRARE §fBracket in my contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §9§lEPIC §fBracket in my contest!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §9§lLEGENDARY §fBracket in my contest!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou reached the §r§lCOMMON §fBracket in my contest!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou reached the §a§lUNCOMMON §fBracket in my contest!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou reached the §9§lRARE §fBracket in my contest!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou reached the §9§lEPIC §fBracket in my contest!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou reached the §9§lLEGENDARY §fBracket in my contest!
      */
     private val startContestResultsPattern by patternGroup.pattern(
         "start-results",
@@ -37,10 +37,10 @@ object CompactStarlynSisters {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b230 §fpoints!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b2,506 §fpoints!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b700 §fpoints! That's a new §d§lPERSONAL BEST§f!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou earned a total of §b123,700 §fpoints! That's a new §d§lPERSONAL BEST§f!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou earned a total of §b230 §fpoints!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou earned a total of §b2,506 §fpoints!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou earned a total of §b700 §fpoints! That's a new §d§lPERSONAL BEST§f!
+     * @regexTest §e[NPC] §bAgatha§f: §rYou earned a total of §b123,700 §fpoints! That's a new §d§lPERSONAL BEST§f!
      */
     @Suppress("MaxLineLength")
     private val pointsEarnedPattern by patternGroup.pattern(
@@ -49,9 +49,9 @@ object CompactStarlynSisters {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYour previous Personal Best was §b687§f.
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rYour previous Personal Best was §b6,487§f.
-     * REGEX-TEST: §e[NPC] §bPlaceholder Name§f: §rYour previous Personal Best was §b6,487§f.
+     * @regexTest §e[NPC] §bAgatha§f: §rYour previous Personal Best was §b687§f.
+     * @regexTest §e[NPC] §bAgatha§f: §rYour previous Personal Best was §b6,487§f.
+     * @regexTest §e[NPC] §bPlaceholder Name§f: §rYour previous Personal Best was §b6,487§f.
      */
     @Suppress("MaxLineLength")
     private val previousBestPattern by patternGroup.pattern(
@@ -60,8 +60,8 @@ object CompactStarlynSisters {
     )
 
     /***
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rCome see me at §2Murkwater Loch §fto claim your rewards!
-     * REGEX-TEST: §e[NPC] §bPlaceholder Name§f: §rCome see me at §2Murkwater Loch §fto claim your rewards!
+     * @regexTest §e[NPC] §bAgatha§f: §rCome see me at §2Murkwater Loch §fto claim your rewards!
+     * @regexTest §e[NPC] §bPlaceholder Name§f: §rCome see me at §2Murkwater Loch §fto claim your rewards!
      */
     @Suppress("MaxLineLength")
     private val seeMePattern by patternGroup.pattern(
@@ -70,9 +70,9 @@ object CompactStarlynSisters {
     )
 
     /**
-     * REGEX-TEST: §6§lPERSONAL BEST§f: You increased your §bFig §fCollection by §b5,129 §fduring the contest! That's §a5,129 §fmore than your previous best!
-     * REGEX-TEST: §6§lPERSONAL BEST§f: You increased your §bFig §fCollection by §b129 §fduring the contest! That's §a0 §fmore than your previous best!
-     * REGEX-TEST: §6§lPERSONAL BEST§f: You increased your §bFig §fCollection by §b434,325,129 §fduring the contest! That's §a234,455,129 §fmore than your previous best!
+     * @regexTest §6§lPERSONAL BEST§f: You increased your §bFig §fCollection by §b5,129 §fduring the contest! That's §a5,129 §fmore than your previous best!
+     * @regexTest §6§lPERSONAL BEST§f: You increased your §bFig §fCollection by §b129 §fduring the contest! That's §a0 §fmore than your previous best!
+     * @regexTest §6§lPERSONAL BEST§f: You increased your §bFig §fCollection by §b434,325,129 §fduring the contest! That's §a234,455,129 §fmore than your previous best!
      */
     @Suppress("MaxLineLength")
     private val duringContestPersonalBestPattern by patternGroup.pattern(
@@ -81,8 +81,8 @@ object CompactStarlynSisters {
     )
 
     /**
-     * REGEX-TEST: §6Your total §2∮ Sweep §6is now increased by §21.28%§6!
-     * REGEX-TEST: §6Your total §2∮ Sweep §6is now increased by §210%§6!
+     * @regexTest §6Your total §2∮ Sweep §6is now increased by §21.28%§6!
+     * @regexTest §6Your total §2∮ Sweep §6is now increased by §210%§6!
      */
     @Suppress("MaxLineLength")
     private val sweepIncreasePattern by patternGroup.pattern(
@@ -91,12 +91,12 @@ object CompactStarlynSisters {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5129 §fFig logs collected in my Contest§f!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5,129 §fFig logs collected in my Contest§f!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e1,235,129 §fFig logs collected in my Contest§f!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e129 §fFig logs collected in my Contest§f!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e2,678 §fMangrove logs collected in my Contest§f!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e22,989 §fFig logs collected in my Contest§f!
+     * @regexTest §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5129 §fFig logs collected in my Contest§f!
+     * @regexTest §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e5,129 §fFig logs collected in my Contest§f!
+     * @regexTest §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e1,235,129 §fFig logs collected in my Contest§f!
+     * @regexTest §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e129 §fFig logs collected in my Contest§f!
+     * @regexTest §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e2,678 §fMangrove logs collected in my Contest§f!
+     * @regexTest §e[NPC] §bAgatha§f: §6§lPERSONAL BEST§f! You've surpassed your previous record of §e22,989 §fFig logs collected in my Contest§f!
      */
     @Suppress("MaxLineLength")
     private val sisterCollPBDuringContestPattern by patternGroup.pattern(
@@ -105,9 +105,9 @@ object CompactStarlynSisters {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §rKeep it up!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: §fKeep it up!
-     * REGEX-TEST: §e[NPC] §bAgatha§f: Keep it up!
+     * @regexTest §e[NPC] §bAgatha§f: §rKeep it up!
+     * @regexTest §e[NPC] §bAgatha§f: §fKeep it up!
+     * @regexTest §e[NPC] §bAgatha§f: Keep it up!
      */
     @Suppress("MaxLineLength")
     private val sisterKeepItUpPattern by patternGroup.pattern(

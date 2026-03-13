@@ -59,10 +59,10 @@ object CakeTracker {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §cNew Year Cake (Year 360)
-     * REGEX-TEST: §cNew Year Cake (Year 1,000)
-     * REGEX-TEST: §f§f§cNew Year Cake (Year 330)
-     * REGEX-TEST: §f§f§cNew Year Cake (Year 49)
+     * @regexTest §cNew Year Cake (Year 360)
+     * @regexTest §cNew Year Cake (Year 1,000)
+     * @regexTest §f§f§cNew Year Cake (Year 330)
+     * @regexTest §f§f§cNew Year Cake (Year 49)
      */
     private val cakeNamePattern by patternGroup.pattern(
         "cake.name",
@@ -70,7 +70,7 @@ object CakeTracker {
     )
 
     /**
-     * REGEX-TEST: §eYou purchased §r§f§r§f§r§cNew Year Cake (Year 143) §r§efor §r§62,000,000 coins§r§e!
+     * @regexTest §eYou purchased §r§f§r§f§r§cNew Year Cake (Year 143) §r§efor §r§62,000,000 coins§r§e!
      */
     private val cakePurchasedPattern by patternGroup.pattern(
         "cake.purchased",
@@ -78,11 +78,11 @@ object CakeTracker {
     )
 
     /**
-     * REGEX-TEST: Ender Chest (2/9)
-     * REGEX-TEST: Jumbo Backpack (Slot #6)
-     * REGEX-TEST: New Year Cake Bag
-     * REGEX-TEST: Large Chest
-     * REGEX-TEST: Chest
+     * @regexTest Ender Chest (2/9)
+     * @regexTest Jumbo Backpack (Slot #6)
+     * @regexTest New Year Cake Bag
+     * @regexTest Large Chest
+     * @regexTest Chest
      */
     private val cakeContainerPattern by patternGroup.pattern(
         "cake.container",
@@ -90,9 +90,9 @@ object CakeTracker {
     )
 
     /**
-     * REGEX-TEST: Auctions Browser
-     * REGEX-TEST: Auctions: "Test"
-     * REGEX-TEST: Auctions: "New Year Cake (Year
+     * @regexTest Auctions Browser
+     * @regexTest Auctions: "Test"
+     * @regexTest Auctions: "New Year Cake (Year
      */
     private val auctionBrowserPattern by patternGroup.pattern(
         "auction.search",
@@ -100,7 +100,7 @@ object CakeTracker {
     )
 
     /**
-     * REGEX-TEST: Auctions: "New Year C
+     * @regexTest Auctions: "New Year C
      */
     private val auctionCakeSearchPattern by patternGroup.pattern(
         "auction.cakesearch",
@@ -108,7 +108,7 @@ object CakeTracker {
     )
 
     /**
-     * REGEX-TEST: §aYou claimed a §r§cNew Year Cake§r§a!
+     * @regexTest §aYou claimed a §r§cNew Year Cake§r§a!
      */
     private val cakeBakerClaimedPattern by patternGroup.pattern(
         "cake.baker.claimed",

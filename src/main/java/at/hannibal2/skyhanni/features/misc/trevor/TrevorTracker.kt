@@ -27,7 +27,7 @@ object TrevorTracker {
 
     // TODO regex tests
     /**
-     * REGEX-TEST: §aYour mob died randomly, you are rewarded §r§53 pelts§r§a.
+     * @regexTest §aYour mob died randomly, you are rewarded §r§53 pelts§r§a.
      */
     private val selfKillMobPattern by patternGroup.pattern(
         "selfkill",
@@ -35,7 +35,7 @@ object TrevorTracker {
     )
 
     /**
-     * REGEX-TEST: §aKilling the animal rewarded you §r§53 pelts§r§a.
+     * @regexTest §aKilling the animal rewarded you §r§53 pelts§r§a.
      */
     private val killMobPattern by patternGroup.pattern(
         "kill",

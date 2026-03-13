@@ -51,7 +51,7 @@ object EnchantParser {
      * re-populate the tests over time with new examples I guess. (The tests are what is returned
      * from running `formattedTextCompat()` on a lore line, which is what is used against the regex)
      *
-     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
+     * @regexTest §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
@@ -59,7 +59,7 @@ object EnchantParser {
     )
 
     /**
-     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
+     * @regexTest §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(

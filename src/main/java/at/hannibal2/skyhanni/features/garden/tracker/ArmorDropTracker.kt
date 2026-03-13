@@ -39,9 +39,9 @@ object ArmorDropTracker {
     private val patternGroup = RepoPattern.group("garden.armordrops")
 
     /**
-     * REGEX-TEST: FERMENTO_CHESTPLATE
-     * REGEX-TEST: CROPIE_BOOTS
-     * REGEX-TEST: SQUASH_HELMET
+     * @regexTest FERMENTO_CHESTPLATE
+     * @regexTest CROPIE_BOOTS
+     * @regexTest SQUASH_HELMET
      */
     private val armorPattern by patternGroup.pattern(
         "armor",

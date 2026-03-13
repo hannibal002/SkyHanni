@@ -30,10 +30,10 @@ object AbiphoneFeatures {
     private var acceptUUID: String? = null
 
     /**
-     * REGEX-TEST: §a✆ RING... §r §r§2§l[PICK UP]
-     * REGEX-TEST: §a✆ RING... RING... §r §r§2§l[PICK UP]
-     * REGEX-TEST: §a✆ RING... RING... RING... §r §r§2§l[PICK UP]
-     * REGEX-TEST: §a✆ RING... RING... RING...
+     * @regexTest §a✆ RING... §r §r§2§l[PICK UP]
+     * @regexTest §a✆ RING... RING... §r §r§2§l[PICK UP]
+     * @regexTest §a✆ RING... RING... RING... §r §r§2§l[PICK UP]
+     * @regexTest §a✆ RING... RING... RING...
      */
     private val callRingPattern by patternGroup.pattern(
         "call.ring",

@@ -79,7 +79,7 @@ object ForagingTrackerLegacy {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §2§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+     * @regexTest §2§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
      */
     val openCloseRewardPattern by patternGroup.pattern(
         "open-close-reward",
@@ -87,7 +87,7 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                                 §r§9§lTREE GIFT
+     * @regexTestWrapped "                                §r§9§lTREE GIFT"
      */
     val giftHeaderPattern by patternGroup.pattern(
         "header",
@@ -95,9 +95,9 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                  §r§7You helped cut §r§a100% §r§7of the §r§aFig Tree§r§7.
-     * REGEX-TEST:              §r§7You helped cut §r§a100% §r§7of the §r§aMangrove Tree§r§7.
-     * REGEX-TEST:                  §r§7You helped cut §r§c15.2% §r§7of the §r§aFig Tree§r§7.
+     * @regexTestWrapped "                 §r§7You helped cut §r§a100% §r§7of the §r§aFig Tree§r§7."
+     * @regexTestWrapped "             §r§7You helped cut §r§a100% §r§7of the §r§aMangrove Tree§r§7."
+     * @regexTestWrapped "                 §r§7You helped cut §r§c15.2% §r§7of the §r§aFig Tree§r§7."
      */
     val percentageContributedPattern by patternGroup.pattern(
         "contribution-percentage",
@@ -105,8 +105,8 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: §f                       §e+5 rewards gained! §8(hover)
-     * REGEX-TEST:                             §r§e+0 rewards gained!
+     * @regexTest §f                       §e+5 rewards gained! §8(hover)
+     * @regexTestWrapped "                            §r§e+0 rewards gained!"
      */
     val rewardsGainedPattern by patternGroup.pattern(
         "rewards-gained",
@@ -114,15 +114,15 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: §2Forest Essence§r§8 x4
-     * REGEX-TEST: §2Forest Essence§r§8 x12
-     * REGEX-TEST: §2Forest Whispers §r§8x40
-     * REGEX-TEST: §2Forest Whispers §r§8x100
-     * REGEX-TEST: §3Foraging Experience §r§8x1,000
-     * REGEX-TEST: §aHOTF Experience §8x10
-     * REGEX-TEST: §aTender Wood §r§8x0-2
-     * REGEX-TEST: §aVinesap §8x0-3
-     * REGEX-TEST: §6Signal Enhancer §8(§a0.4%§8)
+     * @regexTest §2Forest Essence§r§8 x4
+     * @regexTest §2Forest Essence§r§8 x12
+     * @regexTest §2Forest Whispers §r§8x40
+     * @regexTest §2Forest Whispers §r§8x100
+     * @regexTest §3Foraging Experience §r§8x1,000
+     * @regexTest §aHOTF Experience §8x10
+     * @regexTest §aTender Wood §r§8x0-2
+     * @regexTest §aVinesap §8x0-3
+     * @regexTest §6Signal Enhancer §8(§a0.4%§8)
      */
     @Suppress("MaxLineLength")
     val hoverRewardPattern by patternGroup.pattern(
@@ -131,7 +131,7 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                                 §r§d§lBONUS GIFT
+     * @regexTestWrapped "                                §r§d§lBONUS GIFT"
      */
     val bonusGiftSeparatorPattern by patternGroup.pattern(
         "bonus-gift.separator",
@@ -139,15 +139,15 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                           §r§7§r§aStretching Sticks §r§8(§r§a20%§r§8)
-     * REGEX-TEST:           §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)
-     * REGEX-TEST:           §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)
-     * REGEX-TEST:                            §r§7§r§fSweep Booster §r§8(§r§a1%§r§8)
-     * REGEX-TEST:                     §r§7§r§fForaging Wisdom Booster §r§8(§r§a0.5%§r§8)
-     * REGEX-TEST:                   §r§7§r§aEnchanted Book (§r§d§lMissile I§r§a) §r§8(§r§a0.2%§r§8)
-     * REGEX-TEST:                           §r§7§r§cTree the Fish §r§8(§r§a0.05%§r§8)
-     * REGEX-TEST:                             §r§6Chameleon §r§8(§r§a0.08%§r§8)
-     * REGEX-FAIL:                      §r§7A §r§dPhanflare §r§7fell from the Tree!
+     * @regexTestWrapped "                          §r§7§r§aStretching Sticks §r§8(§r§a20%§r§8)"
+     * @regexTestWrapped "          §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)"
+     * @regexTestWrapped "          §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)"
+     * @regexTestWrapped "                           §r§7§r§fSweep Booster §r§8(§r§a1%§r§8)"
+     * @regexTestWrapped "                    §r§7§r§fForaging Wisdom Booster §r§8(§r§a0.5%§r§8)"
+     * @regexTestWrapped "                  §r§7§r§aEnchanted Book (§r§d§lMissile I§r§a) §r§8(§r§a0.2%§r§8)"
+     * @regexTestWrapped "                          §r§7§r§cTree the Fish §r§8(§r§a0.05%§r§8)"
+     * @regexTestWrapped "                            §r§6Chameleon §r§8(§r§a0.08%§r§8)"
+     * @regexFailWrapped "                     §r§7A §r§dPhanflare §r§7fell from the Tree!"
      */
     val bonusGiftRewardPattern by patternGroup.pattern(
         "bonus-gift.reward",
@@ -155,8 +155,8 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: §aEnchanted Book (§r§d§lMissile I§r§a)
-     * REGEX-TEST: §aEnchanted Book (§r§d§lFirst Impression I§r§a)
+     * @regexTest §aEnchanted Book (§r§d§lMissile I§r§a)
+     * @regexTest §aEnchanted Book (§r§d§lFirst Impression I§r§a)
      */
     val enchantedBookPattern by patternGroup.pattern(
         "bonus-gift.enchanted-book",
@@ -164,9 +164,9 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: §r§7A §r§dPhanpyre §r§7fell from the Tree!
-     * REGEX-TEST: §r§7A §r§dPhanflare §r§7fell from the Tree!
-     * REGEX-TEST: §r§7A §r§dDreadwing §r§7fell from the Tree!
+     * @regexTest §r§7A §r§dPhanpyre §r§7fell from the Tree!
+     * @regexTest §r§7A §r§dPhanflare §r§7fell from the Tree!
+     * @regexTest §r§7A §r§dDreadwing §r§7fell from the Tree!
      */
     val phantomSpawnPattern by patternGroup.pattern(
         "bonus-gift.phantoms",
@@ -174,10 +174,10 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST: ENCHANTED_FIG_LOG
-     * REGEX-TEST: FIG_LOG
-     * REGEX-TEST: ENCHANTED_MANGROVE_LOG
-     * REGEX-TEST: MANGROVE_LOG
+     * @regexTest ENCHANTED_FIG_LOG
+     * @regexTest FIG_LOG
+     * @regexTest ENCHANTED_MANGROVE_LOG
+     * @regexTest MANGROVE_LOG
      */
     val logInternalNamePattern by patternGroup.pattern(
         "log-internal-name",

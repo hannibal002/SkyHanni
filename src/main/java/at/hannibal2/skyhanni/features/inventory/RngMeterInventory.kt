@@ -21,7 +21,7 @@ object RngMeterInventory {
     private val config get() = SkyHanniMod.feature.inventory.rngMeter
 
     /**
-     * REGEX-TEST: §8Catacombs (F1)
+     * @regexTest §8Catacombs (F1)
      */
     private val floorPattern by RepoPattern.pattern(
         "rngmeterinventory.floor.name",

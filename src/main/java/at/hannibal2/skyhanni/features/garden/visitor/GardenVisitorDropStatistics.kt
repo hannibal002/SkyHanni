@@ -57,7 +57,7 @@ object GardenVisitorDropStatistics {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: OFFER ACCEPTED with Duke (UNCOMMON)
+     * @regexTest OFFER ACCEPTED with Duke (UNCOMMON)
      */
     private val acceptPattern by patternGroup.pattern(
         "accept",
@@ -65,7 +65,7 @@ object GardenVisitorDropStatistics {
     )
 
     /**
-     * REGEX-TEST: +20 Copper
+     * @regexTest +20 Copper
      */
     private val copperPattern by patternGroup.pattern(
         "copper",
@@ -73,7 +73,7 @@ object GardenVisitorDropStatistics {
     )
 
     /**
-     * REGEX-TEST: +20 Garden Experience
+     * @regexTest +20 Garden Experience
      */
     private val gardenExpPattern by patternGroup.pattern(
         "gardenexp",
@@ -81,7 +81,7 @@ object GardenVisitorDropStatistics {
     )
 
     /**
-     * REGEX-TEST: +18.2k Farming XP
+     * @regexTest +18.2k Farming XP
      */
     private val farmingExpPattern by patternGroup.pattern(
         "farmingexp",
@@ -89,7 +89,7 @@ object GardenVisitorDropStatistics {
     )
 
     /**
-     * REGEX-TEST: +12 Bits
+     * @regexTest +12 Bits
      */
     private val bitsPattern by patternGroup.pattern(
         "bits",
@@ -97,7 +97,7 @@ object GardenVisitorDropStatistics {
     )
 
     /**
-     * REGEX-TEST: +968 Mithril Powder
+     * @regexTest +968 Mithril Powder
      */
     private val mithrilPowderPattern by patternGroup.pattern(
         "powder.mithril",
@@ -105,7 +105,7 @@ object GardenVisitorDropStatistics {
     )
 
     /**
-     * REGEX-TEST: +754 Gemstone Powder
+     * @regexTest +754 Gemstone Powder
      */
     private val gemstonePowderPattern by patternGroup.pattern(
         "powder.gemstone",

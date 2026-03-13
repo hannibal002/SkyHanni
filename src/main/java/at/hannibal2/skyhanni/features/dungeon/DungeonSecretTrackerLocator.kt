@@ -32,8 +32,8 @@ object DungeonSecretTrackerLocator {
     private val patternGroup = RepoPattern.group("dungeon.secrettracker")
 
     /**
-     * REGEX-TEST: §aThere's a secret §r§e11 blocks in front of you!
-     * REGEX-TEST: §aThere's a secret §r§e38 blocks in front of you and 15 blocks above you§r§a!
+     * @regexTest §aThere's a secret §r§e11 blocks in front of you!
+     * @regexTest §aThere's a secret §r§e38 blocks in front of you and 15 blocks above you§r§a!
      */
     private val secretTrackerMessagePattern by patternGroup.pattern(
         "message",

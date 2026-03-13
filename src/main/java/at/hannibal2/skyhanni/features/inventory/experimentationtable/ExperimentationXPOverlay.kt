@@ -21,16 +21,16 @@ object ExperimentationXPOverlay {
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     /**
-     * REGEX-TEST: §331k Enchanting Exp
-     * REGEX-TEST: §3143k Enchanting Exp
-     * REGEX-TEST: §350k Enchanting Exp
-     * REGEX-TEST: §341k Enchanting Exp
-     * REGEX-TEST: §3137k Enchanting Exp
-     * REGEX-TEST: §3142k Enchanting Exp
-     * REGEX-TEST: §3130k Enchanting Exp
-     * REGEX-TEST: §36.5k Enchanting Exp
-     * REGEX-TEST: §35.5k Enchanting Exp
-     * REGEX-TEST: §33.5k Enchanting Exp
+     * @regexTest §331k Enchanting Exp
+     * @regexTest §3143k Enchanting Exp
+     * @regexTest §350k Enchanting Exp
+     * @regexTest §341k Enchanting Exp
+     * @regexTest §3137k Enchanting Exp
+     * @regexTest §3142k Enchanting Exp
+     * @regexTest §3130k Enchanting Exp
+     * @regexTest §36.5k Enchanting Exp
+     * @regexTest §35.5k Enchanting Exp
+     * @regexTest §33.5k Enchanting Exp
      */
     private val enchantingXPPattern by patternGroup.pattern(
         "enchantingxp",

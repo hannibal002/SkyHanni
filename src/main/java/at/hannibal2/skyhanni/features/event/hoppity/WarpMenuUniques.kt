@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object WarpMenuUniques {
 
     /**
-     * REGEX-TEST: §bSkyBlock Hub
-     * REGEX-TEST: §aThe Barn§7 - §bSpawn
-     * REGEX-TEST: §aCrystal Hollows§7 - §bEntrance
+     * @regexTest §bSkyBlock Hub
+     * @regexTest §aThe Barn§7 - §bSpawn
+     * @regexTest §aCrystal Hollows§7 - §bEntrance
      */
     private val islandNamePattern by RepoPattern.pattern(
         "inventory.warpmenu.island.name",

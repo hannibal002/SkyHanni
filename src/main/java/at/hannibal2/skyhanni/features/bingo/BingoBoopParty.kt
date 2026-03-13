@@ -20,8 +20,8 @@ object BingoBoopParty {
     private val patternGroup = RepoPattern.group("bingo")
 
     /**
-     * REGEX-TEST: §dFrom §b[MVP§3+§b] Tryp0MC§7: §d§lBoop!
-     * REGEX-TEST: §dFrom §b[MVP§5+§b] martimavocado§7: §d§lBoop!
+     * @regexTest §dFrom §b[MVP§3+§b] Tryp0MC§7: §d§lBoop!
+     * @regexTest §dFrom §b[MVP§5+§b] martimavocado§7: §d§lBoop!
      */
     private val boopPattern by patternGroup.pattern(
         "boop",

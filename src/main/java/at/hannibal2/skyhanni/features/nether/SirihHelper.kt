@@ -29,7 +29,7 @@ object SirihHelper {
     private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
 
     /**
-     * REGEX-TEST: §e[NPC] §dSirih§f: §rOink.
+     * @regexTest §e[NPC] §dSirih§f: §rOink.
      */
     private val sirihLine by RepoPattern.pattern(
         "crimson.sirih.helper",
