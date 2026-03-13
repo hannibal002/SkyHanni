@@ -51,7 +51,7 @@ typealias CategoryName = String
 object FishingProfitTracker : SkyHanniItemTracker<FishingProfitTracker.Data>("Fishing Profit Tracker") {
     override val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.fishing.fishingProfitTracker }
-	override val renderConfig = RenderDisplayConfig(
+    override val renderConfig = RenderDisplayConfig(
         outsideInventory = true,
         inOwnInventory = true,
         condition = { isEnabled() && config.enabled && shouldShow }

@@ -50,7 +50,7 @@ object DarkMonolithFeatures : SkyHanniItemTracker<DarkMonolithFeatures.Data>("Da
     private val darkMonolithConfig get() = SkyHanniMod.feature.mining.darkMonolith
     override val config get() = darkMonolithConfig.tracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.darkMonolithTracker }
-	override val renderConfig = RenderDisplayConfig(
+    override val renderConfig = RenderDisplayConfig(
         outsideInventory = true,
         inOwnInventory = true,
         condition = { config.enabled },

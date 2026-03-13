@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 object ArmorDropTracker : SkyHanniTracker<ArmorDropTracker.Data>("Armor Drop Tracker") {
     override val config get() = GardenApi.config.armorDropTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.garden.armorDropTracker }
-	override val renderConfig = RenderDisplayConfig(
+    override val renderConfig = RenderDisplayConfig(
         condition = { shouldShowDisplay() },
     )
     override val customUptimeControl = true
