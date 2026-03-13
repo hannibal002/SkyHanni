@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -34,6 +35,10 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
 ) {
     override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.dragonProfitTracker }
     override val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
+    override val renderConfig = RenderDisplayConfig(
+        condition = { DragonFightAPI.inNestArea() },
+        onlyOnIsland = IslandType.THE_END,
+    )
 
     private var lastPlaced: Int = 0
     private val SUMMONING_EYE = "SUMMONING_EYE".toInternalName()
@@ -97,9 +102,6 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
         event.addItemFromEvent()
         ChatUtils.debug("Added item to tracker: ${event.internalName} (amount: ${event.amount})")
     }
-
-    override val onlyOnIsland: IslandType = IslandType.THE_END
-    override val renderCondition = { DragonFightAPI.inNestArea() }
 
     fun addEyes(amount: Int) {
         modify { it.eyesPlaced += amount }

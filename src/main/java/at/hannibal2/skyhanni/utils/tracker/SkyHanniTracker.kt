@@ -9,12 +9,10 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -61,16 +59,19 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     /**
      * Controls when this tracker's display is rendered.
      *
-     * Override to customise any combination of inventory presence, island filtering,
+     * Override to customize any combination of inventory presence, island filtering,
      * or an enable condition without needing to override six separate vals.
      */
     open val renderConfig: RenderDisplayConfig = RenderDisplayConfig()
 
-    /** Whether this tracker hides when the Estimated Item Value overlay is visible. */
-    protected open val hideInEstimatedValue: Boolean = false
-
-    /** Whether this tracker hides when the player is outside any inventory GUI. */
-    protected open val hideOutsideInventory: Boolean = false
+    /**
+     * Called at the start of each render pass. Return false to suppress rendering entirely.
+     *
+     * Override in subclasses that have additional suppression conditions beyond the standard
+     * [RenderDisplayConfig] gates (e.g. hiding when an overlay is visible, or when outside
+     * an inventory). The base implementation always returns true.
+     */
+    protected open fun shouldRender(): Boolean = true
 
     internal open val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap()
 
@@ -83,8 +84,8 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     protected val textInput = SearchTextInput()
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    // Separate detector used only to drive isInventoryOpen()
-    // Each tracker (optionally) manages its own inventory detection, by overriding renderConfig
+    // Separate detector used only to drive isInventoryOpen(); RenderDisplayHelper manages
+    // its own inventory detection internally for the render condition.
     private val inventoryDetector = InventoryDetector(
         { update() },
         { update() },
@@ -177,8 +178,7 @@ abstract class SkyHanniTracker<Data : TrackerData<*>>(private val staticName: St
     fun firstUpdate() = if (display.isEmpty()) update() else Unit
 
     private fun renderDisplay(position: at.hannibal2.skyhanni.config.core.config.Position) {
-        if (hideInEstimatedValue && EstimatedItemValue.isCurrentlyShowing()) return
-        if (!InventoryUtils.inAnyInventory() && hideOutsideInventory && this is SkyHanniItemTracker) return
+        if (!shouldRender()) return
 
         val searchEnabled = trackerConfig.trackerSearchEnabled.get()
         if (dirty || TrackerManager.dirty || searchEnabled != wasSearchEnabled) {

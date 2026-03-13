@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -34,10 +35,14 @@ import kotlin.time.Duration.Companion.seconds
 object MythologicalCreatureTracker : SkyHanniTracker<MythologicalCreatureTracker.Data>("Mythological Creature Tracker") {
     override val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.diana.mythologicalMobTracker }
-    override val renderCondition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) }
-    override fun extraOnRender() {
-        if (DianaApi.hasSpadeInHand()) firstUpdate()
-    }
+    override val renderConfig = RenderDisplayConfig(
+        condition = {
+            config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand())
+        },
+        onRender = {
+            if (DianaApi.hasSpadeInHand()) firstUpdate()
+        },
+    )
 
     // TODO create a draggable list from repo one that can be done
     private val shardMobs = listOf(

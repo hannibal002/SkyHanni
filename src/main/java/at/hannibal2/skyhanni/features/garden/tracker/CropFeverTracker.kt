@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -48,12 +49,14 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
     override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.garden.cropFeverTracker }
     override val config get() = SkyHanniMod.feature.garden.cropFeverTracker
     override val customUptimeControl: Boolean = true
-    override val onlyOnIsland: IslandType = IslandType.GARDEN
-    override val renderCondition: () -> Boolean = {
-        val holdEnabled = (!config.onlyWithTool || GardenApi.isHoldingCropFever())
-        val feverEnabled = (!config.onlyDuringFever || isCropFever)
-        config.enabled && holdEnabled && feverEnabled
-    }
+    override val renderConfig = RenderDisplayConfig(
+        condition = {
+            val holdEnabled = (!config.onlyWithTool || GardenApi.isHoldingCropFever())
+            val feverEnabled = (!config.onlyDuringFever || isCropFever)
+            config.enabled && holdEnabled && feverEnabled
+        },
+        onlyOnIsland = IslandType.GARDEN,
+    )
 
     data class BucketData(
         @Expose var blocksBrokenDuring: MutableMap<CropType, Long> = EnumMap(CropType::class.java),

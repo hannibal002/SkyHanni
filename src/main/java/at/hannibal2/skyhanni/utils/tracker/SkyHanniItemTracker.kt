@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -58,8 +60,11 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
     // per-tracker config and universalTracker (which extends ItemTrackerSettings) satisfy it.
     override val trackerConfig: ItemTrackerSettings get() = super.trackerConfig as ItemTrackerSettings
 
-    override val hideInEstimatedValue: Boolean get() = trackerConfig.itemTracker.hideInEstimatedItemValue
-    override val hideOutsideInventory: Boolean get() = trackerConfig.itemTracker.hideOutsideInventory
+    override fun shouldRender(): Boolean {
+        if (trackerConfig.itemTracker.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return false
+        if (!InventoryUtils.inAnyInventory() && trackerConfig.itemTracker.hideOutsideInventory) return false
+        return true
+    }
 
     private val scrollValue = ScrollValue()
 

@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
 import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.GardenIndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -73,7 +74,7 @@ class PestProfitTrackerConfig : TopLevelTrackerConfig<ItemTrackerSettings> {
     @Expose
     @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    override val perTrackerConfig: GardenIndividualItemTrackerConfig = GardenIndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<GardenItemTrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = PestProfitTrackerConfig::class, field = "enabled")

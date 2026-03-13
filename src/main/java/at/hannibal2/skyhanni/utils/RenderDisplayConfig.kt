@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper.Companion.NO_INVENTORY
  *   but it may also include feature specific condition checking, etc.
  * @property onlyOnIsland restrict rendering to a specific Skyblock island, or null for any island.
  * @property onlyOnIslandTag restrict rendering to islands with a specific tag, or null for any.
+ * @property onRender block to run when the config is used to render.
  */
 class RenderDisplayConfig(
     val inventoryDetector: InventoryDetector = NO_INVENTORY,
@@ -28,4 +29,5 @@ class RenderDisplayConfig(
     val condition: () -> Boolean = { true },
     val onlyOnIsland: IslandType? = null,
     val onlyOnIslandTag: IslandTypeTag? = null,
+    val onRender: () -> Unit = { },
 )

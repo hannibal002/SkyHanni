@@ -30,8 +30,8 @@ object GardenUptimeCommand {
         for (num in 0..<days) {
 
             val day = date.minusDays(num.toLong())
-            val entry = storage?.getData(DisplayMode.DAY, day.toString())
-            val uptime = entry?.getTotalUptime() ?: 0.seconds
+            val entry = storage?.getOrPutEntry(DisplayMode.DAY, day.toString())
+            val uptime = entry?.value?.getTotalUptime() ?: 0.seconds
 
             val dayString = if (day == LocalDate.now()) "Today" else day.toString()
 

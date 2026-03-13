@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -39,9 +40,17 @@ import com.google.gson.annotations.Expose
 object DianaProfitTracker : SkyHanniItemTracker<DianaProfitTracker.Data>("Diana Profit Tracker") {
     override val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
     override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.diana.profitTracker }
-    override fun extraOnRender() {
-        if (DianaApi.hasSpadeInHand()) firstUpdate()
-    }
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = {
+            config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand())
+        },
+        onRender = {
+            if (DianaApi.hasSpadeInHand()) firstUpdate()
+        }
+    )
+
     override val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = mapOf(
         DisplayMode.MAYOR to {
             it.diana.profitTrackerPerElection.getOrPut(
@@ -49,11 +58,6 @@ object DianaProfitTracker : SkyHanniItemTracker<DianaProfitTracker.Data>("Diana 
             )
         },
     )
-    override val outsideInventory = true
-    override val inOwnInventory = true
-    override val renderCondition: () -> Boolean = {
-        config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand())
-    }
 
     private var allowedDrops = listOf<NeuInternalName>()
 
