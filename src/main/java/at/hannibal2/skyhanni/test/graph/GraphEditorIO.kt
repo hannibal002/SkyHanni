@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test.graph
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.async
 import at.hannibal2.skyhanni.SkyHanniMod.launch
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.Graph
@@ -10,12 +11,12 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -94,10 +95,15 @@ object GraphEditorIO {
 
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
+        useAsIslandArea(compileGraph)
+        showStats(networkCount)
+    }
 
-        if (config.useAsIslandArea) bridgeGraphNetworksConfig.launch {
+    private fun useAsIslandArea(compileGraph: Graph) {
+        if (!GraphEditor.config.useAsIslandArea) return
+        bridgeGraphNetworksConfig.launchCoroutine {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
-            Minecraft.getInstance().execute {
+            DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
                 GraphEditorBugFinder.runTests()
                 if (GraphEditorNodeFinder.active) {
@@ -105,25 +111,25 @@ object GraphEditorIO {
                 }
             }
         }
+    }
 
-        if (config.showsStats) {
-            val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
-            val namedNodes = nodes.count { it.name != null }.addSeparators()
-            ChatUtils.chat(
-                "§lStats\n" +
-                    "§eNamed Nodes: $namedNodes\n" +
-                    "§eNodes: ${nodes.size.addSeparators()}\n" +
-                    "§eEdges: ${edges.size.addSeparators()}\n" +
-                    "§eLength: $length",
-            )
-            if (networkCount > 1) {
-                ChatUtils.clickableChat(
-                    "§cNetworks: ${networkCount.addSeparators()}",
-                    onClick = { GraphEditorNetworks.findNetworks() },
-                    hover = "Click to find networks!",
-                )
-            }
-        }
+    private fun showStats(networkCount: Int) {
+        if (!GraphEditor.config.showsStats) return
+        val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
+        val namedNodes = nodes.count { it.name != null }.addSeparators()
+        ChatUtils.chat(
+            "§lStats\n" +
+                "§eNamed Nodes: $namedNodes\n" +
+                "§eNodes: ${nodes.size.addSeparators()}\n" +
+                "§eEdges: ${edges.size.addSeparators()}\n" +
+                "§eLength: $length",
+        )
+        if (networkCount <= 1) return
+        ChatUtils.clickableChat(
+            "§cNetworks: ${networkCount.addSeparators()}",
+            onClick = { GraphEditorNetworks.findNetworks() },
+            hover = "Click to find networks!",
+        )
     }
 
     fun loadThisIsland() {
@@ -148,10 +154,20 @@ object GraphEditorIO {
 
     fun mergeFromClipboard() = mergeJsonConfig.launch {
         val json = OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard is empty!")
-        runCatching {
-            val graph = Graph.fromJson(json)
-            Minecraft.getInstance().execute {
-                GraphEditorHistory.save("merge from clipboard")
+        mergeJsonConfig.launchCoroutine {
+            try {
+                val graph = Graph.fromJson(json)
+                DelayedRun.runOrNextTick {
+                    merging(graph)
+                }
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
+            }
+        }
+    }
+
+    private fun merging(graph: Graph) {
+        GraphEditorHistory.save("merge from clipboard")
 
                 var nextId = state.id
                 val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
@@ -162,13 +178,9 @@ object GraphEditorIO {
                 GraphEditorNetworks.recalculate()
                 GraphEditor.updateCache()
 
-                val nodeCount = newNodes.size.addSeparators()
-                val edgeCount = newEdges.size.addSeparators()
-                ChatUtils.chat("Merged $nodeCount nodes and $edgeCount edges from clipboard.")
-            }
-        }.getOrElse { e ->
-            ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
-        }
+        val nodeCount = newNodes.size.addSeparators()
+        val edgeCount = newEdges.size.addSeparators()
+        ChatUtils.chat("Merged $nodeCount nodes and $edgeCount edges from clipboard.")
     }
 
     private fun convertToGraphingData(graph: Graph, idProvider: (GraphNode) -> Int): Pair<List<GraphingNode>, List<GraphingEdge>> {

@@ -90,7 +90,7 @@ object ItemAbilityCooldown {
                 }
             }
 
-            event.soundName == "random.fizz" && event.pitch == 0.4920635f && event.volume == 1f -> {
+            event.soundName == "block.lava.extinguish" && event.pitch == 0.4920635f && event.volume == 1f -> {
                 val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
                 if (scrolls.contains(ItemAbility.SHADOW_WARP_SCROLL)) {
                     ItemAbility.SHADOW_WARP_SCROLL.sound()

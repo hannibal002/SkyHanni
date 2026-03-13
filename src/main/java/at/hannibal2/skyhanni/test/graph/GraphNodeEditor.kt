@@ -46,7 +46,7 @@ object GraphNodeEditor {
     private fun doRender() {
         if (!isEnabled()) return
 
-        config.namedNodesList.renderRenderables(
+        GraphEditor.config.namedNodesList.renderRenderables(
             getNodeNames(),
             posLabel = "Graph Nodes List",
         )
@@ -298,7 +298,4 @@ object GraphNodeEditor {
     }
 
     private fun isEnabled() = GraphEditor.isEnabled()
-
-    private val config get() = GraphEditor.config
-
 }
