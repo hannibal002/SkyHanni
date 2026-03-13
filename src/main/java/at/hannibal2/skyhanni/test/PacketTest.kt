@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateField
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
@@ -256,8 +257,7 @@ object PacketTest {
             is ClientboundTeleportEntityPacket -> id()
             is ClientboundUpdateMobEffectPacket -> entityId
             is ClientboundAddEntityPacket -> id
-            is ClientboundEntityEventPacket ->
-                javaClass.getDeclaredField("entityId").makeAccessible().get(this) as Int
+            is ClientboundEntityEventPacket -> getPrivateField("entityId") as Int
             /* is S14PacketEntity.S15PacketEntityRelMove ->
                 packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int
             is S14PacketEntity.S16PacketEntityLook ->
