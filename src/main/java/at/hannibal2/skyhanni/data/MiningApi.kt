@@ -247,7 +247,7 @@ object MiningApi {
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (event.clickType != WorldClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         val now = SimpleTimeMark.now()
         recentClickedBlocks[event.position] = now

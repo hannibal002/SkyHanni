@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.CropStartLocationConfig.CropLocationMode
-import at.hannibal2.skyhanni.data.WorldClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -54,7 +54,7 @@ object GardenStartLocation {
     @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != WorldClickType.LEFT_CLICK || !GardenApi.hasFarmingToolInHand()) return
+        if (event.clickType != InteractClickType.LEFT_CLICK || !GardenApi.hasFarmingToolInHand()) return
         if (GardenApi.onUnfarmablePlot) return
         val startLocations = GardenApi.storage?.cropStartLocations ?: return
         val lastFarmedLocations = GardenApi.storage?.cropLastFarmedLocations ?: return

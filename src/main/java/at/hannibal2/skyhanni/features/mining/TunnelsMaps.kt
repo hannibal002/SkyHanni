@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.WorldClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -495,7 +495,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !config.leftClickPigeon) return
-        if (event.clickType != WorldClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.itemInHand?.getInternalNameOrNull() != ROYAL_PIGEON) return
         nextSpot()
     }

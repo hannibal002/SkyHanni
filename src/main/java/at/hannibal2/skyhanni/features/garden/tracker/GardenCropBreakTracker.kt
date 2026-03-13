@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.data.WorldClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -50,7 +50,7 @@ object GardenCropBreakTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != WorldClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.crop != lastBrokenCropType) lastBrokenCropType = event.crop
 
         if (GardenApi.mushroomCowPet) {

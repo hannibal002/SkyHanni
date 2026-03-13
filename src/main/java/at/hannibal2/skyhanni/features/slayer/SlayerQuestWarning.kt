@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.WorldClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -114,7 +114,7 @@ object SlayerQuestWarning {
     fun onItemClick(event: ItemClickEvent) {
         val internalName = event.itemInHand?.getInternalNameOrNull()
 
-        if (event.clickType == WorldClickType.RIGHT_CLICK) {
+        if (event.clickType == InteractClickType.RIGHT_CLICK) {
             if (internalName in teleportItems) {
                 // ignore harmless teleportation
                 return

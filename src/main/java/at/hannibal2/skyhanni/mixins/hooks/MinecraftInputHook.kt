@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.data.WorldClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
@@ -17,7 +17,7 @@ object MinecraftInputHook {
     fun shouldCancelMouseRightClick(hitResult: HitResult?): Boolean =
         handleClick(
             hitResult,
-            WorldClickType.RIGHT_CLICK,
+            InteractClickType.RIGHT_CLICK,
             ServerboundInteractPacket.ActionType.INTERACT_AT,
         )
 
@@ -25,7 +25,7 @@ object MinecraftInputHook {
     fun shouldCancelMouseLeftClick(hitResult: HitResult?): Boolean =
         handleClick(
             hitResult,
-            WorldClickType.LEFT_CLICK,
+            InteractClickType.LEFT_CLICK,
             ServerboundInteractPacket.ActionType.ATTACK,
         )
 
@@ -40,10 +40,10 @@ object MinecraftInputHook {
 
         if (currentBlockPos == position) return false
 
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), WorldClickType.LEFT_CLICK).post()
+        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), InteractClickType.LEFT_CLICK).post()
 
         return BlockClickEvent(
-            WorldClickType.LEFT_CLICK,
+            InteractClickType.LEFT_CLICK,
             position.toLorenzVec(),
             InventoryUtils.getItemInHand(),
         ).also {
@@ -53,7 +53,7 @@ object MinecraftInputHook {
 
     private fun handleClick(
         hitResult: HitResult?,
-        clickType: WorldClickType,
+        clickType: InteractClickType,
         entityAction: ServerboundInteractPacket.ActionType,
     ): Boolean {
         if (hitResult == null) return false
