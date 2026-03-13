@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -61,9 +60,9 @@ object BlazeSlayerDaggerHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        if (!isEnabled()) return
+        if (!config.daggers) return
 
         val dagger = getDaggerFromStack(InventoryUtils.getItemInHand())
         if (dagger != null) {
@@ -182,9 +181,9 @@ object BlazeSlayerDaggerHelper {
         return null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTitleReceived(event: TitleReceivedEvent) {
-        if (!isEnabled()) return
+        if (!config.daggers) return
 
         for (shield in HellionShield.entries) {
             if (shield.formattedName in event.title) {
@@ -200,13 +199,9 @@ object BlazeSlayerDaggerHelper {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return SkyBlockUtils.inSkyBlock && config.daggers
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
-        if (!isEnabled()) return
+        if (!config.daggers) return
         if (clientSideClicked) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
@@ -246,9 +241,9 @@ object BlazeSlayerDaggerHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.daggers) return
 
         val currentScreen = Minecraft.getInstance().screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return

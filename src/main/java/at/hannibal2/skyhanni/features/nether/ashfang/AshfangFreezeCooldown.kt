@@ -18,31 +18,28 @@ import kotlin.time.Duration.Companion.seconds
 object AshfangFreezeCooldown {
 
     private val config get() = AshfangManager.config
-
     private val cryogenicBlastPattern by RepoPattern.pattern(
         "ashfang.freeze.cryogenic",
         "§cAshfang Follower's Cryogenic Blast hit you for .* damage!",
     )
 
     private var unfrozenTime = SimpleTimeMark.farPast()
-    private val duration = 3.seconds
+    private val freezeDuration = 3.seconds
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (cryogenicBlastPattern.matches(event.message)) unfrozenTime = SimpleTimeMark.now() + duration
+        if (cryogenicBlastPattern.matches(event.message)) unfrozenTime = SimpleTimeMark.now() + freezeDuration
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!isCurrentlyFrozen()) return
+        if (!isEnabled() || !isCurrentlyFrozen()) return
 
         val format = unfrozenTime.timeUntil().format(showMilliSeconds = true)
-        config.freezeCooldownPos.renderRenderable(
-            Renderable.text("§cAshfang Freeze: §a$format"),
-            posLabel = "Ashfang Freeze Cooldown",
-        )
+        val display = Renderable.text("§cAshfang Freeze: §a$format")
+
+        config.freezeCooldownPos.renderRenderable(display, posLabel = "Ashfang Freeze Cooldown")
     }
 
     fun isCurrentlyFrozen() = unfrozenTime.isInFuture()

@@ -21,7 +21,8 @@ object CurrentPetDisplay {
         if (RiftApi.inRift() || !config.display) return
 
         val displayName = CurrentPetApi.currentPet?.getUserFriendlyName(includeLevel = false) ?: return
-        config.displayPos.renderRenderable(Renderable.text(displayName), posLabel = "Current Pet")
+        val display = Renderable.text(displayName)
+        config.displayPos.renderRenderable(display, posLabel = "Current Pet")
     }
 
     @HandleEvent

@@ -28,12 +28,11 @@ object FirePillarDisplay {
     )
 
     private var display: Renderable? = null
-
     private var entityId: Int = 0
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
-        if (!isEnabled()) return
+        if (!config.firePillarDisplay) return
         val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
         entityId = event.entity.id
         display = Renderable.text("§cFire Pillar: §b${seconds}s")
@@ -44,12 +43,10 @@ object FirePillarDisplay {
         if (event.entity.id == entityId) display = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.firePillarDisplay) return
 
         config.firePillarDisplayPosition.renderRenderable(display, posLabel = "Fire Pillar")
     }
-
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.firePillarDisplay
 }

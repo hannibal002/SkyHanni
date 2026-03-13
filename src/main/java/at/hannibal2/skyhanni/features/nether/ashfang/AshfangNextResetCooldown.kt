@@ -19,17 +19,14 @@ object AshfangNextResetCooldown {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (AshfangManager.lastSpawnTime.isFarPast()) return
+        if (!isEnabled() || AshfangManager.lastSpawnTime.isFarPast()) return
         val nextSpawn = AshfangManager.lastSpawnTime + ashfangResetTime
 
         val format = if (nextSpawn.isInPast()) "§aNow!"
         else "§b${nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)}"
 
-        config.nextResetCooldownPos.renderRenderable(
-            Renderable.text("§cAshfang next reset in: $format"),
-            posLabel = "Ashfang Reset Cooldown",
-        )
+        val display = Renderable.text("§cAshfang next reset in: $format")
+        config.nextResetCooldownPos.renderRenderable(display, posLabel = "Ashfang Reset Cooldown")
     }
 
     @HandleEvent
