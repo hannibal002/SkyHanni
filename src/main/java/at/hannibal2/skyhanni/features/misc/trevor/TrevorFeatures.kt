@@ -52,6 +52,7 @@ import kotlin.time.Duration.Companion.seconds
 object TrevorFeatures {
     private val patternGroup = RepoPattern.group("misc.trevor")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: [NPC] Trevor: You can find your TRACKABLE animal near the §eDesert Mountain.
      */
@@ -103,7 +104,9 @@ object TrevorFeatures {
         "area.trappersden",
         "Trapper's Den",
     )
+    // </editor-fold>
 
+    // TODO form to data class, use Resettable
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY
@@ -242,9 +245,7 @@ object TrevorFeatures {
         else "$timeUntilNextReady seconds left"
 
         val display = Renderable.text("${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage")
-        config.cooldownGuiPosition.renderRenderable(
-            display, posLabel = "Trapper Cooldown GUI",
-        )
+        config.cooldownGuiPosition.renderRenderable(display, posLabel = "Trapper Cooldown GUI")
     }
 
     private fun updateTrapper() {

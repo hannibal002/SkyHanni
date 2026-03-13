@@ -38,6 +38,7 @@ object LimboTimeTracker {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val config get() = SkyHanniMod.feature.misc
 
+    // TODO reshape to data class, use Resettable
     private var limboJoinTime = SimpleTimeMark.farPast()
     var inLimbo = false
     private var inFakeLimbo = false
@@ -52,6 +53,7 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
+        // TODO repo pattern
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
@@ -116,12 +118,9 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!inLimbo) return
-        if (SkyBlockUtils.inSkyBlock) {
-            leaveLimbo()
-            return
-        }
+        if (!isEnabled() || !inLimbo) return
+        if (SkyBlockUtils.inSkyBlock) return leaveLimbo()
+
         val duration = limboJoinTime.passedSince().format()
         val display = Renderable.text("§eIn Limbo since §b$duration")
         config.showTimeInLimboPosition.renderRenderable(display, posLabel = "Limbo Time Tracker")
@@ -206,10 +205,9 @@ object LimboTimeTracker {
 
     fun isEnabled() = config.showTimeInLimbo
 
-    private fun tryTruncateFloat(input: Float): String {
-        val string = input.toString()
-        return if (string.endsWith(".0")) return string.dropLast(2)
-        else string
+    private fun tryTruncateFloat(input: Float): String = input.toString().let {
+        if (it.endsWith(".0")) it.dropLast(2)
+        else it
     }
 
     @HandleEvent
