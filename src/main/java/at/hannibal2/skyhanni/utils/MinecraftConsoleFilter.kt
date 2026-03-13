@@ -41,6 +41,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         }
     }
 
+    @Suppress("LongMethod")
     override fun filter(event: LogEvent?): Filter.Result {
         if (event == null) return Filter.Result.ACCEPT
 
@@ -125,9 +126,11 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
             }
         }
 
-        if (filterConfig.filterInvalidSkinSignature && (formattedMessage.startsWith("Failed to verify signature on property")
-                || formattedMessage.startsWith("Profile contained invalid signature for textures property")
-                || formattedMessage.startsWith("Malformed signature encoding on property"))
+        if (filterConfig.filterInvalidSkinSignature && (
+                formattedMessage.startsWith("Failed to verify signature on property") ||
+                    formattedMessage.startsWith("Profile contained invalid signature for textures property") ||
+                    formattedMessage.startsWith("Malformed signature encoding on property")
+                )
         ) {
             filterConsole("invalid skin signature")
             return Filter.Result.DENY
