@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -72,7 +71,7 @@ object DungeonDeathCounter {
             3 -> "§c"
             else -> "§4"
         }
-        display = Renderable.text(DungeonMilestonesDisplay.color + color + "Deaths: $deaths")
+        display = Renderable.text(color + "Deaths: $deaths")
     }
 
     @HandleEvent

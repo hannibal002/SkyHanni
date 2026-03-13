@@ -34,6 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TheGreatSpook {
     private val config get() = SkyHanniMod.feature.event.spook
+    private val needPrimalFear get() = config.primalFearNotification || config.primalFearTimer
 
     private var isGreatSpookActive = false
     private var greatSpookTimeRange: ClosedRange<SimpleTimeMark>? = null
@@ -90,9 +91,8 @@ object TheGreatSpook {
                     showSmallerUnits = false,
                 )
             }"
-        } else {
-            "§5§lPrimal Fear Ready!"
-        }
+        } else "§5§lPrimal Fear Ready!"
+
         displayMobCooldown = Renderable.text(mobCooldownString)
 
         if (config.primalFearNotification && mobCooldown.isInPast()) {
@@ -148,20 +148,14 @@ object TheGreatSpook {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isGreatSpookActive) return
 
-        if (config.primalFearTimer) {
-            displayMobCooldown.let {
-                config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
-            }
+        if (config.primalFearTimer) displayMobCooldown?.let {
+            config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
         }
-        if (config.fearStatDisplay) {
-            SkyblockStat.FEAR.displayValue?.let {
-                config.positionFear.renderRenderable(Renderable.text(it), posLabel = "Fear Stat Display")
-            }
+        if (config.fearStatDisplay) SkyblockStat.FEAR.displayValue?.let {
+            config.positionFear.renderRenderable(Renderable.text(it), posLabel = "Fear Stat Display")
         }
-        if (config.greatSpookTimeLeft) {
-            displayGreatSpookEnd.let {
-                config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
-            }
+        if (config.greatSpookTimeLeft) displayGreatSpookEnd?.let {
+            config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
         }
     }
 
@@ -199,28 +193,22 @@ object TheGreatSpook {
 
         if (primalFearSpawnPattern.matches(event.message)) {
             timeUntilNextMob = SimpleTimeMark.now().plus(6.minutes)
-            if (SkyblockStat.FEAR.lastKnownValue == null && (config.primalFearNotification || config.primalFearTimer)) {
-                ChatUtils.userError(
-                    "Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.",
-                    replaceSameMessage = true,
-                )
-            }
+            if (SkyblockStat.FEAR.lastKnownValue == null && needPrimalFear) ChatUtils.userError(
+                "Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.",
+                replaceSameMessage = true,
+            )
             return
         }
 
-        if (config.primalFearSolver.math) {
-            mathFearMessagePattern.matchMatcher(event.message) {
-                DelayedRun.runNextTick {
-                    mathSolver(group("math"))
-                }
+        if (config.primalFearSolver.math) mathFearMessagePattern.matchMatcher(event.message) {
+            DelayedRun.runNextTick {
+                mathSolver(group("math"))
             }
         }
 
-        if (config.primalFearSolver.publicSpeaking) {
-            speakingFearMessagePattern.matchMatcher(event.message) {
-                DelayedRun.runNextTick {
-                    publicSpeakingSolver()
-                }
+        if (config.primalFearSolver.publicSpeaking) speakingFearMessagePattern.matchMatcher(event.message) {
+            DelayedRun.runNextTick {
+                publicSpeakingSolver()
             }
         }
     }

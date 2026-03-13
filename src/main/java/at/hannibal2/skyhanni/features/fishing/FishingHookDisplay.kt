@@ -23,20 +23,17 @@ object FishingHookDisplay {
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
     private var armorStand: ArmorStand? = null
     private val potentialArmorStands = mutableListOf<ArmorStand>()
+    // Todo repo pattern?
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
     private var isRendering = false
 
     @HandleEvent
-    fun onWorldChange() {
-        reset()
-    }
+    fun onWorldChange() = reset()
 
     @HandleEvent
-    fun onBobberThrow(event: FishingBobberCastEvent) {
-        reset()
-    }
+    fun onBobberThrow(event: FishingBobberCastEvent) = reset()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         if (!isEnabled()) return
 
@@ -53,13 +50,13 @@ object FishingHookDisplay {
         armorStand = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<ArmorStand>) {
         if (!isEnabled()) return
         potentialArmorStands.add(event.entity)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
@@ -70,7 +67,7 @@ object FishingHookDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         isRendering = false
@@ -82,10 +79,8 @@ object FishingHookDisplay {
         }
         if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible) return
         val alertText = Renderable.text(
-            if (armorStand.name.string == "!!!") config.customAlertText.replace(
-                "&",
-                "§",
-            ) else armorStand.name.formattedTextCompatLessResets(),
+            if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§")
+            else armorStand.name.formattedTextCompatLessResets(),
         )
 
         isRendering = true
@@ -97,12 +92,8 @@ object FishingHookDisplay {
         event.transform(72, "fishing.fishingHookDisplay.position", Position::migrate)
     }
 
-    private fun ArmorStand.hasCorrectName(): Boolean {
-        if (name.string == "!!!") {
-            return true
-        }
-        return pattern.matcher(name.formattedTextCompatLessResets()).matches()
-    }
+    private fun ArmorStand.hasCorrectName(): Boolean =
+        (name.string == "!!!") || pattern.matcher(name.formattedTextCompatLessResets()).matches()
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && FishingApi.holdingRod
+    fun isEnabled() = config.enabled && FishingApi.holdingRod
 }

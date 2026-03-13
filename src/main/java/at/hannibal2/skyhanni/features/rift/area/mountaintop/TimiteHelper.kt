@@ -89,7 +89,6 @@ object TimiteHelper {
         val timeLeft = holdingClick + time.milliseconds
         if (!timeLeft.isInPast()) {
             val formattedTime = timeLeft.timeUntil().format(showMilliSeconds = true)
-            Renderable.text("§b$formattedTime")
             config.timerPosition.renderRenderable(
                 Renderable.text("§b$formattedTime"),
                 posLabel = "Timite Helper",
