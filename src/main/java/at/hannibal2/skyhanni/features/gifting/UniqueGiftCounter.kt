@@ -12,8 +12,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -27,7 +29,7 @@ object UniqueGiftCounter {
         "§7Unique Players Gifted: §a(?<amount>.*)",
     )
 
-    private var display = ""
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -61,14 +63,14 @@ object UniqueGiftCounter {
         val max = 600
         val hasMax = amountGifted >= max
         val color = if (hasMax) "§a" else "§e"
-        display = "§7Unique Players Gifted: $color$amountGifted/$max"
+        display = Renderable.text("§7Unique Players Gifted: $color$amountGifted/$max")
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderString(
+        config.position.renderRenderable(
             display,
             posLabel = "Unique Gift Counter",
         )

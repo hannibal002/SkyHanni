@@ -9,16 +9,18 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object SharkFishCounter {
 
     private var counter = mutableListOf(0, 0, 0, 0)
-    private var display = ""
+    private var display: Renderable? = null
     private var hasWaterRodInHand = false
 
     @HandleEvent
@@ -28,9 +30,11 @@ object SharkFishCounter {
         val name = event.seaCreature.name
         if (!name.contains("Shark")) return
         counter[sharkIndex(name)] += if (event.doubleHook) 2 else 1
-        display = "§7Sharks caught: §e${
-            counter.sum().addSeparators()
-        } §7(§a${counter[0]} §9${counter[1]} §5${counter[2]} §6${counter[3]}§7)"
+        display = Renderable.text(
+            "§7Sharks caught: §e${
+                counter.sum().addSeparators()
+            } §7(§a${counter[0]} §9${counter[1]} §5${counter[2]} §6${counter[3]}§7)",
+        )
     }
 
     private fun sharkIndex(name: String): Int = when {
@@ -71,10 +75,10 @@ object SharkFishCounter {
                 appendWithColor("$g", ChatFormatting.GOLD)
                 appendWithColor(") ", ChatFormatting.WHITE)
                 append("sharks during this fishing festival. $funnyComment")
-            }
+            },
         )
         counter = mutableListOf(0, 0, 0, 0)
-        display = ""
+        display = null
     }
 
     private fun funnyComment(count: Int): String = when {
@@ -94,6 +98,6 @@ object SharkFishCounter {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 
-        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderString(display, posLabel = "Shark Fish Counter")
+        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderRenderable(display, posLabel = "Shark Fish Counter")
     }
 }

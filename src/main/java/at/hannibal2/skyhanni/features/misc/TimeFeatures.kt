@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -39,20 +41,22 @@ object TimeFeatures {
                 // 24 h format
                 SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds) ":ss" else ""}")
             }
-            val currentTime = timeFormat.format(System.currentTimeMillis())
-            config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
+            val currentTime = Renderable.text(timeFormat.format(System.currentTimeMillis()))
+            config.realTimePosition.renderRenderable(currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isCurrent()) {
             if (WinterApi.isDecember()) return
             val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
-            val text = if (alreadyInNextYear) {
-                "§fJerry's Workshop §cis closing!"
-            } else {
-                "§fJerry's Workshop §ecloses in §b${timeTillNextYear.format()}"
-            }
-            winterConfig.islandCloseTimePosition.renderString(text, posLabel = "Winter Time")
+            val text = Renderable.text(
+                if (alreadyInNextYear) {
+                    "§fJerry's Workshop §cis closing!"
+                } else {
+                    "§fJerry's Workshop §ecloses in §b${timeTillNextYear.format()}"
+                },
+            )
+            winterConfig.islandCloseTimePosition.renderRenderable(text, posLabel = "Winter Time")
         }
     }
 

@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -46,7 +48,7 @@ object DungeonCopilot {
         "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern(),
     )
 
-    private var nextStep = ""
+    private var nextStep: Renderable? = null
     private var searchForKey = false
 
     @HandleEvent
@@ -104,7 +106,7 @@ object DungeonCopilot {
     }
 
     private fun changeNextStep(step: String) {
-        nextStep = step
+        nextStep = Renderable.text(step)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -151,7 +153,7 @@ object DungeonCopilot {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        config.pos.renderRenderable(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @HandleEvent

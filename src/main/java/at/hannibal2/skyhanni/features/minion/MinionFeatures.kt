@@ -70,7 +70,7 @@ object MinionFeatures {
     private var lastMinionOpened = 0L
 
     private var lastInventoryClosed = 0L
-    private var coinsPerDay = ""
+    private var coinsPerDay: Renderable? = null
 
     private val patternGroup = RepoPattern.group("minion")
 
@@ -261,7 +261,7 @@ object MinionFeatures {
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
-        coinsPerDay = ""
+        coinsPerDay = null
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
@@ -274,13 +274,15 @@ object MinionFeatures {
         }
     }
 
+    // Todo this calculation should not happen invariably when null.
+    //  Use a "dirty" flag or something similar, and handle state management.
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        if (coinsPerDay != "") return
+        if (coinsPerDay != null) return
 
         if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
-            coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
+            coinsPerDay = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }
 
@@ -418,7 +420,7 @@ object MinionFeatures {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
-        config.hopperProfitPos.renderRenderable(Renderable.text(coinsPerDay), posLabel = "Minion Coins Per Day")
+        config.hopperProfitPos.renderRenderable(coinsPerDay, posLabel = "Minion Coins Per Day")
     }
 
     @HandleEvent

@@ -7,11 +7,13 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -39,7 +41,7 @@ object InGameDateDisplay {
         "[☀☽࿇]",
     )
 
-    private var display = ""
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -73,7 +75,7 @@ object InGameDateDisplay {
             }
         }
         if (!config.includeOrdinal) theBaseString = theBaseString.removeOrdinal()
-        display = theBaseString
+        display = Renderable.text(theBaseString)
     }
 
     private fun String.removeOrdinal() = replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
@@ -82,7 +84,7 @@ object InGameDateDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderString(display, posLabel = "In-game Date Display")
+        config.position.renderRenderable(display, posLabel = "In-game Date Display")
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled

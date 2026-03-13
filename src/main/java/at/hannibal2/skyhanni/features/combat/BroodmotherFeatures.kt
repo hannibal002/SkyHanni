@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
 import kotlin.reflect.KProperty0
 import kotlin.time.Duration
@@ -46,7 +48,7 @@ object BroodmotherFeatures {
     private var lastStage: StageEntry? = null
     private var currentStage: StageEntry? = null
     private var broodmotherSpawnTime = SimpleTimeMark.farPast()
-    private var display = ""
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -140,7 +142,7 @@ object BroodmotherFeatures {
                 append("! It will spawn in ")
                 appendWithColor("60 seconds", ChatFormatting.AQUA)
                 append("!")
-            }
+            },
         )
     }
 
@@ -156,18 +158,18 @@ object BroodmotherFeatures {
         broodmotherSpawnTime = SimpleTimeMark.farPast()
         lastStage = null
         currentStage = null
-        display = ""
+        display = null
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
-        if (display.isEmpty()) return
+        if (display == null) return
         if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
-            display = "§4Broodmother spawning now!"
+            display = Renderable.text("§4Broodmother spawning now!")
         }
 
-        config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
+        config.countdownPosition.renderRenderable(display, posLabel = "Broodmother Countdown")
     }
 
     @HandleEvent
@@ -176,11 +178,11 @@ object BroodmotherFeatures {
 
         if (broodmotherSpawnTime.isFarPast()) {
             if (currentStage == StageEntry.ALIVE) {
-                display = "§4Broodmother spawned!"
+                display = Renderable.text("§4Broodmother spawned!")
             }
         } else {
             val countdown = broodmotherSpawnTime.timeUntil().format()
-            display = "§4Broodmother spawning in §b$countdown"
+            display = Renderable.text("§4Broodmother spawning in §b$countdown")
         }
     }
 

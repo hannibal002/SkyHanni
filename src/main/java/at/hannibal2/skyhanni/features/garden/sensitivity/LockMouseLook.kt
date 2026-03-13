@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -17,7 +19,7 @@ object LockMouseLook {
     /**
      * REGEX-TEST: §aTeleported you to §r§aPlot
      */
-    private val gardenTeleportPattern by RepoPattern.Companion.pattern(
+    private val gardenTeleportPattern by RepoPattern.pattern(
         "chat.garden.teleport",
         "§aTeleported you to .*",
     )
@@ -65,7 +67,7 @@ object LockMouseLook {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive) return
-        config.lockedMouseDisplay.renderString("§eMouse Locked", posLabel = "Mouse Locked")
+        config.lockedMouseDisplay.renderRenderable(Renderable.text("§eMouse Locked"), posLabel = "Mouse Locked")
     }
 
     @HandleEvent

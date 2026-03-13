@@ -17,13 +17,15 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import kotlin.time.Duration.Companion.milliseconds
@@ -87,7 +89,11 @@ object TimiteHelper {
         val timeLeft = holdingClick + time.milliseconds
         if (!timeLeft.isInPast()) {
             val formattedTime = timeLeft.timeUntil().format(showMilliSeconds = true)
-            config.timerPosition.renderString("§b$formattedTime", 0, 0, "Timite Helper")
+            Renderable.text("§b$formattedTime")
+            config.timerPosition.renderRenderable(
+                Renderable.text("§b$formattedTime"),
+                posLabel = "Timite Helper",
+            )
         }
     }
 

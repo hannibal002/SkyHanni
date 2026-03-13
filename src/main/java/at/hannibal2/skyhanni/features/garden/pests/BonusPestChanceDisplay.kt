@@ -11,8 +11,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.iterator
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -30,7 +32,7 @@ object BonusPestChanceDisplay {
         "widget-no-color",
         "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
     )
-    private var display: String? = null
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onWorldChange() {
@@ -52,12 +54,14 @@ object BonusPestChanceDisplay {
                 }
                 val amount = group("amount").formatInt()
 
-                display = buildString {
-                    if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
-                    if (disabled) append("§c§m") else append("§f")
-                    append("$amount%")
-                    if (disabled && !compact) append("§r §cDISABLED")
-                }
+                display = Renderable.text(
+                    buildString {
+                        if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
+                        if (disabled) append("§c§m") else append("§f")
+                        append("$amount%")
+                        if (disabled && !compact) append("§r §cDISABLED")
+                    },
+                )
                 return
             }
         }
@@ -66,7 +70,7 @@ object BonusPestChanceDisplay {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.pestChanceDisplayPosition.renderString(display, posLabel = "Bonus Pest Chance")
+        config.pestChanceDisplayPosition.renderRenderable(display, posLabel = "Bonus Pest Chance")
     }
 
     @HandleEvent

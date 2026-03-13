@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object FerocityDisplay {
@@ -17,7 +19,7 @@ object FerocityDisplay {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         SkyblockStat.FEROCITY.displayValue?.let {
-            config.position.renderString(it, posLabel = "Ferocity Display")
+            config.position.renderRenderable(Renderable.text(it), posLabel = "Ferocity Display")
         }
     }
 

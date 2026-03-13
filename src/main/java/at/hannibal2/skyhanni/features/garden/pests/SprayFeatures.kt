@@ -13,9 +13,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,7 +26,7 @@ object SprayFeatures {
 
     private val config get() = PestApi.config.spray
 
-    private var display: String? = null
+    private var display: Renderable? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
 
     private val changeMaterialPattern by RepoPattern.pattern(
@@ -51,7 +53,7 @@ object SprayFeatures {
             val sprayName = group("spray")
             val type = SprayType.getByNameOrNull(sprayName)
             val sprayEffect = type.getSprayEffect()
-            "§a${type?.displayName ?: sprayName} §7(§6$sprayEffect§7)"
+            Renderable.text("§a${type?.displayName ?: sprayName} §7(§6$sprayEffect§7)")
         } ?: return
 
         lastChangeTime = SimpleTimeMark.now()
@@ -61,14 +63,12 @@ object SprayFeatures {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        val display = display ?: return
-
         if (lastChangeTime.passedSince() > 5.seconds) {
             this.display = null
             return
         }
 
-        config.position.renderString(display, posLabel = "Pest Spray Selector")
+        config.position.renderRenderable(display, posLabel = "Pest Spray Selector")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
