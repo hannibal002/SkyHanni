@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.iterator
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -43,27 +43,17 @@ object BonusPestChanceDisplay {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.STATS)) return
         val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
-        event.widget.lines.forEach { line ->
-            bonusPestChancePattern.matchMatcher(line) {
-                var disabled = false
-                for (component in line.iterator()) {
-                    if (component.style.isStrikethrough) {
-                        disabled = true
-                        break
-                    }
-                }
-                val amount = group("amount").formatInt()
+        bonusPestChancePattern.matchAllComponents(event.widget.lines) { line ->
+            val disabled = line.iterator().any { it.style.isStrikethrough }
+            val amount = group("amount").formatInt()
 
-                display = Renderable.text(
-                    buildString {
-                        if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
-                        if (disabled) append("§c§m") else append("§f")
-                        append("$amount%")
-                        if (disabled && !compact) append("§r §cDISABLED")
-                    },
-                )
-                return
+            display = Renderable.text {
+                if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
+                if (disabled) append("§c§m") else append("§f")
+                append("$amount%")
+                if (disabled && !compact) append("§r §cDISABLED")
             }
+            return
         }
     }
 

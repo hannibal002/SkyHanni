@@ -64,7 +64,7 @@ private fun Component.computeUnformattedTextCompat(): String {
 }
 
 fun Component.unformattedTextCompat(): String =
-    iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
+    iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
 // has to be a separate function for pattern mappings
 fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
