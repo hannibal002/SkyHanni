@@ -13,17 +13,27 @@ import java.lang.reflect.TypeVariable
 import java.lang.reflect.WildcardType
 import java.util.function.Consumer
 
-
 object ReflectionUtils {
-
-    fun Any.getPrivateField(name: String): Any? =
-        javaClass.getDeclaredField(name).makeAccessible().get(this)
-
-    fun Any.getPrivateField(index: Int): Any? =
-        javaClass.declaredFields[index].makeAccessible().get(this)
-
-    fun Class<*>.getPrivateField(name: String, instance: Any?): Any? =
-        getDeclaredField(name).makeAccessible().get(instance)
+    /**
+     * Be aware that the 6 functions below for fetching & accessing private fields are fickle.
+     * They can, and will, throw:
+     * - [NoSuchFieldException] - no field with that name/index exists on the class
+     * - [SecurityException] - the security manager has denied reflective access to the field
+     * - [NullPointerException] - the field exists but its value is null at the time of access
+     * You've been warned. -David
+     */
+    fun Any.getPrivateField(name: String): Field = javaClass.getDeclaredField(name).makeAccessible()
+    fun Any.getPrivateField(index: Int): Field = javaClass.declaredFields[index].makeAccessible()
+    fun Class<*>.getPrivateField(name: String): Field = getDeclaredField(name).makeAccessible()
+    fun Any.getPrivateFieldValue(name: String): Any = requireNotNull(getPrivateField(name).get(this)) {
+        "Field '$name' on ${javaClass.name} is null"
+    }
+    fun Any.getPrivateFieldValue(index: Int): Any = requireNotNull(getPrivateField(index).get(this)) {
+        "Field at index $index on ${javaClass.name} is null"
+    }
+    fun Class<*>.getPrivateFieldValue(name: String, instance: Any?): Any = requireNotNull(getPrivateField(name).get(instance)) {
+        "Field '$name' on $name is null"
+    }
 
     fun Field.makeAccessible() = also { isAccessible = true }
 
@@ -102,19 +112,22 @@ object ReflectionUtils {
             samMethodType,
             handle,
             instantiatedMethodType,
-        ).target.bindTo(instance).invokeExact() as T
+        ).target.bindTo(instance).invoke() as T
     }.getOrElse { e ->
         val illegalMessage = "Method ${instance.javaClass.name}#${method.name} is not a valid ${functionalClass.simpleName}"
         throw IllegalArgumentException(illegalMessage, e)
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun createConsumerFromMethod(instance: Any, method: Method): Consumer<Any> = createFunctionalInterface(
-        instance, method,
-        Consumer::class.java, "accept",
-        MethodType.methodType(Nothing::class.javaPrimitiveType, Any::class.java),
-        MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0]),
-    ) as Consumer<Any>
+    fun createConsumerFromMethod(instance: Any, method: Method): Consumer<Any> =
+        if (method.parameterTypes.isEmpty()) throw IllegalArgumentException(
+            "Method ${instance.javaClass.name}#${method.name} has no parameters, cannot be a Consumer"
+        ) else createFunctionalInterface(
+            instance, method,
+            Consumer::class.java, "accept",
+            MethodType.methodType(Nothing::class.javaPrimitiveType, Any::class.java),
+            MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0]),
+        ) as Consumer<Any>
 
     fun createRunnableFromMethod(instance: Any, method: Method): Runnable = createFunctionalInterface(
         instance, method,
