@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 object AtmosphericFilterDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
-
     private var display: Renderable? = null
 
     @HandleEvent
@@ -30,25 +29,21 @@ object AtmosphericFilterDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenApi.inGarden()) {
-            config.position.renderRenderable(display, posLabel = "Atmospheric Filter Perk Display")
-        } else {
-            config.positionOutside.renderRenderable(display, posLabel = "Atmospheric Filter Perk Display")
-        }
+        val display = display ?: return
+        val position = if (GardenApi.inGarden()) config.position else config.positionOutside
+        position.renderRenderable(display, posLabel = "Atmospheric Filter Perk Display")
     }
 
-    private fun drawDisplay(season: SkyblockSeason) = Renderable.text(
-        buildString {
-            if (!config.onlyBuff) {
-                append(season.getSeasonName(config.abbreviateSeason))
-                append("§7: ")
-            }
-            append(season.getPerk(config.abbreviatePerk))
-        },
-    )
+    private fun drawDisplay(season: SkyblockSeason) = Renderable.text {
+        if (!config.onlyBuff) {
+            append(season.getSeasonName(config.abbreviateSeason))
+            append("§7: ")
+        }
+        append(season.getPerk(config.abbreviatePerk))
+    }
 
-    private fun isEnabled() = SkyBlockUtils.onHypixel && config.enabled && (
-        (OutsideSBFeature.ATMOSPHERIC_FILTER.isSelected() && !SkyBlockUtils.inSkyBlock) ||
-            (SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden))
-        )
+    private fun hypixelEnabled() = SkyBlockUtils.onHypixel && config.enabled
+    private fun outSkyblockEnabled() = OutsideSBFeature.ATMOSPHERIC_FILTER.isSelected() && !SkyBlockUtils.inSkyBlock
+    private fun inSkyblockEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden)
+    private fun isEnabled() = hypixelEnabled() && (outSkyblockEnabled() || inSkyblockEnabled())
 }
