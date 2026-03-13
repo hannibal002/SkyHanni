@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component
 
 object AbstractChatEvent {
 
+    // TODO docs missing
     open class Allow(
         val messageComponent: ComponentSpan,
         chatComponent: Component,
@@ -18,6 +19,7 @@ object AbstractChatEvent {
         override val message = messageComponent.getText().removePrefix("§r")
     }
 
+    // TODO docs missing
     open class Modify(
         val messageComponent: ComponentSpan,
         chatComponent: Component,

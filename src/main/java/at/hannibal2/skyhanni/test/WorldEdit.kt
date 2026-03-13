@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -147,5 +146,5 @@ object WorldEdit {
         }
     }
 
-    fun isEnabled() = SkyHanniMod.feature.dev.worldEdit
+    fun isEnabled() = DevApi.config.worldEdit
 }

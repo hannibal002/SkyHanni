@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,8 +23,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.WasdInputMatrix as Wasd
 
 @SkyHanniModule
 object GraphEditorRenderer {
-
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
     private val state get() = GraphEditor.state
 
@@ -58,13 +54,15 @@ object GraphEditorRenderer {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
+        GraphEditor.config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
     }
 
     private fun buildDisplay(): List<Renderable> = buildList {
         if (GraphEditor.hideDisabled) {
             add("§cDisabled nodes are hidden!")
         }
+
+        val config = GraphEditor.config
         add("§eExit: §6${config.exitKey.name()}")
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${config.placeKey.name()}")
