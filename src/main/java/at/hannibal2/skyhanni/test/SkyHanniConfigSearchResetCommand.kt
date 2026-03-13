@@ -13,9 +13,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
+import io.github.notenoughupdates.moulconfig.observer.Property
 import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -27,24 +29,20 @@ import java.util.Date
 import java.util.UUID
 
 // TODO in the future change something here
+//  ^ Convert the command functions to suspend funs, use coroutines
 @SkyHanniModule
 object SkyHanniConfigSearchResetCommand {
 
     private var lastCommand = emptyArray<String>()
 
-    private fun runCommand(args: Array<String>): String {
-        if (args.isEmpty()) {
-            return "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
-        }
-
-        return when (args[0].lowercase()) {
-            "reset" -> resetCommand(args)
-            "search" -> searchCommand(args)
-            "set" -> setCommand(args)
-            "toggle" -> toggleCommand(args)
-
-            else -> "§c/shconfig <search;reset;set;toggle>"
-        }
+    private fun runCommand(args: Array<String>): String = if (args.isEmpty()) {
+        "§cThis is a powerful config-edit command, only use it if you know what you are doing!"
+    } else when (args[0].lowercase()) {
+        "reset" -> resetCommand(args)
+        "search" -> searchCommand(args)
+        "set" -> setCommand(args)
+        "toggle" -> toggleCommand(args)
+        else -> "§c/shconfig <search;reset;set;toggle>"
     }
 
     fun resetCommand(args: Array<String>): String {
@@ -116,7 +114,7 @@ object SkyHanniConfigSearchResetCommand {
 
         val element = ConfigManager.gson.fromJson(rawJson, JsonElement::class.java)
         val list = term.split(".").drop(1)
-        val shimmy = Shimmy.makeShimmy(root, list) ?: return "§cCould not change config element '$term', not found!"
+        val shimmy = Shimmy(root, list) ?: return "§cCould not change config element '$term', not found!"
         return try {
             shimmy.setJson(element)
             "§eChanged config element $term to $rawJson."
@@ -322,8 +320,8 @@ object SkyHanniConfigSearchResetCommand {
 
 
     private fun Any.getClassName(): String {
-        if (this is io.github.notenoughupdates.moulconfig.observer.Property<*>) {
-            val value = javaClass.getDeclaredField("value").makeAccessible().get(this)
+        if (this is Property<*>) {
+            val value = getPrivateFieldValue("value")
             val name = value.getClassName()
             return "moulconfig.Property<$name>"
         }
@@ -347,33 +345,20 @@ object SkyHanniConfigSearchResetCommand {
         }
     }
 
-    private fun Any.getObjectName(): String {
-        if (this is Position) {
-            val x = javaClass.getDeclaredField("x").makeAccessible().get(this)
-            val y = javaClass.getDeclaredField("y").makeAccessible().get(this)
-            val scale = javaClass.getDeclaredField("scale").makeAccessible().get(this)
-            return "($x, $y, $scale)"
+    private fun Any.getObjectName(): String = when {
+        this is Position -> {
+            val x = getPrivateFieldValue("x")
+            val y = getPrivateFieldValue("y")
+            val scale = getPrivateFieldValue("scale")
+            "($x, $y, $scale)"
         }
-
-        if (this is String) {
-            return if (toString() == "") {
-                "<empty string>"
-            } else {
-                "'$this'"
-            }
-        }
-
-        if (this is io.github.notenoughupdates.moulconfig.observer.Property<*>) {
-            val value = javaClass.getDeclaredField("value").makeAccessible().get(this)
-            return value.getObjectName()
-        }
-
-        if (this is Int) return addSeparators()
-        if (this is Long) return addSeparators()
-
-        if (this is Runnable) return "<Runnable>"
-
-        return toString()
+        this is String && isEmpty() -> "<empty string>"
+        this is String -> "'$this'"
+        this is Property<*> -> getPrivateFieldValue("value").getObjectName()
+        this is Int -> addSeparators()
+        this is Long -> addSeparators()
+        this is Runnable -> "<Runnable>"
+        else -> toString()
     }
 
     @HandleEvent
