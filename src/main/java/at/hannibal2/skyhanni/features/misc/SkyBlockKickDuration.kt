@@ -23,6 +23,7 @@ object SkyBlockKickDuration {
 
     private val config get() = SkyHanniMod.feature.misc.kickDuration
 
+    // TODO form to data class, use Resettable
     private var kickMessage = false
     private var showTime = false
     private var lastKickTime = SimpleTimeMark.farFuture()
@@ -57,19 +58,14 @@ object SkyBlockKickDuration {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled() || !(lastKickTime.isFarFuture())) return
+        if (!config.enabled || !(lastKickTime.isFarFuture())) return
 
         if (kickPattern.matches(event.message)) {
-            if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
-                kicked()
-            } else {
-                kickMessage = true
-            }
+            if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) kicked()
+            else kickMessage = true
         }
 
-        if (problemJoiningPattern.matches(event.message)) {
-            kicked()
-        }
+        if (problemJoiningPattern.matches(event.message)) kicked()
     }
 
     private fun notKicked() {
@@ -80,23 +76,10 @@ object SkyBlockKickDuration {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!SkyBlockUtils.onHypixel) return
-        if (!showTime) return
-        if (SkyBlockUtils.inSkyBlock) {
-            notKicked()
-        }
+        if (!config.enabled || !SkyBlockUtils.onHypixel || !showTime) return
 
-        if (lastKickTime.passedSince() > 5.minutes) {
-            notKicked()
-        }
-
-        if (lastKickTime.passedSince() > config.warnTime.get().seconds) {
-            if (!hasWarned) {
-                hasWarned = true
-                warn()
-            }
-        }
+        if (SkyBlockUtils.inSkyBlock || lastKickTime.passedSince() > 5.minutes) notKicked()
+        if (lastKickTime.passedSince() > config.warnTime.get().seconds && !hasWarned) warn()
 
         val format = lastKickTime.passedSince().format()
         config.position.renderRenderable(
@@ -108,7 +91,6 @@ object SkyBlockKickDuration {
     private fun warn() {
         TitleManager.sendTitle("§eTry rejoining SkyBlock now!")
         SoundUtils.playBeepSound()
+        hasWarned = true
     }
-
-    fun isEnabled() = config.enabled
 }
