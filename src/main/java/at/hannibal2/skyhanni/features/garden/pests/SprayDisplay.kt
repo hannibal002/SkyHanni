@@ -28,20 +28,19 @@ object SprayDisplay {
 
     private val config get() = PestApi.config.spray
     private var display: Renderable? = null
+    private val currentSprayPlot get() = GardenPlotApi.getCurrentPlot()?.takeUnless { it.isBarn() || it.greenhouse }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5, 3)) return
 
-        if (config.displayEnabled) {
-            val text = GardenPlotApi.getCurrentPlot()?.takeUnless { it.isBarn() || it.greenhouse }?.let { plot ->
-                plot.currentSpray?.let {
-                    val timer = it.expiry.timeUntil()
-                    "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
-                } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
-            }
-            if (text != null) display = Renderable.text(text)
-        }
+        // Todo this calculation should not be running onTick
+        if (config.displayEnabled) display = currentSprayPlot?.let { plot ->
+            plot.currentSpray?.let {
+                val timer = it.expiry.timeUntil()
+                "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
+            } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
+        }?.let { Renderable.text(it) }
 
         if (config.expiryNotification) {
             sendExpiredPlotsToChat(false)
