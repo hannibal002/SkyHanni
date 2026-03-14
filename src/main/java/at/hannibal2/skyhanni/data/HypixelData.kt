@@ -450,6 +450,13 @@ object HypixelData {
         }
     }
 
+    fun workaroundChangeTo(new: IslandType) {
+        ChatUtils.debug("workaroundChangeTo $new")
+        val old = skyBlockIsland
+        IslandChangeEvent(new, old).post()
+        skyBlockIsland = new
+    }
+
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -88,6 +89,25 @@ object IslandDetectionWatcher {
             "log" to buildAndClearLog(),
         )
         showedError = true
+        suggestWorkaround(tabListType)
+    }
+
+    private fun suggestWorkaround(type: IslandType) {
+        ChatUtils.clickableChat(
+            "Wanna have a one time workaround for now? Click here!",
+            onClick = { doWorkaround(type) },
+            hover = "Click to change the internal island type to ${type.displayName}",
+        )
+    }
+
+    private fun doWorkaround(type: IslandType) {
+        if (!SkyBlockUtils.inSkyBlock) {
+            ChatUtils.userError("this only works while on SkyBlock!")
+            return
+        }
+        log("workaround to $type")
+        HypixelData.workaroundChangeTo(type)
+        ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
     private fun fetchTabListType(): IslandType {
