@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.allIdentical
-import kotlin.time.Duration.Companion.minutes
+import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -30,12 +30,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandDetectionWatcher {
 
-    private val action = mutableMapOf<String, SimpleTimeMark>()
+    private val action = SizeLimitedCache<String, SimpleTimeMark>(20)
 
     private var latestEventType = IslandType.NONE
     private var lastWorldChange = SimpleTimeMark.farFuture()
     private var showedError = false
-    private var lastActionLog = listOf<String>()
 
     private val logger = LorenzLogger("debug/island_change")
 
@@ -98,7 +97,7 @@ object IslandDetectionWatcher {
             "tab list" to tabListType,
             "latest event" to latestEventType,
             "internal" to internalType,
-            "log" to buildAndClearLog(),
+            "log" to buildLog(),
         )
         showedError = true
         suggestWorkaround(tabListType)
@@ -128,16 +127,11 @@ object IslandDetectionWatcher {
         return HypixelData.getIslandType(foundIsland, guesting)
     }
 
-    private fun buildAndClearLog(): List<String> {
+    private fun buildLog(): List<String> {
         val result = mutableListOf<String>()
         for ((text, time) in action) {
-            if (time.passedSince() > 5.minutes) continue
-
             result.add("$text (${time.passedSince()} ago, $time)")
         }
-        action.clear()
-
-        lastActionLog = result
         return result
     }
 
@@ -157,7 +151,7 @@ object IslandDetectionWatcher {
             add("internalType: $internalType")
             add(" ")
             add("log: ")
-            for (line in lastActionLog) {
+            for (line in buildLog()) {
                 add(" - $line")
             }
         }
