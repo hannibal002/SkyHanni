@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.allIdentical
 import at.hannibal2.skyhanni.utils.collection.SizeLimitedSet
 import kotlin.time.Duration.Companion.seconds
@@ -123,9 +124,9 @@ object IslandDetectionWatcher {
         ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
-    private fun buildLog(): List<String> = action.map { data ->
+    private fun buildLog(): List<String> = action.sortedBy { it.time }.map { data ->
         val time = data.time
-        "${data.text} (${time.passedSince()} ago, $time)"
+        "${data.text} ${time.passedSince().format()} ago ($time)"
     }
 
     @HandleEvent
