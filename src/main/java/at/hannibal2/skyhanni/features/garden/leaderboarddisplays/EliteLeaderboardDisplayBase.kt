@@ -195,7 +195,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
             return Renderable.hoverTips(
                 content = "§7Waiting for update...",
                 tips = listOf(
-                    "§celitebot.dev is currently overloaded or unavailable.",
+                    "§celiteskyblock.com is currently overloaded or unavailable.",
                     "§7Leaderboard data will update when the service recovers.",
                 ),
             )

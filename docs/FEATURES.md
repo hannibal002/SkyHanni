@@ -808,8 +808,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Default: #10k
 + Sync Jacob Contests - Kaeso + CalMWolfs
     + No need to open the calendar every SkyBlock year again.
-    + Grab Jacob Contest data from the elitebot.dev website.
-    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
+    + Grab Jacob Contest data from the eliteskyblock.com website.
+    + Option to send local contest data to eliteskyblock.com at the start of the new SkyBlock year.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
 + /shmouselock command to lock mouse rotation for farming. - Cad
@@ -844,11 +844,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added crop collection leaderboard display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4665)
   + For each crop, show your all-time and monthly collection, leaderboard position, and players ahead/behind you.
   + Swap between crops and leaderboard modes by clicking on the display switcher button while in an inventory.
-  + Data sourced from the Elitebot.dev API.
+  + Data sourced from the eliteskyblock.com API.
 + Added pest kills leaderboard display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4665)
   + For each pest, show your all-time kills, leaderboard position, and players ahead/behind you.
   + Swap between pests by clicking on the display switcher button while in an inventory.
-  + Data sourced from the Elitebot.dev API.
+  + Data sourced from the eliteskyblock.com API.
 + Highlight Harvestability status in the Greenhouse. - nopo (https://github.com/hannibal002/SkyHanni/pull/5136)
 + Highlight Water Status green if the crop doesn't need more water. - nopo (https://github.com/hannibal002/SkyHanni/pull/5168)
 + Added command `/shgardenuptime`. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4703)
@@ -903,7 +903,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to change the number of seconds until the waypoint will disappear.
 + Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1321)
 + Open On Elite. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1185)
-    + Allow opening farming contest stats on elitebot.dev by pressing a keybind + mouse click onto a contest item.
+    + Allow opening farming contest stats on eliteskyblock.com by pressing a keybind + mouse click onto a contest item.
     + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
 + Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
     + Show all your visited/accepted/denied visitors stats in a display.
@@ -1379,7 +1379,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
-    + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
+    + Opens the eliteskyblock.com website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
 + /shcalccrop. - CalMWolfs
     + Calculate how many crops need to be farmed between different crop milestones.

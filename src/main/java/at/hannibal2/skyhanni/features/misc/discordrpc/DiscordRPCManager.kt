@@ -182,8 +182,8 @@ object DiscordRPCManager {
         if (config.showEliteBotButton.get()) {
             buttons.add(
                 Activity.Button(
-                    label = "Open EliteBot",
-                    url = "https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
+                    label = "Open EliteSkyBlock",
+                    url = "https://eliteskyblock.com/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
                 ),
             )
         }

@@ -72,8 +72,9 @@ class DiscordRPCConfig {
     @ConfigEditorBoolean
     val showSkyCryptButton: Property<Boolean> = Property.of(true)
 
+    // TODO rename to showEliteSkyBlockButton
     @Expose
-    @ConfigOption(name = "Show Button for EliteBot", desc = "Add a button to the RPC that opens your EliteBot profile.")
+    @ConfigOption(name = "Show Button for EliteSkyBlock", desc = "Add a button to the RPC that opens your EliteSkyBlock profile.")
     @ConfigEditorBoolean
     val showEliteBotButton: Property<Boolean> = Property.of(true)
 

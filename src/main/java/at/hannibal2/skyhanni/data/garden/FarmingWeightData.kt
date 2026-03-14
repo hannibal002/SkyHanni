@@ -244,8 +244,8 @@ object FarmingWeightData {
     )
 
     private val weightStatic = ApiStaticGetPath(
-        "https://api.elitebot.dev/weights/all",
-        "Elitebot Farming Weights",
+        "https://api.eliteskyblock.com/weights/all",
+        "EliteSkyBlock Farming Weights",
     )
 
     private suspend fun getCropWeights() {
@@ -264,7 +264,7 @@ object FarmingWeightData {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfarmingprofile") {
-            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            description = "Look up the farming profile from yourself or another player on eliteskyblock.com"
             category = CommandCategory.USERS_ACTIVE
             argCallback("name", BrigadierArguments.string()) { name ->
                 openWebsite(name, ignoreCooldown = true)
@@ -283,7 +283,7 @@ object FarmingWeightData {
         lastOpenWebsite = SimpleTimeMark.now()
         lastName = name
 
-        OSUtils.openBrowser("https://elitebot.dev/@$name".addSkyHanniUtm())
+        OSUtils.openBrowser("https://eliteskyblock.com/@$name".addSkyHanniUtm())
         ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 

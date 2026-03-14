@@ -116,25 +116,25 @@ object JacobFarmingContestsInventory {
 
     private fun openContest(year: String, month: String, day: String) {
         val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
-        OSUtils.openBrowser("https://elitebot.dev/contests/$date".addSkyHanniUtm())
-        ChatUtils.chat("Opening contest in elitebot.dev")
+        OSUtils.openBrowser("https://eliteskyblock.com/contests/$date".addSkyHanniUtm())
+        ChatUtils.chat("Opening contest in eliteskyblock.com")
     }
 
     private fun openFromJacobMenu(itemName: String) {
         when (itemName) {
             "§6Upcoming Contests" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming".addSkyHanniUtm())
-                ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+                OSUtils.openBrowser("https://eliteskyblock.com/contests/upcoming".addSkyHanniUtm())
+                ChatUtils.chat("Opening upcoming contests in eliteskyblock.com")
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
-                ChatUtils.chat("Opening your contests in elitebot.dev")
+                OSUtils.openBrowser("https://eliteskyblock.com/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
+                ChatUtils.chat("Opening your contests in eliteskyblock.com")
             }
 
             "§aWhat is this?" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests".addSkyHanniUtm())
-                ChatUtils.chat("Opening contest page in elitebot.dev")
+                OSUtils.openBrowser("https://eliteskyblock.com/contests".addSkyHanniUtm())
+                ChatUtils.chat("Opening contest page in eliteskyblock.com")
             }
 
             else -> return
@@ -158,8 +158,8 @@ object JacobFarmingContestsInventory {
                 openContest(year, month, day)
             } else {
                 val timestamp = time / 1000
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming".addSkyHanniUtm() + "#$timestamp")
-                ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+                OSUtils.openBrowser("https://eliteskyblock.com/contests/upcoming".addSkyHanniUtm() + "#$timestamp")
+                ChatUtils.chat("Opening upcoming contests in eliteskyblock.com")
             }
             event.cancel()
         }
