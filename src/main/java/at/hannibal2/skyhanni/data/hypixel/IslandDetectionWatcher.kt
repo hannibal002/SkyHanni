@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -56,6 +58,16 @@ object IslandDetectionWatcher {
         log("WorldChangeEvent")
         lastWorldChange = SimpleTimeMark.now()
         showedError = false
+    }
+
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
+        log("ProfileJoinEvent")
+    }
+
+    @HandleEvent(HypixelJoinEvent::class)
+    fun onHypixelJoin() {
+        log("HypixelJoinEvent")
     }
 
     fun log(text: String) {
