@@ -3,8 +3,6 @@ package at.hannibal2.skyhanni.data.hypixel
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -16,10 +14,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.allIdentical
 import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import kotlin.time.Duration.Companion.seconds
@@ -40,11 +36,15 @@ object IslandDetectionWatcher {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        val old = event.oldIsland
-        val new = event.newIsland
-        log("IslandChangeEvent $old -> $new")
+        val oldIsland = event.oldIsland
+        val newIsland = event.newIsland
+        if (newIsland == IslandType.UNKNOWN) {
+            val foundIsland = HypixelData.rawTabListIslandName()
+            ChatUtils.debug("Unknown island detected: '$foundIsland'")
+        }
+        log("IslandChangeEvent $oldIsland -> $newIsland")
 
-        latestEventType = new
+        latestEventType = newIsland
     }
 
     @HandleEvent(SkyBlockLeaveEvent::class)
@@ -85,7 +85,7 @@ object IslandDetectionWatcher {
     private fun checkIslandConsistency() {
         if (!SkyBlockUtils.inSkyBlock) return
 
-        val tabListType = fetchTabListType()
+        val tabListType = HypixelData.fetchTabListType()
         val latestEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 
@@ -121,12 +121,6 @@ object IslandDetectionWatcher {
         ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
-    private fun fetchTabListType(): IslandType {
-        val guesting = HypixelData.guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-        val foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
-        return HypixelData.getIslandType(foundIsland, guesting)
-    }
-
     private fun buildLog(): List<String> {
         val result = mutableListOf<String>()
         for ((text, time) in action) {
@@ -139,7 +133,7 @@ object IslandDetectionWatcher {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Island Detection Watcher")
 
-        val tabListType = fetchTabListType()
+        val tabListType = HypixelData.fetchTabListType()
         val latestEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 

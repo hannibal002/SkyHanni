@@ -544,20 +544,13 @@ object HypixelData {
     }
 
     private fun checkIsland(event: WidgetUpdateEvent) {
-        val newIsland: IslandType
-        val foundIsland: String
-        if (event.isClear()) {
-
+        val newIsland = if (event.isClear()) {
             TabListData.fullyLoaded = false
-            newIsland = IslandType.NONE
-            foundIsland = ""
+            IslandType.NONE
 
         } else {
             TabListData.fullyLoaded = true
-            // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
-            val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
-            newIsland = getIslandType(foundIsland, guesting)
+            fetchTabListType()
         }
 
         if (!hasPostedIslandChangeEvent && newIsland != IslandType.NONE) {
@@ -568,22 +561,23 @@ object HypixelData {
             hasPostedIslandChangeEvent = true
             HypixelLocationApi.checkEquals()
 
-            if (newIsland == IslandType.UNKNOWN) {
-                ChatUtils.debug("Unknown island detected: '$foundIsland'")
-            }
             if (TabListData.fullyLoaded) {
                 TabWidget.reSendEvents()
             }
         }
     }
 
-    fun getIslandType(name: String, guesting: Boolean): IslandType {
-        val islandType = IslandType.getByNameOrUnknown(name)
+    // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
+    fun fetchTabListType(): IslandType {
+        val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
+        val islandType = IslandType.getByNameOrUnknown(rawTabListIslandName())
         if (guesting) {
             return islandType.guestVariant()
         }
         return islandType
     }
+
+    fun rawTabListIslandName(): String = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
 
     fun getScoreboardTitle(): String? {
         val world = MinecraftCompat.localWorldOrNull ?: return null
