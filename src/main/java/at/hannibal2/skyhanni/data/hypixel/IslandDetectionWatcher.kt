@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyBlockJoinEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -31,22 +33,32 @@ object IslandDetectionWatcher {
 
     private val action = SizeLimitedSet<Action>(20)
 
-    private var latestEventType = IslandType.NONE
+    private var latestEventType = IslandType.UNKNOWN
     private var lastWorldChange = SimpleTimeMark.farFuture()
     private var showedError = false
 
     private val logger = LorenzLogger("debug/island_change")
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        val oldIsland = event.oldIsland
-        val newIsland = event.newIsland
+    fun onIslandJoin(event: IslandJoinEvent) {
+        val newIsland = event.island
+        val oldIsland = event.previousIsland
         if (newIsland == IslandType.UNKNOWN) {
-            val foundIsland = HypixelData.rawTabListIslandName()
+            val foundIsland = SkyBlockLocationData.rawTabListIslandName()
             ChatUtils.debug("Unknown island detected: '$foundIsland'")
         }
-        log("IslandChangeEvent $oldIsland -> $newIsland")
+        log("IslandJoinEvent $oldIsland -> $newIsland")
         latestEventType = newIsland
+    }
+
+    @HandleEvent
+    fun onIslandLeave(event: IslandLeaveEvent) {
+        log("IslandLeaveEvent ${event.island}")
+    }
+
+    @HandleEvent(SkyBlockJoinEvent::class)
+    fun onSkyBlockJoin() {
+        log("SkyBlockJoinEvent")
     }
 
     @HandleEvent(SkyBlockLeaveEvent::class)
@@ -88,7 +100,7 @@ object IslandDetectionWatcher {
     private fun checkIslandConsistency() {
         if (!SkyBlockUtils.inSkyBlock) return
 
-        val tabListType = HypixelData.fetchTabListType()
+        val tabListType = SkyBlockLocationData.fetchTabListType()
         val currentEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 
@@ -120,7 +132,7 @@ object IslandDetectionWatcher {
             return
         }
         log("workaround to $type")
-        HypixelData.workaroundChangeTo(type)
+        SkyBlockLocationData.workaroundChangeTo(type)
         ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
@@ -132,15 +144,15 @@ object IslandDetectionWatcher {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Island Detection Watcher")
 
-        val tabListType = HypixelData.fetchTabListType()
+        val tabListType = SkyBlockLocationData.fetchTabListType()
         val currentEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 
-        val isCurrentlyValid = listOf(tabListType, currentEventType, internalType).allIdentical()
-        val isRelevant = !isCurrentlyValid || showedError
+        val isIncorrect = !listOf(tabListType, currentEventType, internalType).allIdentical()
+        val isRelevant = isIncorrect || showedError
 
         val list = buildList {
-            add("isCurrentlyValid: $isCurrentlyValid")
+            add("isWrong: $isIncorrect")
             add("error got shown: $showedError")
             add("")
             add("tabListType: $tabListType")
