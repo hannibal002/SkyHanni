@@ -77,7 +77,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SkyHanniDebugsAndTests {
 
-    private val config get() = SkyHanniMod.feature.dev
+    private val config get() = DevApi.config
     private val debugConfig get() = config.debug
 
     var displayLine: String? = null
