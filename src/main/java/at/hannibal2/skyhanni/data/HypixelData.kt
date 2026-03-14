@@ -423,7 +423,7 @@ object HypixelData {
             checkSpecialModes()
             checkCurrentServerId()
         } else {
-            if (!skyBlock) {
+            if (skyBlock) {
                 SkyBlockLeaveEvent.post()
             }
         }
