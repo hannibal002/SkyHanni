@@ -27,13 +27,13 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandDetectionWatcher {
 
+    private data class Action(val text: String, val time: SimpleTimeMark)
+
     private val action = SizeLimitedSet<Action>(20)
 
     private var latestEventType = IslandType.NONE
     private var lastWorldChange = SimpleTimeMark.farFuture()
     private var showedError = false
-
-    private data class Action(val text: String, val time: SimpleTimeMark)
 
     private val logger = LorenzLogger("debug/island_change")
 
@@ -108,7 +108,7 @@ object IslandDetectionWatcher {
 
     private fun suggestWorkaround(type: IslandType) {
         ChatUtils.clickableChat(
-            "Wanna have a one time workaround for now? Click here!",
+            "Wanna have a one-time workaround for now? Click here!",
             onClick = { doWorkaround(type) },
             hover = "Click to change the internal island type to ${type.displayName}",
         )
@@ -124,9 +124,8 @@ object IslandDetectionWatcher {
         ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
-    private fun buildLog(): List<String> = action.sortedBy { it.time }.map { data ->
-        val time = data.time
-        "${data.text} ${time.passedSince().format()} ago ($time)"
+    private fun buildLog(): List<String> = action.sortedBy { it.time }.map { (text, time) ->
+        "$text ${time.passedSince().format()} ago($time)"
     }
 
     @HandleEvent
@@ -143,11 +142,11 @@ object IslandDetectionWatcher {
         val list = buildList {
             add("isCurrentlyValid: $isCurrentlyValid")
             add("error got shown: $showedError")
-            add(" ")
+            add("")
             add("tabListType: $tabListType")
             add("currentEventType: $currentEventType")
             add("internalType: $internalType")
-            add(" ")
+            add("")
             add("log: ")
             for (line in buildLog()) {
                 add(" - $line")
