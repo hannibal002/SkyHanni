@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyBlockJoinEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -53,16 +51,6 @@ object IslandDetectionWatcher {
     @HandleEvent
     fun onIslandLeave(event: IslandLeaveEvent) {
         log("IslandLeaveEvent ${event.island}")
-    }
-
-    @HandleEvent(SkyBlockJoinEvent::class)
-    fun onSkyBlockJoin() {
-        log("SkyBlockJoinEvent")
-    }
-
-    @HandleEvent(SkyBlockLeaveEvent::class)
-    fun onSkyBlockLeave() {
-        log("SkyBlockLeaveEvent")
     }
 
     @HandleEvent(WorldChangeEvent::class)

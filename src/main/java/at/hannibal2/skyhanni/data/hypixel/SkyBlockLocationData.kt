@@ -11,9 +11,8 @@ import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyBlockJoinEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -78,10 +77,6 @@ object SkyBlockLocationData {
     fun onScoreboardUpdate() {
         scoreboardTitle = HypixelData.getScoreboardTitle()?.removeColor()
         scoreboardShowsSkyBlock = scoreboardTitle?.let { scoreboardTitlePattern.matches(it) } ?: false
-        if (scoreboardShowsSkyBlock && tabListIsland == IslandType.NONE) {
-            val island = fetchTabListType()
-            if (island != IslandType.NONE) tabListIsland = island
-        }
         handleStateChange()
     }
 
@@ -120,15 +115,17 @@ object SkyBlockLocationData {
     }
 
     private fun changeTo(newIsland: IslandType) {
+        if (confirmedIsland == newIsland) {
+            ErrorManager.logErrorStateWithData(
+                "Invalid island type change detected",
+                "old and new island are identical, this should never happen!",
+                "newIsland" to newIsland,
+            )
+            return
+        }
         val oldIsland = confirmedIsland
         confirmedIsland = newIsland
 
-        if (oldIsland != IslandType.NONE && newIsland == IslandType.NONE) {
-            SkyBlockLeaveEvent.post()
-        }
-        if (oldIsland == IslandType.NONE && newIsland != IslandType.NONE) {
-            SkyBlockJoinEvent.post()
-        }
         if (newIsland == IslandType.NONE) {
             IslandLeaveEvent(oldIsland).post()
         }
