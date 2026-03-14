@@ -4,6 +4,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -183,7 +184,7 @@ object DiscordRPCManager {
             buttons.add(
                 Activity.Button(
                     label = "Open EliteSkyBlock",
-                    url = "https://eliteskyblock.com/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
+                    url = "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
                 ),
             )
         }

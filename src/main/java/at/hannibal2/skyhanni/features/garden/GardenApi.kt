@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -312,8 +313,8 @@ object GardenApi {
                     if (profile.isNotEmpty()) profile += "/"
                     ChatUtils.clickableLinkChat(
                         "§cSkyHannis /ff display is no longer being developed! " +
-                            "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on eliteskyblock.com instead!",
-                        "https://eliteskyblock.com/@$name/${profile}fortune".addSkyHanniUtm() + "#fortune",
+                            "§6Click §bhere §6to see your updated fortune progress and cheapest upgrades on ${EliteDevApi.ELITE_DOMAIN} instead!",
+                        "${EliteDevApi.ELITE_URL}/@$name/${profile}fortune".addSkyHanniUtm() + "#fortune",
                     )
                 }
             }

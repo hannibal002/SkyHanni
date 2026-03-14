@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
@@ -116,25 +117,25 @@ object JacobFarmingContestsInventory {
 
     private fun openContest(year: String, month: String, day: String) {
         val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
-        OSUtils.openBrowser("https://eliteskyblock.com/contests/$date".addSkyHanniUtm())
-        ChatUtils.chat("Opening contest in eliteskyblock.com")
+        OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests/$date".addSkyHanniUtm())
+        ChatUtils.chat("Opening contest in ${EliteDevApi.ELITE_DOMAIN}")
     }
 
     private fun openFromJacobMenu(itemName: String) {
         when (itemName) {
             "§6Upcoming Contests" -> {
-                OSUtils.openBrowser("https://eliteskyblock.com/contests/upcoming".addSkyHanniUtm())
-                ChatUtils.chat("Opening upcoming contests in eliteskyblock.com")
+                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests/upcoming".addSkyHanniUtm())
+                ChatUtils.chat("Opening upcoming contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("https://eliteskyblock.com/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
-                ChatUtils.chat("Opening your contests in eliteskyblock.com")
+                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
+                ChatUtils.chat("Opening your contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             "§aWhat is this?" -> {
-                OSUtils.openBrowser("https://eliteskyblock.com/contests".addSkyHanniUtm())
-                ChatUtils.chat("Opening contest page in eliteskyblock.com")
+                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests".addSkyHanniUtm())
+                ChatUtils.chat("Opening contest page in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             else -> return
@@ -158,8 +159,8 @@ object JacobFarmingContestsInventory {
                 openContest(year, month, day)
             } else {
                 val timestamp = time / 1000
-                OSUtils.openBrowser("https://eliteskyblock.com/contests/upcoming".addSkyHanniUtm() + "#$timestamp")
-                ChatUtils.chat("Opening upcoming contests in eliteskyblock.com")
+                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests/upcoming".addSkyHanniUtm() + "#$timestamp")
+                ChatUtils.chat("Opening upcoming contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
             event.cancel()
         }
