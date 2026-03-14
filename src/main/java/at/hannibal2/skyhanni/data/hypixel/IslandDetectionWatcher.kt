@@ -122,12 +122,8 @@ object IslandDetectionWatcher {
         ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
-    private fun buildLog(): List<String> {
-        val result = mutableListOf<String>()
-        for ((time, text) in action) {
-            result.add("$text (${time.passedSince()} ago, $time)")
-        }
-        return result
+    private fun buildLog(): List<String> = action.map { (time, text) ->
+        "$text (${time.passedSince()} ago, $time)"
     }
 
     @HandleEvent
