@@ -92,7 +92,7 @@ object HypixelData {
         "scoreboard.visiting.amount",
         "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
     )
-    val guestPattern by patternGroup.pattern(
+    private val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
         "SKYBLOCK GUEST",
     )
@@ -453,8 +453,8 @@ object HypixelData {
     fun workaroundChangeTo(new: IslandType) {
         ChatUtils.debug("workaroundChangeTo $new")
         val old = skyBlockIsland
-        IslandChangeEvent(new, old).post()
         skyBlockIsland = new
+        IslandChangeEvent(new, old).post()
     }
 
     @HandleEvent

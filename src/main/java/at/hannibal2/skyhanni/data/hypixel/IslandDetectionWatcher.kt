@@ -69,7 +69,7 @@ object IslandDetectionWatcher {
         log("HypixelJoinEvent")
     }
 
-    fun log(text: String) {
+    private fun log(text: String) {
         action[SimpleTimeMark.now()] = text
         logger.log(text)
         // TODO add ChatUtils.debug here once DevApi is advanced enough
@@ -114,7 +114,7 @@ object IslandDetectionWatcher {
 
     private fun doWorkaround(type: IslandType) {
         if (!SkyBlockUtils.inSkyBlock) {
-            ChatUtils.userError("this only works while on SkyBlock!")
+            ChatUtils.userError("This only works while on SkyBlock!")
             return
         }
         log("workaround to $type")
@@ -139,7 +139,7 @@ object IslandDetectionWatcher {
         val internalType = SkyBlockUtils.currentIsland
 
         val isCurrentlyValid = listOf(tabListType, latestEventType, internalType).allIdentical()
-        val isRelevant = isCurrentlyValid || showedError
+        val isRelevant = !isCurrentlyValid || showedError
 
         val list = buildList {
             add("isCurrentlyValid: $isCurrentlyValid")
