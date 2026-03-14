@@ -93,7 +93,7 @@ object HypixelData {
         "scoreboard.visiting.amount",
         "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
     )
-    private val guestPattern by patternGroup.pattern(
+    val guestPattern by patternGroup.pattern(
         "guesting.scoreboard",
         "SKYBLOCK GUEST",
     )
@@ -303,8 +303,6 @@ object HypixelData {
             }
         }
     }
-
-    private val loggerIslandChange = LorenzLogger("debug/island_change")
 
     @HandleEvent
     fun onWorldChange() {
@@ -566,9 +564,6 @@ object HypixelData {
 
             if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
-                loggerIslandChange.log("Unknown: '$foundIsland'")
-            } else {
-                loggerIslandChange.log(newIsland.name)
             }
             if (TabListData.fullyLoaded) {
                 TabWidget.reSendEvents()
@@ -576,7 +571,7 @@ object HypixelData {
         }
     }
 
-    private fun getIslandType(name: String, guesting: Boolean): IslandType {
+    fun getIslandType(name: String, guesting: Boolean): IslandType {
         val islandType = IslandType.getByNameOrUnknown(name)
         if (guesting) {
             return islandType.guestVariant()
