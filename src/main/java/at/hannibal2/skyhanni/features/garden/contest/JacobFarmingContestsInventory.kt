@@ -117,29 +117,33 @@ object JacobFarmingContestsInventory {
 
     private fun openContest(year: String, month: String, day: String) {
         val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
-        OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests/$date".addSkyHanniUtm())
+        openElite("contests/$date".addSkyHanniUtm())
         ChatUtils.chat("Opening contest in ${EliteDevApi.ELITE_DOMAIN}")
     }
 
     private fun openFromJacobMenu(itemName: String) {
         when (itemName) {
             "§6Upcoming Contests" -> {
-                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests/upcoming".addSkyHanniUtm())
+                openElite("contests/upcoming".addSkyHanniUtm())
                 ChatUtils.chat("Opening upcoming contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
+                openElite("@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
                 ChatUtils.chat("Opening your contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             "§aWhat is this?" -> {
-                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests".addSkyHanniUtm())
+                openElite("contests".addSkyHanniUtm())
                 ChatUtils.chat("Opening contest page in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             else -> return
         }
+    }
+
+    private fun openElite(url: String) {
+        OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/$url")
     }
 
     private fun openFromCalendar(
@@ -159,7 +163,7 @@ object JacobFarmingContestsInventory {
                 openContest(year, month, day)
             } else {
                 val timestamp = time / 1000
-                OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/contests/upcoming".addSkyHanniUtm() + "#$timestamp")
+                openElite("contests/upcoming".addSkyHanniUtm() + "#$timestamp")
                 ChatUtils.chat("Opening upcoming contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
             event.cancel()
