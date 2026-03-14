@@ -446,8 +446,10 @@ object HypixelData {
     @HandleEvent
     fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
         val oldIsland = skyBlockIsland
-        if (oldIsland != IslandType.NONE) {
-            IslandChangeEvent(IslandType.NONE, oldIsland)
+        if (oldIsland != IslandType.NONE && oldIsland != IslandType.UNKNOWN) {
+            skyBlockIsland = IslandType.NONE
+            ChatUtils.debug("onSkyBlockLeave firing: $oldIsland → NONE (hasPostedIslandChangeEvent=$hasPostedIslandChangeEvent)")
+            IslandChangeEvent(IslandType.NONE, oldIsland).post()
         }
     }
 
@@ -554,8 +556,9 @@ object HypixelData {
             newIsland = getIslandType(foundIsland, guesting)
         }
 
-        if (!hasPostedIslandChangeEvent && !eitherIsNone(skyBlockIsland, newIsland)) {
+        if (!hasPostedIslandChangeEvent && newIsland != IslandType.NONE) {
             val oldIsland = skyBlockIsland
+            ChatUtils.debug("checkIsland firing: $oldIsland → $newIsland")
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
             hasPostedIslandChangeEvent = true
@@ -571,10 +574,6 @@ object HypixelData {
                 TabWidget.reSendEvents()
             }
         }
-    }
-
-    private fun eitherIsNone(oldIsland: IslandType, newIsland: IslandType): Boolean {
-        return (oldIsland == IslandType.NONE || newIsland == IslandType.NONE)
     }
 
     private fun getIslandType(name: String, guesting: Boolean): IslandType {
