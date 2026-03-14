@@ -180,6 +180,7 @@ object MobDetection {
     }
 
     /**@return a false means that it should try again (later)*/
+    @Suppress("ReturnCount")
     private fun entitySpawn(entity: LivingEntity, roughType: Category): Boolean {
         when (roughType) {
             Category.PLAYER -> SpawnEvent.Player(MobFactories.player(entity)).post()
