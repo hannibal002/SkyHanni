@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.allIdentical
 import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.SizeLimitedSet
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -26,11 +27,13 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandDetectionWatcher {
 
-    private val action = SizeLimitedCache<SimpleTimeMark, String>(20)
+    private val action = SizeLimitedSet<Data>(20)
 
     private var latestEventType = IslandType.NONE
     private var lastWorldChange = SimpleTimeMark.farFuture()
     private var showedError = false
+
+    data class Data(val text: String, val time: SimpleTimeMark)
 
     private val logger = LorenzLogger("debug/island_change")
 
@@ -43,7 +46,6 @@ object IslandDetectionWatcher {
             ChatUtils.debug("Unknown island detected: '$foundIsland'")
         }
         log("IslandChangeEvent $oldIsland -> $newIsland")
-
         latestEventType = newIsland
     }
 
@@ -70,7 +72,7 @@ object IslandDetectionWatcher {
     }
 
     private fun log(text: String) {
-        action[SimpleTimeMark.now()] = text
+        action.add(Data(text, SimpleTimeMark.now()))
         logger.log(text)
         // TODO add ChatUtils.debug here once DevApi is advanced enough
     }
@@ -87,16 +89,16 @@ object IslandDetectionWatcher {
         if (!SkyBlockUtils.inSkyBlock) return
 
         val tabListType = HypixelData.fetchTabListType()
-        val latestEventType = latestEventType
+        val currentEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 
-        if (listOf(tabListType, latestEventType, internalType).allIdentical()) return
+        if (listOf(tabListType, currentEventType, internalType).allIdentical()) return
 
         ErrorManager.logErrorStateWithData(
             userMessage = "Error loading island type",
             internalMessage = "invalid island state",
             "tab list" to tabListType,
-            "latest event" to latestEventType,
+            "latest event" to currentEventType,
             "internal" to internalType,
             "log" to buildLog(),
         )
@@ -122,8 +124,9 @@ object IslandDetectionWatcher {
         ChatUtils.chat("Changed island type to ${type.displayName} as a workaround")
     }
 
-    private fun buildLog(): List<String> = action.map { (time, text) ->
-        "$text (${time.passedSince()} ago, $time)"
+    private fun buildLog(): List<String> = action.map { data ->
+        val time = data.time
+        "${data.text} (${time.passedSince()} ago, $time)"
     }
 
     @HandleEvent
@@ -131,10 +134,10 @@ object IslandDetectionWatcher {
         event.title("Island Detection Watcher")
 
         val tabListType = HypixelData.fetchTabListType()
-        val latestEventType = latestEventType
+        val currentEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 
-        val isCurrentlyValid = listOf(tabListType, latestEventType, internalType).allIdentical()
+        val isCurrentlyValid = listOf(tabListType, currentEventType, internalType).allIdentical()
         val isRelevant = !isCurrentlyValid || showedError
 
         val list = buildList {
@@ -142,7 +145,7 @@ object IslandDetectionWatcher {
             add("error got shown: $showedError")
             add(" ")
             add("tabListType: $tabListType")
-            add("latestEventType: $latestEventType")
+            add("currentEventType: $currentEventType")
             add("internalType: $internalType")
             add(" ")
             add("log: ")
