@@ -72,6 +72,7 @@ object IslandDetectionWatcher {
     fun log(text: String) {
         action[text] = SimpleTimeMark.now()
         logger.log(text)
+        // TODO add ChatUtils.debug here once DevApi is advanced enough
     }
 
     @HandleEvent(SecondPassedEvent::class)
