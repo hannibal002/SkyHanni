@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandDetectionWatcher {
 
-    private val action = SizeLimitedCache<String, SimpleTimeMark>(20)
+    private val action = SizeLimitedCache<SimpleTimeMark, String>(20)
 
     private var latestEventType = IslandType.NONE
     private var lastWorldChange = SimpleTimeMark.farFuture()
@@ -70,7 +70,7 @@ object IslandDetectionWatcher {
     }
 
     fun log(text: String) {
-        action[text] = SimpleTimeMark.now()
+        action[SimpleTimeMark.now()] = text
         logger.log(text)
         // TODO add ChatUtils.debug here once DevApi is advanced enough
     }
@@ -124,7 +124,7 @@ object IslandDetectionWatcher {
 
     private fun buildLog(): List<String> {
         val result = mutableListOf<String>()
-        for ((text, time) in action) {
+        for ((time, text) in action) {
             result.add("$text (${time.passedSince()} ago, $time)")
         }
         return result
