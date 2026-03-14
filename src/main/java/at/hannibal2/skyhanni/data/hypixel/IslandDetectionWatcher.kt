@@ -138,8 +138,12 @@ object IslandDetectionWatcher {
         val latestEventType = latestEventType
         val internalType = SkyBlockUtils.currentIsland
 
+        val isCurrentlyValid = listOf(tabListType, latestEventType, internalType).allIdentical()
+        val isRelevant = isCurrentlyValid || showedError
+
         val list = buildList {
-            add("showedError: $showedError")
+            add("isCurrentlyValid: $isCurrentlyValid")
+            add("error got shown: $showedError")
             add(" ")
             add("tabListType: $tabListType")
             add("latestEventType: $latestEventType")
@@ -151,7 +155,7 @@ object IslandDetectionWatcher {
             }
         }
 
-        if (showedError) {
+        if (isRelevant) {
             event.addData(list)
         } else {
             event.addIrrelevant(list)
