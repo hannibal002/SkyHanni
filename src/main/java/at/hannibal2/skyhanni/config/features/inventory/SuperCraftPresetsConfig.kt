@@ -12,7 +12,7 @@ class SuperCraftPresetsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Show preset craft amounts in the Supercrafting sign menu (edit with /shsupercraftpreset <number>)."
+        desc = "Show preset craft amounts in the Supercrafting sign menu (edit with /shsupercraftpreset <number>).",
     )
     @ConfigEditorBoolean
     @FeatureToggle

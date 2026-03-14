@@ -60,8 +60,8 @@ object SuperCraftPresets {
 
     private fun commandHelp() {
         ChatUtils.chat(
-            "§6/shsupercraftpreset <number> §7 - Add or remove a preset amount.",
-            prefix = false
+            "§6/shsupercraftpreset <number> §7- Add or remove a preset amount.",
+            prefix = false,
         )
     }
 
