@@ -214,6 +214,8 @@ object FastFairySoulsPathfinder {
 
         for (stack in event.inventoryItems.values) {
             val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
+            // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
+            // which is distinct from finding it on an island.
             val found = stack.getLoreComponent().firstOrNull()?.let {
                 loreSoulPattern.matchMatcher(it.string) {
                     group("found").toIntOrNull()
