@@ -448,6 +448,7 @@ object HypixelData {
         val oldIsland = skyBlockIsland
         if (oldIsland != IslandType.NONE && oldIsland != IslandType.UNKNOWN) {
             skyBlockIsland = IslandType.NONE
+            ChatUtils.debug("onSkyBlockLeave firing: $oldIsland → NONE (hasPostedIslandChangeEvent=$hasPostedIslandChangeEvent)")
             IslandChangeEvent(IslandType.NONE, oldIsland).post()
         }
     }
@@ -557,6 +558,7 @@ object HypixelData {
 
         if (!hasPostedIslandChangeEvent && newIsland != IslandType.NONE) {
             val oldIsland = skyBlockIsland
+            ChatUtils.debug("checkIsland firing: $oldIsland → $newIsland")
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
             hasPostedIslandChangeEvent = true
