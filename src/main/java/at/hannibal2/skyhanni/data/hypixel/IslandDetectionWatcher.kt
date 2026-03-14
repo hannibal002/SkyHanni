@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.allIdentical
-import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.SizeLimitedSet
 import kotlin.time.Duration.Companion.seconds
 
@@ -27,13 +26,13 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandDetectionWatcher {
 
-    private val action = SizeLimitedSet<Data>(20)
+    private val action = SizeLimitedSet<Action>(20)
 
     private var latestEventType = IslandType.NONE
     private var lastWorldChange = SimpleTimeMark.farFuture()
     private var showedError = false
 
-    data class Data(val text: String, val time: SimpleTimeMark)
+    private data class Action(val text: String, val time: SimpleTimeMark)
 
     private val logger = LorenzLogger("debug/island_change")
 
@@ -72,7 +71,7 @@ object IslandDetectionWatcher {
     }
 
     private fun log(text: String) {
-        action.add(Data(text, SimpleTimeMark.now()))
+        action.add(Action(text, SimpleTimeMark.now()))
         logger.log(text)
         // TODO add ChatUtils.debug here once DevApi is advanced enough
     }
