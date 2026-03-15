@@ -166,7 +166,7 @@ object GoldenFishTimer {
         if (weakPattern.matches(event.message)) {
             goldenFishDespawnTimer = DESPAWN_TIME.fromServerNow()
             val entity = confirmedGoldenFishEntity ?: return
-            if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            if (config.highlight) RenderLivingEntityHelper.setEntityColor(
                 entity,
                 LorenzColor.GREEN.toColor().addAlpha(100),
             ) { true }
@@ -234,11 +234,10 @@ object GoldenFishTimer {
         if (icon) {
             // TODO use MutableList<Renderable>.addItemStack once it allows for align
             add(
-                Renderable.item(
-                    goldenFishSkullItem,
-                    2.5,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ),
+                Renderable.item(goldenFishSkullItem) {
+                    scale = 2.5
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                }
             )
         }
         val text = buildList {

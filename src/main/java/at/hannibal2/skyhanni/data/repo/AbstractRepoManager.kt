@@ -1,16 +1,21 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates.ChatProgressCategory
+import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
+import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
+import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
@@ -18,14 +23,13 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
@@ -88,7 +92,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val statusCommand: String
     abstract val reloadCommand: String
 
-    var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory) }
+    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineConfig(
+        name = "$commonName Repo $repoAction Coroutine",
+        timeout = 2.minutes,
+        withIOContext = true,
+    ).let {
+        if (repoMutex != null) it.withMutex(repoMutex) else it
+    }
+
+    private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
+    private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
+    private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
+    private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
+
+    var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
         private set
 
     var localRepoCommit: RepoCommit = RepoCommit()
@@ -131,7 +148,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
                 val progress = progressCategory.start("reloading local repo via /$reloadCommand")
-                reloadLocalRepo(progress)
+                progress.update("reloadLocalRepo")
+                shouldManuallyReload = true
+                repoReloadCoroutineConfig.launch {
+                    reloadRepository(progress, "$commonName repo loaded from local files successfully.")
+                }
             }
         }
     }
@@ -143,29 +164,22 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
 
     @PublishedApi
-    internal fun readJsonElement(path: String): JsonElement? {
-        if (repoFileSystem.exists(path)) {
-            return repoFileSystem.readAllBytesAsJsonElement(path)
-        }
-        val onDisk = repoDirectory.resolve(path)
-        return if (!onDisk.isFile) {
+    internal fun readJsonElement(path: String): JsonElement? =
+        if (repoFileSystem.exists(path)) repoFileSystem.readJson(path)
+        else repoDirectory.resolve(path).takeIf { it.isFile }?.getJson() ?: run {
             logger.logNonDestructiveError("Repo file not found: $path")
             null
-        } else onDisk.getJson()
-    }
+        }
 
     @PublishedApi
     internal inline fun <reified T : Any> getRepoData(
         directory: String,
         fileName: String,
-        type: Type? = null,
         gson: Gson = getGson(),
     ): T = runCatching {
         val path = resolvePath(directory, fileName)
-        val json = readJsonElement(path)
-            ?: logger.throwError("Repo file '$fileName' not found.")
-        if (type == null) gson.fromJson<T>(json)
-        else gson.fromJson(json, type)
+        val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
+        gson.fromJson<T>(json)
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
     }
@@ -181,20 +195,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             resetRepositoryLocation()
         }
 
-        SkyHanniMod.launchIOCoroutine("$commonName updateRepo", timeout = 2.minutes) {
+        repoUpdateCoroutineConfig.launch {
             if (!fetchAndUnpackRepo(progress, command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
-                return@launchIOCoroutine
+                return@launch
             }
             reloadRepository(progress, "$commonName repo updated successfully.")
-            if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launchIOCoroutine
+            if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launch
             val informed = logger.logErrorStateWithData(
                 "Error updating reading $commonName repo",
                 "no success",
                 "usingBackupRepo" to isUsingBackup,
                 "unsuccessfulConstants" to unsuccessfulConstants,
             )
-            if (informed) return@launchIOCoroutine
+            if (informed) return@launch
             logger.logToChat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
         }
     }
@@ -215,28 +229,32 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         )
     }
 
-    fun initRepo() {
-        val progress = progressCategory.start("auto loading on init")
+    fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
-        val loaded = AtomicBoolean(false)
-        val job = SkyHanniMod.launchIOCoroutine("$commonName repo init", timeout = 2.minutes) {
-            if (config.repoAutoUpdate && !fetchAndUnpackRepo(progress, command = false).canContinue) {
-                progress.end("Failed to fetch & unpack repo - aborting repository reload.")
-                logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
-                return@launchIOCoroutine
+        repoInitCoroutineConfig.launch {
+            if (config.repoAutoUpdate) {
+                if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
+                    progress.end("Failed to fetch & unpack repo - aborting.")
+                    return@launch
+                }
+            } else if (!repoDirectoryHasContent()) {
+                if (!switchToBackupRepo(progress).canContinue) {
+                    progress.end("No repo on disk and backup failed.")
+                    return@launch
+                }
             }
-            loaded.set(true)
             reloadRepository(progress)
-        }
-        job.invokeOnCompletion {
-            if (!loaded.get()) {
-                progress.end("reached timeout")
-            }
+        }.invokeOnCompletion { cause ->
+            // `cause` is non-null only when the coroutine ended 'abnormally' (timeout or external cancellation)
+            //  i.e. before any internal return path could call progress.end()
+            // In all normal return paths above, progress is ended explicitly
+            // We only need to guard here against the coroutine being torn down prematurely
+            if (cause != null) progress.end("init ended abnormally: ${cause.message}")
         }
     }
 
     // Code taken + adapted from NotEnoughUpdates
-    private fun switchToBackupRepo(progress: ChatProgressUpdates): FetchUnpackResult = runCatching {
+    private suspend fun switchToBackupRepo(progress: ChatProgressUpdates): FetchUnpackResult = runCatching {
         progress.update("switchToBackupRepo")
         if (PlatformUtils.isDevEnvironment) {
             progress.end("Can not use backup repo in dev env.")
@@ -251,17 +269,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("Attempting to switch to backup repo")
         logger.debug("Attempting to switch to backup repo")
-        val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath)
-            ?: run {
-                progress.update("Failed to find backup resource '$backupRepoResourcePath'")
-                logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
-            }
+        val inputStream = javaClass.classLoader.getResourceAsStream(backupRepoResourcePath) ?: run {
+            progress.update("Failed to find backup resource '$backupRepoResourcePath'")
+            logger.throwError("Failed to find backup resource '$backupRepoResourcePath'")
+        }
 
         progress.update("prepCleanRepoFileSystem")
         prepCleanRepoFileSystem(progress)
 
-        Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger)) {
+        @Suppress("InjectDispatcher")
+        withContext(Dispatchers.IO) {
+            Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        }
+        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
             logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
         }
@@ -371,6 +391,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     /**
+     * Checks if the repo directory exists and has any .json files in it. This is a sanity check to avoid trying to
+     *  load from an empty or non-existent repo directory.
+     * @return true if the repo directory exists and has .json files, false otherwise.
+     */
+    private fun repoDirectoryHasContent() = repoDirectory.exists() &&
+        repoDirectory.walkTopDown().any { it.isFile && it.extension == "json" }
+
+    /**
      * Determines the latest commit on the GitHub repo and compares it to the current commit.
      * If out of date, will download the latest commit zip file and unpack it into the repo directory.
      * Will automatically switch to the backup repo if the download fails or the unpacking fails,
@@ -390,13 +418,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         silentError: Boolean = true,
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
-    ): FetchUnpackResult = repoMutex.withLock {
+    ): FetchUnpackResult {
         progress.update("fetchAndUnpackRepo")
         val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
         }
-        if (comparison.hashesMatch && !forceReset && repoDirectory.exists() && unsuccessfulConstants.isEmpty()) {
+        if (comparison.hashesMatch && !forceReset && repoDirectoryHasContent() && unsuccessfulConstants.isEmpty()) {
             if (command) {
                 comparison.reportRepoUpToDate()
                 shouldManuallyReload = false
@@ -425,7 +453,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile, logger)) {
+        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to unpack the downloaded zip file.")
             logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
@@ -441,8 +469,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
         progress.update("deleteRecursively")
         repoDirectory.deleteRecursively()
+
         progress.update("createAndClean")
-        repoFileSystem = RepoFileSystem.createAndClean(repoDirectory, config.unzipToMemory)
+        repoFileSystem = repoDirectory.let { root ->
+            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory, logger, repoIOCoroutineConfig)
+            else DiskRepoFileSystem(repoDirectory, logger)
+        }.apply { deleteRecursively("") }
+
         progress.update("mkdirs")
         repoDirectory.mkdirs()
         progress.update("createNewFile")
@@ -450,25 +483,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("done with prepCleanRepoFileSystem")
     }
 
-    fun reloadLocalRepo(progress: ChatProgressUpdates, answerMessage: String = "$commonName repo loaded from local files successfully.") {
-        progress.update("reloadLocalRepo")
-        shouldManuallyReload = true
-        SkyHanniMod.launchIOCoroutine("$commonName reloadLocalRepo", timeout = 2.minutes) {
-            reloadRepository(progress, answerMessage)
-        }
-    }
-
     /**
      * Called before the repo reload event is fired, but inside the IO coroutine.
      */
     open suspend fun extraReloadCoroutineWork(progress: ChatProgressUpdates) = Unit
 
-    private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") = repoMutex.withLock {
+    private suspend fun reloadRepository(progress: ChatProgressUpdates, answerMessage: String = "") {
         progress.update("reloadRepository")
         if (!shouldManuallyReload) {
             progress.end("should not manually reload")
             return
         }
+        shouldManuallyReload = false
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()

@@ -45,6 +45,18 @@
 
 + Added Year of the Witch Stew Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/5315)
 
+#### Inventory
+
++ Added Supercrafting menu quantity preset overlay. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5296)
+
+#### Garden
+
++ Added command `/shgardenuptime`. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4703)
+    + Shows garden uptime history for the past x days, defaults to 7 days.
++ Added Crop Break Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4703)
+    + Shows the number of crops you have broken on the Garden and blocks per second (supports pest farming/visitors).
+    + Can choose to display data from the following modes: Total, Session, Day, Week, Month, or Year.
+
 ### Improvements
 
 #### Fishing
@@ -53,6 +65,7 @@
     + Rare Sea Creature Highlight.
     + Seen Rare Sea Creature Ding/Title.
     + Self Notify Upon Seeing.
++ Improved Fishing Timer with total mob count and more accurate despawn timing. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5247)
 
 #### Event
 
@@ -75,6 +88,11 @@
 + Added option to show Sky Mall and Lottery HUD outside of mining/foraging islands. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5297)
 + Improved visual quality of items in displays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5318)
 + Added a copy to clipboard for missing sack items. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/5351)
+
+#### Garden
+
++ Changed Duplicate Location Markers to no longer show after all Hoppity Egg locations on the island are found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5395)
++ Renamed Farming Weight's EliteBot display name to Elite SkyBlock. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5409)
 
 ### Fixes
 
@@ -118,10 +136,14 @@
 
 + Fixed GUI Editor opening while typing in REI search box. - SidOfThe7Cs (https://github.com/hannibal002/SkyHanni/pull/5225)
 + Fixed Visual Words not working in chat on 1.21.11. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/5335)
++ Fixed advertisement blocking in Custom Tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5366)
++ Fixed Open Profile in SkyCrypt RPC buttons not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5369)
++ Improved Custom Scoreboard performance by caching rendered lines. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5368)
 
 #### Item Ability
 
 + Fixed Overclockers not being detected when claiming Jacob Contest rewards. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5235)
++ Fixed cooldown display for Shadow Warp ability not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5387)
 
 #### Event
 
@@ -129,6 +151,8 @@
 + Fixed Double Click to Start option for Carnival not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5302)
 + Fixed rabbits bought from Hoppity via Abiphone not compacting/tracking. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5309)
 + Fixed `/shnavigate` to no longer show Carnival info while Carnival is not active. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5300)
++ Fixed showing more than 100% of found Hoppity locations on the island because of outdated config data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5394)
++ Fixed Stranded players being notified to collect Hoppity eggs. - Luna (https://github.com/hannibal002/SkyHanni/pull/5390)
 
 #### Fishing
 
@@ -145,15 +169,28 @@
 #### Dungeon
 
 + Fixed Croesus Highlight not working on chests made on a separate game instance. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5322)
++ Fixed Dungeon Clean End feature not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5386)
 
 #### Foraging
 
 + Fixed error in DNA Analyzer Solver. - hannibal2 + nopo (https://github.com/hannibal002/SkyHanni/pull/5337)
 
+#### Rift
+
++ Fixed holographs not appearing in Crafting Room Helper. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5327)
+
+#### Inventory
+
++ Fixed sometimes getting an error in chat / disconnect when opening sacks. - Luna (https://github.com/hannibal002/SkyHanni/pull/5370)
+
 #### Misc
 
 + Fixed some features not working when changing from 1 island to the same island type. (e.g. hub--> hub) . - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5348)
 + Fixed world rendering not working with Iris. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5354)
++ Fixed error when using Fast Fairy Souls without soul data loaded. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5383)
++ Fixed island change event not always being sent, causing many features to malfunction (incorrect scoreboard data, broken profit trackers, etc.). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5399)
++ Fixed Sky Mall and Lottery HUD elements displaying outside of SkyBlock. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5389)
++ Fixed multiple different errors all related to island type detection, this time for real. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5408)
 
 ### Technical Details
 
@@ -217,6 +254,32 @@
 + Replaced TablistFooterUpdateEvent and TabListUpdateEvent with Component versions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5329)
 + Split coroutine handling into new manager class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5339)
 + Support for node weight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5325)
++ Changed Crimson Isle Faction Quests to use the Graph Editor more. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5359)
++ Cleaned up code around player location loading. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5333)
++ Extracted some re-usable functionalities from `AnimatedItemStackRenderable`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5274)
++ Fixed detekt rule that flags skull textures in strings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5352)
++ Fixed the cursed existence that was `HolographicEntities`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5327)
++ Refactored `ItemStackRenderable` and `AnimatedItemStackRenderable` to have structured configs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5274)
++ Removed `RenderLivingEntityHelper.setEntityColorWithNoHurtTime` in favor of `RenderLivingEntityHelper.setEntityColor`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5367)
++ Removed `SoundUtils.getLegacySoundName`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5363)
++ Removed deprecated `NBTTypeAdapter` and `ItemStackTypeAdapterFactory` classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5327)
++ Removed mapping to legacy sound name from `PlaySoundEvent`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5363)
++ Updated Graph Editor test Dijkstra logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5344)
++ Added and used `DevApi`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5375)
++ Added SkyHanni Timed Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4702)
+    + Supports saving multiple modes to `profileSpecificStorage`.
+    + Has display modes for Total, Session, Day, Week, Month, and Year.
+    + Allows players to show data from prior dates.
++ Cleaned up `GraphEditorRenderer.buildDisplay`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5376)
++ Cleaned up console messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5398)
++ Migrated `FastFairySouls` to using colorless patterns and components. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5383)
++ Renamed the config of SkyHanni. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5374)
++ Added error logging and showing of island detection issues. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5408)
+
+### Removed Features
+
++ Removed command `/ff old`. - nopo (https://github.com/hannibal002/SkyHanni/pull/5381)
+    + The `/ff` command that opens Elitebot still works.
 
 ## Version 7.0.0
 

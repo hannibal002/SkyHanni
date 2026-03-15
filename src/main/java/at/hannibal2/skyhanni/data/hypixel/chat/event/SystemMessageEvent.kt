@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component
 // A SkyHanniChatEvent after filtering all player send events, leaving messages from the game/system.
 object SystemMessageEvent {
 
+    // TODO docs missing
     @PrimaryFunction("onSystemMessage")
     open class Allow(
         open val message: String,
@@ -17,6 +18,7 @@ object SystemMessageEvent {
         open val cleanMessage: String = chatComponent.string.removeColor(),
     ) : SkyHanniEvent()
 
+    // TODO docs missing
     open class Modify(
         open val message: String,
         @set:Deprecated("Use replaceComponent() instead")

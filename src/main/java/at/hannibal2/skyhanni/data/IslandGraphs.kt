@@ -238,13 +238,18 @@ object IslandGraphs {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
-        val important = SkyBlockUtils.inSkyBlock && lastLoadedIslandType != islandType
+        val isPersonal = IslandTypeTags.PERSONAL_ISLAND.inAny()
+        val important = SkyBlockUtils.inSkyBlock && lastLoadedIslandType != islandType && !isPersonal
         val list = buildList {
             add("")
             if (important) {
                 add("wrong island!")
             } else {
-                add("island is correct!")
+                if (isPersonal) {
+                    add("disabled on $islandType")
+                } else {
+                    add("island is correct!")
+                }
             }
             add("")
             add("lastLoadedIslandType: $lastLoadedIslandType")

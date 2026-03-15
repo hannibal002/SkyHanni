@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 object UltraRareBookAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
-    private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
+    private val dragonSound by lazy { createSound("entity.ender_dragon.growl", 1f) }
 
     private var enchantsFound = false
 

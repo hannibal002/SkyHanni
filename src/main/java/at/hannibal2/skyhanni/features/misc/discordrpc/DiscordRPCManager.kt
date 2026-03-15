@@ -4,6 +4,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -25,6 +26,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import dev.cbyrne.kdiscordipc.KDiscordIPC
 import dev.cbyrne.kdiscordipc.core.error.ConnectionError
 import dev.cbyrne.kdiscordipc.core.event.data.ErrorEventData
@@ -180,17 +183,18 @@ object DiscordRPCManager {
         if (config.showEliteBotButton.get()) {
             buttons.add(
                 Activity.Button(
-                    label = "Open EliteBot",
-                    url = "https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}",
+                    label = "Open EliteSkyBlock",
+                    url = "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
                 ),
             )
         }
 
         if (config.showSkyCryptButton.get()) {
+            val profileName = HypixelData.profileName.firstLetterUppercase()
             buttons.add(
                 Activity.Button(
                     label = "Open SkyCrypt",
-                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName}",
+                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/$profileName".addSkyHanniUtm(),
                 ),
             )
         }

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -9,16 +8,15 @@ import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditorIO {
-
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
@@ -82,38 +80,41 @@ object GraphEditorIO {
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
+        useAsIslandArea(compileGraph)
+        showStats(networkCount)
+    }
 
-        if (config.useAsIslandArea) {
-            SkyHanniMod.launchCoroutine("bridge graph networks") {
-                GraphEditorNetworks.bridgeNetworks(compileGraph)
-                Minecraft.getInstance().execute {
-                    IslandGraphs.setNewGraph(compileGraph)
-                    GraphEditorBugFinder.runTests()
-                    if (GraphEditorNodeFinder.active) {
-                        GraphEditorNodeFinder.calculateNewAllNodeFind()
-                    }
+    private fun useAsIslandArea(compileGraph: Graph) {
+        if (!GraphEditor.config.useAsIslandArea) return
+        CoroutineConfig("bridge graph networks").launchCoroutine {
+            GraphEditorNetworks.bridgeNetworks(compileGraph)
+            DelayedRun.runOrNextTick {
+                IslandGraphs.setNewGraph(compileGraph)
+                GraphEditorBugFinder.runTests()
+                if (GraphEditorNodeFinder.active) {
+                    GraphEditorNodeFinder.calculateNewAllNodeFind()
                 }
             }
         }
+    }
 
-        if (config.showsStats) {
-            val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
-            val namedNodes = nodes.count { it.name != null }.addSeparators()
-            ChatUtils.chat(
-                "§lStats\n" +
-                    "§eNamed Nodes: $namedNodes\n" +
-                    "§eNodes: ${nodes.size.addSeparators()}\n" +
-                    "§eEdges: ${edges.size.addSeparators()}\n" +
-                    "§eLength: $length",
-            )
-            if (networkCount > 1) {
-                ChatUtils.clickableChat(
-                    "§cNetworks: ${networkCount.addSeparators()}",
-                    onClick = { GraphEditorNetworks.findNetworks() },
-                    hover = "Click to find networks!",
-                )
-            }
-        }
+    private fun showStats(networkCount: Int) {
+        if (!GraphEditor.config.showsStats) return
+        val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
+        val namedNodes = nodes.count { it.name != null }.addSeparators()
+        ChatUtils.chat(
+            "§lStats\n" +
+                "§eNamed Nodes: $namedNodes\n" +
+                "§eNodes: ${nodes.size.addSeparators()}\n" +
+                "§eEdges: ${edges.size.addSeparators()}\n" +
+                "§eLength: $length",
+        )
+        if (networkCount <= 1) return
+        ChatUtils.clickableChat(
+            "§cNetworks: ${networkCount.addSeparators()}",
+            onClick = { GraphEditorNetworks.findNetworks() },
+            hover = "Click to find networks!",
+        )
     }
 
     fun loadThisIsland() {
@@ -148,30 +149,33 @@ object GraphEditorIO {
             return
         }
 
-        SkyHanniMod.launchIOCoroutine("merge graph json") {
+        CoroutineConfig("merge graph json").launchCoroutine {
             try {
                 val graph = Graph.fromJson(json)
-
-                Minecraft.getInstance().execute {
-                    GraphEditorHistory.save("merge from clipboard")
-
-                    var nextId = state.id
-                    val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
-                    nodes.addAll(newNodes)
-                    edges.addAll(newEdges)
-                    state.id = nextId
-
-                    GraphEditorNetworks.recalculate()
-                    GraphEditor.updateCache()
-
-                    val nodeCount = newNodes.size.addSeparators()
-                    val edgeCount = newEdges.size.addSeparators()
-                    ChatUtils.chat("Merged $nodeCount nodes and $edgeCount edges from clipboard.")
+                DelayedRun.runOrNextTick {
+                    merging(graph)
                 }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
             }
         }
+    }
+
+    private fun merging(graph: Graph) {
+        GraphEditorHistory.save("merge from clipboard")
+
+        var nextId = state.id
+        val (newNodes, newEdges) = convertToGraphingData(graph) { nextId++ }
+        nodes.addAll(newNodes)
+        edges.addAll(newEdges)
+        state.id = nextId
+
+        GraphEditorNetworks.recalculate()
+        GraphEditor.updateCache()
+
+        val nodeCount = newNodes.size.addSeparators()
+        val edgeCount = newEdges.size.addSeparators()
+        ChatUtils.chat("Merged $nodeCount nodes and $edgeCount edges from clipboard.")
     }
 
     private fun convertToGraphingData(graph: Graph, idProvider: (GraphNode) -> Int): Pair<List<GraphingNode>, List<GraphingEdge>> {
