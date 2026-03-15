@@ -81,7 +81,7 @@ object CocoonAPI {
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         val cocoonMob = cocoon.mob
         val timeSince = cocoon.spawnTime.passedSince()
-        logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
+        logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.category}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 

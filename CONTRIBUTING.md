@@ -336,7 +336,7 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 
 ### Elite Farmers API
 
-SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for
+SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for
 some farming features.
 
 This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience.
