@@ -46,24 +46,24 @@ import java.util.UUID
  * @property extraEntities Additional entities associated with the Mob.
  *
  * Avoid caching, as they may change without notice.
- * @property owner Valid for: [Type.SUMMON], [Type.SLAYER]
+ * @property owner Valid for: [MobCategory.SUMMON], [MobCategory.SLAYER]
  *
  * The owner of the Mob.
- * @property hasStar Valid for: [Type.DUNGEON]
+ * @property hasStar Valid for: [MobCategory.DUNGEON]
  *
  * Indicates whether the Mob has a star.
- * @property attribute Valid for: [Type.DUNGEON]
+ * @property attribute Valid for: [MobCategory.DUNGEON]
  *
  * The attribute of the Mob.
- * @property levelOrTier Valid for: [Type.BASIC], [Type.SLAYER]
+ * @property levelOrTier Valid for: [MobCategory.BASIC], [MobCategory.SLAYER]
  *
  * The level or tier of the Mob.
- * @property hologram1 Valid for: [Type.BASIC], [Type.SLAYER]
+ * @property hologram1 Valid for: [MobCategory.BASIC], [MobCategory.SLAYER]
  *
  * Gives back the first additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
- * @property hologram2 Valid for: [Type.BASIC], [Type.SLAYER]
+ * @property hologram2 Valid for: [MobCategory.BASIC], [MobCategory.SLAYER]
  *
  * Gives back the second additional armor stand.
  *

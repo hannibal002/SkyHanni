@@ -36,7 +36,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import at.hannibal2.skyhanni.data.mob.MobCategory as Category
 import at.hannibal2.skyhanni.events.MobEvent.Spawn as SpawnEvent
 import at.hannibal2.skyhanni.events.MobEvent.DeSpawn as DeSpawnEvent
 import at.hannibal2.skyhanni.events.MobEvent.FirstSeen as FirstSeenEvent
@@ -146,9 +145,9 @@ object MobDetection {
 
     /** Splits the entity into player, displayNPC and other */
     private fun LivingEntity.getRoughType() = when {
-        this is Player && this.isRealPlayer() -> Category.PLAYER
-        this.isDisplayNpc() -> Category.DISPLAY_NPC
-        this.isSkyBlockMob() && !islandException() -> Category.BASIC
+        this is Player && this.isRealPlayer() -> MobCategory.PLAYER
+        this.isDisplayNpc() -> MobCategory.DISPLAY_NPC
+        this.isSkyBlockMob() && !islandException() -> MobCategory.BASIC
         else -> null
     }
 
@@ -168,12 +167,12 @@ object MobDetection {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
         if (isVisible) {
             when (mob.category) {
-                Category.PLAYER -> FirstSeenEvent.Player(mob)
-                Category.SUMMON -> FirstSeenEvent.Summon(mob)
-                Category.SPECIAL -> FirstSeenEvent.Special(mob)
-                Category.PROJECTILE -> FirstSeenEvent.Projectile(mob)
-                Category.DISPLAY_NPC -> FirstSeenEvent.DisplayNpc(mob)
-                Category.BASIC, Category.DUNGEON, Category.BOSS, Category.SLAYER -> FirstSeenEvent.SkyblockMob(mob)
+                MobCategory.PLAYER -> FirstSeenEvent.Player(mob)
+                MobCategory.SUMMON -> FirstSeenEvent.Summon(mob)
+                MobCategory.SPECIAL -> FirstSeenEvent.Special(mob)
+                MobCategory.PROJECTILE -> FirstSeenEvent.Projectile(mob)
+                MobCategory.DISPLAY_NPC -> FirstSeenEvent.DisplayNpc(mob)
+                MobCategory.BASIC, MobCategory.DUNGEON, MobCategory.BOSS, MobCategory.SLAYER -> FirstSeenEvent.SkyblockMob(mob)
             }.post()
         }
         return isVisible
@@ -181,12 +180,12 @@ object MobDetection {
 
     /**@return a false means that it should try again (later)*/
     @Suppress("ReturnCount")
-    private fun entitySpawn(entity: LivingEntity, roughType: Category): Boolean {
-        when (roughType) {
-            Category.PLAYER -> SpawnEvent.Player(MobFactories.player(entity)).post()
+    private fun entitySpawn(entity: LivingEntity, roughCategory: MobCategory): Boolean {
+        when (roughCategory) {
+            MobCategory.PLAYER -> SpawnEvent.Player(MobFactories.player(entity)).post()
 
-            Category.DISPLAY_NPC -> return MobFilter.createDisplayNpc(entity)
-            Category.BASIC -> {
+            MobCategory.DISPLAY_NPC -> return MobFilter.createDisplayNpc(entity)
+            MobCategory.BASIC -> {
                 val (result, mob) = MobFilter.createSkyblockEntity(entity)
                 when (result) {
                     MobData.Result.NotYetFound -> return false
@@ -195,12 +194,12 @@ object MobDetection {
                     MobData.Result.Found -> {
                         if (mob == null) return mobDetectionError("Mob is null even though result is Found")
                         when (mob.category) {
-                            Category.SUMMON -> SpawnEvent.Summon(mob)
-                            Category.BASIC, Category.DUNGEON, Category.BOSS, Category.SLAYER -> SpawnEvent.SkyblockMob(mob)
-                            Category.SPECIAL -> SpawnEvent.Special(mob)
-                            Category.PROJECTILE -> SpawnEvent.Projectile(mob)
-                            Category.DISPLAY_NPC -> SpawnEvent.DisplayNpc(mob) // Needed for some special cases
-                            Category.PLAYER -> return mobDetectionError("An Player Ended Here. How?")
+                            MobCategory.SUMMON -> SpawnEvent.Summon(mob)
+                            MobCategory.BASIC, MobCategory.DUNGEON, MobCategory.BOSS, MobCategory.SLAYER -> SpawnEvent.SkyblockMob(mob)
+                            MobCategory.SPECIAL -> SpawnEvent.Special(mob)
+                            MobCategory.PROJECTILE -> SpawnEvent.Projectile(mob)
+                            MobCategory.DISPLAY_NPC -> SpawnEvent.DisplayNpc(mob) // Needed for some special cases
+                            MobCategory.PLAYER -> return mobDetectionError("An Player Ended Here. How?")
                         }.post()
                     }
                 }
@@ -233,13 +232,13 @@ object MobDetection {
             EntityPacketType.VILLAGER -> {
                 val entity = EntityUtils.getEntityByID(id) as? Villager ?: return@drainForEach
                 val mob = MobData.entityToMob[entity]
-                if (mob != null && mob.category == Category.DISPLAY_NPC) {
+                if (mob != null && mob.category == MobCategory.DISPLAY_NPC) {
                     DeSpawnEvent.DisplayNpc(mob)
                     addRetry(entity)
                     return@drainForEach
                 }
                 getRetry(entity)?.let {
-                    if (it.roughCategory == Category.DISPLAY_NPC) {
+                    if (it.roughCategory == MobCategory.DISPLAY_NPC) {
                         removeRetry(entity)
                         addRetry(entity)
                     }
@@ -285,21 +284,21 @@ object MobDetection {
     }
 
     private fun Mob.createDeSpawnEvent() = when (this.category) {
-        Category.PLAYER -> DeSpawnEvent.Player(this)
-        Category.SUMMON -> DeSpawnEvent.Summon(this)
-        Category.SPECIAL -> DeSpawnEvent.Special(this)
-        Category.PROJECTILE -> DeSpawnEvent.Projectile(this)
-        Category.DISPLAY_NPC -> DeSpawnEvent.DisplayNpc(this)
-        Category.BASIC, Category.DUNGEON, Category.BOSS, Category.SLAYER -> DeSpawnEvent.SkyblockMob(this)
+        MobCategory.PLAYER -> DeSpawnEvent.Player(this)
+        MobCategory.SUMMON -> DeSpawnEvent.Summon(this)
+        MobCategory.SPECIAL -> DeSpawnEvent.Special(this)
+        MobCategory.PROJECTILE -> DeSpawnEvent.Projectile(this)
+        MobCategory.DISPLAY_NPC -> DeSpawnEvent.DisplayNpc(this)
+        MobCategory.BASIC, MobCategory.DUNGEON, MobCategory.BOSS, MobCategory.SLAYER -> DeSpawnEvent.SkyblockMob(this)
     }
 
     fun postMobHurtEvent(mob: Mob, source: DamageSource, amount: Float) = when (mob.category) {
-        Category.PLAYER -> HurtEvent.Player(mob, source, amount)
-        Category.SUMMON -> HurtEvent.Summon(mob, source, amount)
-        Category.SPECIAL -> HurtEvent.Special(mob, source, amount)
-        Category.PROJECTILE -> HurtEvent.Projectile(mob, source, amount)
-        Category.DISPLAY_NPC -> HurtEvent.DisplayNpc(mob, source, amount)
-        Category.BASIC, Category.DUNGEON, Category.BOSS, Category.SLAYER -> HurtEvent.SkyblockMob(mob, source, amount)
+        MobCategory.PLAYER -> HurtEvent.Player(mob, source, amount)
+        MobCategory.SUMMON -> HurtEvent.Summon(mob, source, amount)
+        MobCategory.SPECIAL -> HurtEvent.Special(mob, source, amount)
+        MobCategory.PROJECTILE -> HurtEvent.Projectile(mob, source, amount)
+        MobCategory.DISPLAY_NPC -> HurtEvent.DisplayNpc(mob, source, amount)
+        MobCategory.BASIC, MobCategory.DUNGEON, MobCategory.BOSS, MobCategory.SLAYER -> HurtEvent.SkyblockMob(mob, source, amount)
     }.post()
 
     private fun handleRetries() {
