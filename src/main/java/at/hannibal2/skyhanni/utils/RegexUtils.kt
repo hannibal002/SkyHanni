@@ -101,6 +101,17 @@ object RegexUtils {
 
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
+    fun Matcher.toLorenzVec(
+        xGroup: String = "x",
+        yGroup: String = "y",
+        zGroup: String = "z",
+    ): LorenzVec? {
+        val x = groupOrNull(xGroup)?.trim()?.toDoubleOrNull() ?: return null
+        val y = groupOrNull(yGroup)?.trim()?.toDoubleOrNull() ?: return null
+        val z = groupOrNull(zGroup)?.trim()?.toDoubleOrNull() ?: return null
+        return LorenzVec(x, y, z)
+    }
+
     fun Pattern.indexOfFirstMatch(list: List<String>): Int? {
         for ((index, line) in list.withIndex()) {
             matcher(line).let { if (it.matches()) return index }
