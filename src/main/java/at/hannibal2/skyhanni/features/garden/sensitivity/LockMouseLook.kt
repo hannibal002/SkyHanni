@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object LockMouseLook {
     /**
-     * REGEX-TEST: §aTeleported you to §r§aPlot
+     * REGEX-TEST: Teleported you to Plot
      */
     private val gardenTeleportPattern by RepoPattern.pattern(
         "chat.garden.teleport.colorless",
@@ -33,7 +33,7 @@ object LockMouseLook {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!gardenTeleportPattern.matches(event.message)) return
+        if (!gardenTeleportPattern.matches(event.chatComponent)) return
         unlockMouse()
     }
 

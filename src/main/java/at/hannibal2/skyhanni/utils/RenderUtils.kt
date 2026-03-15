@@ -219,6 +219,8 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
+    // TODO clean up nullable calls - the function param should not take `Renderable?`,
+    //  the onus should be on the caller to check before calling this.
     fun Position.renderRenderable(
         renderable: Renderable?,
         posLabel: String,

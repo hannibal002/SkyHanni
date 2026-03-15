@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.awt.Color
+import kotlin.let
 
 // Extension Functions are not inside there Companion Object as it would be ambiguous on import.
 // Therefore, they are in the top level and the constructors are just internal not private as they should be.
@@ -25,8 +26,9 @@ fun Renderable.Companion.text(
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     builder: StringBuilder.() -> Unit = {},
-) = builder.invoke(StringBuilder()).toString().let { constructed ->
-    StringRenderable(constructed, scale, color, horizontalAlign, verticalAlign)
+) = StringBuilder().let {
+    builder.invoke(it)
+    StringRenderable(it.toString(), scale, color, horizontalAlign, verticalAlign)
 }
 
 fun Renderable.Companion.text(
