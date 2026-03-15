@@ -109,7 +109,7 @@ object CollectionUtils {
      */
     inline fun <K, V : Number, R> Map<K, V>.subtract(
         other: Map<K, V>,
-        transform: (Double) -> R
+        transform: (Double) -> R,
     ): Map<K, R> = (keys + other.keys).associateWith { k ->
         val diff = (this[k]?.toDouble() ?: 0.0) - (other[k]?.toDouble() ?: 0.0)
         transform(diff)
@@ -122,7 +122,7 @@ object CollectionUtils {
         map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
 
     suspend inline fun <T, R> Iterable<T>.mapAsync(
-        crossinline transform: (T) -> R
+        crossinline transform: (T) -> R,
     ): List<R> = coroutineScope {
         map {
             async { transform(it) }
@@ -130,7 +130,7 @@ object CollectionUtils {
     }
 
     suspend inline fun <T, R> Iterable<T>.mapNotNullAsync(
-        crossinline transform: (T) -> R?
+        crossinline transform: (T) -> R?,
     ): List<R> = coroutineScope {
         mapNotNull {
             async { transform(it) }
@@ -563,7 +563,7 @@ object CollectionUtils {
 
     @Deprecated(
         "Use the built-in ifEmpty function with emptySet() instead",
-        ReplaceWith("this.ifEmpty { emptySet() }")
+        ReplaceWith("this.ifEmpty { emptySet() }"),
     )
     fun <T> Set<T>.optionalEmpty(): Set<T> = ifEmpty { emptySet() }
 
@@ -574,4 +574,10 @@ object CollectionUtils {
 
     @Suppress("UNCHECKED_CAST")
     fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
+
+    fun <T> List<T>.allIdentical(): Boolean {
+        if (isEmpty()) return true
+        val first = first()
+        return all { it == first }
+    }
 }

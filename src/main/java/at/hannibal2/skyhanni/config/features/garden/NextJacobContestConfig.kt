@@ -39,7 +39,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Fetch Contests",
-        desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.",
+        desc = "Automatically fetch Contests from eliteskyblock.com for the current year if they're uploaded already.",
     )
     @ConfigEditorBoolean
     var fetchAutomatically: Boolean = true
@@ -63,7 +63,7 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(
         name = "Share Contests",
-        desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.",
+        desc = "Share the list of upcoming Contests to eliteskyblock.com for everyone else to then fetch automatically.",
     )
     @ConfigEditorDropdown
     var shareAutomatically: ShareContestsEntry = ShareContestsEntry.ASK

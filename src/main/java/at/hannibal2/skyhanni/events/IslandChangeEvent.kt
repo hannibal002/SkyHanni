@@ -4,9 +4,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
-
-// TODO to support checking "switched from island X to island Y" where both are specific islands,
-//  expand this event with a "last valid island" field that holds the last non-[IslandType.NONE] island.
 /**
  * Fired when the current island state changes.
  *
@@ -17,5 +14,9 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  * When switching islands, the event fires twice: first with [newIsland] =[IslandType.NONE]
  * (leaving the old island), then with [oldIsland] = [IslandType.NONE] (entering the new one).
  */
+@Deprecated("use IslandJoinEvent or IslandLeaveEvent instead")
 @PrimaryFunction("onIslandChange")
 class IslandChangeEvent(val newIsland: IslandType, val oldIsland: IslandType) : SkyHanniEvent()
+
+class IslandJoinEvent(val island: IslandType, val previousIsland: IslandType) : SkyHanniEvent()
+class IslandLeaveEvent(val island: IslandType) : SkyHanniEvent()
