@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeComponent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -225,6 +227,38 @@ enum class SkyHanniTypeAdapters(
             { name.lowercase() },
             { SkyblockStat.getValue(this.uppercase()) },
         ),
+    ),
+    SKYBLOCK_STAT_LIST(
+        SkyblockStatList::class.java,
+        object : TypeAdapter<SkyblockStatList>() {
+            override fun write(out: JsonWriter, value: SkyblockStatList) {
+                out.beginObject()
+                value.entries.forEach {
+                    out.name(it.key.name.lowercase()).value(it.value)
+                }
+                out.endObject()
+            }
+
+            override fun read(reader: JsonReader): SkyblockStatList = buildMap {
+                reader.beginObject()
+                while (reader.hasNext()) {
+                    val name = reader.nextName()
+                    val value = reader.nextDouble()
+                    val stat = SkyblockStat.getValueOrNull(name.uppercase()) ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Unknown stat: '${name.uppercase()}'",
+                            "Stat list could not parse stat",
+                            "failed" to name.uppercase(),
+                            betaOnly = true,
+                        )
+                        continue
+                    }
+
+                    this[stat] = value
+                }
+                reader.endObject()
+            } as SkyblockStatList
+        },
     ),
     GRAPH(Graph::class.java, Graph.typeAdapter),
 }
