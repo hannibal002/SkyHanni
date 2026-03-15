@@ -479,7 +479,7 @@ object GardenNextJacobContest {
 
     private fun handleFetchedContests() {
         if (haveAllContests) {
-            ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
+            ChatUtils.chat("Successfully loaded this year's contests from ${EliteDevApi.ELITE_DOMAIN} automatically!")
             fetchedFromElite = true
             nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
             loadedContestsYear = SkyBlockTime.now().year

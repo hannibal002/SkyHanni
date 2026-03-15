@@ -231,8 +231,11 @@ object OrderedWaypoints {
 
     @HandleEvent
     fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
+        val routeName = event.type.name
+        val hasRoute = storage?.routes?.get(routeName) != null
+        ChatUtils.debug("AutoLoad check: type=$routeName, autoLoad=${config.autoLoadMatchingShaftRoute}, hasRoute=$hasRoute")
         if (!config.autoLoadMatchingShaftRoute) return
-        if (storage?.routes?.get(event.type.name) == null) return
+        if (!hasRoute) return
         SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
             load(event.type.name)
         }

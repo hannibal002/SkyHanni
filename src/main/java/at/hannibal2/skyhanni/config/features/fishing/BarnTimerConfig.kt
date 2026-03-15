@@ -4,18 +4,16 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.glfw.GLFW
 
 class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Barn Fishing Timer",
-        desc = "Show the time and amount of own sea creatures nearby while barn fishing."
+        desc = "Show the time and amount of own/global sea creatures nearby while barn fishing.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,7 +22,7 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Show Anywhere",
-        desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location."
+        desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location.",
     )
     @ConfigEditorBoolean
     var showAnywhere: Boolean = false
@@ -40,6 +38,33 @@ class BarnTimerConfig {
     val crimsonIsle: Property<Boolean> = Property.of(true)
 
     @Expose
+    @ConfigOption(name = "Warn Personal Cap", desc = "Warns you when you reach your personal sea creature cap.")
+    @ConfigEditorBoolean
+    var warnPersonalCap: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Warn Global Cap",
+        desc = "Warns you when you reach the global sea creature cap (Only works if all mobs are in range)."
+    )
+    @ConfigEditorBoolean
+    var warnGlobalCap: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Time Alert", desc = "Warns you when the fishing timer reaches a certain value.")
+    @ConfigEditorBoolean
+    var timeAlert: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Time Alert Seconds",
+        desc = "The time in seconds to alert you at.\n" +
+            "§cNote: sea creatures despawn after 6 minutes, (360s).",
+    )
+    @ConfigEditorSlider(minValue = 240f, maxValue = 360f, minStep = 1f)
+    var alertTime: Int = 300
+
+    @Expose
     @ConfigOption(name = "Winter Fishing", desc = "Show the Barn Fishing Timer on the Jerry's Workshop island.")
     @ConfigEditorBoolean
     val winterIsland: Property<Boolean> = Property.of(true)
@@ -47,38 +72,10 @@ class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Stranded Fishing",
-        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit."
+        desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit.",
     )
     @ConfigEditorBoolean
     val forStranded: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Worm Cap Alert",
-        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 20."
-    )
-    @ConfigEditorBoolean
-    var wormLimitAlert: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manually.")
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var manualResetTimer: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
-    @ConfigOption(name = "Fishing Timer Alert", desc = "Change the amount of time in seconds until the timer dings.")
-    @ConfigEditorSlider(minValue = 240f, maxValue = 360f, minStep = 10f)
-    var alertTime: Int = 330
-
-    @Expose
-    @ConfigOption(name = "Fishing Cap Alert", desc = "Gives a warning when you reach a certain amount of mobs.")
-    @ConfigEditorBoolean
-    var fishingCapAlert: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Fishing Cap Amount", desc = "Amount of mobs at which to trigger the Fishing Cap Alert.")
-    @ConfigEditorSlider(minValue = 10f, maxValue = 60f, minStep = 1f)
-    var fishingCapAmount: Int = 30
 
     @Expose
     @ConfigLink(owner = BarnTimerConfig::class, field = "enabled")

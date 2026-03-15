@@ -169,7 +169,7 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    fun renderString(
+    internal fun renderString(
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
@@ -182,7 +182,7 @@ internal object RenderableUtils {
         DrawContextUtils.translate(-1.0, -1.0)
     }
 
-    fun renderString(
+    internal fun renderString(
         text: Component,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
