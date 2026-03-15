@@ -153,7 +153,7 @@ object CompactJacobClaim {
         }
 
         overclockerPattern.matchMatcher(message) {
-            rewardSet.overclockers += groupOrNull("overclockers")?.formatInt() ?: 1
+            rewardSet.overclockers += groupOrNull("count")?.formatInt() ?: 1
         }
 
         bookPattern.matchMatcher(message) {
