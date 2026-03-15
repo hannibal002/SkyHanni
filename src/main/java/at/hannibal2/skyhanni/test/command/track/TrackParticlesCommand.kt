@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.command.track
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ParticleUtils
 import net.minecraft.core.registries.BuiltInRegistries
@@ -18,7 +18,7 @@ import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(commonName = "particle") {
-    override val config get() = SkyHanniMod.feature.dev.debug.trackParticle
+    override val config get() = DevApi.config.debug.trackParticle
 
     // todo add suggestion provider for particle types, maybe when we're fully in 1.21
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
