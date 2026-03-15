@@ -72,28 +72,6 @@ object VanquisherWaypointShare {
         val spawnTime: SimpleTimeMark,
     )
 
-    private fun onOwnVanquisherFound(data: VanquisherApi.VanquisherData) {
-        lastShareTime = SimpleTimeMark.farPast()
-        ownVanquisherData = data
-        TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
-        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled)
-
-        val playerName = PlayerUtils.getName()
-        sharedWaypoints[playerName] = SharedVanquisher(
-            playerName,
-            data.mob.baseEntity.getLorenzVec(),
-            SimpleTimeMark.now(),
-        )
-
-        if (config.instantShare) {
-            sendSpawn()
-        } else {
-            val keyName = KeyboardManager.getKeyName(config.keybindSharing)
-            val message = "You found a Vanquisher! Click here or press $keyName to share!"
-            ChatUtils.clickableChat(message, onClick = ::sendSpawn, hover = "Click to share!", oneTimeClick = true)
-        }
-    }
-
     private fun sendSpawn() {
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
@@ -117,17 +95,6 @@ object VanquisherWaypointShare {
         }
     }
 
-    private fun sendDeath() {
-        if (lastShareTime.passedSince() < 2.seconds) return
-        if (PartyApi.isInParty()) {
-            HypixelCommands.partyChat("Vanquisher dead!")
-        } else if (config.readGlobalChat) {
-            HypixelCommands.allChat("Vanquisher dead!")
-        }
-    }
-
-    private fun isEnabled() = config.enabled
-
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
         sharedWaypoints.clear()
@@ -138,14 +105,37 @@ object VanquisherWaypointShare {
     fun onVanquisherSpawn(event: VanquisherEvent.Spawn) {
         if (!isEnabled()) return
         if (!event.vanquisher.isOwn) return
-        onOwnVanquisherFound(event.vanquisher)
+
+        lastShareTime = SimpleTimeMark.farPast()
+        ownVanquisherData = event.vanquisher
+        TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
+        ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled)
+        val playerName = PlayerUtils.getName()
+        sharedWaypoints[playerName] = SharedVanquisher(
+            playerName,
+            event.vanquisher.mob.baseEntity.getLorenzVec(),
+            SimpleTimeMark.now(),
+        )
+        if (config.instantShare) {
+            sendSpawn()
+        } else {
+            val keyName = KeyboardManager.getKeyName(config.keybindSharing)
+            val message = "You found a Vanquisher! Click here or press $keyName to share!"
+            ChatUtils.clickableChat(message, onClick = ::sendSpawn, hover = "Click to share!", oneTimeClick = true)
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onVanquisherDeath(event: VanquisherEvent.Death) {
         if (!isEnabled()) return
         if (!event.vanquisher.isOwn) return
-        sendDeath()
+        if (lastShareTime.passedSince() < 2.seconds) return
+
+        if (PartyApi.isInParty()) {
+            HypixelCommands.partyChat("Vanquisher dead!")
+        } else if (config.readGlobalChat) {
+            HypixelCommands.allChat("Vanquisher dead!")
+        }
     }
 
     @HandleEvent
@@ -250,4 +240,6 @@ object VanquisherWaypointShare {
             }
         }
     }
+
+    private fun isEnabled() = config.enabled
 }
