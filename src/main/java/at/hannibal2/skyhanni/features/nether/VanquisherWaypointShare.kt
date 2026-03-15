@@ -23,7 +23,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
@@ -216,29 +218,29 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
 
         val beaconColor = Color(160, 37, 191)
-
-        with(WorldRenderUtils) {
-            for (waypoint in sharedWaypoints.values) {
-                if (waypoint.spawnTime.passedSince() > 60.seconds) continue
-
-                event.drawWaypointFilled(
-                    location = waypoint.location,
-                    color = beaconColor,
-                    seeThroughBlocks = true,
-                    beacon = false,
-                )
-                event.renderBeaconBeam(
-                    waypoint.location,
-                    beaconColor.rgb,
-                )
-                event.drawLineToEye(
-                    location = waypoint.location,
-                    color = beaconColor,
-                    lineWidth = 3,
-                    depth = false,
-                )
-            }
+        sharedWaypoints.values.forEach { waypoint ->
+            event.drawWaypoint(waypoint, beaconColor)
         }
+    }
+
+    private fun SkyHanniRenderWorldEvent.drawWaypoint(waypoint: SharedVanquisher, beaconColor: Color) {
+        if (waypoint.spawnTime.passedSince() > 60.seconds) return
+        drawWaypointFilled(
+            location = waypoint.location,
+            color = beaconColor,
+            seeThroughBlocks = true,
+            beacon = false,
+        )
+        renderBeaconBeam(
+            waypoint.location,
+            beaconColor.rgb,
+        )
+        drawLineToEye(
+            location = waypoint.location,
+            color = beaconColor,
+            lineWidth = 3,
+            depth = false,
+        )
     }
 
     private fun isEnabled() = config.enabled
