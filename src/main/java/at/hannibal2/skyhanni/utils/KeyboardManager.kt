@@ -5,16 +5,14 @@ import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+import net.minecraft.client.input.KeyEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
-import net.minecraft.client.input.KeyEvent
 
 @SkyHanniModule
 object KeyboardManager {
