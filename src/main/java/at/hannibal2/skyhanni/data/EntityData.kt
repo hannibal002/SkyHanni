@@ -74,12 +74,12 @@ object EntityData {
     }
 
     @JvmStatic
-    fun onRenderCheck(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
+    fun shouldRender(entity: Entity, camX: Double, camY: Double, camZ: Double): Boolean {
         if (GlobalRender.renderDisabled) return true
         lastVisibilityCheck[entity.id]?.let { result ->
             return result
         }
-        val result = CheckRenderEntityEvent(entity, camX, camY, camZ).post()
+        val result = !CheckRenderEntityEvent(entity, camX, camY, camZ).post().isCancelled
         lastVisibilityCheck[entity.id] = result
         return result
     }

@@ -23,7 +23,7 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         Entity entity = EntityRenderDispatcherHookKt.getEntity();
         if (entity instanceof LivingEntity livingEntity
             && !EntityRenderDispatcherHookKt.getActiveHolographicEntities().contains(livingEntity)) {
-            if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
+            if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post().isCancelled()) {
                 ci.cancel();
             }
         }

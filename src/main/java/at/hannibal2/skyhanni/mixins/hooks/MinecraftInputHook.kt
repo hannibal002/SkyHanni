@@ -40,7 +40,7 @@ object MinecraftInputHook {
 
         if (currentBlockPos == position) return false
 
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
+        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post().isCancelled
 
         return BlockClickEvent(
             ClickType.LEFT_CLICK,
@@ -48,7 +48,7 @@ object MinecraftInputHook {
             InventoryUtils.getItemInHand(),
         ).also {
             if (clickCancelled) it.cancel()
-        }.post()
+        }.post().isCancelled
     }
 
     private fun handleClick(
@@ -60,7 +60,7 @@ object MinecraftInputHook {
 
         val itemInHand = InventoryUtils.getItemInHand()
 
-        val clickCancelled = ItemClickEvent(itemInHand, clickType).post()
+        val clickCancelled = ItemClickEvent(itemInHand, clickType).post().isCancelled
 
         return when (hitResult.type) {
             HitResult.Type.MISS ->
@@ -74,7 +74,7 @@ object MinecraftInputHook {
                     itemInHand,
                 ).also {
                     if (clickCancelled) it.cancel()
-                }.post()
+                }.post().isCancelled
             }
 
             HitResult.Type.ENTITY -> {
@@ -85,7 +85,7 @@ object MinecraftInputHook {
                     itemInHand,
                 ).also {
                     if (clickCancelled) it.cancel()
-                }.post()
+                }.post().isCancelled
             }
         }
     }

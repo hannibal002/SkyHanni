@@ -51,7 +51,7 @@ object KeyboardManager {
         val isClose = keycode.matchesClosureKey() || keycode == GLFW.GLFW_KEY_ESCAPE
         if (!isClose) return false
 
-        return AttemptedInventoryCloseEvent().post()
+        return AttemptedInventoryCloseEvent().post().isCancelled
     }
 
     /**

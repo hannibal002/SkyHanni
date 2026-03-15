@@ -43,7 +43,7 @@ public class MixinClientPacketListener {
                 new LorenzVec(packet.getXDist(), packet.getYDist(), packet.getZDist()),
                 packet.isOverrideLimiter(),
                 null
-            ).post()
+            ).post().isCancelled()
         ) {
             ci.cancel();
         }

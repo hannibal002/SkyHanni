@@ -20,7 +20,7 @@ object ToolTipData {
     init {
         ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
             val slot = lastSlot
-            if (ToolTipTextEvent(slot, stack, originalToolTip).post()) {
+            if (ToolTipTextEvent(slot, stack, originalToolTip).post().isCancelled) {
                 originalToolTip.clear()
                 return@register
             }
@@ -60,7 +60,7 @@ object ToolTipData {
         val slot = lastSlot ?: return
         val itemStack = slot.item ?: return
         try {
-            if (ToolTipEvent(slot, itemStack, toolTip).post()) {
+            if (ToolTipEvent(slot, itemStack, toolTip).post().isCancelled) {
                 toolTip.clear()
             }
         } catch (e: Throwable) {

@@ -28,7 +28,7 @@ public class MixinSoundEngine {
                 new LorenzVec(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ()),
                 soundInstance.getPitch(),
                 soundInstance.getVolume()
-            ).post()
+            ).post().isCancelled()
         ) {
             cir.setReturnValue(SoundEngine.PlayResult.NOT_STARTED);
         }

@@ -33,7 +33,7 @@ public class MixinGui {
 
     @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postHotbarLayerEventPre(context)) {
+        if (RenderEvents.postHotbarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -45,14 +45,14 @@ public class MixinGui {
 
     @Inject(method = "renderTabList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;render(Lnet/minecraft/client/gui/GuiGraphics;ILnet/minecraft/world/scores/Scoreboard;Lnet/minecraft/world/scores/Objective;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderPlayerList(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postTablistLayerEventPre(context)) {
+        if (RenderEvents.postTablistLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
 
      @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
      public void renderExperienceBar(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
-         if (RenderEvents.postExperienceBarLayerEventPre(context)) {
+         if (RenderEvents.postExperienceBarLayerEventPre(context).isCancelled()) {
              ci.cancel();
          }
      }
@@ -64,7 +64,7 @@ public class MixinGui {
 
      @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;renderExperienceLevel(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
      public void renderExperienceLevel(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
-         if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
+         if (RenderEvents.postExperienceNumberLayerEventPre(context).isCancelled()) {
              ci.cancel();
          }
      }
@@ -91,7 +91,7 @@ public class MixinGui {
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, false).post()) {
+        if (!new TitleReceivedEvent(formattedText, false).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -99,14 +99,14 @@ public class MixinGui {
     @WrapMethod(method = "setSubtitle")
     private void handleSubtitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, true).post()) {
+        if (!new TitleReceivedEvent(formattedText, true).post().isCancelled()) {
             original.call(component);
         }
     }
 
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphics context, CallbackInfo ci) {
-        if (RenderEvents.postHeldItemTooltipLayerEventPre(context)) {
+        if (RenderEvents.postHeldItemTooltipLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -118,7 +118,7 @@ public class MixinGui {
 
     @Inject(method = "renderOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphics context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postActionBarLayerEventPre(context)) {
+        if (RenderEvents.postActionBarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }

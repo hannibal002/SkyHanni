@@ -44,8 +44,8 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
+    fun onRenderOverlay() {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
         if (Minecraft.getInstance().screen != null) return
 
@@ -142,7 +142,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.SUB_TITLE) {
                     lastSubTitle = tabLine
                 }
-                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post().isCancelled
             }.let(::RenderColumn)
 
             GuiRenderUtils.drawRect(

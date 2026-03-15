@@ -133,7 +133,7 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer,
-            ).post()
+            ).post().isCancelled
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
@@ -191,24 +191,23 @@ object ChatManager {
      * If the message is modified return the modified message otherwise return null.
      */
     fun onChatModify(original: Component): Component? {
-        val component = original
-        val message = component.formattedTextCompat().stripHypixelMessage()
+        val message = original.formattedTextCompat().stripHypixelMessage()
 
-        val key = IdentityCharacteristics(component)
-        val chatEvent = SkyHanniChatEvent.Modify(message, component)
+        val key = IdentityCharacteristics(original)
+        val chatEvent = SkyHanniChatEvent.Modify(message, original)
         chatEvent.post()
 
         val modifiedComponent = chatEvent.chatComponent
         var modified = false
-        if (modifiedComponent != component) {
+        if (modifiedComponent != original) {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
-            loggerModified.log("[original] " + component.formattedTextCompat())
+            loggerModified.log("[original] " + original.formattedTextCompat())
             loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat())
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent, reason)
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modifiedComponent, reason)
         } else {
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null, null)
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null, null)
         }
 
         return modifiedComponent.takeIf { modified }

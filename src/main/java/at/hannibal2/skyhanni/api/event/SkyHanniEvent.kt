@@ -15,14 +15,15 @@ abstract class SkyHanniEvent protected constructor() {
 
     fun post(onError: (Throwable) -> Unit = {}) = prePost(onError)
 
-    private fun prePost(onError: ((Throwable) -> Unit)?): Boolean {
+    private fun prePost(onError: ((Throwable) -> Unit)?): SkyHanniEvent {
         if (this is Rendering) {
             DrawContextUtils.setContext(this.context)
-            val result = SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+            SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
             DrawContextUtils.clearContext()
-            return result
+            return this
         }
-        return SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+        SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+        return this
     }
 
     interface Cancellable {
