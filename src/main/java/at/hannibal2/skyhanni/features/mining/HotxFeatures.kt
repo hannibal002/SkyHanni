@@ -30,7 +30,7 @@ object HotxFeatures {
 
     private val handlers = listOf(HotmData, HotfData)
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
         handlers.forEach { it.renderOverlay() }
     }

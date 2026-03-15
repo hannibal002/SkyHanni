@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -76,19 +76,8 @@ object AdvancedPlayerList {
             }
             val playerData: PlayerData? = levelPattern.matchMatcher(line) {
                 val levelText = group("level")
-                val removeColor = levelText.removeColor()
-                try {
-                    val sbLevel = removeColor.toInt()
-                    readPlayerData(sbLevel, levelText, line)
-                } catch (e: NumberFormatException) {
-                    ErrorManager.logErrorWithData(
-                        e, "Advanced Player List failed to parse username",
-                        "line" to line,
-                        "i" to i,
-                        "original" to original.map { it.string },
-                    )
-                    null
-                }
+                val sbLevel = levelText.removeColor().formatIntOrNull() ?: return@matchMatcher null
+                readPlayerData(sbLevel, levelText, line)
             }
             playerData?.let {
                 val name = it.name
