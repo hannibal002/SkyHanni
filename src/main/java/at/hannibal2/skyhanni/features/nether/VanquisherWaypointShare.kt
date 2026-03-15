@@ -42,7 +42,7 @@ object VanquisherWaypointShare {
      * REGEX-TEST: [MVP+] itsseth3: x: -10 y: 30 z: 22 | Vanquisher
      */
     @Suppress("MaxLineLength")
-    private val vanquisherSharedPattern by patternGroup.list(
+    private val sharedPattern by patternGroup.list(
         "share",
         "^(?<channel>Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*",
     )
@@ -52,12 +52,12 @@ object VanquisherWaypointShare {
      * REGEX-TEST: [MVP+] itsseth3: Vanquisher dead!
      */
 
-    private val vanquisherDiedPattern by patternGroup.pattern(
+    private val diedPattern by patternGroup.pattern(
         "died",
         "^(?<channel>.*> )?(?<playerName>[^:]+): Vanquisher dead!.*",
     )
 
-    private var myVanquisherData: VanquisherApi.VanquisherData? = null
+    private var ownVanquisherData: VanquisherApi.VanquisherData? = null
 
     private var lastShareTime = SimpleTimeMark.farPast()
 
@@ -69,9 +69,9 @@ object VanquisherWaypointShare {
         val spawnTime: SimpleTimeMark,
     )
 
-    private fun foundVanquisher(data: VanquisherApi.VanquisherData) {
+    private fun onOwnVanquisherFound(data: VanquisherApi.VanquisherData) {
         lastShareTime = SimpleTimeMark.farPast()
-        myVanquisherData = data
+        ownVanquisherData = data
         TitleManager.sendTitle("§5§lVanquisher Spawned!", "§r§7You found one nearby!")
         ChatUtils.notifyOrDisable("You Spawned a Vanquisher", config::enabled)
 
@@ -83,19 +83,19 @@ object VanquisherWaypointShare {
         )
 
         if (config.instantShare) {
-            sendVanquisher()
+            sendSpawn()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keybindSharing)
             val message = "You found a Vanquisher! Click here or press $keyName to share!"
-            ChatUtils.clickableChat(message, onClick = ::sendVanquisher, hover = "Click to share!", oneTimeClick = true)
+            ChatUtils.clickableChat(message, onClick = ::sendSpawn, hover = "Click to share!", oneTimeClick = true)
         }
     }
 
-    private fun sendVanquisher() {
+    private fun sendSpawn() {
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
-        val data = myVanquisherData ?: run {
+        val data = ownVanquisherData ?: run {
             ChatUtils.debug("Trying to send Vanquisher via chat, but no mob found nearby.")
             return
         }
@@ -114,7 +114,7 @@ object VanquisherWaypointShare {
         }
     }
 
-    private fun sendVanquisherDeath() {
+    private fun sendDeath() {
         if (lastShareTime.passedSince() < 2.seconds) return
         if (PartyApi.isInParty()) {
             HypixelCommands.partyChat("Vanquisher dead!")
@@ -128,33 +128,33 @@ object VanquisherWaypointShare {
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         sharedWaypoints.clear()
-        myVanquisherData = null
+        ownVanquisherData = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onVanquisherSpawn(event: VanquisherEvent.Spawn) {
         if (!isEnabled()) return
         if (!event.vanquisher.isOwn) return
-        foundVanquisher(event.vanquisher)
+        onOwnVanquisherFound(event.vanquisher)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onVanquisherDeath(event: VanquisherEvent.Death) {
         if (!isEnabled()) return
         if (!event.vanquisher.isOwn) return
-        sendVanquisherDeath()
+        sendDeath()
     }
 
     @HandleEvent
     fun onVanquisherDeSpawn(event: VanquisherEvent.DeSpawn) {
-        if (event.vanquisher == myVanquisherData) myVanquisherData = null
+        if (event.vanquisher == ownVanquisherData) ownVanquisherData = null
     }
 
     @HandleEvent
     fun onKeyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getInstance().screen != null) return
-        if (event.keyCode == config.keybindSharing) sendVanquisher()
+        if (event.keyCode == config.keybindSharing) sendSpawn()
     }
 
     @HandleEvent
@@ -170,12 +170,12 @@ object VanquisherWaypointShare {
         if (!isEnabled()) return
         val message = event.cleanMessage
 
-        handleVanquisherShared(message, event)
-        handleVanquisherDied(message)
+        handleShared(message, event)
+        handleDied(message)
     }
 
-    private fun handleVanquisherShared(message: String, event: SkyHanniChatEvent.Allow) {
-        vanquisherSharedPattern.matchMatchers(message) {
+    private fun handleShared(message: String, event: SkyHanniChatEvent.Allow) {
+        sharedPattern.matchMatchers(message) {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
 
@@ -205,8 +205,8 @@ object VanquisherWaypointShare {
         }
     }
 
-    private fun handleVanquisherDied(message: String) {
-        vanquisherDiedPattern.matchMatcher(message) {
+    private fun handleDied(message: String) {
+        diedPattern.matchMatcher(message) {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
             if (isGlobalChat && !config.readGlobalChat) return@matchMatcher
