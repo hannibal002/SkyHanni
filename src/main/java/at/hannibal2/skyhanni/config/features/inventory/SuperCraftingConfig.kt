@@ -8,6 +8,11 @@ class SuperCraftingConfig {
 
     @Expose
     @Accordion
+    @ConfigOption(name = "Presets", desc = "")
+    var presets = SuperCraftPresetsConfig()
+
+    @Expose
+    @Accordion
     @ConfigOption(name = "Waste Warning", desc = "")
     var waste = SuperCraftingWasteConfig()
 }

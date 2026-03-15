@@ -4,6 +4,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -182,8 +183,8 @@ object DiscordRPCManager {
         if (config.showEliteBotButton.get()) {
             buttons.add(
                 Activity.Button(
-                    label = "Open EliteBot",
-                    url = "https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
+                    label = "Open EliteSkyBlock",
+                    url = "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
                 ),
             )
         }

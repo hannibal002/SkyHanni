@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
@@ -195,7 +196,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
             return Renderable.hoverTips(
                 content = "§7Waiting for update...",
                 tips = listOf(
-                    "§celitebot.dev is currently overloaded or unavailable.",
+                    "§c${EliteDevApi.ELITE_DOMAIN} is currently overloaded or unavailable.",
                     "§7Leaderboard data will update when the service recovers.",
                 ),
             )
