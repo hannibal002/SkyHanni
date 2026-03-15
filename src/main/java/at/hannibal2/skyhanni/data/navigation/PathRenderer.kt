@@ -15,15 +15,18 @@ import java.awt.Color
 /**
  * TODO
  *
- * es updaed die nächste curve location nur per tick, nciht per frame.
  * bug: hides the two separate render things, if one is just out of line, instead, should the static one always show,
  *  and the near one should "Jump" closer to me on the line until it finds the correct one finally
  * bug: not through water line
  * bug: sometimes disappears entirely for a frame
  * bug: does not show up immediately on start, only after node move
  * improvement: corners are too sharp, smooth them
+ * block at target is gone
+ * jump all 2 blocks/per node
+ *
  * IslandGraphs: rename all functions and members to be more logical/explain what they do
  * IslandGraphs: magic numbers
+ * IslandGraphs: fix distance calculation for display being off
  *
  * arrow in direction in 2d user frame space: if close to player point is out of player looking direction/frustum
  *
@@ -33,9 +36,9 @@ import java.awt.Color
  */
 
 private const val SUBDIVISION_STEP = 0.5
-private const val CURVE_RADIUS = 5.0
+private const val CURVE_RADIUS = 8.0
 
-private const val ANCHOR_Y_OFFSET = -0.1
+private const val ANCHOR_Y_OFFSET = -1.0
 private const val ANCHOR_FORWARD_DIST = 0.7
 
 private const val CONTROL_POINT_SCALE = 0.5
@@ -50,12 +53,11 @@ private const val STANDING_EYE_HEIGHT = 1.62
  */
 class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: LorenzVec) {
 
-    private var densePositions: List<LorenzVec> = emptyList()
+    private val densePositions: List<LorenzVec> = subdividePositions(path.map { it.position.addHalf() })
     private var curveMaxDist: Double = 0.0
 
     fun render(event: SkyHanniRenderWorldEvent) {
         renderCurve(event)
-
         val lastNode = path.lastOrNull()?.position ?: return
         event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, true)
     }
@@ -63,31 +65,30 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     private fun renderCurve(event: SkyHanniRenderWorldEvent) {
         val eyePos = event.exactPlayerEyeLocation()
         val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
-
         val dense = densePositions
         val maxDist = curveMaxDist
-        if (dense.isEmpty() || maxDist <= 0.0) return
+        if (dense.size < 2 || maxDist <= 0.0) return
 
-        val closestIdx = findClosestIndex(dense)
+        val (startPos, nextDenseIdx) = projectOntoPath(dense, eyePos)
+        val walkPositions = listOf(startPos) + dense.drop(nextDenseIdx)
         var totalDist = 0.0
         var curveEndPos: LorenzVec? = null
         var curveTangent = LorenzVec(0.0, 0.0, 1.0)
-        var curveNextIdx = closestIdx
-
-        for (i in (closestIdx + 1)..dense.lastIndex) {
-            val segLen = dense[i - 1].distance(dense[i])
+        var curveNextIdx = nextDenseIdx
+        for (i in 1..walkPositions.lastIndex) {
+            val segLen = walkPositions[i - 1].distance(walkPositions[i])
             val remaining = maxDist - totalDist
             if (segLen >= remaining) {
-                val dir = (dense[i] - dense[i - 1]).normalize()
-                curveEndPos = dense[i - 1] + dir * remaining
+                val dir = (walkPositions[i] - walkPositions[i - 1]).normalize()
+                curveEndPos = walkPositions[i - 1] + dir * remaining
                 curveTangent = dir
-                curveNextIdx = i
+                curveNextIdx = nextDenseIdx + i - 1
                 break
             }
             totalDist += segLen
-            curveEndPos = dense[i]
-            curveTangent = (dense[i] - dense[i - 1]).normalize()
-            curveNextIdx = i
+            curveEndPos = walkPositions[i]
+            curveTangent = (walkPositions[i] - walkPositions[i - 1]).normalize()
+            curveNextIdx = nextDenseIdx + i - 1
         }
 
         if (curveEndPos == null) return
@@ -97,25 +98,35 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val controlPoint = curveEndPos - curveTangent * scale
         event.draw3DBezier2(anchor, controlPoint, curveEndPos, color, NEAR_LINE_WIDTH, true)
         val farPositions = listOf(curveEndPos) + dense.drop(curveNextIdx)
+        if (farPositions.size >= 2) event.draw3DPolyline(farPositions, color, NEAR_LINE_WIDTH, true)
+    }
 
-        if (farPositions.size >= 2) {
-            event.draw3DPolyline(farPositions, color, NEAR_LINE_WIDTH, true)
+
+    private fun projectOntoPath(dense: List<LorenzVec>, eyePos: LorenzVec): Pair<LorenzVec, Int> {
+        var bestDistSq = Double.MAX_VALUE
+        var bestPos = dense[0]
+        var bestNextIdx = 1
+        for (i in 0 until dense.lastIndex) {
+            val proj = eyePos.nearestPointOnLine(dense[i], dense[i + 1])
+            val distSq = eyePos.distanceSq(proj)
+            if (distSq < bestDistSq) {
+                bestDistSq = distSq
+                bestPos = proj
+                bestNextIdx = i + 1
+            }
         }
+        return bestPos to bestNextIdx
     }
 
     fun updateNearSegment() {
-        val dense = subdividePositions(path.map { it.position.addHalf() })
-        densePositions = dense
-        val closestIdx = findClosestIndex(dense)
+        val dense = densePositions
+        val closestIdx = findClosestIndex(dense, playerPosition)
         var totalDist = 0.0
-
         for (i in (closestIdx + 1)..dense.lastIndex) {
             if (!dense[i].canBeSeen()) break
-            val segLen = dense[i - 1].distance(dense[i])
-            totalDist += segLen
+            totalDist += dense[i - 1].distance(dense[i])
             if (totalDist >= CURVE_RADIUS) {
-                totalDist = CURVE_RADIUS
-                break
+                totalDist = CURVE_RADIUS; break
             }
         }
         curveMaxDist = totalDist
@@ -126,7 +137,6 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val result = mutableListOf<LorenzVec>()
         var prev = positions.first()
         result.add(prev)
-
         for (curr in positions.drop(1)) {
             val dist = prev.distance(curr)
             if (dist > SUBDIVISION_STEP) {
@@ -143,6 +153,6 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return result
     }
 
-    private fun findClosestIndex(positions: List<LorenzVec>): Int =
-        positions.indices.minBy { positions[it].distance(playerPosition) }
+    private fun findClosestIndex(positions: List<LorenzVec>, referencePos: LorenzVec): Int =
+        positions.indices.minBy { positions[it].distance(referencePos) }
 }

@@ -379,12 +379,6 @@ object IslandGraphs {
         if (path.isEmpty()) return false
         val closest = path.getNearestNode()
         if (closest.distanceSqToPlayer() > 49) return false
-
-        val index = path.indexOf(closest)
-        val newNodes = path.drop(index)
-        val newGraph = Graph(newNodes)
-        pathRenderer = PathRenderer(newGraph, color, currentTarget ?: error("target is null"))
-        setFastestPath(newGraph to newGraph.totalLength(), setPath = false)
         return true
     }
 
@@ -408,8 +402,6 @@ object IslandGraphs {
         }
         setFastestPath(path to (distance + nodeDistance))
     }
-
-    private fun Graph.totalLength(): Double = zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
     private fun handlePositionChange() {
         updateFeedback()
