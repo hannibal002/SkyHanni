@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -26,7 +28,6 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
@@ -42,12 +43,15 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOldHoeCounter
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
@@ -198,7 +202,6 @@ object GardenApi {
         SkyMartCopperPrice.inInventory ||
         FarmingContestApi.inInventory ||
         VisitorApi.inInventory ||
-        FFGuideGui.isInGui() ||
         CFShopPrice.inInventory ||
         CFApi.inChocolateFactory ||
         CFApi.chocolateFactoryPaused ||
@@ -298,6 +301,25 @@ object GardenApi {
                 updateGardenTool()
                 ChatUtils.chat("Manually reset all crop speed data!")
             }
+        }
+        event.registerBrigadier("ff") {
+            description = "Opens the Farming Fortune Guide"
+            simpleCallback {
+                if (!SkyBlockUtils.inSkyBlock) {
+                    ChatUtils.userError("Join SkyBlock to open the fortune guide!")
+                } else {
+                    val name = PlayerUtils.getName()
+                    var profile = HypixelData.profileName
+                    if (profile.isNotEmpty()) profile += "/"
+                    ChatUtils.clickableLinkChat(
+                        "§cSkyHannis /ff display is no longer being developed! " +
+                            "§6Click §bhere §6to see your updated fortune progress and " +
+                            "cheapest upgrades on ${EliteDevApi.ELITE_DOMAIN} instead!",
+                        "${EliteDevApi.ELITE_URL}/@$name/${profile}fortune".addSkyHanniUtm() + "#fortune",
+                    )
+                }
+            }
+
         }
     }
 }

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -23,7 +24,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ParkourWaypointSaver {
 
-    private val config get() = SkyHanniMod.feature.dev.waypoint
+    private val config get() = DevApi.config.waypoint
     private var timeLastSaved = SimpleTimeMark.farPast()
     private var locations = mutableListOf<LorenzVec>()
     private var parkourHelper: ParkourHelper? = null
@@ -33,7 +34,7 @@ object ParkourWaypointSaver {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getInstance().screen != null) return
-        if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
+        if (GraphEditor.isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
         when (event.keyCode) {
