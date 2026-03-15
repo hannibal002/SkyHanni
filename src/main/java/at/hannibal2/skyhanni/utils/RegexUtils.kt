@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -106,9 +107,9 @@ object RegexUtils {
         yGroup: String = "y",
         zGroup: String = "z",
     ): LorenzVec? {
-        val x = groupOrNull(xGroup)?.trim()?.toDoubleOrNull() ?: return null
-        val y = groupOrNull(yGroup)?.trim()?.toDoubleOrNull() ?: return null
-        val z = groupOrNull(zGroup)?.trim()?.toDoubleOrNull() ?: return null
+        val x = groupOrNull(xGroup)?.trim()?.formatDoubleOrNull() ?: return null
+        val y = groupOrNull(yGroup)?.trim()?.formatDoubleOrNull() ?: return null
+        val z = groupOrNull(zGroup)?.trim()?.formatDoubleOrNull() ?: return null
         return LorenzVec(x, y, z)
     }
 
