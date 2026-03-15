@@ -28,6 +28,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -125,8 +128,8 @@ object VanquisherWaypointShare {
 
     private fun isEnabled() = config.enabled
 
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    @HandleEvent(WorldChangeEvent::class)
+    fun onWorldChange() {
         sharedWaypoints.clear()
         ownVanquisherData = null
     }
@@ -175,33 +178,34 @@ object VanquisherWaypointShare {
     }
 
     private fun handleShared(message: String, event: SkyHanniChatEvent.Allow) {
-        sharedPattern.matchMatchers(message) {
+        val (rawName, location) = sharedPattern.matchMatchers(message) {
             val channel = group("channel")
             val isGlobalChat = channel.isNullOrEmpty()
 
-            if (isGlobalChat && !config.readGlobalChat) return@matchMatchers
+            if (isGlobalChat && !config.readGlobalChat) return
 
             val rawName = group("playerName").trim()
-            val x = group("x").toDoubleOrNull() ?: return@matchMatchers
-            val y = group("y").toDoubleOrNull() ?: return@matchMatchers
-            val z = group("z").toDoubleOrNull() ?: return@matchMatchers
+            val x = group("x").toDoubleOrNull() ?: return
+            val y = group("y").toDoubleOrNull() ?: return
+            val z = group("z").toDoubleOrNull() ?: return
+            rawName to LorenzVec(x, y, z)
+        } ?: return
 
-            val name = rawName.cleanPlayerName()
-            val playerDisplayName = rawName.cleanPlayerName(displayName = true)
-            val yourName = PlayerUtils.getName()
-            val playerIsYou = name.equals(yourName, ignoreCase = true)
-            val location = LorenzVec(x, y, z)
+        val name = rawName.cleanPlayerName()
+        val playerDisplayName = rawName.cleanPlayerName(displayName = true)
+        val yourName = PlayerUtils.getName()
+        val playerIsYou = name.equals(yourName, ignoreCase = true)
 
-            sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
+        sharedWaypoints[name] = SharedVanquisher(playerDisplayName, location, SimpleTimeMark.now())
 
-            if (!playerIsYou) {
-                ChatUtils.notifyOrDisable(
-                    "$playerDisplayName§r found a Vanquisher at §b${x.toInt()} ${y.toInt()} ${z.toInt()}§r!",
-                    config::enabled,
-                )
-                TitleManager.sendTitle("§5§lVanquisher from $playerDisplayName")
-                event.blockedReason = "vanquisher_waypoint"
-            }
+        if (!playerIsYou) {
+            val (x, y, z) = location.toDoubleArray().map { it.toInt() }
+            ChatUtils.notifyOrDisable(
+                "$playerDisplayName§r found a Vanquisher at §b$x $y $z§r!",
+                config::enabled,
+            )
+            TitleManager.sendTitle("§5§lVanquisher from $playerDisplayName")
+            event.blockedReason = "vanquisher_waypoint"
         }
     }
 
