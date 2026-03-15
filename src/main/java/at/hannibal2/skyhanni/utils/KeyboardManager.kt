@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.common.IMinecraft
@@ -11,7 +16,17 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 import net.minecraft.client.input.KeyEvent
 
+@SkyHanniModule
 object KeyboardManager {
+
+    // When a screen closes (e.g. chat closed via Enter), lock Enter so it does not
+    // immediately fire as a key click in features that use isKeyClicked().
+    @HandleEvent
+    fun onGuiOpen(event: GuiScreenOpenEvent) {
+        if (event.gui != null) return
+        if (GLFW.GLFW_KEY_ENTER.isKeyHeld()) lockedKeys[GLFW.GLFW_KEY_ENTER] = true
+        if (GLFW.GLFW_KEY_KP_ENTER.isKeyHeld()) lockedKeys[GLFW.GLFW_KEY_KP_ENTER] = true
+    }
 
     const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_RIGHT
