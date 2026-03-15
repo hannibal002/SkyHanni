@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -50,14 +51,14 @@ object DungeonMobManager {
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (event.mob.mobType != Mob.Type.DUNGEON) return
+        if (event.mob.category != MobCategory.DUNGEON) return
         handleStar(event.mob)
         handleFel(event.mob)
     }
 
     @HandleEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        if (event.mob.mobType != Mob.Type.DUNGEON) return
+        if (event.mob.category != MobCategory.DUNGEON) return
         if (starredConfig.highlight.get()) {
             staredInvisible.remove(event.mob)
         }
