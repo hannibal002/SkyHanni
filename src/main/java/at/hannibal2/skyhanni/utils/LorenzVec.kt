@@ -107,6 +107,8 @@ data class LorenzVec(
     fun min() = min(x, min(y, z))
     fun max() = max(x, max(y, z))
 
+    fun addHalf() = add(0.5, 0.5, 0.5)
+
     fun minOfEachElement(other: LorenzVec) = LorenzVec(min(x, other.x), min(y, other.y), min(z, other.z))
     fun maxOfEachElement(other: LorenzVec) = LorenzVec(max(x, other.x), max(y, other.y), max(z, other.z))
 
