@@ -617,7 +617,6 @@ object ItemUtils {
     var bazaarOverrides = mapOf<String, String>()
         private set
 
-    @KSerializable
     internal data class BazaarOverride(
         @Expose @SerializedName("stock") val bazaarInternalName: String,
         @Expose @SerializedName("id") val neuInternalName: String,
