@@ -122,7 +122,10 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
-        if (!waypointsConfig.highlightDuplicates || !waypointsConfig.showNearbyDuplicates) return
+        if (!waypointsConfig.highlightDuplicates) return
+        if (!waypointsConfig.showNearbyDuplicates) return
+        if (HoppityEggLocations.foundAllOnThisIsland) return
+
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
@@ -136,7 +139,11 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
-        val shouldMarkDuplicate = waypointsConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
+        val shouldMarkDuplicate =
+            waypointsConfig.highlightDuplicates &&
+                HoppityEggLocations.hasCollectedEgg(location) &&
+                !HoppityEggLocations.foundAllOnThisIsland
+
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
 
         if (!shouldMarkDuplicate) {
