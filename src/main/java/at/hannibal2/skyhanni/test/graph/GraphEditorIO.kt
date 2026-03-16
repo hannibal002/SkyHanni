@@ -75,7 +75,6 @@ object GraphEditorIO {
         return newState
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun save() = copyGraphCoroutine.launch {
         if (nodes.isEmpty()) return@launch ChatUtils.chat("Copied nothing since the graph is empty.")
 
