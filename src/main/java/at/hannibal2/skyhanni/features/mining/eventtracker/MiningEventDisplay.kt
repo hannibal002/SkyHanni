@@ -28,14 +28,15 @@ object MiningEventDisplay {
 
     private val islandEventData = mutableMapOf<IslandType, MiningIslandEventInfo>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
     fun onSecondPassed(event: SecondPassedEvent) {
         updateDisplay()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!shouldDisplay()) return
+        val isOnValidMiningLocation = (config.outsideMining || MiningEventTracker.isMiningIsland())
+        if (!config.enabled || !isOnValidMiningLocation) return
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
     }
 
@@ -124,16 +125,8 @@ object MiningEventDisplay {
                 if (sorted.isNotEmpty()) {
                     islandEventData[islandType] = MiningIslandEventInfo(sorted)
                 }
-            } else {
-                oldData.islandEvents = sorted
-            }
+            } else oldData.islandEvents = sorted
         }
-    }
-
-    private fun shouldDisplay(): Boolean {
-        val isOnValidMiningLocation = SkyBlockUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
-
-        return (isOnValidMiningLocation || OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
     }
 
     @HandleEvent

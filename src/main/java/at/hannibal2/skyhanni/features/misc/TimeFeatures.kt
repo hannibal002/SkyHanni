@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
@@ -27,10 +26,8 @@ object TimeFeatures {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).toTimeMark()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.REAL_TIME])
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        @Suppress("InSkyBlockEarlyReturn")
-        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.REAL_TIME.isSelected()) return
         if (config.realTime) {
             val timeFormat = if (config.realTimeFormatToggle) {
                 // 12 h format
