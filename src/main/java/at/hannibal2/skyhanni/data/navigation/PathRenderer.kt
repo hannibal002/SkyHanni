@@ -15,8 +15,6 @@ import java.awt.Color
 /**
  * TODO
  *
- * bug: hides the two separate render things, if one is just out of line, instead, should the static one always show,
- *  and the near one should "Jump" closer to me on the line until it finds the correct one finally
  * bug: not through water line
  * bug: sometimes disappears entirely for a frame
  * bug: does not show up immediately on start, only after node move
@@ -33,6 +31,13 @@ import java.awt.Color
  * show distance to target 5 blocks in front of path
  * option to show x more worse paths, in different colors, only the ones that actually have a different
  * node structure around the 5 blocks in front of you
+ *
+ * if the closest node and the path to it is not visible, move further down the line of currently moves paths to
+ *  find the spot where to start the curve from. and if that also doesnt work, find a new edge on the actual graph to start the path on.
+ *
+ *  do not jump forward if the path is  higher than the user location
+ *
+ *  fix the rendering  being weird when moving up a ladder, same issue when diving
  */
 
 private const val SUBDIVISION_STEP = 0.5
@@ -67,7 +72,15 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
         val dense = densePositions
         val maxDist = curveMaxDist
-        if (dense.size < 2 || maxDist <= 0.0) return
+        if (dense.isEmpty()) return
+        if (dense.size == 1) {
+            val dirToNode = (dense[0] - eyePos).normalize()
+            val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
+            val scale = anchor.distance(dense[0]) * CONTROL_POINT_SCALE
+            val controlPoint = dense[0] - dirToNode * scale
+            event.draw3DBezier2(anchor, controlPoint, dense[0], color, NEAR_LINE_WIDTH, true)
+            return
+        }
 
         val (startPos, nextDenseIdx) = projectOntoPath(dense, eyePos)
         val walkPositions = listOf(startPos) + dense.drop(nextDenseIdx)
@@ -129,7 +142,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
                 totalDist = CURVE_RADIUS; break
             }
         }
-        curveMaxDist = totalDist
+        curveMaxDist = totalDist.coerceAtLeast(SUBDIVISION_STEP)
     }
 
     private fun subdividePositions(positions: List<LorenzVec>): List<LorenzVec> {
