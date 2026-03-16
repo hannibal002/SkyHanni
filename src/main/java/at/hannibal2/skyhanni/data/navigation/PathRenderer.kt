@@ -59,6 +59,8 @@ private fun LorenzVec.isWater(): Boolean = getBlockAt() in waterBlocks
 
 private data class DensePoint(val pos: LorenzVec, val isWater: Boolean)
 
+private data class CurveEnd(val pos: LorenzVec, val tangent: LorenzVec, val nextIdx: Int)
+
 /**
  * Uses tick and render events to calculate the final pathfind lines.
  */
@@ -84,23 +86,44 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         if (dense.isEmpty()) return
 
         if (dense.size == 1) {
-            val point = dense[0]
-            val nodePos = point.pos
-            val dirToNode = (nodePos - eyePos).normalize()
-            val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
-            val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
-            val controlPoint = nodePos - dirToNode * scale
-            event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !eyeIsWater && !point.isWater)
+            renderSingleNodeCurve(event, eyePos, eyeIsWater, anchorY, dense[0])
             return
         }
 
         val (startPos, nextDenseIdx) = projectOntoPath(dense, eyePos)
         val walkPositions: List<LorenzVec> = listOf(startPos) + dense.drop(nextDenseIdx).map { it.pos }
-        var totalDist = 0.0
-        var curveEndPos: LorenzVec? = null
-        var curveTangent = LorenzVec(0.0, 0.0, 1.0)
-        var curveNextIdx = nextDenseIdx
+        val curveEnd = walkToEnd(walkPositions, maxDist, nextDenseIdx) ?: return
 
+        val dirToCurve = (curveEnd.pos - eyePos).normalize()
+        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
+        val scale = anchor.distance(curveEnd.pos) * CONTROL_POINT_SCALE
+        val controlPoint = curveEnd.pos - curveEnd.tangent * scale
+        val curveEndIsWater = dense[(curveEnd.nextIdx - 1).coerceAtLeast(0)].isWater
+        val bezierDepth = !eyeIsWater && !curveEndIsWater
+        event.draw3DBezier2(anchor, controlPoint, curveEnd.pos, color, NEAR_LINE_WIDTH, bezierDepth)
+        if (curveEnd.nextIdx > dense.lastIndex) return
+
+        val firstFar = dense[curveEnd.nextIdx]
+        event.draw3DLine(curveEnd.pos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isWater)
+        for (i in curveEnd.nextIdx until dense.lastIndex) {
+            val a = dense[i]
+            val b = dense[i + 1]
+            event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !eyeIsWater && !a.isWater && !b.isWater)
+        }
+    }
+
+    private fun renderSingleNodeCurve(event: SkyHanniRenderWorldEvent, eyePos: LorenzVec, eyeIsWater: Boolean, anchorY: Double, point: DensePoint) {
+        val nodePos = point.pos
+        val dirToNode = (nodePos - eyePos).normalize()
+        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
+        val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
+        val controlPoint = nodePos - dirToNode * scale
+        event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !eyeIsWater && !point.isWater)
+    }
+
+    private fun walkToEnd(walkPositions: List<LorenzVec>, maxDist: Double, nextDenseIdx: Int): CurveEnd? {
+        var totalDist = 0.0
+        var result: CurveEnd? = null
         for (i in 1..walkPositions.lastIndex) {
             val segStart = walkPositions[i - 1]
             val segEnd = walkPositions[i]
@@ -108,34 +131,12 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             val remaining = maxDist - totalDist
             if (segLen >= remaining) {
                 val dir = (segEnd - segStart).normalize()
-                curveEndPos = segStart + dir * remaining
-                curveTangent = dir
-                curveNextIdx = nextDenseIdx + i - 1
-                break
+                return CurveEnd(segStart + dir * remaining, dir, nextDenseIdx + i - 1)
             }
             totalDist += segLen
-            curveEndPos = segEnd
-            curveTangent = (segEnd - segStart).normalize()
-            curveNextIdx = nextDenseIdx + i - 1
+            result = CurveEnd(segEnd, (segEnd - segStart).normalize(), nextDenseIdx + i - 1)
         }
-        if (curveEndPos == null) return
-
-        val dirToCurve = (curveEndPos - eyePos).normalize()
-        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
-        val scale = anchor.distance(curveEndPos) * CONTROL_POINT_SCALE
-        val controlPoint = curveEndPos - curveTangent * scale
-        val curveEndIsWater = dense[(curveNextIdx - 1).coerceAtLeast(0)].isWater
-        val bezierDepth = !eyeIsWater && !curveEndIsWater
-        event.draw3DBezier2(anchor, controlPoint, curveEndPos, color, NEAR_LINE_WIDTH, bezierDepth)
-        if (curveNextIdx > dense.lastIndex) return
-
-        val firstFar = dense[curveNextIdx]
-        event.draw3DLine(curveEndPos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isWater)
-        for (i in curveNextIdx until dense.lastIndex) {
-            val a = dense[i]
-            val b = dense[i + 1]
-            event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !eyeIsWater && !a.isWater && !b.isWater)
-        }
+        return result
     }
 
     private fun projectOntoPath(dense: List<DensePoint>, eyePos: LorenzVec): Pair<LorenzVec, Int> {
