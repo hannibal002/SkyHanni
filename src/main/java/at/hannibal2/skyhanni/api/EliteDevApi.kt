@@ -54,7 +54,7 @@ object EliteDevApi {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfetcheliteresource") {
-            description = "Fetches the specified Elite resource from elitebot.dev"
+            description = "Fetches the specified Elite resource from $ELITE_DOMAIN"
             category = CommandCategory.DEVELOPER_DEBUG
             argCallback("resource", EnumArgumentType.lowercase<EliteResourceType>()) { resource ->
                 SkyHanniMod.launchIOCoroutine("shfetcheliteresource command") {
@@ -116,25 +116,28 @@ object EliteDevApi {
         ChatUtils.chat("Failed to fetch $resourceType resources!")
     }
 
-    private const val ELITEBOT_API_URL = "https://api.elitebot.dev"
-    private const val FARMING_WEIGHT_API_NAME = "Elitebot Farming Weight"
-    private const val FARMING_WEIGHT_URL = "$ELITEBOT_API_URL/weight"
+    const val ELITE_DOMAIN = "eliteskyblock.com"
+
+    const val ELITE_URL = "https://$ELITE_DOMAIN"
+    const val ELITE_API_URL = "https://api.$ELITE_DOMAIN"
+    const val FARMING_WEIGHT_API_NAME = "EliteSkyBlock Farming Weight"
+    private const val FARMING_WEIGHT_URL = "$ELITE_API_URL/weight"
 
     private val contestStatic = ApiStaticPostPath(
-        "$ELITEBOT_API_URL/contests/at/now",
-        "Elitebot Farming Contests",
+        "$ELITE_API_URL/contests/at/now",
+        "EliteSkyBlock Farming Contests",
     )
 
-    private val apiWeightsStatic = ApiStaticPath(
-        "$ELITEBOT_API_URL/weights/all",
+    val apiWeightsStatic = ApiStaticPath(
+        "$ELITE_API_URL/weights/all",
         FARMING_WEIGHT_API_NAME,
     )
 
-    private const val LEADERBOARD_URL = "$ELITEBOT_API_URL/leaderboard/"
-    private const val LEADERBOARD_API_NAME = "Elitebot Leaderboard"
+    private const val LEADERBOARD_URL = "$ELITE_API_URL/leaderboard/"
+    private const val LEADERBOARD_API_NAME = "EliteSkyBlock Leaderboard"
 
-    private const val RESOURCE_API_NAME = "Elitebot Resources"
-    private const val RESOURCE_API_URL = "$ELITEBOT_API_URL/resources"
+    private const val RESOURCE_API_NAME = "EliteSkyBlock Resources"
+    private const val RESOURCE_API_URL = "$ELITE_API_URL/resources"
 
     // <editor-fold desc="Upcoming Contests">
     suspend fun fetchUpcomingContests(): List<EliteFarmingContest> {
@@ -185,7 +188,7 @@ object EliteDevApi {
         ErrorManager.logErrorWithData(
             e,
             "Error loading user farming weight\n" +
-                "§eLoading the farming weight data from elitebot.dev failed!\n" +
+                "§eLoading the farming weight data from $ELITE_DOMAIN failed!\n" +
                 "§eYou can re-enter the garden to try to fix the problem.\n" +
                 "§cIf this message repeats, please report it on Discord",
             "weightUrl" to weightUrl,
@@ -198,7 +201,7 @@ object EliteDevApi {
     suspend fun fetchApiWeights(): EliteWeightsJson {
         val apiWeightsResponse = ApiUtils.getTypedJsonResponse<JsonObject>(apiWeightsStatic.toGet())
         val (_, apiData) = apiWeightsResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
-            "Error getting crop weights from elitebot.dev",
+            "Error getting crop weights from $ELITE_DOMAIN",
             "apiWeightsResponse" to apiWeightsResponse,
         )
         return ConfigManager.gson.fromJson<EliteWeightsJson>(apiData)
@@ -211,7 +214,7 @@ object EliteDevApi {
         lbType: EliteLeaderboardType,
         upcomingCount: Int? = null,
         atRank: Int? = null,
-        mode: String? = null
+        mode: String? = null,
     ): EliteLeaderboard {
         require(profileId.isNotBlank()) { "Profile ID cannot be blank" }
         val uuid = if (spoofProfile) playerUuid else PlayerUtils.getUuid()
@@ -243,7 +246,7 @@ object EliteDevApi {
         val resourceUrl = "$RESOURCE_API_URL/$subUrl"
         val resourceApiResponse = ApiUtils.getTypedJsonResponse<JsonObject>(resourceUrl, apiName = RESOURCE_API_NAME)
         val (_, apiData) = resourceApiResponse.assertSuccessWithData() ?: ErrorManager.skyHanniError(
-            "Error getting resources from elitebot.dev",
+            "Error getting resources from $ELITE_DOMAIN",
             "resourceUrl" to resourceUrl,
             "resourceApiResponse" to resourceApiResponse,
         )

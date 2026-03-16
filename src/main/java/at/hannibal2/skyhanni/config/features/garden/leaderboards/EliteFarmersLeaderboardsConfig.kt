@@ -24,7 +24,7 @@ class EliteFarmersLeaderboardsConfig {
         name = "Leaderboards",
         desc = "Choose what leaderboards to enable.\n" +
             "Per-leaderboard settings below.\n" +
-            "Leaderboards provided by §eelitebot.dev"
+            "Leaderboards provided by §eeliteskyblock.com"
     )
     @ConfigEditorDraggableList
     val display: Property<MutableList<EliteLeaderboards>> = Property.of(
