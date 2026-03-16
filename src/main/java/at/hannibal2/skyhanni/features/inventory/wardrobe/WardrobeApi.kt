@@ -101,6 +101,7 @@ object WardrobeApi {
     }
 
     fun getArmorAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
+        // TODO this is probably wrong, we need the skin internal name, not the item itself
         val internalName = stack.getInternalNameOrNull()?.asString() ?: return null
         val animJson = armorAnimatedSkins[internalName] ?: return null
         return animJson.textures.map { ItemStackAnimatedFrame(it.buildTextureItemStack(), animJson.ticks) }
