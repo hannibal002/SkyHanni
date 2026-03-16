@@ -114,7 +114,7 @@ object IslandGraphs {
 
     fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
         disabledNodesReason = reason
-        for (node in getNonNullableGraph().filter { it.position.distance(center) < radius }) {
+        for (node in getGraph().filter { it.position.distance(center) < radius }) {
             node.enabled = false
         }
     }
@@ -133,11 +133,11 @@ object IslandGraphs {
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
-    private var label = ""
-    private var lastDistance = 0.0
+    private var navigationLabel = ""
+    private var lastDisplayedDistance = 0.0
     private var totalDistance = 0.0
-    private var color = Color.WHITE
-    private var shouldAllowRerouting = false
+    private var pathColor = Color.WHITE
+    private var allowRerouting = false
     private var onFound: () -> Unit = {}
     private var onManualCancel: () -> Unit = {}
     private var goal: GraphNode? = null
@@ -148,7 +148,7 @@ object IslandGraphs {
     private var prevGoal: GraphNode? = null
 
     private var pathRenderer: PathRenderer? = null
-    private var condition: () -> Boolean = { true }
+    private var activeCondition: () -> Boolean = { true }
     private var inGlaciteTunnels: Boolean? = null
     private var ignoredIslandTypes = setOf<IslandType>()
 
@@ -186,7 +186,7 @@ object IslandGraphs {
     fun onWorldChange() {
         currentIslandGraph = null
         if (currentTarget != null) NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped because of world switch!")
-        reset()
+        resetNavigation()
     }
 
     private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
@@ -298,18 +298,18 @@ object IslandGraphs {
         currentIslandGraph = graph
         if (currentTarget != null) {
             DelayedRun.runDelayed(500.milliseconds) {
-                handleTick()
-                checkMoved()
+                processNavigation()
+                handleMovementUpdate()
             }
         }
 
         // calling various update functions to make switching between deep caverns and glacite tunnels bearable
-        handleTick()
+        processNavigation()
         IslandGraphReloadEvent(graph).post()
     }
 
-    private fun reset() {
-        stop()
+    private fun resetNavigation() {
+        stopNavigation()
         closestNode = null
         cachedNearbyNodes = emptyList()
         lastCacheUpdate = SimpleTimeMark.farPast()
@@ -324,38 +324,36 @@ object IslandGraphs {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
             // TODO add dev config toggle to disable
-            update()
+            refreshNavigation()
         }
-        updateFeedback()
+        updateNavigationProgress()
     }
 
-    fun update(force: Boolean = false) {
+    fun refreshNavigation(force: Boolean = false) {
         if (force) {
             closestNode = null
         }
-        handleTick()
-        checkMoved()
+        processNavigation()
+        handleMovementUpdate()
         pathRenderer?.updateNearSegment()
     }
 
-    private fun handleTick() {
+    private fun processNavigation() {
         GraphUtils.updatePlayerPosition()
         currentTarget?.let {
             if (distanceSqToPlayer(it) < 9) {
-                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$label§e!")
-                reset()
+                NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$navigationLabel§e!")
+                resetNavigation()
                 onFound()
             }
-            if (!condition()) {
-                reset()
+            if (!activeCondition()) {
+                resetNavigation()
             }
         }
 
-        val graph = getNonNullableGraph()
-
         // Update cache every second for normal movement
         if (lastCacheUpdate.passedSince() > 1.seconds) {
-            updateClosestCache(graph)
+            updateClosestCache(getGraph())
         }
 
         val newClosest = cachedNearbyNodes.minByOrNull { it.distanceSqToPlayer() } ?: return
@@ -363,7 +361,7 @@ object IslandGraphs {
         val newPath = !onCurrentPath()
 
         closestNode = newClosest
-        onNewNode()
+        onClosestNodeChanged()
         if (newPath) {
             findNewPath()
         }
@@ -396,25 +394,20 @@ object IslandGraphs {
             val firstPath = first.neighbours[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
-                setFastestPath(Graph(path.drop(1)) to (distance - firstPath + direct))
+                applyPath(Graph(path.drop(1)) to (distance - firstPath + direct))
                 return
             }
         }
-        setFastestPath(path to (distance + nodeDistance))
-    }
-
-    private fun handlePositionChange() {
-        updateFeedback()
+        applyPath(path to (distance + nodeDistance))
     }
 
     private var hasMoved = false
 
-    private fun checkMoved() {
-        if (hasMoved) {
-            hasMoved = false
-            if (goal != null) {
-                handlePositionChange()
-            }
+    private fun handleMovementUpdate() {
+        if (!hasMoved) return
+        hasMoved = false
+        if (goal != null) {
+            updateNavigationProgress()
         }
     }
 
@@ -429,23 +422,23 @@ object IslandGraphs {
         }
     }
 
-    private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
-        val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
-        renderPath(setPath, fastestPath.toList())
+    private fun applyPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
+        val (graph, _) = path.takeIf { it.first.isNotEmpty() } ?: return
+        setupPathRenderer(setPath, graph.toList())
     }
 
-    private fun renderPath(setPath: Boolean = true, nodes: List<GraphNode>) {
+    private fun setupPathRenderer(setPath: Boolean = true, nodes: List<GraphNode>) {
         if (setPath) {
-            val graph = Graph(cutByMaxDistance(nodes, 2.0))
-            pathRenderer = PathRenderer(graph, color, currentTarget ?: error("target is null"))
+            val graph = Graph(interpolatePathNodes(nodes, 2.0))
+            pathRenderer = PathRenderer(graph, pathColor, currentTarget ?: error("target is null"))
         }
-        updateFeedback()
+        updateNavigationProgress()
     }
 
-    private fun onNewNode() {
+    private fun onClosestNodeChanged() {
         // TODO create an event
         IslandAreaBackend.nodeMoved()
-        if (shouldAllowRerouting) {
+        if (allowRerouting) {
             tryRerouting()
         }
     }
@@ -457,11 +450,11 @@ object IslandGraphs {
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
             ChatUtils.debug("Rerouting navigation..")
-            newTarget.pathFind(label, color, onFound, allowRerouting = true, condition = condition)
+            newTarget.pathFind(navigationLabel, pathColor, onFound, allowRerouting = true, condition = activeCondition)
         }
     }
 
-    fun stop() {
+    fun stopNavigation() {
         if (currentTarget != null) {
             NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation stopped!")
             currentTarget = null
@@ -469,11 +462,10 @@ object IslandGraphs {
         goal = null
         pathRenderer = null
         currentTargetNode = null
-        label = ""
+        navigationLabel = ""
         totalDistance = 0.0
-        lastDistance = 0.0
+        lastDisplayedDistance = 0.0
         NavigationFeedback.setNavInactive()
-
     }
 
     /**
@@ -494,10 +486,10 @@ object IslandGraphs {
         condition: () -> Boolean,
     ) {
         if (isActive(position, label)) return
-        reset()
+        resetNavigation()
         currentTargetNode = this
-        shouldAllowRerouting = allowRerouting
-        pathFind0(location = position, label, color, onFound, onManualCancel, condition)
+        IslandGraphs.allowRerouting = allowRerouting
+        initNavigation(location = position, label, color, onFound, onManualCancel, condition)
     }
 
     /**
@@ -519,23 +511,23 @@ object IslandGraphs {
     ) {
         if (isActive(location, label)) return
         require(label.isNotEmpty()) { "Label cannot be empty." }
-        reset()
-        shouldAllowRerouting = false
-        pathFind0(location, label, color, onFound, onManualCancel, condition)
+        resetNavigation()
+        allowRerouting = false
+        initNavigation(location, label, color, onFound, onManualCancel, condition)
     }
 
-    private fun getNonNullableGraph(): Graph = currentIslandGraph ?: error("current island graph is not loaded")
+    private fun getGraph(): Graph = currentIslandGraph ?: error("current island graph is not loaded")
 
     fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
-        getNonNullableGraph().getClosestNode(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
+        getGraph().getClosestNode(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
 
     fun nodes(nodeName: String, nodeTag: GraphNodeTag): List<GraphNode> =
-        getNonNullableGraph().getNodesWithNameAndTags(nodeName, nodeTag)
+        getGraph().getNodesWithNameAndTags(nodeName, nodeTag)
 
     fun nodesAround(node: GraphNode, condition: (GraphNode) -> Boolean): Set<GraphNode> =
-        getNonNullableGraph().nodesAround(node, condition)
+        getGraph().nodesAround(node, condition)
 
-    private fun pathFind0(
+    private fun initNavigation(
         location: LorenzVec,
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
@@ -544,17 +536,17 @@ object IslandGraphs {
         condition: () -> Boolean,
     ) {
         currentTarget = location
-        this.label = label
-        this.color = color
+        this.navigationLabel = label
+        this.pathColor = color
         this.onFound = onFound
         this.onManualCancel = onManualCancel
-        this.condition = condition
-        goal = getNonNullableGraph().minByActive { it.position.distance(currentTarget!!) }
-        updateFeedback()
+        this.activeCondition = condition
+        goal = getGraph().minByActive { it.position.distance(currentTarget!!) }
+        updateNavigationProgress()
     }
 
-    private fun updateFeedback() {
-        if (label == "") return
+    private fun updateNavigationProgress() {
+        if (navigationLabel == "") return
         val path = pathRenderer?.path ?: return
         var distance = 0.0
         if (path.isNotEmpty()) {
@@ -565,22 +557,22 @@ object IslandGraphs {
             distance = distance.roundTo(1)
         }
 
-        if (distance == lastDistance) return
-        lastDistance = distance
+        if (distance == lastDisplayedDistance) return
+        lastDisplayedDistance = distance
         if (distance == 0.0) return
         if (totalDistance == 0.0 || distance > totalDistance) {
             totalDistance = distance
         }
 
         val percentage = (1 - (distance / totalDistance)) * 100
-        val component = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
+        val component = "§e[SkyHanni] Navigating to §r$navigationLabel §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
         component.onClick(onClick = ::cancelClick)
         component.hover = "§eClick to stop navigating!".asComponent()
         NavigationFeedback.sendPathFindMessage(component)
     }
 
     fun cancelClick() {
-        stop()
+        stopNavigation()
         onManualCancel()
     }
 
@@ -591,7 +583,7 @@ object IslandGraphs {
     }
 
     // TODO remove once onCurrentPath() and updateFeedback() uses PathRenderer for distance/closest-node logic
-    private fun cutByMaxDistance(nodes: List<GraphNode>, maxDistance: Double): List<GraphNode> {
+    private fun interpolatePathNodes(nodes: List<GraphNode>, maxDistance: Double): List<GraphNode> {
         var index = nodes.size * 10
         val locations = mutableListOf<LorenzVec>()
         var first = true
@@ -620,10 +612,10 @@ object IslandGraphs {
         return locations.map { GraphNode(index++, it) }
     }
 
-    fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
+    fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == navigationLabel
 
     fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
-        val found = getNonNullableGraph().getNearestNode(location, condition)
+        val found = getGraph().getNearestNode(location, condition)
         return found.takeIf { it.position.distance(location) < radius }
     }
 
@@ -654,7 +646,7 @@ object IslandGraphs {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 if (currentTarget != null) {
-                    stop()
+                    stopNavigation()
                 } else {
                     ChatUtils.userError("No navigation is currently active.")
                 }

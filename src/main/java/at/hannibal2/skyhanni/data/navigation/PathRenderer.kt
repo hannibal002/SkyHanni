@@ -18,9 +18,8 @@ import java.awt.Color
 /**
  * TODO
  *
- * IslandGraphs: rename all functions and members to be more logical/explain what they do
  * IslandGraphs: magic numbers
- * IslandGraphs: fix distance calculation for display being off
+ * IslandGraphs: fix distance calculation for display being off (think of interpolatePathNodes)
  *
  * arrow in direction in 2d user frame space: if close to player point is out of player looking direction/frustum
  *
@@ -33,7 +32,7 @@ import java.awt.Color
  *
  *  do not jump forward if the path is higher than the user location
  *
- *  fix the rendering  being weird when moving up a ladder, same issue when diving
+ *  fix the rendering being weird when moving up a ladder, same issue when diving
  */
 
 private const val SUBDIVISION_STEP = 0.5
@@ -58,7 +57,7 @@ private val waterBlocks = buildList { addWaters() }
 
 private fun LorenzVec.isWater(): Boolean = getBlockAt() in waterBlocks
 
-private class DensePoint(val pos: LorenzVec, val isWater: Boolean) {
+private class PathPoint(val pos: LorenzVec, val isWater: Boolean) {
     // depth testing disabled near a water surface crossing so the line renders through water
     var isPeek: Boolean = false
 }
@@ -70,29 +69,29 @@ private data class CurveEnd(val pos: LorenzVec, val tangent: LorenzVec, val next
  */
 class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: LorenzVec) {
 
-    private val densePoints: List<DensePoint> = subdividePositions(path.map { it.position.addHalf() }).map { DensePoint(it, it.isWater()) }
-    private var curveMaxDist: Double = 0.0
+    private val pathPoints: List<PathPoint> = subdividePositions(path.map { it.position.addHalf() }).map { PathPoint(it, it.isWater()) }
+    private var nearCurveLength: Double = 0.0
 
     fun render(event: SkyHanniRenderWorldEvent) {
-        renderCurve(event)
+        renderPathSegments(event)
         val lastNode = path.lastOrNull()?.position ?: return
-        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !densePoints.last().isPeek)
+        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !pathPoints.last().isPeek)
         event.drawWaypointFilled(targetLocation, color, seeThroughBlocks = true)
     }
 
-    private fun renderCurve(event: SkyHanniRenderWorldEvent) {
+    private fun renderPathSegments(event: SkyHanniRenderWorldEvent) {
         val eyePos = event.exactPlayerEyeLocation()
         val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
-        if (densePoints.isEmpty()) return
+        if (pathPoints.isEmpty()) return
 
-        if (densePoints.size == 1) {
-            renderSingleNodeCurve(event, eyePos, anchorY, densePoints[0])
+        if (pathPoints.size == 1) {
+            renderSingleNodeCurve(event, eyePos, anchorY, pathPoints[0])
             return
         }
 
-        val (startPos, nextDenseIdx) = projectOntoPath(eyePos)
-        val walkPositions: List<LorenzVec> = listOf(startPos) + densePoints.drop(nextDenseIdx).map { it.pos }
-        val curveEnd = walkToEnd(walkPositions, nextDenseIdx) ?: return
+        val (startPos, nextPathIdx) = projectOntoPath(eyePos)
+        val walkPositions: List<LorenzVec> = listOf(startPos) + pathPoints.drop(nextPathIdx).map { it.pos }
+        val curveEnd = findBezierEnd(walkPositions, nextPathIdx) ?: return
 
         val dirToCurve = (curveEnd.pos - eyePos).normalize()
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
@@ -100,18 +99,18 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val controlPoint = curveEnd.pos - curveEnd.tangent * scale
         val bezierDepth = !WorldRenderUtils.isRenderingUnderwater()
         event.draw3DBezier2(anchor, controlPoint, curveEnd.pos, color, NEAR_LINE_WIDTH, bezierDepth)
-        if (curveEnd.nextIdx > densePoints.lastIndex) return
+        if (curveEnd.nextIdx > pathPoints.lastIndex) return
 
-        val firstFar = densePoints[curveEnd.nextIdx]
+        val firstFar = pathPoints[curveEnd.nextIdx]
         event.draw3DLine(curveEnd.pos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isPeek)
-        for (i in curveEnd.nextIdx until densePoints.lastIndex) {
-            val a = densePoints[i]
-            val b = densePoints[i + 1]
+        for (i in curveEnd.nextIdx until pathPoints.lastIndex) {
+            val a = pathPoints[i]
+            val b = pathPoints[i + 1]
             event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !a.isPeek && !b.isPeek)
         }
     }
 
-    private fun renderSingleNodeCurve(event: SkyHanniRenderWorldEvent, eyePos: LorenzVec, anchorY: Double, point: DensePoint) {
+    private fun renderSingleNodeCurve(event: SkyHanniRenderWorldEvent, eyePos: LorenzVec, anchorY: Double, point: PathPoint) {
         val nodePos = point.pos
         val dirToNode = (nodePos - eyePos).normalize()
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
@@ -136,30 +135,30 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         else (walkPositions.last() - walkPositions[walkPositions.lastIndex - 1]).normalize()
     }
 
-    private fun walkToEnd(walkPositions: List<LorenzVec>, nextDenseIdx: Int): CurveEnd? {
+    private fun findBezierEnd(walkPositions: List<LorenzVec>, nextPathIdx: Int): CurveEnd? {
         var totalDist = 0.0
         var result: CurveEnd? = null
         for (i in 1..walkPositions.lastIndex) {
             val segStart = walkPositions[i - 1]
             val segEnd = walkPositions[i]
             val segLen = segStart.distance(segEnd)
-            val remaining = curveMaxDist - totalDist
+            val remaining = nearCurveLength - totalDist
             if (segLen >= remaining) {
                 val endPos = segStart + (segEnd - segStart).normalize() * remaining
-                return CurveEnd(endPos, walkTangent(walkPositions, i, endPos), nextDenseIdx + i - 1)
+                return CurveEnd(endPos, walkTangent(walkPositions, i, endPos), nextPathIdx + i - 1)
             }
             totalDist += segLen
-            result = CurveEnd(segEnd, (segEnd - segStart).normalize(), nextDenseIdx + i - 1)
+            result = CurveEnd(segEnd, (segEnd - segStart).normalize(), nextPathIdx + i - 1)
         }
         return result
     }
 
     private fun projectOntoPath(eyePos: LorenzVec): Pair<LorenzVec, Int> {
         var bestDistSq = Double.MAX_VALUE
-        var bestPos = densePoints[0].pos
+        var bestPos = pathPoints[0].pos
         var bestNextIdx = 1
-        for (i in 0 until densePoints.lastIndex) {
-            val proj = eyePos.nearestPointOnLine(densePoints[i].pos, densePoints[i + 1].pos)
+        for (i in 0 until pathPoints.lastIndex) {
+            val proj = eyePos.nearestPointOnLine(pathPoints[i].pos, pathPoints[i + 1].pos)
             val distSq = eyePos.distanceSq(proj)
             if (distSq < bestDistSq) {
                 bestDistSq = distSq
@@ -171,25 +170,24 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     }
 
     fun updateNearSegment() {
-        val dense = densePoints
-        for (point in dense) point.isPeek = false
-        val closestIdx = findClosestIndex(dense, playerPosition)
+        for (point in pathPoints) point.isPeek = false
+        val closestIdx = findClosestIndex(pathPoints, playerPosition)
         var totalDist = 0.0
-        for (i in (closestIdx + 1)..dense.lastIndex) {
-            if (!dense[i].pos.canBeSeen()) break
-            totalDist += dense[i - 1].pos.distance(dense[i].pos)
+        for (i in (closestIdx + 1)..pathPoints.lastIndex) {
+            if (!pathPoints[i].pos.canBeSeen()) break
+            totalDist += pathPoints[i - 1].pos.distance(pathPoints[i].pos)
             if (totalDist >= CURVE_RADIUS) {
                 totalDist = CURVE_RADIUS; break
             }
         }
-        curveMaxDist = totalDist.coerceAtLeast(SUBDIVISION_STEP)
+        nearCurveLength = totalDist.coerceAtLeast(SUBDIVISION_STEP)
         val peekSteps = (PEEK_DISTANCE / SUBDIVISION_STEP).toInt()
-        for (i in maxOf(0, closestIdx - 1) until dense.lastIndex) {
-            if (dense[i].isWater == dense[i + 1].isWater) continue
-            if (!dense[i].pos.canBeSeen()) break
+        for (i in maxOf(0, closestIdx - 1) until pathPoints.lastIndex) {
+            if (pathPoints[i].isWater == pathPoints[i + 1].isWater) continue
+            if (!pathPoints[i].pos.canBeSeen()) break
             val peekStart = maxOf(0, i + 1 - peekSteps)
-            val peekEnd = minOf(dense.lastIndex, i + 1 + peekSteps)
-            for (j in peekStart..peekEnd) dense[j].isPeek = true
+            val peekEnd = minOf(pathPoints.lastIndex, i + 1 + peekSteps)
+            for (j in peekStart..peekEnd) pathPoints[j].isPeek = true
         }
     }
 
@@ -220,6 +218,6 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return result
     }
 
-    private fun findClosestIndex(positions: List<DensePoint>, referencePos: LorenzVec): Int =
+    private fun findClosestIndex(positions: List<PathPoint>, referencePos: LorenzVec): Int =
         positions.indices.minBy { positions[it].pos.distance(referencePos) }
 }

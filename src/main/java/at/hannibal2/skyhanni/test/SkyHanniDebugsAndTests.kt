@@ -130,7 +130,7 @@ object SkyHanniDebugsAndTests {
         if (location == null) {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
-            IslandGraphs.stop()
+            IslandGraphs.stopNavigation()
             return
         }
 
