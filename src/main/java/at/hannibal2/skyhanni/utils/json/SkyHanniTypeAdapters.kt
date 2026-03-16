@@ -239,7 +239,7 @@ enum class SkyHanniTypeAdapters(
                 out.endObject()
             }
 
-            override fun read(reader: JsonReader): SkyblockStatList = buildMap {
+            override fun read(reader: JsonReader): SkyblockStatList = SkyblockStatList().apply {
                 reader.beginObject()
                 while (reader.hasNext()) {
                     val name = reader.nextName()
@@ -253,11 +253,10 @@ enum class SkyHanniTypeAdapters(
                         )
                         continue
                     }
-
                     this[stat] = value
                 }
                 reader.endObject()
-            } as SkyblockStatList
+            }
         },
     ),
     GRAPH(Graph::class.java, Graph.typeAdapter),
