@@ -300,15 +300,6 @@ class MiscConfig {
     var accountUpgradeReminder: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Fix Patcher Lines",
-        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fixPatcherLines: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Time In Limbo", desc = "Show the time since you entered the limbo.")
     @ConfigEditorBoolean
     @FeatureToggle
