@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.event.yearofthepig
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbChargedEvent
 import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbLootedEvent
-import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -38,6 +38,7 @@ object ShinyOrbTracker : SkyHanniItemTracker<ShinyOrbTracker.Data>("Shiny Orb Tr
     )
     private val SHINY_ORB_ITEM = "SHINY_ORB".toInternalName()
     private val SHINY_ROD_ITEM = "SHINY_ROD".toInternalName()
+    private val SHINY_SHARD_ITEM = "SHINY_SHARD".toInternalName()
 
     private fun passesHoldingItem() = !config.holdingItems || InventoryUtils.getItemInHand()?.let {
         it.getInternalNameOrNull() in setOf(SHINY_ORB_ITEM, SHINY_ROD_ITEM)
@@ -70,17 +71,18 @@ object ShinyOrbTracker : SkyHanniItemTracker<ShinyOrbTracker.Data>("Shiny Orb Tr
     }
 
     @HandleEvent
-    fun onShinyOrbUsed(event: ShinyOrbUsedEvent) {
+    fun onShinyOrbUsed() {
         modify { it.orbsUsed++ }
     }
 
     @HandleEvent
-    fun onShinyOrbCharged(event: ShinyOrbChargedEvent) {
+    fun onShinyOrbCharged() {
         modify { it.orbsCompleted++ }
     }
 
     @HandleEvent
     fun onShinyOrbLooted(event: ShinyOrbLootedEvent) {
+        addItem(SHINY_SHARD_ITEM, 1, command = false)
         when {
             event.loot != null -> {
                 val (internalName, amount) = event.loot.first to event.loot.second
@@ -110,5 +112,14 @@ object ShinyOrbTracker : SkyHanniItemTracker<ShinyOrbTracker.Data>("Shiny Orb Tr
 
         val duration = data.getTotalUptime()
         addAll(addTotalProfit(profit, data.orbsCompleted, "orb used", duration, "Orbs used"))
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetshinyorbtracker") {
+            description = "Resets the Shiny Orb Tracker"
+            category = CommandCategory.USERS_RESET
+            simpleCallback { resetCommand() }
+        }
     }
 }
