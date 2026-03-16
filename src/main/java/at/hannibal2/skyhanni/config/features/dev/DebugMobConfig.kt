@@ -7,10 +7,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DebugMobConfig {
-    @Expose
-    @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all mobs.")
-    @ConfigEditorBoolean
-    var enable: Boolean = true
 
     @Expose
     @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")

@@ -16,6 +16,14 @@ import org.lwjgl.glfw.GLFW
 
 class DevConfig {
 
+    // new config values
+
+    @Expose
+    @Category(name = "Main Toggles", desc = "Main Toggles")
+    val mainToggles: MainTogglesConfig = MainTogglesConfig()
+
+    // old config entries: all below options will get moved soon
+
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
