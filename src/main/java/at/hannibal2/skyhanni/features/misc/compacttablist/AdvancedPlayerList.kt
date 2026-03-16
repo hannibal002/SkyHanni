@@ -38,10 +38,12 @@ object AdvancedPlayerList {
      * REGEX-TEST: [290] Skirtwearer ꀾ♲
      * REGEX-TEST: [14] ColombianoGood Ⓑ
      * REGEX-TEST: [218] nightdives
+     * REGEX-TEST: [281] [YOUTUBE] Remittal
+     * REGEX-FAIL: SB Level§r§f: §r§8[§r§6419§r§8] §r§b8§r§3/§r§b100 XP
      */
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level.colorless",
-        ".*\\[(?<level>.*)] (?<name>.*)",
+        "^(?!SB Level).*\\[(?<level>(?:§.)*[\\d,]+)(?:§.)*] (?<name>.*)",
     )
 
     private var playerData = mutableMapOf<Component, PlayerData>()
@@ -132,44 +134,35 @@ object AdvancedPlayerList {
         sbLevel: Int,
         levelText: String,
         line: String,
-    ): PlayerData {
-        val playerData = PlayerData(sbLevel)
+    ): PlayerData = PlayerData(sbLevel).apply {
         var index = 0
         val fullName = group("name")
         if (fullName.contains("[")) index++
+
         val name = fullName.split(" ")
         val coloredName = name[index]
-        if (index == 1) {
-            playerData.coloredName = name[0] + " " + coloredName
-        } else {
-            playerData.coloredName = coloredName
-        }
-        playerData.name = coloredName.removeColor()
-        playerData.levelText = levelText
+        this.coloredName = if (index == 1) name[0] + " " + coloredName else coloredName
+        this.name = coloredName.removeColor()
+        this.levelText = levelText
         index++
-        if (name.size > index) {
+        this.nameSuffix = if (name.size > index) {
             var nameSuffix = name.drop(index).joinToString(" ")
-            if (nameSuffix.contains("♲")) {
-                playerData.ironman = true
+
+            if (nameSuffix.contains("♲")) ironman = true
+            else bingoLevel = BingoApi.getRank(line)
+
+            if (IslandType.CRIMSON_ISLE.isCurrent()) faction = if (line.contains("⚒")) {
+                nameSuffix = nameSuffix.replace("⚒", "")
+                CrimsonIsleFaction.BARBARIAN
+            } else if (line.contains("ቾ")) {
+                nameSuffix = nameSuffix.replace("ቾ", "")
+                CrimsonIsleFaction.MAGE
             } else {
-                playerData.bingoLevel = BingoApi.getRank(line)
+                CrimsonIsleFaction.NONE
             }
-            if (IslandType.CRIMSON_ISLE.isCurrent()) {
-                playerData.faction = if (line.contains("§c⚒")) {
-                    nameSuffix = nameSuffix.replace("§c⚒", "")
-                    CrimsonIsleFaction.BARBARIAN
-                } else if (line.contains("§5ቾ")) {
-                    nameSuffix = nameSuffix.replace("§5ቾ", "")
-                    CrimsonIsleFaction.MAGE
-                } else {
-                    CrimsonIsleFaction.NONE
-                }
-            }
-            playerData.nameSuffix = nameSuffix
-        } else {
-            playerData.nameSuffix = ""
-        }
-        return playerData
+
+            nameSuffix
+        } else ""
     }
 
     fun ignoreCustomTabList(): Boolean {
