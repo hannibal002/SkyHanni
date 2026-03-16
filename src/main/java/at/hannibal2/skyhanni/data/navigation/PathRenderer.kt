@@ -53,11 +53,17 @@ private const val FAR_LINE_WIDTH = 4
 
 private const val STANDING_EYE_HEIGHT = 1.62
 
+// distance in blocks above/below a water surface crossing where depth testing is disabled
+private const val PEEK_DISTANCE = 4.0
+
 private val waterBlocks = buildList { addWaters() }
 
 private fun LorenzVec.isWater(): Boolean = getBlockAt() in waterBlocks
 
-private data class DensePoint(val pos: LorenzVec, val isWater: Boolean)
+private class DensePoint(val pos: LorenzVec, val isWater: Boolean) {
+    // depth testing disabled near a water surface crossing so the line renders through water
+    var isPeek: Boolean = false
+}
 
 private data class CurveEnd(val pos: LorenzVec, val tangent: LorenzVec, val nextIdx: Int)
 
@@ -67,24 +73,21 @@ private data class CurveEnd(val pos: LorenzVec, val tangent: LorenzVec, val next
 class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: LorenzVec) {
 
     private val densePoints: List<DensePoint> = subdividePositions(path.map { it.position.addHalf() }).map { DensePoint(it, it.isWater()) }
-    private val targetIsWater: Boolean = targetLocation.addHalf().isWater()
     private var curveMaxDist: Double = 0.0
 
     fun render(event: SkyHanniRenderWorldEvent) {
         renderCurve(event)
         val lastNode = path.lastOrNull()?.position ?: return
-        val eyeIsWater = MinecraftCompat.localPlayer.isInWater
-        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !eyeIsWater && !densePoints.last().isWater && !targetIsWater)
+        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !densePoints.last().isPeek)
     }
 
     private fun renderCurve(event: SkyHanniRenderWorldEvent) {
         val eyePos = event.exactPlayerEyeLocation()
-        val eyeIsWater = MinecraftCompat.localPlayer.isInWater
         val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
         if (densePoints.isEmpty()) return
 
         if (densePoints.size == 1) {
-            renderSingleNodeCurve(event, eyePos, eyeIsWater, anchorY, densePoints[0])
+            renderSingleNodeCurve(event, eyePos, anchorY, densePoints[0])
             return
         }
 
@@ -96,27 +99,26 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(curveEnd.pos) * CONTROL_POINT_SCALE
         val controlPoint = curveEnd.pos - curveEnd.tangent * scale
-        val curveEndIsWater = densePoints[(curveEnd.nextIdx - 1).coerceAtLeast(0)].isWater
-        val bezierDepth = !eyeIsWater && !curveEndIsWater
+        val bezierDepth = !densePoints[(curveEnd.nextIdx - 1).coerceAtLeast(0)].isPeek
         event.draw3DBezier2(anchor, controlPoint, curveEnd.pos, color, NEAR_LINE_WIDTH, bezierDepth)
         if (curveEnd.nextIdx > densePoints.lastIndex) return
 
         val firstFar = densePoints[curveEnd.nextIdx]
-        event.draw3DLine(curveEnd.pos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isWater)
+        event.draw3DLine(curveEnd.pos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isPeek)
         for (i in curveEnd.nextIdx until densePoints.lastIndex) {
             val a = densePoints[i]
             val b = densePoints[i + 1]
-            event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !eyeIsWater && !a.isWater && !b.isWater)
+            event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !a.isPeek && !b.isPeek)
         }
     }
 
-    private fun renderSingleNodeCurve(event: SkyHanniRenderWorldEvent, eyePos: LorenzVec, eyeIsWater: Boolean, anchorY: Double, point: DensePoint) {
+    private fun renderSingleNodeCurve(event: SkyHanniRenderWorldEvent, eyePos: LorenzVec, anchorY: Double, point: DensePoint) {
         val nodePos = point.pos
         val dirToNode = (nodePos - eyePos).normalize()
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
         val controlPoint = nodePos - dirToNode * scale
-        event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !eyeIsWater && !point.isWater)
+        event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !point.isPeek)
     }
 
     private fun walkToEnd(walkPositions: List<LorenzVec>, nextDenseIdx: Int): CurveEnd? {
@@ -155,6 +157,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
 
     fun updateNearSegment() {
         val dense = densePoints
+        for (point in dense) point.isPeek = false
         val closestIdx = findClosestIndex(dense, playerPosition)
         var totalDist = 0.0
         for (i in (closestIdx + 1)..dense.lastIndex) {
@@ -165,6 +168,14 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             }
         }
         curveMaxDist = totalDist.coerceAtLeast(SUBDIVISION_STEP)
+        val peekSteps = (PEEK_DISTANCE / SUBDIVISION_STEP).toInt()
+        for (i in closestIdx until dense.lastIndex) {
+            if (dense[i].isWater == dense[i + 1].isWater) continue
+            if (!dense[i].pos.canBeSeen()) break
+            val peekEnd = (i + 1 + peekSteps).coerceAtMost(dense.lastIndex)
+            for (j in (i + 1)..peekEnd) dense[j].isPeek = true
+            break
+        }
     }
 
     private fun subdividePositions(positions: List<LorenzVec>): List<LorenzVec> {
