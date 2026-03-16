@@ -26,7 +26,6 @@ object AnimatedSkullRecorder {
     enum class RecordingMode {
         NONE,
         HEAD,
-        ARMOR,
         PET,
         PLAYER
     }
@@ -53,9 +52,6 @@ object AnimatedSkullRecorder {
             RecordingMode.HEAD -> Minecraft.getInstance().player
                 ?.getItemBySlot(EquipmentSlot.HEAD)
                 ?.captureFrame()
-
-            RecordingMode.ARMOR -> listOf(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET)
-                .forEach { Minecraft.getInstance().player?.getItemBySlot(it)?.captureFrame() }
 
             RecordingMode.PET -> EntityUtils.getEntitiesNearby<ArmorStand>(32.0)
                 .forEach { it.getItemBySlot(EquipmentSlot.HEAD).captureFrame() }
@@ -116,7 +112,7 @@ object AnimatedSkullRecorder {
             category = CommandCategory.DEVELOPER_DEBUG
 
             literal("start") {
-                for (mode in listOf(RecordingMode.HEAD, RecordingMode.ARMOR, RecordingMode.PET)) {
+                for (mode in listOf(RecordingMode.HEAD, RecordingMode.PET)) {
                     literal(mode.name.lowercase()) {
                         callback { startRecording(mode) }
                         arg("key", BrigadierArguments.string()) { keyArg ->
