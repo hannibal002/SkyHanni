@@ -32,7 +32,7 @@ object DianaApi {
 
     fun hasGriffinPet() = CurrentPetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInHotbar()
+    fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInHotbar()
 
     val ItemStack.isDianaSpade get() = getInternalName() in spades
 

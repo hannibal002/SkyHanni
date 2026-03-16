@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.HotfApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.foraging.HotfConfig.LotteryDisplayVisibility
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -269,7 +269,7 @@ enum class HotfData(
         override val rotatingPerks = HotfApi.LotteryPerk.entries
         override val rotatingPerkEntry = LOTTERY
         override var currentRotPerk = HotfApi.lottery
-        override val applicableIslandType = IslandTypeTags.FORAGING
+        override val islandTypeTag = IslandTypeTag.FORAGING
         private val config get() = SkyHanniMod.feature.foraging.hotf
 
         override val position: Position get() = config.lotteryPosition
@@ -416,7 +416,7 @@ enum class HotfData(
         }
 
         override fun tryBlock(event: SkyHanniChatEvent.Allow) {
-            if (!chatConfig.hideLottery || IslandTypeTags.FORAGING.inAny()) return
+            if (!chatConfig.hideLottery || IslandTypeTag.FORAGING.isInIsland()) return
             event.blockedReason = "lottery"
         }
 

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractSourcedChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
@@ -240,7 +240,7 @@ object PlayerChatManager {
 
         var privateIslandRank: ComponentSpan? = null
         var privateIslandGuest: ComponentSpan? = null
-        if (IslandTypeTags.PRIVATE_ISLAND.inAny()) {
+        if (IslandTypeTag.PRIVATE_ISLAND.isInIsland()) {
             privateIslandGuestPattern.matchStyledMatcher(author) {
                 privateIslandGuest = groupOrThrow("guest")
                 val prefix = groupOrThrow("prefix")
@@ -282,7 +282,7 @@ object PlayerChatManager {
 
         var privateIslandRank: ComponentSpan? = null
         var privateIslandGuest: ComponentSpan? = null
-        if (IslandTypeTags.PRIVATE_ISLAND.inAny()) {
+        if (IslandTypeTag.PRIVATE_ISLAND.isInIsland()) {
             privateIslandGuestPattern.matchStyledMatcher(author) {
                 privateIslandGuest = groupOrThrow("guest")
                 val prefix = groupOrThrow("prefix")

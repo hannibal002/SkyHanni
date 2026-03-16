@@ -126,5 +126,5 @@ object CorpseLocator {
         }
     }
 
-    fun isEnabled() = IslandType.MINESHAFT.isCurrent() && config.enabled
+    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.enabled
 }

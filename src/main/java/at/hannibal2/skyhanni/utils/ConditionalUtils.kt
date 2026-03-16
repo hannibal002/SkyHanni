@@ -31,8 +31,12 @@ object ConditionalUtils {
         whenChanged { _, _ -> observer.run() }
     }
 
-    fun <T> Property<out T>.afterChange(observer: T.() -> Unit) {
+    fun <T> Property<out T>.afterChange(
+        init: Boolean = false,
+        observer: T.() -> Unit,
+    ) {
         whenChanged { _, new -> observer(new) }
+        if (init) observer(this.get())
     }
 
     fun Property<out Boolean>.onEnable(observer: Runnable) {

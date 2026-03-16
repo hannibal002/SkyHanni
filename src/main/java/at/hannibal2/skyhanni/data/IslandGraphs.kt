@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -195,7 +195,7 @@ object IslandGraphs {
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
     fun onAreaChange() {
-        if (!IslandType.DWARVEN_MINES.isCurrent()) {
+        if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
         }
@@ -238,7 +238,7 @@ object IslandGraphs {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
-        val isPersonal = IslandTypeTags.PERSONAL_ISLAND.inAny()
+        val isPersonal = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
         val important = SkyBlockUtils.inSkyBlock && lastLoadedIslandType != islandType && !isPersonal
         val list = buildList {
             add("")
@@ -278,7 +278,7 @@ object IslandGraphs {
         lastLoadedTime = SimpleTimeMark.now()
         SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
-                val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+                val graph = SkyHanniRepoManager.getRepoDataAsync<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreaFeatures.display = null
                 DelayedRun.runNextTick {
                     setNewGraph(graph)

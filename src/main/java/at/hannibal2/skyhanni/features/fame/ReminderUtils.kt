@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.fame
 
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -22,5 +22,5 @@ object ReminderUtils {
             KuudraApi.inKuudra ||
             (FarmingContestApi.inContest && !ignoreFarmingContest) ||
             RiftApi.inRift() ||
-            IslandTypeTags.BUSY.inAny()
+            IslandTypeTag.BUSY.isInIsland()
 }

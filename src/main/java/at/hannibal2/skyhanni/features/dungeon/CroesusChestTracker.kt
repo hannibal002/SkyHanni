@@ -249,7 +249,7 @@ object CroesusChestTracker {
     }
 
     // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic
-    private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0
+    private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isInIsland() && LocationUtils.playerLocation().y > 103.0
 
     init {
         RenderDisplayHelper(

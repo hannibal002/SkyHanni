@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 @SkyHanniModule
 object SkyBlockXPBar {
     private val config get() = SkyHanniMod.feature.misc
+    private val ignoredAreas = setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)
     private var cache: OriginalValues? = null
 
     private class OriginalValues(val currentXP: Float, val maxXP: Int, val level: Int)
@@ -46,5 +47,5 @@ object SkyBlockXPBar {
     }
 
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && !SkyBlockUtils.inAnyIsland(setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)) && config.skyblockXPBar
+        SkyBlockUtils.inSkyBlock && ignoredAreas.none { it.isInIsland() } && config.skyblockXPBar
 }

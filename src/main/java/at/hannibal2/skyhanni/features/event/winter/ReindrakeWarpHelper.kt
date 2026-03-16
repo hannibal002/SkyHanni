@@ -38,5 +38,5 @@ object ReindrakeWarpHelper {
         )
     }
 
-    fun isEnabled() = IslandType.WINTER.isCurrent() && config.reindrakeWarpHelper
+    fun isEnabled() = IslandType.WINTER.isInIsland() && config.reindrakeWarpHelper
 }

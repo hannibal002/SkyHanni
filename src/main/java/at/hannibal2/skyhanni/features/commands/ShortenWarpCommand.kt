@@ -31,8 +31,8 @@ object ShortenWarpCommand {
 
         val command = message.lowercase().removePrefix("/").trimEnd()
         // Avoid overriding commands on islands where they have a different use
-        if (command == "jerry" && IslandType.PRIVATE_ISLAND.isCurrent()) return
-        if (command == "barn" && IslandType.GARDEN.isCurrent() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
+        if (command == "jerry" && IslandType.PRIVATE_ISLAND.isInIsland()) return
+        if (command == "barn" && IslandType.GARDEN.isInIsland() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
 
         if (command in warps) {
             event.cancel()

@@ -38,7 +38,7 @@ object MiscFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        inChickenRace = IslandType.WINTER.isCurrent() && chickenRacePattern.matches(event.actionBar)
+        inChickenRace = IslandType.WINTER.isInIsland() && chickenRacePattern.matches(event.actionBar)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

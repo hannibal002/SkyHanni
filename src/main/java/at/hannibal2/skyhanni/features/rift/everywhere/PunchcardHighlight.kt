@@ -146,7 +146,7 @@ object PunchcardHighlight {
 
     private fun colorPlayer(entity: LivingEntity) {
         val color = config.color.get().toColor()
-        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isCurrent() }
+        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isInIsland() }
     }
 
     private fun removePlayerColor(entity: LivingEntity) {

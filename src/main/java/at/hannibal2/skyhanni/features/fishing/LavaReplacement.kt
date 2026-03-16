@@ -57,7 +57,7 @@ object LavaReplacement {
 
         override fun toString() = displayName
 
-        fun inIsland() = island.isCurrent()
+        fun inIsland() = island.isInIsland()
     }
 
     @HandleEvent

@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandType.Companion.isInAnyIsland
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.util.function.Consumer
@@ -104,15 +106,18 @@ class EventListeners private constructor(val name: String, private val isGeneric
         init {
             cachedPredicates = buildList {
                 if (options.onlyOnSkyblock) add { _ -> SkyBlockUtils.inSkyBlock }
-
-                if (options.onlyOnIsland != IslandType.ANY) {
-                    val island = options.onlyOnIsland
-                    add { _ -> island.isCurrent() }
+                options.onlyOnSkyblockOrFeatures.takeIfNotEmpty()?.let { features ->
+                    @Suppress("DEPRECATION")
+                    add { _ -> SkyBlockUtils.inSkyBlock || features.any { it.isSelected() } }
                 }
-
-                if (options.onlyOnIslands.isNotEmpty()) {
-                    val set = options.onlyOnIslands.toSet()
-                    add { _ -> SkyBlockUtils.inAnyIsland(set) }
+                options.onlyOnIsland.takeIf { it != IslandType.ANY }?.let { island ->
+                    add { _ -> island.isInIsland() }
+                }
+                options.onlyOnIslands.takeIfNotEmpty()?.let { islands ->
+                    add { _ -> islands.toList().isInAnyIsland() }
+                }
+                options.onlyOnIslandTypeTag.takeIfNotEmpty()?.let { tags ->
+                    add { _ -> tags.any { it.isInIsland() } }
                 }
             }
             // These predicates cant be cached since they depend on info about the actual event

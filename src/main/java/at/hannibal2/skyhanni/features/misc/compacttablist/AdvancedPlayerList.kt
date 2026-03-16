@@ -154,7 +154,7 @@ object AdvancedPlayerList {
             } else {
                 playerData.bingoLevel = BingoApi.getRank(line)
             }
-            if (IslandType.CRIMSON_ISLE.isCurrent()) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 playerData.faction = if (line.contains("§c⚒")) {
                     nameSuffix = nameSuffix.replace("§c⚒", "")
                     CrimsonIsleFaction.BARBARIAN
@@ -206,7 +206,7 @@ object AdvancedPlayerList {
             }
         }
 
-        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
             suffix.append(data.faction.icon.orEmpty())
         }
 

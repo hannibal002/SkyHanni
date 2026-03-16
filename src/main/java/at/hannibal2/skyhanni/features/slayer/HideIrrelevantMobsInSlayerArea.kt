@@ -38,7 +38,7 @@ object HideIrrelevantMobsInSlayerArea {
     enum class IrrelevantMob(val mobNames: Set<String>, val isInArea: () -> Boolean) {
         CRIMSON_MAGMA_CUBE(
             mobNames = setOf("Magma Cube", "Magma Cube Rider"),
-            isInArea = { IslandType.CRIMSON_ISLE.isCurrent() && SkyBlockUtils.graphArea == "Burning Desert" },
+            isInArea = { IslandType.CRIMSON_ISLE.isInIsland() && SkyBlockUtils.graphArea == "Burning Desert" },
         ),
     }
 

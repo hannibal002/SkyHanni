@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
@@ -176,7 +176,7 @@ object BingoApi {
     }
 
     private fun checkBingoNpcs() {
-        if (!IslandType.HUB.isCurrent()) return
+        if (!IslandType.HUB.isInIsland()) return
 
         val shouldHideAlixer = !SkyBlockUtils.isBingoProfile
         if (shouldHideAlixer != alixerHidden) {

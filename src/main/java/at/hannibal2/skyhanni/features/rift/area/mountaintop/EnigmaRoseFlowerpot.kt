@@ -37,5 +37,5 @@ object EnigmaRoseFlowerpot {
         event.drawDynamicText(dropLocation, "Drop", 1.5)
     }
 
-    private fun isEnabled() = IslandType.THE_RIFT.isCurrent() && config.enigmaRoseFlowerpot
+    private fun isEnabled() = IslandType.THE_RIFT.isInIsland() && config.enigmaRoseFlowerpot
 }
