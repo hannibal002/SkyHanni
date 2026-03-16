@@ -143,9 +143,10 @@ object InstanceChestProfit {
      * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
      * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
-    private val bookColorFixerold by patternGroup.pattern( // Remove after 7.6.0 is pushed
+    private val bookColorFixerold by patternGroup.pattern(
+        // Remove after 7.6.0 is pushed
         "bookcolorfix",
-        "Enchanted Book \\((?<item>.+)(?:§.)+\\)"
+        "Enchanted Book \\((?<item>.+)(?:§.)+\\)",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -433,17 +434,15 @@ object InstanceChestProfit {
     fun onRenderOverlay() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
-                config.position.renderRenderable(
-                    chestDisplay,
-                    posLabel = "Instance Chest Profit",
-                )
+                chestDisplay?.let {
+                    config.position.renderRenderable(it, posLabel = "Instance Chest Profit")
+                }
             }
         if (config.croesusAllChestsOverlay && InventoryUtils.inInventory())
             if (isInCroesusMenu()) {
-                config.croesusPosition.renderRenderable(
-                    croesusDisplay,
-                    posLabel = "Croesus Chest Profit",
-                )
+                croesusDisplay?.let {
+                    config.croesusPosition.renderRenderable(it, posLabel = "Croesus Chest Profit")
+                }
             }
     }
 

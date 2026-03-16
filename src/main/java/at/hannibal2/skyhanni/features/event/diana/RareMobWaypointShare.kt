@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -228,13 +229,10 @@ object RareMobWaypointShare {
             ChatUtils.chat("§cRare Mob is dead")
             return
         }
-        val location = rareMob.getLorenzVec()
-        val x = location.x.toInt()
-        val y = location.y.toInt()
-        val z = location.z.toInt()
+        val location = rareMob.getLorenzVec().toChatFormat()
         val mobName = rareMob.name.string.orEmpty()
         val name = if (mobName.isEmpty()) "" else "| $mobName"
-        HypixelCommands.partyChat("x: $x, y: $y, z: $z $name")
+        HypixelCommands.partyChat("$location $name")
     }
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
@@ -242,10 +240,7 @@ object RareMobWaypointShare {
     private fun Matcher.detectFromChat(): Boolean {
         if (block()) return false
         val rawPlayerName = group("playerName")
-        val x = group("x").trim().toDoubleOrNull() ?: return false
-        val y = group("y").trim().toDoubleOrNull() ?: return false
-        val z = group("z").trim().toDoubleOrNull() ?: return false
-        val location = LorenzVec(x, y, z)
+        val location = toLorenzVec() ?: return false
 
         val rawMobName = if (hasGroup("mobName")) group("mobName").replace(" | ", "").trim().lowercase() else "Rare Mob"
         var mobName = "Rare Mob"
@@ -260,7 +255,7 @@ object RareMobWaypointShare {
         val name = rawPlayerName.cleanPlayerName()
         val playerDisplayName = rawPlayerName.cleanPlayerName(displayName = true)
         if (!waypoints.containsKey(name)) {
-            ChatUtils.chat("$playerDisplayName §l§efound $optionalAn $mobName at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
+            ChatUtils.chat("$playerDisplayName §l§efound $optionalAn $mobName at §l§c${location.toLocalFormat()}!")
             if (name != PlayerUtils.getName()) {
                 TitleManager.sendTitle("§d$mobName §efrom §b$playerDisplayName")
                 playUserSound()

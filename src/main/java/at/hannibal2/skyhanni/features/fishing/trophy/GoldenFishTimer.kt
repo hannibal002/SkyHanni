@@ -103,12 +103,9 @@ object GoldenFishTimer {
     private val DESPAWN_TIME = 1.minutes
     private val MAX_ROD_TIME = 3.minutes
 
-    private val goldBaitLevel get() =
-        AttributeShardsData.getActiveLevel(GOLDFIN_SHARD_ID)
-    private val minimumSpawnTime get() =
-        8.minutes - (30.seconds * goldBaitLevel)
-    private val maximumSpawnTime get() =
-        12.minutes - (30.seconds * goldBaitLevel)
+    private val goldBaitLevel get() = AttributeShardsData.getActiveLevel(GOLDFIN_SHARD_ID)
+    private val minimumSpawnTime get() = 8.minutes - (30.seconds * goldBaitLevel)
+    private val maximumSpawnTime get() = 12.minutes - (30.seconds * goldBaitLevel)
 
     private var lastFishEntity = SimpleTimeMark.farPast()
     private var lastChatMessage = SimpleTimeMark.farPast()
@@ -202,7 +199,9 @@ object GoldenFishTimer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
-        config.position.renderRenderable(display, posLabel = "Golden Fish Timer")
+        display?.let {
+            config.position.renderRenderable(it, posLabel = "Golden Fish Timer")
+        }
     }
 
     private fun updateDisplay() {
@@ -237,7 +236,7 @@ object GoldenFishTimer {
                 Renderable.item(goldenFishSkullItem) {
                     scale = 2.5
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER
-                }
+                },
             )
         }
         val text = buildList {
