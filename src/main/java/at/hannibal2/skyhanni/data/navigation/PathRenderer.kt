@@ -17,7 +17,6 @@ import java.awt.Color
 /**
  * TODO
  *
- * improvement: corners are too sharp, smooth them
  * block at target is gone
  * jump all 2 blocks/per node
  *
@@ -177,23 +176,29 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         }
     }
 
+    private fun catmullRomPoint(p0: LorenzVec, p1: LorenzVec, p2: LorenzVec, p3: LorenzVec, t: Double): LorenzVec {
+        val t2 = t * t
+        val t3 = t2 * t
+        val a = p1 * 2.0
+        val b = (p2 - p0) * t
+        val c = (p0 * 2.0 - p1 * 5.0 + p2 * 4.0 - p3) * t2
+        val d = (p1 * 3.0 - p0 - p2 * 3.0 + p3) * t3
+        return (a + b + c + d) * 0.5
+    }
+
     private fun subdividePositions(positions: List<LorenzVec>): List<LorenzVec> {
         if (positions.size < 2) return positions
         val result = mutableListOf<LorenzVec>()
-        var prev = positions.first()
-        result.add(prev)
-        for (curr in positions.drop(1)) {
-            val dist = prev.distance(curr)
-            if (dist > SUBDIVISION_STEP) {
-                val dir = (curr - prev).normalize()
-                var traveled = SUBDIVISION_STEP
-                while (traveled < dist) {
-                    result.add(prev + dir * traveled)
-                    traveled += SUBDIVISION_STEP
-                }
+        result.add(positions.first())
+        for (i in 0 until positions.lastIndex) {
+            val p0 = positions.getOrElse(i - 1) { positions[i] }
+            val p1 = positions[i]
+            val p2 = positions[i + 1]
+            val p3 = positions.getOrElse(i + 2) { positions[i + 1] }
+            val steps = (p1.distance(p2) / SUBDIVISION_STEP).toInt().coerceAtLeast(1)
+            for (step in 1..steps) {
+                result.add(catmullRomPoint(p0, p1, p2, p3, step.toDouble() / steps))
             }
-            result.add(curr)
-            prev = curr
         }
         return result
     }
