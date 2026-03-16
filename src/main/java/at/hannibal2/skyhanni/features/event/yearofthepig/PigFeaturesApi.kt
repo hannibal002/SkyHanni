@@ -79,7 +79,7 @@ object PigFeaturesApi {
      * REGEX-TEST: SHINY! You extracted Shiny Shard and 16x Enchanted Potato from the piglet's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
-        "chat.orb.looted.colorless",
+        "chat.orb.looted",
         "SHINY! You extracted Shiny Shard and (?<reward>.+) from the piglet's orb!",
     )
 
