@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -28,14 +27,15 @@ object MiningEventDisplay {
 
     private val islandEventData = mutableMapOf<IslandType, MiningIslandEventInfo>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
     fun onSecondPassed(event: SecondPassedEvent) {
         updateDisplay()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!shouldDisplay()) return
+        val isOnValidMiningLocation = (config.outsideMining || MiningEventTracker.isMiningIsland())
+        if (!config.enabled || !isOnValidMiningLocation) return
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
     }
 
@@ -64,7 +64,7 @@ object MiningEventDisplay {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
-                MiningEventConfig.ShowType.CURRENT -> islandType.isCurrent()
+                MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
                 else -> true
             }
 
@@ -124,16 +124,8 @@ object MiningEventDisplay {
                 if (sorted.isNotEmpty()) {
                     islandEventData[islandType] = MiningIslandEventInfo(sorted)
                 }
-            } else {
-                oldData.islandEvents = sorted
-            }
+            } else oldData.islandEvents = sorted
         }
-    }
-
-    private fun shouldDisplay(): Boolean {
-        val isOnValidMiningLocation = SkyBlockUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
-
-        return (isOnValidMiningLocation || OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
     }
 
     @HandleEvent

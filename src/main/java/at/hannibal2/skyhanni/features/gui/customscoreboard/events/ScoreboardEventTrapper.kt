@@ -25,5 +25,5 @@ object ScoreboardEventTrapper : ScoreboardEvent() {
         ScoreboardPattern.mobLocationPattern,
     )
 
-    override fun showIsland() = IslandType.THE_FARMING_ISLANDS.isCurrent()
+    override fun showIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 }

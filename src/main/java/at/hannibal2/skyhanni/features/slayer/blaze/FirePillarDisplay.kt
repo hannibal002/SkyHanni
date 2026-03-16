@@ -49,5 +49,5 @@ object FirePillarDisplay {
         config.firePillarDisplayPosition.renderString(display, posLabel = "Fire Pillar")
     }
 
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.firePillarDisplay
+    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.firePillarDisplay
 }

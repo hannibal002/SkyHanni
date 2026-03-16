@@ -71,5 +71,5 @@ object GeyserFishing {
     }
 
     private fun shouldProcessParticles() =
-        IslandType.CRIMSON_ISLE.isCurrent() && SkyBlockUtils.graphArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
+        IslandType.CRIMSON_ISLE.isInIsland() && SkyBlockUtils.graphArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
 }

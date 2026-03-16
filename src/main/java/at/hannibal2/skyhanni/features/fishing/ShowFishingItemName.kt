@@ -70,13 +70,13 @@ object ShowFishingItemName {
     }
 
     private fun inCorrectArea(): Boolean {
-        if (IslandType.HUB.isCurrent()) {
+        if (IslandType.HUB.isInIsland()) {
             SkyBlockUtils.graphArea?.let {
                 if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
                 if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }
         }
-        return !(IslandType.THE_END.isCurrent())
+        return !(IslandType.THE_END.isInIsland())
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && FishingApi.holdingRod && inCorrectArea()

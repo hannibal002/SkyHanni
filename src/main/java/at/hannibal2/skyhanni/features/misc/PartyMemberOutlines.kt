@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import java.awt.Color
@@ -19,15 +17,13 @@ object PartyMemberOutlines {
 
     private val config get() = SkyHanniMod.feature.misc.highlightPartyMembers
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS])
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
+        if (!config.enabled || DungeonApi.inDungeon()) return
+        if (event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
             event.queueEntitiesToOutline { entity -> getEntityOutlineColor(entity) }
         }
     }
-
-    fun isEnabled() = config.enabled &&
-        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) && !DungeonApi.inDungeon()
 
     private fun getEntityOutlineColor(entity: Entity): Color? {
         if (entity !is RemotePlayer || !PartyApi.partyMembers.contains(entity.name.string)) return null

@@ -82,7 +82,7 @@ object EntityMovementData {
             nextTeleport = null
             return
         }
-        if (passedSince > 50.milliseconds && nextData.island.isCurrent()) {
+        if (passedSince > 50.milliseconds && nextData.island.isInIsland()) {
             nextData.action()
             nextTeleport = null
             return

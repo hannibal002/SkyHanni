@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import kotlin.reflect.KClass
 
 @Retention(AnnotationRetention.RUNTIME)
@@ -10,12 +12,14 @@ annotation class HandleEvent(
      * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
      * To specify multiple events, use [eventTypes] instead.
      */
+    @Deprecated("Use Primary Function Name, or explicit type parameter instead.")
     val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
 
     /**
      * For cases where multiple events are listened to, and properties are unnecessary.
      * To specify only one event, use [eventType] instead.
      */
+    @Deprecated("Use Primary Function Name, or explicit type parameter instead.")
     val eventTypes: Array<KClass<out SkyHanniEvent>> = [],
 
     /**
@@ -24,10 +28,22 @@ annotation class HandleEvent(
     val onlyOnSkyblock: Boolean = false,
 
     /**
+     * If the event should only be handled while on SkyBlock, or while
+     * outside SkyBlock with one or more certain OutsideSBFeature being enabled.
+     */
+    val onlyOnSkyblockOrFeatures: Array<OutsideSBFeature> = [],
+
+    /**
      * If the event should only be received while on a specific skyblock island.
      * To specify multiple islands, use [onlyOnIslands] instead.
      */
     val onlyOnIsland: IslandType = IslandType.ANY,
+
+    /**
+     * If the event should only be received while on an island within specified
+     * [IslandTypeTag]s
+     */
+    val onlyOnIslandTypeTag: Array<IslandTypeTag> = [],
 
     /**
      * If the event should only be received while being on specific skyblock islands.

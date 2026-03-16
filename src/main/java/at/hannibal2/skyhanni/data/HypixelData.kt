@@ -36,7 +36,7 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -242,7 +242,7 @@ object HypixelData {
             }
         }
 
-        if (!IslandTypeTags.PERSONAL_ISLAND.inAny()) {
+        if (!IslandTypeTag.PERSONAL_ISLAND.isInIsland()) {
             playerAmountOnIsland = 0
         }
 
@@ -381,7 +381,7 @@ object HypixelData {
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                CoroutineConfig("hypixel join repo update").launchCoroutine {
+                CoroutineSettings("hypixel join repo update").launchCoroutine {
                     val progress = progressCategory.start("hypixel join repo update check")
                     SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
                     EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)

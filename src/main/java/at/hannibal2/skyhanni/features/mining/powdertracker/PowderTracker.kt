@@ -403,7 +403,7 @@ object PowderTracker {
         val perMin: MutableList<Long>,
     )
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.enabled
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

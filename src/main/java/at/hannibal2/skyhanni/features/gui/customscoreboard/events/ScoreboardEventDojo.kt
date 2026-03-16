@@ -23,5 +23,5 @@ object ScoreboardEventDojo : ScoreboardEvent() {
         ScoreboardPattern.dojoTimePattern,
     )
 
-    override fun showIsland() = IslandType.CRIMSON_ISLE.isCurrent()
+    override fun showIsland() = IslandType.CRIMSON_ISLE.isInIsland()
 }

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
@@ -31,5 +31,5 @@ object ScoreboardElementSowdust : ScoreboardElement(), CustomScoreboardNumberTra
 
     override val elementPatterns = listOf(ScoreboardPattern.sowdustPattern, ScoreboardPattern.sowdustGainedPattern)
 
-    override fun showIsland() = IslandTypeTags.GARDEN_ISLAND.inAny()
+    override fun showIsland() = IslandTypeTag.GARDEN_ISLAND.isInIsland()
 }

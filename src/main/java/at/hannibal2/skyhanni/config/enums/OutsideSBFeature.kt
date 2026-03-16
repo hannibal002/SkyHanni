@@ -26,5 +26,6 @@ enum class OutsideSBFeature(private val displayName: String) {
 
     override fun toString() = displayName
 
+    @Deprecated("Use onlyOnSkyblockOrFeatures instead")
     fun isSelected() = MinecraftCompat.localPlayerExists && SkyHanniMod.feature.misc.showOutsideSB.get().contains(this)
 }

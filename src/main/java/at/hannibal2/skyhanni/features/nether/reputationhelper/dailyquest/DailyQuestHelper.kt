@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
-import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -104,7 +104,7 @@ object DailyQuestHelper {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
-            if (IslandType.CRIMSON_ISLE.isCurrent()) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 QuestLoader.loadFromTabList()
             }
         }
@@ -386,5 +386,5 @@ object DailyQuestHelper {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.enabled.get()
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

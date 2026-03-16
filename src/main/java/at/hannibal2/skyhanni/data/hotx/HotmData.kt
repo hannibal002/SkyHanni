@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.mining.HotmConfig.SkyMallDisplayVisibility
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -428,7 +428,7 @@ enum class HotmData(
         override val rotatingPerks = SkymallPerk.entries
         override val rotatingPerkEntry: HotmData = SKY_MALL
         override var currentRotPerk = HotmApi.skymall
-        override val applicableIslandType = IslandTypeTags.MINING
+        override val islandTypeTag = IslandTypeTag.MINING
 
         private val config get() = SkyHanniMod.feature.mining.hotm
         override val position: Position get() = config.skyMallPosition
@@ -646,7 +646,7 @@ enum class HotmData(
         override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
 
         override fun tryBlock(event: SkyHanniChatEvent.Allow) {
-            if (!chatConfig.hideSkyMall || IslandTypeTags.MINING.inAny()) return
+            if (!chatConfig.hideSkyMall || IslandTypeTag.MINING.isInIsland()) return
             event.blockedReason = "skymall"
         }
 
