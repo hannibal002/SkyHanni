@@ -115,7 +115,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         event: SkyHanniRenderWorldEvent,
         eyePos: LorenzVec,
         anchorY: Double,
-        point: PathPoint
+        point: PathPoint,
     ) {
         val nodePos = point.pos
         val dirToNode = (nodePos - eyePos).normalize()
@@ -128,7 +128,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             p3 = nodePos,
             color = color,
             lineWidth = NEAR_LINE_WIDTH,
-            depth = !WorldRenderUtils.isRenderingUnderwater()
+            depth = !WorldRenderUtils.isRenderingUnderwater(),
         )
     }
 
