@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.min
@@ -110,16 +111,14 @@ object CustomWardrobe {
                 .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f)
+        DrawContextUtils.translatedPushPopResult(0f, 0f) {
+            position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
-        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-
-        if (EstimatedItemValue.config.enabled) {
-            DrawContextUtils.translate(0f, 0f)
-            EstimatedItemValue.tryRendering()
+            if (EstimatedItemValue.config.enabled) {
+                DrawContextUtils.translate(0f, 0f)
+                EstimatedItemValue.tryRendering()
+            }
         }
-        DrawContextUtils.popMatrix()
         event.cancel()
     }
 
@@ -280,9 +279,9 @@ object CustomWardrobe {
         val fakePlayer = FakePlayer()
         var scale = playerWidth
 
-        for (equipment in net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING.values) {
+        for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
-            if (armorOrdinal < 0 || armorOrdinal > 3) continue
+            if (armorOrdinal !in 0..3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
             if (stack == null) stack = ItemStack.EMPTY
             fakePlayer.equipment.set(equipment, stack)
