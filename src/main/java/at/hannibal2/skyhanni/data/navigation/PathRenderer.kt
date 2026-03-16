@@ -100,7 +100,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(curveEnd.pos) * CONTROL_POINT_SCALE
         val controlPoint = curveEnd.pos - curveEnd.tangent * scale
-        val bezierDepth = !densePoints[(curveEnd.nextIdx - 1).coerceAtLeast(0)].isPeek
+        val bezierDepth = !WorldRenderUtils.isRenderingUnderwater()
         event.draw3DBezier2(anchor, controlPoint, curveEnd.pos, color, NEAR_LINE_WIDTH, bezierDepth)
         if (curveEnd.nextIdx > densePoints.lastIndex) return
 
@@ -119,7 +119,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
         val controlPoint = nodePos - dirToNode * scale
-        event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !point.isPeek)
+        event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !WorldRenderUtils.isRenderingUnderwater())
     }
 
     private fun walkToEnd(walkPositions: List<LorenzVec>, nextDenseIdx: Int): CurveEnd? {
@@ -169,15 +169,13 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             }
         }
         curveMaxDist = totalDist.coerceAtLeast(SUBDIVISION_STEP)
-        val cameraInWater = WorldRenderUtils.isRenderingUnderwater()
         val peekSteps = (PEEK_DISTANCE / SUBDIVISION_STEP).toInt()
-        for (i in closestIdx until dense.lastIndex) {
+        for (i in maxOf(0, closestIdx - 1) until dense.lastIndex) {
             if (dense[i].isWater == dense[i + 1].isWater) continue
-            if (dense[i].isWater != cameraInWater) continue
             if (!dense[i].pos.canBeSeen()) break
-            val peekEnd = (i + 1 + peekSteps).coerceAtMost(dense.lastIndex)
-            for (j in (i + 1)..peekEnd) dense[j].isPeek = true
-            break
+            val peekStart = maxOf(0, i + 1 - peekSteps)
+            val peekEnd = minOf(dense.lastIndex, i + 1 + peekSteps)
+            for (j in peekStart..peekEnd) dense[j].isPeek = true
         }
     }
 
