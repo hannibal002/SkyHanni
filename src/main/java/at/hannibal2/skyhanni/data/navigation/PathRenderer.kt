@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addWaters
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DBezier2
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
@@ -168,9 +169,11 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             }
         }
         curveMaxDist = totalDist.coerceAtLeast(SUBDIVISION_STEP)
+        val cameraInWater = WorldRenderUtils.isRenderingUnderwater()
         val peekSteps = (PEEK_DISTANCE / SUBDIVISION_STEP).toInt()
         for (i in closestIdx until dense.lastIndex) {
             if (dense[i].isWater == dense[i + 1].isWater) continue
+            if (dense[i].isWater != cameraInWater) continue
             if (!dense[i].pos.canBeSeen()) break
             val peekEnd = (i + 1 + peekSteps).coerceAtMost(dense.lastIndex)
             for (j in (i + 1)..peekEnd) dense[j].isPeek = true

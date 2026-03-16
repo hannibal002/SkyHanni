@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import java.awt.Color
@@ -1077,4 +1078,7 @@ object WorldRenderUtils {
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
     }
+
+    // returns true if the camera is underwater
+    fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera.fluidInCamera == FogType.WATER
 }
