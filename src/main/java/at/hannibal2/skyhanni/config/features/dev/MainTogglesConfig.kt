@@ -26,4 +26,12 @@ class MainTogglesConfig {
     @ConfigOption(name = "Mob Detection Enable", desc = "Turn off and on again to reset all mobs.")
     @ConfigEditorBoolean
     var mobDetection: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Ping API",
+        desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
+    )
+    @ConfigEditorBoolean
+    var pingApi: Boolean = true
 }

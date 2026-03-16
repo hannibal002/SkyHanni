@@ -131,14 +131,6 @@ class DevConfig {
 
     @Expose
     @ConfigOption(
-        name = "Ping API",
-        desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
-    )
-    @ConfigEditorBoolean
-    var pingApi: Boolean = true
-
-    @Expose
-    @ConfigOption(
         name = "Damage Indicator",
         desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!",
     )

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -24,7 +25,6 @@ import kotlin.time.Duration.Companion.seconds
 object PartyChatCommands {
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
-    private val devConfig get() = SkyHanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,
@@ -70,7 +70,7 @@ object PartyChatCommands {
                 if (!CurrentPing.isEnabled()) {
                     ChatUtils.notifyOrDisable(
                         "Ping API is disabled, the ping command won't work!",
-                        devConfig::pingApi,
+                        DevApi.mainToggles::pingApi,
                     )
                     return@PartyChatCommand
                 }
