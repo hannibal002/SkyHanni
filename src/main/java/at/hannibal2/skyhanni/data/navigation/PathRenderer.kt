@@ -18,7 +18,6 @@ import java.awt.Color
 /**
  * TODO
  *
- * IslandGraphs: magic numbers
  * IslandGraphs: fix distance calculation for display being off (think of interpolatePathNodes)
  *
  * arrow in direction in 2d user frame space: if close to player point is out of player looking direction/frustum

@@ -104,6 +104,15 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object IslandGraphs {
 
+    private const val TARGET_REACHED_DISTANCE_SQ = 9.0
+    private const val ON_PATH_MAX_DISTANCE_SQ = 49.0
+    private const val FAST_MOVEMENT_THRESHOLD = 20.0
+    private const val NEARBY_NODE_CACHE_SIZE = 20
+    private const val PATH_NODE_INTERPOLATION_STEP = 2.0
+    private const val DEFAULT_NODE_SEARCH_RADIUS = 100.0
+    private val GRAPH_RELOAD_DELAY = 500.milliseconds
+    private val CLOSEST_NODE_CACHE_TTL = 1.seconds
+
     var currentIslandGraph: Graph? = null
         private set
     var lastLoadedIslandType = "nothing"
@@ -297,7 +306,7 @@ object IslandGraphs {
     fun setNewGraph(graph: Graph) {
         currentIslandGraph = graph
         if (currentTarget != null) {
-            DelayedRun.runDelayed(500.milliseconds) {
+            DelayedRun.runDelayed(GRAPH_RELOAD_DELAY) {
                 processNavigation()
                 handleMovementUpdate()
             }
@@ -341,7 +350,7 @@ object IslandGraphs {
     private fun processNavigation() {
         GraphUtils.updatePlayerPosition()
         currentTarget?.let {
-            if (distanceSqToPlayer(it) < 9) {
+            if (distanceSqToPlayer(it) < TARGET_REACHED_DISTANCE_SQ) {
                 NavigationFeedback.sendPathFindMessage("§e[SkyHanni] Navigation reached §r$navigationLabel§e!")
                 resetNavigation()
                 onFound()
@@ -352,7 +361,7 @@ object IslandGraphs {
         }
 
         // Update cache every second for normal movement
-        if (lastCacheUpdate.passedSince() > 1.seconds) {
+        if (lastCacheUpdate.passedSince() > CLOSEST_NODE_CACHE_TTL) {
             updateClosestCache(getGraph())
         }
 
@@ -368,7 +377,7 @@ object IslandGraphs {
     }
 
     private fun updateClosestCache(graph: Graph) {
-        cachedNearbyNodes = graph.sortedBy { it.distanceSqToPlayer() }.take(20)
+        cachedNearbyNodes = graph.sortedBy { it.distanceSqToPlayer() }.take(NEARBY_NODE_CACHE_SIZE)
         lastCacheUpdate = SimpleTimeMark.now()
     }
 
@@ -376,7 +385,7 @@ object IslandGraphs {
         val path = pathRenderer?.path ?: return false
         if (path.isEmpty()) return false
         val closest = path.getNearestNode()
-        if (closest.distanceSqToPlayer() > 49) return false
+        if (closest.distanceSqToPlayer() > ON_PATH_MAX_DISTANCE_SQ) return false
         return true
     }
 
@@ -417,7 +426,7 @@ object IslandGraphs {
         if (graph == null || !event.isLocalPlayer) return
         hasMoved = true
 
-        if (event.distance > 20) {
+        if (event.distance > FAST_MOVEMENT_THRESHOLD) {
             updateClosestCache(graph)
         }
     }
@@ -429,7 +438,7 @@ object IslandGraphs {
 
     private fun setupPathRenderer(setPath: Boolean = true, nodes: List<GraphNode>) {
         if (setPath) {
-            val graph = Graph(interpolatePathNodes(nodes, 2.0))
+            val graph = Graph(interpolatePathNodes(nodes, PATH_NODE_INTERPOLATION_STEP))
             pathRenderer = PathRenderer(graph, pathColor, currentTarget ?: error("target is null"))
         }
         updateNavigationProgress()
@@ -614,7 +623,7 @@ object IslandGraphs {
 
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == navigationLabel
 
-    fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
+    fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = DEFAULT_NODE_SEARCH_RADIUS): GraphNode? {
         val found = getGraph().getNearestNode(location, condition)
         return found.takeIf { it.position.distance(location) < radius }
     }
