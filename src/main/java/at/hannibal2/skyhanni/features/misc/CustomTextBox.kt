@@ -19,33 +19,26 @@ object CustomTextBox {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        display = config.text.get().format()
-
-        config.text.afterChange {
-            display = format()
+        config.text.afterChange(init = true) {
+            display = config.text.get().format()
         }
     }
 
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.CUSTOM_TEXT_BOX])
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!config.onlyInGui) return
-        if (!isEnabled()) return
+        if (!config.onlyInGui || !config.enabled) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.CUSTOM_TEXT_BOX])
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (config.onlyInGui) return
-        if (!isEnabled()) return
+        if (config.onlyInGui || !config.enabled) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
     }
-
-    private fun isEnabled() =
-        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.CUSTOM_TEXT_BOX.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

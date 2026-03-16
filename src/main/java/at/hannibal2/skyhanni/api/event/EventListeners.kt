@@ -107,6 +107,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
             cachedPredicates = buildList {
                 if (options.onlyOnSkyblock) add { _ -> SkyBlockUtils.inSkyBlock }
                 options.onlyOnSkyblockOrFeatures.takeIfNotEmpty()?.let { features ->
+                    @Suppress("DEPRECATION")
                     add { _ -> SkyBlockUtils.inSkyBlock || features.any { it.isSelected() } }
                 }
                 options.onlyOnIsland.takeIf { it != IslandType.ANY }?.let { island ->

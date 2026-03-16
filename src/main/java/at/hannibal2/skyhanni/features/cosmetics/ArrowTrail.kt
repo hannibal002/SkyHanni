@@ -45,11 +45,8 @@ object ArrowTrail {
 
         for (arrow in EntityUtils.getEntities<Arrow>()) {
             val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
-            if (arrow.owner.isLocalPlayer) {
-                listYourArrow.add(line)
-            } else {
-                listAllArrow.add(line)
-            }
+            val target = if (arrow.owner.isLocalPlayer) listYourArrow else listAllArrow
+            target.add(line)
         }
     }
 
