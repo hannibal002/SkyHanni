@@ -10,15 +10,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class RarityBackgroundConfig(
-    scalar: Float = 1.0f,
+    override val scalar: Float = 1.0f,
 ) : ResettableScalableConfig {
     companion object {
         private const val DEFAULT_PADDING = 4
     }
-
-    @Suppress("CanBePrimaryConstructorProperty")
-    @Transient
-    override val scalar: Float = scalar
 
     @Expose
     @ConfigOption(

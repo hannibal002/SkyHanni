@@ -12,11 +12,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class BorderRingConfig(
-    scalar: Float = 1.0f,
+    override val scalar: Float = 1.0f,
 ) : ResettableScalableConfig {
-    @Suppress("CanBePrimaryConstructorProperty")
-    @Transient
-    override val scalar: Float = scalar
 
     @Expose
     @ConfigOption(

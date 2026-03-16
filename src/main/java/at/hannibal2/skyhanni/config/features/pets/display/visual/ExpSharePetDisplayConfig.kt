@@ -9,11 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExpSharePetDisplayConfig(
-    scalar: Float = 0.6f,
+    override val scalar: Float = 0.6f,
 ) : VisualPetDisplayConfig(scalar) {
-    @Suppress("CanBePrimaryConstructorProperty")
-    @Transient
-    override val scalar: Float = scalar
 
     @Expose
     @ConfigOption(

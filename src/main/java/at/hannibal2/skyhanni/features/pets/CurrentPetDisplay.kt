@@ -87,9 +87,8 @@ object CurrentPetDisplay {
             useSkinAnimations = icon.skinAnimation.get(),
         )
 
-        val petItemEnabled = petItem.enabled.get()
         val petItemWrappedRenderable = baseItemRenderable.wrapInPetItemOrSelf(
-            enabled = petItemEnabled,
+            enabled = petItem.enabled.get(),
             petData = this@buildMainIconRenderableOrNull,
             petItemConfig = petItem,
         )
@@ -101,20 +100,22 @@ object CurrentPetDisplay {
             rarity = rarity,
         )
 
-        val separatorEnabled = rarityBackground.borderRing.separator.enabled.get()
-        val xpRingEnabled = rarityBackground.borderRing.enabled.get()
+        val borderRingConfig = rarityBackground.borderRing
+        val separatorEnabled = borderRingConfig.separator.enabled.get()
+        val xpRingEnabled = borderRingConfig.enabled.get()
         val separatorWrappedRenderable = backgroundWrappedRenderable.wrapInRingOrSelf(
             enabled = backgroundEnabled && xpRingEnabled && separatorEnabled,
-            ringConfig = rarityBackground.borderRing.separator,
+            ringConfig = borderRingConfig.separator,
         )
 
         val shouldUseXpRing = backgroundEnabled && xpRingEnabled
-        val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable else Renderable.circularContainer(
+        val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable
+        else Renderable.circularContainer(
             separatorWrappedRenderable,
-            backgroundColor = rarityBackground.borderRing.customization.filledColor.get(),
-            unfilledColor = rarityBackground.borderRing.customization.unfilledColor.get(),
+            backgroundColor = borderRingConfig.customization.filledColor.get(),
+            unfilledColor = borderRingConfig.customization.unfilledColor.get(),
             filledPercentage = levelProgressionPercentage,
-            padding = rarityBackground.borderRing.customization.padding.get(),
+            padding = borderRingConfig.customization.padding.get(),
         )
 
         return xpRingWrappedRenderable

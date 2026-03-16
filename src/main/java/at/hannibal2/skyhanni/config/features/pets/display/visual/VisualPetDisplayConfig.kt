@@ -14,11 +14,8 @@ import io.github.notenoughupdates.moulconfig.observer.Property
  *  the config class.
  */
 open class VisualPetDisplayConfig(
-    scalar: Float = 1.0f,
+    override val scalar: Float = 1.0f,
 ) : ResettableScalableConfig {
-    @Suppress("CanBePrimaryConstructorProperty")
-    @Transient
-    override val scalar: Float = scalar
 
     @Expose
     @ConfigOption(name = "Pet Icon", desc = "")
@@ -31,11 +28,8 @@ open class VisualPetDisplayConfig(
     open val rarityBackground: BackgroundColorConfig = BackgroundColorConfig(scalar)
 
     open class BackgroundColorConfig(
-        scalar: Float = 1.0f,
+        override val scalar: Float = 1.0f,
     ) : ResettableScalableConfig {
-        @Suppress("CanBePrimaryConstructorProperty")
-        @Transient
-        override val scalar: Float = scalar
 
         @Expose
         @ConfigOption(
