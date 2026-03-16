@@ -40,8 +40,6 @@ class BroodmotherSpawnAlertConfig {
 
     companion object {
         @JvmStatic
-        fun BroodmotherSpawnAlertConfig.playTestSound() = Runnable {
-            SoundUtils.createSound(alertSound, pitch).playSound()
-        }
+        fun BroodmotherSpawnAlertConfig.playTestSound() = SoundUtils.createSound(alertSound, pitch).playSound()
     }
 }

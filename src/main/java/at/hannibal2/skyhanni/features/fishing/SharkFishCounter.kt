@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
+import java.util.EnumMap
 
 @SkyHanniModule
 object SharkFishCounter {
@@ -31,7 +31,14 @@ object SharkFishCounter {
         GREAT_WHITE("Great White", LorenzColor.GOLD),
     }
 
-    private val counterMap = enumMapOf<SharkType, Int>()
+    private val counterMap = object : EnumMap<SharkType, Int>(SharkType::class.java) {
+        override fun clear() {
+            SharkType.entries.forEach { this[it] = 0 }
+        }
+        init {
+            this.clear()
+        }
+    }
     private val totalCount get() = counterMap.values.sum()
 
     private var display: Renderable? = null

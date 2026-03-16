@@ -49,7 +49,7 @@ object DungeonDeathCounter {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.deathCounterDisplay || deathPattern.matches(event.chatComponent)) return
+        if (!config.deathCounterDisplay || !deathPattern.matches(event.chatComponent)) return
         deaths++
         ChatUtils.chat("§c§l$deaths. DEATH!", false)
         update()

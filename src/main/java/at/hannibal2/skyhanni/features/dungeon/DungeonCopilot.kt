@@ -96,7 +96,7 @@ object DungeonCopilot {
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
             if (DungeonApi.getCurrentBoss() == DungeonFloor.E) {
-                changeNextStep("")
+                changeNextStep()
             } else {
                 changeNextStep("Enter Boss Room")
             }
@@ -105,8 +105,8 @@ object DungeonCopilot {
         return null
     }
 
-    private fun changeNextStep(step: String) {
-        nextStep = Renderable.text(step)
+    private fun changeNextStep(step: String? = null) {
+        nextStep = step?.let { Renderable.text(it) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -144,7 +144,7 @@ object DungeonCopilot {
 
     @HandleEvent
     fun onWorldChange() {
-        changeNextStep("")
+        changeNextStep()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)

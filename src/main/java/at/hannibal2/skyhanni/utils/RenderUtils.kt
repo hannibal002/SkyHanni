@@ -181,14 +181,15 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
+    // TODO clean up nullable calls - the function param should not take `Renderable?`,
+    //  the onus should be on the caller to check before calling this.
     fun Position.renderRenderable(
-        renderable: Renderable?,
+        renderable: Renderable,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
         // cause crashes and errors on purpose
         DrawContextUtils.drawContext
-        if (renderable == null) return
         DrawContextUtils.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
