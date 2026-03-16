@@ -129,49 +129,46 @@ object CurrentPetDisplay {
 
         val organization = expShareConfig.organization
         val subOrbit = organization.subOrbit
-        return when (val placement: EXPSharePlace = organization.placement.get()) {
-            EXPSharePlace.ORBIT -> {
-                val orbitDirection = subOrbit.orbitDirection.get()
-                val orbitSpeed = when (orbitDirection) {
-                    OrbitDirection.NONE -> 0
-                    else -> subOrbit.orbitSpeed.get().toInt()
-                }
-                Renderable.orbitalSystem(
-                    this,
-                    subBodySpacing = subOrbit.orbitDistance.get(),
-                    orbitSpeed = orbitSpeed,
-                    orbitDirection = orbitDirection,
-                    subBodies = expShareRenderables,
+        val placement: EXPSharePlace = organization.placement.get()
+        return if (placement == EXPSharePlace.ORBIT) {
+            val orbitDirection = subOrbit.orbitDirection.get()
+            val orbitSpeed = when (orbitDirection) {
+                OrbitDirection.NONE -> 0
+                else -> subOrbit.orbitSpeed.get().toInt()
+            }
+            Renderable.orbitalSystem(
+                this,
+                subBodySpacing = subOrbit.orbitDistance.get(),
+                orbitSpeed = orbitSpeed,
+                orbitDirection = orbitDirection,
+                subBodies = expShareRenderables,
+            )
+        } else {
+            val expShareContainer = when (organization.groupOrientation.get()) {
+                EXPShareGO.VERTICAL -> Renderable.vertical(
+                    expShareRenderables,
+                    spacing = expShareConfig.icon.iconSpacing.get(),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                )
+                EXPShareGO.HORIZONTAL -> Renderable.horizontal(
+                    expShareRenderables,
+                    spacing = expShareConfig.icon.iconSpacing.get(),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 )
             }
-            else -> {
-                val expShareOrientation: EXPShareGO = organization.groupOrientation.get()
-                val expShareContainer = when (expShareOrientation) {
-                    EXPShareGO.VERTICAL -> Renderable.vertical(
-                        expShareRenderables,
-                        spacing = expShareConfig.icon.iconSpacing.get(),
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                    )
-                    EXPShareGO.HORIZONTAL -> Renderable.horizontal(
-                        expShareRenderables,
-                        spacing = expShareConfig.icon.iconSpacing.get(),
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                    )
-                }
 
-                val orderedList = when (placement) {
-                    EXPSharePlace.TOP, EXPSharePlace.LEFT -> listOf(expShareContainer, this)
-                    EXPSharePlace.BOTTOM, EXPSharePlace.RIGHT -> listOf(this, expShareContainer)
-                    else -> return this
-                }
+            val orderedList = when (placement) {
+                EXPSharePlace.TOP, EXPSharePlace.LEFT -> listOf(expShareContainer, this)
+                EXPSharePlace.BOTTOM, EXPSharePlace.RIGHT -> listOf(this, expShareContainer)
+                else -> return this
+            }
 
-                when (placement) {
-                    EXPSharePlace.TOP, EXPSharePlace.BOTTOM -> Renderable.vertical(orderedList, spacing = 2)
-                    EXPSharePlace.LEFT, EXPSharePlace.RIGHT -> Renderable.horizontal(orderedList, spacing = 2)
-                    else -> this
-                }
+            when (placement) {
+                EXPSharePlace.TOP, EXPSharePlace.BOTTOM -> Renderable.vertical(orderedList, spacing = 2)
+                EXPSharePlace.LEFT, EXPSharePlace.RIGHT -> Renderable.horizontal(orderedList, spacing = 2)
+                else -> this
             }
         }
     }
@@ -259,7 +256,6 @@ object CurrentPetDisplay {
                 ),
             ),
         ) { currentRotation }
-
         scale = iconScale
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         verticalAlign = RenderUtils.VerticalAlignment.CENTER
@@ -309,8 +305,8 @@ object CurrentPetDisplay {
     )
 
     private fun Double.formatExpByConfigOption() = when (config.text.xpFormat.get()) {
-        NFE.DEFAULT, NFE.UNFORMATTED -> toInt().addSeparators()
-        NFE.FORMATTED -> toInt().shortFormat()
+        NFE.DEFAULT, NFE.UNFORMATTED -> toLong().addSeparators()
+        NFE.FORMATTED -> toLong().shortFormat()
         else -> ""
     }
 
@@ -318,9 +314,9 @@ object CurrentPetDisplay {
         firstExp: Double,
         secondExp: Double,
     ): String = when (config.text.xpFormat.get()) {
-        NFE.DEFAULT -> "§b${firstExp.toInt().addSeparators()}§9/§b${secondExp.toInt().shortFormat()}"
-        NFE.FORMATTED -> "§b${firstExp.toInt().shortFormat()}§9/§b${secondExp.toInt().shortFormat()}"
-        NFE.UNFORMATTED -> "§b${firstExp.toInt().addSeparators()}§9/§b${secondExp.toInt().addSeparators()}"
+        NFE.DEFAULT -> "§b${firstExp.toLong().addSeparators()}§9/§b${secondExp.toLong().shortFormat()}"
+        NFE.FORMATTED -> "§b${firstExp.toLong().shortFormat()}§9/§b${secondExp.toLong().shortFormat()}"
+        NFE.UNFORMATTED -> "§b${firstExp.toLong().addSeparators()}§9/§b${secondExp.toLong().addSeparators()}"
         else -> ""
     }
 
