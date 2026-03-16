@@ -225,7 +225,9 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderRenderable(display, posLabel = "City Project Materials")
+        display?.let {
+            config.pos.renderRenderable(it, posLabel = "City Project Materials")
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

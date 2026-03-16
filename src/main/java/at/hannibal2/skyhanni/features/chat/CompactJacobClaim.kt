@@ -95,10 +95,11 @@ object CompactJacobClaim {
 
     /**
      * REGEX-TEST:     Overclocker 3000
+     * REGEX-TEST:     Overclocker 3000 x4
      */
     private val overclockerPattern by patternGroup.pattern(
         "overclocker",
-        " {4}Overclocker 3000",
+        " {4}Overclocker 3000(?: x(?<count>\\d+))?",
     )
     // </editor-fold>
 
@@ -152,7 +153,7 @@ object CompactJacobClaim {
         }
 
         overclockerPattern.matchMatcher(message) {
-            rewardSet.overclockers++
+            rewardSet.overclockers += groupOrNull("count")?.formatInt() ?: 1
         }
 
         bookPattern.matchMatcher(message) {
