@@ -75,7 +75,7 @@ object AnimatedSkullRecorder {
             state.frames.clear()
         }
         state = RecordingState(mode, keyName, ticks, trackedPlayer)
-        val label = if (mode == RecordingMode.PLAYER) "§e${trackedPlayer}§a's head" else "§e${mode.name.lowercase()}§a"
+        val label = if (mode == RecordingMode.PLAYER) "§e$trackedPlayer§a's head" else "§e${mode.name.lowercase()}§a"
         ChatUtils.chat("Started recording $label skull frames.")
 
         if (mode == RecordingMode.PET) ChatUtils.chat("§eMake sure no other armor stands are nearby.")
