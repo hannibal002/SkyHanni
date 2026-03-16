@@ -92,7 +92,7 @@ object GrowthCycle {
                         append("Greenhouse Growth Stage is ready in the Garden") {
                             withColor(ChatFormatting.GREEN)
                         }
-                    }
+                    },
                 )
                 beep = true
             }
@@ -108,6 +108,8 @@ object GrowthCycle {
     fun onRenderOverlay() {
         if (!config.showDisplay) return
 
-        config.position.renderRenderable(display, posLabel = "Growth Cycle Timer")
+        display?.let {
+            config.position.renderRenderable(it, posLabel = "Growth Cycle Timer")
+        }
     }
 }
