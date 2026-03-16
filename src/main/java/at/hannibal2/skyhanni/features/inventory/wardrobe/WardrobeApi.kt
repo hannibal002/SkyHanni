@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -23,7 +24,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStained
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -35,7 +36,7 @@ object WardrobeApi {
 
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
-    private val repReloadCoroutine = CoroutineConfig("wardrobe api repo reload")
+    private val repReloadCoroutine = CoroutineSettings("wardrobe api repo reload")
     private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
@@ -127,7 +128,8 @@ object WardrobeApi {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = repReloadCoroutine.launch {
-
+        val skinData = event.getConstantAsync<NeuAnimatedSkullsJson>("animatedskulls")
+        armorAnimatedSkins = skinData.skins.filterKeys { !it.startsWith("PET_SKIN") }
     }
 
     @HandleEvent

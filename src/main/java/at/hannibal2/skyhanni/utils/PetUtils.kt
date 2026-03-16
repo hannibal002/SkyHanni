@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -25,10 +26,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.google.gson.JsonObject
 
 @SkyHanniModule
 object PetUtils {
+    private val repoReloadCoroutine = CoroutineSettings("pet utils repo reload")
+
     // Late load from NEU repo
     private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
     private var basePetLeveling: List<Int> = listOf()
@@ -261,8 +265,8 @@ object PetUtils {
     // </editor-fold>
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val petSkinData = event.getConstant<PetsJson>("Pets")
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val petSkinData = event.getConstantAsync<PetsJson>("Pets")
         val gameVariants = petSkinData.skins.gameVariants
         seasonalVariants = gameVariants["seasonal"].orEmpty()
         dayNightVariants = gameVariants["day_night"].orEmpty()
@@ -270,14 +274,14 @@ object PetUtils {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val petData = event.getConstant<NeuPetsJson>("pets")
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val petData = event.getConstantAsync<NeuPetsJson>("pets")
         basePetLeveling = petData.basePetLeveling
         customPetLeveling = petData.customPetLeveling
         petItemResolution = petData.petItemResolution
         displayNameMap = petData.displayNameMap
 
-        val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
+        val skinData = event.getConstantAsync<NeuAnimatedSkullsJson>("animatedskulls")
         animatedPetSkins = skinData.skins.filter { it.key.startsWith("PET_SKIN") }
         petSkinVariants = skinData.petSkinVariants
         petSkinNbtNames = skinData.petSkinNbtNames
