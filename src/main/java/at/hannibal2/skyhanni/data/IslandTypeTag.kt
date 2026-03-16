@@ -36,12 +36,12 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
 
     private val types: EnumSet<IslandType> = types.fold(
         EnumSet.noneOf(IslandType::class.java),
-    ) { set, it ->
+    ) { set, islandType ->
         set.apply {
-            when (it) {
-                is IslandTypeTag -> addAll(it.types)
-                is IslandType -> add(it)
-                else -> error("Invalid type: $it")
+            when (islandType) {
+                is IslandTypeTag -> addAll(islandType.types)
+                is IslandType -> add(islandType)
+                else -> error("Invalid type: $islandType")
             }
         }
     }

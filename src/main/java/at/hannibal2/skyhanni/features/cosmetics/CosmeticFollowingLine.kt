@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.cosmetics.CosmeticFollowingLine.latestLocations
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -25,7 +26,7 @@ object CosmeticFollowingLine {
     private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
     private var locations = LinkedHashMap<LorenzVec, LocationSpot>()
-    private var latestLocations = LinkedHashMap<LorenzVec, LocationSpot>()
+    private val latestLocations = LinkedHashMap<LorenzVec, LocationSpot>()
 
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 

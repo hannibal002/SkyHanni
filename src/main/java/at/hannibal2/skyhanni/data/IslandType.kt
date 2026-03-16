@@ -80,8 +80,7 @@ enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
     companion object {
 
         fun Collection<IslandType>.isInAnyIsland(): Boolean = any { it.isInIsland() }
-
-            private val repoReloadCoroutine = CoroutineSettings("island type repo reload")
+        private val repoReloadCoroutine = CoroutineSettings("island type repo reload")
 
         /**
          * The maximum amount of players that can be on an island.
