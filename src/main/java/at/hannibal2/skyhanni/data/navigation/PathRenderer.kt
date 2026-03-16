@@ -11,14 +11,14 @@ import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DBezier2
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import java.awt.Color
 
 /**
  * TODO
  *
- * block at target is gone
- * jump all 2 blocks/per node
+ * bug: jump all 2 blocks/per node
  *
  * IslandGraphs: rename all functions and members to be more logical/explain what they do
  * IslandGraphs: magic numbers
@@ -33,7 +33,7 @@ import java.awt.Color
  * if the closest node and the path to it is not visible, move further down the line of currently moves paths to
  *  find the spot where to start the curve from. and if that also doesnt work, find a new edge on the actual graph to start the path on.
  *
- *  do not jump forward if the path is  higher than the user location
+ *  do not jump forward if the path is higher than the user location
  *
  *  fix the rendering  being weird when moving up a ladder, same issue when diving
  */
@@ -77,6 +77,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         renderCurve(event)
         val lastNode = path.lastOrNull()?.position ?: return
         event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !densePoints.last().isPeek)
+        event.drawWaypointFilled(targetLocation, color, seeThroughBlocks = true)
     }
 
     private fun renderCurve(event: SkyHanniRenderWorldEvent) {
