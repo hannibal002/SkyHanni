@@ -278,7 +278,7 @@ object IslandGraphs {
         lastLoadedTime = SimpleTimeMark.now()
         SkyHanniMod.launchCoroutine("load island graph data for $islandName") {
             try {
-                val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+                val graph = SkyHanniRepoManager.getRepoDataAsync<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreaFeatures.display = null
                 DelayedRun.runNextTick {
                     setNewGraph(graph)
