@@ -355,7 +355,7 @@ object SackApi {
         updateSacks(sackEvent)
         sackEvent.post()
         if (chatConfig.hideSacksChange) {
-            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isCurrent())) {
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
                 event.blockedReason = "sacks_change"
             }
         }

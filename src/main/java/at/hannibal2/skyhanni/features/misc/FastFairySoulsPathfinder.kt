@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -51,7 +51,7 @@ object FastFairySoulsPathfinder {
 
     private var data: Data? = null
 
-    private val soulPathFindConfig = CoroutineConfig("fairy souls pathfind")
+    private val soulPathFindConfig = CoroutineSettings("fairy souls pathfind")
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
@@ -222,7 +222,7 @@ object FastFairySoulsPathfinder {
                 }
             } ?: continue
 
-            if (island.isCurrent()) {
+            if (island.isInIsland()) {
                 data?.checkHaveAll()
             }
             totalFound[island] = found

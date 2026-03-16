@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -86,7 +86,7 @@ object GraphEditorIO {
 
     private fun useAsIslandArea(compileGraph: Graph) {
         if (!GraphEditor.config.useAsIslandArea) return
-        CoroutineConfig("bridge graph networks").launchCoroutine {
+        CoroutineSettings("bridge graph networks").launchCoroutine {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
             DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
@@ -149,7 +149,7 @@ object GraphEditorIO {
             return
         }
 
-        CoroutineConfig("merge graph json").launchCoroutine {
+        CoroutineSettings("merge graph json").launchCoroutine {
             try {
                 val graph = Graph.fromJson(json)
                 DelayedRun.runOrNextTick {

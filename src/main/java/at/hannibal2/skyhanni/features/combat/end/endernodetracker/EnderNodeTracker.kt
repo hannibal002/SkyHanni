@@ -200,7 +200,7 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun isEnabled() = IslandType.THE_END.isCurrent() && (!config.onlyPickaxe || hasItemInHand())
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && (!config.onlyPickaxe || hasItemInHand())
 
     private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 

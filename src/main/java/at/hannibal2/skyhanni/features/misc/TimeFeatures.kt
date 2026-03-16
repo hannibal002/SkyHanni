@@ -43,7 +43,7 @@ object TimeFeatures {
             config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
 
-        if (winterConfig.islandCloseTime && IslandType.WINTER.isCurrent()) {
+        if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
             if (WinterApi.isDecember()) return
             val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days

@@ -104,7 +104,7 @@ object DailyMiniBossHelper {
             .forEach { storage.miniBossesDoneToday.add(it.displayName) }
     }
 
-    fun onRepoReload(data: Map<String, ReputationQuest>) {
+    fun processRepoData(data: Map<String, ReputationQuest>) {
         miniBosses.clear()
         for ((displayName, quest) in data) {
             val displayItem = quest.item
@@ -122,5 +122,5 @@ object DailyMiniBossHelper {
     }
 
     private fun getByDisplayName(name: String) = miniBosses.firstOrNull { it.displayName == name }
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.enabled.get()
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

@@ -202,5 +202,5 @@ object CompactSweepDetails {
 
     private fun isFinalCalculation(regexGroup: String): Boolean = regexGroup == "§a"
 
-    private fun isInIsland(): Boolean = IslandTypeTags.FORAGING.inAny() || IslandType.HUB.isCurrent()
+    private fun isInIsland(): Boolean = IslandTypeTags.FORAGING.inAny() || IslandType.HUB.isInIsland()
 }

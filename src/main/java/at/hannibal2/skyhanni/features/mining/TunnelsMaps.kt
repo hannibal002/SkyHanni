@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -539,6 +538,6 @@ object TunnelsMaps {
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isCurrent() && config.enable &&
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable &&
             (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
 }

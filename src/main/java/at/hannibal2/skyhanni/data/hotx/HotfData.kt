@@ -269,7 +269,7 @@ enum class HotfData(
         override val rotatingPerks = HotfApi.LotteryPerk.entries
         override val rotatingPerkEntry = LOTTERY
         override var currentRotPerk = HotfApi.lottery
-        override val applicableIslandType = IslandTypeTags.FORAGING
+        override val islandTypeTag = IslandTypeTags.FORAGING
         private val config get() = SkyHanniMod.feature.foraging.hotf
 
         override val position: Position get() = config.lotteryPosition

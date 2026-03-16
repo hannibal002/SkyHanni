@@ -176,7 +176,7 @@ object BingoApi {
     }
 
     private fun checkBingoNpcs() {
-        if (!IslandType.HUB.isCurrent()) return
+        if (!IslandType.HUB.isInIsland()) return
 
         val shouldHideAlixer = !SkyBlockUtils.isBingoProfile
         if (shouldHideAlixer != alixerHidden) {

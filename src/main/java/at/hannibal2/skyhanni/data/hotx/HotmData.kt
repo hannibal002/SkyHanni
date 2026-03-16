@@ -428,7 +428,7 @@ enum class HotmData(
         override val rotatingPerks = SkymallPerk.entries
         override val rotatingPerkEntry: HotmData = SKY_MALL
         override var currentRotPerk = HotmApi.skymall
-        override val applicableIslandType = IslandTypeTags.MINING
+        override val islandTypeTag = IslandTypeTags.MINING
 
         private val config get() = SkyHanniMod.feature.mining.hotm
         override val position: Position get() = config.skyMallPosition

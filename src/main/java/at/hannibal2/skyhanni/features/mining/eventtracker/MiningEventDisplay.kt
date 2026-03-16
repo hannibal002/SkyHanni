@@ -64,7 +64,7 @@ object MiningEventDisplay {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
-                MiningEventConfig.ShowType.CURRENT -> islandType.isCurrent()
+                MiningEventConfig.ShowType.CURRENT -> islandType.isInIsland()
                 else -> true
             }
 

@@ -5,11 +5,11 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Represents the configuration for a coroutine run through [CoroutineManager].
+ * Represents the declaration of, and execution for a coroutine run through [CoroutineManager].
  *
  * Options can be chained before launching:
  * ```
- * CoroutineConfig("myTask", timeout = 5.seconds)
+ * CoroutineSettings("myTask", timeout = 5.seconds)
  *     .withIOContext()
  *     .withMutex(myMutex)
  *     .launchCoroutine { ... }
@@ -20,24 +20,24 @@ import kotlin.time.Duration.Companion.seconds
  *   [kotlinx.coroutines.TimeoutCancellationException]. Use [Duration.INFINITE] to disable.
  * @param withIOContext Whether to run the block on [kotlinx.coroutines.Dispatchers.IO].
  */
-open class CoroutineConfig(
+open class CoroutineSettings(
     val name: String,
     val timeout: Duration = 10.seconds,
-    internal val withIOContext: Boolean = false,
+    internal var withIOContext: Boolean = false,
 ) {
-    fun withMutex(mutex: Mutex): MutexedCoroutineConfig = MutexedCoroutineConfig(name, mutex, timeout, withIOContext)
-    open fun withIOContext(): CoroutineConfig = CoroutineConfig(name, timeout, withIOContext = true)
+    fun withMutex(mutex: Mutex?): CoroutineSettings = mutex?.let {
+        MutexedCoroutineSettings(name, it, timeout, withIOContext)
+    } ?: this
+    fun withIOContext(): CoroutineSettings = this.apply { withIOContext = true }
 }
 
 /**
- * A [CoroutineConfig] that additionally holds a [Mutex], which will be acquired
+ * A [CoroutineSettings] that additionally holds a [Mutex], which will be acquired
  * before the coroutine block executes.
  */
-open class MutexedCoroutineConfig(
+open class MutexedCoroutineSettings(
     name: String,
     val mutex: Mutex,
     timeout: Duration = 10.seconds,
     withIOContext: Boolean = false,
-) : CoroutineConfig(name, timeout, withIOContext) {
-    override fun withIOContext(): MutexedCoroutineConfig = MutexedCoroutineConfig(name, mutex, timeout, withIOContext = true)
-}
+) : CoroutineSettings(name, timeout, withIOContext)

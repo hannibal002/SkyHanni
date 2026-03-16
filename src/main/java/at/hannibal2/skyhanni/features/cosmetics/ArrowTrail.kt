@@ -33,9 +33,9 @@ object ArrowTrail {
 
     // TODO: This should probably be done using entity add events, and only iterating through the known arrows on tick
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ARROW_TRAIL])
     fun onTick() {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
         val deathTime = time.plus(secondsAlive)
@@ -53,9 +53,9 @@ object ArrowTrail {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ARROW_TRAIL])
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
         listYourArrow.forEach {
             event.draw3DLine(it.start, it.end, color.toColor(), config.lineWidth, true)
@@ -67,8 +67,6 @@ object ArrowTrail {
             }
         }
     }
-
-    private fun isEnabled() = config.enabled && (SkyBlockUtils.inSkyBlock || OutsideSBFeature.ARROW_TRAIL.isSelected())
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {

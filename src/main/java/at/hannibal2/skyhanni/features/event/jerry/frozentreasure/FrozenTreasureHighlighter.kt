@@ -29,7 +29,7 @@ object FrozenTreasureHighlighter {
     )
 
     private fun isEnabled(): Boolean {
-        return IslandType.WINTER.isCurrent() && WinterApi.inGlacialCave() && config.enabled
+        return IslandType.WINTER.isInIsland() && WinterApi.inGlacialCave() && config.enabled
     }
 
     private const val yOffset = 2

@@ -55,7 +55,7 @@ object DragonFightAPI {
 
     private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
 
-    fun inNestArea() = IslandType.THE_END.isCurrent() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
+    fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent.Allow) {
