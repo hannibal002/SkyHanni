@@ -35,14 +35,16 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedFakePlayerRenderable.Companion.animatedFakePlayer
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.EquipmentSlotAnimationState
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.fakePlayer
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
@@ -278,13 +280,19 @@ object CustomWardrobe {
     ): Renderable {
         val fakePlayer = FakePlayer()
         var scale = playerWidth
+        val animatedSlots = mutableMapOf<EquipmentSlot, EquipmentSlotAnimationState>()
 
         for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal !in 0..3) continue
-            var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
-            if (stack == null) stack = ItemStack.EMPTY
-            fakePlayer.equipment.set(equipment, stack)
+            val raw = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants() ?: ItemStack.EMPTY
+            val frames = WardrobeApi.getArmorAnimatedFrames(raw)
+            if (frames != null && frames.size > 1) {
+                fakePlayer.equipment.set(equipment, frames.first().stack)
+                animatedSlots[equipment] = EquipmentSlotAnimationState(frames)
+            } else {
+                fakePlayer.equipment.set(equipment, raw)
+            }
         }
 
         val playerColor = if (!slot.isInCurrentPage()) {
@@ -292,8 +300,9 @@ object CustomWardrobe {
             Color.GRAY.addAlpha(100)
         } else null
 
-        return Renderable.fakePlayer(
-            fakePlayer,
+        return Renderable.animatedFakePlayer(
+            player = fakePlayer,
+            animatedSlots = animatedSlots,
             followMouse = config.eyesFollowMouse,
             width = containerWidth,
             height = containerHeight,

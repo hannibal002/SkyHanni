@@ -1,15 +1,19 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -19,6 +23,8 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStained
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
@@ -29,6 +35,7 @@ object WardrobeApi {
 
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
+    private val repReloadCoroutine = CoroutineConfig("wardrobe api repo reload")
     private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
@@ -55,6 +62,7 @@ object WardrobeApi {
     const val MAX_SLOT_PER_PAGE = 9
     const val MAX_PAGES = 3
 
+    private var armorAnimatedSkins: Map<String, AnimatedSkinJson> = mapOf()
     var slots = listOf<WardrobeSlot>()
     var inCustomWardrobe = false
 
@@ -86,6 +94,17 @@ object WardrobeApi {
         slots = list
     }
 
+    private fun String.buildTextureItemStack(): ItemStack {
+        val (uuid, texture) = this.split(":")
+        return ItemUtils.createSkull("Animated Armor", uuid, texture)
+    }
+
+    fun getArmorAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
+        val internalName = stack.getInternalNameOrNull()?.asString() ?: return null
+        val animJson = armorAnimatedSkins[internalName] ?: return null
+        return animJson.textures.map { ItemStackAnimatedFrame(it.buildTextureItemStack(), animJson.ticks) }
+    }
+
     private fun getWardrobeItem(itemStack: ItemStack?) =
         if (itemStack == null || itemStack.isStainedGlassPane()) null else itemStack
 
@@ -104,6 +123,11 @@ object WardrobeApi {
             }
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
+    }
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = repReloadCoroutine.launch {
+
     }
 
     @HandleEvent

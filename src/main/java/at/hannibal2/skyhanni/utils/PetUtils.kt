@@ -278,7 +278,7 @@ object PetUtils {
         displayNameMap = petData.displayNameMap
 
         val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
-        animatedPetSkins = skinData.skins
+        animatedPetSkins = skinData.skins.filter { it.key.startsWith("PET_SKIN") }
         petSkinVariants = skinData.petSkinVariants
         petSkinNbtNames = skinData.petSkinNbtNames
 
