@@ -10,4 +10,5 @@ data class DisabledApiJson(
     @Expose @SerializedName("disabled_elite_ah") val disabledEliteAh: Boolean,
     @Expose @SerializedName("disabled_elite_bz") val disabledEliteBz: Boolean,
     @Expose @SerializedName("disabled_elite_items") val disabledEliteItems: Boolean,
+    @Expose @SerializedName("disabled_counting_legacy_hoppity_locations") val disabledCountingLegacyHoppityLocations: Boolean,
 )

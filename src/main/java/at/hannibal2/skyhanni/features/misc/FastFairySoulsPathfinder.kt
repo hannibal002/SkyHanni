@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -49,30 +51,31 @@ object FastFairySoulsPathfinder {
 
     private var data: Data? = null
 
+    private val soulPathFindConfig = CoroutineConfig("fairy souls pathfind")
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
-     * REGEX-TEST: §dYou have already found that Fairy Soul!
+     * REGEX-TEST: You have already found that Fairy Soul!
      */
     private val duplicatePattern by patternGroup.pattern(
-        "chat.duplicat",
-        "§dYou have already found that Fairy Soul!",
+        "chat.duplicate.colorless",
+        "^You have already found that Fairy Soul!$",
     )
 
     /**
-     * REGEX-TEST: §d§lSOUL! §fYou found a §r§dFairy Soul§r§f!
+     * REGEX-TEST: SOUL! You found a Fairy Soul!
      */
     private val newPattern by patternGroup.pattern(
-        "chat.new",
-        "§d§lSOUL! §fYou found a §r§dFairy Soul§r§f!",
+        "chat.new.colorless",
+        "^SOUL! You found a Fairy Soul!$",
     )
 
     /**
-     * REGEX-TEST: §7Fairy Souls: §e11§7/§d11
+     * REGEX-TEST: Fairy Souls: 11/11
      */
     private val loreSoulPattern by patternGroup.pattern(
-        "new",
-        "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
+        "new.colorless",
+        "Fairy Souls: (?<found>.*)\\/(?<total>.*)",
     )
 
     private class Data(
@@ -95,13 +98,13 @@ object FastFairySoulsPathfinder {
 
         private fun getNearestSoul(): LorenzVec? {
             val playerLocation = LocationUtils.playerLocation()
-            val nearest = allSouls.minBy { it.distanceSq(playerLocation) }
+            val nearest = allSouls.minByOrNull { it.distanceSq(playerLocation) } ?: return null
             if (nearest.distanceToPlayer() < 10) return nearest
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
                 val abovePlayer = playerLocation.up(10)
-                val aboveNearest = allSouls.minBy { it.distanceSq(abovePlayer) }
+                val aboveNearest = allSouls.minByOrNull { it.distanceSq(abovePlayer) } ?: return null
                 if (aboveNearest.distance(abovePlayer) < 10) return aboveNearest
             }
 
@@ -211,16 +214,18 @@ object FastFairySoulsPathfinder {
 
         for (stack in event.inventoryItems.values) {
             val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
-            val have = stack.getLore().firstOrNull()?.let {
-                loreSoulPattern.matchMatcher(it) {
-                    group("have").toIntOrNull()
+            // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
+            // which is distinct from finding it on an island.
+            val found = stack.getLoreComponent().firstOrNull()?.let {
+                loreSoulPattern.matchMatcher(it.string) {
+                    group("found").toIntOrNull()
                 }
             } ?: continue
 
             if (island.isCurrent()) {
                 data?.checkHaveAll()
             }
-            totalFound[island] = have
+            totalFound[island] = found
         }
     }
 
@@ -262,7 +267,7 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        SkyHanniMod.launchCoroutine("fairy souls pathfind") {
+        soulPathFindConfig.launch {
             val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()
@@ -292,29 +297,22 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
+        if (duplicatePattern.matches(event.chatComponent) || newPattern.matches(event.chatComponent)) {
             data?.foundNearby()
         }
     }
 
     @HandleEvent(IslandGraphReloadEvent::class)
     fun onIslandGraphReload() {
-        if (isEnabled()) {
-            reload()
-        } else {
-            data = null
-        }
+        if (isEnabled()) reload()
+        else data = null
     }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Fairy Souls Pathfinder")
 
-        if (!isEnabled()) {
-            event.addIrrelevant("disabled")
-            return
-        }
-
+        if (!isEnabled()) return event.addIrrelevant("disabled")
         event.addData {
             data?.apply {
                 debugState?.let {

@@ -370,7 +370,7 @@ object DamageIndicatorManager {
         val mob = event.mob
 
         if (SkyBlockUtils.debug) {
-            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.mobType}", 5.seconds.fromNow()))
+            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.category}", 5.seconds.fromNow()))
         }
         if (!isEnabled()) return
         try {

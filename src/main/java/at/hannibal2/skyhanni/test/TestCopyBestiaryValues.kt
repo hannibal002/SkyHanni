@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -44,14 +43,16 @@ object TestCopyBestiaryValues {
         var bracket: Int = 0
     }
 
+    // TODO add regex test
+    @Suppress("RepoPatternRegexTestMissing")
     private val bestiaryTypePattern by RepoPattern.pattern(
         "test.bestiary.type",
-        "\\[Lv(?<lvl>.*)] (?<text>.*)"
+        "\\[Lv(?<lvl>.*)] (?<text>.*)",
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
+        if (!DevApi.config.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = null
 
         val backItem = event.inventoryItems[3 + 9 * 5 + 3] ?: return
