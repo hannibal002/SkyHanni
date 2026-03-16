@@ -1011,4 +1011,7 @@ class ProfileSpecificStorage(
 
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
+
+    @Expose
+    var slayerBonusRewardsLevel: Int = 0
 }

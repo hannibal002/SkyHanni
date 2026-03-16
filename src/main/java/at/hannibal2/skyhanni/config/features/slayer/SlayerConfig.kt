@@ -204,6 +204,16 @@ class SlayerConfig {
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
 
+    @Expose
+    @ConfigOption(name = "RNG Meter Fractions", desc = "Converts the percentages in the RNG Meter to fractions.")
+    @ConfigEditorBoolean
+    var rngMeterFractions: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "RNG Meter Coins/Boss", desc = "Adds Coins/Boss to description of the drops in the RNG Meter.")
+    @ConfigEditorBoolean
+    var rngMeterCoinsPerBoss: Boolean = false
+
     @SkyHanniModule
     companion object {
         @HandleEvent
