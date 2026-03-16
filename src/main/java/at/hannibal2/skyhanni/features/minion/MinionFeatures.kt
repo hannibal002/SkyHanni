@@ -135,7 +135,7 @@ object MinionFeatures {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        lastClickedEntity = event.clickedEntity.getLorenzVec()
+        lastClickedEntity = event.entity.getLorenzVec()
     }
 
     @HandleEvent(onlyOnSkyblock = true)

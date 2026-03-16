@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.events.entity.EntityNameTagRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
@@ -28,7 +28,7 @@ object PetNametag {
     )
 
     @HandleEvent
-    fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStand>) {
+    fun onEntityNameTagRender(event: EntityNameTagRenderEvent<ArmorStand>) {
         if (!isEnabled()) return
 
         val standName: String = event.chatComponent.formattedTextCompatLessResets()

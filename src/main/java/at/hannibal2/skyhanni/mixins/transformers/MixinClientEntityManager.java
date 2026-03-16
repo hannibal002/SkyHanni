@@ -22,7 +22,7 @@ public class MixinClientEntityManager<T extends EntityAccess> {
     private void remove(Entity.RemovalReason reason, CallbackInfo ci) {
         if (entity instanceof Entity entity) {
             EntityData.despawnEntity(entity);
-            new EntityRemovedEvent(entity).post();
+            new EntityRemovedEvent<>(entity).post();
         }
     }
 }

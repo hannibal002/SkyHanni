@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyFeatureActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -18,7 +18,7 @@ object HideIrrelevantMobsInSlayerArea {
     private var irrelevantMob: IrrelevantMob? = null
 
     @HandleEvent
-    fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
+    fun onEntityTransparencyActive(event: EntityTransparencyFeatureActiveEvent) {
         irrelevantMob = if (isActive() && config.hideIrrelevantMobsTransparency < 100) {
             IrrelevantMob.entries.find { it.isInArea() }
         } else null

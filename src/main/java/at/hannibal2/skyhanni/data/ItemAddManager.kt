@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.events.inventory.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

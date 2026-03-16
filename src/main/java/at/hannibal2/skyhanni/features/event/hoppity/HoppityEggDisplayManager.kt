@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityUnclaimedEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyFeatureActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
@@ -40,7 +40,7 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
+    fun onEntityTransparencyActive(event: EntityTransparencyFeatureActiveEvent) {
         event.setActive(HoppityEggLocator.isEnabled() && config.playerTransparency < 100)
     }
 

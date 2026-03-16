@@ -91,7 +91,7 @@ object HighlightVisitorsOutsideOfGarden {
     fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
         if (PlayerUtils.isSneaking()) return
-        val entity = event.clickedEntity
+        val entity = event.entity
         if (isVisitor(entity) || (entity is ArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             ChatUtils.chatAndOpenConfig(
                 "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",

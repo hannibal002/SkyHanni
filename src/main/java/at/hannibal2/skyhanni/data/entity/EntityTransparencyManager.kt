@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data.entity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyFeatureActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
@@ -19,7 +19,7 @@ object EntityTransparencyManager {
 
     private var entities = emptyMap<LivingEntity, Int>()
     private val activeValue = TimeLimitedValue(1.seconds) {
-        EntityTransparencyActiveEvent().apply { post() }.isActive()
+        EntityTransparencyFeatureActiveEvent().apply { post() }.isActive()
     }
     private val active get() = activeValue.get() ?: false
 

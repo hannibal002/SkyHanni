@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.events.entity.EntityNameTagRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
@@ -43,7 +43,7 @@ object ContributorManager {
     }
 
     @HandleEvent
-    fun onRenderNametag(event: EntityDisplayNameEvent<Player>) {
+    fun onEntityNameTagRender(event: EntityNameTagRenderEvent<Player>) {
         if (!config.contributorNametags) return
 
         val gameProfile = event.entity.gameProfile
