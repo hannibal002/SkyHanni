@@ -225,6 +225,12 @@ data class LorenzVec(
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
+    // format we use to send to all/party chat
+    fun toChatFormat(): String = "x: ${x.toInt()}, y: ${y.toInt()}, z: ${z.toInt()}"
+
+    // format we show in local chat or for local commands
+    fun toLocalFormat(): String = "${x.toInt()} ${y.toInt()} ${z.toInt()}"
+
     /**
      * Kotlin compiles the default equals method of data classes for doubles by comparing them, like
      * ```kt

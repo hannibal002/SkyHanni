@@ -741,7 +741,7 @@ object IslandGraphs {
 
         data["generic data"] = "below"
         data["island"] = island
-        data["reported location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
+        data["reported location"] = "/shtestwaypoint ${location.toLocalFormat()} pathfind"
         if (graphArea != scoreboardArea) {
             data["area graph"] = graphArea.orEmpty()
             data["area scoreboard"] = scoreboardArea
