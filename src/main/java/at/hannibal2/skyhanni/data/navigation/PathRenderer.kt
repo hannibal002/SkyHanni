@@ -2,20 +2,20 @@ package at.hannibal2.skyhanni.data.navigation
 
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DBezier2
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPolyline
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import java.awt.Color
 
 /**
  * TODO
  *
- * bug: not through water line
  * bug: sometimes disappears entirely for a frame
  * bug: does not show up immediately on start, only after node move
  * improvement: corners are too sharp, smooth them
@@ -53,74 +53,97 @@ private const val FAR_LINE_WIDTH = 4
 
 private const val STANDING_EYE_HEIGHT = 1.62
 
+private val waterBlocks = buildList { addWaters() }
+
+private fun LorenzVec.isWater(): Boolean = getBlockAt() in waterBlocks
+
+private data class DensePoint(val pos: LorenzVec, val isWater: Boolean)
+
 /**
  * Uses tick and render events to calculate the final pathfind lines.
  */
 class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: LorenzVec) {
 
-    private val densePositions: List<LorenzVec> = subdividePositions(path.map { it.position.addHalf() })
+    private val densePoints: List<DensePoint> = subdividePositions(path.map { it.position.addHalf() }).map { DensePoint(it, it.isWater()) }
+    private val targetIsWater: Boolean = targetLocation.addHalf().isWater()
     private var curveMaxDist: Double = 0.0
 
     fun render(event: SkyHanniRenderWorldEvent) {
         renderCurve(event)
         val lastNode = path.lastOrNull()?.position ?: return
-        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, true)
+        val eyeIsWater = MinecraftCompat.localPlayer.isInWater
+        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !eyeIsWater && !densePoints.last().isWater && !targetIsWater)
     }
 
     private fun renderCurve(event: SkyHanniRenderWorldEvent) {
         val eyePos = event.exactPlayerEyeLocation()
+        val eyeIsWater = MinecraftCompat.localPlayer.isInWater
         val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
-        val dense = densePositions
+        val dense = densePoints
         val maxDist = curveMaxDist
         if (dense.isEmpty()) return
+
         if (dense.size == 1) {
-            val dirToNode = (dense[0] - eyePos).normalize()
+            val point = dense[0]
+            val nodePos = point.pos
+            val dirToNode = (nodePos - eyePos).normalize()
             val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
-            val scale = anchor.distance(dense[0]) * CONTROL_POINT_SCALE
-            val controlPoint = dense[0] - dirToNode * scale
-            event.draw3DBezier2(anchor, controlPoint, dense[0], color, NEAR_LINE_WIDTH, true)
+            val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
+            val controlPoint = nodePos - dirToNode * scale
+            event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !eyeIsWater && !point.isWater)
             return
         }
 
         val (startPos, nextDenseIdx) = projectOntoPath(dense, eyePos)
-        val walkPositions = listOf(startPos) + dense.drop(nextDenseIdx)
+        val walkPositions: List<LorenzVec> = listOf(startPos) + dense.drop(nextDenseIdx).map { it.pos }
         var totalDist = 0.0
         var curveEndPos: LorenzVec? = null
         var curveTangent = LorenzVec(0.0, 0.0, 1.0)
         var curveNextIdx = nextDenseIdx
+
         for (i in 1..walkPositions.lastIndex) {
-            val segLen = walkPositions[i - 1].distance(walkPositions[i])
+            val segStart = walkPositions[i - 1]
+            val segEnd = walkPositions[i]
+            val segLen = segStart.distance(segEnd)
             val remaining = maxDist - totalDist
             if (segLen >= remaining) {
-                val dir = (walkPositions[i] - walkPositions[i - 1]).normalize()
-                curveEndPos = walkPositions[i - 1] + dir * remaining
+                val dir = (segEnd - segStart).normalize()
+                curveEndPos = segStart + dir * remaining
                 curveTangent = dir
                 curveNextIdx = nextDenseIdx + i - 1
                 break
             }
             totalDist += segLen
-            curveEndPos = walkPositions[i]
-            curveTangent = (walkPositions[i] - walkPositions[i - 1]).normalize()
+            curveEndPos = segEnd
+            curveTangent = (segEnd - segStart).normalize()
             curveNextIdx = nextDenseIdx + i - 1
         }
-
         if (curveEndPos == null) return
+
         val dirToCurve = (curveEndPos - eyePos).normalize()
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(curveEndPos) * CONTROL_POINT_SCALE
         val controlPoint = curveEndPos - curveTangent * scale
-        event.draw3DBezier2(anchor, controlPoint, curveEndPos, color, NEAR_LINE_WIDTH, true)
-        val farPositions = listOf(curveEndPos) + dense.drop(curveNextIdx)
-        if (farPositions.size >= 2) event.draw3DPolyline(farPositions, color, NEAR_LINE_WIDTH, true)
+        val curveEndIsWater = dense[(curveNextIdx - 1).coerceAtLeast(0)].isWater
+        val bezierDepth = !eyeIsWater && !curveEndIsWater
+        event.draw3DBezier2(anchor, controlPoint, curveEndPos, color, NEAR_LINE_WIDTH, bezierDepth)
+        if (curveNextIdx > dense.lastIndex) return
+
+        val firstFar = dense[curveNextIdx]
+        event.draw3DLine(curveEndPos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isWater)
+        for (i in curveNextIdx until dense.lastIndex) {
+            val a = dense[i]
+            val b = dense[i + 1]
+            event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !eyeIsWater && !a.isWater && !b.isWater)
+        }
     }
 
-
-    private fun projectOntoPath(dense: List<LorenzVec>, eyePos: LorenzVec): Pair<LorenzVec, Int> {
+    private fun projectOntoPath(dense: List<DensePoint>, eyePos: LorenzVec): Pair<LorenzVec, Int> {
         var bestDistSq = Double.MAX_VALUE
-        var bestPos = dense[0]
+        var bestPos = dense[0].pos
         var bestNextIdx = 1
         for (i in 0 until dense.lastIndex) {
-            val proj = eyePos.nearestPointOnLine(dense[i], dense[i + 1])
+            val proj = eyePos.nearestPointOnLine(dense[i].pos, dense[i + 1].pos)
             val distSq = eyePos.distanceSq(proj)
             if (distSq < bestDistSq) {
                 bestDistSq = distSq
@@ -132,12 +155,12 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     }
 
     fun updateNearSegment() {
-        val dense = densePositions
+        val dense = densePoints
         val closestIdx = findClosestIndex(dense, playerPosition)
         var totalDist = 0.0
         for (i in (closestIdx + 1)..dense.lastIndex) {
-            if (!dense[i].canBeSeen()) break
-            totalDist += dense[i - 1].distance(dense[i])
+            if (!dense[i].pos.canBeSeen()) break
+            totalDist += dense[i - 1].pos.distance(dense[i].pos)
             if (totalDist >= CURVE_RADIUS) {
                 totalDist = CURVE_RADIUS; break
             }
@@ -166,6 +189,6 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return result
     }
 
-    private fun findClosestIndex(positions: List<LorenzVec>, referencePos: LorenzVec): Int =
-        positions.indices.minBy { positions[it].distance(referencePos) }
+    private fun findClosestIndex(positions: List<DensePoint>, referencePos: LorenzVec): Int =
+        positions.indices.minBy { positions[it].pos.distance(referencePos) }
 }
