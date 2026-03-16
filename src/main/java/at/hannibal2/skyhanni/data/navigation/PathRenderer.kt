@@ -81,33 +81,31 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         val eyePos = event.exactPlayerEyeLocation()
         val eyeIsWater = MinecraftCompat.localPlayer.isInWater
         val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
-        val dense = densePoints
-        val maxDist = curveMaxDist
-        if (dense.isEmpty()) return
+        if (densePoints.isEmpty()) return
 
-        if (dense.size == 1) {
-            renderSingleNodeCurve(event, eyePos, eyeIsWater, anchorY, dense[0])
+        if (densePoints.size == 1) {
+            renderSingleNodeCurve(event, eyePos, eyeIsWater, anchorY, densePoints[0])
             return
         }
 
-        val (startPos, nextDenseIdx) = projectOntoPath(dense, eyePos)
-        val walkPositions: List<LorenzVec> = listOf(startPos) + dense.drop(nextDenseIdx).map { it.pos }
-        val curveEnd = walkToEnd(walkPositions, maxDist, nextDenseIdx) ?: return
+        val (startPos, nextDenseIdx) = projectOntoPath(eyePos)
+        val walkPositions: List<LorenzVec> = listOf(startPos) + densePoints.drop(nextDenseIdx).map { it.pos }
+        val curveEnd = walkToEnd(walkPositions, nextDenseIdx) ?: return
 
         val dirToCurve = (curveEnd.pos - eyePos).normalize()
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(curveEnd.pos) * CONTROL_POINT_SCALE
         val controlPoint = curveEnd.pos - curveEnd.tangent * scale
-        val curveEndIsWater = dense[(curveEnd.nextIdx - 1).coerceAtLeast(0)].isWater
+        val curveEndIsWater = densePoints[(curveEnd.nextIdx - 1).coerceAtLeast(0)].isWater
         val bezierDepth = !eyeIsWater && !curveEndIsWater
         event.draw3DBezier2(anchor, controlPoint, curveEnd.pos, color, NEAR_LINE_WIDTH, bezierDepth)
-        if (curveEnd.nextIdx > dense.lastIndex) return
+        if (curveEnd.nextIdx > densePoints.lastIndex) return
 
-        val firstFar = dense[curveEnd.nextIdx]
+        val firstFar = densePoints[curveEnd.nextIdx]
         event.draw3DLine(curveEnd.pos, firstFar.pos, color, NEAR_LINE_WIDTH, bezierDepth && !firstFar.isWater)
-        for (i in curveEnd.nextIdx until dense.lastIndex) {
-            val a = dense[i]
-            val b = dense[i + 1]
+        for (i in curveEnd.nextIdx until densePoints.lastIndex) {
+            val a = densePoints[i]
+            val b = densePoints[i + 1]
             event.draw3DLine(a.pos, b.pos, color, NEAR_LINE_WIDTH, !eyeIsWater && !a.isWater && !b.isWater)
         }
     }
@@ -121,14 +119,14 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !eyeIsWater && !point.isWater)
     }
 
-    private fun walkToEnd(walkPositions: List<LorenzVec>, maxDist: Double, nextDenseIdx: Int): CurveEnd? {
+    private fun walkToEnd(walkPositions: List<LorenzVec>, nextDenseIdx: Int): CurveEnd? {
         var totalDist = 0.0
         var result: CurveEnd? = null
         for (i in 1..walkPositions.lastIndex) {
             val segStart = walkPositions[i - 1]
             val segEnd = walkPositions[i]
             val segLen = segStart.distance(segEnd)
-            val remaining = maxDist - totalDist
+            val remaining = curveMaxDist - totalDist
             if (segLen >= remaining) {
                 val dir = (segEnd - segStart).normalize()
                 return CurveEnd(segStart + dir * remaining, dir, nextDenseIdx + i - 1)
@@ -139,12 +137,12 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return result
     }
 
-    private fun projectOntoPath(dense: List<DensePoint>, eyePos: LorenzVec): Pair<LorenzVec, Int> {
+    private fun projectOntoPath(eyePos: LorenzVec): Pair<LorenzVec, Int> {
         var bestDistSq = Double.MAX_VALUE
-        var bestPos = dense[0].pos
+        var bestPos = densePoints[0].pos
         var bestNextIdx = 1
-        for (i in 0 until dense.lastIndex) {
-            val proj = eyePos.nearestPointOnLine(dense[i].pos, dense[i + 1].pos)
+        for (i in 0 until densePoints.lastIndex) {
+            val proj = eyePos.nearestPointOnLine(densePoints[i].pos, densePoints[i + 1].pos)
             val distSq = eyePos.distanceSq(proj)
             if (distSq < bestDistSq) {
                 bestDistSq = distSq
