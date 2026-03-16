@@ -18,8 +18,6 @@ import java.awt.Color
 /**
  * TODO
  *
- * IslandGraphs: fix distance calculation for display being off (think of interpolatePathNodes)
- *
  * arrow in direction in 2d user frame space: if close to player point is out of player looking direction/frustum
  *
  * show distance to target 5 blocks in front of path
@@ -41,6 +39,7 @@ private const val ANCHOR_Y_OFFSET = -1.0
 private const val ANCHOR_FORWARD_DIST = 0.7
 
 private const val CONTROL_POINT_SCALE = 0.5
+
 // blocks to look ahead along the path when computing the bezier tangent at the curve endpoint
 private const val TANGENT_LOOKAHEAD = 1.5
 
@@ -68,8 +67,11 @@ private data class CurveEnd(val pos: LorenzVec, val tangent: LorenzVec, val next
  */
 class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: LorenzVec) {
 
-    private val pathPoints: List<PathPoint> = subdividePositions(path.map { it.position.addHalf() }).map { PathPoint(it, it.isWater()) }
+    private val pathPoints: List<PathPoint> =
+        subdividePositions(path.map { it.position.addHalf() }).map { PathPoint(it, it.isWater()) }
     private var nearCurveLength: Double = 0.0
+    var remainingDistance: Double = 0.0
+        private set
 
     fun render(event: SkyHanniRenderWorldEvent) {
         renderPathSegments(event)
@@ -109,13 +111,25 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         }
     }
 
-    private fun renderSingleNodeCurve(event: SkyHanniRenderWorldEvent, eyePos: LorenzVec, anchorY: Double, point: PathPoint) {
+    private fun renderSingleNodeCurve(
+        event: SkyHanniRenderWorldEvent,
+        eyePos: LorenzVec,
+        anchorY: Double,
+        point: PathPoint
+    ) {
         val nodePos = point.pos
         val dirToNode = (nodePos - eyePos).normalize()
         val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
         val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
         val controlPoint = nodePos - dirToNode * scale
-        event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !WorldRenderUtils.isRenderingUnderwater())
+        event.draw3DBezier2(
+            p1 = anchor,
+            control = controlPoint,
+            p3 = nodePos,
+            color = color,
+            lineWidth = NEAR_LINE_WIDTH,
+            depth = !WorldRenderUtils.isRenderingUnderwater()
+        )
     }
 
     private fun walkTangent(walkPositions: List<LorenzVec>, startSegIdx: Int, startPos: LorenzVec): LorenzVec {
@@ -171,6 +185,8 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     fun updateNearSegment() {
         for (point in pathPoints) point.isPeek = false
         val closestIdx = findClosestIndex(pathPoints, playerPosition)
+        remainingDistance = calculateDistance(closestIdx)
+
         var totalDist = 0.0
         for (i in (closestIdx + 1)..pathPoints.lastIndex) {
             if (!pathPoints[i].pos.canBeSeen()) break
@@ -188,6 +204,19 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             val peekEnd = minOf(pathPoints.lastIndex, i + 1 + peekSteps)
             for (j in peekStart..peekEnd) pathPoints[j].isPeek = true
         }
+    }
+
+    private fun calculateDistance(closestIdx: Int): Double {
+        var distance = pathPoints[closestIdx].pos.distance(playerPosition)
+        for (i in closestIdx until pathPoints.lastIndex) {
+            distance += pathPoints[i].pos.distance(pathPoints[i + 1].pos)
+        }
+        return distance + pathPoints.last().pos.distance(targetLocation.addHalf())
+    }
+
+    fun nearestPathDistanceSq(): Double {
+        if (pathPoints.isEmpty()) return Double.MAX_VALUE
+        return pathPoints.minOf { it.pos.distanceSq(playerPosition) }
     }
 
     private fun catmullRomPoint(p0: LorenzVec, p1: LorenzVec, p2: LorenzVec, p3: LorenzVec, t: Double): LorenzVec {

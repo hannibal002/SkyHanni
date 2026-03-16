@@ -108,7 +108,6 @@ object IslandGraphs {
     private const val ON_PATH_MAX_DISTANCE_SQ = 49.0
     private const val FAST_MOVEMENT_THRESHOLD = 20.0
     private const val NEARBY_NODE_CACHE_SIZE = 20
-    private const val PATH_NODE_INTERPOLATION_STEP = 2.0
     private const val DEFAULT_NODE_SEARCH_RADIUS = 100.0
     private val GRAPH_RELOAD_DELAY = 500.milliseconds
     private val CLOSEST_NODE_CACHE_TTL = 1.seconds
@@ -382,11 +381,8 @@ object IslandGraphs {
     }
 
     private fun onCurrentPath(): Boolean {
-        val path = pathRenderer?.path ?: return false
-        if (path.isEmpty()) return false
-        val closest = path.getNearestNode()
-        if (closest.distanceSqToPlayer() > ON_PATH_MAX_DISTANCE_SQ) return false
-        return true
+        val renderer = pathRenderer ?: return false
+        return renderer.nearestPathDistanceSq() <= ON_PATH_MAX_DISTANCE_SQ
     }
 
     private fun findNewPath() {
@@ -438,8 +434,8 @@ object IslandGraphs {
 
     private fun setupPathRenderer(setPath: Boolean = true, nodes: List<GraphNode>) {
         if (setPath) {
-            val graph = Graph(interpolatePathNodes(nodes, PATH_NODE_INTERPOLATION_STEP))
-            pathRenderer = PathRenderer(graph, pathColor, currentTarget ?: error("target is null"))
+            pathRenderer = PathRenderer(Graph(nodes), pathColor, currentTarget ?: error("target is null"))
+            pathRenderer?.updateNearSegment()
         }
         updateNavigationProgress()
     }
@@ -556,15 +552,7 @@ object IslandGraphs {
 
     private fun updateNavigationProgress() {
         if (navigationLabel == "") return
-        val path = pathRenderer?.path ?: return
-        var distance = 0.0
-        if (path.isNotEmpty()) {
-            for ((a, b) in path.zipWithNext()) {
-                distance += a.position.distance(b.position)
-            }
-            distance += path.first().distanceToPlayer()
-            distance = distance.roundTo(1)
-        }
+        val distance = (pathRenderer?.remainingDistance ?: return).roundTo(1)
 
         if (distance == lastDisplayedDistance) return
         lastDisplayedDistance = distance
@@ -589,36 +577,6 @@ object IslandGraphs {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
         pathRenderer?.render(event)
-    }
-
-    // TODO remove once onCurrentPath() and updateFeedback() uses PathRenderer for distance/closest-node logic
-    private fun interpolatePathNodes(nodes: List<GraphNode>, maxDistance: Double): List<GraphNode> {
-        var index = nodes.size * 10
-        val locations = mutableListOf<LorenzVec>()
-        var first = true
-        for (node in nodes) {
-            if (first) {
-                first = false
-            } else {
-                var lastPosition = locations.last()
-                val currentPosition = node.position
-                val vector = (currentPosition - lastPosition).normalize()
-                var distance = lastPosition.distance(currentPosition)
-                while (distance > maxDistance) {
-                    distance -= maxDistance
-                    val nextStepDistance = if (distance < maxDistance / 2) {
-                        (maxDistance + distance) / 2
-                        break
-                    } else maxDistance
-                    val newPosition = lastPosition + (vector * (nextStepDistance))
-                    locations.add(newPosition)
-                    lastPosition = newPosition
-                }
-            }
-            locations.add(node.position)
-        }
-
-        return locations.map { GraphNode(index++, it) }
     }
 
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == navigationLabel
