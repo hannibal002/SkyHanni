@@ -43,7 +43,7 @@ annotation class HandleEvent(
      * If the event should only be received while on an island within specified
      * [IslandTypeTag]s
      */
-    val onlyOnIslandTypeTags: Array<IslandTypeTag> = [],
+    val onlyOnIslandTypeTag: Array<IslandTypeTag> = [],
 
     /**
      * If the event should only be received while being on specific skyblock islands.

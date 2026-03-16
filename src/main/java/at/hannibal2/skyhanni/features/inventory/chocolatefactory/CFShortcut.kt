@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -41,7 +41,7 @@ object CFShortcut {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (IslandTypeTags.HOPPITY_DISALLOWED.inAny()) return
+        if (IslandTypeTag.HOPPITY_DISALLOWED.isInIsland()) return
         showItem = config.hoppityMenuShortcut && event.inventoryName == "SkyBlock Menu"
     }
 

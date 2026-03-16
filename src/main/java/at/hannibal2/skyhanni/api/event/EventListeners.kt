@@ -116,7 +116,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                 options.onlyOnIslands.takeIfNotEmpty()?.let { islands ->
                     add { _ -> islands.toList().isInAnyIsland() }
                 }
-                options.onlyOnIslandTypeTags.takeIfNotEmpty()?.let { tags ->
+                options.onlyOnIslandTypeTag.takeIfNotEmpty()?.let { tags ->
                     add { _ -> tags.any { it.isInIsland() } }
                 }
             }

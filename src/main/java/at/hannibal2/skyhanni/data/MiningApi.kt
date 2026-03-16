@@ -209,7 +209,7 @@ object MiningApi {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (IslandTypeTags.IS_COLD.inAny()) {
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
@@ -246,7 +246,7 @@ object MiningApi {
 
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         val now = SimpleTimeMark.now()
@@ -257,8 +257,8 @@ object MiningApi {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (IslandTypeTags.IS_COLD.inAny()) {
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
                 updateCold(0)
                 lastColdReset = SimpleTimeMark.now()
@@ -297,7 +297,7 @@ object MiningApi {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.soundName == "entity.generic.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
             lastPickobulusExplosion = SimpleTimeMark.now()
             pickobulusExplosionPos = event.location
@@ -341,7 +341,7 @@ object MiningApi {
 
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         val oldState = event.oldState
         val newState = event.newState
         val oldBlock = oldState.block
@@ -385,7 +385,7 @@ object MiningApi {
 
     @HandleEvent
     fun onTick() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 10 seconds to mine a single block, congrats
@@ -404,7 +404,7 @@ object MiningApi {
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
     fun onAreaChange() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
     }
 
@@ -480,7 +480,7 @@ object MiningApi {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining API")
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) {
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) {
             event.addIrrelevant("not in a mining island")
             return
         }

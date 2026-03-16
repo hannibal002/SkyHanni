@@ -242,7 +242,7 @@ object HypixelData {
             }
         }
 
-        if (!IslandTypeTags.PERSONAL_ISLAND.inAny()) {
+        if (!IslandTypeTag.PERSONAL_ISLAND.isInIsland()) {
             playerAmountOnIsland = 0
         }
 
