@@ -115,9 +115,9 @@ object RenderUtils {
     }
 
     private fun highlight(color: Color, x: Int, y: Int) {
-        DrawContextUtils.pushMatrix()
-        GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
+        }
     }
 
     fun Slot.drawBorder(color: LorenzColor) {
@@ -137,12 +137,12 @@ object RenderUtils {
     }
 
     fun drawBorder(color: Color, x: Int, y: Int) {
-        DrawContextUtils.pushMatrix()
-        GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
-        GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
-        GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
-        GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
+            GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
+            GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
+            GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
+        }
     }
 
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
@@ -167,23 +167,23 @@ object RenderUtils {
     @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
     private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
         val display = "§f$string"
-        DrawContextUtils.pushMatrix()
-        transform()
-        val fr = Minecraft.getInstance().font
+        val font = Minecraft.getInstance().font
+        DrawContextUtils.pushPop {
+            transform()
 
-        DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0)
+            DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0)
 
-        if (centered) {
-            val strLen: Int = fr.width(string)
-            val x2 = offsetX - strLen / 2f
-            GuiRenderUtils.drawString(display, x2, 0f, -1)
-        } else {
-            GuiRenderUtils.drawString(display, 0f, 0f, -1)
+            if (centered) {
+                val strLen: Int = font.width(string)
+                val x2 = offsetX - strLen / 2f
+                GuiRenderUtils.drawString(display, x2, 0f, -1)
+            } else {
+                GuiRenderUtils.drawString(display, 0f, 0f, -1)
+            }
+
         }
 
-        DrawContextUtils.popMatrix()
-
-        return fr.width(display)
+        return font.width(display)
     }
 
     @Deprecated("Use renderRenderables instead", ReplaceWith("renderRenderables(renderables)"))
@@ -212,16 +212,15 @@ object RenderUtils {
         var longestY = 0
         val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
-            DrawContextUtils.pushMatrix()
-            val (x, y) = transform()
-            DrawContextUtils.translate(0f, longestY.toFloat())
-            Renderable.withMousePosition(x, y) {
-                line.renderXAligned(0, longestY, longestX)
+            DrawContextUtils.pushPop {
+                val (x, y) = transform()
+                DrawContextUtils.translate(0f, longestY.toFloat())
+                Renderable.withMousePosition(x, y) {
+                    line.renderXAligned(0, longestY, longestX)
+                }
+
+                longestY += line.height + extraSpace + 2
             }
-
-            longestY += line.height + extraSpace + 2
-
-            DrawContextUtils.popMatrix()
         }
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
@@ -234,12 +233,12 @@ object RenderUtils {
         // cause crashes and errors on purpose
         DrawContextUtils.drawContext
         if (renderable == null) return
-        DrawContextUtils.pushMatrix()
-        val (x, y) = transform()
-        Renderable.withMousePosition(x, y) {
-            renderable.render(0, 0)
+        DrawContextUtils.pushPop {
+            val (x, y) = transform()
+            Renderable.withMousePosition(x, y) {
+                renderable.render(0, 0)
+            }
         }
-        DrawContextUtils.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
