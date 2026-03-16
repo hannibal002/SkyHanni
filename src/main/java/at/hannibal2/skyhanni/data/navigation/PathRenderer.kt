@@ -17,8 +17,6 @@ import java.awt.Color
 /**
  * TODO
  *
- * bug: sometimes disappears entirely for a frame
- * bug: does not show up immediately on start, only after node move
  * improvement: corners are too sharp, smooth them
  * block at target is gone
  * jump all 2 blocks/per node
