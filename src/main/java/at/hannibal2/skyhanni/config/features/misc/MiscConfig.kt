@@ -106,10 +106,11 @@ class MiscConfig {
     @Accordion
     val bits: BitsConfig = BitsConfig()
 
+    // TODO rename to coordsWaypoint
     @Expose
-    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @ConfigOption(name = "Coords Waypoints", desc = "")
     @Accordion
-    val patcherCoordsWaypoint: PatcherCoordsWaypointConfig = PatcherCoordsWaypointConfig()
+    val patcherCoordsWaypoint: CoordsWaypointConfig = CoordsWaypointConfig()
 
     @Expose
     @ConfigOption(name = "Reminders", desc = "")
