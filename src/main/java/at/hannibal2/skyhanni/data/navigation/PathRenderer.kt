@@ -18,8 +18,6 @@ import java.awt.Color
 /**
  * TODO
  *
- * bug: jump all 2 blocks/per node
- *
  * IslandGraphs: rename all functions and members to be more logical/explain what they do
  * IslandGraphs: magic numbers
  * IslandGraphs: fix distance calculation for display being off
@@ -45,6 +43,8 @@ private const val ANCHOR_Y_OFFSET = -1.0
 private const val ANCHOR_FORWARD_DIST = 0.7
 
 private const val CONTROL_POINT_SCALE = 0.5
+// blocks to look ahead along the path when computing the bezier tangent at the curve endpoint
+private const val TANGENT_LOOKAHEAD = 1.5
 
 private const val NEAR_LINE_WIDTH = 6
 private const val FAR_LINE_WIDTH = 4
@@ -120,6 +120,22 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         event.draw3DBezier2(anchor, controlPoint, nodePos, color, NEAR_LINE_WIDTH, !WorldRenderUtils.isRenderingUnderwater())
     }
 
+    private fun walkTangent(walkPositions: List<LorenzVec>, startSegIdx: Int, startPos: LorenzVec): LorenzVec {
+        var remaining = TANGENT_LOOKAHEAD
+        var prev = startPos
+        for (i in startSegIdx until walkPositions.size) {
+            val next = walkPositions[i]
+            val d = prev.distance(next)
+            if (d >= remaining) {
+                return (prev + (next - prev).normalize() * remaining - startPos).normalize()
+            }
+            remaining -= d
+            prev = next
+        }
+        return if (prev.distanceSq(startPos) > 0.0001) (prev - startPos).normalize()
+        else (walkPositions.last() - walkPositions[walkPositions.lastIndex - 1]).normalize()
+    }
+
     private fun walkToEnd(walkPositions: List<LorenzVec>, nextDenseIdx: Int): CurveEnd? {
         var totalDist = 0.0
         var result: CurveEnd? = null
@@ -129,8 +145,8 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             val segLen = segStart.distance(segEnd)
             val remaining = curveMaxDist - totalDist
             if (segLen >= remaining) {
-                val dir = (segEnd - segStart).normalize()
-                return CurveEnd(segStart + dir * remaining, dir, nextDenseIdx + i - 1)
+                val endPos = segStart + (segEnd - segStart).normalize() * remaining
+                return CurveEnd(endPos, walkTangent(walkPositions, i, endPos), nextDenseIdx + i - 1)
             }
             totalDist += segLen
             result = CurveEnd(segEnd, (segEnd - segStart).normalize(), nextDenseIdx + i - 1)
