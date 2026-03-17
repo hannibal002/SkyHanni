@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.api.minecraftevents
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
+import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -56,6 +59,13 @@ object ClientEvents {
             },
         )
 
+        // Connect event
+        ClientPlayConnectionEvents.JOIN.register(
+            ClientPlayConnectionEvents.Join { _, _, _ ->
+                ClientConnectEvent.post()
+            },
+        )
+
         // World change event
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(
             ClientWorldEvents.AfterClientWorldChange { client, world ->
@@ -88,6 +98,7 @@ object ClientEvents {
         ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
         ClientReceiveMessageEvents.GAME_CANCELED.register(::onCanceled)
 
+        ClientLifecycleEvents.CLIENT_STOPPING.register { ClientShutdownEvent.post() }
     }
 
     var currentMessage: Component? = null
@@ -129,7 +140,7 @@ object ClientEvents {
                     TextHelper.createGradientText(
                         ColorUtils.getRandomColor(),
                         ColorUtils.getRandomColor(),
-                        message.string.removeColor()
+                        message.string.removeColor(),
                     )
                 } else {
                     message
@@ -139,7 +150,7 @@ object ClientEvents {
                     TextHelper.createGradientText(
                         ColorUtils.getRandomColor(),
                         ColorUtils.getRandomColor(),
-                        result.string.removeColor()
+                        result.string.removeColor(),
                     )
                 } else {
                     result

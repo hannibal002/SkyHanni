@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import java.awt.Color
 
@@ -21,7 +22,7 @@ object GraphEditorBugFinder {
     private var errorsInWorld = emptyMap<GraphNode, String>()
 
     fun runTests() {
-        SkyHanniMod.launchCoroutine("graph editor bug finder") {
+        CoroutineConfig("graph editor bug finder").launchCoroutine {
             asyncTest()
         }
     }
@@ -33,30 +34,11 @@ object GraphEditorBugFinder {
         checkConflictingTags(graph, errorsInWorld)
         checkConflictingAreas(graph, errorsInWorld)
         checkMissingData(graph, errorsInWorld)
-        val clusters = checkDisjointClusters(graph, errorsInWorld)
 
         this.errorsInWorld = errorsInWorld
-        if (clusters.size <= 1) {
-            errorsInWorld.keys.minByOrNull {
-                it.distanceSqToPlayer()
-            }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
-        }
-    }
-
-    private fun checkDisjointClusters(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>): List<Set<GraphNode>> {
-        val clusters = GraphUtils.findDisjointClusters(graph)
-        if (clusters.size <= 1) return clusters
-
-        val closestCluster = clusters.minBy { cluster -> cluster.minOf { it.distanceSqToPlayer() } }
-        val foreignClusters = clusters.filter { it !== closestCluster }
-        val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.distanceSqToPlayer() } }
-        closestForeignNodes.forEach {
-            errorsInWorld[it] = "§cDisjoint node network"
-        }
-        val closestForeignNode = closestForeignNodes.minBy { it.distanceSqToPlayer() }
-        val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-        closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
-        return clusters
+        errorsInWorld.keys.minByOrNull {
+            it.distanceSqToPlayer()
+        }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
     }
 
     private fun checkMissingData(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {

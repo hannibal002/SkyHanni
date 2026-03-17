@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -32,43 +33,43 @@ object CakeCounterFeatures {
     private val patternGroup = RepoPattern.group("misc.cakecounter")
 
     /**
-     * REGEX-TEST: §7You placed a §r§eCake Counter§r§7. §r§7(9/15)
+     * REGEX-TEST: You placed a Cake Counter. (9/15)
      */
     private val cakeCounterPlacedPattern by patternGroup.pattern(
-        "placed",
-        "§7You placed a §r§eCake Counter§r§7\\. §r§7\\([\\d\\/]+\\)",
+        "placed.colorless",
+        "You placed a Cake Counter\\. \\([\\d\\/]+\\)",
     )
 
     /**
-     * REGEX-TEST: §7You removed a §r§eCake Counter§r§7. (4/15)
+     * REGEX-TEST: You removed a Cake Counter. (4/15)
      */
     private val cakeCounterRemovedPattern by patternGroup.pattern(
-        "removed",
-        "§7You removed a §r§eCake Counter§r§7\\. \\([\\d\\/]+\\)",
+        "removed.colorless",
+        "You removed a Cake Counter\\. \\([\\d\\/]+\\)",
     )
 
     /**
-     * REGEX-TEST: Cakes Eaten: §d9,453,416
+     * REGEX-TEST: Cakes Eaten: 9,453,416
      */
     private val cakesEatenPattern by patternGroup.pattern(
-        "cakeseaten",
-        "Cakes Eaten: §d(?<cakes>[\\d,]+)",
+        "cakeseaten.colorless",
+        "Cakes Eaten: (?<cakes>[\\d,]+)",
     )
 
     /**
-     * REGEX-TEST: Souls Found: §b9,341
+     * REGEX-TEST: Souls Found: 9,341
      */
     private val soulsFoundPattern by patternGroup.pattern(
-        "soulsfound",
-        "Souls Found: §b(?<souls>[\\d,]+)",
+        "soulsfound.colorless",
+        "Souls Found: (?<souls>[\\d,]+)",
     )
 
     /**
-     * REGEX-TEST: §eYou found a §r§dCake Soul§r§e!
+     * REGEX-TEST: You found a Cake Soul!
      */
     private val cakeSoulFoundPattern by RepoPattern.pattern(
-        "misc.cakesoul.found",
-        "§eYou found a §r§dCake Soul§r§e!",
+        "misc.cakesoul.found.colorless",
+        "You found a Cake Soul!",
     )
 
     private val config get() = SkyHanniMod.feature.misc.cakeCounter
@@ -138,7 +139,7 @@ object CakeCounterFeatures {
     private fun checkForSoulsStand(cakesStand: ArmorStand) {
         if (soulsFoundEntityId != null) return // in case it was found during DelayedRun time
 
-        val nearbyArmorStands = EntityUtils.getEntitiesNearby<ArmorStand>(cakesStand.blockPosition().toLorenzVec(), 1.0)
+        val nearbyArmorStands = cakesStand.blockPosition().toLorenzVec().getEntitiesNearby<ArmorStand>(1.0)
         soulsStandExists = nearbyArmorStands.any { armorStand ->
             soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompatLessResets()) {
                 soulsFoundEntityId = armorStand.id
@@ -205,11 +206,11 @@ object CakeCounterFeatures {
         }
 
         val cakesMessage = cakesDifference?.let {
-            "ate §d${it.addSeparators()}§e ${StringUtils.pluralize(it, "Century Cake")}"
+            "ate ${it.addSeparators()} ${StringUtils.pluralize(it, "Century Cake")}"
         }
 
         val soulsMessage = soulsDifference?.let {
-            "found §b${it.addSeparators()}§e ${StringUtils.pluralize(it, "Cake Soul")}"
+            "found ${it.addSeparators()} ${StringUtils.pluralize(it, "Cake Soul")}"
         }
 
         when (config.offlineStatsMode) {
@@ -226,11 +227,11 @@ object CakeCounterFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (cakeSoulFoundPattern.matches(event.message)) {
+        if (cakeSoulFoundPattern.matches(event.cleanMessage)) {
             lastSoulFoundBySelf = SimpleTimeMark.now()
         }
 
-        if (cakeCounterRemovedPattern.matches(event.message)) {
+        if (cakeCounterRemovedPattern.matches(event.cleanMessage)) {
             cakesEatenEntityId?.let {
                 if (EntityUtils.getEntityByID(it) == null) {
                     cakesEatenEntityId = null
@@ -246,7 +247,7 @@ object CakeCounterFeatures {
         }
 
         if (config.offlineStatsMode != OfflineStatsMode.DISABLED) return
-        if (cakeCounterPlacedPattern.matches(event.message)) {
+        if (cakeCounterPlacedPattern.matches(event.cleanMessage)) {
             DelayedRun.runNextTick {
                 ChatUtils.chatAndOpenConfig(
                     "Click here to be notified of any stat changes on your Cake Counter every time you rejoin your Private Island.",

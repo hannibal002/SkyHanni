@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.misc.trevor
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -30,8 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -134,6 +135,7 @@ object TrevorFeatures {
 
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
+            TalbotCircles.resetCircles()
             if (config.mobDiedMessage) {
                 lastTitle?.stop()
                 lastTitle = TitleManager.sendTitle("§2Mob Died")
@@ -163,11 +165,15 @@ object TrevorFeatures {
 
         talbotPatternAbove.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
+            val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, true)
+            TalbotCircles.addResult(height, angle)
         }
         talbotPatternBelow.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
+            val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, false)
+            TalbotCircles.addResult(-height, angle)
         }
         talbotPatternAt.matchMatcher(formattedMessage) {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
@@ -187,6 +193,42 @@ object TrevorFeatures {
                 }
             }
         }
+    }
+
+    @HandleEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        var found = false
+        var active = false
+        val previousLocation = TrevorSolver.mobLocation
+        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
+        event.tabList.forEach { line ->
+            val formattedLine = line.string.drop(1)
+            if (formattedLine.startsWith("Time Left: ")) {
+                trapperReady = false
+                currentStatus = TrapperStatus.ACTIVE
+                currentLabel = "§cActive Quest"
+                active = true
+            }
+
+            TrapperMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
+                TrevorSolver.mobLocation = it
+                found = true
+            }
+            locationPattern.matchMatcher(formattedLine) {
+                val zone = group("zone")
+                TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone } ?: TrapperMobArea.NONE
+                found = true
+            }
+        }
+        if (!found) TrevorSolver.mobLocation = TrapperMobArea.NONE
+
+        if (!active) trapperReady = true
+        else inBetweenQuests = true
+
+        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
+            TrevorSolver.mobLocation = previousLocation
+        }
+        questActive = active
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
@@ -221,40 +263,6 @@ object TrevorFeatures {
             currentStatus = TrapperStatus.READY
             currentLabel = "§2Ready"
         }
-
-        var found = false
-        var active = false
-        val previousLocation = TrevorSolver.mobLocation
-        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
-        for (line in TabListData.getTabList()) {
-            val formattedLine = line.removeColor().drop(1)
-            if (formattedLine.startsWith("Time Left: ")) {
-                trapperReady = false
-                currentStatus = TrapperStatus.ACTIVE
-                currentLabel = "§cActive Quest"
-                active = true
-            }
-
-            TrapperMobArea.entries.firstOrNull { it.location == formattedLine }?.let {
-                TrevorSolver.mobLocation = it
-                found = true
-            }
-            locationPattern.matchMatcher(formattedLine) {
-                val zone = group("zone")
-                TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone } ?: TrapperMobArea.NONE
-                found = true
-            }
-        }
-        if (!found) TrevorSolver.mobLocation = TrapperMobArea.NONE
-        if (!active) {
-            trapperReady = true
-        } else {
-            inBetweenQuests = true
-        }
-        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
-            TrevorSolver.mobLocation = previousLocation
-        }
-        questActive = active
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
@@ -265,7 +273,7 @@ object TrevorFeatures {
             // Solve for the fact that Moby also has the same ID as the Trapper
             val entityMob = MobData.entityToMob[entityTrapper] ?: return
             if (entityMob.name == "Moby") return
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
+            RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color) {
                 config.cooldown
             }
             entityTrapper.getLorenzVec().let {
@@ -275,6 +283,8 @@ object TrevorFeatures {
             }
         }
 
+        var mobFound = false
+
         if (config.solver) {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
@@ -282,6 +292,7 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
+                mobFound = true
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
@@ -290,6 +301,10 @@ object TrevorFeatures {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
             }
+        }
+
+        if (config.talbotCircles && !mobFound) {
+            TalbotCircles.drawCircles(event)
         }
     }
 
@@ -324,6 +339,7 @@ object TrevorFeatures {
 
     private fun resetTrapper() {
         TrevorSolver.resetLocation()
+        TalbotCircles.resetCircles()
         currentStatus = TrapperStatus.READY
         currentLabel = "§2Ready"
         questActive = false
@@ -360,5 +376,14 @@ object TrevorFeatures {
         event.move(95, "$base.trapperReadyTitle", "$base.readyTitle")
         event.move(95, "$base.trapperCooldownGui", "$base.cooldownGui")
         event.move(95, "$base.trapperCooldownGuiPosition", "$base.cooldownGuiPosition")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcleartalbotcircles") {
+            description = "Clears Talbot circles"
+            category = CommandCategory.USERS_RESET
+            simpleCallback { TalbotCircles.resetCircles() }
+        }
     }
 }

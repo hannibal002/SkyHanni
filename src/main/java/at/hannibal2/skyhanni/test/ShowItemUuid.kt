@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -13,7 +12,7 @@ object ShowItemUuid {
 
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
-        if (!SkyHanniMod.feature.dev.debug.showItemUuid) return
+        if (!DevApi.config.debug.showItemUuid) return
         event.itemStack.getItemUuid()?.let {
             event.toolTip.add("§7Item UUID: '$it'")
         }

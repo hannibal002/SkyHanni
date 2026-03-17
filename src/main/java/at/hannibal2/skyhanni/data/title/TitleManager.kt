@@ -94,6 +94,9 @@ object TitleManager {
         override fun toString() = displayName
     }
 
+    /**
+     * always combine this with notifyOrDisable!
+     */
     fun <E : Enum<E>> sendTitle(
         titleText: String,
         subtitleText: String? = null,

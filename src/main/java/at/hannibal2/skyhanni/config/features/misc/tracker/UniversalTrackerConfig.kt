@@ -1,11 +1,18 @@
 package at.hannibal2.skyhanni.config.features.misc.tracker
 
-import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig.TrackerSync.setUseUniversalConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.GenericIndividualTrackerConfig.TrackerSync.syncAllTrackers
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig.TrackerSync.setUseUniversalConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig.TrackerSync.syncAllTrackers
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class UniversalTrackerConfig : ItemTrackerGenericConfig() {
+    @Expose
+    @ConfigOption(name = "Timed Tracker", desc = "Timed Tracker Settings")
+    @Accordion
+    val timedTracker: TimedTrackerConfig = TimedTrackerConfig()
+
     @ConfigOption(
         name = "Use Universal Settings",
         desc = "Sets the \"Use Universal Settings\" option in all tracker configs to True."

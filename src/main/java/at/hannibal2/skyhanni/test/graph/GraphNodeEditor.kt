@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -43,7 +46,7 @@ object GraphNodeEditor {
     private fun doRender() {
         if (!isEnabled()) return
 
-        config.namedNodesList.renderRenderables(
+        GraphEditor.config.namedNodesList.renderRenderables(
             getNodeNames(),
             posLabel = "Graph Nodes List",
         )
@@ -76,6 +79,7 @@ object GraphNodeEditor {
                 add(list.buildSearchableScrollable(height, textInput, scrollValueNodes, velocity = 10.0))
             }
         }
+        updateDisabledNames()
     }
 
     private fun updateToggleTags() {
@@ -255,7 +259,43 @@ object GraphNodeEditor {
         },
     ).toSearchable(name)
 
-    fun isEnabled() = GraphEditor.isEnabled()
-    private val config get() = GraphEditor.config
+    private var disabledLocations = setOf<LorenzVec>()
 
+    fun handleDisabled(graph: Graph) {
+        val newDisabled = mutableSetOf<LorenzVec>()
+        for (node in graph) {
+            if (!node.enabled) {
+                newDisabled.add(node.position)
+            }
+        }
+
+        disabledLocations = newDisabled
+        updateDisabledNames()
+    }
+
+    private fun updateDisabledNames() {
+        for (node in state.nodes) {
+            node.enabled = node.position !in disabledLocations
+        }
+    }
+
+    fun getWeight() {
+        val node = state.activeNode ?: run {
+            ChatUtils.userError("No node selected!")
+            return
+        }
+        ChatUtils.chat("Extra weight of this node: §e${node.extraWeight}")
+    }
+
+    fun setWeight(weight: Int) {
+        val node = state.activeNode ?: run {
+            ChatUtils.userError("No node selected!")
+            return
+        }
+        GraphEditorHistory.save("set weight ${node.id}")
+        node.extraWeight = weight
+        ChatUtils.chat("Set extra weight to §e$weight§e.")
+    }
+
+    private fun isEnabled() = GraphEditor.isEnabled()
 }

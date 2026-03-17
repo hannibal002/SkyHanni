@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -165,7 +164,14 @@ object MiningApi {
 
     val blockStrengths = mutableMapOf<OreBlock, Int>()
 
-    private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb", "block.metal.place")
+    private val allowedSoundNames = setOf(
+        "block.glass.break",
+        "block.stone.break",
+        "block.gravel.break",
+        "block.wool.break",
+        "entity.experience_orb.pickup",
+        "block.metal.place",
+    )
 
     var heat: Int = 0
         private set
@@ -280,8 +286,8 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onPlayerDeath(event: PlayerDeathEvent) {
-        if (event.name == PlayerUtils.getName()) {
+    fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
+        if (event.isSelf) {
             updateCold(0)
             updateHeat(0)
             lastColdReset = SimpleTimeMark.now()
@@ -292,7 +298,7 @@ object MiningApi {
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (event.soundName == "random.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
+        if (event.soundName == "entity.generic.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
             lastPickobulusExplosion = SimpleTimeMark.now()
             pickobulusExplosionPos = event.location
             pickobulusWaitingForSound = true
@@ -305,7 +311,7 @@ object MiningApi {
             return
         }
         if (waitingForInitSound) {
-            if (event.soundName != "random.orb") {
+            if (event.soundName != "entity.experience_orb.pickup") {
                 if (event.pitch != 0.7936508f) return
                 val pos = event.location.roundToBlock()
                 if (!recentClickedBlocks.containsKey(pos)) return
@@ -541,8 +547,9 @@ object MiningApi {
 
         blockStrengths.clear()
         repo.blockStrengths.forEach { (key, value) ->
-            val ore = OreBlock.getByNameOrNull(key) ?: return@forEach
-            blockStrengths[ore] = value
+            OreBlock.getByNameOrNull(key)?.let { ore ->
+                blockStrengths[ore] = value
+            }
         }
     }
 }

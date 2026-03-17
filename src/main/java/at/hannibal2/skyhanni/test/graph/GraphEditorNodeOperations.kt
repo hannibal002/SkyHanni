@@ -1,16 +1,11 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 
 object GraphEditorNodeOperations {
-
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
@@ -54,8 +49,7 @@ object GraphEditorNodeOperations {
     }
 
     fun handleDissolve() {
-        if (!state.dissolvePossible || !config.dissolveKey.isKeyClicked()) return
-
+        if (!state.dissolvePossible) return
         val activeNode = state.activeNode ?: return
 
         GraphEditor.feedBackInTutorial("Dissolved the node, now it is gone.")
@@ -94,7 +88,7 @@ object GraphEditorNodeOperations {
     }
 
     fun handleConnect() {
-        if (state.activeNode == state.closestNode || !config.connectKey.isKeyClicked()) return
+        if (state.activeNode == state.closestNode) return
         val edge = GraphEditor.state.getEdgeIndex(state.activeNode, state.closestNode)
         if (edge == null) {
             GraphEditorHistory.save("added edge")

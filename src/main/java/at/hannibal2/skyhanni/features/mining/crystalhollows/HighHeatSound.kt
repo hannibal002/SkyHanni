@@ -16,7 +16,7 @@ object HighHeatSound {
         if (!isEnabled()) return
         if (LocationUtils.playerLocation().y > 65.0 || MiningApi.heat < 90) return
 
-        if (event.soundName == "mob.wolf.panting" && event.pitch == 0.0f && event.volume == 1.0f) event.cancel()
+        if (event.soundName == "entity.wolf.pant" && event.pitch == 0.0f && event.volume == 1.0f) event.cancel()
     }
 
     private fun isEnabled() = config.muteHighHeat && MiningApi.inCrystalHollows()

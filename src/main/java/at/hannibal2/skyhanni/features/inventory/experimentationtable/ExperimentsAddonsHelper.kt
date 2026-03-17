@@ -51,7 +51,7 @@ object ExperimentsAddonsHelper {
     private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
-    private var chronHasBeenEmpty: Boolean = false
+    private var chronHasBeenEmpty: Boolean = true
     private var lastChronomatronSound: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentAddonPhase: HelperPhase? = null
     private var chronomatronSequenceIndex: Int = 0
@@ -105,7 +105,7 @@ object ExperimentsAddonsHelper {
         chronomatronSequenceIndex = 0
         lastChronomatronSound = SimpleTimeMark.farPast()
         currentAddonPhase = null
-        chronHasBeenEmpty = false
+        chronHasBeenEmpty = true
     }
 
     private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.string.removeColor()) {
@@ -231,7 +231,7 @@ object ExperimentsAddonsHelper {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!ExperimentationTableApi.inChronomatron) return
         // This sound indicates when the player has finished a round in chronomatron
-        if (event.soundName != "random.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
+        if (event.soundName != "entity.player.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
         lastChronomatronSound = SimpleTimeMark.now()
     }
 
@@ -342,6 +342,7 @@ object ExperimentsAddonsHelper {
                     if (ExperimentationTableApi.inChronomatron) {
                         addString("Current Round: $currentChronomatronRound")
                         addString("Current Sequence Index: $chronomatronSequenceIndex")
+                        addString("chronHasBeenEmpty: $chronHasBeenEmpty")
                         add(Renderable.emptyText())
                         addString("Hypixel Data:")
                         addString(formatColorSet(hypixelChronomatronData))

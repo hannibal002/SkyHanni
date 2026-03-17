@@ -1,31 +1,38 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+import net.minecraft.client.player.LocalPlayer
 import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GraphEditorInput {
 
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = GraphEditor.config
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 
@@ -36,6 +43,7 @@ object GraphEditorInput {
     private val closestNode get() = state.closestNode
     private val selectedEdge get() = state.selectedEdge
 
+    @Suppress("ReturnCount")
     fun input() {
         if (handleUndoRedo()) return
 
@@ -56,28 +64,40 @@ object GraphEditorInput {
             return
         }
         if (handleLoad()) return
-        handleClear()
+        if (handleClear()) return
         if (config.placeKey.isKeyClicked()) {
             GraphEditorNodeOperations.addNode()
+            return
         }
-        handleSelect()
-        handleRayCast()
-        GraphEditorNodeOperations.handleConnect()
-        handleThroughBlocks()
+        if (handleSelect()) return
+        if (handleRayCast()) return
+
+        if (config.connectKey.isKeyClicked()) {
+            GraphEditorNodeOperations.handleConnect()
+            return
+        }
+        if (handleThroughBlocks()) return
         if (config.dijkstraKey.isKeyClicked()) {
+            ChatUtils.debug("testDijkstra")
             GraphEditor.feedBackInTutorial("Calculated shortest route and cleared active node.")
             testDijkstra()
+            return
         }
         if (config.tutorialKey.isKeyClicked()) {
             state.inTutorialMode = !state.inTutorialMode
             ChatUtils.chat("Tutorial mode is now ${if (state.inTutorialMode) "active" else "inactive"}.")
+            return
         }
         val selectedEdge = selectedEdge
         if (selectedEdge != null) {
             handleSplit(selectedEdge)
             handleEdgeCycle(selectedEdge)
         }
-        GraphEditorNodeOperations.handleDissolve()
+
+        if (config.dissolveKey.isKeyClicked()) {
+            GraphEditorNodeOperations.handleDissolve()
+            return
+        }
     }
 
     private fun handleText(): Boolean {
@@ -109,24 +129,28 @@ object GraphEditorInput {
         state.activeNode = node
     }
 
-    private fun handleThroughBlocks() {
-        if (!config.throughBlocksKey.isKeyClicked()) return
+    private fun handleThroughBlocks(): Boolean {
+        if (!config.throughBlocksKey.isKeyClicked()) return false
+        ChatUtils.debug("handleThroughBlocks")
         state.seeThroughBlocks = !state.seeThroughBlocks
         GraphEditor.feedBackInTutorial(
             if (state.seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
         )
+
+        return true
     }
 
-    private fun handleClear() {
-        if (!config.clearKey.isKeyClicked()) return
+    private fun handleClear(): Boolean {
+        if (!config.clearKey.isKeyClicked()) return false
         val json = GraphEditorIO.compileGraph().toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard and cleared the graph.")
         GraphEditor.clear()
+        return true
     }
 
-    private fun handleSelect() {
-        if (!config.selectKey.isKeyClicked()) return
+    private fun handleSelect(): Boolean {
+        if (!config.selectKey.isKeyClicked()) return false
         state.activeNode = if (state.activeNode == closestNode) {
             GraphEditor.feedBackInTutorial("De-selected active node.")
             null
@@ -134,6 +158,7 @@ object GraphEditorInput {
             GraphEditor.feedBackInTutorial("Selected new active node.")
             closestNode
         }
+        return true
     }
 
     private fun handleUndoRedo(): Boolean {
@@ -150,8 +175,8 @@ object GraphEditorInput {
         return false
     }
 
-    private fun handleRayCast() {
-        if (!config.selectRaycastKey.isKeyClicked()) return
+    private fun handleRayCast(): Boolean {
+        if (!config.selectRaycastKey.isKeyClicked()) return false
         val playerRay = RaycastUtils.createPlayerLookDirectionRay()
         var minimumDistance = Double.MAX_VALUE
         var minimumNode: GraphingNode? = null
@@ -172,6 +197,7 @@ object GraphEditorInput {
             }
         }
         state.activeNode = minimumNode
+        return true
     }
 
     private fun handleLoad(): Boolean {
@@ -179,14 +205,15 @@ object GraphEditorInput {
 
         val json = OSUtils.readFromClipboard() ?: return true
 
-        SkyHanniMod.launchIOCoroutine("load graph json") {
+        CoroutineConfig("load graph json").launchCoroutine {
             try {
                 val graph = Graph.fromJson(json)
                 val newState = GraphEditorIO.createStateFrom(graph)
 
-                Minecraft.getInstance().execute {
+                DelayedRun.runOrNextTick {
                     GraphEditorHistory.save("load from clipboard")
                     GraphEditor.state = newState
+                    GraphEditorNetworks.recalculate()
                     ChatUtils.chat("Loaded Graph from clipboard.")
                 }
             } catch (e: Exception) {
@@ -241,33 +268,39 @@ object GraphEditorInput {
         }
     }
 
+    private var moveToStart: LorenzVec? = null
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        if (!event.isLocalPlayer) return
+        val location = moveToStart ?: return
+        if (!GraphEditor.isEnabled()) {
+            moveToStart = null
+            return
+        }
+        if (location.distanceSqToPlayer() < 100) return
+
+        IslandGraphs.pathFind(
+            location,
+            "Graph Test",
+            condition = { GraphEditor.isEnabled() },
+        )
+        moveToStart = null
+    }
+
     private fun testDijkstra() {
-        val savedCurrentPos = state.closestNode?.position ?: return
-        val savedActivePos = state.activeNode?.position ?: return
-
-        val compiled = GraphEditorIO.compileGraph()
-        val newState = GraphEditorIO.createStateFrom(compiled)
-
-        val current = compiled.firstOrNull { it.position == savedCurrentPos } ?: return
-        val goal = compiled.firstOrNull { it.position == savedActivePos } ?: return
-
-        val path = GraphUtils.findShortestPathAsGraph(current, goal)
-
-        if (path.isEmpty()) {
-            ChatUtils.chat("No Path found")
+        val location = state.activeNode?.position ?: return
+        if (location.distanceToPlayer() < 5) {
+            ChatUtils.chat("Graph Test starts once you move away.")
+            moveToStart = location
+            return
         }
 
-        val inGraph = path.map { newState.nodes[it.id] }
-        newState.highlightedNodes.addAll(inGraph)
-
-        newState.highlightedEdges.addAll(
-            newState.highlightedNodes.zipWithNext { a, b ->
-                newState.edges.firstOrNull { it.isValidConnectionFromTo(a, b) }
-            }.filterNotNull(),
+        IslandGraphs.pathFind(
+            location,
+            "Graph Test",
+            condition = { GraphEditor.isEnabled() },
         )
-
-        GraphEditorHistory.save("Test Dijkstra")
-        GraphEditor.state = newState
     }
 
     private fun editModeClicks() {

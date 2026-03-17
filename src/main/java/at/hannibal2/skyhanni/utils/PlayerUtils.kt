@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.ai.attributes.Attributes
 import java.util.UUID
@@ -39,9 +38,14 @@ object PlayerUtils {
 
     fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uuid
 
-    fun getName(): String = MinecraftCompat.localPlayer.name.string
+    fun getName(): String = MinecraftCompat.localPlayer.plainTextName
 
-    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround()
+    fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
+    fun inAir(): Boolean = !onGround()
+
+    fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
+
+    fun getLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
     fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

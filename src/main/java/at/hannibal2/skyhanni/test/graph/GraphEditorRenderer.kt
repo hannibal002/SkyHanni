@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,13 +16,13 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import net.minecraft.client.KeyMapping
 import java.awt.Color
 import kotlin.math.min
+import at.hannibal2.skyhanni.utils.KeyboardManager.WasdInputMatrix as Wasd
 
 @SkyHanniModule
 object GraphEditorRenderer {
-
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
     private val state get() = GraphEditor.state
 
@@ -38,16 +36,12 @@ object GraphEditorRenderer {
     private val selectedEdge get() = state.selectedEdge
     private val textBox get() = state.textBox
     private val seeThroughBlocks get() = state.seeThroughBlocks
-    private val highlightedEdges get() = state.highlightedEdges
-    private val highlightedNodes get() = state.highlightedNodes
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
     private val activeColor = LorenzColor.GREEN.addOpacity(200)
     private val closestColor = LorenzColor.YELLOW.addOpacity(200)
-    private val dijkstraColor = LorenzColor.LIGHT_PURPLE.addOpacity(200)
 
     private val edgeColor = LorenzColor.GOLD.addOpacity(150)
-    private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -60,47 +54,52 @@ object GraphEditorRenderer {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
+        GraphEditor.config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
     }
 
     private fun buildDisplay(): List<Renderable> = buildList {
-        add("§eExit: §6${KeyboardManager.getKeyName(config.exitKey)}")
+        if (GraphEditor.hideDisabled) {
+            add("§cDisabled nodes are hidden!")
+        }
+
+        val config = GraphEditor.config
+        add("§eExit: §6${config.exitKey.name()}")
         if (!inEditMode && !inTextMode) {
-            add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
-            add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
-            add("§eSelect (Look): §6${KeyboardManager.getKeyName(config.selectRaycastKey)}")
-            add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
-            add("§eTest Dijkstra: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
-            add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
-            add("§eSave: §6${KeyboardManager.getKeyName(config.saveKey)}")
-            add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
-            add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
-            add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
+            add("§ePlace: §6${config.placeKey.name()}")
+            add("§eSelect: §6${config.selectKey.name()}")
+            add("§eSelect (Look): §6${config.selectRaycastKey.name()}")
+            add("§eConnect: §6${config.connectKey.name()}")
+            add("§eTest Dijkstra: §6${config.dijkstraKey.name()}")
+            add("§eVision: §6${config.throughBlocksKey.name()}")
+            add("§eSave: §6${config.saveKey.name()}")
+            add("§eLoad: §6${config.loadKey.name()}")
+            add("§eClear: §6${config.clearKey.name()}")
+            add("§eTutorial: §6${config.tutorialKey.name()}")
             GraphEditorHistory.addDisplayLines(this)
             add(" ")
             if (activeNode != null) {
-                add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
-                if (dissolvePossible) add("§eDissolve: §6${KeyboardManager.getKeyName(config.dissolveKey)}")
+                add("§eText: §6${config.textKey.name()}")
+                if (dissolvePossible) add("§eDissolve: §6${config.dissolveKey.name()}")
                 if (selectedEdge != null) {
-                    add("§eSplit: §6${KeyboardManager.getKeyName(config.splitKey)}")
-                    add("§eCycle Direction: §6${KeyboardManager.getKeyName(config.edgeCycle)}")
+                    add("§eSplit: §6${config.splitKey.name()}")
+                    add("§eCycle Direction: §6${config.edgeCycle.name()}")
                 }
             }
         }
 
         if (!inTextMode) {
             if (activeNode != null) {
-                add("§eEdit active node: §6${KeyboardManager.getKeyName(config.editKey)}")
+                add("§eEdit active node: §6${config.editKey.name()}")
             }
         }
 
         if (inEditMode) {
-            add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.key.value)}")
-            add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.key.value)}")
-            add("§ez+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.a.key.value)}")
-            add("§ez- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.d.key.value)}")
-            add("§ey+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.up.key.value)}")
-            add("§ey- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.down.key.value)}")
+            add("§ex+ §6${Wasd.w.name()}")
+            add("§ex- §6${Wasd.s.name()}")
+            add("§ez+ §6${Wasd.a.name()}")
+            add("§ez- §6${Wasd.d.name()}")
+            add("§ey+ §6${Wasd.up.name()}")
+            add("§ey- §6${Wasd.down.name()}")
         }
         if (inTextMode) {
             add("§eFormat: ${textBox.finalText()}")
@@ -110,6 +109,7 @@ object GraphEditorRenderer {
 
     private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
         if (!node.rendering) return
+        if (GraphEditor.hideDisabled && !node.enabled) return
         this.drawWaypointFilled(
             node.position,
             node.getNodeColor(),
@@ -120,45 +120,48 @@ object GraphEditorRenderer {
 
         val showTextAlways = seeThroughBlocks || node.distanceSqToPlayer() < 100
 
+        fun draw(text: String, yOff: Float) {
+            this.drawDynamicText(
+                node.position,
+                text,
+                scaleMultiplier = 0.8,
+                seeThroughBlocks = showTextAlways,
+                smallestDistanceVew = 12.0,
+                ignoreY = true,
+                yOff = yOff,
+                maxDistance = 80,
+            )
+        }
+
+        if (node.extraWeight != 0) {
+            val sign = if (node.extraWeight > 0) "+" else ""
+            draw("§eWeight: $sign${node.extraWeight}", yOff = -45f)
+        }
+
+        if (!node.enabled) {
+            draw("§cDisabled", yOff = -30f)
+        }
+
         val nodeName = if (inTextMode && node == activeNode) {
             textBox.finalText().ifEmpty { null }
         } else {
             node.name
         }
         if (nodeName != null) {
-            this.drawDynamicText(
-                node.position,
-                nodeName,
-                0.8,
-                seeThroughBlocks = showTextAlways,
-                smallestDistanceVew = 12.0,
-                ignoreY = true,
-                yOff = -15f,
-                maxDistance = 80,
-            )
+            draw(nodeName, yOff = -15f)
         }
 
         val tags = node.tags
         if (tags.isEmpty()) return
         val tagText = tags.joinToString(" §f+ ") { it.displayName }
-        this.drawDynamicText(
-            node.position,
-            tagText,
-            0.8,
-            seeThroughBlocks = showTextAlways,
-            smallestDistanceVew = 12.0,
-            ignoreY = true,
-            yOff = 0f,
-            maxDistance = 80,
-        )
+        draw(tagText, yOff = 0f)
     }
 
     private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (!edge.node1.rendering && !edge.node2.rendering) return
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
-            edge in highlightedEdges -> edgeDijkstraColor
-            else -> edgeColor
+            else -> edge.networkColor ?: edgeColor
         }
 
         draw3DLine(
@@ -203,10 +206,12 @@ object GraphEditorRenderer {
     private fun GraphingNode.getNodeColor() = when (this) {
         activeNode -> if (this == closestNode) ColorUtils.blendRGB(activeColor, closestColor, 0.5) else activeColor
         closestNode -> closestColor
-        in highlightedNodes -> dijkstraColor
         else -> nodeColor
     }
 
-    private fun isEnabled() = GraphEditor.isEnabled()
+    private fun Int.name() = KeyboardManager.getKeyName(this)
 
+    private fun KeyMapping.name() = key.value.name()
+
+    private fun isEnabled() = GraphEditor.isEnabled()
 }

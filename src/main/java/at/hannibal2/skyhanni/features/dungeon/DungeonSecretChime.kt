@@ -62,8 +62,8 @@ object DungeonSecretChime {
 
     private fun PlaySoundEvent.isChestSound(): Boolean {
         return when (soundName) {
-            "random.chestopen" -> volume == 0.5f
-            "note.harp" ->
+            "block.chest.open" -> volume == 0.5f
+            "block.note_block.harp" ->
                 volume == 1f && pitch in setOf(0.7936508f, 0.8888889f, 1f, 1.0952381f, 1.1904762f)
 
             else -> false
@@ -72,8 +72,8 @@ object DungeonSecretChime {
 
     private fun PlaySoundEvent.isLeverSound(): Boolean {
         return when (soundName) {
-            "random.anvil_break" -> volume == 1f && pitch == 1.6984127f
-            "random.wood_click" -> volume in setOf(1f, 2f) && pitch == 0.4920635f
+            "block.anvil.break" -> volume == 1f && pitch == 1.6984127f
+            "block.lever.click" -> volume in setOf(1f, 2f) && pitch == 0.4920635f
             else -> false
         }
     }

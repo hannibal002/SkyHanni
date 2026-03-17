@@ -49,7 +49,7 @@ object HoppityCallWarning {
     // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
-    private var warningSound = SoundUtils.createSound("note.pling", 1f)
+    private var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
     private var activeWarning = false
     private var nextWarningTime: Instant? = null
     private var finalWarningTime: Instant? = null

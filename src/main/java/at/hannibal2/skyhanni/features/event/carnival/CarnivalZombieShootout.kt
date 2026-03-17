@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -20,11 +19,10 @@ import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -68,7 +66,7 @@ object CarnivalZombieShootout {
     )
 
     /**
-     * REGEX-TEST:                              Zombie Shootout
+     * WRAPPED-REGEX-TEST: "                             Zombie Shootout"
      */
     private val endPattern by patternGroup.pattern(
         "shootout.end",
@@ -130,7 +128,6 @@ object CarnivalZombieShootout {
 
         for ((zombie, type) in drawZombies) {
             val entity = EntityUtils.getEntityByID(zombie.id) ?: continue
-            val isSmall = (entity as? Zombie)?.isBaby ?: false
 
             val boundingBox = entity.boundingBox
 
@@ -144,8 +141,7 @@ object CarnivalZombieShootout {
     }
 
     private fun SkyHanniRenderWorldEvent.renderLines() = lamp?.let {
-        draw3DLine(
-            exactPlayerEyeLocation(),
+        drawLineToEye(
             it.pos.add(0.5, 0.5, 0.5),
             Color.RED,
             3,
@@ -153,8 +149,8 @@ object CarnivalZombieShootout {
         )
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
@@ -162,7 +158,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent(ServerBlockChangeEvent::class)
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!isEnabled() || !started) return
+        if (!isEnabled()) return
 
         val blockOld = event.old
         val blockNew = event.new
@@ -179,7 +175,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!config.enabled || HypixelData.skyBlockArea != "Carnival") return
+        if (!config.enabled || !CarnivalAPI.inCarnivalArea) return
 
         val message = event.cleanMessage
 
@@ -237,7 +233,7 @@ object CarnivalZombieShootout {
     }
 
     private fun getZombies() =
-        EntityUtils.getEntitiesNextToPlayer<Zombie>(50.0).mapNotNull { zombie ->
+        EntityUtils.getEntitiesNearby<Zombie>(50.0).mapNotNull { zombie ->
             if (zombie.findHealthReal() <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
             val type = toType(helmet) ?: run {
@@ -263,5 +259,5 @@ object CarnivalZombieShootout {
 
     private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
 
-    private fun isEnabled() = config.enabled && HypixelData.skyBlockArea == "Carnival" && started
+    private fun isEnabled() = config.enabled && CarnivalAPI.inCarnivalArea && started
 }

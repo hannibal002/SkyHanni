@@ -23,13 +23,17 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrameLocalStorage
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackAnimationFrame
-import at.hannibal2.skyhanni.utils.renderables.animated.ItemStackRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationPropertyStorage
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AxisRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.system.LazyVar
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction.Axis
 import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
@@ -41,12 +45,8 @@ object ScrapGFS {
     private val enabled get() = config.enabled && FossilExcavatorApi.inExcavatorMenu
     private val currentFetchAmount get() = config.fetchAmount.get()
     private val scrapProvider = NeuItemStackProvider(FossilExcavatorApi.scrapItem)
-    private val scrapFrames = listOf(ItemStackAnimationFrame(scrapProvider, ticks = 0))
-    private val scrapRotationDefinition = ItemStackRotationDefinition(
-        axis = Axis.Y,
-        rotationSpeed = 50.0,
-    )
     private val validRange = 1..2048
+    private val currentScrapRotation: Property<Vec3> = Property.of(Vec3.ZERO)
 
     private val darkGray = LorenzColor.DARK_GRAY.toColor()
     private val darkerGray = darkGray.darker()
@@ -57,9 +57,17 @@ object ScrapGFS {
     private var uiDirty: Boolean = true
     private var susScrapInInventory by LazyVar { getSusScrapCurrentlyInInventory() }
     private var renderable: Renderable? = null
-    private var currentScrapRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var lastScrollSound: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastScrollErrorSound: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    private val scrapRotationStorage = AnimatedRotationPropertyStorage(
+        AnimatedRotationDefinition(Axis.Y to AxisRotationDefinition(rotationSpeed = 50.0)),
+        propGetter = { currentScrapRotation },
+    )
+
+    private val scrapFrameStorage = AnimatedFrameLocalStorage(
+        listOf(ItemStackAnimatedFrame(scrapProvider, ticks = 0))
+    )
 
     private fun getSusScrapCurrentlyInInventory() = InventoryUtils.getItemsInOwnInventory().filter {
         it.getInternalNameOrNull() == FossilExcavatorApi.scrapItem
@@ -186,13 +194,12 @@ object ScrapGFS {
         Renderable.drawInsideRoundedRectWithOutline(
             Renderable.vertical(
                 listOf(
-                    Renderable.animatedItemStack(
-                        scrapFrames,
-                        scrapRotationDefinition,
-                        scale = 1.2,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                        initialRotation = currentScrapRotation,
-                    ) { currentScrapRotation = it },
+                    Renderable.animatedItemStack {
+                        frameStorage = scrapFrameStorage
+                        rotationStorage = scrapRotationStorage
+                        scale = 1.2
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                    },
                     Renderable.text(currentFetchAmount.toString(), scale = 0.9, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                 ),
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,

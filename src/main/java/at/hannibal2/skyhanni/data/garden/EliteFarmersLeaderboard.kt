@@ -493,7 +493,7 @@ object EliteFarmersLeaderboard {
             message,
             listOf(
                 "§eClick to open your Farming Weight",
-                "§eprofile on §celitebot.dev",
+                "§eprofile on §c${EliteDevApi.ELITE_DOMAIN}",
             ),
             "/shfarmingprofile ${PlayerUtils.getName()}",
         )

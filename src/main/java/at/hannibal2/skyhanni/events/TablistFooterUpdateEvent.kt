@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import net.minecraft.network.chat.Component
 
-@Deprecated("use the component version", ReplaceWith("TablistFooterUpdateComponentEvent"))
-class TablistFooterUpdateEvent(val footer: String) : SkyHanniEvent()
+class TablistFooterUpdateEvent(val footer: Component) : SkyHanniEvent()

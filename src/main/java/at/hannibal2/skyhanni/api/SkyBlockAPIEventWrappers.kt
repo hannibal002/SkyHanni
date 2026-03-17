@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiProfile
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
@@ -62,7 +62,7 @@ object SkyBlockAPIEventWrappers {
             val profileData = hypixelApiGson.fromJson<HypixelApiProfile>(data)
             val playerData = HypixelPlayerApiJson(listOf(profileData))
 
-            NeuProfileDataLoadedEvent(playerData).post()
+            ProfileViewerDataLoadedEvent(playerData).post()
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error reading hypixel player api data",

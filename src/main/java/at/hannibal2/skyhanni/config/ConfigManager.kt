@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -267,7 +268,7 @@ private fun getBackupFile(file: File): File {
 }
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
-    FEATURES("config", Features::class.java, SkyHanniMod::feature),
+    FEATURES("config", SkyHanniConfig::class.java, SkyHanniMod::feature),
     SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
     FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
@@ -277,13 +278,14 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     STORAGE("storage", StorageData::class.java, SkyHanniMod::storageData),
     ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
+    SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
     val backupFile get() = getBackupFile(file)
 }
 
-class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.feature) {
+class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -65,20 +65,20 @@ object TrophyFishManager {
     val fish: MutableMap<String, MutableMap<TrophyRarity, Int>>?
         get() = ProfileStorageData.profileSpecific?.crimsonIsle?.trophyFishes
 
-    private var loadedNeu = false
+    private var loadedPV = false
 
     @HandleEvent
-    fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        if (loadedNeu || !config.loadFromNeuPV) return
+    fun onProfileViewerDataLoaded(event: ProfileViewerDataLoadedEvent) {
+        if (loadedPV || !config.loadFromNeuPV) return
 
         val caughtTrophyFish = event.getCurrentPlayerData()?.trophyFish?.caught ?: return
 
-        loadedNeu = true
+        loadedPV = true
 
         val savedFishes = fish ?: return
         var changed = false
 
-        val neuData = mutableListOf<Triple<String, TrophyRarity, Int>>()
+        val pvData = mutableListOf<Triple<String, TrophyRarity, Int>>()
         for ((fishName, apiAmount) in caughtTrophyFish) {
             val rarity = TrophyRarity.getByName(fishName) ?: continue
             val name = fishName.split("_").dropLast(1).joinToString("")
@@ -86,7 +86,7 @@ object TrophyFishManager {
             val savedFishData = savedFishes.getOrPut(name) { mutableMapOf() }
 
             val currentSavedAmount = savedFishData[rarity] ?: 0
-            neuData.add(Triple(name, rarity, apiAmount))
+            pvData.add(Triple(name, rarity, apiAmount))
             if (apiAmount > currentSavedAmount) {
                 changed = true
             }
@@ -97,7 +97,7 @@ object TrophyFishManager {
             ChatUtils.clickableChat(
                 message,
                 onClick = {
-                    updateFromNeuPv(savedFishes, neuData)
+                    updateFromPv(savedFishes, pvData)
                 },
                 "§eClick to load!",
                 oneTimeClick = true,
@@ -152,11 +152,11 @@ object TrophyFishManager {
         }
     }
 
-    private fun updateFromNeuPv(
+    private fun updateFromPv(
         savedFishes: Map<String, MutableMap<TrophyRarity, Int>>,
-        neuData: List<Triple<String, TrophyRarity, Int>>,
+        pvData: List<Triple<String, TrophyRarity, Int>>,
     ) {
-        for ((name, rarity, newValue) in neuData) {
+        for ((name, rarity, newValue) in pvData) {
             val saved = savedFishes[name] ?: continue
 
             val current = saved[rarity] ?: 0
