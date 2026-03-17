@@ -184,6 +184,7 @@ object ChatUtils {
         prefixColor: String? = null,
         oneTimeClick: Boolean = false,
         replaceSameMessage: Boolean = false,
+        messageId: Int? = null,
     ) {
         var color: Int? = null
         if (prefixColor != null) {
@@ -200,9 +201,12 @@ object ChatUtils {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
-
-        if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
-        else logAndSendMessage(text)
+        messageId?.let {
+            text.send(it)
+        } ?: run {
+            if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
+            else logAndSendMessage(text)
+        }
     }
 
     /**
@@ -465,6 +469,7 @@ object ChatUtils {
         message: String,
         option: KProperty0<*>,
         oneTimeClick: Boolean = false,
+        messageId: Int? = null,
     ) {
         val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to disable this feature]"
@@ -474,6 +479,7 @@ object ChatUtils {
             hover = "§eClick to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
+            messageId = messageId,
         )
     }
 
@@ -488,7 +494,9 @@ object ChatUtils {
 
     var GuiMessage.fullComponent: Component
         get() = `skyhanni$getFullComponent`()
-        set(value) { `skyhanni$setFullComponent`(value) }
+        set(value) {
+            `skyhanni$setFullComponent`(value)
+        }
 
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks

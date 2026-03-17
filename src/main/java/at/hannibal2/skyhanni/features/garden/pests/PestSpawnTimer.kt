@@ -53,6 +53,7 @@ object PestSpawnTimer {
 
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     /**
      * WRAPPED-REGEX-TEST: " Cooldown: READY"
@@ -271,13 +272,17 @@ object PestSpawnTimer {
         ChatUtils.notifyOrDisable(
             "§cPest spawn cooldown has expired!",
             option = config::cooldownOverWarning,
+            messageId = messageId,
         )
         playUserSound()
         hasWarned = true
     }
 
     private fun cooldownReminder(endTime: SimpleTimeMark) {
-        ChatUtils.chat("§cPest spawn cooldown expires in ${endTime.timeUntil().format()}")
+        ChatUtils.chat(
+            "§cPest spawn cooldown expires in ${endTime.timeUntil().format()}",
+            messageId = messageId,
+        )
         hasWarned = true
 
         if (config.repeatWarning) {
@@ -290,6 +295,7 @@ object PestSpawnTimer {
         ChatUtils.notifyOrDisable(
             "§cPest Cooldown Expires Soon!",
             option = config::cooldownOverWarning,
+            messageId = messageId,
         )
         playUserSound()
     }
@@ -316,6 +322,7 @@ object PestSpawnTimer {
         ChatUtils.notifyOrDisable(
             text,
             option = config::cooldownOverWarning,
+            messageId = messageId,
         )
     }
 
