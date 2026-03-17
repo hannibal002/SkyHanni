@@ -53,7 +53,7 @@ object PestSpawnTimer {
 
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
-    private val messageId = ChatUtils.getUniqueMessageId()
+    private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
 
     /**
      * WRAPPED-REGEX-TEST: " Cooldown: READY"
@@ -81,7 +81,7 @@ object PestSpawnTimer {
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    fun getCustomCooldownTime(): Duration {
+    private fun getCustomCooldownTime(): Duration {
         val config = if (Perk.PEST_ERADICATOR.isActive) {
             config.customCooldownTimeFinnegan
         } else {
@@ -128,7 +128,10 @@ object PestSpawnTimer {
                 ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
             }
             if (config.pestSpawnChatMessage) {
-                ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
+                ChatUtils.notifyOrDisable(
+                    "Pests spawned in §b${spawnTime.format()}",
+                    option = config::pestSpawnChatMessage,
+                )
             }
         }
 
@@ -272,16 +275,17 @@ object PestSpawnTimer {
         ChatUtils.notifyOrDisable(
             "§cPest spawn cooldown has expired!",
             option = config::cooldownOverWarning,
-            messageId = messageId,
+            messageId = cooldownOverMessageId,
         )
         playUserSound()
         hasWarned = true
     }
 
     private fun cooldownReminder(endTime: SimpleTimeMark) {
-        ChatUtils.chat(
+        ChatUtils.notifyOrDisable(
             "§cPest spawn cooldown expires in ${endTime.timeUntil().format()}",
-            messageId = messageId,
+            option = config::cooldownOverWarning,
+            messageId = cooldownOverMessageId,
         )
         hasWarned = true
 
@@ -292,11 +296,6 @@ object PestSpawnTimer {
         }
 
         TitleManager.sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
-        ChatUtils.notifyOrDisable(
-            "§cPest Cooldown Expires Soon!",
-            option = config::cooldownOverWarning,
-            messageId = messageId,
-        )
         playUserSound()
     }
 
@@ -322,7 +321,7 @@ object PestSpawnTimer {
         ChatUtils.notifyOrDisable(
             text,
             option = config::cooldownOverWarning,
-            messageId = messageId,
+            messageId = cooldownOverMessageId,
         )
     }
 
