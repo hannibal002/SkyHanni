@@ -151,14 +151,11 @@ object AdvancedPlayerList {
             if (nameSuffix.contains("♲")) ironman = true
             else bingoLevel = BingoApi.getRank(line)
 
-            if (IslandType.CRIMSON_ISLE.isCurrent()) faction = if (line.contains("⚒")) {
-                nameSuffix = nameSuffix.replace("⚒", "")
-                CrimsonIsleFaction.BARBARIAN
-            } else if (line.contains("ቾ")) {
-                nameSuffix = nameSuffix.replace("ቾ", "")
-                CrimsonIsleFaction.MAGE
-            } else {
-                CrimsonIsleFaction.NONE
+            if (IslandType.CRIMSON_ISLE.isCurrent()) {
+                CrimsonIsleFaction.entries.firstOrNull { it.isLine(line) }?.let {
+                    faction = it
+                    nameSuffix = nameSuffix.replace(it.pattern, "")
+                }
             }
 
             nameSuffix
@@ -223,7 +220,6 @@ object AdvancedPlayerList {
     }
 
     class PlayerData(val sbLevel: Int) {
-
         var name: String = "?"
         var coloredName: String = "?"
         var nameSuffix: String = "?"
@@ -233,10 +229,19 @@ object AdvancedPlayerList {
         var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
     }
 
-    enum class CrimsonIsleFaction(val icon: String?) {
-        BARBARIAN(" §c⚒"),
-        MAGE(" §5ቾ"),
-        NONE(null)
+    enum class CrimsonIsleFaction(color: String?, private val symbol: String?) {
+        BARBARIAN("§c", "⚒"),
+        MAGE("§5", "ቾ"),
+        NONE(null, null)
+        ;
+
+        val icon: String? = color?.let { " $it$symbol" }
+
+        val pattern = Regex("(?:§.)*$symbol")
+
+        fun isLine(line: String): Boolean {
+            return line.contains(this.symbol ?: return false)
+        }
     }
 
     enum class SocialIcon(val icon: () -> String, val score: Int) {
