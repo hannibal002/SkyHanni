@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.navigation
 
-import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
