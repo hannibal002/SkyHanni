@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.DefaultDisplayMode
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
