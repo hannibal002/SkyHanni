@@ -131,9 +131,7 @@ object NavigationHelper {
             aliases = listOf("shnav")
             argCallback("coords", LorenzVecArgumentType.double()) { location ->
                 pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
-                with(location) {
-                    ChatUtils.chat("Started Navigating to custom goal at §f$x $y $z", messageId = messageId)
-                }
+                ChatUtils.chat("Started Navigating to custom goal at §f${location.toLocalFormat()}", messageId = messageId)
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
                 SkyHanniMod.launchCoroutine("shnavigate command") {

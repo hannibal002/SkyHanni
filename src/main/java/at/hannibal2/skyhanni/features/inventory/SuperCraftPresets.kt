@@ -113,10 +113,9 @@ object SuperCraftPresets {
         if (!config.enabled) return
         val gui = event.gui as? SignEditScreen ?: return
         if (!gui.isSupercraftAmountSetSign()) return
-        config.signPosition.renderRenderable(
-            display,
-            posLabel = "Supercraft Presets",
-        )
+        display?.let {
+            config.signPosition.renderRenderable(it, posLabel = "Supercraft Presets")
+        }
     }
 
     private fun createButton(amount: Int): Renderable {

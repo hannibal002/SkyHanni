@@ -314,20 +314,20 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun copyLocation(parameter: String? = null) {
-        val location = LocationUtils.playerLocation()
-        val x = (location.x + 0.001).roundTo(1)
-        val y = (location.y + 0.001).roundTo(1)
-        val z = (location.z + 0.001).roundTo(1)
-        val (clipboard, format) = formatLocation(x, y, z, parameter)
+        val location = LocationUtils.playerLocation().add(0.001, 0.001, 0.001).roundTo(1)
+        val (clipboard, format) = formatLocation(location, parameter)
         OSUtils.copyToClipboard(clipboard)
         ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)
     }
 
-    private fun formatLocation(x: Double, y: Double, z: Double, parameter: String?): Pair<String, String> = when (parameter) {
-        "json" -> "$x:$y:$z" to "json"
-        "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
-        "navigate" -> "`/shnavigate $x $y $z`" to "navigate"
-        else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
+    private fun formatLocation(location: LorenzVec, parameter: String?): Pair<String, String> {
+        val localFormat = location.toLocalFormat()
+        return when (parameter) {
+            "json" -> location.asStoredString() to "json"
+            "pathfind" -> "`/shtestwaypoint $localFormat pathfind`" to "pathfind"
+            "navigate" -> "`/shnavigate $localFormat`" to "navigate"
+            else -> "LorenzVec(${location.x}, ${location.y}, ${location.z})" to "LorenzVec"
+        }
     }
 
     private fun registerDebugScreenEntry(
@@ -350,7 +350,7 @@ object SkyHanniDebugsAndTests {
                 }
 
                 override fun isAllowed(reducedDebugInfo: Boolean) = true
-            }
+            },
         )
     }
 
