@@ -22,7 +22,6 @@ data class NeuReforgeJson(
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any? = null,
 ) {
 
-    // NOTE: Lateinit fields are used here because `by lazy` causes errors
     val nbtModifier: String by lazy {
         rawNbtModifier ?: reforgeName.lowercase()
             .replace("[^a-z0-9\\s_-]".toRegex(), "")

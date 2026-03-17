@@ -125,9 +125,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" graph area: ${SkyBlockUtils.graphArea}")
-                with(PlayerUtils.blockPosition()) {
-                    add(" /shtestwaypoint $x $y $z pathfind")
-                }
+                add(" /shtestwaypoint ${PlayerUtils.blockPosition().toLocalFormat()} pathfind")
             }
             add("isInAnyArea: $isInAnyArea")
             add("latestProgress: '${latestProgress.removeColor()}'")
