@@ -130,13 +130,13 @@ object DanceRoomHelper {
 
         when {
             event.isSuccess() -> {
-                ChatUtils.debug("DanceRoomHelper: Success (t=${MinecraftData.totalServerTicks})")
+                ChatUtils.debug("DanceRoomHelper: Got success sound (t=${MinecraftData.totalServerTicks})")
                 index++
                 countdownTicks = 20
                 update()
             }
             event.isFailure() && (index > 0 || countdownTicks > 0) -> {
-                ChatUtils.debug("DanceRoomHelper: Failure (t=${MinecraftData.totalServerTicks})")
+                ChatUtils.debug("DanceRoomHelper: Got failure sound (t=${MinecraftData.totalServerTicks})")
                 index = 0
                 countdownTicks = 0
                 update()
