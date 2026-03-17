@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.test.command.ErrorManager

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.model
+package at.hannibal2.skyhanni.data.model.graph
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzColor
