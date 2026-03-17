@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandGraphSettingsJson
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -741,7 +741,7 @@ object IslandGraphs {
 
         data["generic data"] = "below"
         data["island"] = island
-        data["reported location"] = with(location.roundTo(1)) { "/shtestwaypoint $x $y $z pathfind" }
+        data["reported location"] = "/shtestwaypoint ${location.toLocalFormat()} pathfind"
         if (graphArea != scoreboardArea) {
             data["area graph"] = graphArea.orEmpty()
             data["area scoreboard"] = scoreboardArea

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
