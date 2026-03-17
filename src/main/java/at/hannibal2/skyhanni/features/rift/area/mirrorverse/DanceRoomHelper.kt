@@ -105,6 +105,7 @@ object DanceRoomHelper {
     @HandleEvent
     fun onWorldChange() {
         inRoom = false
+        countdownTicks = 0
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -114,7 +115,12 @@ object DanceRoomHelper {
         if (event.isMod(10)) {
             inRoom = RiftApi.inMirrorVerse && danceRoom.isPlayerInside()
         }
-        if (inRoom) update()
+
+        if (inRoom) {
+            update()
+        } else {
+            countdownTicks = 0
+        }
     }
 
     private fun PlaySoundEvent.isSuccess() =
@@ -164,6 +170,7 @@ object DanceRoomHelper {
 
     @HandleEvent
     fun onServerTick() {
+        if (!inRoom) return
         countdownTicks = (--countdownTicks).coerceAtLeast(0)
     }
 
