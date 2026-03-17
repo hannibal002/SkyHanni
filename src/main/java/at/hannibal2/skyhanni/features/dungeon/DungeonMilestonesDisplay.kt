@@ -84,6 +84,7 @@ object DungeonMilestonesDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.showMilestonesDisplay) return
 
+        val display = display ?: return
         config.showMileStonesDisplayPos.renderRenderable(display, posLabel = "Dungeon Milestone")
     }
 }

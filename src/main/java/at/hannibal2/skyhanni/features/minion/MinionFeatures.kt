@@ -70,7 +70,7 @@ object MinionFeatures {
     private var lastMinionOpened = 0L
 
     private var lastInventoryClosed = 0L
-    private var coinsPerDay: Renderable? = null
+    private var display: Renderable? = null
 
     private val patternGroup = RepoPattern.group("minion")
 
@@ -260,7 +260,7 @@ object MinionFeatures {
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
-        coinsPerDay = null
+        display = null
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
@@ -277,10 +277,10 @@ object MinionFeatures {
     //  Use a "dirty" flag or something similar, and handle state management.
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTick() {
-        if (coinsPerDay != null) return
+        if (display != null) return
 
         if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
-            coinsPerDay = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
+            display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }
 
@@ -413,7 +413,8 @@ object MinionFeatures {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
-        config.hopperProfitPos.renderRenderable(coinsPerDay, posLabel = "Minion Coins Per Day")
+        val display = display ?: return
+        config.hopperProfitPos.renderRenderable(display, posLabel = "Minion Coins Per Day")
     }
 
     @HandleEvent

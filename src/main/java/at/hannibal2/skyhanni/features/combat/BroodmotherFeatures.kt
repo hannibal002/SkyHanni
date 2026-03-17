@@ -165,12 +165,9 @@ object BroodmotherFeatures {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
-        if (display == null) return
-        // Todo, this should not be happening in the render event.
-        if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
-            display = Renderable.text("§4Broodmother spawning now!")
-        }
-
+        val display = if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
+            Renderable.text("§4Broodmother spawning now!")
+        } else display ?: return
         config.countdownPosition.renderRenderable(display, posLabel = "Broodmother Countdown")
     }
 

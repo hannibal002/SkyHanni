@@ -47,6 +47,7 @@ object FirePillarDisplay {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.firePillarDisplay) return
 
+        val display = display ?: return
         config.firePillarDisplayPosition.renderRenderable(display, posLabel = "Fire Pillar")
     }
 }

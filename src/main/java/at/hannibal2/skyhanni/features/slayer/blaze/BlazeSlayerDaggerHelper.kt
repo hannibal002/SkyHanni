@@ -248,8 +248,8 @@ object BlazeSlayerDaggerHelper {
         val currentScreen = Minecraft.getInstance().screen
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
-        config.positionTop.renderRenderable(textTop, posLabel = "Blaze Slayer Dagger Top")
-        config.positionBottom.renderRenderable(textBottom, posLabel = "Blaze Slayer Dagger Bottom")
+        textTop?.let { config.positionTop.renderRenderable(it, "Blaze Slayer Dagger Top") }
+        textBottom?.let { config.positionBottom.renderRenderable(it, "Blaze Slayer Bottom") }
     }
 
     @HandleEvent
