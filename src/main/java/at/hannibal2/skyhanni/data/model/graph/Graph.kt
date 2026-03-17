@@ -72,6 +72,8 @@ value class Graph(
             override fun read(reader: JsonReader) = deserializeGraph(reader)
         }
 
+        // Minimal Gson for graph files — deliberately does not use the base builder
+        // (no @Expose filtering, no config adapters).
         val gson: Gson = GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(Graph::class.java, typeAdapter.nullSafe())
