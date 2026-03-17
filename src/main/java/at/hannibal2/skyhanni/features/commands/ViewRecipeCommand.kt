@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType.Companion.lowercase
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -66,7 +67,7 @@ object ViewRecipeCommand {
     fun onNeuRepoReload() {
         list = NeuItems.allNeuRepoItems().asSequence().filter { (_, json) ->
             json.recipe != null || json.recipes.any { it.type == NeuRecipeType.CRAFTING }
-        }.map { (key, _) -> key.repoItemName.lowercase() }.toList()
+        }.map { (key, _) -> key.skyblockCommandId }.toList()
     }
 
     fun customTabComplete(command: String): List<String>? {
