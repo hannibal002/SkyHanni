@@ -168,7 +168,6 @@ object AdvancedPlayerList {
     }
 
     private fun createCustomName(data: PlayerData): Component {
-
         val playerName = if (config.useLevelColorForName) {
             val c = data.levelText[3]
             "§$c" + data.name
@@ -185,7 +184,8 @@ object AdvancedPlayerList {
         } else Component.literal(data.nameSuffix)
 
         if (config.markSpecialPersons) {
-            suffix.append(" ${getSocialIcon(data.name).icon()}")
+            val icon = getSocialIcon(data.name).icon()
+            if (icon.isNotEmpty()) suffix.append(" $icon")
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
@@ -197,7 +197,10 @@ object AdvancedPlayerList {
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            suffix.append(data.faction.icon.orEmpty())
+            data.faction.icon?.let {
+                if (suffix.formattedTextCompat().removeColor().isNotBlank()) suffix.append(" ")
+                suffix.append(it)
+            }
         }
 
         // todo: level and player name should also really be components
@@ -235,7 +238,7 @@ object AdvancedPlayerList {
         NONE(null, null)
         ;
 
-        val icon: String? = color?.let { " $it$symbol" }
+        val icon: String? = color?.let { "$it$symbol" }
 
         val pattern = Regex("(?:§.)*$symbol")
 
