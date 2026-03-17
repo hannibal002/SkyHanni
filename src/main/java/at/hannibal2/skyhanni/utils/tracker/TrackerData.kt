@@ -14,13 +14,14 @@ abstract class TrackerData<T : SessionUptime>(
 ) : Resettable {
     @Expose
     private var migrated = false
+
+    @Expose
     @SerializedName("sessionUptime")
     private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
 
     @Suppress("UNCHECKED_CAST")
-    private val sessionUptime: MutableMap<SessionUptime, Stopwatch> get() {
-        return sessionUptimeInternal as MutableMap<SessionUptime, Stopwatch>
-    }
+    private val sessionUptime: MutableMap<SessionUptime, Stopwatch>
+        get() = sessionUptimeInternal as MutableMap<SessionUptime, Stopwatch>
 
 
     override fun reset() {

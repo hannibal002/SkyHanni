@@ -83,9 +83,9 @@ object PartyChatCommands {
             { config.tpsCommand },
             requiresPartyLead = false,
             executable = {
-                if (TpsCounter.tps != null) {
-                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", prefix = true)
-                } else {
+                TpsCounter.tps?.let {
+                    HypixelCommands.partyChat("Current TPS: $it", prefix = true)
+                } ?: run {
                     ChatUtils.chat("TPS Command Sent too early to calculate TPS")
                 }
             },
@@ -213,19 +213,18 @@ object PartyChatCommands {
     }
 
     private fun blacklistModify(player: String) {
-        if (player !in storage.blacklistedUsers) {
-            ChatUtils.chat("§cNow ignoring §b$player§e!")
-            storage.blacklistedUsers.add(player)
+        if (isBlockedUser(player)) {
+            ChatUtils.chat("§aStopped ignoring §b$player§e!")
+            storage.blacklistedUsers.removeIf { it.equals(player, ignoreCase = true) }
             return
         }
-        ChatUtils.chat("§aStopped ignoring §b$player§e!")
-        storage.blacklistedUsers.remove(player)
-        return
+        ChatUtils.chat("§cNow ignoring §b$player§e!")
+        storage.blacklistedUsers.add(player)
     }
 
     private fun blacklistView() {
         val blacklist = storage.blacklistedUsers
-        if (blacklist.size <= 0) {
+        if (blacklist.isEmpty()) {
             ChatUtils.chat("Your ignored players list is empty!")
             return
         }

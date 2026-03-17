@@ -127,7 +127,9 @@ object TpsCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.tpsDisplayPosition.renderRenderable(display, posLabel = "Tps Display")
+        display?.let {
+            config.tpsDisplayPosition.renderRenderable(it, posLabel = "Tps Display")
+        }
     }
 
     @HandleEvent

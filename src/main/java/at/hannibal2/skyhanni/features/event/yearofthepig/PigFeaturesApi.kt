@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbChargedEvent
 import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbLootedEvent
 import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
@@ -51,11 +50,11 @@ object PigFeaturesApi {
     private val SHINY_ORB_ITEM = "SHINY_ORB".toInternalName()
 
     private val data: MutableList<ShinyOrbData> = mutableListOf()
-    val dataSetList get() = data
+    val dataSetList get(): List<ShinyOrbData> = data
 
     private fun tryToRemoveOrb() {
         DelayedRun.runDelayed(1.seconds) {
-            dataSetList.removeIf { dataSet ->
+            data.removeIf { dataSet ->
                 val pigId = dataSet.pigEntityId
                 EntityUtils.getEntityByID(pigId) == null && dataSet.spawnTime.passedSince() > 2.seconds
             }
@@ -64,28 +63,24 @@ object PigFeaturesApi {
 
     // <editor-fold desc="Patterns">
     private val orbChargedChatPattern by patternGroup.pattern(
-        "chat.orb.charged",
-        "§6§lSHINY! §r§eThe orb is charged! Click on it for loot!",
+        "chat.orb.charged.colorless",
+        "SHINY! The orb is charged! Click on it for loot!",
     )
 
     private val orbExpiredChatPattern by patternGroup.pattern(
-        "chat.orb.expired",
-        "§cYour Shiny Orb and associated pig expired and disappeared\\.",
+        "chat.orb.expired.colorless",
+        "Your Shiny Orb and associated pig expired and disappeared\\.",
     )
 
     /**
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§3+1,000 Mining XP §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§5Potato Spreading §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§b3x §r§aGrand Experience Bottle §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§6+9,721 Coins §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§5Farming for Dummies §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§3+1,000 Alchemy XP §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§9Harvesting VI §r§efrom the piglet's orb!
-     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§a8x Enchanted Pork §r§efrom the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Shard and Blood God Crest from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Shard and +1,185,000 Coins from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Shard and +1,000 Foraging XP from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Shard and 16x Enchanted Potato from the piglet's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
-        "§6§lSHINY! §r§eYou extracted (?:§.)+(?<reward>.*) §r§efrom the piglet's orb!",
+        "SHINY! You extracted Shiny Shard and (?<reward>.+) from the piglet's orb!",
     )
 
     /**
@@ -116,14 +111,14 @@ object PigFeaturesApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         data.clear()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isYearOfThePig()) return
-        val message = event.message
+        val message = event.cleanMessage
 
         orbChargedChatPattern.matchMatcher(message) {
             val orbEntity = tryFindOrb(LocationUtils.playerLocation())
