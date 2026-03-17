@@ -110,6 +110,7 @@ object SharkFishCounter {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 
+        val display = display ?: return
         SkyHanniMod.feature.fishing.sharkFishCounterPos.renderRenderable(display, posLabel = "Shark Fish Counter")
     }
 }

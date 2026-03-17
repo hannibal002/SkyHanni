@@ -60,6 +60,7 @@ object BonusPestChanceDisplay {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
+        val display = display ?: return
         config.pestChanceDisplayPosition.renderRenderable(display, posLabel = "Bonus Pest Chance")
     }
 
