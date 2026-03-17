@@ -192,7 +192,8 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
             if (!pathPoints[i].pos.canBeSeen()) break
             totalDist += pathPoints[i - 1].pos.distance(pathPoints[i].pos)
             if (totalDist >= CURVE_RADIUS) {
-                totalDist = CURVE_RADIUS; break
+                totalDist = CURVE_RADIUS
+                break
             }
         }
         nearCurveLength = totalDist.coerceAtLeast(SUBDIVISION_STEP)
