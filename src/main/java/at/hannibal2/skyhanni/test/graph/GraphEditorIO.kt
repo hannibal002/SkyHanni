@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.test.graph
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.async
 import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
-import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
@@ -22,11 +19,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphEditorIO {
 
-    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
-
-    private val copyGraphConfig = CoroutineConfig("copy-graph").withIOContext()
-    private val bridgeGraphNetworksConfig = CoroutineConfig("bridge-graph-networks")
-    private val mergeJsonConfig = CoroutineConfig("merge-json").withIOContext()
+    private val copyGraphCoroutine = CoroutineConfig("copy-graph").withIOContext()
+    private val bridgeGraphNetworksCoroutine = CoroutineConfig("bridge-graph-networks")
+    private val mergeJsonCoroutine = CoroutineConfig("merge-json").withIOContext()
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
@@ -81,17 +76,12 @@ object GraphEditorIO {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun save() {
-        if (nodes.isEmpty()) {
-            ChatUtils.chat("Copied nothing since the graph is empty.")
-            return
-        }
+    fun save() = copyGraphCoroutine.launch {
+        if (nodes.isEmpty()) return@launch ChatUtils.chat("Copied nothing since the graph is empty.")
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
-        val copied = copyGraphConfig.async {
-            OSUtils.copyToClipboardAsync(json) ?: false
-        }.getCompleted() ?: false
-        if (!copied) return ChatUtils.chat("Failed to copy graph to clipboard.")
+        val copied = OSUtils.copyToClipboardAsync(json) ?: false
+        if (!copied) return@launch ChatUtils.chat("Failed to copy graph to clipboard.")
 
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
@@ -101,7 +91,7 @@ object GraphEditorIO {
 
     private fun useAsIslandArea(compileGraph: Graph) {
         if (!GraphEditor.config.useAsIslandArea) return
-        bridgeGraphNetworksConfig.launchCoroutine {
+        bridgeGraphNetworksCoroutine.launchCoroutine {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
             DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
@@ -152,17 +142,15 @@ object GraphEditorIO {
         ChatUtils.chat("Graph Editor loaded this island!")
     }
 
-    fun mergeFromClipboard() = mergeJsonConfig.launch {
+    fun mergeFromClipboard() = mergeJsonCoroutine.launch {
         val json = OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard is empty!")
-        mergeJsonConfig.launchCoroutine {
-            try {
-                val graph = Graph.fromJson(json)
-                DelayedRun.runOrNextTick {
-                    merging(graph)
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
+        try {
+            val graph = Graph.fromJson(json)
+            DelayedRun.runOrNextTick {
+                merging(graph)
             }
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
         }
     }
 
