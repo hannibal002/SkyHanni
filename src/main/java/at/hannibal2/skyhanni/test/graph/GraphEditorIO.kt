@@ -12,15 +12,15 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditorIO {
 
-    private val copyGraphCoroutine = CoroutineConfig("copy-graph").withIOContext()
-    private val bridgeGraphNetworksCoroutine = CoroutineConfig("bridge-graph-networks")
-    private val mergeJsonCoroutine = CoroutineConfig("merge-json").withIOContext()
+    private val copyGraphCoroutine = CoroutineSettings("copy-graph").withIOContext()
+    private val bridgeGraphNetworksCoroutine = CoroutineSettings("bridge-graph-networks")
+    private val mergeJsonCoroutine = CoroutineSettings("merge-json").withIOContext()
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
