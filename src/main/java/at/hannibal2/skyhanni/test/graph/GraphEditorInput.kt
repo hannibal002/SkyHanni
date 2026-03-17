@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
