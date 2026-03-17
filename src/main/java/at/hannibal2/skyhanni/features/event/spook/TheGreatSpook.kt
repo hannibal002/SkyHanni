@@ -150,7 +150,7 @@ object TheGreatSpook {
         if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) {
-            displayMobCooldown.let {
+            displayMobCooldown?.let {
                 config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
             }
         }
@@ -160,7 +160,7 @@ object TheGreatSpook {
             }
         }
         if (config.greatSpookTimeLeft) {
-            displayGreatSpookEnd.let {
+            displayGreatSpookEnd?.let {
                 config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
             }
         }

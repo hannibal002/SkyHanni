@@ -681,14 +681,12 @@ object ComposterOverlay {
             displayDirty = false
         }
 
-        config.overlayOrganicMatterPos.renderRenderable(
-            organicMatterDisplay,
-            posLabel = "Composter Overlay Organic Matter",
-        )
-        config.overlayFuelExtrasPos.renderRenderable(
-            fuelExtraDisplay,
-            posLabel = "Composter Overlay Fuel Extras",
-        )
+        organicMatterDisplay?.let {
+            config.overlayOrganicMatterPos.renderRenderable(it, posLabel = "Composter Overlay Organic Matter")
+        }
+        fuelExtraDisplay?.let {
+            config.overlayFuelExtrasPos.renderRenderable(it, posLabel = "Composter Overlay Fuel Extras")
+        }
     }
 
     enum class TimeType(val display: String, val multiplier: Int) {

@@ -150,7 +150,9 @@ object ComposterDisplay {
     )
     fun onGuiRenderOverlay() {
         if (GardenApi.inGarden() && config.displayEnabled) {
-            config.displayPos.renderRenderable(display, posLabel = "Composter Display")
+            display?.let {
+                config.displayPos.renderRenderable(it, posLabel = "Composter Display")
+            }
         }
 
         checkWarningsAndOutsideGarden()
