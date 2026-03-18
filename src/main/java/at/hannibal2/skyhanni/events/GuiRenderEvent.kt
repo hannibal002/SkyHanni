@@ -13,9 +13,7 @@ sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(conte
      * Use ScreenDrawnEvent instead.
      * Also, ensure you do not render with this event while in a sign, as it will override ScreenDrawnEvent.
      */
-    // TODO rename primary function to not be disambiguated with the event
-    //  rename to "onChestGuiRender" or similar
-    @PrimaryFunction("onBackgroundDraw")
+    @PrimaryFunction("onChestGuiRender")
     class ChestGuiOverlayRenderEvent(context: GuiGraphics) : GuiRenderEvent(context)
 
     /**
