@@ -79,7 +79,7 @@ object TpsCounter {
         var currentTps = tps
         when {
             LimboTimeTracker.inLimbo -> {
-                append("§fN/A §7(Limbo)")
+                append("§4N/A §7(Limbo)")
             }
             currentTps == null -> {
                 val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
