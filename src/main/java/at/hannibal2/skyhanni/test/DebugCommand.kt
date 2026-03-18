@@ -145,9 +145,8 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(PlayerUtils.blockPosition()) {
-                add(" /shtestwaypoint $x $y $z pathfind")
-            }
+            val location = PlayerUtils.blockPosition().toLocalFormat()
+            add(" /shtestwaypoint $location pathfind")
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
         }
     }

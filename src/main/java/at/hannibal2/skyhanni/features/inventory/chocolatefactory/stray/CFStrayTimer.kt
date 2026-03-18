@@ -88,7 +88,7 @@ object CFStrayTimer {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }

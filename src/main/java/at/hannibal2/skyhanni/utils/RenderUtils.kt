@@ -227,13 +227,12 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable?,
+        renderable: Renderable,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
         // cause crashes and errors on purpose
         DrawContextUtils.drawContext
-        if (renderable == null) return
         DrawContextUtils.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {

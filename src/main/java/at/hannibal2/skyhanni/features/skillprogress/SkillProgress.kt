@@ -78,7 +78,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 

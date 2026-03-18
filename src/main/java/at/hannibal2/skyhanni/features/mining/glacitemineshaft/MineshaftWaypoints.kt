@@ -66,11 +66,9 @@ object MineshaftWaypoints {
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         timeLastShared = SimpleTimeMark.now()
-        val location = closestWaypoint.location
-        val (x, y, z) = location.toDoubleArray().map { it.toInt() }
+        val location = closestWaypoint.location.toChatFormat()
         val type = closestWaypoint.waypointType.displayText
-
-        val message = "x: $x, y: $y, z: $z | ($type)"
+        val message = "$location | ($type)"
 
         if (PartyApi.partyMembers.isNotEmpty()) {
             HypixelCommands.partyChat(message)
