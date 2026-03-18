@@ -152,11 +152,6 @@ object CopyNearbyEntitiesCommand {
             add("-     ${equipSlot.name} (id ${equipSlot.id}) ($adjustedStack)")
             printItemStackData(adjustedStack)
         }
-        /*for ((id, stack) in entity.getInventoryItems().withIndex()) {
-            val adjustedStack = stack.orNull()
-            add("-  id $id ($adjustedStack)")
-            printItemStackData(adjustedStack)
-        }*/
     }
 
     private fun MutableList<String>.addEnderman(entity: EnderMan) {
