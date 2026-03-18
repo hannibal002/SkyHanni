@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -77,20 +76,6 @@ object RemainingSlayerKills {
     private val killCombatWisdomPattern by patternGroup.pattern(
         "kill-combat-wisdom",
         "\\+\\d+ Kill Combo \\+(?<wisdom>\\d+)☯ Combat Wisdom",
-    )
-
-    data class SlayerData(
-        @Expose @SerializedName("normal_mobs")
-        val normalMobs: Map<SlayerType, Map<String, List<Mob>>>,
-
-        @Expose @SerializedName("mini_bosses")
-        val miniBosses: Map<SlayerType, Map<String, List<Mob>>>,
-
-        @Expose
-        val weapons: Map<SlayerType, Map<NeuInternalName, Int>>,
-
-        @Expose
-        val equipments: Map<SlayerType, Map<NeuInternalName, Int>>,
     )
 
     data class Mob(
