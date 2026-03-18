@@ -47,7 +47,7 @@ object GrowthCycle {
     )
 
     private var display: Renderable? = null
-    private var beep = true
+    private var hasNotified = true
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -59,23 +59,36 @@ object GrowthCycle {
             val timeString = group("time")
             val duration = TimeUtils.getDurationOrNull(timeString) ?: return
             storage?.nextCycle = duration.fromNow()
-            beep = false
+            hasNotified = false
             updateDisplay()
         }
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!config.showDisplay) return
 
         updateDisplay()
+
+        val nextCycle = storage?.nextCycle ?: return
+        if (nextCycle.isInPast() && !hasNotified) {
+            hasNotified = true
+            SoundUtils.playPlingSound()
+            ChatUtils.chat(
+                componentBuilder {
+                    append("Greenhouse Growth Stage is ready in the Garden") {
+                        withColor(ChatFormatting.GREEN)
+                    }
+                },
+            )
+        }
     }
 
     private fun updateDisplay() {
         val nextCycle = storage?.nextCycle ?: return
         if (nextCycle.isFarPast() || nextCycle.passedSince() > 60.minutes) {
             display = null
-            beep = false
+            hasNotified = false
             return
         }
         display = drawDisplay(nextCycle)
@@ -85,17 +98,6 @@ object GrowthCycle {
         val timeUntil = nextCycle.timeUntil()
         val color = timeUntil.timerColor("§a")
         val formatted = if (nextCycle.isInPast()) {
-            if (!beep) {
-                SoundUtils.playPlingSound()
-                ChatUtils.chat(
-                    componentBuilder {
-                        append("Greenhouse Growth Stage is ready in the Garden") {
-                            withColor(ChatFormatting.GREEN)
-                        }
-                    },
-                )
-                beep = true
-            }
             "§cOVERDUE"
         } else {
             if (config.onlyShowWhenOverdue) return null
