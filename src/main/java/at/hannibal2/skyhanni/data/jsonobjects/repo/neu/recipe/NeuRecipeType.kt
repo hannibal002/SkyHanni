@@ -15,6 +15,8 @@ enum class NeuRecipeType(
     CRAFTING("crafting", castClazz = NeuCraftingRecipeJson::class.java),
     ;
 
+    val repoIdOrEmpty get() = this.neuRepoId.orEmpty()
+
     companion object {
         fun fromNeuIdOrNull(neuId: String): NeuRecipeType? = entries.firstOrNull { it.neuRepoId == neuId }
         fun fromNeuId(neuId: String) = entries.first { it.neuRepoId == neuId }

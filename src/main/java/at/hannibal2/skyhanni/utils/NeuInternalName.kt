@@ -5,11 +5,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.json.SkyHanniAdaptable
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 
 @JvmInline
-value class NeuInternalName private constructor(private val internalName: String) : Comparable<NeuInternalName> {
+value class NeuInternalName private constructor(
+    private val internalName: String,
+) : Comparable<NeuInternalName>, SkyHanniAdaptable<NeuInternalName> {
+    override fun toJsonString(): String = this.asString()
 
     override fun compareTo(other: NeuInternalName): Int = internalName.compareTo(other.internalName)
 
@@ -57,7 +61,9 @@ value class NeuInternalName private constructor(private val internalName: String
     private val isEnchantedBook: Boolean
         get() = getItemStackOrNull()?.item == Items.ENCHANTED_BOOK
 
-    companion object {
+    companion object : SkyHanniAdaptable.Factory<NeuInternalName> {
+
+        override fun fromJsonString(json: String) = json.toInternalName()
 
         val NONE = "NONE".toInternalName()
         val MISSING_ITEM = "MISSING_ITEM".toInternalName()

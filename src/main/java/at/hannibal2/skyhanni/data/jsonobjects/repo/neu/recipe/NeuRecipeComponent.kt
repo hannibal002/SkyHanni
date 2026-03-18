@@ -3,12 +3,17 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
+import at.hannibal2.skyhanni.utils.json.SkyHanniAdaptable
 
-data class NeuRecipeComponent(val internalName: NeuInternalName?, val count: Int = 1) {
-    fun toJsonString() = internalName?.let { "$it:$count" }.orEmpty()
+data class NeuRecipeComponent(
+    val internalName: NeuInternalName?,
+    val count: Int = 1,
+) : SkyHanniAdaptable<NeuRecipeComponent> {
+    override fun toJsonString() = internalName?.let { "$it:$count" }.orEmpty()
 
-    companion object {
-        val EMPTY = NeuRecipeComponent(null, 0)
+    companion object : SkyHanniAdaptable.Factory<NeuRecipeComponent> {
+        override fun fromJsonString(json: String): NeuRecipeComponent =
+            fromJsonStringOrNull(json) ?: NeuRecipeComponent(null, 0)
 
         fun fromJsonStringOrNull(component: String): NeuRecipeComponent? {
             if (component.isEmpty()) return null
