@@ -221,7 +221,7 @@ object IslandAreaFeatures {
         onLeftClick = {
             if (area.node == targetNode) {
                 targetNode = null
-                IslandGraphs.stop()
+                IslandGraphs.stopNavigation()
                 IslandAreaBackend.update()
             } else {
                 setTarget(area.node)
