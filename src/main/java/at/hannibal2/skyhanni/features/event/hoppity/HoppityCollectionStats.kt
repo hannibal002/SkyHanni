@@ -491,7 +491,7 @@ object HoppityCollectionStats {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory || !collectionConfig.enabled) return
 
         collectionConfig.position.renderRenderables(

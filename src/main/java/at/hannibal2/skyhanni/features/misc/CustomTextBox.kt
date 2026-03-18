@@ -26,8 +26,9 @@ object CustomTextBox {
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.CUSTOM_TEXT_BOX])
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGui || !config.enabled) return
+
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
     }
