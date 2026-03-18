@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
