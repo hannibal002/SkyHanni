@@ -8,7 +8,6 @@ import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
@@ -38,38 +37,48 @@ interface Resettable {
         private fun KRProp.isOtherMutable() = isOtherMutableCache.getOrPut(returnType.jvmErasure) {
             otherMutableTypes.any { sc -> returnType.jvmErasure.isSubclassOf(sc) }
         }
-        private fun KRProp.isIgnored() = hasAnnotation<Transient>() ||
-            hasAnnotation<NoReset>() || javaField?.let { f ->
-                f.isAnnotationPresent(NoReset::class.java) || Modifier.isTransient(f.modifiers)
-            } ?: false
+        private fun KRProp.isIgnored() = hasAnnotation<Transient>() || hasAnnotation<NoReset>() || javaField?.let { f ->
+            f.isAnnotationPresent(NoReset::class.java) || Modifier.isTransient(f.modifiers)
+        } ?: false
     }
 
     private val classSimpleName get() = this::class.simpleName ?: this::class.qualifiedName ?: "UnknownClass"
 
     fun reset() = with(this::class) {
-        val defaults = createInstance()
+        // Find a constructor where all parameters have defaults. Equivalent to createInstance(),
+        // but with isAccessible = true so private nested classes work correctly
+        val ctor = constructors.firstOrNull { c ->
+            c.parameters.all { it.isOptional }
+        } ?: return@with ErrorManager.logErrorWithData(
+            IllegalStateException("No no-arg/all-default constructor found"),
+            "Failed to reset $classSimpleName",
+            "class" to this,
+        )
+
+        ctor.isAccessible = true
+        val defaults = ctor.callBy(emptyMap())
+
         propCache.getOrPut(this) {
-            this.memberProperties.filter { prop ->
+            memberProperties.filter { prop ->
                 if (prop.isIgnored()) return@filter false
                 prop is KMutableProperty1<out Resettable, *> || prop.isOtherMutable()
             }
         }.forEach { tryResetProp(it, defaults) }
     }
 
-    private fun tryResetProp(prop: KProperty1<out Resettable, *>, defaults: Resettable) {
-        val originalAccessibility = prop.isAccessible
-        runCatching {
-            prop.isAccessible = true
-            val current = prop.getter.call(this)
-            prop.internalResetFun(current, defaults)
-        }.getOrElse { e ->
-            ErrorManager.logErrorWithData(
-                e,
-                "Failed to reset property ${prop.name} of $classSimpleName",
-                "throwable message" to e.message,
-            )
-        }
-        prop.isAccessible = originalAccessibility
+    private fun tryResetProp(
+        prop: KProperty1<out Resettable, *>,
+        defaults: Resettable,
+    ): Any = runCatching {
+        prop.isAccessible = true
+        val current = prop.getter.call(this)
+        prop.internalResetFun(current, defaults)
+    }.getOrElse { e ->
+        ErrorManager.logErrorWithData(
+            e,
+            "Failed to reset property ${prop.name} of $classSimpleName",
+            "throwable message" to e.message,
+        )
     }
 
     @Suppress("UNCHECKED_CAST")
