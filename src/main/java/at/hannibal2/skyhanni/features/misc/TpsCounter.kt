@@ -134,7 +134,7 @@ object TpsCounter {
         ErrorManager.logErrorStateWithData(
             "TPS calculation got an error",
             "tps is $tps",
-            "tos" to tps,
+            "tps" to tps,
             "tpsList" to tpsList,
             "timeSinceWorldSwitch" to timeSinceWorldSwitch,
         )
