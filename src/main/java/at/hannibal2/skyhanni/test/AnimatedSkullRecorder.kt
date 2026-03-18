@@ -43,6 +43,10 @@ object AnimatedSkullRecorder {
 
     val isRecording get() = state.mode != RecordingMode.NONE
 
+    private fun ArmorStand.isPetTextureStand(): Boolean {
+        return false
+    }
+
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         val current = state.takeIf { it.mode != RecordingMode.NONE } ?: return
@@ -53,8 +57,9 @@ object AnimatedSkullRecorder {
                 ?.getItemBySlot(EquipmentSlot.HEAD)
                 ?.captureFrame()
 
-            RecordingMode.PET -> EntityUtils.getEntitiesNearby<ArmorStand>(32.0)
-                .forEach { it.getItemBySlot(EquipmentSlot.HEAD).captureFrame() }
+            RecordingMode.PET -> EntityUtils.getEntitiesNearby<ArmorStand>(32.0) {
+                it.isPetTextureStand()
+            }.forEach { it.getItemBySlot(EquipmentSlot.HEAD).captureFrame() }
 
             RecordingMode.PLAYER -> getPlayerEntities()
                 .firstOrNull { it.name.string.equals(current.trackedPlayer, ignoreCase = true) }
