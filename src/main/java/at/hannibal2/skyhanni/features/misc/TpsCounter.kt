@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.ServerTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -29,9 +30,16 @@ object TpsCounter {
     private val WORLD_SWITCH_DELAY = 5.seconds
 
     private var lastServerTick = ServerTimeMark.farPast()
+    private var lastError = SimpleTimeMark.farPast()
     private val tpsList = TimeAndSizeLimitedCache<Long, Long>(100, 5.seconds)
-    val tps: Double
-        get() = if (tpsList.isEmpty()) 0.0 else (1000.0 / tpsList.values.average()).coerceIn(0.0..20.0)
+    val tps: Double?
+        get() = when {
+            timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
+            tpsList.isEmpty() -> 0.0
+            else -> (1000.0 / tpsList.values.average()).coerceIn(0.0..20.0).also {
+                if (!it.isFinite()) printError(it)
+            }
+        }
 
     private var display: Renderable? = null
 
@@ -62,13 +70,19 @@ object TpsCounter {
         }
     }
 
-    private fun getTpsString(compact: Boolean = false): String =
-        "§eTPS: " + if (timeSinceWorldSwitch > WORLD_SWITCH_DELAY) {
-            format(tps)
-        } else {
-            val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
-            (if (compact) "" else "§fCalculating... ") + "§7(${remaining}s)"
+    private fun getTpsString(compact: Boolean = false): String = buildString {
+        append("§eTPS: ")
+        when (val currentTps = tps) {
+            null -> {
+                val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
+                if (!compact) append("§fCalculating... ")
+                append("§7(${remaining}s)")
+            }
+            else -> {
+                append("%s%.1f".format(getColor(currentTps), currentTps))
+            }
         }
+    }
 
     private fun updateDisplay() {
         display = Renderable.text(getTpsString(compact = true))
@@ -117,11 +131,6 @@ object TpsCounter {
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
     }
 
-    private fun format(tps: Double): String {
-        if (!tps.isFinite()) printError(tps)
-        return "%s%.1f§r".format(getColor(tps), tps)
-    }
-
     private fun getColor(tps: Double) = when {
         tps > 19.8 -> "§2"
         tps > 19 -> "§a"
@@ -132,6 +141,8 @@ object TpsCounter {
     }
 
     private fun printError(tps: Double) {
+        if (lastError.passedSince() < 5.seconds) return
+        lastError = SimpleTimeMark.now()
         ErrorManager.logErrorStateWithData(
             "TPS calculation got an error",
             "tps is $tps",
