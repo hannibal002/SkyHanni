@@ -50,7 +50,7 @@ object TpsCounter {
     @HandleEvent
     fun onSecondPassed() {
         if (lastServerTick.passedSince() >= 1.seconds) {
-            ChatUtils.debug("No ping packets received for 1 second, clearing TPS data")
+            ChatUtils.debug("No server ticks detected for 1 second, clearing TPS data")
             tpsList.clear()
         }
 
