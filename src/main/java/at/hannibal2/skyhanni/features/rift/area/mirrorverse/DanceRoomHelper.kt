@@ -38,15 +38,13 @@ object DanceRoomHelper {
     private var countdownTicks = 0
 
     private val countdownStr: String
-        get() = if (countdownTicks > 0) {
+        get() = if (countdownTicks <= 0) "" else {
             val totalMilliseconds = countdownTicks * 50
             "%s%01d:%03d".format(
                 config.danceRoomFormatting.color.countdown.formatColor(),
                 totalMilliseconds / 1000,
                 totalMilliseconds % 1000,
             )
-        } else {
-            ""
         }
 
     private val emptyInstructionsDisplay by lazy {
@@ -92,7 +90,7 @@ object DanceRoomHelper {
         } + this@addColor
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent
     fun onGuiRenderOverlay() {
         if (!config.enabled || !inRoom) return
         config.position.renderRenderables(
@@ -105,6 +103,7 @@ object DanceRoomHelper {
     @HandleEvent
     fun onWorldChange() {
         inRoom = false
+        index = 0
         countdownTicks = 0
     }
 
@@ -119,6 +118,7 @@ object DanceRoomHelper {
         if (inRoom) {
             update()
         } else {
+            index = 0
             countdownTicks = 0
         }
     }
@@ -130,7 +130,7 @@ object DanceRoomHelper {
         (soundName == "entity.player.burp" && volume == 0.8f) ||
             (soundName == "entity.player.levelup" && pitch == 1.8412699f && volume == 1f)
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.enabled || !inRoom) return
 
@@ -150,15 +150,16 @@ object DanceRoomHelper {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
-        if (!config.enabled) return
-        if (config.hideOriginalTitle && inRoom) event.cancel()
+        if (!config.enabled || !inRoom) return
+        if (config.hideOriginalTitle) event.cancel()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent
     fun onCheckRender(event: CheckRenderEntityEvent<RemotePlayer>) {
-        if (config.hidePlayers && inRoom && event.entity.isRealPlayer()) {
+        if (!inRoom) return
+        if (config.hidePlayers && event.entity.isRealPlayer()) {
             event.cancel()
         }
     }
@@ -171,7 +172,9 @@ object DanceRoomHelper {
     @HandleEvent
     fun onServerTick() {
         if (!inRoom) return
-        countdownTicks = (--countdownTicks).coerceAtLeast(0)
+
+        if (countdownTicks <= 0) countdownTicks = 0
+        else --countdownTicks
     }
 
     @HandleEvent
