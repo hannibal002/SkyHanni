@@ -13,12 +13,15 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getPlayerEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterValuesNotNull
+import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object AnimatedSkullRecorder {
@@ -44,7 +47,16 @@ object AnimatedSkullRecorder {
     val isRecording get() = state.mode != RecordingMode.NONE
 
     private fun ArmorStand.isPetTextureStand(): Boolean {
-        return false
+        // Pet stands are invisible
+        if (!this.isInvisible) return false
+        val equipment = getEquipmentSlots().filterValuesNotNull()
+        // Pets should only have MAINHAND
+        if (equipment.keys.size != 1) return false
+        // Item should be a player head
+        equipment[EquipmentSlot.MAINHAND]?.takeIf {
+            it.item == Items.PLAYER_HEAD && it.getSkullTexture() != null
+        } ?: return false
+        return true
     }
 
     @HandleEvent
@@ -59,7 +71,7 @@ object AnimatedSkullRecorder {
 
             RecordingMode.PET -> EntityUtils.getEntitiesNearby<ArmorStand>(32.0) {
                 it.isPetTextureStand()
-            }.forEach { it.getItemBySlot(EquipmentSlot.HEAD).captureFrame() }
+            }.forEach { it.getItemBySlot(EquipmentSlot.MAINHAND).captureFrame() }
 
             RecordingMode.PLAYER -> getPlayerEntities()
                 .firstOrNull { it.name.string.equals(current.trackedPlayer, ignoreCase = true) }
@@ -89,7 +101,10 @@ object AnimatedSkullRecorder {
 
     suspend fun stopRecording() {
         val current = state.takeIf { it.mode != RecordingMode.NONE } ?: return ChatUtils.chat("§cNot currently recording.")
-        if (current.frames.isEmpty()) return ChatUtils.chat("§cNo frames were captured.")
+        if (current.frames.isEmpty()) {
+            ChatUtils.chat("§cNo frames were captured.")
+            return state.reset()
+        }
 
         val copied = ClipboardUtils.copyToClipboardAsync(buildOutput(current)).await() ?: false
         if (!copied) return ChatUtils.chat("§cFailed to copy frames to clipboard.")
