@@ -37,7 +37,7 @@ class DebugMobConfig {
         @ConfigOption(
             name = "Player Highlight",
             desc = "Highlight each entity that is a real Player in blue " +
-                    "(you are also included in the list but won't be highlighted for obvious reasons).",
+                "(you are also included in the list but won't be highlighted for obvious reasons).",
         )
         @ConfigEditorBoolean
         var realPlayerHighlight: Boolean = false
