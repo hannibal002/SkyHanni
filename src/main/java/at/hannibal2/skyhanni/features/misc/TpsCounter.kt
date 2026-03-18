@@ -12,11 +12,17 @@ import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.*
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
+import at.hannibal2.skyhanni.utils.inPartialMilliseconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.roundedUpSeconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -70,7 +76,7 @@ object TpsCounter {
 
     private fun getTpsString(compact: Boolean = false): String = buildString {
         append("§eTPS: ")
-        val currentTps = tps
+        var currentTps = tps
         when {
             LimboTimeTracker.inLimbo -> {
                 append("§fN/A §7(Limbo)")
@@ -81,6 +87,7 @@ object TpsCounter {
                 append("§7(${remaining}s)")
             }
             else -> {
+                if (TimeUtils.isAprilFoolsDay) currentTps /= 2
                 append("%s%.1f".format(getColor(currentTps), currentTps))
             }
         }
