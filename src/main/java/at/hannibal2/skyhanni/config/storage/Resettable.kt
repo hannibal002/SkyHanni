@@ -44,16 +44,18 @@ interface Resettable {
 
     private val classSimpleName get() = this::class.simpleName ?: this::class.qualifiedName ?: "UnknownClass"
 
-    fun reset() = with(this::class) {
+    fun reset(): Unit = with(this::class) {
         // Find a constructor where all parameters have defaults. Equivalent to createInstance(),
         // but with isAccessible = true so private nested classes work correctly
         val ctor = constructors.firstOrNull { c ->
             c.parameters.all { it.isOptional }
-        } ?: return@with ErrorManager.logErrorWithData(
-            IllegalStateException("No no-arg/all-default constructor found"),
-            "Failed to reset $classSimpleName",
-            "class" to this,
-        )
+        } ?: return@with run {
+            ErrorManager.logErrorWithData(
+                IllegalStateException("No no-arg/all-default constructor found"),
+                "Failed to reset $classSimpleName",
+                "class" to this,
+            )
+        }
 
         ctor.isAccessible = true
         val defaults = ctor.callBy(emptyMap())
