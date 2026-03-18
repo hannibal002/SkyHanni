@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
 import java.awt.Color
@@ -755,6 +756,31 @@ object WorldRenderUtils {
         draw3DLine(p1, p2, color)
     }
 
+    fun SkyHanniRenderWorldEvent.draw3DPolyline(
+        points: List<LorenzVec>,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
+    ) {
+        if (points.size < 2) return
+        LineDrawer.draw3D(this, lineWidth, depth) {
+            points.zipWithNext { a, b -> draw3DLine(a, b, color) }
+        }
+    }
+
+    fun SkyHanniRenderWorldEvent.draw3DBezier2(
+        p1: LorenzVec,
+        control: LorenzVec,
+        p3: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
+    ) {
+        LineDrawer.draw3D(this, lineWidth, depth) {
+            drawBezier2(p1, control, p3, color)
+        }
+    }
+
     fun SkyHanniRenderWorldEvent.outlineTopFace(
         boundingBox: AABB,
         lineWidth: Int,
@@ -1052,4 +1078,7 @@ object WorldRenderUtils {
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
     }
+
+    // returns true if the camera is underwater
+    fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera.fluidInCamera == FogType.WATER
 }
