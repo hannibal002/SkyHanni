@@ -346,7 +346,7 @@ object TitleManager {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
         inventoryTitle.tryRenderInventoryTitle()

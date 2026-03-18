@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
@@ -24,6 +25,7 @@ object ConfigUpdaterMigrator {
         return obj?.at(chain.drop(1), init)
     }
 
+    @PrimaryFunction("onConfigFix")
     data class ConfigFixEvent(
         val old: JsonObject,
         val new: JsonObject,
