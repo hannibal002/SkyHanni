@@ -67,7 +67,7 @@ value class Graph(
         (nodes as Collection<GraphNode>).toArray(generator)
 
     companion object : SkyHanniAdaptable.Factory<Graph> {
-        /** Exposed so [at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters] can register it without
+        /** Exposed so [at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapter] can register it without
          *  pulling in the full base GsonBuilder. */
         val typeAdapter: TypeAdapter<Graph> = object : TypeAdapter<Graph>() {
             override fun write(out: JsonWriter, value: Graph) = serializeGraph(out, value)

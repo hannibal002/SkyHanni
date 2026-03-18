@@ -47,7 +47,7 @@ import kotlin.time.Duration.Companion.milliseconds
 private typealias J_UUID = UUID
 
 /**
- * Implement on types used as [SkyHanniTypeAdapters] entries via the `(Class<out SkyHanniAdaptable<*>>)` constructor.
+ * Implement on types used as [SkyHanniTypeAdapter] entries via the `(Class<out SkyHanniAdaptable<*>>)` constructor.
  * The companion object must implement [Factory] to provide the deserialization half.
  */
 interface SkyHanniAdaptable<T : Any> {
@@ -83,7 +83,7 @@ private fun enumAdapter(clazz: Class<out Enum<*>>, default: Enum<*>? = null): Ty
 /**
  * All entries are automatically registered in [BaseGsonBuilder.gson] via [GsonBuilder.registerSkyHanniAdapters]
  */
-enum class SkyHanniTypeAdapters(
+enum class SkyHanniTypeAdapter(
     val clazz: Class<*>,
     val adapter: TypeAdapter<*>,
 ) {
@@ -219,7 +219,7 @@ enum class SkyHanniTypeAdapters(
 
 @Suppress("UNCHECKED_CAST")
 fun GsonBuilder.registerSkyHanniAdapters(): GsonBuilder = apply {
-    SkyHanniTypeAdapters.entries.forEach {
+    SkyHanniTypeAdapter.entries.forEach {
         val adapter = (it.adapter as TypeAdapter<Any>).nullSafe()
         registerTypeAdapter(it.clazz, adapter)
     }
