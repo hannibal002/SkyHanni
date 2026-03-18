@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterValuesNotNull
 import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import com.mojang.brigadier.arguments.IntegerArgumentType
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -35,8 +34,6 @@ object AnimatedSkullRecorder {
 
     private data class RecordingState(
         var mode: RecordingMode = RecordingMode.NONE,
-        var keyName: String? = null,
-        var ticks: Int = 0,
         var trackedPlayer: String = "",
         val frames: LinkedHashSet<String> = linkedSetOf(),
     ) : Resettable
@@ -86,12 +83,12 @@ object AnimatedSkullRecorder {
         state.frames.add("$uuid:$texture")
     }
 
-    fun startRecording(mode: RecordingMode, keyName: String? = null, ticks: Int = 1, trackedPlayer: String = "") {
+    fun startRecording(mode: RecordingMode, trackedPlayer: String = "") {
         if (isRecording) {
             ChatUtils.chat("Restarting...")
             state.frames.clear()
         }
-        state = RecordingState(mode, keyName, ticks, trackedPlayer)
+        state = RecordingState(mode, trackedPlayer)
         val label = if (mode == RecordingMode.PLAYER) "§e$trackedPlayer§a's head" else "§e${mode.name.lowercase()}§a"
         ChatUtils.chat("Started recording $label skull frames.")
 
@@ -106,7 +103,8 @@ object AnimatedSkullRecorder {
             return state.reset()
         }
 
-        val copied = ClipboardUtils.copyToClipboardAsync(buildOutput(current)).await() ?: false
+        val formattedOutput = buildOutput(current)
+        val copied = ClipboardUtils.copyToClipboardAsync(formattedOutput).await() ?: false
         if (!copied) return ChatUtils.chat("§cFailed to copy frames to clipboard.")
         else {
             ChatUtils.chat("§a${current.frames.size} frame(s) copied to clipboard.")
@@ -114,58 +112,55 @@ object AnimatedSkullRecorder {
         }
     }
 
-    private fun buildOutput(state: RecordingState): String = if (state.keyName != null) {
-        """
-        |"${state.keyName}": {
-        |    "ticks": ${state.ticks},
-        |    "textures": [
-        |        ${state.frames.joinToString(",\n        ") { "\"$it\"" }}
-        |    ]
-        |}
-        """.trimMargin()
-    } else state.frames.joinToString(",\n  ", "[\n  ", "\n]") { "\"$it\"" }
+    private fun buildOutput(state: RecordingState): String = state.frames.joinToString(",\n  ", "[\n  ", "\n]") { "\"$it\"" }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shskull") {
             description = "Records animated skull texture frames for animatedskulls.json"
             category = CommandCategory.DEVELOPER_DEBUG
+            aliases = listOf("shrecordanmiation", "shanimation", "shrecani")
 
             literal("start") {
                 for (mode in listOf(RecordingMode.HEAD, RecordingMode.PET)) {
                     literal(mode.name.lowercase()) {
                         callback { startRecording(mode) }
-                        arg("key", BrigadierArguments.string()) { keyArg ->
-                            callback { startRecording(mode, keyName = getArg(keyArg)) }
-                            argCallback("ticks", IntegerArgumentType.integer(1)) { ticks ->
-                                startRecording(mode, keyName = getArg(keyArg), ticks = ticks)
-                            }
-                        }
                     }
                 }
 
                 literal("player") {
                     arg("name", BrigadierArguments.string()) { nameArg ->
                         callback { startRecording(RecordingMode.PLAYER, trackedPlayer = getArg(nameArg)) }
-                        arg("key", BrigadierArguments.string()) { keyArg ->
-                            callback { startRecording(RecordingMode.PLAYER, keyName = getArg(keyArg), trackedPlayer = getArg(nameArg)) }
-                            argCallback("ticks", IntegerArgumentType.integer(1)) { ticks ->
-                                startRecording(
-                                    RecordingMode.PLAYER,
-                                    keyName = getArg(keyArg),
-                                    ticks = ticks,
-                                    trackedPlayer = getArg(nameArg),
-                                )
-                            }
-                        }
                     }
+
+                    callback {
+                        ChatUtils.userError("Please specify a player name.")
+                        ChatUtils.chat("  §e/shskull start player <name> §7- Start recording a player's head frames.")
+                    }
+                }
+
+                callback {
+                    ChatUtils.userError("Please specify a recording mode: head, pet, or player <name>")
+                    ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.")
                 }
             }
 
             coroutineLiteralCallback("stop", config = stopRecordingCoroutine) { stopRecording() }
 
             literalCallback("status") {
-                if (isRecording) ChatUtils.chat("§aCurrently recording.") else ChatUtils.chat("§cNot recording.")
+                val message = if (isRecording) {
+                    val frameCount = state.frames.size
+                    if (frameCount == 0) "§aCurrently recording - no frames captured yet."
+                    else "§aCurrently recording - §b$frameCount§a frame(s) captured so far."
+                } else "§cNot recording."
+                ChatUtils.chat(message)
+            }
+
+            callback {
+                ChatUtils.userError("Please specify a subcommand: start, stop, or status.")
+                ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.")
+                ChatUtils.chat("  §e/shskull stop §7- Stop recording and copy frames to clipboard.")
+                ChatUtils.chat("  §e/shskull status §7- Show current recording status.")
             }
         }
     }
