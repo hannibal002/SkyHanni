@@ -135,13 +135,13 @@ object AnimatedSkullRecorder {
 
                     callback {
                         ChatUtils.userError("Please specify a player name.")
-                        ChatUtils.chat("  §e/shskull start player <name> §7- Start recording a player's head frames.")
+                        ChatUtils.chat("  §e/shskull start player <name> §7- Start recording a player's head frames.", prefix = false)
                     }
                 }
 
                 callback {
                     ChatUtils.userError("Please specify a recording mode: head, pet, or player <name>")
-                    ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.")
+                    ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.", prefix = false)
                 }
             }
 
@@ -158,9 +158,9 @@ object AnimatedSkullRecorder {
 
             callback {
                 ChatUtils.userError("Please specify a subcommand: start, stop, or status.")
-                ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.")
-                ChatUtils.chat("  §e/shskull stop §7- Stop recording and copy frames to clipboard.")
-                ChatUtils.chat("  §e/shskull status §7- Show current recording status.")
+                ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.", prefix = false)
+                ChatUtils.chat("  §e/shskull stop §7- Stop recording and copy frames to clipboard.", prefix = false)
+                ChatUtils.chat("  §e/shskull status §7- Show current recording status.", prefix = false)
             }
         }
     }
