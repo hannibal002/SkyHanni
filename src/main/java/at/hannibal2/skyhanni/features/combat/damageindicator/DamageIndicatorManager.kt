@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -1047,12 +1048,10 @@ object DamageIndicatorManager {
         }
     }
 
-    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
-
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
-        if (!backendEnabled) {
+        if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")
         } else {
             event.addIrrelevant {
@@ -1067,5 +1066,5 @@ object DamageIndicatorManager {
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && DevApi.mainToggles.damageIndicator
 }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -60,7 +60,7 @@ object MobDetection {
 
     private const val MAX_RETRIES = 20 * 5
 
-    private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
+    private val mainToggle get() = DevApi.mainToggles.mobDetection
 
     private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 
@@ -129,7 +129,7 @@ object MobDetection {
                 .filter { it !is ArmorStand && it !is LocalPlayer },
         )
 
-        if (forceReset) {
+        if (!mainToggle) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
         }
 
@@ -138,7 +138,7 @@ object MobDetection {
 
         MobData.notSeenMobs.removeIf(::canBeSeen)
 
-        if (forceReset) {
+        if (!mainToggle) {
             mobDetectionReset() // Ensure that all mobs are cleared 100%
         }
     }
@@ -390,7 +390,7 @@ object MobDetection {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
-        if (forceReset) {
+        if (!mainToggle) {
             event.addData("Mob Detection is manually disabled!")
         } else {
             event.addIrrelevant {
