@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,9 +22,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrameLocalStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
-import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationPropertyStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AxisRotationDefinition
