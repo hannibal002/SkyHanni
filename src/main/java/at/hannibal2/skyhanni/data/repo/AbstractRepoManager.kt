@@ -53,7 +53,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open val backupRepoResourcePath: String? = null
 
-    abstract val config: AbstractRepoConfig<*>
+    abstract val config: AbstractRepoConfig
     abstract val configDirectory: File
 
     @PublishedApi
