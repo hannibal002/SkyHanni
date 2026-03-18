@@ -47,7 +47,7 @@ object NavigationHelper {
 
         val goBack = {
             doCommandAsync(searchTerm)
-            IslandGraphs.stop()
+            IslandGraphs.stopNavigation()
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
