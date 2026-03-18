@@ -8,7 +8,6 @@ import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
@@ -47,9 +46,15 @@ interface Resettable {
     private val classSimpleName get() = this::class.simpleName ?: this::class.qualifiedName ?: "UnknownClass"
 
     fun reset() = with(this::class) {
-        val defaults = createInstance()
+        // Find a constructor where all parameters have defaults. Equivalent to createInstance(),
+        // but with isAccessible = true so private nested classes work correctly
+        val ctor = constructors.firstOrNull { c -> c.parameters.all { it.isOptional } }
+            ?: error("No no-arg/all-default constructor found for $classSimpleName")
+        ctor.isAccessible = true
+        val defaults = ctor.callBy(emptyMap())
+
         propCache.getOrPut(this) {
-            this.memberProperties.filter { prop ->
+            memberProperties.filter { prop ->
                 if (prop.isIgnored()) return@filter false
                 prop is KMutableProperty1<out Resettable, *> || prop.isOtherMutable()
             }
