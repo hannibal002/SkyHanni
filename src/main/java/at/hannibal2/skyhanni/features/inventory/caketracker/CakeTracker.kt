@@ -186,8 +186,8 @@ object CakeTracker {
         ) { invalidateCakeCache() }
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onBackgroundDraw() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChestGuiRender() {
         if (!config.enabled) return
 
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()

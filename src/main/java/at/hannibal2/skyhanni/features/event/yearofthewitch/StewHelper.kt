@@ -118,8 +118,8 @@ object StewHelper {
         return container
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onChestGuiRender() {
         if (!config.stewHelper) return
         if (display.isEmpty()) return
         config.stewHelperPosition.renderRenderables(display, posLabel = "Witch Stew Helper")

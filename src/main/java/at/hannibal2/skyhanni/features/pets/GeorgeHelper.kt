@@ -134,8 +134,8 @@ object GeorgeHelper {
         var renderableInfo: HorizontalContainerRenderable,
     )
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onChestGuiRender() {
         if (!config.enabled) return
         if (display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Taming 60 Helper")

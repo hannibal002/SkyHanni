@@ -96,8 +96,8 @@ object ScrapGFS {
         uiDirty = true
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onBackgroundDraw() {
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
+    fun onChestGuiRender() {
         if (!enabled) return
         if (config.onlyIfNoScrap && susScrapInInventory > 0) return
         if (uiDirty) {

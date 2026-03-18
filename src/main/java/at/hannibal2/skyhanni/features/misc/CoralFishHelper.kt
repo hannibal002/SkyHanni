@@ -120,8 +120,8 @@ object CoralFishHelper {
         val searchable: Searchable,
     )
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GALATEA)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    fun onChestGuiRender() {
         if (!config.coralFishHelper) return
         if (display.isEmpty()) return
         config.coralFishHelperPosition.renderRenderables(display, posLabel = "Coral Fish Helper")
