@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.PurseChangeCause
+import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,8 +50,8 @@ object SlayerRngMeterToolTipFeatures {
     )
 
     /**
-     * Tier V amount: 1 to 2
-     * Tier IV amount: 32 to 48
+     * REGEX-TEST: Tier V amount: 1 to 2
+     * REGEX-TEST: Tier IV amount: 32 to 48
      */
     private val toolTipAmountPattern by patternGroup.pattern(
         "rngmeter.tooltip.amount",
@@ -122,6 +124,19 @@ object SlayerRngMeterToolTipFeatures {
     }
 
     @HandleEvent
+    fun onPurseChange(event: PurseChangeEvent) {
+        if (event.reason != PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) return
+
+        val expectedCoins = data?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
+
+        val hasSlayerBonusRewards = event.coins * -1 == expectedCoins * 0.96 // -4% from Slayer Bonus Rewards
+        val hasBartender = event.coins * -1 == expectedCoins * 0.95 // -5% from Brewery city project
+
+        if (hasSlayerBonusRewards) ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = 7
+        ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction = hasBartender
+    }
+
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<SlayerData>("Slayer")
     }
@@ -150,8 +165,12 @@ object SlayerRngMeterToolTipFeatures {
         maxProfit: Double?,
     ) {
         val bossesNeeded = (secondary ?: primary).toFraction()
-        val hasPriceReduction = ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == 7
-        val costPerBoss = spawnCost * if (hasPriceReduction) 0.96 else 1.0
+        val reduction = when {
+            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == 7 -> 0.96
+            ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true -> 0.95
+            else -> 1.0
+        }
+        val costPerBoss = spawnCost * reduction
 
         val line = buildString {
             append("§7Coins/Boss: ")

@@ -1014,4 +1014,7 @@ class ProfileSpecificStorage(
 
     @Expose
     var slayerBonusRewardsLevel: Int = 0
+
+    @Expose
+    var slayerBreweryContributionReduction: Boolean = false
 }
