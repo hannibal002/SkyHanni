@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -111,7 +112,7 @@ object MetalDetectorSolver {
         }
 
         metalDetectorDistancePattern.matchMatcher(event.actionBar) {
-            val distance = group("distance").toDoubleOrNull() ?: return
+            val distance = group("distance").formatDoubleOrNull() ?: return
 
             if (baseCoordinates == null) findBaseCoordinates()
             val baseCoordinatesNonNull = baseCoordinates ?: return

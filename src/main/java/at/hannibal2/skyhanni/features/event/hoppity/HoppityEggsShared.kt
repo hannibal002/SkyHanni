@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
@@ -32,8 +32,7 @@ object HoppityEggsShared {
         if (!isEnabled()) return
 
         sharedEggPattern.matchMatcher(event.message.removeColor()) {
-            val (x, y, z) = listOf(group("x"), group("y"), group("z")).map { it.formatInt() }
-            val eggLocation = LorenzVec(x, y, z)
+            val eggLocation = toLorenzVec() ?: return
 
             val meal = getEggType(event)
             val note = groupOrNull("note")
@@ -52,11 +51,9 @@ object HoppityEggsShared {
         val islandEggsLocations = HoppityEggLocations.islandLocations
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
-        val x = closestEgg.x.toInt()
-        val y = closestEgg.y.toInt()
-        val z = closestEgg.z.toInt()
+        val location = closestEgg.toChatFormat()
 
-        HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
+        HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at $location ($note)")
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared

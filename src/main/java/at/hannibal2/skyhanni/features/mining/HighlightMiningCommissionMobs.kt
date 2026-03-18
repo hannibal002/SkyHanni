@@ -27,29 +27,27 @@ object HighlightMiningCommissionMobs {
     private val config get() = SkyHanniMod.feature.mining
 
     // TODO Commission API
-    private var active = listOf<MobType>()
+    private var active = listOf<(LivingEntity) -> Boolean>()
 
     // TODO Commission API
-    enum class MobType(val commissionName: String, val isMob: (LivingEntity) -> Boolean) {
-
+    private val commissionMobs: Map<String, (LivingEntity) -> Boolean> = mapOf(
         // Dwarven Mines
-        DWARVEN_GOBLIN_SLAYER("Goblin Slayer", { it.name.string == "Goblin " }),
-        STAR_PUNCHER("Star Sentry Puncher", { it.name.string == "Crystal Sentry" }),
-        ICE_WALKER("Glacite Walker Slayer", { it.name.string == "Ice Walker" }),
-        GOLDEN_GOBLIN("Golden Goblin Slayer", { it.name.string.contains("Golden Goblin") }),
-        TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name.string == "Treasuer Hunter" }), // typo is intentional
+        "Goblin Slayer" to { it.name.string == "Goblin " || it.name.string == "Weakling " }, // Dwarven Mines + Crystal Hollows
+        "Star Sentry Puncher" to { it.name.string == "Crystal Sentry" },
+        "Glacite Walker Slayer" to { it.name.string == "Ice Walker" },
+        "Golden Goblin Slayer" to { it.name.string.contains("Golden Goblin") },
+        "Treasure Hoarder Puncher" to { it.name.string == "Treasuer Hunter" }, // typo is intentional
 
         // Crystal Hollows
-        AUTOMATON("Automaton Slayer", { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
-        TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name.string == "Team Treasurite" }),
-        YOG("Yog Slayer", { it is MagmaCube && it.hasMaxHealth(35_000) }),
-        THYST("Thyst Slayer", { it is Endermite && it.hasMaxHealth(5_000) }),
-        CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name.string == "Team Treasurite" }),
-        SLUDGE("Sludge Slayer", { it is Slime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
-        CH_GOBLIN_SLAYER("Goblin Slayer", { it.name.string == "Weakling " }),
+        "Automaton Slayer" to { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) },
+        "Team Treasurite Member Slayer" to { it.name.string == "Team Treasurite" },
+        "Yog Slayer" to { it is MagmaCube && it.hasMaxHealth(35_000) },
+        "Thyst Slayer" to { it is Endermite && it.hasMaxHealth(5_000) },
+        "Corleone Slayer" to { it.hasMaxHealth(1_000_000) && it.name.string == "Team Treasurite" },
+        "Sludge Slayer" to { it is Slime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) },
 
         // new commissions
-    }
+    )
 
     @OptIn(AllEntitiesGetter::class)
     @HandleEvent
@@ -59,12 +57,14 @@ object HighlightMiningCommissionMobs {
 
         // TODO: optimize to just update when the commissions change
         val entities = EntityUtils.getEntities<LivingEntity>()
-        for ((type, entity) in active.flatMap { type -> entities.map { type to it } }) {
-            if (type.isMob(entity)) {
-                RenderLivingEntityHelper.setEntityColor(
-                    entity,
-                    LorenzColor.YELLOW.toColor().addAlpha(127),
-                ) { isEnabled() && type in active }
+        for (isMob in active) {
+            for (entity in entities) {
+                if (isMob(entity)) {
+                    RenderLivingEntityHelper.setEntityColor(
+                        entity,
+                        LorenzColor.YELLOW.toColor().addAlpha(127),
+                    ) { isEnabled() && isMob in active }
+                }
             }
         }
     }
@@ -73,16 +73,11 @@ object HighlightMiningCommissionMobs {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
-        // TODO Commissin API
-        MobType.entries.filter { type ->
-            event.tabList.findLast { line -> line.string.removeColor().trim().startsWith(type.commissionName) }
-                ?.let { !it.string.endsWith("DONE") }
-                ?: false
-        }.let {
-            if (it != active) {
-                active = it
-            }
-        }
+        // TODO Commission API
+        active = commissionMobs.filter { (name, _) ->
+            event.tabList.findLast { line -> line.string.removeColor().trim().startsWith(name) }
+                ?.let { !it.string.endsWith("DONE") } ?: false
+        }.values.toList()
     }
 
     @HandleEvent
@@ -90,12 +85,12 @@ object HighlightMiningCommissionMobs {
         if (!isEnabled()) return
 
         val entity = event.entity
-        for (type in active) {
-            if (type.isMob(entity)) {
+        for (isMob in active) {
+            if (isMob(entity)) {
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
                     LorenzColor.YELLOW.toColor().addAlpha(127),
-                ) { isEnabled() && type in active }
+                ) { isEnabled() && isMob in active }
             }
         }
     }

@@ -198,6 +198,16 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             return progress
         }
 
+        fun startBlock(
+            label: String,
+            block: (ChatProgressUpdates) -> Unit
+        ): ChatProgressUpdates = start(label).apply { block(this) }
+
+        suspend fun startSuspendBlock(
+            label: String,
+            block: suspend (ChatProgressUpdates) -> Unit
+        ): ChatProgressUpdates = start(label).apply { block(this) }
+
         fun toggle() {
             enabled = !enabled
             dirty = true

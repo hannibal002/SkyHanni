@@ -16,13 +16,12 @@ import java.awt.Color
 object PigFeatures {
 
     private val config get() = SkyHanniMod.feature.event.yearOfThePig
-    private val dataSetList get() = PigFeaturesApi.dataSetList
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.linesToDraw.any()) return
 
-        dataSetList.forEach { dataSet ->
+        PigFeaturesApi.dataSetList.forEach { dataSet ->
             event.tryRenderLineToPig(dataSet)
             event.tryRenderLinePigToOrb(dataSet)
         }

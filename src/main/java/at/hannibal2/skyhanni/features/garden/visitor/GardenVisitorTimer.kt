@@ -83,7 +83,7 @@ object GardenVisitorTimer {
     )
 
     private fun TabListUpdateEvent.readTimePattern(
-        context: TabUpdateContext
+        context: TabUpdateContext,
     ): Boolean = timePattern.firstComponentMatcher(tabList) {
         val timeInfo = group("info")
         if (timeInfo == "Not Unlocked!") {
@@ -210,7 +210,9 @@ object GardenVisitorTimer {
             outsideInventory = true,
             inOwnInventory = true,
         ) {
-            config.position.renderRenderable(display, posLabel = "Garden Visitor Timer")
+            display?.let {
+                config.position.renderRenderable(it, posLabel = "Garden Visitor Timer")
+            }
         }
     }
 

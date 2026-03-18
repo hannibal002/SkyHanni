@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -59,12 +60,12 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import com.mojang.authlib.properties.PropertyMap
@@ -616,7 +617,7 @@ object ItemUtils {
     var bazaarOverrides = mapOf<String, String>()
         private set
 
-    private data class BazaarOverride(
+    internal data class BazaarOverride(
         @Expose @SerializedName("stock") val bazaarInternalName: String,
         @Expose @SerializedName("id") val neuInternalName: String,
     )
@@ -631,9 +632,9 @@ object ItemUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
-        val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
-        bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+        bazaarOverrides = event.getConstant<List<BazaarOverride>>("bazaarstocks").associate {
+            it.bazaarInternalName to it.neuInternalName
+        }
 
         // clear the item name cache so any potential missing items are reloaded
         itemNameCache.clear()
@@ -743,11 +744,11 @@ object ItemUtils {
         }
     }
 
+    private val testItemCoroutineConfig = CoroutineConfig("shtestitem").withIOContext()
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
-
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine("shtestitem") {
+        testItemCoroutineConfig.launch {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }

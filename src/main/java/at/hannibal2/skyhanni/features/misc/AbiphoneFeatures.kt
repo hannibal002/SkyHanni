@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AbiphoneContactInfo
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAbiphoneJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
@@ -63,7 +62,7 @@ object AbiphoneFeatures {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone", NeuAbiphoneJson.TYPE)
+        val constant = event.getConstant<Map<String, AbiphoneContactInfo>>("abiphone")
         abiphoneContacts = constant.flatMap { (key, value) ->
             value.callNames ?: listOf(key.removeAllNonLettersAndNumbers().replace(" ", ""))
         }.toSet()

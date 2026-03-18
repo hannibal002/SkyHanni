@@ -110,7 +110,7 @@ object SeaCreatureManager {
         allFishingMobs = emptyMap()
         var counter = 0
 
-        val data = event.getConstant<Map<String, SeaCreatureJson>>("SeaCreatures", SeaCreatureJson.TYPE)
+        val data = event.getConstant<Map<String, SeaCreatureJson>>("SeaCreatures")
         val allFishingMobs = mutableMapOf<String, SeaCreature>()
 
         val variants = mutableMapOf<String, List<String>>()

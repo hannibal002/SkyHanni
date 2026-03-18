@@ -63,7 +63,9 @@ object FrogMaskFeatures {
     fun onRenderOverlay() {
         if (!isEnabled()) return
 
-        config.position.renderRenderable(display, posLabel = "Frog Mask Display")
+        display?.let {
+            config.position.renderRenderable(it, posLabel = "Frog Mask Display")
+        }
     }
 
     @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
