@@ -6,51 +6,49 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.ServerTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.roundedUpSeconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TpsCounter {
 
-    private val config get() = SkyHanniMod.feature.gui
-
     private val WORLD_SWITCH_DELAY = 5.seconds
 
-    private var lastServerTick = ServerTimeMark.farPast()
-    private var lastError = SimpleTimeMark.farPast()
-    private val tpsList = TimeAndSizeLimitedCache<Long, Long>(100, 5.seconds)
+    private val config get() = SkyHanniMod.feature.gui
+
+    // MSPT (Milliseconds Per Tick) = 1000 / TPS
+    private val msptList = TimeAndSizeLimitedCache<Long, Double>(100, 5.seconds)
     val tps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
-            tpsList.isEmpty() -> 0.0
-            else -> (1000.0 / tpsList.values.average()).coerceIn(0.0..20.0).also {
+            msptList.isEmpty() -> 0.0
+            else -> (1000.0 / msptList.values.average()).coerceIn(0.0..20.0).also {
                 if (!it.isFinite()) printError(it)
             }
         }
 
-    private var display: Renderable? = null
-
     private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
+
+    private var display: Renderable? = null
+    private var lastServerTick = SimpleTimeMark.farPast()
+    private var lastError = SimpleTimeMark.farPast()
     private var pendingTpsCommand = false
 
     @HandleEvent
     fun onServerTick(event: ServerTickEvent) {
-        val now = event.timeMark
+        val now = SimpleTimeMark.now()
         if (!lastServerTick.isFarPast()) {
-            tpsList[event.tick] = (now - lastServerTick).inWholeMilliseconds
+            msptList[event.tick] = (now - lastServerTick).inPartialMilliseconds
         }
         lastServerTick = now
     }
@@ -59,7 +57,7 @@ object TpsCounter {
     fun onSecondPassed() {
         if (lastServerTick.passedSince() >= 1.seconds) {
             ChatUtils.debug("No server ticks detected for 1 second, clearing TPS data")
-            tpsList.clear()
+            msptList.clear()
         }
 
         updateDisplay()
@@ -72,8 +70,12 @@ object TpsCounter {
 
     private fun getTpsString(compact: Boolean = false): String = buildString {
         append("§eTPS: ")
-        when (val currentTps = tps) {
-            null -> {
+        val currentTps = tps
+        when {
+            LimboTimeTracker.inLimbo -> {
+                append("§fN/A §7(Limbo)")
+            }
+            currentTps == null -> {
                 val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
                 if (!compact) append("§fCalculating... ")
                 append("§7(${remaining}s)")
@@ -102,9 +104,9 @@ object TpsCounter {
 
     @HandleEvent
     fun onWorldChange() {
-        tpsList.clear()
+        msptList.clear()
         display = null
-        lastServerTick = ServerTimeMark.farPast()
+        lastServerTick = SimpleTimeMark.farPast()
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
@@ -147,8 +149,18 @@ object TpsCounter {
             "TPS calculation got an error",
             "tps is $tps",
             "tps" to tps,
-            "tpsList" to tpsList,
+            "msptList" to msptList,
             "timeSinceWorldSwitch" to timeSinceWorldSwitch,
         )
+    }
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("TPS Counter")
+        event.addIrrelevant {
+            add("TPS: %.1f".format(tps))
+            add("Milliseconds Per Tick: ${msptList.values.joinToString(", ") { "%.1f".format(it) }}")
+            add("Time Since World Switch: $timeSinceWorldSwitch")
+        }
     }
 }
