@@ -83,7 +83,7 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEXT: §7Piece Bonus: §6+10☘
+     * @regexTest §7Piece Bonus: §6+10☘
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
