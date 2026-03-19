@@ -47,7 +47,7 @@ object AvoriusHelper {
         if (!isEnabled()) return
         if (lastSentMessage.passedSince() < 15.seconds) return
 
-        if (!avoriusLines.matches(event.cleanMessage)) return;
+        if (!avoriusLines.matches(event.cleanMessage)) return
         if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == CUP_OF_BLOOD } > 0) return
 
         DelayedRun.runNextTick {
