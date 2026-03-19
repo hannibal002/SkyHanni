@@ -147,10 +147,9 @@ object WorldRenderUtils {
          * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
         seeThroughBlocks: Boolean = false,
     ) {
-        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, seeThroughBlocks)
+        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, seeThroughBlocks)
     }
 
     // TODO make deprecated
@@ -163,7 +162,6 @@ object WorldRenderUtils {
          * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
         seeThroughBlocks: Boolean = false,
     ) {
         val effectiveAABB = if (!renderRelativeToCamera) {
@@ -816,13 +814,13 @@ object WorldRenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
-        drawLineToEye(location, color.toColor(), lineWidth, depth)
+    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+        drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(
-            exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2),
+            exactPlayerCrosshairLocation(),
             location,
             color,
             lineWidth,
@@ -952,8 +950,6 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos(ignored: Float) = getViewerPos()
-
     fun getViewerPos() =
         Minecraft.getInstance().gameRenderer.mainCamera?.let { exactLocation(it) } ?: LorenzVec()
 
@@ -984,6 +980,9 @@ object WorldRenderUtils {
         return exactLocation(player).add(y = eyeHeight)
     }
 
+    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
+        exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
+
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
         if (entity.deceased) return entity.boundingBox
         val offset = exactLocation(entity) - entity.getLorenzVec()
@@ -997,10 +996,12 @@ object WorldRenderUtils {
         ) ?: aabb
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
-        val add = if (player.isShiftKeyDown) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-        return exactLocation(player) + add
-    }
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
+        exactLocation(player) + LorenzVec(
+            0.0,
+            if (player.isShiftKeyDown) SNEAKING_EYE_HEIGHT else STANDING_EYE_HEIGHT,
+            0.0,
+        )
 
     private fun addChainedFilledBoxVertices(
         matrices: PoseStack,

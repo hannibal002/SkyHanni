@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -191,7 +191,7 @@ object MetalDetectorSolver {
         predictedChestLocations.forEach {
             // TODO add chroma color support via config
             event.drawColor(it, LorenzColor.GOLD.toChromaColor())
-            event.drawLineToEye(it.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toChromaColor(), 3, false)
+            event.drawLineToCrosshair(it.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toChromaColor(), 3, false)
             event.drawWaypointFilled(it, LorenzColor.RED.toColor(), seeThroughBlocks = true, beacon = true)
             event.drawString(it, "Treasure: §e${it.distanceToPlayer().roundTo(1)}m", true)
         }
