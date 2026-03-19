@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
@@ -252,7 +253,10 @@ object ItemPickupLog {
         val default = hoverName.formattedTextCompatLeadingWhiteLessResets()
         return runCatching {
             if (compact) getInternalName().repoItemName else default
-        }.getOrDefault(default)
+        }.getOrElse {
+            ChatUtils.debug("Could not get dynamic name for $item - error:\n$it")
+            default
+        }
     }
 
     private fun ItemStack.hash(): Int {
