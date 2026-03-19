@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 // https://wiki.hypixel.net/Avorius
 @SkyHanniModule
@@ -28,12 +28,14 @@ object AvoriusHelper {
 
     private val CUP_OF_BLOOD = "CUP_OF_BLOOD".toInternalName()
 
+    private val cupOfBloodPrimitiveStack by lazy { CUP_OF_BLOOD.makePrimitiveStack() }
+
     /**
      * REGEX-TEST: §e[NPC] §cAvorius§f: §rI am quite thirsty all the time, it's a rare condition.
      * REGEX-TEST: §e[NPC] §cAvorius§f: §rThere is no sunlight either, it would be quite accommodating for a Vampire.
      * REGEX-TEST: §e[NPC] §cAvorius§f: §rWhy are you looking at me that way? I am not a Vampire, you are!
      */
-    private val patterns by RepoPattern.list(
+    private val avoriusLines by RepoPattern.list(
         "crimson.avorius.helper",
         "\\[NPC] Avorius: I am quite thirsty all the time, it's a rare condition\\.",
         "\\[NPC] Avorius: There is no sunlight either, it would be quite accommodating for a Vampire\\.",
@@ -43,15 +45,14 @@ object AvoriusHelper {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (lastSentMessage.passedSince() < 5.minutes) return
+        if (lastSentMessage.passedSince() < 15.seconds) return
 
-        patterns.matchMatchers(event.cleanMessage) {} ?: return
-
+        if (!avoriusLines.matches(event.cleanMessage)) return;
         if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == CUP_OF_BLOOD } > 0) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(
-                CUP_OF_BLOOD.makePrimitiveStack(),
+                cupOfBloodPrimitiveStack,
                 "Click here to grab a Cup of Blood from sacks!",
             )
         }
