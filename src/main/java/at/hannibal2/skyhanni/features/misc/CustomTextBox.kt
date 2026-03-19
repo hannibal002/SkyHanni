@@ -31,7 +31,7 @@ object CustomTextBox {
     private fun String.format(): List<Renderable> = replace("&", "§").split("\\n").map { Renderable.text(it) }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGui) return
         if (!isEnabled()) return
 

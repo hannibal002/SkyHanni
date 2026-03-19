@@ -32,7 +32,7 @@ object ExperimentsDryStreakDisplay {
     private var ignoreNextFinish = false
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled() || !ExperimentationTableApi.inTable) return
 
         val display = display.takeIfNotEmpty() ?: drawDisplay().takeIfNotEmpty() ?: return

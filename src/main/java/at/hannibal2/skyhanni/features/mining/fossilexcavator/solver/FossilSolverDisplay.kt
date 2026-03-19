@@ -186,7 +186,7 @@ object FossilSolverDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
