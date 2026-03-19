@@ -410,7 +410,7 @@ object MinionFeatures {
     private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isCurrent() || IslandType.HUB.isCurrent()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
         val display = display ?: return

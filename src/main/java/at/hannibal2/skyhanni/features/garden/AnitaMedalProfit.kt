@@ -234,7 +234,7 @@ object AnitaMedalProfit {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory || VisitorApi.inInventory) return
         config.medalProfitPos.renderRenderables(
             display,

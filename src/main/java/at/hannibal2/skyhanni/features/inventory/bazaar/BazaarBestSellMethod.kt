@@ -79,7 +79,7 @@ object BazaarBestSellMethod {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         val display = display ?: return

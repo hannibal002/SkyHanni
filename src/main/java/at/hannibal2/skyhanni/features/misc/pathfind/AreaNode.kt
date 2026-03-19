@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
