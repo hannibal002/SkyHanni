@@ -108,8 +108,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRender() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
@@ -249,7 +249,10 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        return if (compact) getInternalName().repoItemName else hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val default = hoverName.formattedTextCompatLeadingWhiteLessResets()
+        return runCatching {
+            if (compact) getInternalName().repoItemName else default
+        }.getOrDefault(default)
     }
 
     private fun ItemStack.hash(): Int {
