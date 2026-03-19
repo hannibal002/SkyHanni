@@ -145,9 +145,8 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(PlayerUtils.blockPosition()) {
-                add(" /shtestwaypoint $x $y $z pathfind")
-            }
+            val location = PlayerUtils.blockPosition().toLocalFormat()
+            add(" /shtestwaypoint $location pathfind")
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
         }
     }
@@ -209,7 +208,7 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
-        val pingEnabled = DevApi.config.pingApi
+        val pingEnabled = DevApi.mainToggles.pingApi
 
         val list = buildList {
             add("tps: $tps")

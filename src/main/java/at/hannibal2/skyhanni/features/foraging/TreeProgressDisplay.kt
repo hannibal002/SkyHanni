@@ -27,8 +27,9 @@ object TreeProgressDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-        if (display == null) return
-        config.position.renderRenderable(display, posLabel = "Tree Progress")
+        display?.let {
+            config.position.renderRenderable(it, posLabel = "Tree Progress")
+        }
     }
 
     // TODO: optimize to not use getEntities

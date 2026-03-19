@@ -65,7 +65,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     open val backupRepoResourcePath: String? = null
 
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
-    abstract val config: AbstractRepoConfig<*>
+    abstract val config: AbstractRepoConfig
     abstract val configDirectory: File
 
     val logger by lazy { RepoLogger("[Repo - $commonName]") }
