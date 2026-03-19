@@ -168,9 +168,8 @@ object AdvancedPlayerList {
     }
 
     private fun createCustomName(data: PlayerData): Component {
-        val playerName = if (config.useLevelColorForName) {
-            val c = data.levelText[3]
-            "§$c" + data.name
+        val playerName = if (config.useLevelColorForName) data.levelText.getOrNull(3)?.let {
+            "§$it" + data.name
         } else if (config.hideRankColor) "§b" + data.name else data.coloredName
 
         val level = if (!config.hideLevel) {
