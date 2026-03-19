@@ -38,9 +38,9 @@ class DiskRepoFileSystem(
      */
     override fun pathDiagnostics(path: String): String = with(File(root, path)) {
         buildString {
-            append("absolutePath='${absolutePath}'")
+            append("absolutePath='$absolutePath'")
             append(", exists=${exists()}")
-            append(", isFile=${isFile}")
+            append(", isFile=$isFile")
             if (exists()) {
                 append(", size=${length()}B")
                 append(", canRead=${canRead()}")
