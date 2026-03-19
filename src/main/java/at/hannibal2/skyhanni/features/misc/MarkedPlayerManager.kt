@@ -82,7 +82,7 @@ object MarkedPlayerManager {
         }
 
     private fun RemotePlayer.setColor() {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+        RenderLivingEntityHelper.setEntityColor(
             this,
             config.entityColor.get().toColor().addAlpha(127),
             ::isEnabled,
@@ -197,7 +197,7 @@ object MarkedPlayerManager {
                     ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
                 } else {
                     playerNamesToMark.remove(name)
-                    markedPlayers[name]?.let { RenderLivingEntityHelper.removeCustomRender(it) }
+                    markedPlayers[name]?.let { RenderLivingEntityHelper.removeEntityColor(it) }
                     markedPlayers.remove(name)
                     ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
                 }

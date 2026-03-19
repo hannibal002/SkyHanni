@@ -132,7 +132,7 @@ object BroodmotherFeatures {
     }
 
     private fun playImminentWarning() {
-        SoundUtils.repeatSound(100, 2, SoundUtils.createSound("note.pling", 0.5f))
+        SoundUtils.repeatSound(100, 2, SoundUtils.createSound("block.note_block.pling", 0.5f))
         ChatUtils.chat(
             componentBuilder {
                 append("The Broodmother is ")

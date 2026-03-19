@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.world.entity.Entity
 
 /**
- * THis event is already cached and only fires 5 times per second per entity.
+ * This event is already cached and only fires 5 times per second per entity.
  * This means the changed visibility state can take up to 200ms until it updates.
  * This is a cached version similarly to [SkyHanniRenderEntityEvent].
  * Do not use this event when you want to do further render calls!

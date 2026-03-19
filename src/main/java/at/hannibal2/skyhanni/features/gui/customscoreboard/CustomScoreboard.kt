@@ -62,6 +62,8 @@ object CustomScoreboard {
 
     private var dirty = false
 
+    private var lastLines: List<ScoreboardLine> = emptyList()
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
@@ -111,9 +113,13 @@ object CustomScoreboard {
         if (dirty || nextScoreboardUpdate.isInPast()) {
             nextScoreboardUpdate = 250.milliseconds.fromNow()
             dirty = false
-            display = createLines().removeEmptyLinesFromEdges().createRenderable()
-            if (TabListData.fullyLoaded) {
-                cache = display
+            val newLines = createLines().removeEmptyLinesFromEdges()
+            if (newLines != lastLines) {
+                lastLines = newLines
+                display = newLines.createRenderable()
+                if (TabListData.fullyLoaded) {
+                    cache = display
+                }
             }
         }
 

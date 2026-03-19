@@ -61,7 +61,7 @@ object VoltHighlighter {
         for (entity in EntityUtils.getEntities<LivingEntity>()) {
             val state = getVoltState(entity).takeIf { it != VoltState.NO_VOLT } ?: continue
 
-            if (config.voltMoodMeter) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            if (config.voltMoodMeter) RenderLivingEntityHelper.setEntityColor(
                 entity,
                 state.color.toColor()
             ) { config.voltMoodMeter }

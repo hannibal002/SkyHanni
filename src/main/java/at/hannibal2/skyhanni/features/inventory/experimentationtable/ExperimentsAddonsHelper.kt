@@ -231,7 +231,7 @@ object ExperimentsAddonsHelper {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!ExperimentationTableApi.inChronomatron) return
         // This sound indicates when the player has finished a round in chronomatron
-        if (event.soundName != "random.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
+        if (event.soundName != "entity.player.levelup" || event.pitch != 1.7619047f || event.volume != 0.7f) return
         lastChronomatronSound = SimpleTimeMark.now()
     }
 

@@ -145,9 +145,8 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${SkyBlockUtils.scoreboardArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            with(PlayerUtils.blockPosition()) {
-                add(" /shtestwaypoint $x $y $z pathfind")
-            }
+            val location = PlayerUtils.blockPosition().toLocalFormat()
+            add(" /shtestwaypoint $location pathfind")
             add("isOnAlphaServer: '${SkyBlockUtils.isOnAlphaServer}'")
         }
     }
@@ -155,7 +154,7 @@ object DebugCommand {
     // todo clean this up so that it commonly reports on any AbstractRepoManager
     private fun repoData(event: DebugDataCollectEvent) {
         event.title("Repo Information")
-        val config = SkyHanniMod.feature.dev.repo
+        val config = DevApi.config.repo
 
         val hasDefaultSettings = config.location.hasDefaultSettings()
         val unsuccessfulConstants = SkyHanniRepoManager.getFailedConstants()
@@ -175,7 +174,7 @@ object DebugCommand {
                 }
             }
 
-            val neuRepoConfig = SkyHanniMod.feature.dev.neuRepo
+            val neuRepoConfig = DevApi.config.neuRepo
             add(" neuRepoAutoUpdate: ${neuRepoConfig.repoAutoUpdate}")
 
             if (!neuRepoConfig.location.hasDefaultSettings()) {
@@ -209,7 +208,7 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
-        val pingEnabled = SkyHanniMod.feature.dev.pingApi
+        val pingEnabled = DevApi.mainToggles.pingApi
 
         val list = buildList {
             add("tps: $tps")

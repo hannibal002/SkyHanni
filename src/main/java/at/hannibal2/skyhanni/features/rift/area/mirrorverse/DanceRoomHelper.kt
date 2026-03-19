@@ -111,10 +111,10 @@ object DanceRoomHelper {
         if (inRoom) update()
     }
 
-    private fun PlaySoundEvent.isFailure() = (soundName == "random.burp" && volume == 0.8f) ||
-        (soundName == "random.levelup" && pitch == 1.8412699f && volume == 1f)
+    private fun PlaySoundEvent.isFailure() = (soundName == "entity.player.burp" && volume == 0.8f) ||
+        (soundName == "entity.player.levelup" && pitch == 1.8412699f && volume == 1f)
 
-    private fun PlaySoundEvent.isSuccess() = soundName == "note.bassattack" &&
+    private fun PlaySoundEvent.isSuccess() = soundName == "block.note_block.bass" &&
         pitch == 0.6984127f && volume == 1f
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

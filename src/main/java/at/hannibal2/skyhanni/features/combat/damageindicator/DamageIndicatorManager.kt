@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -77,7 +78,7 @@ import at.hannibal2.skyhanni.data.mob.Mob as ShMob
 
 typealias EntityData = DamageIndicatorEntityData
 
-// TODO cut class into smaller pieces
+// TODO cut class into definition, API, and display classes
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
@@ -370,7 +371,7 @@ object DamageIndicatorManager {
         val mob = event.mob
 
         if (SkyBlockUtils.debug) {
-            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.mobType}", 5.seconds.fromNow()))
+            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.category}", 5.seconds.fromNow()))
         }
         if (!isEnabled()) return
         try {
@@ -1047,12 +1048,10 @@ object DamageIndicatorManager {
         }
     }
 
-    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
-
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
-        if (!backendEnabled) {
+        if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")
         } else {
             event.addIrrelevant {
@@ -1067,5 +1066,5 @@ object DamageIndicatorManager {
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && DevApi.mainToggles.damageIndicator
 }

@@ -18,10 +18,9 @@ object RenderLivingEntityHelper {
     private val entityColorMap = mutableMapOf<LivingEntity, Color>()
     private val entityColorCondition = ConcurrentHashMap<LivingEntity, () -> Boolean>()
 
-    private val entityNoHurtTimeCondition = mutableMapOf<LivingEntity, () -> Boolean>()
-
     @JvmStatic
     var areMobsHighlighted = false
+        private set
 
     @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
@@ -54,15 +53,12 @@ object RenderLivingEntityHelper {
     fun onWorldChange() {
         entityColorMap.clear()
         entityColorCondition.clear()
-
-        entityNoHurtTimeCondition.clear()
     }
 
     @HandleEvent(SkyHanniTickEvent::class)
     fun onTick() {
         entityColorMap.removeIfKey { it.deceased }
         entityColorCondition.removeIfKey { it.deceased }
-        entityNoHurtTimeCondition.removeIfKey { it.deceased }
     }
 
     fun <T : LivingEntity> removeEntityColor(entity: T) {
@@ -76,24 +72,6 @@ object RenderLivingEntityHelper {
         entityColorCondition[entity] = condition
     }
 
-    private fun <T : LivingEntity> setEntityNoHurtTime(entity: T, condition: () -> Boolean) {
-        entityNoHurtTimeCondition[entity] = condition
-    }
-
-    fun <T : LivingEntity> setEntityColorWithNoHurtTime(entity: T, color: Color, condition: () -> Boolean) {
-        setEntityColor(entity, color, condition)
-        setEntityNoHurtTime(entity, condition)
-    }
-
-    fun <T : LivingEntity> removeNoHurtTime(entity: T) {
-        entityNoHurtTimeCondition.remove(entity)
-    }
-
-    fun <T : LivingEntity> removeCustomRender(entity: T) {
-        removeEntityColor(entity)
-        removeNoHurtTime(entity)
-    }
-
     @JvmStatic
     fun <T : LivingEntity> internalSetColorMultiplier(entity: T, default: Int): Int {
         if (GlobalRender.renderDisabled) return default
@@ -104,17 +82,5 @@ object RenderLivingEntityHelper {
             }
         }
         return default
-    }
-
-    @JvmStatic
-    fun <T : LivingEntity> internalChangeHurtTime(entity: T): Int {
-        if (GlobalRender.renderDisabled) return entity.hurtTime
-        run {
-            val condition = entityNoHurtTimeCondition[entity] ?: return@run
-            if (condition.invoke()) {
-                return 0
-            }
-        }
-        return entity.hurtTime
     }
 }

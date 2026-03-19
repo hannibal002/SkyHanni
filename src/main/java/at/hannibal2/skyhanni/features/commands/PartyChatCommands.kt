@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -24,7 +25,6 @@ import kotlin.time.Duration.Companion.seconds
 object PartyChatCommands {
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
-    private val devConfig get() = SkyHanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,
@@ -70,7 +70,7 @@ object PartyChatCommands {
                 if (!CurrentPing.isEnabled()) {
                     ChatUtils.notifyOrDisable(
                         "Ping API is disabled, the ping command won't work!",
-                        devConfig::pingApi,
+                        DevApi.mainToggles::pingApi,
                     )
                     return@PartyChatCommand
                 }
@@ -83,9 +83,9 @@ object PartyChatCommands {
             { config.tpsCommand },
             requiresPartyLead = false,
             executable = {
-                if (TpsCounter.tps != null) {
-                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", prefix = true)
-                } else {
+                TpsCounter.tps?.let {
+                    HypixelCommands.partyChat("Current TPS: $it", prefix = true)
+                } ?: run {
                     ChatUtils.chat("TPS Command Sent too early to calculate TPS")
                 }
             },
@@ -213,19 +213,18 @@ object PartyChatCommands {
     }
 
     private fun blacklistModify(player: String) {
-        if (player !in storage.blacklistedUsers) {
-            ChatUtils.chat("§cNow ignoring §b$player§e!")
-            storage.blacklistedUsers.add(player)
+        if (isBlockedUser(player)) {
+            ChatUtils.chat("§aStopped ignoring §b$player§e!")
+            storage.blacklistedUsers.removeIf { it.equals(player, ignoreCase = true) }
             return
         }
-        ChatUtils.chat("§aStopped ignoring §b$player§e!")
-        storage.blacklistedUsers.remove(player)
-        return
+        ChatUtils.chat("§cNow ignoring §b$player§e!")
+        storage.blacklistedUsers.add(player)
     }
 
     private fun blacklistView() {
         val blacklist = storage.blacklistedUsers
-        if (blacklist.size <= 0) {
+        if (blacklist.isEmpty()) {
             ChatUtils.chat("Your ignored players list is empty!")
             return
         }
