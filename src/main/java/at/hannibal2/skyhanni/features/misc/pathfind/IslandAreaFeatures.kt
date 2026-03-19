@@ -116,8 +116,8 @@ object IslandAreaFeatures {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
+    @HandleEvent
+    fun onChestGuiRender() {
         if (!isAreaListEnabled()) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) {
@@ -221,7 +221,7 @@ object IslandAreaFeatures {
         onLeftClick = {
             if (area.node == targetNode) {
                 targetNode = null
-                IslandGraphs.stop()
+                IslandGraphs.stopNavigation()
                 IslandAreaBackend.update()
             } else {
                 setTarget(area.node)

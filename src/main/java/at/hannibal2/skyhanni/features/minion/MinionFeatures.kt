@@ -415,7 +415,7 @@ object MinionFeatures {
     private fun enableWithHub() = isEnabled() || IslandType.HUB.isCurrent()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
         config.hopperProfitPos.renderRenderable(Renderable.text(coinsPerDay), posLabel = "Minion Coins Per Day")
