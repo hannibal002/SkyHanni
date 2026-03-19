@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
-import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -999,11 +997,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
-        exactLocation(player) + LorenzVec(
-            0.0,
-            (if (player.isShiftKeyDown) SNEAKING_EYE_HEIGHT else STANDING_EYE_HEIGHT).toDouble(),
-            0.0,
-        )
+        exactLocation(player).up(player.getEyeHeight(player.pose))
 
     private fun addChainedFilledBoxVertices(
         matrices: PoseStack,
