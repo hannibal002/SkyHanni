@@ -34,7 +34,6 @@ object LineToSpiderSlayer {
     @HandleEvent
     fun onWorldChange() = bosses.clear()
 
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!SlayerApi.isInAnyArea || !config.lineToBoss) return
