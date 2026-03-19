@@ -122,7 +122,7 @@ object DungeonCleanEnd {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
+        if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("block.note_block.")) {
             event.cancel()
         }
     }
