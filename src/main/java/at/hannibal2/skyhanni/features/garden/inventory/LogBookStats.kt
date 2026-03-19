@@ -94,7 +94,7 @@ object LogBookStats {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (IslandType.GARDEN_GUEST.isCurrent()) return
         if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(

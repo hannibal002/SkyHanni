@@ -90,7 +90,9 @@ object BarnFishingTimer {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.pos.renderRenderable(display, posLabel = "Fishing Timer")
+        display?.let {
+            config.pos.renderRenderable(it, posLabel = "Fishing Timer")
+        }
     }
 
     private fun KMutableProperty0<Int>.decrease() = set((get() - 1).coerceAtLeast(0))
