@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -11,7 +10,6 @@ typealias NeuPetNumsJson = Map<String, PetSpecificNums>
 // Rarity -> ...
 private typealias PetSpecificNums = Map<LorenzRarity, NEURaritySpecificPetNums>
 
-@KSerializable
 data class NEURaritySpecificPetNums(
     @Expose @SerializedName("1") val min: NeuPetNums,
     @Expose @SerializedName("100") val max: NeuPetNums,

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.navigation
 
-import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils

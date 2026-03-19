@@ -71,6 +71,7 @@
 
 + Added hiding of Bingo-related NPCs on the Hub island graph when not playing on a Bingo profile. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5316)
 + Made Diana Tracker show exact burrows per hour when above 1000. - nopo (https://github.com/hannibal002/SkyHanni/pull/5340)
++ Added `/shresetshinyorbtracker` command to reset Shiny Orb Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5421)
 
 #### Farming
 
@@ -88,6 +89,7 @@
 + Added option to show Sky Mall and Lottery HUD outside of mining/foraging islands. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5297)
 + Improved visual quality of items in displays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5318)
 + Added a copy to clipboard for missing sack items. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/5351)
++ Improved pathfind lines to look prettier. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5417)
 
 #### Garden
 
@@ -139,6 +141,9 @@
 + Fixed advertisement blocking in Custom Tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5366)
 + Fixed Open Profile in SkyCrypt RPC buttons not working. - nopo (https://github.com/hannibal002/SkyHanni/pull/5369)
 + Improved Custom Scoreboard performance by caching rendered lines. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5368)
++ Fixed Advanced Player List issues with YouTubers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5427)
++ Fixed double XP lines in tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5427)
+
 
 #### Item Ability
 
@@ -153,6 +158,7 @@
 + Fixed `/shnavigate` to no longer show Carnival info while Carnival is not active. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5300)
 + Fixed showing more than 100% of found Hoppity locations on the island because of outdated config data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5394)
 + Fixed Stranded players being notified to collect Hoppity eggs. - Luna (https://github.com/hannibal002/SkyHanni/pull/5390)
++ Fixed Shiny Orb Tracker not working with revamped Year of the Pig event. - Luna (https://github.com/hannibal002/SkyHanni/pull/5421)
 
 #### Fishing
 
@@ -182,6 +188,7 @@
 #### Inventory
 
 + Fixed sometimes getting an error in chat / disconnect when opening sacks. - Luna (https://github.com/hannibal002/SkyHanni/pull/5370)
++ Fixed multiple overclockers not being detected by Jacob bulk-claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5410)
 
 #### Misc
 
@@ -191,6 +198,12 @@
 + Fixed island change event not always being sent, causing many features to malfunction (incorrect scoreboard data, broken profit trackers, etc.). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5399)
 + Fixed Sky Mall and Lottery HUD elements displaying outside of SkyBlock. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5389)
 + Fixed multiple different errors all related to island type detection, this time for real. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5408)
++ Fixed issues with backup repo not loading. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5343)
++ Fixed tracker uptime data not being saved between sessions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5412)
+
+#### Commands
+
++ Fixed colored item names in `/viewrecipe` autocomplete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5434)
 
 ### Technical Details
 
@@ -275,6 +288,18 @@
 + Migrated `FastFairySouls` to using colorless patterns and components. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5383)
 + Renamed the config of SkyHanni. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5374)
 + Added error logging and showing of island detection issues. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5408)
++ Added lots more suspension usage in repo for efficient IO. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5343)
++ Cleaned up code duplications around location to string or string to location parsing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5411)
++ Made `renderRenderable` require non-nullable strings now. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5428)
++ Migrated all top-level configs in `SkyHanniConfig` from `var` to `val`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5418)
++ Moved main toggles into one new shared config object. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5426)
++ Ported Vanquisher API from Nautilus. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5253)
++ Refactored `SkyHanniTypeAdapters` into an enum class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5380)
++ Renamed `Mob.Type` to `MobCategory`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5397)
++ Renamed all `ChestGuiOverlay` render handlers to `onChestGuiRender`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5418)
++ Simplified Reforge data loading from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5380)
++ Started cleanup of `Graph` and its related classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5380)
++ Started defining `PrimaryFunctions` for events missing them. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5418)
 
 ### Removed Features
 
