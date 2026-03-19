@@ -16,6 +16,14 @@ import org.lwjgl.glfw.GLFW
 
 class DevConfig {
 
+    // new config values
+
+    @Expose
+    @Category(name = "Main Toggles", desc = "Main Toggles")
+    val mainToggles: MainTogglesConfig = MainTogglesConfig()
+
+    // old config entries: all below options will get moved soon
+
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
@@ -120,22 +128,6 @@ class DevConfig {
     // @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
     // @ConfigEditorBoolean
     // var hypixelModApi: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Ping API",
-        desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
-    )
-    @ConfigEditorBoolean
-    var pingApi: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Damage Indicator",
-        desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!",
-    )
-    @ConfigEditorBoolean
-    var damageIndicatorBackend: Boolean = true
 
     @Expose
     @ConfigOption(
