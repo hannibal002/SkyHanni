@@ -107,6 +107,8 @@ data class LorenzVec(
     fun min() = min(x, min(y, z))
     fun max() = max(x, max(y, z))
 
+    fun addHalf() = add(0.5, 0.5, 0.5)
+
     fun minOfEachElement(other: LorenzVec) = LorenzVec(min(x, other.x), min(y, other.y), min(z, other.z))
     fun maxOfEachElement(other: LorenzVec) = LorenzVec(max(x, other.x), max(y, other.y), max(z, other.z))
 
@@ -224,6 +226,12 @@ data class LorenzVec(
     fun middle(other: LorenzVec): LorenzVec = this + ((other - this) / 2)
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
+
+    // format we use to send to all/party chat
+    fun toChatFormat(): String = "x: ${x.toInt()}, y: ${y.toInt()}, z: ${z.toInt()}"
+
+    // format we show in local chat or for local commands
+    fun toLocalFormat(): String = "${x.toInt()} ${y.toInt()} ${z.toInt()}"
 
     /**
      * Kotlin compiles the default equals method of data classes for doubles by comparing them, like
