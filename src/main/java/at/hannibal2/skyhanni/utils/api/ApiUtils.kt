@@ -129,4 +129,13 @@ object ApiUtils {
     fun isMoulberryLowestBinDisabled() = disabledApis?.disabledMoulberryLowestBin == true
     fun isHypixelItemsDisabled() = disabledApis?.disableHypixelItems == true
     fun isBazaarDisabled() = disabledApis?.disabledBazaar == true
+
+    /**
+     * Hypixel counts all hoppity locations ever found per island, not only the live ones. meaning, when an island changes big time,
+     * and the hoppity locations change, hypixel does not remove the legacy information from the player data.
+     * For fairy souls, hypixel properly moves the pointer/raw data for changed locations, for hoppity not. This toggle exists so we
+     * can change when hypixel decides to do the right thing and properly clears out invalid data from their user data.
+     * While this is not the case yet, we need to support invalid data to not show the user wrong data. thanks hypixel.
+     */
+    fun isLegacyHoppityLocationCountingDisabled() = disabledApis?.disabledCountingLegacyHoppityLocations == true
 }

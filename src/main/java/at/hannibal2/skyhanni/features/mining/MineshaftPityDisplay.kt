@@ -10,7 +10,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -322,8 +323,15 @@ object MineshaftPityDisplay {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.MINESHAFT || event.oldIsland == IslandType.MINESHAFT) {
+    fun onIslandChange(event: IslandJoinEvent) {
+        if (event.island == IslandType.MINESHAFT) {
+            resetCounter()
+        }
+    }
+
+    @HandleEvent
+    fun onIslandLeave(event: IslandLeaveEvent) {
+        if (event.island == IslandType.MINESHAFT) {
             resetCounter()
         }
     }
@@ -362,6 +370,7 @@ object MineshaftPityDisplay {
             2,
             ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
+
         // cant rename enum because config explodes
         GEMSTONE(
             "Low Tier Gemstone",

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GuiEditManager
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -22,7 +21,7 @@ object ChatPeek {
         if (Minecraft.getInstance().screen is SignEditScreen) return false
         if (ConfigUtils.configScreenCurrentlyOpen) return false
 
-        if (GuiEditManager.isInGui() || FFGuideGui.isInGui() || VisualWordGui.isInGui()) return false
+        if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return false
 
         return key.isKeyHeld()
     }

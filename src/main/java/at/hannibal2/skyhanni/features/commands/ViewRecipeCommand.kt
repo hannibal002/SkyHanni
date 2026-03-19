@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -66,7 +65,7 @@ object ViewRecipeCommand {
     fun onNeuRepoReload() {
         list = NeuItems.allNeuRepoItems().asSequence().filter { (_, json) ->
             json.recipe != null || json.recipes.any { it.type == NeuRecipeType.CRAFTING }
-        }.map { (key, _) -> key.repoItemName.lowercase() }.toList()
+        }.map { (key, _) -> key.skyblockCommandId }.toList()
     }
 
     fun customTabComplete(command: String): List<String>? {

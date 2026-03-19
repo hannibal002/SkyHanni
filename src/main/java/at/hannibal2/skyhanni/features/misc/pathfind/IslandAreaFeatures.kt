@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.AreaNodesUpdatedEvent
@@ -116,8 +116,8 @@ object IslandAreaFeatures {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
+    @HandleEvent
+    fun onChestGuiRender() {
         if (!isAreaListEnabled()) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
         if (isInOwnInventory) {
@@ -221,7 +221,7 @@ object IslandAreaFeatures {
         onLeftClick = {
             if (area.node == targetNode) {
                 targetNode = null
-                IslandGraphs.stop()
+                IslandGraphs.stopNavigation()
                 IslandAreaBackend.update()
             } else {
                 setTarget(area.node)
