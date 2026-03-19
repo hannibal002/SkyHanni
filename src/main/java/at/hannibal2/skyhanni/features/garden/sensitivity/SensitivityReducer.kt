@@ -38,6 +38,8 @@ object SensitivityReducer {
     private val isAutoActive get() = SensitivityState.AUTO_REDUCED.isActive()
     private val isManualActive get() = SensitivityState.MANUAL_REDUCED.isActive()
 
+    private val squeakyMousematItem = "SQUEAKY_MOUSEMAT".toInternalName()
+
     @HandleEvent
     fun onTick() {
         if (!GardenApi.inGarden()) {
@@ -189,7 +191,7 @@ object SensitivityReducer {
         }
     }
 
-    private fun isHoldingMousemat(): Boolean = GardenApi.itemInHand?.getInternalName() == "SQUEAKY_MOUSEMAT".toInternalName()
+    private fun isHoldingMousemat(): Boolean = GardenApi.itemInHand?.getInternalName() == squeakyMousematItem
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
     private fun isHoldingFishingRod(): Boolean = FishingApi.holdingRod
     private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
