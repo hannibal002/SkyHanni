@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.Closeable
