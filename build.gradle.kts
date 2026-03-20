@@ -358,9 +358,8 @@ detekt {
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12110
     val isCi = System.getenv("CI") == "true"
-    onlyIf { isTargetVersion && isCi }
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
+    val skipDetekt = project.findProperty("skipDetekt") == "true"
+    onlyIf { isTargetVersion && isCi && !skipDetekt }
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
