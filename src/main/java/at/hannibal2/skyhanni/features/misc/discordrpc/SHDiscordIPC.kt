@@ -119,6 +119,7 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
      * @return A pair of the received [Opcode] and its decoded JSON payload string.
      * @throws DiscordIPCException If the connection is closed by Discord or an unrecognized opcode is received.
      */
+    @Suppress("ThrowsCount")
     private fun readFrame(): Pair<Opcode, String> {
         val inp = connection?.input ?: throw DiscordIPCException("readFrame called with no active connection")
         val header = inp.readNBytes(8)
@@ -146,33 +147,20 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
         val activity = JsonObject().apply {
             presence.details?.let { addProperty("details", it) }
             presence.state?.let { addProperty("state", it) }
-            presence.startTimestamp?.let { add("timestamps", JsonObject().apply { addProperty("start", it) }) }
-
-            if (presence.largeImageKey != null || presence.largeImageText != null) {
-                add(
-                    "assets",
-                    JsonObject().apply {
-                        presence.largeImageKey?.let { addProperty("large_image", it) }
-                        presence.largeImageText?.let { addProperty("large_text", it) }
-                    },
-                )
+            presence.startTimestamp?.let { start ->
+                JsonObject().apply {
+                    addProperty("start", start)
+                }.also { add("timestamps", it) }
             }
 
-            if (presence.buttons.isNotEmpty()) {
-                add(
-                    "buttons",
-                    JsonArray().apply {
-                        presence.buttons.forEach { (label, url) ->
-                            add(
-                                JsonObject().apply {
-                                    addProperty("label", label)
-                                    addProperty("url", url)
-                                },
-                            )
-                        }
-                    },
-                )
-            }
+            if (presence.largeImageKey != null || presence.largeImageText != null) JsonObject().apply {
+                presence.largeImageKey?.let { addProperty("large_image", it) }
+                presence.largeImageText?.let { addProperty("large_text", it) }
+            }.let { add("assets", it) }
+
+            if (presence.buttons.isNotEmpty()) JsonArray().apply {
+                presence.buttons.forEach { (label, url) -> add(JsonObject().apply { addProperty("label", label); addProperty("url", url) }) }
+            }.let { add("buttons", it) }
         }
 
         return JsonObject().apply {

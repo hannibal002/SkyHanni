@@ -148,6 +148,12 @@ object DiscordRPCManager {
         }
     }
 
+    private val skyCryptUrl get(): String =
+        "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName.firstLetterUppercase()}".addSkyHanniUtm()
+
+    private val eliteSbUrl get(): String =
+        "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm()
+
     private fun updatePresence(progress: ChatProgressUpdates?) {
         progress?.update("start in updatePresence")
         val location = DiscordStatus.LOCATION.getDisplayString()
@@ -166,11 +172,11 @@ object DiscordRPCManager {
             buttons = buildList {
                 if (config.showEliteSkyBlockButton.get()) SHDiscordRichPresence.Button(
                     label = "Open EliteSkyBlock",
-                    url = "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
+                    url = eliteSbUrl,
                 ).let { add(it) }
                 if (config.showSkyCryptButton.get()) SHDiscordRichPresence.Button(
                     label = "Open SkyCrypt",
-                    url = "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName.firstLetterUppercase()}".addSkyHanniUtm(),
+                    url = skyCryptUrl,
                 ).let { add(it) }
             },
         )
@@ -197,9 +203,9 @@ object DiscordRPCManager {
 
     private fun isEnabled() = config.enabled.get()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        if (started || !isEnabled() || !SkyBlockUtils.inSkyBlock) return
+        if (started || !isEnabled()) return
         val progress = progressCategory.start("auto start in onTick")
         with(SkyHanniMod) { startConfig.launchUnScopedCoroutine { start(progress) } }
         started = true
@@ -259,10 +265,12 @@ object DiscordRPCManager {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Discord RPC")
-        if (debugError) {
-            event.addData { add("Error detected!"); add(debugStatusMessage) }
-        } else {
-            event.addIrrelevant { add("no error detected."); add("status: $debugStatusMessage") }
+        if (debugError) event.addData {
+            add("Error detected!")
+            add(debugStatusMessage)
+        } else event.addIrrelevant {
+            add("no error detected.")
+            add("status: $debugStatusMessage")
         }
     }
 
