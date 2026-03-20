@@ -206,9 +206,8 @@ class DiscordIPC(private val clientId: Long) : Closeable {
         }.getOrNull()
 
         val flatpakDirs = uid?.let {
-            val flatpakRoot = Path("/run/user/$it/.flatpak")
             runCatching {
-                Files.list(flatpakRoot).map { app -> "$app/xdg-run" }.toList()
+                Files.list(Path("/run/user/$it/.flatpak")).map { app -> "$app/xdg-run" }.toList()
             }.getOrDefault(emptyList())
         }.orEmpty()
 
@@ -222,13 +221,15 @@ class DiscordIPC(private val clientId: Long) : Closeable {
             "/tmp",
         ) + flatpakDirs
 
+        var lastError: Throwable? = null
         for (dir in dirs) {
             for (i in 0..9) {
                 val path = Path("$dir/discord-ipc-$i")
-                if (path.exists()) runCatching { return UnixIPCConnection(path) }
+                if (!path.exists()) continue
+                runCatching { return UnixIPCConnection(path) }.onFailure { lastError = it }
             }
         }
-        throw DiscordIPCException("No Discord IPC socket found on Unix. Is Discord running?")
+        throw DiscordIPCException("No Discord IPC socket found on Unix. Is Discord running? Last error: ${lastError?.message}", lastError)
     }
 
     private val isWindows = System.getProperty("os.name").lowercase().contains("win")
