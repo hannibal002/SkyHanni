@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.Closeable
@@ -159,7 +160,12 @@ class DiscordIPC(private val clientId: Long) : Closeable {
             }.let { add("assets", it) }
 
             if (presence.buttons.isNotEmpty()) JsonArray().apply {
-                presence.buttons.forEach { (label, url) -> add(JsonObject().apply { addProperty("label", label); addProperty("url", url) }) }
+                presence.buttons.forEach { (label, url) ->
+                    JsonObject().apply {
+                        addProperty("label", label)
+                        addProperty("url", url)
+                    }.let { add(it) }
+                }
             }.let { add("buttons", it) }
         }
 
