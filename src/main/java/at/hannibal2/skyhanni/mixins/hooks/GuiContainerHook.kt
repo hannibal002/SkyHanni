@@ -32,14 +32,14 @@ class GuiContainerHook(guiAny: Any) {
         partialTicks: Float,
     ): Boolean {
         if (GlobalRender.renderDisabled) return false
-        if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post()) {
+        return if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post()) {
             GuiData.preDrawEventCancelled = true
-            return true
+            true
         } else {
             DelayedRun.runNextTick {
                 GuiData.preDrawEventCancelled = false
             }
-            return false
+            false
         }
     }
 

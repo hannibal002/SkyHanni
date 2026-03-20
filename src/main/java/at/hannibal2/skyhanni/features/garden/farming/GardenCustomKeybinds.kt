@@ -23,33 +23,24 @@ object GardenCustomKeybinds {
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
 
-    private var map: Map<KeyMapping, Int> = emptyMap()
+    private var overrides: Map<KeyMapping, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
 
     @JvmStatic
-    fun isKeyDown(keyBinding: KeyMapping): Boolean? {
+    private fun KeyMapping.isKeyPredicated(predicate: Int.() -> Boolean): Boolean? {
         if (!isActive()) return null
-        val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
-                return false
-            }
-            return null
-        }
 
-        return override.isKeyHeld()
+        overrides[this]?.let { return it.predicate() }
+        if (key.value in overrides.values) return false
+
+        return null
     }
 
     @JvmStatic
-    fun isKeyPressed(keyBinding: KeyMapping): Boolean? {
-        if (!isActive()) return null
-        val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
-                return false
-            }
-            return null
-        }
-        return override.isKeyClicked()
-    }
+    fun isKeyDown(keyBinding: KeyMapping): Boolean? = keyBinding.isKeyPredicated { isKeyHeld() }
+
+    @JvmStatic
+    fun isKeyPressed(keyBinding: KeyMapping): Boolean? = keyBinding.isKeyPredicated { isKeyClicked() }
 
     @HandleEvent
     fun onTick() {
@@ -72,7 +63,7 @@ object GardenCustomKeybinds {
     private fun update() {
         with(config) {
             with(mcSettings) {
-                map = buildMap {
+                overrides = buildMap {
                     fun add(keyBinding: KeyMapping, property: Property<Int>) {
                         put(keyBinding, property.get())
                     }
