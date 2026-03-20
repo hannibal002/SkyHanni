@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.animation
 
 import at.hannibal2.skyhanni.config.storage.Resettable
+import kotlin.math.roundToInt
 
 /**
  * Tracks animated skull texture frames with server-tick and client-tick precision.
@@ -27,14 +28,25 @@ class SkullFrameTracker : Resettable {
         val fullTexture get() = if (uuid != null) "$uuid:$texture" else texture
     }
 
+    private data class FrameAccumulator(
+        val prototype: FrameRecord,
+        val clientSamples: MutableList<Int> = mutableListOf(),
+        val serverSamples: MutableList<Int> = mutableListOf(),
+    ) {
+        fun toFrameRecord() = prototype.copy(
+            clientTicks = clientSamples.average().roundToInt(),
+            serverTicks = serverSamples.average().roundToInt(),
+        )
+    }
+
     /** If every learned frame shares the same server tick duration, returns that value; otherwise null. */
-    val uniformServerTicks: Int? get() = _frames.firstOrNull()?.serverTicks?.takeIf {
-        first -> _frames.all { it.serverTicks == first }
+    val uniformServerTicks: Int? get() = frames.firstOrNull()?.serverTicks?.takeIf { first ->
+        frames.all { it.serverTicks == first }
     }
 
     /** If every learned frame shares the same client tick duration, returns that value; otherwise null. */
-    val uniformClientTicks: Int? get() = _frames.firstOrNull()?.clientTicks?.takeIf {
-        first -> _frames.all { it.clientTicks == first }
+    val uniformClientTicks: Int? get() = frames.firstOrNull()?.clientTicks?.takeIf { first ->
+        frames.all { it.clientTicks == first }
     }
 
     private enum class Phase { LEARNING, VERIFYING }
@@ -45,31 +57,34 @@ class SkullFrameTracker : Resettable {
     private var frameStartServerTick: Long = 0L
     private var frameStartClientTick: Int = 0
 
-    private val _frames = mutableListOf<FrameRecord>()
+    private val _accumulators = mutableListOf<FrameAccumulator>()
 
-    /** Learned frame sequence. Empty until the first loop completes. */
-    val frames: List<FrameRecord> get() = _frames
+    /** Learned frame sequence with averaged tick durations. Empty until the first loop completes. */
+    val frames: List<FrameRecord> get() = _accumulators.map { it.toFrameRecord() }
 
     /** Number of completed animation loops (≥ 1 once learning finishes). */
     var loopCount = 0
         private set
 
-    /** Number of frames whose texture or tick count differed from the learned sequence. */
+    /** Number of frames whose texture differed from the learned sequence. */
     var verificationErrors = 0
         private set
 
-    /** Index into [frames] of the next expected frame during verification. */
+    /** Index into accumulators of the next expected frame during verification. */
     var verifyIndex = 0
         private set
 
     val isLearning get() = phase == Phase.LEARNING
-    val hasData get() = _frames.isNotEmpty()
+    val hasData get() = _accumulators.isNotEmpty()
+
+    /** Minimum number of samples collected across all frames — the weakest link in accuracy. */
+    val minSampleCount: Int get() = _accumulators.minOfOrNull { it.serverSamples.size } ?: 0
 
     /**
      * Record the current skull texture for this tick.
      *
      * @param serverTick The tick number from [at.hannibal2.skyhanni.events.minecraft.ServerTickEvent].
-     * @param clientTick The tick number from [at.hannibal2.skyhanni.events.ClientEvents.totalTicks].
+     * @param clientTick The tick number from [at.hannibal2.skyhanni.api.minecraftevents.ClientEvents.totalTicks].
      * @param frame      The current skull frame, or null if no skull is present.
      * @return true if a loop was just completed.
      */
@@ -99,10 +114,12 @@ class SkullFrameTracker : Resettable {
 
     private fun onFrameEnd(frame: FrameRecord, serverTicks: Int, clientTicks: Int): Boolean = when (phase) {
         Phase.LEARNING -> {
-            if (_frames.isNotEmpty() && frame.fullTexture == firstTexture) {
+            if (_accumulators.isNotEmpty() && frame.fullTexture == firstTexture) {
                 // We've seen the first texture again, loop complete.
-                // Verify that its tick duration matches what we learned initially.
-                if (_frames.first().serverTicks != serverTicks) verificationErrors++
+                _accumulators.first().also {
+                    it.serverSamples.add(serverTicks)
+                    it.clientSamples.add(clientTicks)
+                }
                 loopCount++
                 phase = Phase.VERIFYING
                 // currentFrame is about to be set to the frame AFTER firstTexture,
@@ -110,16 +127,23 @@ class SkullFrameTracker : Resettable {
                 verifyIndex = 1
                 true
             } else {
-                _frames.add(frame.copy(serverTicks = serverTicks, clientTicks = clientTicks))
+                _accumulators.add(FrameAccumulator(frame).also {
+                    it.serverSamples.add(serverTicks)
+                    it.clientSamples.add(clientTicks)
+                })
                 false
             }
         }
 
         Phase.VERIFYING -> {
-            _frames.getOrNull(verifyIndex)?.let { expected ->
-                if (expected.fullTexture != frame.fullTexture || expected.serverTicks != serverTicks) verificationErrors++
+            val accumulator = _accumulators.getOrNull(verifyIndex)
+            if (accumulator == null || accumulator.prototype.fullTexture != frame.fullTexture) {
+                verificationErrors++
+            } else {
+                accumulator.serverSamples.add(serverTicks)
+                accumulator.clientSamples.add(clientTicks)
             }
-            verifyIndex = (verifyIndex + 1) % _frames.size
+            verifyIndex = (verifyIndex + 1) % _accumulators.size
             if (verifyIndex == 0) {
                 loopCount++
                 true
