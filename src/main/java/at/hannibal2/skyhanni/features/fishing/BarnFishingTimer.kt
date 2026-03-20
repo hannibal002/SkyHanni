@@ -211,7 +211,8 @@ object BarnFishingTimer {
         reset()
     }
 
-    @Suppress("UNUSED_PARAMETER") // `event` parameter is required because of the generic
+    // `event` parameter is required because of the generic
+    @Suppress("UNUSED_PARAMETER")
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         enabledInIsland = if (config.showAnywhere) true else hubBarnFishingLocation.distanceToPlayer() < 50
