@@ -15,6 +15,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.Channels
 import java.nio.channels.SocketChannel
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.UUID
 import kotlin.io.path.Path
@@ -200,13 +201,27 @@ class DiscordIPC(private val clientId: Long) : Closeable {
             throw DiscordIPCException("No Discord IPC pipe found on Windows. Is Discord running?")
         }
 
+        val uid = runCatching {
+            ProcessBuilder("id", "-u").start().inputStream.bufferedReader().readLine()?.trim()
+        }.getOrNull()
+
+        val flatpakDirs = uid?.let {
+            val flatpakRoot = Path("/run/user/$it/.flatpak")
+            runCatching {
+                Files.list(flatpakRoot).map { app -> "$app/xdg-run" }.toList()
+            }.getOrDefault(emptyList())
+        }.orEmpty()
+
         val dirs = listOfNotNull(
             System.getenv("XDG_RUNTIME_DIR"),
+            uid?.let { "/run/user/$it" },
+            uid?.let { "/run/user/$it/snap.discord" },
             System.getenv("TMPDIR"),
             System.getenv("TMP"),
             System.getenv("TEMP"),
             "/tmp",
-        )
+        ) + flatpakDirs
+
         for (dir in dirs) {
             for (i in 0..9) {
                 val path = Path("$dir/discord-ipc-$i")
