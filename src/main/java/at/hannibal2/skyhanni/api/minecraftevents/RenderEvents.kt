@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -56,49 +55,49 @@ object RenderEvents {
     // GameOverlayRenderPreEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPre(context: GuiGraphics): SkyHanniEvent =
+    fun postHotbarLayerEventPre(context: GuiGraphics) =
         GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
 
     @JvmStatic
-    fun postExperienceBarLayerEventPre(context: GuiGraphics): SkyHanniEvent =
+    fun postExperienceBarLayerEventPre(context: GuiGraphics) =
         GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPre(context: GuiGraphics): SkyHanniEvent =
+    fun postExperienceNumberLayerEventPre(context: GuiGraphics) =
         GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
 
     @JvmStatic
-    fun postTablistLayerEventPre(context: GuiGraphics): SkyHanniEvent =
+    fun postTablistLayerEventPre(context: GuiGraphics) =
         GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
 
     // GameOverlayRenderPostEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPost(context: GuiGraphics): SkyHanniEvent =
+    fun postHotbarLayerEventPost(context: GuiGraphics) =
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
 
     @JvmStatic
-    fun postExperienceBarLayerEventPost(context: GuiGraphics): SkyHanniEvent =
+    fun postExperienceBarLayerEventPost(context: GuiGraphics) =
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPost(context: GuiGraphics): SkyHanniEvent =
+    fun postExperienceNumberLayerEventPost(context: GuiGraphics) =
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
 
     @JvmStatic
-    fun postHeldItemTooltipLayerEventPre(context: GuiGraphics): SkyHanniEvent =
+    fun postHeldItemTooltipLayerEventPre(context: GuiGraphics) =
         GameOverlayRenderPreEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
 
     @JvmStatic
-    fun postHeldItemTooltipLayerEventPost(context: GuiGraphics): SkyHanniEvent =
+    fun postHeldItemTooltipLayerEventPost(context: GuiGraphics) =
         GameOverlayRenderPostEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
 
     @JvmStatic
-    fun postActionBarLayerEventPre(context: GuiGraphics): SkyHanniEvent =
+    fun postActionBarLayerEventPre(context: GuiGraphics) =
         GameOverlayRenderPreEvent(context, RenderLayer.ACTION_BAR).post()
 
     @JvmStatic
-    fun postActionBarLayerEventPost(context: GuiGraphics): SkyHanniEvent =
+    fun postActionBarLayerEventPost(context: GuiGraphics) =
         GameOverlayRenderPostEvent(context, RenderLayer.ACTION_BAR).post()
 }
 

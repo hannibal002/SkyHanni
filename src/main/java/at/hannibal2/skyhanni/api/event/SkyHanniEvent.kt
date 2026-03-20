@@ -15,14 +15,10 @@ abstract class SkyHanniEvent protected constructor() {
 
     fun post(onError: (Throwable) -> Unit = {}) = prePost(onError)
 
-    private fun prePost(onError: ((Throwable) -> Unit)?): SkyHanniEvent {
-        if (this is Rendering) {
-            DrawContextUtils.setContext(this.context)
-            SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
-            DrawContextUtils.clearContext()
-            return this
-        }
+    private fun prePost(onError: ((Throwable) -> Unit)?): SkyHanniEvent = apply {
+        (this as? Rendering)?.let { DrawContextUtils.setContext(it.context) }
         SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+        if (this is Rendering) DrawContextUtils.clearContext()
         return this
     }
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.client.gui.GuiGraphics
 
 sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context) {
@@ -16,6 +17,7 @@ sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(conte
     /**
      * Renders always, and while in an inventory it renders a bit darker, gray
      */
+    @PrimaryFunction("onGuiRenderOverlay")
     class GuiOverlayRenderEvent(context: GuiGraphics) : GuiRenderEvent(context)
 
     /**
