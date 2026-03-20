@@ -228,6 +228,7 @@ tasks.processResources {
     }
 }
 
+@Suppress("UnstableApiUsage")
 if (target == ProjectTarget.MODERN_12110) {
     fabricApi {
         configureTests {
