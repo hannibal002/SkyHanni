@@ -20,7 +20,6 @@ import net.minecraft.world.entity.decoration.ArmorStand
 @SkyHanniModule
 object AnimatedSkullRecorderHandler {
 
-    private val stopRecordingCoroutine = CoroutineSettings("animated skull recorder stop recording")
     private var lastServerTick = 0L
     private val statusMessageId by lazy {
         ChatUtils.getUniqueMessageId()
