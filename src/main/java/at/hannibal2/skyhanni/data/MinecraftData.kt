@@ -27,15 +27,12 @@ object MinecraftData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
-        when (val packet = event.packet) {
-            is ClientboundPingPacket -> {
-                if (lastPingParameter == packet.id) return
-                lastPingParameter = packet.id
+        val packet = event.packet as? ClientboundPingPacket ?: return
 
-                totalServerTicks++
-                ServerTickEvent.post()
-            }
-        }
+        if (lastPingParameter == packet.id) return
+        lastPingParameter = packet.id
+
+        ServerTickEvent(++totalServerTicks).post()
     }
 
     private var lastPingParameter = 0
