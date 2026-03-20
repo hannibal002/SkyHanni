@@ -72,9 +72,5 @@ class About {
         @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
         val mixin: Runnable = Runnable { openBrowser("https://github.com/SpongePowered/Mixin/") }
-
-        @ConfigOption(name = "DiscordIPC", desc = "DiscordIPC is available under the Apache License 2.0")
-        @ConfigEditorButton(buttonText = "GitHub")
-        val discordRPC: Runnable = Runnable { openBrowser("https://github.com/jagrosh/DiscordIPC") }
     }
 }

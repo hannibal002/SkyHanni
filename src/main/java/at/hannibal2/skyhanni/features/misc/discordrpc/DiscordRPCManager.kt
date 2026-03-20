@@ -164,7 +164,7 @@ object DiscordRPCManager {
             largeImageKey = DiscordLocationKey.getDiscordIconKey(location),
             largeImageText = location,
             buttons = buildList {
-                if (config.showEliteBotButton.get()) SHDiscordRichPresence.Button(
+                if (config.showEliteSkyBlockButton.get()) SHDiscordRichPresence.Button(
                     label = "Open EliteSkyBlock",
                     url = "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm(),
                 ).let { add(it) }

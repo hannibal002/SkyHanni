@@ -24,15 +24,7 @@ import kotlin.io.path.exists
  * A lightweight Discord IPC client implementing the Rich Presence protocol over Discord's local IPC pipe.
  *
  * Manages pipe discovery, handshake, presence updates, and clean disconnection.
- * Platform-aware: uses named pipes on Windows and Unix domain sockets on Linux/macOS.
- *
- * Usage:
- * ```
- * val ipc = SHDiscordIPC(clientId)
- * ipc.connect()             // discovers pipe, performs handshake
- * ipc.setActivity(presence) // updates presence
- * ipc.close()               // sends close frame, releases resources
- * ```
+ * Uses named pipes on Windows and Unix domain sockets on Linux/macOS.
  *
  * @param clientId The Discord application client ID (from the Discord Developer Portal).
  */
@@ -40,11 +32,11 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
 
     @Volatile
     private var _connected = false
+    private var connection: IPCConnection? = null
 
     /** Whether this client is currently connected to and ready for Discord IPC. */
     val isConnected: Boolean get() = _connected
-
-    private var connection: IPCConnection? = null
+    private val clientPayload = """{"v":1,"client_id":"$clientId"}"""
 
     /**
      * Discovers an active Discord IPC pipe, opens a connection, and performs the version-1 handshake.
@@ -55,9 +47,9 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
      */
     fun connect() {
         connection = findConnection()
-        sendFrame(Opcode.HANDSHAKE, """{"v":1,"client_id":"$clientId"}""")
+        sendFrame(Opcode.HANDSHAKE, clientPayload)
         val (opcode, body) = readFrame()
-        if (opcode != Opcode.FRAME) throw DiscordIPCException("Expected FRAME after handshake, got $opcode — body: $body")
+        if (opcode != Opcode.FRAME) throw DiscordIPCException("Expected FRAME after handshake, got $opcode. Body: $body")
         _connected = true
     }
 
@@ -78,7 +70,7 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
      * since the connection is being torn down regardless.
      */
     override fun close() {
-        if (_connected) runCatching { sendFrame(Opcode.CLOSE, """{"v":1,"client_id":"$clientId"}""") }
+        if (_connected) runCatching { sendFrame(Opcode.CLOSE, clientPayload) }
         _connected = false
         connection?.close()
         connection = null
@@ -212,7 +204,7 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
     private fun findConnection(): IPCConnection {
         if (isWindows) {
             for (i in 0..9) runCatching { return WindowsIPCConnection("\\\\.\\pipe\\discord-ipc-$i") }
-            throw DiscordIPCException("No Discord IPC pipe found on Windows — is Discord running?")
+            throw DiscordIPCException("No Discord IPC pipe found on Windows. Is Discord running?")
         }
 
         val dirs = listOfNotNull(
@@ -228,7 +220,7 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
                 if (path.exists()) runCatching { return UnixIPCConnection(path) }
             }
         }
-        throw DiscordIPCException("No Discord IPC socket found on Unix — is Discord running?")
+        throw DiscordIPCException("No Discord IPC socket found on Unix. Is Discord running?")
     }
 
     private val isWindows = System.getProperty("os.name").lowercase().contains("win")
