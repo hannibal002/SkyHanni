@@ -122,8 +122,6 @@ dependencies {
         mappings(target.mappingDependency)
     }
 
-    // Discord RPC client
-    includeImplementation("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     include("com.kohlschutter.junixsocket:junixsocket-common:2.6.2")
     include("com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2")
     compileOnly(libs.jbAnnotations)
