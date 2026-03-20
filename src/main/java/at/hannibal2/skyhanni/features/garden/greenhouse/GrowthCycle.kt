@@ -70,17 +70,17 @@ object GrowthCycle {
         updateDisplay()
 
         val nextCycle = storage?.nextCycle ?: return
-        if (nextCycle.isInPast() && !hasNotified) {
-            hasNotified = true
-            SoundUtils.playPlingSound()
-            ChatUtils.chat(
-                componentBuilder {
-                    append("Greenhouse Growth Stage is ready in the Garden") {
-                        withColor(ChatFormatting.GREEN)
-                    }
-                },
-            )
-        }
+        if (!nextCycle.isInPast() || hasNotified) return
+
+        hasNotified = true
+        SoundUtils.playPlingSound()
+        ChatUtils.chat(
+            componentBuilder {
+                append("Greenhouse Growth Stage is ready in the Garden") {
+                    withColor(ChatFormatting.GREEN)
+                }
+            },
+        )
     }
 
     private fun updateDisplay() {
