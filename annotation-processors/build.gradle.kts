@@ -27,3 +27,10 @@ tasks.withType<KotlinCompile> {
         jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }
+
+tasks.named("kspTestKotlin") {
+    enabled = false
+}
+tasks.named("kspTestJava") {
+    enabled = false
+}
