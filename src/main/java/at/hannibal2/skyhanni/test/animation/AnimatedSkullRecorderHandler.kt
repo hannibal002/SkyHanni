@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.test.animation
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.animation.AnimatedSkullRecorder.getFrameTexture
 import at.hannibal2.skyhanni.test.animation.AnimatedSkullRecorder.isPetTextureStand
@@ -23,17 +25,16 @@ import net.minecraft.world.entity.decoration.ArmorStand
 object AnimatedSkullRecorderHandler {
 
     private val stopRecordingCoroutine = CoroutineSettings("animated skull recorder stop recording")
+    private var lastServerTick = 0L
 
-    @HandleEvent
-    fun onServerTick(event: ServerTickEvent) {
+    private fun recordFrame(serverTick: Long, clientTick: Int) {
         val current = AnimatedSkullRecorder.state.takeIf { it.mode != AnimatedSkullRecorder.RecordingMode.NONE } ?: return
-        val instance = Minecraft.getInstance()
-        if (instance.level == null) return AnimatedSkullRecorder.state.reset()
+        if (Minecraft.getInstance().level == null) return AnimatedSkullRecorder.state.reset()
         when (current.mode) {
             AnimatedSkullRecorder.RecordingMode.NONE -> return
             AnimatedSkullRecorder.RecordingMode.HEAD -> {
-                val frame = instance.player?.getItemBySlot(EquipmentSlot.HEAD)?.getFrameTexture()
-                current.tracker.record(event.tick, frame)
+                val frame = Minecraft.getInstance().player?.getItemBySlot(EquipmentSlot.HEAD)?.getFrameTexture()
+                current.tracker.record(serverTick, clientTick, frame)
             }
 
             AnimatedSkullRecorder.RecordingMode.PET -> EntityUtils.getEntitiesNearby<ArmorStand>(32.0) {
@@ -46,7 +47,7 @@ object AnimatedSkullRecorderHandler {
                     AnimatedSkullRecorder.ArmorStandRecording(stand.id, displayName)
                 }
                 stand.getItemBySlot(EquipmentSlot.MAINHAND).getFrameTexture()?.let {
-                    recording.tracker.record(event.tick, it)
+                    recording.tracker.record(serverTick, clientTick, it)
                 }
             }
 
@@ -54,9 +55,20 @@ object AnimatedSkullRecorderHandler {
                 val frame = getPlayerEntities().firstOrNull {
                     it.name.string.equals(current.trackedPlayer, ignoreCase = true)
                 }?.getItemBySlot(EquipmentSlot.HEAD)?.getFrameTexture()
-                current.tracker.record(event.tick, frame)
+                current.tracker.record(serverTick, clientTick, frame)
             }
         }
+    }
+
+    @HandleEvent
+    fun onServerTick(event: ServerTickEvent) {
+        lastServerTick = event.tick
+        recordFrame(event.tick, ClientEvents.totalTicks)
+    }
+
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        recordFrame(lastServerTick, ClientEvents.totalTicks)
     }
 
     @HandleEvent

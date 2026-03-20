@@ -19,7 +19,7 @@ object AnimatedSkullRecorder {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    private data class TrackerOutput(val ticks: Int, val textures: List<String>)
+    private data class TrackerOutput(val serverTicks: Int, val clientTicks: Int, val textures: List<String>)
     private data class PetEntryOutput(val displayName: String, val frames: List<SkullFrameTracker.FrameRecord>)
 
     enum class RecordingMode {
@@ -60,13 +60,13 @@ object AnimatedSkullRecorder {
         return true
     }
 
-    fun ItemStack.getFrameTexture(): SkullFrameTracker.FrameRecord? {
-        val texture = getSkullTexture() ?: return null
-        return SkullFrameTracker.FrameRecord(
+    fun ItemStack.getFrameTexture(): SkullFrameTracker.FrameRecord? = getSkullTexture()?.let { texture ->
+        SkullFrameTracker.FrameRecord(
             uuid = getSkullOwner(),
             texture = texture,
             signature = getSkullSignature(),
-            ticks = 0,
+            clientTicks = 0,
+            serverTicks = 0,
         )
     }
 
@@ -83,10 +83,9 @@ object AnimatedSkullRecorder {
     suspend fun stopRecording() {
         val current = state.takeIf { it.mode != RecordingMode.NONE } ?: return ChatUtils.chat("§cNot currently recording.")
 
-        val totalFrames = if (current.mode == RecordingMode.PET)
-            current.petRecordings.values.sumOf { it.tracker.frames.size }
-        else
-            current.tracker.frames.size
+        val totalFrames = if (current.mode == RecordingMode.PET) current.petRecordings.values.sumOf {
+            it.tracker.frames.size
+        } else current.tracker.frames.size
 
         if (totalFrames == 0) {
             ChatUtils.chat("§cNo frames were captured.")
@@ -121,8 +120,10 @@ object AnimatedSkullRecorder {
     }
 
     private fun buildTrackerOutput(tracker: SkullFrameTracker): String = with(tracker) {
-        if (uniformTicks != null) {
-            gson.toJson(TrackerOutput(uniformTicks ?: 0, frames.map { it.fullTexture }))
+        val uniformServer = uniformServerTicks
+        val uniformClient = uniformClientTicks
+        if (uniformServer != null && uniformClient != null) {
+            gson.toJson(TrackerOutput(uniformServer, uniformClient, frames.map { it.fullTexture }))
         } else gson.toJson(frames)
     }
 
