@@ -82,7 +82,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
+        if (!isEnabled()) return
 
         if (config.zombieTimer) event.renderZombieTimer()
         if (config.coloredHitboxes) event.renderHitBoxes()
@@ -188,7 +188,7 @@ object CarnivalZombieShootout {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || (!config.coloredHitboxes && !config.zombieTimer && !config.lampTimer) || !event.isMod(2)) return
+        if (!isEnabled() || !event.isMod(2)) return
 
         if (config.coloredHitboxes || config.zombieTimer) {
             updateZombies()

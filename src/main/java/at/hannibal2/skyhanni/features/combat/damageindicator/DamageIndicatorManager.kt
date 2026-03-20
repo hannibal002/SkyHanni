@@ -389,7 +389,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onSkyHanniTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
