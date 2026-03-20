@@ -4,6 +4,7 @@ import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -265,7 +266,10 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
 excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
-    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
+        freeCompilerArgs.addAll("-Xbackend-threads=0")
+    }
 }
 
 tasks.withType(JavaCompile::class) {
@@ -300,12 +304,6 @@ tasks.jar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 tasks.assemble.get().dependsOn(tasks.remapJar)
-
-tasks.withType(KotlinCompile::class) {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.javaLanguageVersion.versionString()))
-    }
-}
 
 if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {
@@ -356,23 +354,23 @@ detekt {
 }
 
 tasks.withType<Detekt>().configureEach {
-    onlyIf {
-        target == ProjectTarget.MODERN_12110 && project.findProperty("skipDetekt") != "true"
-    }
+    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    val isCi = System.getenv("CI") == "true"
+    onlyIf { isTargetVersion && isCi }
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
 
-    val isDetektMain = (this.name == "detektMain")
+    val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
     val detektDir = rootProject.layout.buildDirectory.dir("reports/detekt").get().asFile.absolutePath
     reports {
-        html.required.set(true) // observe findings in your browser with structure and code snippets
+        html.required.set(true)
         html.outputLocation.set(file("$detektDir/$outputFileName.html"))
-        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        xml.required.set(true)
         xml.outputLocation.set(file("$detektDir/$outputFileName.xml"))
-        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        sarif.required.set(true)
         sarif.outputLocation.set(file("$detektDir/$outputFileName.sarif"))
-        md.required.set(true) // simple Markdown format
+        md.required.set(true)
         md.outputLocation.set(file("$detektDir/$outputFileName.md"))
         txt.required.set(true)
         txt.outputLocation.set(file("$detektDir/$outputFileName.txt"))
@@ -380,17 +378,20 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
+    val isTargetVersion = target == ProjectTarget.MODERN_12110
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-    onlyIf {
-        // We only need one baseline for the main source set
-        target == ProjectTarget.MODERN_12110
-    }
+    outputs.cacheIf { false }
+    onlyIf { isTargetVersion }
 
-    val isMainBaseline = (this.name == "detektBaselineMain")
+    val isMainBaseline = name == "detektBaselineMain"
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
 }
+
+tasks.withType<RemapSourcesJarTask>().configureEach {
+    enabled = false
+}
+
 repositories {
     mavenCentral()
 }

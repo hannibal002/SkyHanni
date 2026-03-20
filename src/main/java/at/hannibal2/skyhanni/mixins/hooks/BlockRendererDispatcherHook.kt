@@ -20,3 +20,4 @@ fun modifyGetModelFromBlockState(
         cir.returnValue = blockRendererDispatcher.blockModelShaper.getBlockModel(returnState)
     }
 }
+
