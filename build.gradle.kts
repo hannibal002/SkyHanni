@@ -393,6 +393,10 @@ tasks.withType<RemapSourcesJarTask>().configureEach {
     enabled = false
 }
 
+tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
+    enabled = false
+}
+
 repositories {
     mavenCentral()
 }
