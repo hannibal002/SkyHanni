@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
+import java.util.Locale
 
 object AnimatedSkullRecorderCommand {
 
@@ -81,7 +82,8 @@ object AnimatedSkullRecorderCommand {
         val entityFormat = "§b$entityCount§a ${"entity".pluralize(entityCount, "entities")}"
         val frameFormat = "§b$frameCount§a total ${"frame".pluralize(frameCount)}"
         val loopFormat = "§b$loopCount§a ${"loop".pluralize(loopCount)}"
-        return "§aCurrently recording pets - $entityFormat, $frameFormat captured, $loopFormat completed, §b${minSamples}§a sample(s)/frame min."
+        return "§aCurrently recording pets - $entityFormat, $frameFormat captured, " +
+            "$loopFormat completed, §b$minSamples§a sample(s)/frame min."
     }
 
     private fun buildTrackerStatus(tracker: SkullFrameTracker): String {
@@ -94,14 +96,9 @@ object AnimatedSkullRecorderCommand {
                 append(", §b${tracker.minSampleCount}§a sample(s)/frame")
                 val avgServer = tracker.frames.map { it.serverTicks }.average()
                 val avgClient = tracker.frames.map { it.clientTicks }.average()
-                append(
-                    " §7(avg §bserver§7: §f${String.format("%.1f", avgServer)} §7ticks, §bclient§7: §f${
-                        String.format(
-                            "%.1f",
-                            avgClient,
-                        )
-                    } §7ticks/frame)",
-                )
+                val serverFormat = String.format(Locale.getDefault(), "%.1f", avgServer)
+                val clientFormat = String.format(Locale.getDefault(), "%.1f", avgClient)
+                append(" §7(avg §bserver§7: §f$serverFormat §7ticks, §bclient§7: §f$clientFormat §7ticks/frame)")
             }
             if (tracker.verificationErrors > 0) append(", §c${tracker.verificationErrors}§a verification error(s)")
             append(".")

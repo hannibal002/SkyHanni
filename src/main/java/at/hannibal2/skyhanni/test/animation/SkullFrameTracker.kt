@@ -127,10 +127,11 @@ class SkullFrameTracker : Resettable {
                 verifyIndex = 1
                 true
             } else {
-                _accumulators.add(FrameAccumulator(frame).also {
+                FrameAccumulator(frame).also {
+                    _accumulators.add(it)
                     it.serverSamples.add(serverTicks)
                     it.clientSamples.add(clientTicks)
-                })
+                }
                 false
             }
         }
