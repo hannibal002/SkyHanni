@@ -57,8 +57,6 @@ object GardenCropSpeed {
 
     @HandleEvent
     fun onCropClick(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
-
         lastBrokenCrop = event.crop
         lastBrokenTime = SimpleTimeMark.now()
         blocksBroken++

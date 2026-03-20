@@ -137,7 +137,6 @@ object PestSpawnTimer {
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         val timeDiff = lastCropBrokenTime.passedSince()
 
         if (timeDiff > longestCropBrokenTime) {

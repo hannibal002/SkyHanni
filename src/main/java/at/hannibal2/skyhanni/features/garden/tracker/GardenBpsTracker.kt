@@ -44,9 +44,7 @@ object GardenBpsTracker {
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         blockBreaksLastFiveTicks++
-
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

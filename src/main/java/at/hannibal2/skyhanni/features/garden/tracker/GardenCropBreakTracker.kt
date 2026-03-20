@@ -50,7 +50,6 @@ object GardenCropBreakTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != lastBrokenCropType) lastBrokenCropType = event.crop
 
         if (GardenApi.mushroomCowPet) {

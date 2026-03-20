@@ -54,7 +54,7 @@ object GardenStartLocation {
     @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.LEFT_CLICK || !GardenApi.hasFarmingToolInHand()) return
+        if (!GardenApi.hasFarmingToolInHand()) return
         if (GardenApi.onUnfarmablePlot) return
         val startLocations = GardenApi.storage?.cropStartLocations ?: return
         val lastFarmedLocations = GardenApi.storage?.cropLastFarmedLocations ?: return

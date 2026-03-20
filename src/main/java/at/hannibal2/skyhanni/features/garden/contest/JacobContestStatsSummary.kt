@@ -27,7 +27,6 @@ object JacobContestStatsSummary {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN, priority = HandleEvent.HIGHEST)
     fun onCropClick(event: CropClickEvent) {
         if (!config.enabled) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
 
         if (FarmingContestApi.inContest && event.crop == FarmingContestApi.contestCrop) {
             blocksBroken.addOrPut(event.crop, 1)
