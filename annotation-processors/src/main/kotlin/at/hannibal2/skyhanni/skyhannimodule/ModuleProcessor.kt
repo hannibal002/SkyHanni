@@ -24,16 +24,10 @@ class ModuleProcessor(
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
 
     private var skyHanniEvent: KSType? = null
-    private var minecraftForgeEvent: KSType? = null
     private val warnings = mutableListOf<String>()
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
         skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
-
-        if (mcVersion == "1.8.9") {
-            minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
-                ?.asStarProjectedType() ?: return emptyList()
-        }
 
         val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
         logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion")
@@ -71,17 +65,14 @@ class ModuleProcessor(
 
         val className = symbol.qualifiedName?.asString() ?: "unknown"
         for (function in symbol.getDeclaredFunctions()) {
-            if (mcVersion == "1.8.9" && function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
-                val firstParam = function.parameters.firstOrNull()?.type?.resolve()!!
-                if (!minecraftForgeEvent!!.isAssignableFrom(firstParam))
-                    warnings.add("Function in $className must have an event assignable from $minecraftForgeEvent because it is annotated with @SubscribeEvent")
-            }
             if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
+                // It's technically nullable, idk man, safety and shit
+                val event = skyHanniEvent ?: return symbol
                 val firstParam = function.parameters.firstOrNull()?.type?.resolve()
                 val eventType = function.annotations.find { it.shortName.asString() == "HandleEvent" }
                     ?.arguments?.find { it.name?.asString() == "eventType" }?.value
-                if ((firstParam == null && eventType == null) || (firstParam != null && !skyHanniEvent!!.isAssignableFrom(firstParam)))
-                    warnings.add("Function in $className must have an event assignable from $skyHanniEvent because it is annotated with @HandleEvent")
+                if ((firstParam == null && eventType == null) || (firstParam != null && !event.isAssignableFrom(firstParam)))
+                    warnings.add("Function in $className must have an event assignable from $event because it is annotated with @HandleEvent")
             }
         }
         return symbol
