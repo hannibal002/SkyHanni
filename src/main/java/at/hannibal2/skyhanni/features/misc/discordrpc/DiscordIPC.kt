@@ -28,7 +28,7 @@ import kotlin.io.path.exists
  *
  * @param clientId The Discord application client ID (from the Discord Developer Portal).
  */
-class SHDiscordIPC(private val clientId: Long) : Closeable {
+class DiscordIPC(private val clientId: Long) : Closeable {
 
     @Volatile
     private var _connected = false
@@ -56,10 +56,10 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
     /**
      * Updates the rich presence activity currently displayed on the user's Discord profile.
      *
-     * @param presence The [SHDiscordRichPresence] data to send. Null fields are omitted from the payload.
+     * @param presence The [DiscordRichPresence] data to send. Null fields are omitted from the payload.
      * @throws DiscordIPCException If the client is not connected or if writing to the pipe fails.
      */
-    fun setActivity(presence: SHDiscordRichPresence) {
+    fun setActivity(presence: DiscordRichPresence) {
         if (!_connected) throw DiscordIPCException("setActivity called while not connected")
         sendFrame(Opcode.FRAME, ConfigManager.gson.toJson(buildActivityPayload(presence)))
     }
@@ -140,10 +140,10 @@ class SHDiscordIPC(private val clientId: Long) : Closeable {
      * The payload structure follows the Discord RPC protocol:
      * `{ cmd, args: { pid, activity: { ... } }, nonce }`.
      *
-     * @param presence The [SHDiscordRichPresence] to serialize into the payload.
+     * @param presence The [DiscordRichPresence] to serialize into the payload.
      * @return A [JsonObject] ready to be serialized and sent as a FRAME.
      */
-    private fun buildActivityPayload(presence: SHDiscordRichPresence): JsonObject {
+    private fun buildActivityPayload(presence: DiscordRichPresence): JsonObject {
         val activity = JsonObject().apply {
             presence.details?.let { addProperty("details", it) }
             presence.state?.let { addProperty("state", it) }

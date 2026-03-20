@@ -12,7 +12,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
  * @param largeImageText Tooltip text shown when hovering over the large image.
  * @param buttons Clickable buttons rendered on the presence card. Discord enforces a maximum of two.
  */
-data class SHDiscordRichPresence(
+data class DiscordRichPresence(
     val details: String? = null,
     val state: String? = null,
     val startTimestamp: Long? = null,

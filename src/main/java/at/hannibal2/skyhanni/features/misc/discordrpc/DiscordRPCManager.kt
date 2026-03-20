@@ -41,7 +41,7 @@ object DiscordRPCManager {
 
     val config get() = feature.gui.discordRPC
 
-    private var client: SHDiscordIPC? = null
+    private var client: DiscordIPC? = null
     private var startTimestamp = SimpleTimeMark.farPast()
     private var started = false
     private var nextUpdate = SimpleTimeMark.farPast()
@@ -67,7 +67,7 @@ object DiscordRPCManager {
         updateDebugStatus("Starting...")
         startTimestamp = SimpleTimeMark.now()
         try {
-            SHDiscordIPC(APPLICATION_ID).also {
+            DiscordIPC(APPLICATION_ID).also {
                 it.connect()
                 client = it
             }
@@ -163,18 +163,18 @@ object DiscordRPCManager {
         progress?.update("firstLine: ${config.firstLine.get()}, secondLine: ${config.secondLine.get()}")
         progress?.update("details: $details, state: $state")
 
-        val presence = SHDiscordRichPresence(
+        val presence = DiscordRichPresence(
             details = details,
             state = state,
             startTimestamp = startTimestamp.toMillis(),
             largeImageKey = DiscordLocationKey.getDiscordIconKey(location),
             largeImageText = location,
             buttons = buildList {
-                if (config.showEliteSkyBlockButton.get()) SHDiscordRichPresence.Button(
+                if (config.showEliteSkyBlockButton.get()) DiscordRichPresence.Button(
                     label = "Open EliteSkyBlock",
                     url = eliteSbUrl,
                 ).let { add(it) }
-                if (config.showSkyCryptButton.get()) SHDiscordRichPresence.Button(
+                if (config.showSkyCryptButton.get()) DiscordRichPresence.Button(
                     label = "Open SkyCrypt",
                     url = skyCryptUrl,
                 ).let { add(it) }
