@@ -941,4 +941,9 @@ object ItemUtils {
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
         return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
     }
+
+    fun ItemStack.getSkullSignature(): String? {
+        if (item != Items.PLAYER_HEAD) return null
+        return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.signature
+    }
 }

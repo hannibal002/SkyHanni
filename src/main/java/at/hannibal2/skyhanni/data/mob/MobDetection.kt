@@ -256,7 +256,7 @@ object MobDetection {
     }
 
     @HandleEvent
-    fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         when {
             event.entity is Bat && event.health == 6 -> {
                 entityFromPacket.add(EntityPacketType.SPIRIT_BAT to event.entity.id)
@@ -388,7 +388,7 @@ object MobDetection {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
         if (!mainToggle) {
             event.addData("Mob Detection is manually disabled!")
