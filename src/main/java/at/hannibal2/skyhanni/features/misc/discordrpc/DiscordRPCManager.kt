@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
@@ -54,9 +54,9 @@ object DiscordRPCManager {
     private val retryHelper = ConnectionRetryHelper(listOf(10.seconds, 20.seconds, 30.seconds))
     private var retryJob: Job? = null
 
-    private val startConfig = CoroutineConfig("discord rpc start", timeout = Duration.INFINITE).withIOContext()
-    private val presenceConfig = CoroutineConfig("discord rpc updatePresence", timeout = Duration.INFINITE).withIOContext()
-    private val manualStartConfig = CoroutineConfig("discord rpc manual start", timeout = Duration.INFINITE).withIOContext()
+    private val startConfig = CoroutineSettings("discord rpc start", timeout = Duration.INFINITE).withIOContext()
+    private val presenceConfig = CoroutineSettings("discord rpc updatePresence", timeout = Duration.INFINITE).withIOContext()
+    private val manualStartConfig = CoroutineSettings("discord rpc manual start", timeout = Duration.INFINITE).withIOContext()
 
     private fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
         progress.update("call start")
@@ -93,7 +93,7 @@ object DiscordRPCManager {
             updateDebugStatus("Discord not detected, retrying in ${retryDelay.inWholeSeconds}s ${retryHelper.retriesLabel}")
             val retryCount = retryHelper.currentRetry
             retryJob = with(SkyHanniMod) {
-                CoroutineConfig("discord rpc autoretry $retryCount", timeout = Duration.INFINITE).withIOContext()
+                CoroutineSettings("discord rpc autoretry $retryCount", timeout = Duration.INFINITE).withIOContext()
                     .launchUnScopedCoroutine {
                         delay(retryDelay)
                         start(progressCategory.start("discord rpc autoretry $retryCount"))
