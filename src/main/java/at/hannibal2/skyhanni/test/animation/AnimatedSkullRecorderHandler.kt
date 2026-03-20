@@ -21,9 +21,6 @@ import net.minecraft.world.entity.decoration.ArmorStand
 object AnimatedSkullRecorderHandler {
 
     private var lastServerTick = 0L
-    private val statusMessageId by lazy {
-        ChatUtils.getUniqueMessageId()
-    }
 
     @HandleEvent
     fun onServerTick(event: ServerTickEvent) {
