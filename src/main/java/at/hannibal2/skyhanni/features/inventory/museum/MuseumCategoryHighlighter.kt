@@ -19,9 +19,11 @@ object MuseumCategoryHighlighter {
         for (slot in event.container.slots) {
             val lore = slot.item.getLoreComponent()
             for (line in lore) {
-                if (line.string == "Items Donated: 100%") slot.highlight(LorenzColor.GREEN)
+                if (line.string == "Items Donated: 100%") {
+                    slot.highlight(LorenzColor.GREEN)
+                    break
+                }
             }
         }
     }
-
 }
