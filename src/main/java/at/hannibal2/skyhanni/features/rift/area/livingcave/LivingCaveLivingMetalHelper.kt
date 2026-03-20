@@ -31,7 +31,7 @@ object LivingCaveLivingMetalHelper {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.clickType == ClickType.LEFT_CLICK) {
-            val name = event.getBlockState.block.toString()
+            val name = event.blockState.block.toString()
             if (name.contains("lapis_ore")) {
                 lastClicked = event.position
             }

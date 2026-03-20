@@ -2,13 +2,17 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
@@ -20,6 +24,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object GardenCustomKeybinds {
+
+    private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
@@ -60,7 +66,7 @@ object GardenCustomKeybinds {
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
@@ -96,9 +102,15 @@ object GardenCustomKeybinds {
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
+    private fun isHoldingTool() = InventoryUtils.getItemInHand()?.getInternalNameOrNull()?.let { heldItem ->
+        heldItem.isFarmingTool() ||
+            (config.mousemat && heldItem == SQUEAKY_MOUSEMAT) ||
+            (config.fishingRod && heldItem.isFishingRod())
+    } ?: false
+
     private fun isActive(): Boolean =
         isEnabled() &&
-            GardenApi.toolInHand != null &&
+            isHoldingTool() &&
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 
