@@ -8,13 +8,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
+import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterToolTipFeatures.calculateSpawnCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -35,6 +36,9 @@ import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import kotlin.math.ceil
@@ -78,6 +82,7 @@ object SlayerRngMeterDisplay {
     private var timesUpdatedSinceLastDrop = 0
 
     var rngScore = mapOf<String, Map<NeuInternalName, Long>>()
+    var slayerData: SlayerData? = null
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -158,7 +163,7 @@ object SlayerRngMeterDisplay {
                         append("dropped at ")
                         appendWithColor("$percentage ", ChatFormatting.YELLOW)
                         append("XP ($from/$to)")
-                    }
+                    },
                 )
                 lastItemDroppedTime = SimpleTimeMark.now()
                 timesUpdatedSinceLastDrop = 0
@@ -241,43 +246,77 @@ object SlayerRngMeterDisplay {
         rngScore = event.getConstant<NeuRNGScore>("rngscore").slayer
     }
 
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        slayerData = event.getConstant<SlayerData>("Slayer")
+    }
+
     private fun update() {
         display = listOf(makeLink(drawDisplay()))
     }
 
-    private fun makeLink(text: String) = Renderable.clickable(
-        text,
-        tips = listOf("§eClick to open RNG Meter Inventory."),
-        onLeftClick = {
-            HypixelCommands.showRng("slayer", SlayerApi.activeType?.rngName)
-        },
+    private fun makeLink(content: Renderable) = Renderable.clickable(
+        content,
+        onLeftClick = {},
     )
 
-    fun drawDisplay(): String {
-        val storage = getStorage() ?: return ""
+    fun drawDisplay(): Renderable {
+        val storage = getStorage() ?: return Renderable.empty()
 
         if (SlayerApi.latestCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
-            return ""
+            return Renderable.empty()
         }
 
-        with(storage) {
-            if (itemGoal == "?") return "§cOpen RNG Meter Inventory!"
-            if (itemGoal == "") {
-                return if (!lastItemDroppedTime.isFarPast()) {
-                    "§a§lRNG Item dropped!"
-                } else {
-                    "§eNo RNG Item selected!"
+        return Renderable.vertical(
+            buildList {
+                with(storage) {
+                    if (itemGoal == "?") {
+                        add(StringRenderable("§cOpen RNG Meter Inventory!"))
+                        return@buildList
+                    }
+                    if (itemGoal == "") {
+                        val msg = if (!lastItemDroppedTime.isFarPast()) "§a§lRNG Item dropped!" else "§eNo RNG Item selected!"
+                        add(StringRenderable(msg))
+                        return@buildList
+                    }
+                    if (currentMeter == -1L || gainPerBoss == -1L) {
+                        add(StringRenderable("§cKill the slayer boss 2 times!"))
+                        return@buildList
+                    }
+
+                    val missing = goalNeeded - currentMeter + gainPerBoss
+                    var timesMissing = missing.toDouble() / gainPerBoss
+                    if (timesMissing < 1) timesMissing = 1.0
+                    timesMissing = ceil(timesMissing)
+
+                    add(StringRenderable("$itemGoal §7in §e${timesMissing.toInt().addSeparators()} §7bosses!"))
+
+                    if (config.coinsPerBoss) {
+                        val internalName = NeuInternalName.fromItemNameOrNull(itemGoal.removeColor()) ?: return@buildList
+                        val itemPrice = SlayerApi.getItemNameAndPrice(internalName, 1).second
+
+                        val bossesNeeded = ceil(goalNeeded.toDouble() / gainPerBoss).toInt().takeIf { it > 0 } ?: return@buildList
+
+                        val slayerType = SlayerApi.activeType ?: return@buildList
+                        val slayerXpGains = slayerData?.xpGains?.get(slayerType) ?: return@buildList
+                        val slayerTier = slayerXpGains.entries.firstOrNull {
+                            val baseBaseXp = it.value.toLong()
+                            baseBaseXp == gainPerBoss || baseBaseXp == (gainPerBoss / 1.25).toLong()
+                        }?.key ?: return@buildList
+
+                        val spawnCost = slayerType.calculateSpawnCost(slayerTier) ?: return@buildList
+
+                        val coinsPerBoss = SlayerRngMeterToolTipFeatures.calculateCoinsPerBoss(
+                            bossesNeeded,
+                            spawnCost,
+                            itemPrice,
+                        )
+
+                        add(StringRenderable("§7Coins/Boss: $coinsPerBoss"))
+                    }
                 }
-            }
-            if (currentMeter == -1L || gainPerBoss == -1L) return "§cKill the slayer boss 2 times!"
-
-            val missing = goalNeeded - currentMeter + gainPerBoss
-            var timesMissing = missing.toDouble() / gainPerBoss
-            if (timesMissing < 1) timesMissing = 1.0
-            timesMissing = ceil(timesMissing)
-
-            return "$itemGoal §7in §e${timesMissing.toInt().addSeparators()} §7bosses!"
-        }
+            },
+        )
     }
 
     init {

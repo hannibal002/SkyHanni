@@ -20,4 +20,7 @@ data class SlayerData(
 
     @Expose @SerializedName("spawn_costs")
     val spawnCosts: Map<SlayerType, Map<Int, Int>>,
+
+    @Expose @SerializedName("xp_gains")
+    val xpGains: Map<SlayerType, Map<Int, Int>>,
 )
