@@ -2,7 +2,10 @@ package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
 import net.minecraft.world.level.block.state.BlockState;
+//? if < 26.1 {
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+//? } else
+// import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

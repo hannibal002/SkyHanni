@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.network.chat.MessageSignature;
+//? if > 1.21.11
+//import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 
 @Mixin(GuiMessage.class)
 public class MixinChatLine implements ChatLineData {
