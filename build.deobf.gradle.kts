@@ -1,7 +1,9 @@
+@file:OptIn(StonecutterExperimentalAPI::class)
+
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
+import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
@@ -11,7 +13,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
-import kotlin.jvm.java
 
 plugins {
     idea
@@ -25,7 +26,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
-val target = ProjectTarget.values().find { it.projectPath == project.path }!!
+val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 
 // Toolchains:
 java {
@@ -137,7 +138,6 @@ dependencies {
     // include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     include("org.notenoughupdates.moulconfig:modern-26.1:9999.9999.9999:named")
 
-    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -211,7 +211,7 @@ tasks.processResources {
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
     val props = buildMap {
         put("version", version)
-        put("minecraft", target.minecraftVersion.versionName)
+        put("minecraft", target.minecraftVersion.versionNameOverride?.replace("rc-", "rc.") ?: target.minecraftVersion.versionName)
         put("fapi", fapiVersion)
     }
 
@@ -222,6 +222,7 @@ tasks.processResources {
     }
 }
 
+@Suppress("UnstableApiUsage")
 if (target == ProjectTarget.MODERN_12110) {
     fabricApi {
         configureTests {
