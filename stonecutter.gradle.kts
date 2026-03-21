@@ -156,22 +156,20 @@ stonecutter parameters {
             replace("GuiGraphics", "GuiGraphicsExtractor")
             replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
             replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
-            replace(
-                "import net.minecraft.client.gui.render.state.GlyphRenderState",
-                "import net.minecraft.client.renderer.state.gui.GlyphRenderState"
+
+            val states = listOf(
+                "GlyphRenderState",
+                "GuiElementRenderState",
+                "GuiRenderState",
+                "GuiItemRenderState",
+                "BlitRenderState",
+                "pip.PictureInPictureRenderState"
             )
-            replace(
-                "import net.minecraft.client.gui.render.state.GuiElementRenderState",
-                "import net.minecraft.client.renderer.state.gui.GuiElementRenderState"
-            )
-            replace(
-                "import net.minecraft.client.gui.render.state.GuiRenderState",
-                "import net.minecraft.client.renderer.state.gui.GuiRenderState"
-            )
-            replace(
-                "import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState",
-                "import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState"
-            )
+
+            states.forEach {
+                replace("import net.minecraft.client.gui.render.state.$it", "import net.minecraft.client.renderer.state.gui.$it")
+            }
+
             replace(
                 "import net.minecraft.client.renderer.block.model.BlockStateModel",
                 "import net.minecraft.client.renderer.block.dispatch.BlockStateModel"
@@ -203,6 +201,7 @@ stonecutter parameters {
             replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
             replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
             replace("DepthTestFunction", "CompareOp")
+            replace("submitBlitToCurrentLayer(", "addBlitToCurrentLayer(")
         }
     }
 

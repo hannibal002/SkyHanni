@@ -8,7 +8,12 @@ import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
+//? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//?} else {
+/*import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import org.joml.Matrix4f*/
+//?}
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -23,8 +28,18 @@ internal class SkyHanniItemAtlasRenderer(
     private val depthTexture: GpuTexture,
 ) {
 
-    fun render(projectionBuffer: CachedOrthoProjectionMatrixBuffer, block: () -> Unit) {
-        val bufferSlice = projectionBuffer.getBuffer(sizePixels.toFloat(), sizePixels.toFloat())
+    fun render(
+        //? if < 26.1 {
+        projectionBuffer: CachedOrthoProjectionMatrixBuffer,
+        //?} else
+        //projectionBuffer: ProjectionMatrixBuffer,
+        block: () -> Unit,
+    ) {
+        val size = sizePixels.toFloat()
+        //? if < 26.1 {
+        val bufferSlice = projectionBuffer.getBuffer(size, size)
+        //?} else
+        //val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView

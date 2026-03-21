@@ -3,7 +3,12 @@ package at.hannibal2.skyhanni.utils.render.item
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
+//? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//?} else {
+/*import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import org.joml.Matrix4f*/
+//?}
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.world.phys.Vec3
