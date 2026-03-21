@@ -352,11 +352,10 @@ detekt {
 }
 
 tasks.withType<Detekt>().configureEach {
-    onlyIf {
-        target == ProjectTarget.MODERN_12110 && project.findProperty("skipDetekt") != "true"
-    }
-    jvmTarget = target.minecraftVersion.formattedKotlinJvmTarget
-    outputs.cacheIf { false } // Custom rules won't work if cached
+    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    val isCi = System.getenv("CI") == "true"
+    val skipDetekt = project.findProperty("skipDetekt") == "true"
+    onlyIf { isTargetVersion && isCi && !skipDetekt }
 
     val isDetektMain = (this.name == "detektMain")
     val outputFileName = if (isDetektMain) "main" else "detekt"
@@ -376,12 +375,10 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedKotlinJvmTarget
-    outputs.cacheIf { false } // Custom rules won't work if cached
-    onlyIf {
-        // We only need one baseline for the main source set
-        target == ProjectTarget.MODERN_12110
-    }
+    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false }
+    onlyIf { isTargetVersion }
 
     val isMainBaseline = (this.name == "detektBaselineMain")
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
