@@ -18,7 +18,7 @@ object MinecraftInputHook {
         handleClick(
             hitResult,
             ClickType.RIGHT_CLICK,
-            ServerboundInteractPacket.ActionType.INTERACT_AT,
+            EntityClickEvent.ActionType.INTERACT_AT,
         )
 
     @JvmStatic
@@ -26,7 +26,7 @@ object MinecraftInputHook {
         handleClick(
             hitResult,
             ClickType.LEFT_CLICK,
-            ServerboundInteractPacket.ActionType.ATTACK,
+            EntityClickEvent.ActionType.ATTACK,
         )
 
     @JvmStatic
@@ -54,7 +54,7 @@ object MinecraftInputHook {
     private fun handleClick(
         hitResult: HitResult?,
         clickType: ClickType,
-        entityAction: ServerboundInteractPacket.ActionType,
+        entityAction: EntityClickEvent.ActionType,
     ): Boolean {
         if (hitResult == null) return false
 

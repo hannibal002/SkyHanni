@@ -31,8 +31,11 @@ object RenderEvents {
 
         // makes the lines render weird idk
         /*WorldRenderEvents.END_MAIN.register { event ->
-            val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
+            val immediateVertexConsumers = /*? if < 26.1 {*/ event.consumers() /*?} else {*/ /*event.bufferSource() *//*?}*/ as? MultiBufferSource.BufferSource ?: return@register
+            //? if < 26.1 {
             val stack = event.matrices()
+            //?} else
+            //val stack = event.poseStack()
             SkyHanniRenderWorldEvent(
                 stack,
                 event.gameRenderer().mainCamera,

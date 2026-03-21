@@ -137,6 +137,17 @@ stonecutter parameters {
         string(current.parsed >= "1.21.11") {
             replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
         }
+        string(current.parsed >= "26.1") {
+            replace("ClientWorldEvents", "ClientLevelEvents")
+            replace("START_WORLD_TICK", "START_LEVEL_TICK")
+            replace("StartWorldTick", "StartLevelTick")
+            replace("AFTER_CLIENT_WORLD_CHANGE", "AFTER_CLIENT_LEVEL_CHANGE")
+            replace("AfterClientWorldChange", "AfterClientLevelChange")
+            replace("net.fabricmc.fabric.api.client.rendering.v1.world", "net.fabricmc.fabric.api.client.rendering.v1.level")
+            replace("WorldRenderEvents", "LevelRenderEvents")
+            replace("ClickType", "ContainerInput")
+            replace("handleInventoryMouseClick", "handleContainerInput")
+        }
     }
 
     filters.include("**/*.fsh", "**/*.vsh")

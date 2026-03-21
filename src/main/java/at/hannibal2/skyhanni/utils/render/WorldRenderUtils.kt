@@ -26,7 +26,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
@@ -283,7 +282,7 @@ object WorldRenderUtils {
             vertexConsumers,
             if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
             backGroundColor,
-            LightTexture.FULL_BRIGHT,
+            15728880,
         )
     }
 
@@ -340,7 +339,7 @@ object WorldRenderUtils {
             vertexConsumers,
             if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
             backGroundColor,
-            LightTexture.FULL_BRIGHT,
+            15728880,
         )
     }
 
