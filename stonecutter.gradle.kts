@@ -202,6 +202,7 @@ stonecutter parameters {
             replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
             replace("DepthTestFunction", "CompareOp")
             replace("submitBlitToCurrentLayer(", "addBlitToCurrentLayer(")
+            replace("submitGuiElement(", "addGuiElement(")
         }
     }
 

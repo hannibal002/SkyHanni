@@ -394,7 +394,9 @@ object GuiRenderUtils {
          *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
         val guiItemRenderState = GuiItemRenderState(
+            //? if < 26.1 {
             this.item.name.toString(),
+            //?}
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
             0,
@@ -412,7 +414,10 @@ object GuiRenderUtils {
             stableRenderId,
             frameNumber = frameNumber,
         )
+        //? if < 26.1 {
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        //? } else
+        //Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId
     }
 

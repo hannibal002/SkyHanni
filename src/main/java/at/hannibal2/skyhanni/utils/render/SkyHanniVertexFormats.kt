@@ -44,7 +44,7 @@ object SkyHanniVertexFormats {
             //? if < 26.1 {
             safeRegister(registrationId, index, type, usage, count)
             //?} else {
-            /*safeRegister(registrationId, index, type, count)*/
+            /*safeRegister(registrationId, index, type, false, count)*/
             //?}
         }
     }
@@ -65,9 +65,8 @@ object SkyHanniVertexFormats {
         type: VFEType = VFEType.FLOAT,
         //? if < 26.1 {
         usage: VFEUsage = VFEUsage.GENERIC,
-        //?} else {
-        /*normalized: Boolean = false,*/
-        //?}
+        //?} else
+        //normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
         // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
@@ -79,9 +78,8 @@ object SkyHanniVertexFormats {
         )
         //? if < 26.1 {
         return VertexFormatElement.register(id, index, type, usage, count)
-        //?} else {
-        /*return VertexFormatElement.register(id, index, type, normalized, count)*/
-        //?}
+        //?} else
+        //return VertexFormatElement.register(id, index, type, normalized, count)
     }
 
     val POSITION_COLOR_ROUNDED: VertexFormat by lazy {

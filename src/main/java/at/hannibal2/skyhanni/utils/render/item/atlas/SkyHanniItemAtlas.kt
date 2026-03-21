@@ -9,7 +9,12 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
+//? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//?} else {
+/*import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import org.joml.Matrix4f*/
+//?}
 import net.minecraft.client.renderer.texture.Dumpable
 import net.minecraft.resources.Identifier
 import java.nio.file.Path
@@ -92,7 +97,10 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
 
     fun SkyHanniItemRenderContext.setupAtlasRendering(
         frameNumber: Int,
+        //? if < 26.1 {
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
+        //?} else
+        //projectionBuffer: ProjectionMatrixBuffer,
     ) {
         pruneFrames(frameNumber)
         if (atlasStates.isEmpty()) return

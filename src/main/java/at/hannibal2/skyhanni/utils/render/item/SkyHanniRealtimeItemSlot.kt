@@ -5,7 +5,12 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
+//? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//?} else {
+/*import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import org.joml.Matrix4f*/
+//?}
 import net.minecraft.client.renderer.RenderPipelines
 //? if > 1.21.10
 // import com.mojang.blaze3d.textures.FilterMode
@@ -22,7 +27,10 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         context: SkyHanniItemRenderContext,
         state: SkyHanniGuiItemRenderState,
         guiRenderState: GuiRenderState,
+        //? if < 26.1 {
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
+        //?} else
+        //projectionBuffer: ProjectionMatrixBuffer,
     ) {
         val texture = texture ?: return
         val textureView = textureView ?: return
@@ -33,7 +41,12 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.getDevice().createCommandEncoder()
             .clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
 
+        //? if < 26.1 {
         val bufferSlice = projectionBuffer.getBuffer(slotSize.toFloat(), slotSize.toFloat())
+        //?} else {
+        /*val size = slotSize.toFloat()
+        val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))*/
+        //?}
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
