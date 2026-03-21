@@ -214,11 +214,17 @@ tasks.processResources {
         put("minecraft", target.minecraftVersion.versionNameOverride?.replace("rc-", "rc.") ?: target.minecraftVersion.versionName)
         put("fapi", fapiVersion)
     }
-
     props.forEach(inputs::property)
-
     filesMatching("fabric.mod.json") {
         expand(props)
+    }
+
+    // The named-namespace classtweaker is correct for remapped builds,
+    // but 26.1 runs official mappings with no remapping step, so we have to bundle the
+    // official-namespace variant instead.
+    exclude("skyhanni.classtweaker")
+    from(rootProject.file("src/main/resources/skyhannideobf.classtweaker")) {
+        rename { "skyhanni.classtweaker" }
     }
 }
 
