@@ -397,5 +397,6 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }

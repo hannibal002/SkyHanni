@@ -71,9 +71,10 @@ allprojects {
 
         // moulconfig and a few detekt rules
         exclusiveContent {
-            forRepository {
-                maven("https://maven.notenoughupdates.org/releases")
-            }
+            forRepositories(
+                repositories.mavenLocal(),
+                repositories.maven("https://maven.notenoughupdates.org/releases"),
+            )
             filter {
                 includeGroup("org.notenoughupdates")
                 includeGroup("org.notenoughupdates.moulconfig")
@@ -152,6 +153,9 @@ stonecutter parameters {
             replace("vertexConsumers", "bufferSource")
             replace("ClickType", "ContainerInput")
             replace("handleInventoryMouseClick", "handleContainerInput")
+            replace("GuiGraphics", "GuiGraphicsExtractor")
+            replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
+            replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
         }
     }
 
