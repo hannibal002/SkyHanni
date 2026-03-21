@@ -257,7 +257,7 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
 excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
-    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedKotlinJvmTarget))
 }
 
 tasks.withType(JavaCompile::class) {
@@ -295,7 +295,7 @@ tasks.assemble.get()/*.dependsOn(tasks.remapJar)*/
 
 tasks.withType(KotlinCompile::class) {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.javaLanguageVersion.versionString()))
+        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedKotlinJvmTarget))
     }
 }
 
@@ -351,7 +351,7 @@ tasks.withType<Detekt>().configureEach {
     onlyIf {
         target == ProjectTarget.MODERN_12110 && project.findProperty("skipDetekt") != "true"
     }
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    jvmTarget = target.minecraftVersion.formattedKotlinJvmTarget
     outputs.cacheIf { false } // Custom rules won't work if cached
 
     val isDetektMain = (this.name == "detektMain")
@@ -372,7 +372,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    jvmTarget = target.minecraftVersion.formattedKotlinJvmTarget
     outputs.cacheIf { false } // Custom rules won't work if cached
     onlyIf {
         // We only need one baseline for the main source set

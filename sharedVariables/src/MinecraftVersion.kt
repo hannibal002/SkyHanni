@@ -15,13 +15,16 @@ enum class MinecraftVersion(
 ) {
     MC12110("1.21.10", 21),
     MC12111("1.21.11", 21),
-    MC26100("26.1", 21, versionNameOverride = "26.1-snapshot-6", moulconfigMinecraftVersionOverride = "1.21.11"),
+    MC26100("26.1", 25, versionNameOverride = "26.1-rc-2", moulconfigMinecraftVersionOverride = "1.21.11"),
     ;
 
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)
 
     val formattedJavaLanguageVersion: String
         get() = javaVersion.toString()
+
+    val kotlinJvmTarget: Int get() = javaVersion
+    val formattedKotlinJvmTarget: String get() = kotlinJvmTarget.toString()
 
     val versionNumber = run {
         val parts = versionName.split('.').mapTo(mutableListOf()) { it.toInt() }

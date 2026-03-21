@@ -36,9 +36,9 @@ enum class ProjectTarget(
         "official",
         MappingStyle.NONE,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.143.2+26.1",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.143.15+26.1",
         modMenuVersion = "17.0.0-beta.2",
-        modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
+        modrinthInfo = null,
     ),
     ;
 
