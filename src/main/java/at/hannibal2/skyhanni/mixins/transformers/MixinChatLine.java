@@ -32,10 +32,18 @@ public class MixinChatLine implements ChatLineData {
         skyhanni$fullComponent = fullComponent;
     }
 
+    //? if < 26.1 {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(int creationTick, Component line, MessageSignature messageSignatureData, GuiMessageTag messageIndicator, CallbackInfo ci) {
         Component component = GuiChatHook.getCurrentComponent();
         skyhanni$fullComponent = component == null ? line : component;
     }
+    //? } else {
+    /*@Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(int addedTime, Component content, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci) {
+        Component hookComponent = GuiChatHook.getCurrentComponent();
+        skyhanni$fullComponent = hookComponent == null ? content : hookComponent;
+    }*/
+    //? }
 
 }

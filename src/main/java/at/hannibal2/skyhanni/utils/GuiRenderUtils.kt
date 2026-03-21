@@ -417,7 +417,7 @@ object GuiRenderUtils {
         //? if < 26.1 {
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         //? } else
-        //Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.submitPicturesInPictureState(newRenderState)
+        //Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
         return newRenderState.stableId
     }
 

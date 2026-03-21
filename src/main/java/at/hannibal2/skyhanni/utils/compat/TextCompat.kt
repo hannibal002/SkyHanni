@@ -25,8 +25,11 @@ import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
-//? > 1.21.11
-//import net.minecraft.world.item.ItemStackTemplate
+//? > 1.21.11 {
+/*import net.minecraft.world.item.ItemStackTemplate
+import net.minecraft.client.multiplayer.chat.GuiMessageSource*/
+//? }
+
 
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
@@ -236,7 +239,12 @@ fun Style.setHoverShowText(text: Component): Style {
 
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
-    DelayedRun.runOrNextTick { Minecraft.getInstance().player?.displayClientMessage(message, false) }
+    DelayedRun.runOrNextTick {
+        //? if < 26.1 {
+        Minecraft.getInstance().player?.displayClientMessage(message, false)
+        //?} else
+        //Minecraft.getInstance().player?.sendSystemMessage(message)
+    }
 }
 
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
@@ -244,7 +252,10 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
     DelayedRun.runOrNextTick {
         val chat = Minecraft.getInstance().gui.chat
         chat.deleteMessage(idToMessageSignature(id))
+        //? if < 26.1 {
         chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
+        //?} else
+        //chat.addMessage(component, idToMessageSignature(id), GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
     }
 }
 
@@ -285,7 +296,10 @@ fun ClickEvent.value(): String {
 fun HoverEvent.value(): Component {
     return when (this.action()) {
         HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+        //? if < 26.1 {
         HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
+        //?} else
+        //HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
         HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
         else -> Component.empty()
     }
