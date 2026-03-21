@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.world.scores.Objective;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.scores.Objective;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -74,10 +74,13 @@ public class MixinGui {
          RenderEvents.postExperienceNumberLayerEventPost(context);
      }
 
-     @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
-     private void renderItemOverlayPost(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
-         GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
-     }
+    //? if < 26.1 {
+    @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
+    //?} else
+    //@Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
+    private void renderItemOverlayPost(GuiGraphics drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
+        GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
+    }
 
     //? if < 1.21.11 {
     @ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V"))

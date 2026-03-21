@@ -136,7 +136,7 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed >= "1.21.11") {
-            replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
+            replace($$"com.google.gson.internal.`$Gson$Types`", "com.google.gson.internal.GsonTypes")
         }
         string(current.parsed >= "26.1") {
             replace("ClientWorldEvents", "ClientLevelEvents")
@@ -156,6 +156,53 @@ stonecutter parameters {
             replace("GuiGraphics", "GuiGraphicsExtractor")
             replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
             replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
+            replace(
+                "import net.minecraft.client.gui.render.state.GlyphRenderState",
+                "import net.minecraft.client.renderer.state.gui.GlyphRenderState"
+            )
+            replace(
+                "import net.minecraft.client.gui.render.state.GuiElementRenderState",
+                "import net.minecraft.client.renderer.state.gui.GuiElementRenderState"
+            )
+            replace(
+                "import net.minecraft.client.gui.render.state.GuiRenderState",
+                "import net.minecraft.client.renderer.state.gui.GuiRenderState"
+            )
+            replace(
+                "import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState",
+                "import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState"
+            )
+            replace(
+                "import net.minecraft.client.renderer.block.model.BlockStateModel",
+                "import net.minecraft.client.renderer.block.dispatch.BlockStateModel"
+            )
+            replace(".addedTime", ".addedTime()")
+            replace("drawContext.renderItem(", "drawContext.item(")
+            replace("drawContext.drawString(", "drawContext.text(")
+            replace("\"renderItemHotbar\"", "\"extractItemHotbar\"")
+            replace("\"renderHotbarAndDecorations\"", "\"extractHotbarAndDecorations\"")
+            replace("\"renderTabList\"", "\"extractTabList\"")
+            replace("\"renderSelectedItemName\"", "\"extractSelectedItemName\"")
+            replace("\"renderOverlayMessage\"", "\"extractOverlayMessage\"")
+            replace("\"renderChat\"", "\"extractChat\"")
+            replace("ContextualBarRenderer;render(", "ContextualBarRenderer;extractRenderState(")
+            replace("ContextualBarRenderer;renderExperienceLevel(", "ContextualBarRenderer;extractExperienceLevel(")
+            replace("PlayerTabOverlay;render(", "PlayerTabOverlay;extractRenderState(")
+
+            replace("override fun render(context: GuiGraphics", "override fun extractRenderState(context: GuiGraphicsExtractor")
+            replace("super.render(context,", "super.extractRenderState(context,")
+            replace("override fun renderBackground(context: GuiGraphics", "override fun extractBackground(context: GuiGraphicsExtractor")
+            replace("this.renderMenuBackground(", "this.extractMenuBackground(")
+            replace("renderMenuBackground(DrawContextUtils", "extractMenuBackground(DrawContextUtils")
+
+            replace(
+                "import com.mojang.blaze3d.platform.DepthTestFunction",
+                "import com.mojang.blaze3d.pipeline.ColorTargetState\nimport com.mojang.blaze3d.pipeline.DepthStencilState\nimport com.mojang.blaze3d.platform.CompareOp"
+            )
+            replace("DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp = CompareOp.LESS_THAN_OR_EQUAL")
+            replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
+            replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
+            replace("DepthTestFunction", "CompareOp")
         }
     }
 
