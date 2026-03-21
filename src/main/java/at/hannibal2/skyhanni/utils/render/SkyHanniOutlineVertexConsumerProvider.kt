@@ -36,6 +36,11 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
             SkyHanniOutlineVertexConsumerProvider()
         }
 
+        //? if > 1.21.11 {
+        /*@JvmStatic
+        fun getVertexConsumers(): SkyHanniOutlineVertexConsumerProvider = bufferSource*/
+        //? }
+
         private var customDepthAttachment: GpuTexture? = null
 
         private var customDepthAttachmentView: GpuTextureView? = null

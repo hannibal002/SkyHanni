@@ -66,8 +66,10 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return;
             //? if < 1.21.11 {
             cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
-            //?} else
+            //?} else if < 26.1 {
             //cir.setReturnValue(RenderTypes.itemEntityTranslucentCull(this.getTextureLocation(state)));
+            //?} else
+            //cir.setReturnValue(RenderTypes.entityTranslucentCullItemTarget(this.getTextureLocation(state)));
         }
     }
 

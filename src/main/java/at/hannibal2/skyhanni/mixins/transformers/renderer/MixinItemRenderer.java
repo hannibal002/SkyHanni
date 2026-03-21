@@ -6,6 +6,10 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 //? if < 26.1 {
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+//? } else {
+/*import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
+import net.minecraft.util.ARGB;
+import net.minecraft.client.renderer.rendertype.RenderTypes;*/
 //? }
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
