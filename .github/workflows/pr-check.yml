@@ -45,6 +45,7 @@ jobs:
 
             -   name: Remove label if changelog verification passes
                 if: success()
+                continue-on-error: true
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}

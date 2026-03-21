@@ -61,6 +61,7 @@ jobs:
                     labels: 'Detekt'
             -   name: Remove label if detekt passes
                 if: ${{ steps.run_detekt.outcome != 'failure' }}
+                continue-on-error: true
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +74,7 @@ jobs:
                     ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif | tee detekt_output.txt
             -   name: Upload detekt output as artifact
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 with:
                     name: detekt-output
                     path: detekt_output.txt
@@ -99,7 +100,7 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
             -   name: Download detekt output
-                uses: actions/download-artifact@v4
+                uses: actions/download-artifact@v8
                 with:
                     name: detekt-output
                     path: .
