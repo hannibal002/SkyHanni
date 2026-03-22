@@ -19,6 +19,7 @@ import org.lwjgl.glfw.GLFW
 @SkyHanniModule
 object GuiData {
 
+    @JvmStatic
     var preDrawEventCancelled = false
 
     @HandleEvent(priority = HandleEvent.HIGH)

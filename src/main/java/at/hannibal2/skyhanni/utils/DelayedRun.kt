@@ -9,44 +9,51 @@ import kotlin.time.Duration
 // TODO add names for runs
 object DelayedRun {
 
-    private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
-    private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
+    private val tasks = mutableListOf<Pair<() -> Any?, SimpleTimeMark>>()
+    private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any?, SimpleTimeMark>>()
 
-    fun runDelayed(duration: Duration, run: () -> Unit): SimpleTimeMark {
+    /**
+     * Runs [runnable] at the end of the next game tick after [duration] has passed,
+     * always on the main thread.
+     */
+    fun runDelayed(duration: Duration, runnable: Runnable): SimpleTimeMark {
         val time = SimpleTimeMark.now() + duration
-        futureTasks.add(run to time)
+        futureTasks.add(runnable::run to time)
         return time
     }
 
-    fun <T> runDelayedReturning(duration: Duration, run: () -> T): Pair<SimpleTimeMark, () -> T> {
+    fun <T> runDelayedReturning(duration: Duration, block: () -> T): Pair<SimpleTimeMark, () -> T> {
         val time = SimpleTimeMark.now() + duration
-        val runnable = { run() }
-        @Suppress("UNCHECKED_CAST")
-        futureTasks.add((runnable as () -> Any) to time)
-        return time to runnable
+        futureTasks.add(block to time)
+        return time to block
     }
 
     /**
-     * Runs in the next game tick (up to 50ms delay), always on the main thread.
+     * Runs [runnable] at the start of the next game tick, always on the main thread.
      */
-    fun runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
+    @JvmStatic
+    fun runNextTick(runnable: Runnable) = Minecraft.getInstance().schedule(runnable)
 
     /**
-     * I'm not sure why, but this acts different to the above one
+     * Runs [runnable] at the end of the next game tick, always on the main thread.
+     *
+     * Prefer [runNextTick] unless you have a specific reason to use this method.
      */
-    fun runNextTickOld(run: () -> Unit) = futureTasks.add(run to SimpleTimeMark.farPast())
+    @JvmStatic
+    fun runNextTickEnd(runnable: Runnable) = futureTasks.add(runnable::run to SimpleTimeMark.farPast())
 
     /**
-     * Runs now if we are on the main thread, otherwise queues it for the next tick.
+     * Runs [runnable] now if we are on the main thread,
+     * otherwise queues it for the start of the next game tick.
      */
-    fun runOrNextTick(run: () -> Unit) = Minecraft.getInstance().execute(run)
+    fun runOrNextTick(runnable: Runnable) = Minecraft.getInstance().execute(runnable)
 
     fun checkRuns() {
-        tasks.removeIf { (runnable, time) ->
+        tasks.removeIf { (block, time) ->
             val inPast = time.isInPast()
             if (inPast) {
                 try {
-                    runnable()
+                    block()
                 } catch (e: Exception) {
                     ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing")
                 }

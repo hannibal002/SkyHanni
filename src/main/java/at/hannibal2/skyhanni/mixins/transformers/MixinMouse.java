@@ -24,27 +24,24 @@ public class MixinMouse {
 
     @Inject(method = "onMove", at = @At("RETURN"))
     private void onMouseButton(long window, double x, double y, CallbackInfo ci) {
-        MouseCompat.INSTANCE.setDeltaMouseX(this.accumulatedDX);
-        MouseCompat.INSTANCE.setDeltaMouseY(this.accumulatedDY);
+        MouseCompat.setDeltaMouseX(this.accumulatedDX);
+        MouseCompat.setDeltaMouseY(this.accumulatedDY);
     }
 
     @Inject(method = "onScroll", at = @At("HEAD"))
     private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
-        MouseCompat.INSTANCE.setScroll(vertical);
-        DelayedRun.INSTANCE.runNextTickOld(() -> {
-            MouseCompat.INSTANCE.setScroll(0);
-            return null;
-        });
+        MouseCompat.setScroll(vertical);
+        DelayedRun.runNextTickEnd(() -> MouseCompat.setScroll(0));
     }
 
     @Inject(method = "onButton", at = @At("HEAD"))
     private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
-        MouseCompat.INSTANCE.handleMouseButton(input, action);
+        MouseCompat.handleMouseButton(input, action);
     }
 
     @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isWindowActive()Z"))
     private void onMouseButtonHead(CallbackInfo ci, @Local(ordinal = 0) double timeDelta) {
-        MouseCompat.INSTANCE.setTimeDelta(timeDelta * 10000);
+        MouseCompat.setTimeDelta(timeDelta * 10000);
     }
 
     @ModifyVariable(method = "turnPlayer", at = @At("STORE"), ordinal = 1)

@@ -9,11 +9,16 @@ import net.minecraft.client.input.MouseButtonInfo
 object MouseCompat {
     private const val NUMBER_OF_MOUSE_BUTTONS = 6
 
-    var deltaMouseY = 0.0
-    var deltaMouseX = 0.0
-    var scroll = 0.0
-    var timeDelta = 0.0
     private val buttonStates = BooleanArray(NUMBER_OF_MOUSE_BUTTONS)
+
+    @JvmStatic
+    var deltaMouseY = 0.0
+    @JvmStatic
+    var deltaMouseX = 0.0
+    @JvmStatic
+    var scroll = 0.0
+    @JvmStatic
+    var timeDelta = 0.0
 
     private val mouse by lazy {
         Minecraft.getInstance().mouseHandler
@@ -32,7 +37,7 @@ object MouseCompat {
 
     fun getScrollDelta(): Int {
         val delta = scroll
-        DelayedRun.runNextTickOld { scroll = 0.0 }
+        DelayedRun.runNextTickEnd { scroll = 0.0 }
         return delta.toInt() * 120
     }
 
@@ -44,11 +49,6 @@ object MouseCompat {
         return mouse.ypos().toInt()
     }
 
-    // I have no clue what the difference between getx and geteventx is on 1.8.9
-    // on 1.8.9 they are pretty much the same (they are the exact same when the mouse is still)
-    fun getEventX(): Int = getX()
-    fun getEventY(): Int = getY()
-
     fun getEventButtonState(): Boolean = buttonStates.any { it }
     fun getEventNanoseconds(): Long = timeDelta.toLong()
 
@@ -56,6 +56,7 @@ object MouseCompat {
         return deltaMouseY.toInt()
     }
 
+    @JvmStatic
     fun handleMouseButton(input: MouseButtonInfo, action: Int) {
         val button: Int = input.button()
         if (action == 1) {
@@ -64,7 +65,7 @@ object MouseCompat {
             KeyPressEvent(button).post()
         } else {
             KeyPressEvent(button).post()
-            DelayedRun.runNextTickOld {
+            DelayedRun.runNextTickEnd {
                 setButtonState(button, false)
             }
         }

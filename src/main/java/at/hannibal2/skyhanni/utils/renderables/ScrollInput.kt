@@ -123,8 +123,8 @@ class ScrollValue {
     }
 
     fun isPureScrollEvent(): Boolean {
-        val mouseX = MouseCompat.getEventX()
-        val mouseY = MouseCompat.getEventY()
+        val mouseX = MouseCompat.getX()
+        val mouseY = MouseCompat.getY()
         val isScrollEvent = MouseCompat.getScrollDelta() != 0
         val hasMouseMoved = mouseX != lastMouseX || mouseY != lastMouseY
 
