@@ -440,7 +440,7 @@ fun Component.replace(
                                 hasEdited = true
                             } else {
                                 append(oldValue) {
-                                    style = currentStyle
+                                    style = currentStyle.orEmpty()
                                 }
                             }
                         }
