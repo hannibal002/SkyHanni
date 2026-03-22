@@ -153,7 +153,6 @@ object InstanceChestProfit {
      * REGEX-TEST: §eRequires a Dungeon Chest Key
      */
     private val requiresDungeonChestKeyPattern by patternGroup.pattern(
-        // Remove after 7.6.0 is pushed
         "requiresadungeonchestkey",
         "§eRequires a Dungeon Chest Key",
     )
