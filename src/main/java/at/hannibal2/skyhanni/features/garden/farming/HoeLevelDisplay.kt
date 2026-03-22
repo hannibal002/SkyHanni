@@ -77,11 +77,11 @@ object HoeLevelDisplay {
             }
             add("§7Level §8$hoeLevel➜§3${hoeLevel + 1}")
 
-            val colorPrefix = if (hoeExp <= next) "§e"
-            else {
+            var colorPrefix = "§e"
+            if (hoeExp > next) {
+                colorPrefix = "§c§l"
                 if (hoeLevel >= OVERCLOCK_THRESHOLD) add("§3§lOVERCLOCK REQUIRED!")
                 else add("§c§lUPGRADE REQUIRED!")
-                "§c§l"
             }
             val formattedXp = hoeExp.addSeparators()
             val formattedXpToNext = next.addSeparators()
