@@ -108,6 +108,8 @@ private val textColorLUT = ChatFormatting.entries
     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
     .toMap()
 
+fun Style?.orEmpty(): Style = this ?: Style.EMPTY
+
 fun Style.chatStyle() = buildString {
     color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
     if (isBold) append("§l")
@@ -280,22 +282,16 @@ fun ClickEvent.value(): String {
 
 }
 
-fun HoverEvent.value(): Component {
-    return when (this.action()) {
-        HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-        HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
-        HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
-        else -> Component.empty()
-    }
+fun HoverEvent.value(): Component = when (action()) {
+    HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+    HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
+    HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }
 
-fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? {
-    if (action == null) return null
-    when (action) {
-        HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
-        // I really don't think anyone is using the other 2 lol
-        else -> return null
-    }
+fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? = when (action) {
+    HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
+    // I really don't think anyone is using the other 2 lol
+    else -> null
 }
 
 fun Component.changeColor(color: LorenzColor): Component =
@@ -414,7 +410,7 @@ private fun replace(
         }
         if (edit != string) hasEdited = true
 
-        newComp.append(Component.literal(edit).withStyle(style))
+        newComp.append(Component.literal(edit.orEmpty()).withStyle(style.orEmpty()))
         Optional.empty<Component>()
     }, Style.EMPTY)
 
@@ -437,7 +433,7 @@ fun Component.replace(
             newComp.append(
                 componentBuilder {
                     for ((index, str) in split.withIndex()) {
-                        append(Component.literal(str).withStyle(currentStyle))
+                        append(Component.literal(str).withStyle(currentStyle.orEmpty()))
                         if (index < split.size - 1) {
                             if (!onlyReplaceFirst || !hasEdited) {
                                 append(newValue)
@@ -452,7 +448,7 @@ fun Component.replace(
                 }
             )
         } else {
-            newComp.append(Component.literal(string).withStyle(currentStyle))
+            newComp.append(Component.literal(string.orEmpty()).withStyle(currentStyle.orEmpty()))
         }
         Optional.empty<Component>()
     }, Style.EMPTY)

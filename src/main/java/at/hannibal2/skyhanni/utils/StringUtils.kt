@@ -212,7 +212,7 @@ object StringUtils {
             var newLine = ""
             var lastColor: TextColor? = null
             var lastFormatting = ""
-            line.accept { index, style, codePoint ->
+            line.accept { _, style, codePoint ->
                 val color = style.color
                 if (color != lastColor) {
                     lastColor = color
@@ -528,14 +528,7 @@ object StringUtils {
 
     fun String.splitCamelCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
-    fun String.isValidUuid(): Boolean {
-        return try {
-            UUID.fromString(this)
-            true
-        } catch (e: IllegalArgumentException) {
-            false
-        }
-    }
+    fun String.isValidUuid(): Boolean = runCatching(UUID::fromString).isSuccess
 
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""

@@ -182,7 +182,7 @@ class ComponentSpan internal constructor(
     /**
      * Sample the chat style at the start of the span.
      */
-    fun sampleStyleAtStart(): Style? = sampleAtStart().style
+    fun sampleStyleAtStart(): Style = sampleAtStart().style ?: Style.EMPTY
 
     /**
      * Sample all the components that intersect with this span. Note that some of the returned components may contain

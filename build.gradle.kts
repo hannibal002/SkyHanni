@@ -1,7 +1,6 @@
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
@@ -205,7 +204,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
+            languageVersion = "2.2"
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
     }
@@ -303,12 +302,6 @@ tasks.jar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 tasks.assemble.get().dependsOn(tasks.remapJar)
-
-tasks.withType(KotlinCompile::class) {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.javaLanguageVersion.versionString()))
-    }
-}
 
 if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.orEmpty
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -209,10 +210,11 @@ object TextHelper {
 
         component.visit({ style: Style?, string: String? ->
             if (string.isNullOrEmpty()) return@visit Optional.empty()
+
             for (c in string) {
                 if (index >= match.length) {
                     if (!currentString.isEmpty()) {
-                        newComponent.append(Component.literal(currentString).withStyle(style))
+                        newComponent.append(Component.literal(currentString).withStyle(style.orEmpty()))
                     }
                     currentString = ""
                     return@visit Optional.of(newComponent)
@@ -227,7 +229,7 @@ object TextHelper {
                 }
             }
             if (!currentString.isEmpty()) {
-                newComponent.append(Component.literal(currentString).withStyle(style))
+                newComponent.append(Component.literal(currentString).withStyle(style.orEmpty()))
             }
             currentString = ""
 
@@ -243,16 +245,17 @@ object TextHelper {
 
         component.visit({ style: Style?, string: String? ->
             if (string.isNullOrEmpty()) return@visit Optional.empty()
+
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
-                currentComponent.append(Component.literal(string).withStyle(style))
+                currentComponent.append(Component.literal(string).withStyle(style.orEmpty()))
             } else {
-                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                currentComponent.append(Component.literal(split.first()).withStyle(style.orEmpty()))
                 if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                 currentComponent = Component.empty()
                 for ((index, str) in split.withIndex()) {
                     if (index == 0) continue
-                    currentComponent.append(Component.literal(str).withStyle(style))
+                    currentComponent.append(Component.literal(str).withStyle(style.orEmpty()))
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
                 }
