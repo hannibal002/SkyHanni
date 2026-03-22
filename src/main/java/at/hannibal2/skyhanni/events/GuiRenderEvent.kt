@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.client.gui.GuiGraphics
 
+@PrimaryFunction("onGuiRender")
 sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context) {
 
     /**
@@ -12,6 +13,7 @@ sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(conte
      * Use ScreenDrawnEvent instead.
      * Also, ensure you do not render with this event while in a sign, as it will override ScreenDrawnEvent.
      */
+    @PrimaryFunction("onChestGuiRender")
     class ChestGuiOverlayRenderEvent(context: GuiGraphics) : GuiRenderEvent(context)
 
     /**
@@ -23,6 +25,7 @@ sealed class GuiRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(conte
     /**
      * Renders as [GuiOverlayRenderEvent] if not inside an inventory and runs as [ChestGuiOverlayRenderEvent] when inside an inventory
      */
+    @PrimaryFunction("onGuiRenderTop")
     class GuiOnTopRenderEvent(context: GuiGraphics) : RenderingSkyHanniEvent(context)
     // This is intentional not an [GuiRenderEvent] since it will cause double renders
 }
