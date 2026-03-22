@@ -39,7 +39,7 @@ class EnumArgumentType<E : Enum<E>> private constructor(
         return entry?.value ?: throw invalidValueException.createWithContext(reader, input)
     }
 
-    override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
         val string = builder.remainingLowerCase
         val items = mutableListOf<String>()
         for (enum in mapping.keys) {

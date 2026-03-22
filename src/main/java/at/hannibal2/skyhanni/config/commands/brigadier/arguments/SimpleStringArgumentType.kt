@@ -25,7 +25,7 @@ class SimpleStringArgumentType<T : Any>(
         return map[input] ?: throw invalidValueException.createWithContext(reader, input)
     }
 
-    override fun <S : Any> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
         return builder.addOptionalEscaped(map.keys).buildFuture()
     }
 

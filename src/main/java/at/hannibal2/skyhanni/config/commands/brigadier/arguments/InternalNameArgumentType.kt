@@ -50,7 +50,7 @@ sealed class InternalNameArgumentType(
     protected open fun isValidItem(item: NeuInternalName): Boolean = true
 
     private open class ItemName(isGreedy: Boolean) : InternalNameArgumentType(isGreedy) {
-        override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+        override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
             return BrigadierUtils.parseItemNameTabComplete(
                 builder.remainingLowerCase,
                 builder,
