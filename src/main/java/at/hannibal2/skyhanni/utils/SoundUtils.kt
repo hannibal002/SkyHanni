@@ -57,7 +57,7 @@ object SoundUtils {
         //? if < 1.21.11 {
         Minecraft.getInstance().soundManager.setVolume(this, level)
     //?} else
-    //Minecraft.getInstance().soundManager.updateCategoryVolume(this.source, level)
+    //Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
