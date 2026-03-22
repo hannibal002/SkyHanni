@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class MixinHandledScreen {
+public abstract class MixinAbstractContainerScreen {
 
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
