@@ -34,14 +34,10 @@ import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-@Suppress("MemberVisibilityCanBePrivate", "unused")
 @SkyHanniModule
 object SpiderDenRelicPathfinder {
 
-    val config get() = SkyHanniMod.feature.misc
-
-    private val foundRelics
-        get() = ProfileStorageData.profileSpecific?.spiderRelics?.found ?: mutableSetOf()
+    private val config get() = SkyHanniMod.feature.misc
 
     private var data: Data? = null
 
@@ -52,16 +48,16 @@ object SpiderDenRelicPathfinder {
      * REGEX-TEST: +10,000 Coins! (2/28 Relics)
      */
     private val foundPattern by patternGroup.pattern(
-        key = "chat.found.colorless",
-        fallback = "^\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)$",
+        key = "chat.found",
+        fallback = "\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)",
     )
 
     /**
      * REGEX-TEST: You've already found this relic!
      */
     private val duplicatePattern by patternGroup.pattern(
-        key = "chat.duplicate.colorless",
-        fallback = "^You've already found this relic!$",
+        key = "chat.duplicate",
+        fallback = "You've already found this relic!",
     )
 
     private class Data(
@@ -200,10 +196,16 @@ object SpiderDenRelicPathfinder {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Spider Den Relic Pathfinder")
-        if (!isEnabled()) return event.addIrrelevant("disabled")
+        if (!isEnabled()) {
+            event.addIrrelevant("disabled")
+            return
+        }
         event.addData {
             data?.apply {
-                debugState?.let { add(it); add("") }
+                debugState?.let {
+                    add(it)
+                    add("")
+                }
                 add("found: $found")
                 add("total: $total")
                 add("route remaining: ${route.size}")
@@ -280,7 +282,7 @@ object SpiderDenRelicPathfinder {
     private fun getRelicNodes(nodes: List<GraphNode>): List<GraphNode> =
         nodes.filter { it.hasTag(GraphNodeTag.SPIDER_RELIC) }
 
-    fun foundRelicsStore(): MutableSet<LorenzVec> =
+    private fun foundRelicsStore(): MutableSet<LorenzVec> =
         ProfileStorageData.profileSpecific?.spiderRelics?.found ?: mutableSetOf()
 
     private fun isEnabled() =
