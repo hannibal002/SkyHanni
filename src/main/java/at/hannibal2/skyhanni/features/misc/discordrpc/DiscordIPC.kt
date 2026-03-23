@@ -36,6 +36,9 @@ class DiscordIPC(private val clientId: Long) : Closeable {
     val isConnected: Boolean get() = _connected
     private val clientPayload = """{"v":1,"client_id":"$clientId"}"""
 
+    var lastResolvedUid: String? = null
+        private set
+
     /**
      * Discovers an active Discord IPC pipe, opens a connection, and performs the version-1 handshake.
      * Blocks until a READY frame is received from Discord, confirming the connection is active.
@@ -200,7 +203,12 @@ class DiscordIPC(private val clientId: Long) : Closeable {
 
         val uid = runCatching {
             ProcessBuilder("id", "-u").start().inputStream.bufferedReader().readLine()?.trim()
+        }.getOrNull() ?: runCatching {
+            java.io.File("/proc/self/status").useLines { lines ->
+                lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
+            }
         }.getOrNull()
+        lastResolvedUid = uid
 
         val flatpakDirs = uid?.let {
             runCatching {
