@@ -7,7 +7,7 @@ import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
 //? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//?} else {
+//? } else {
 /*import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f*/
 //?}
@@ -29,7 +29,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         guiRenderState: GuiRenderState,
         //? if < 26.1 {
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
-        //?} else
+        //? } else
         //projectionBuffer: ProjectionMatrixBuffer,
     ) {
         val texture = texture ?: return
@@ -43,7 +43,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
 
         //? if < 26.1 {
         val bufferSlice = projectionBuffer.getBuffer(slotSize.toFloat(), slotSize.toFloat())
-        //?} else {
+        //? } else {
         /*val size = slotSize.toFloat()
         val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))*/
         //?}
@@ -76,7 +76,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
                 RenderPipelines.GUI_TEXTURED,
                 //? if < 1.21.11 {
                 TextureSetup.singleTexture(textureView),
-                //?} else
+                //? } else
                 //TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 state.pose(),
                 state.x0(), state.y0(), state.x1(), state.y1(),

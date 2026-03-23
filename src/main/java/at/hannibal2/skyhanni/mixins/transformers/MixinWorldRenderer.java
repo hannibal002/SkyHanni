@@ -35,7 +35,7 @@ public class MixinWorldRenderer {
     @Inject(
         //? if < 26.1 {
         method = "method_62214",
-        //?} else
+        //? } else
         //method = "lambda$addMainPass$0",
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
@@ -46,7 +46,7 @@ public class MixinWorldRenderer {
     @Inject(
         //? if < 26.1 {
         method = "method_62214",
-        //?} else
+        //? } else
         //method = "lambda$addMainPass$0",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {

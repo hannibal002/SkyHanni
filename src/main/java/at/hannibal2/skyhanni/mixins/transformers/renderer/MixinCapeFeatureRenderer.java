@@ -23,9 +23,9 @@ public class MixinCapeFeatureRenderer {
             if (entityAlpha == null) return original;
             //? if < 1.21.11 {
             return RenderType.itemEntityTranslucentCull(skinTextures.cape().texturePath());
-            //?} else if < 26.1 {
+            //? } else if < 26.1 {
             //return RenderTypes.itemEntityTranslucentCull(skinTextures.cape().texturePath());
-            //?} else
+            //? } else
             //return RenderTypes.entityTranslucentCullItemTarget(skinTextures.cape().texturePath());
         }
         return original;

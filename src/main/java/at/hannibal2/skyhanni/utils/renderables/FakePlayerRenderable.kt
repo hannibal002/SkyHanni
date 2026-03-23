@@ -108,7 +108,7 @@ private fun drawEntityWithoutScissor(
     entity.setXRot(t)
     entity.yHeadRotO = u
     entity.yHeadRot = v
-    //?} else if < 26.1
+    //? } else if < 26.1
     //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
     // TODO 26.1 We need to make our own EntityRenderState to blit
 }

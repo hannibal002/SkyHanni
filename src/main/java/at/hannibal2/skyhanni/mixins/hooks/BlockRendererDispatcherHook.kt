@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 //? if < 26.1 {
 import net.minecraft.client.renderer.block.BlockRenderDispatcher
-//?} else
+//? } else
 //import net.minecraft.client.renderer.block.BlockStateModelSet
 import net.minecraft.client.renderer.block.model.BlockStateModel
 import net.minecraft.world.level.block.state.BlockState
@@ -22,7 +22,7 @@ fun modifyGetModelFromBlockState(
         cir.returnValue = blockRendererDispatcher.blockModelShaper.getBlockModel(returnState)
     }
 }
-//?} else {
+//? } else {
 /*fun modifyGetModelFromBlockState(
     modelSet: BlockStateModelSet,
     state: BlockState?,

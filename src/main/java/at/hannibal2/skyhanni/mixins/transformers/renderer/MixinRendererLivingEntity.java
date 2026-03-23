@@ -47,10 +47,10 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
 
 
     @ModifyArg(
-        //? if < 21.6 {
+        //? if < 26.1 {
         method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
         //? } else
-        //method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V"
+        //method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
         at = @At(value = "INVOKE",target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"),
         index = 6
     )
@@ -74,9 +74,9 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return;
             //? if < 1.21.11 {
             cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
-            //?} else if < 26.1 {
+            //? } else if < 26.1 {
             //cir.setReturnValue(RenderTypes.itemEntityTranslucentCull(this.getTextureLocation(state)));
-            //?} else
+            //? } else
             //cir.setReturnValue(RenderTypes.entityTranslucentCullItemTarget(this.getTextureLocation(state)));
         }
     }

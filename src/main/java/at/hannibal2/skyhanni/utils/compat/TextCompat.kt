@@ -242,7 +242,7 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
     DelayedRun.runOrNextTick {
         //? if < 26.1 {
         Minecraft.getInstance().player?.displayClientMessage(message, false)
-        //?} else
+        //? } else
         //Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }
@@ -254,7 +254,7 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
         chat.deleteMessage(idToMessageSignature(id))
         //? if < 26.1 {
         chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
-        //?} else
+        //? } else
         //chat.addMessage(component, idToMessageSignature(id), GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
     }
 }
@@ -298,7 +298,7 @@ fun HoverEvent.value(): Component {
         HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
         //? if < 26.1 {
         HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
-        //?} else
+        //? } else
         //HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
         HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
         else -> Component.empty()

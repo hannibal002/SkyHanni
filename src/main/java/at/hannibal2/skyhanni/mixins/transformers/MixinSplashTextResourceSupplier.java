@@ -31,7 +31,7 @@ public class MixinSplashTextResourceSupplier {
     public void addSplash(List<String> list, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
         this.splashes.add("SkyHanni!");
     }
-    //?} else {
+    //? } else {
 
     /*@Shadow
     private List<Component> splashes;

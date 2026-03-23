@@ -274,7 +274,7 @@ object ChatManager {
                 }
                 //? if < 26.1 {
                 this[it] = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
-                //?} else
+                //? } else
                 //this[it] = GuiMessage(counter, newComponent, id, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
             }
         }

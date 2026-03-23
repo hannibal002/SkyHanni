@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 //? if < 26.1 {
 import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderHandlerRegistryImpl;
-//?} else
+//? } else
 //import net.fabricmc.fabric.impl.client.rendering.fluid.FluidRenderingRegistryImpl;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -33,7 +33,7 @@ public class MixinFluidRenderHandlerRegistry {
         }
     }
 }
-//?} else {
+//? } else {
 /*@Mixin(value = FluidRenderingRegistryImpl.class, remap = false)
 public class MixinFluidRenderHandlerRegistry {
 

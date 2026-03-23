@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 //? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
-//?} else
+//? } else
 //import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 //? if < 26.1 {
 import net.minecraft.world.inventory.ClickType;
-//?} else
+//? } else
 //import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V"))
     private void backgroundDrawn(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"))
     private void backgroundDrawn(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
@@ -57,7 +57,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     private void preDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
@@ -67,7 +67,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "render", at = @At("TAIL"))
     private void postDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractRenderState", at = @At("TAIL"))
     private void postDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
@@ -77,7 +77,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
@@ -87,7 +87,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(GuiGraphics guiGraphics, Slot slot, /*? if > 1.21.10 {*/ /*int i, int j, *//*?}*/ CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
     private void onDrawSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {*/
         //?}
@@ -97,7 +97,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "renderSlot", at = @At("RETURN"))
     private void onDrawSlotReturn(GuiGraphics guiGraphics, Slot slot, /*? if > 1.21.10 {*/ /*int i, int j, *//*?}*/ CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractSlot", at = @At("RETURN"))
     private void onDrawSlotReturn(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {*/
         //?}
@@ -109,7 +109,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     private void onMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo cir) {
         skyhanni$hook.onMouseClick(slot, slotId, button, actionType.ordinal(), cir);
     }
-    //?} else {
+    //? } else {
     /*@Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo cir) {
         skyhanni$hook.onMouseClick(slot, slotId, button, actionType.id(), cir);
@@ -119,7 +119,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
     //? if < 26.1 {
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        //?} else {
+        //? } else {
     /*@Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}

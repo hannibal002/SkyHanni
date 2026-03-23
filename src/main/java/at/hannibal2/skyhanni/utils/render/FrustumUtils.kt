@@ -9,7 +9,7 @@ object FrustumUtils {
 
     //? if < 26.1 {
     private val frustum get() = Minecraft.getInstance().levelRenderer.capturedFrustum
-    //?} else {
+    //? } else {
     /*private val frustum get() = Minecraft.getInstance().gameRenderer.getMainCamera().getCullFrustum()*/
     //?}
 

@@ -61,7 +61,7 @@ public class MixinGuiRenderer {
         method = "addElementToMesh",
         //? if < 26.1 {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
-        //?} else
+        //? } else
         //at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
@@ -107,7 +107,7 @@ public class MixinGuiRenderer {
             // TODO 26.1 frameNumber moved to atlas ?
             //? if < 26.1 {
             frameNumber
-            //?} else
+            //? } else
             //0
         );
     }
@@ -128,7 +128,7 @@ public class MixinGuiRenderer {
             // TODO 26.1 frameNumber moved to atlas ?
             //? if < 26.1 {
             frameNumber
-            //?} else
+            //? } else
             //0
         );
     }

@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
 //? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//?} else {
+//? } else {
 /*import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f*/
 //?}
@@ -99,7 +99,7 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
         frameNumber: Int,
         //? if < 26.1 {
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
-        //?} else
+        //? } else
         //projectionBuffer: ProjectionMatrixBuffer,
     ) {
         pruneFrames(frameNumber)

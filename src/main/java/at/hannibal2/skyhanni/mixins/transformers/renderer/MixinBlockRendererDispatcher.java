@@ -21,7 +21,7 @@ public class MixinBlockRendererDispatcher {
         BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockRenderDispatcher) (Object) this, state, cir);
     }
 }
-//?} else {
+//? } else {
 /*@Mixin(BlockStateModelSet.class)
 public class MixinBlockRendererDispatcher {
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)

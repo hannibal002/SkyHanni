@@ -13,7 +13,7 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 //? if < 1.21.11 {
 import net.minecraft.client.renderer.rendertype.RenderType.CompositeRenderType
-//?} else {
+//? } else {
 /*import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
 import net.minecraft.client.renderer.rendertype.RenderType
@@ -30,7 +30,7 @@ class ChromaRenderLayer(
     //? if < 1.21.11 {
     phases: CompositeState,
 ) : CompositeRenderType(name, size, hasCrumbling, translucent, pipeline, phases) {
-    //?} else {
+    //? } else {
     /*texture: Identifier? = null,
 ) : RenderType(
     name,
@@ -48,7 +48,7 @@ class ChromaRenderLayer(
         //? if < 1.21.11 {
         val renderPipeline = this.renderPipeline
         this.setupRenderState()
-        //?} else {
+        //? } else {
         /*val renderPipeline = this.state.pipeline
         val matrix4fStack = RenderSystem.getModelViewStack()
         val consumer = this.state.layeringTransform.modifier
@@ -64,7 +64,7 @@ class ChromaRenderLayer(
             //? if < 1.21.11 {
             RenderSystem.getTextureMatrix(),
             RenderSystem.getShaderLineWidth(),
-            //?} else
+            //? } else
             //Matrix4f(),
         )
         if (GuiRendererHook.chromaBufferSlice == null) {
@@ -105,7 +105,7 @@ class ChromaRenderLayer(
                             renderPass.bindSampler("Sampler$i", gpuTexture)
                         }
                     }
-                    //?} else {
+                    //? } else {
                     /*for (entry in this.state.textures) {
                         renderPass.bindTexture(entry.key, entry.value.textureView, entry.value.sampler)
                     }
@@ -127,7 +127,7 @@ class ChromaRenderLayer(
         buffer.close()
         //? if < 1.21.11 {
         this.clearRenderState()
-        //?} else {
+        //? } else {
         /*if (consumer != null) {
             matrix4fStack.popMatrix()
         }

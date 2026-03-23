@@ -171,7 +171,7 @@ object TabListRenderer {
                     middleX += 8 + 2
                 }
                 // TODO 26.1 PlayerFaceRenderer was removed in 26.1, we need to blit our own.
-                //?} else {
+                //? } else {
                 /*if (tabLine.type == TabStringType.PLAYER && !hideIcons) middleX += 8 + 2*/
                 //?}
 

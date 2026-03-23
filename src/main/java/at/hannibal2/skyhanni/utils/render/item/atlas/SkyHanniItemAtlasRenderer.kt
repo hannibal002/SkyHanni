@@ -10,7 +10,7 @@ import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
 //? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//?} else {
+//? } else {
 /*import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f*/
 //?}
@@ -31,14 +31,14 @@ internal class SkyHanniItemAtlasRenderer(
     fun render(
         //? if < 26.1 {
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
-        //?} else
+        //? } else
         //projectionBuffer: ProjectionMatrixBuffer,
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
         //? if < 26.1 {
         val bufferSlice = projectionBuffer.getBuffer(size, size)
-        //?} else
+        //? } else
         //val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
@@ -90,7 +90,7 @@ internal class SkyHanniItemAtlasRenderer(
                 RenderPipelines.GUI_TEXTURED,
                 //? if < 1.21.11 {
                 TextureSetup.singleTexture(textureView),
-                //?} else
+                //? } else
                 //TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 shState.pose(),
                 shState.x0(), shState.y0(), shState.x1(), shState.y1(),

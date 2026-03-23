@@ -192,7 +192,7 @@ object WorldRenderUtils {
 
         //? < 1.21.11 {
         ShapeRenderer.addChainedFilledBoxVertices(
-            //?} else
+            //? } else
             //addChainedFilledBoxVertices(
             matrices,
             buf,

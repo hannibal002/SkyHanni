@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 //? if < 26.1 {
 import com.mojang.blaze3d.platform.DepthTestFunction;
-//?} else {
+//? } else {
 /*import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.platform.CompareOp;*/
 //?}
@@ -23,7 +23,7 @@ public class RenderPipelineMixin {
         if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
         return SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive() ? DepthTestFunction.LEQUAL_DEPTH_TEST : original;
     }
-    //?} else {
+    //? } else {
     /*@ModifyReturnValue(method = "getDepthStencilState", at = @At("RETURN"))
     private DepthStencilState setGlowDepth(DepthStencilState original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;

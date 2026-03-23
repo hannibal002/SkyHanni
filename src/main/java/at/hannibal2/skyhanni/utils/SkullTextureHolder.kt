@@ -23,6 +23,9 @@ object SkullTextureHolder {
 
     // Any classes that rely on textures that cannot make use of by lazy or other late initializers
     private fun fixLateInits() = DelayedRun.runNextTick {
+        // TODO 26.1 this fires too early
+        //? if < 26.1 {
         MiningEventType.fixGoblinItemStack()
+        //? }
     }
 }

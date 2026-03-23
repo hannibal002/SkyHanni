@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 //? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//?} else
+//? } else
 //import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
@@ -34,7 +34,7 @@ object RoundedShapeDrawer {
 
     //? if < 26.1 {
     val projectionMatrix = CachedOrthoProjectionMatrixBuffer("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
-    //?} else
+    //? } else
     //val projectionMatrix = ProjectionMatrixBuffer("SkyHanni Rounded Shapes")
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
@@ -83,7 +83,7 @@ object RoundedShapeDrawer {
             RenderSystem.setProjectionMatrix(
                 //? if < 26.1 {
                 projectionMatrix.getBuffer(w, h),
-                //?} else
+                //? } else
                 //projectionMatrix.getBuffer(Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)),
                 ProjectionType.ORTHOGRAPHIC,
             )
@@ -94,7 +94,7 @@ object RoundedShapeDrawer {
                 //? if < 1.21.11 {
                 RenderSystem.getTextureMatrix(),
                 RenderSystem.getShaderLineWidth(),
-                //?} else
+                //? } else
                 //Matrix4f(),
             )
             roundedBufferSlice =
@@ -136,7 +136,7 @@ object RoundedShapeDrawer {
         ) {
             //? if < 1.21.11 {
             bindSampler("textureSampler", glTex)
-            //?} else {
+            //? } else {
             /*val sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)
             bindTexture("textureSampler", glTex, sampler)
             *///?}

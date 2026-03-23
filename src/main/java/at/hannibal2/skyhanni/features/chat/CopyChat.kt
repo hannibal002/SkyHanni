@@ -86,7 +86,7 @@ object CopyChat {
         val chatGui = mc.gui.chat ?: return 0.0
         //? if < 1.21.11 {
         return chatGui.screenToChatX(d)
-        //?} else
+        //? } else
         //return d / chatGui.scale - 4.0
     }
 
@@ -95,7 +95,7 @@ object CopyChat {
         val chatGui = mc.gui.chat ?: return 0.0
         //? if < 1.21.11 {
         return chatGui.screenToChatY(d)
-        //?} else {
+        //? } else {
         /*val e = mc.window.guiScaledHeight - d - 40.0
         return e / (chatGui.scale * chatGui.lineHeight)
         *///?}

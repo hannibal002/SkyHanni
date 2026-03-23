@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderItemHookKt;
 import net.minecraft.client.gui.Font;
 //? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
-//?} else
+//? } else
 //import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if < 26.1 {
 @Mixin(GuiGraphics.class)
-//?} else
+//? } else
 //@Mixin(GuiGraphicsExtractor.class)
 public class MixinDrawContext {
 
@@ -30,7 +30,7 @@ public class MixinDrawContext {
     private void drawItemPost(LivingEntity entity, Level world, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
         RenderItemHookKt.renderItemReturn((GuiGraphics) (Object) this, stack, x, y);
     }
-    //?} else {
+    //? } else {
     /*@Inject(method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At("RETURN"))
     private void drawItemPost(LivingEntity entity, Level world, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
         RenderItemHookKt.renderItemReturn((GuiGraphicsExtractor) (Object) this, stack, x, y);
@@ -42,7 +42,7 @@ public class MixinDrawContext {
     private void drawItemPost(Font textRenderer, ItemStack stack, int x, int y, String stackCountText, CallbackInfo ci) {
         RenderItemHookKt.renderItemOverlayPost((GuiGraphics) (Object) this, stack, x, y, stackCountText);
     }
-    //?} else {
+    //? } else {
     /*@Inject(method = "itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void drawItemDecorationsPost(Font textRenderer, ItemStack stack, int x, int y, String stackCountText, CallbackInfo ci) {
         RenderItemHookKt.renderItemOverlayPost((GuiGraphicsExtractor) (Object) this, stack, x, y, stackCountText);
@@ -51,7 +51,7 @@ public class MixinDrawContext {
 
     //? if < 26.1 {
     @Inject(method = "renderComponentHoverEffect", at = @At(value = "INVOKE", target = "Ljava/util/Objects;requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;", shift = At.Shift.AFTER))
-    //?} else
+    //? } else
     //@Inject(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Ljava/util/Objects;requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;", shift = At.Shift.AFTER))
     private void onRenderComponentHoverEffect(Font font, Style style, int i, int j, CallbackInfo ci) {
         GuiChatHook.INSTANCE.setReplacementComponent(null);
@@ -60,7 +60,7 @@ public class MixinDrawContext {
 
     //? if < 26.1 {
     @ModifyArg(method = "renderComponentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 0)
-    //?} else
+    //? } else
     //@ModifyArg(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 0)
     private FormattedText replaceWithNewList(FormattedText originalComponent) {
         return GuiChatHook.INSTANCE.getReplacementComponent() != null ? GuiChatHook.INSTANCE.getReplacement() : originalComponent;

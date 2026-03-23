@@ -67,7 +67,7 @@ class GuiPositionEditor(
             //? if < 26.1 {
             oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
             oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
-            //?} else {
+            //? } else {
             /*oldScreen.extractBackground(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
             oldScreen.extractRenderState(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)*/
             //?}

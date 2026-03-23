@@ -164,7 +164,7 @@ enum class SkyHanniRenderPipeline(
                 // One or the other, never both
                 //? if < 26.1 {
                 blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
-                //?} else
+                //? } else
                 //blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
@@ -179,7 +179,7 @@ enum class SkyHanniRenderPipeline(
                 //? if < 26.1 {
                 withDepthWrite(depthWrite)
                 withDepthTestFunction(depthTestFunction)
-                //?} else
+                //? } else
                 //withDepthStencilState(DepthStencilState(depthTestFunction, depthWrite, 0f, 0f))
             }.build(),
     )

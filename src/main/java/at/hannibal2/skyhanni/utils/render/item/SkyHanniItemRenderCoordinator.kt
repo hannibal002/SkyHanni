@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
 //? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//?} else
+//? } else
 //import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -27,7 +27,7 @@ internal object SkyHanniItemRenderCoordinator {
     private val projectionBuffer by lazy {
         //? if < 26.1 {
         CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
-        //?} else
+        //? } else
         //ProjectionMatrixBuffer("SkyHanni items")
     }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()

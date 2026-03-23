@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.RenderStateShard
 import java.util.OptionalDouble
 import java.util.concurrent.ConcurrentHashMap
 import net.minecraft.client.renderer.rendertype.RenderType.CompositeState
-//?} else {
+//? } else {
 /*import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.LayeringTransform
 *///?}
@@ -29,7 +29,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.FILLED(),
         CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.FILLED()).createRenderSetup(),
     )
 
@@ -41,7 +41,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.FILLED_XRAY(),
         CompositeState.builder().createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.FILLED_XRAY()).createRenderSetup(),
     )
 
@@ -53,7 +53,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.TRIANGLES(),
         CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.TRIANGLES()).createRenderSetup(),
     )
 
@@ -65,7 +65,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.TRIANGLES_XRAY(),
         CompositeState.builder().createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.TRIANGLES_XRAY()).createRenderSetup(),
     )
 
@@ -77,7 +77,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.TRIANGLE_FAN(),
         CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.TRIANGLE_FAN()).createRenderSetup(),
     )
 
@@ -89,7 +89,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY(),
         CompositeState.builder().createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.TRIANGLE_FAN_XRAY()).createRenderSetup(),
     )
 
@@ -101,7 +101,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.QUADS(),
         CompositeState.builder().setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING).createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.QUADS()).createRenderSetup(),
     )
 
@@ -113,7 +113,7 @@ object SkyHanniRenderLayers {
         true,
         SkyHanniRenderPipeline.QUADS_XRAY(),
         CompositeState.builder().createCompositeState(false),
-        //?} else
+        //? } else
         //RenderSetup.builder(SkyHanniRenderPipeline.QUADS_XRAY()).createRenderSetup(),
     )
 
@@ -156,7 +156,7 @@ object SkyHanniRenderLayers {
                 .createCompositeState(false),
         )
     }
-    //?} else {
+    //? } else {
     /*private val LINES: RenderType = RenderType.create(
         "skyhanni_lines",
         RenderSetup.builder(SkyHanniRenderPipeline.LINES())
@@ -192,7 +192,7 @@ object SkyHanniRenderLayers {
         return cache.computeIfAbsent(lineWidth.hashCode()) {
             createLineRenderLayer(lineWidth, throughWalls)
         }
-        //?} else
+        //? } else
         //return if (throughWalls) LINES_XRAY else LINES
     }
 

@@ -22,7 +22,7 @@ import org.joml.Matrix3x2f
 
 //? if < 26.1 {
 private typealias GuiRenderState = net.minecraft.client.gui.render.state.GuiRenderState
-//?} else
+//? } else
 //private typealias GuiRenderState = net.minecraft.client.renderer.state.gui.GuiRenderState
 
 object ShaderRenderUtils {

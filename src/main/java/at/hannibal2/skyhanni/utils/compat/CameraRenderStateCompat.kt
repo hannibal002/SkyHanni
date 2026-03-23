@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
 //? if < 26.1 {
-//?} else {
+//? } else {
 /*import net.minecraft.client.renderer.state.level.CameraRenderState
 import org.joml.Quaternionf
 import net.minecraft.world.phys.Vec3

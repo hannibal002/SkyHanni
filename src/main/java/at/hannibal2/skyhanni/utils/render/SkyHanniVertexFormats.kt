@@ -26,7 +26,7 @@ object SkyHanniVertexFormats {
         private val type: VFEType = VFEType.FLOAT,
         //? if < 26.1 {
         private val usage: VFEUsage = VFEUsage.GENERIC,
-        //?} else {
+        //? } else {
         /*private val normalized: Boolean = false,*/
         //?}
         private val count: Int = 4,
@@ -43,7 +43,7 @@ object SkyHanniVertexFormats {
         val element by lazy {
             //? if < 26.1 {
             safeRegister(registrationId, index, type, usage, count)
-            //?} else {
+            //? } else {
             /*safeRegister(registrationId, index, type, false, count)*/
             //?}
         }
@@ -65,7 +65,7 @@ object SkyHanniVertexFormats {
         type: VFEType = VFEType.FLOAT,
         //? if < 26.1 {
         usage: VFEUsage = VFEUsage.GENERIC,
-        //?} else
+        //? } else
         //normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
@@ -78,7 +78,7 @@ object SkyHanniVertexFormats {
         )
         //? if < 26.1 {
         return VertexFormatElement.register(id, index, type, usage, count)
-        //?} else
+        //? } else
         //return VertexFormatElement.register(id, index, type, normalized, count)
     }
 

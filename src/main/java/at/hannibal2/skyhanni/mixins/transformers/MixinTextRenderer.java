@@ -14,7 +14,7 @@ public class MixinTextRenderer {
 
     //? if < 1.21.11 {
     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)
-            //?} else
+            //? } else
     //@ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)
 
     private FormattedCharSequence modifyOrderedText(FormattedCharSequence value) {

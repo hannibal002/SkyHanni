@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if < 26.1 {
 import net.minecraft.client.Camera;
 import org.joml.Matrix4f;
-//?} else {
+//? } else {
 /*import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;*/
 //?}
@@ -42,7 +42,7 @@ public class MixinReplacementLevelRenderer {
     //? if < 26.1 {
     @Unique
     Camera currentCamera;
-    //?} else {
+    //? } else {
     /*@Unique
     CameraRenderState currentCameraState;*/
     //?}
@@ -60,7 +60,7 @@ public class MixinReplacementLevelRenderer {
         currentCamera = camera;
         currentTickCounter = tickCounter;
     }
-    //?} else {
+    //? } else {
     /*@Inject(method = "renderLevel", at = @At(value = "HEAD"))
     private void beginRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci) {
         currentCameraState = cameraState;
@@ -76,7 +76,7 @@ public class MixinReplacementLevelRenderer {
     )
     private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, Operation<Void> original) {
         original.call(instance, group);
-        //?} else if < 26.1 {
+        //? } else if < 26.1 {
     /*@WrapOperation(
         method = "method_62214",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
@@ -84,7 +84,7 @@ public class MixinReplacementLevelRenderer {
     )
     private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
         original.call(instance, group, gpuSampler);*/
-        //?} else {
+        //? } else {
     /*@WrapOperation(
         method = "lambda$addMainPass$0",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
@@ -99,7 +99,7 @@ public class MixinReplacementLevelRenderer {
             contextMatrixStack,
             //? if < 26.1 {
             currentCamera,
-            //?} else
+            //? } else
             //currentCameraState,
             renderBuffers.bufferSource(),
             currentTickCounter.getGameTimeDeltaPartialTick(true),
@@ -112,7 +112,7 @@ public class MixinReplacementLevelRenderer {
     @ModifyExpressionValue(
         //? if < 26.1 {
         method = "method_62214",
-        //?} else
+        //? } else
         //method = "lambda$addMainPass$0",
         at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
     private PoseStack onCreateMatrixStack(PoseStack matrixStack) {
