@@ -250,10 +250,8 @@ class DiscordIPC(
 
         var lastError: Throwable? = null
         for (dir in allDirs) {
-            for (dir in allDirs) {
-                for (i in 0..9) {
-                    runCatching { return UnixIPCConnection(Path("$dir/discord-ipc-$i")) }.onFailure { lastError = it }
-                }
+            for (i in 0..9) {
+                runCatching { return UnixIPCConnection(Path("$dir/discord-ipc-$i")) }.onFailure { lastError = it }
             }
         }
 
