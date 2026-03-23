@@ -24,6 +24,8 @@ class DiscordIPC(
     private var _connected = false
     private var pipe: DiscordIPCPipe? = null
 
+    private val gson = com.google.gson.GsonBuilder().create()
+
     /** Whether this client is currently connected and ready for Discord IPC. */
     val isConnected: Boolean get() = _connected
     private val clientPayload = """{"v":1,"client_id":"$clientId"}"""
@@ -50,7 +52,7 @@ class DiscordIPC(
      */
     fun setActivity(presence: DiscordRichPresence) {
         if (!_connected) throw DiscordIPCException("setActivity called while not connected")
-        sendFrame(Opcode.FRAME, ConfigManager.gson.toJson(buildActivityPayload(presence)))
+        sendFrame(Opcode.FRAME, gson.toJson(buildActivityPayload(presence)))
     }
 
     /**
