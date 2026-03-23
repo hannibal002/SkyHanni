@@ -1,30 +1,21 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.Closeable
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.RandomAccessFile
-import java.net.StandardProtocolFamily
-import java.net.UnixDomainSocketAddress
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.channels.SocketChannel
-import java.nio.file.Files
-import java.nio.file.Path
 import java.util.UUID
-import kotlin.io.path.Path
 
 /**
- * A lightweight Discord IPC client implementing the Rich Presence protocol over Discord's local IPC pipe.
+ * A lightweight Discord IPC client implementing the Rich Presence protocol.
  *
- * Manages pipe discovery, handshake, presence updates, and clean disconnection.
- * Uses named pipes on Windows and Unix domain sockets on Linux/macOS.
+ * Manages handshake, presence updates, and clean disconnection over a [DiscordIPCPipe]
+ * obtained from [DiscordIPCPipeManager].
  *
  * @param clientId The Discord application client ID (from the Discord Developer Portal).
+ * @param onDebugInfo Called with diagnostic key-value pairs if pipe discovery fails.
  */
 class DiscordIPC(
     private val clientId: Long,
@@ -33,21 +24,20 @@ class DiscordIPC(
 
     @Volatile
     private var _connected = false
-    private var connection: IPCConnection? = null
+    private var pipe: DiscordIPCPipe? = null
 
-    /** Whether this client is currently connected to and ready for Discord IPC. */
+    /** Whether this client is currently connected and ready for Discord IPC. */
     val isConnected: Boolean get() = _connected
     private val clientPayload = """{"v":1,"client_id":"$clientId"}"""
 
     /**
-     * Discovers an active Discord IPC pipe, opens a connection, and performs the version-1 handshake.
-     * Blocks until a READY frame is received from Discord, confirming the connection is active.
+     * Opens a pipe to Discord and performs the version-1 handshake.
      *
      * @throws DiscordIPCException If no Discord client is running, the pipe cannot be opened,
      *   or the handshake does not complete successfully.
      */
     fun connect() {
-        connection = findConnection()
+        pipe = DiscordIPCPipeManager.open(onDebugInfo)
         sendFrame(Opcode.HANDSHAKE, clientPayload)
         val (opcode, body) = readFrame()
         if (opcode != Opcode.FRAME) throw DiscordIPCException("Expected FRAME after handshake, got $opcode. Body: $body")
@@ -55,10 +45,10 @@ class DiscordIPC(
     }
 
     /**
-     * Updates the rich presence activity currently displayed on the user's Discord profile.
+     * Updates the rich presence activity displayed on the user's Discord profile.
      *
-     * @param presence The [DiscordRichPresence] data to send. Null fields are omitted from the payload.
-     * @throws DiscordIPCException If the client is not connected or if writing to the pipe fails.
+     * @param presence The [DiscordRichPresence] to send. Null fields are omitted from the payload.
+     * @throws DiscordIPCException If the client is not connected or writing to the pipe fails.
      */
     fun setActivity(presence: DiscordRichPresence) {
         if (!_connected) throw DiscordIPCException("setActivity called while not connected")
@@ -67,14 +57,13 @@ class DiscordIPC(
 
     /**
      * Sends a CLOSE frame to Discord and releases all pipe resources.
-     * Safe to call when not connected; any errors during the close frame write are silently swallowed
-     * since the connection is being torn down regardless.
+     * Safe to call when not connected; errors during the close frame are silently swallowed.
      */
     override fun close() {
         if (_connected) runCatching { sendFrame(Opcode.CLOSE, clientPayload) }
         _connected = false
-        connection?.close()
-        connection = null
+        pipe?.close()
+        pipe = null
     }
 
     private enum class Opcode(val id: Int) {
@@ -90,19 +79,17 @@ class DiscordIPC(
     }
 
     /**
-     * Writes a single framed IPC message to the pipe output stream.
+     * Writes a single framed IPC message to the pipe.
      *
-     * Discord's IPC wire format is: `[opcode: Int32LE][length: Int32LE][payload: UTF-8 bytes]`.
+     * Discord's IPC wire format: `[opcode: Int32LE][length: Int32LE][payload: UTF-8 bytes]`.
      *
-     * Synchronized to guard against concurrent writes from the presence update loop and [close].
+     * Synchronized to guard against concurrent writes from the presence loop and [close].
      *
-     * @param opcode The [Opcode] for this frame.
-     * @param json The JSON payload string to send.
      * @throws DiscordIPCException If there is no active pipe connection.
      */
     @Synchronized
     private fun sendFrame(opcode: Opcode, json: String) {
-        val out = connection?.output ?: throw DiscordIPCException("sendFrame called with no active connection")
+        val out = pipe?.output ?: throw DiscordIPCException("sendFrame called with no active connection")
         val bytes = json.toByteArray(Charsets.UTF_8)
         val frame = ByteBuffer.allocate(8 + bytes.size).order(ByteOrder.LITTLE_ENDIAN)
             .putInt(opcode.id)
@@ -113,16 +100,16 @@ class DiscordIPC(
     }
 
     /**
-     * Reads one framed IPC message from the pipe input stream. Blocks until a full frame is available.
+     * Reads one framed IPC message from the pipe. Blocks until a full frame is available.
      *
-     * Sets [isConnected] to false and throws if Discord closes the pipe mid-read (EOF in header).
+     * Sets [isConnected] to false and throws if Discord closes the pipe mid-read.
      *
-     * @return A pair of the received [Opcode] and its decoded JSON payload string.
-     * @throws DiscordIPCException If the connection is closed by Discord or an unrecognized opcode is received.
+     * @return A pair of the received [Opcode] and its decoded JSON payload.
+     * @throws DiscordIPCException If the connection is closed or an unrecognized opcode is received.
      */
     @Suppress("ThrowsCount")
     private fun readFrame(): Pair<Opcode, String> {
-        val inp = connection?.input ?: throw DiscordIPCException("readFrame called with no active connection")
+        val inp = pipe?.input ?: throw DiscordIPCException("readFrame called with no active connection")
         val header = inp.readNBytes(8)
         if (header.size < 8) {
             _connected = false
@@ -138,27 +125,19 @@ class DiscordIPC(
     /**
      * Builds the full `SET_ACTIVITY` JSON payload for the given [presence].
      *
-     * The payload structure follows the Discord RPC protocol:
-     * `{ cmd, args: { pid, activity: { ... } }, nonce }`.
-     *
-     * @param presence The [DiscordRichPresence] to serialize into the payload.
-     * @return A [JsonObject] ready to be serialized and sent as a FRAME.
+     * Payload structure: `{ cmd, args: { pid, activity: { ... } }, nonce }`.
      */
     private fun buildActivityPayload(presence: DiscordRichPresence): JsonObject {
         val activity = JsonObject().apply {
             presence.details?.let { addProperty("details", it) }
             presence.state?.let { addProperty("state", it) }
             presence.startTimestamp?.let { start ->
-                JsonObject().apply {
-                    addProperty("start", start)
-                }.also { add("timestamps", it) }
+                JsonObject().apply { addProperty("start", start) }.also { add("timestamps", it) }
             }
-
             if (presence.largeImageKey != null || presence.largeImageText != null) JsonObject().apply {
                 presence.largeImageKey?.let { addProperty("large_image", it) }
                 presence.largeImageText?.let { addProperty("large_text", it) }
             }.let { add("assets", it) }
-
             if (presence.buttons.isNotEmpty()) JsonArray().apply {
                 presence.buttons.forEach { (label, url) ->
                     JsonObject().apply {
@@ -168,7 +147,6 @@ class DiscordIPC(
                 }
             }.let { add("buttons", it) }
         }
-
         return JsonObject().apply {
             addProperty("cmd", "SET_ACTIVITY")
             add(
@@ -181,167 +159,5 @@ class DiscordIPC(
             addProperty("nonce", UUID.randomUUID().toString())
         }
     }
-
-    private fun readProcEnviron(): Map<String, String> = runCatching {
-        java.io.File("/proc/self/environ").readBytes().toString(Charsets.UTF_8).split('\u0000').associateNotNull { entry ->
-            entry.split('=', limit = 2).takeIf {
-                it.size == 2
-            }?.let { it[0] to it[1] }
-        }
-    }.getOrDefault(emptyMap())
-
-    /**
-     * Locates an active Discord IPC pipe and returns an open [IPCConnection] to it.
-     *
-     * On Windows, tries named pipes `\\.\pipe\discord-ipc-{0..9}` in order, returning
-     * the first that opens without error.
-     *
-     * On Unix, resolves candidate socket directories from environment variables
-     * (`XDG_RUNTIME_DIR`, `TMPDIR`, `TMP`, `TEMP`, `/tmp`) and tries
-     * `discord-ipc-{0..9}` within each.
-     *
-     * @return An open [IPCConnection] backed by either a named pipe or Unix domain socket.
-     * @throws DiscordIPCException If no Discord IPC pipe is found across all candidates.
-     */
-    private fun findConnection(): IPCConnection {
-        if (isWindows) {
-            for (i in 0..9) runCatching { return WindowsIPCConnection("\\\\.\\pipe\\discord-ipc-$i") }
-            throw DiscordIPCException("No Discord IPC pipe found on Windows. Is Discord running?")
-        }
-
-        val uid = runCatching {
-            ProcessBuilder("id", "-u").start().inputStream.bufferedReader().readLine()?.trim()
-        }.getOrNull() ?: runCatching {
-            java.io.File("/proc/self/status").useLines { lines ->
-                lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
-            }
-        }.getOrNull()
-
-        val procEnviron = readProcEnviron()
-        fun env(key: String) = System.getenv(key) ?: procEnviron[key]
-
-        // base dirs, env vars first, uid-derived as fallback
-        val baseDirs = listOfNotNull(
-            env("XDG_RUNTIME_DIR"),
-            env("TMPDIR"),
-            env("TMP"),
-            uid?.let { "/run/user/$it" },
-            "/tmp",
-        ).distinct()
-
-        // relative subdirs, flatpak and snap variants
-        val subDirs = listOf(
-            "",
-            "app/com.discordapp.Discord",
-            "app/com.discordapp.DiscordCanary",
-            "snap.discord",
-            "snap.discord-canary",
-            "snap.discord-ptb",
-        )
-
-        // flatpak per-app forwarded sockets
-        val flatpakDirs = uid?.let {
-            runCatching {
-                Files.list(Path("/run/user/$it/.flatpak")).map { app -> "$app/xdg-run" }.toList()
-            }.getOrDefault(emptyList())
-        }.orEmpty()
-
-        val allDirs = baseDirs.flatMap { base -> subDirs.map { if (it.isEmpty()) base else "$base/$it" } } + flatpakDirs
-
-        var lastError: Throwable? = null
-        for (dir in allDirs) {
-            for (i in 0..9) {
-                runCatching { return UnixIPCConnection(Path("$dir/discord-ipc-$i")) }.onFailure { lastError = it }
-            }
-        }
-
-        onDebugInfo(
-            mapOf(
-                "uid" to (uid ?: "null"),
-                "baseDirs" to baseDirs.joinToString("|"),
-                "flatpakDirs" to flatpakDirs.joinToString("|"),
-                "xdgFromEnv" to (System.getenv("XDG_RUNTIME_DIR") ?: "null"),
-                "xdgFromProc" to (procEnviron["XDG_RUNTIME_DIR"] ?: "null"),
-                "lastErrors" to allDirs.flatMap { dir ->
-                    (0..9).mapNotNull { i ->
-                        runCatching { UnixIPCConnection(Path("$dir/discord-ipc-$i")).also { it.close() } }
-                            .exceptionOrNull()
-                            ?.let { "$dir/discord-ipc-$i: ${it.message}" }
-                    }
-                }.ifEmpty { listOf("none") }.joinToString("|"),
-            ),
-        )
-
-        throw DiscordIPCException("No Discord IPC socket found on Unix. Is Discord running? Last error: ${lastError?.message}", lastError)
-    }
-
-    private val isWindows = System.getProperty("os.name").lowercase().contains("win")
-
-    /**
-     * Abstracts the raw byte I/O channel to the Discord IPC pipe,
-     * regardless of whether it is backed by a Windows named pipe or a Unix domain socket.
-     */
-    private interface IPCConnection : Closeable {
-        val input: InputStream
-        val output: OutputStream
-    }
-
-    /**
-     * Windows named-pipe connection via [RandomAccessFile].
-     *
-     * [RandomAccessFile] is used because Windows named pipes are not files in the traditional
-     * sense and are not openable via [java.io.FileInputStream] directly. Input and output
-     * streams are derived from the underlying [java.io.FileDescriptor].
-     *
-     * @param path The Windows named pipe path (e.g. `\\.\pipe\discord-ipc-0`).
-     */
-    private class WindowsIPCConnection(path: String) : IPCConnection {
-        private val pipe = RandomAccessFile(path, "rw")
-        override val input: InputStream = object : InputStream() {
-            override fun read() = pipe.read()
-            override fun read(b: ByteArray, off: Int, len: Int) = pipe.read(b, off, len)
-        }
-        override val output: OutputStream = object : OutputStream() {
-            override fun write(b: Int) = pipe.write(b)
-            override fun write(b: ByteArray, off: Int, len: Int) = pipe.write(b, off, len)
-        }
-        override fun close() = pipe.close()
-    }
-
-    /**
-     * Unix domain socket connection using Java 16+ [StandardProtocolFamily.UNIX].
-     *
-     * @param path The filesystem path of the Discord IPC socket file.
-     */
-    private class UnixIPCConnection(path: Path) : IPCConnection {
-        private val channel = SocketChannel.open(StandardProtocolFamily.UNIX).apply {
-            connect(UnixDomainSocketAddress.of(path))
-        }
-        override val input: InputStream = object : InputStream() {
-            override fun read(): Int {
-                val buf = ByteBuffer.allocate(1)
-                return if (channel.read(buf) == -1) -1 else (buf.flip().get().toInt() and 0xFF)
-            }
-            override fun read(b: ByteArray, off: Int, len: Int) = channel.read(ByteBuffer.wrap(b, off, len))
-        }
-        override val output: OutputStream = object : OutputStream() {
-            override fun write(b: Int) = write(byteArrayOf(b.toByte()))
-            override fun write(b: ByteArray, off: Int, len: Int) {
-                val buf = ByteBuffer.wrap(b, off, len)
-                while (buf.hasRemaining()) channel.write(buf)
-            }
-        }
-        override fun close() = channel.close()
-    }
 }
 
-/**
- * Thrown when the Discord IPC client encounters a connectivity or protocol-level error.
- *
- * Common causes include Discord not running (no pipe found), an unexpected EOF during
- * frame reading, or an unrecognized opcode in a server response.
- *
- * @param message A human-readable description of the failure.
- * @param cause The underlying exception, if any.
- */
-class DiscordIPCException(message: String, cause: Throwable? = null) : Exception(message, cause)

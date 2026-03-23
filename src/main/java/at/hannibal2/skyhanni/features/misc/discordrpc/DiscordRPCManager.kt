@@ -249,12 +249,14 @@ object DiscordRPCManager {
                     start(progressCategory.start("discord rpc manual start"), fromCommand = true)
                 }
             }
-        } catch (e: Exception) {
-            updateDebugStatus("Unable to start: ${e.message}", error = true)
-            ErrorManager.logErrorWithData(
-                e,
-                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.",
-            )
+        } catch (e: DiscordIPCException) {
+            progress.end("discord not detected: ${e.message}")
+            if (e.isSandboxIssue) {
+                updateDebugStatus(e.message ?: "sandbox issue", error = true)
+                ChatUtils.userError(e.message ?: "Discord RPC is blocked by a sandbox restriction")
+            } else {
+                scheduleRetry(e.message)
+            }
         }
     }
 
@@ -269,6 +271,7 @@ object DiscordRPCManager {
         if (debugError) event.addData {
             add("Error detected!")
             add(debugStatusMessage)
+            lastDebugInfo.forEach { (k, v) -> add("$k: $v") }
         } else event.addIrrelevant {
             add("no error detected.")
             add("status: $debugStatusMessage")
