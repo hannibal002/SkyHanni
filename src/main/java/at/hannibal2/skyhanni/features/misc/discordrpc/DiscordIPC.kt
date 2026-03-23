@@ -212,6 +212,8 @@ class DiscordIPC(private val clientId: Long) : Closeable {
             System.getenv("XDG_RUNTIME_DIR"),
             uid?.let { "/run/user/$it" },
             uid?.let { "/run/user/$it/snap.discord" },
+            uid?.let { "/run/user/$it/snap.discord-canary" },
+            uid?.let { "/run/user/$it/snap.discord-ptb" },
             System.getenv("TMPDIR"),
             System.getenv("TMP"),
             System.getenv("TEMP"),
