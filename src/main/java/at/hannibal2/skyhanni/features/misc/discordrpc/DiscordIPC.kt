@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
-import at.hannibal2.skyhanni.config.ConfigManager
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
