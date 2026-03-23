@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.projectile.FishingHook
@@ -116,7 +116,7 @@ object HoppityEggLocator {
             } else "§aGuess #${index + 1}"
             drawEggWaypoint(eggLocation, name)
             if (waypointsConfig.showLine) {
-                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toChromaColor(), 2, false)
+                drawLineToCrosshair(eggLocation.blockCenter(), LorenzColor.GREEN.toChromaColor(), 2, false)
             }
         }
     }
