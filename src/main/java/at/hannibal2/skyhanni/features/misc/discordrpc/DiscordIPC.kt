@@ -23,6 +23,8 @@ class DiscordIPC(
     private var _connected = false
     private var pipe: DiscordIPCPipe? = null
 
+    // We need to use our own GSON here, rather than the ConfigManager one,
+    // as we need NON-null serialization, as discord does not play nice with nulls.
     private val gson = com.google.gson.GsonBuilder().create()
 
     /** Whether this client is currently connected and ready for Discord IPC. */
