@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.Closeable
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.RandomAccessFile
