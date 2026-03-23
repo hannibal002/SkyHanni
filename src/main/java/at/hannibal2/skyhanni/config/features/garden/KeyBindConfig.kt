@@ -25,7 +25,7 @@ class KeyBindConfig {
             "§eRequires main toggle to be enabled!",
     )
     @ConfigEditorBoolean
-    var mousemat: Boolean = true
+    var mousemat: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -34,7 +34,7 @@ class KeyBindConfig {
             "§eRequires main toggle to be enabled!",
     )
     @ConfigEditorBoolean
-    var fishingRod: Boolean = true
+    var fishingRod: Boolean = false
 
     @Expose
     @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
