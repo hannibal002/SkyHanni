@@ -70,7 +70,7 @@ object CrystalHollowsWalls {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        val position = WorldRenderUtils.getViewerPos(event.partialTicks)
+        val position = WorldRenderUtils.getViewerPos()
         when {
             position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
             nucleusBBOffsetY.contains(position.toVec3()) -> {

@@ -2,6 +2,7 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
@@ -14,7 +15,7 @@ import skyhannibuildsystem.PublishToModrinth
 plugins {
     idea
     java
-    id("com.gradleup.shadow") version "9.3.1"
+    alias(libs.plugins.shadow)
     id("net.fabricmc.fabric-loom-remap")
     kotlin("jvm")
     id("com.google.devtools.ksp")
@@ -23,7 +24,7 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
-val target = ProjectTarget.values().find { it.projectPath == project.path }!!
+val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 
 // Toolchains:
 java {
@@ -38,6 +39,7 @@ val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 
 // Minecraft configuration:
+@OptIn(StonecutterExperimentalAPI::class)
 loom {
     val classTweakerFile = sc.process(
         rootProject.file("src/main/resources/skyhanni.classtweaker"),
@@ -111,6 +113,7 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
+    @Suppress("UnstableApiUsage")
     if (target.mappingDependency == "official") {
         mappings(loom.layered {
             officialMojangMappings()
@@ -123,9 +126,9 @@ dependencies {
     }
 
     // Discord RPC client
-    includeImplementation("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
-    include("com.kohlschutter.junixsocket:junixsocket-common:2.6.2")
-    include("com.kohlschutter.junixsocket:junixsocket-native-common:2.6.2")
+    includeImplementation(libs.discord.ipc)
+    include(libs.junixsocket.common)
+    include(libs.junixsocket.native)
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
@@ -137,7 +140,7 @@ dependencies {
     modImplementation(libs.fabricLanguageKotlin)
     target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    modRuntimeOnly(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
     shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
@@ -146,14 +149,13 @@ dependencies {
     }
     include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
 
-    @Suppress("UnstableApiUsage")
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("io.mockk:mockk:1.12.5")
+    testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.launcher)
+    testImplementation(libs.mockk)
 
     modImplementation(libs.hypixelmodapi)
     include(libs.hypixelmodapi.fabric)
@@ -163,18 +165,17 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-
     // getting clock offset
-    includeImplementation("commons-net:commons-net:3.11.1")
+    includeImplementation(libs.commons.net)
 
     // Calculator
-    includeImplementation("com.notkamui.libs:keval:1.1.1")
+    includeImplementation(libs.keval)
 
-    detektPlugins("org.notenoughupdates:detektrules:1.0.0")
+    detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+    detektPlugins(libs.detekt.formatting)
 
-    if (target != ProjectTarget.MODERN_12110) shadowImpl("org.apache.httpcomponents:httpclient:4.5.14")
+    if (target != ProjectTarget.MODERN_12110) shadowImpl(libs.httpclient)
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
