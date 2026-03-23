@@ -271,8 +271,6 @@ object DiscordRPCManager {
         } else event.addIrrelevant {
             add("no error detected.")
             add("status: $debugStatusMessage")
-        }
-        event.addIrrelevant {
             add("lastUid: ${client?.lastResolvedUid ?: "null (not yet attempted or client cleared)"}")
         }
     }
