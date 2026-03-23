@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessageTag
@@ -22,6 +23,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import java.net.URI
 import java.util.Optional
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
@@ -227,7 +229,7 @@ fun Style.setClickRunCommand(text: String): Style {
 }
 
 fun Style.setHoverShowText(text: String): Style {
-    return this.withHoverEvent(HoverEvent.ShowText(Component.literal(text)))
+    return this.withHoverEvent(HoverEvent.ShowText(text.asComponent()))
 }
 
 fun Style.setHoverShowText(text: Component): Style {
@@ -300,7 +302,7 @@ fun Component.changeColor(color: LorenzColor): Component =
 fun Component.convertToJsonString(): String {
     return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
         com.mojang.serialization.JsonOps.INSTANCE,
-        this
+        this,
     ).orThrow.toString()
 }
 
@@ -313,13 +315,13 @@ val formattingPattern = Regex("§.(?:§.)?")
 fun Component.append(newText: String): MutableComponent {
     val mutableText = this.copyIfNeeded()
     if (mutableText.string.matches(formattingPattern)) {
-        return Component.literal(mutableText.string + newText)
+        return (mutableText.string + newText).asComponent()
     }
     return mutableText.append(newText)
 }
 
 fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Unit): MutableComponent {
-    return this.append(Component.literal(string).also(init))
+    return this.append(string.asComponent().also(init))
 }
 
 fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
@@ -327,7 +329,7 @@ fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit):
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(Component.literal(string).withColor(color).also(init))
+    return this.append(string.asComponent().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -335,7 +337,7 @@ fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableC
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(Component.literal(string).withColor(color).also(init))
+    return this.append(string.asComponent().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -343,7 +345,7 @@ fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, ini
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(Component.literal(string).withColor(color).also(init))
+    return this.append(string.asComponent().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -354,7 +356,7 @@ fun List<Any>.mapToComponents(): List<Component> {
     val newList = mutableListOf<Component>()
     for (entry in this) {
         when (entry) {
-            is String -> newList.add(Component.literal(entry))
+            is String -> newList.add(entry.asComponent())
             is Component -> newList.add(entry)
             else -> throw IllegalArgumentException("$entry is not String or Component")
         }
@@ -373,7 +375,7 @@ fun Component.replace(
     oldValue: String,
     newValue: String,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
@@ -382,7 +384,7 @@ fun Component.replace(
     oldValue: Regex,
     newValue: String,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
@@ -392,27 +394,29 @@ private fun replace(
     oldValue: Any,
     newValue: String,
     onlyReplaceFirst: Boolean,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
-    component.visit({ style: Style?, string: String? ->
-        var edit = string
-        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
-            if (oldValue is String) {
-                edit = string?.replace(oldValue, newValue)
-            } else if (oldValue is Regex) {
-                edit = string?.replace(oldValue, newValue)
-            } else {
-                ErrorManager.skyHanniError("replace oldValue is not Regex or String")
-            }
-        }
-        if (edit != string) hasEdited = true
+    component.visit(
+        { style: Style?, string: String? ->
+            var edit = string
+            if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+                edit = when (oldValue) {
+                    is String -> string?.replace(oldValue, newValue)
+                    is Regex -> string?.replace(oldValue, newValue)
 
-        newComp.append(Component.literal(edit.orEmpty()).withStyle(style.orEmpty()))
-        Optional.empty<Component>()
-    }, Style.EMPTY)
+                    else -> ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+                }
+            }
+            if (edit != string) hasEdited = true
+
+            newComp.append(edit.orEmpty().asComponent().withStyle(style.orEmpty()))
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
 
     if (!hasEdited) return null
     return newComp
@@ -422,39 +426,58 @@ fun Component.replace(
     oldValue: String,
     newValue: Component,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
-    var hasEdited = false
+    val hasEdited = AtomicBoolean(false)
 
-    this.visit({ currentStyle: Style?, string: String? ->
-        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+    val replaceInSegment = { currentStyle: Style?, string: String? ->
+        val component = if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited.get()) && predicate(currentStyle)) {
             val split = string.split(oldValue)
-            newComp.append(
-                componentBuilder {
-                    for ((index, str) in split.withIndex()) {
-                        append(Component.literal(str).withStyle(currentStyle.orEmpty()))
-                        if (index < split.size - 1) {
-                            if (!onlyReplaceFirst || !hasEdited) {
-                                append(newValue)
-                                hasEdited = true
-                            } else {
-                                append(oldValue) {
-                                    style = currentStyle.orEmpty()
-                                }
-                            }
-                        }
-                    }
-                }
-            )
+            buildReplacedSegment(split, currentStyle, onlyReplaceFirst, hasEdited, newValue, oldValue)
         } else {
-            newComp.append(Component.literal(string.orEmpty()).withStyle(currentStyle.orEmpty()))
+            string.orEmpty().asComponent().withStyle(currentStyle.orEmpty())
         }
+        newComp.append(component)
         Optional.empty<Component>()
-    }, Style.EMPTY)
+    }
+    this.visit(replaceInSegment, Style.EMPTY)
 
-    if (!hasEdited) return null
+    if (!hasEdited.get()) return null
     return newComp
+}
+
+private fun buildReplacedSegment(
+    split: List<String>,
+    currentStyle: Style?,
+    onlyReplaceFirst: Boolean,
+    hasEdited: AtomicBoolean,
+    newValue: Component,
+    oldValue: String,
+): Component = componentBuilder {
+    for ((index, str) in split.withIndex()) {
+        this.append(str.asComponent().withStyle(currentStyle.orEmpty()))
+        if (index < split.size - 1) {
+            appendReplacement(onlyReplaceFirst, hasEdited, newValue, oldValue, currentStyle)
+        }
+    }
+}
+
+private fun MutableComponent.appendReplacement(
+    onlyReplaceFirst: Boolean,
+    hasEdited: AtomicBoolean,
+    newValue: Component,
+    oldValue: String,
+    currentStyle: Style?,
+) {
+    if (!onlyReplaceFirst || !hasEdited.get()) {
+        append(newValue)
+        hasEdited.set(true)
+    } else {
+        append(oldValue) {
+            style = currentStyle.orEmpty()
+        }
+    }
 }
 
 operator fun Component.plus(string: String): Component {
