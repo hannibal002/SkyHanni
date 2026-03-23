@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -127,37 +125,10 @@ class DiscordIPC(
      *
      * Payload structure: `{ cmd, args: { pid, activity: { ... } }, nonce }`.
      */
-    private fun buildActivityPayload(presence: DiscordRichPresence): JsonObject {
-        val activity = JsonObject().apply {
-            presence.details?.let { addProperty("details", it) }
-            presence.state?.let { addProperty("state", it) }
-            presence.startTimestamp?.let { start ->
-                JsonObject().apply { addProperty("start", start) }.also { add("timestamps", it) }
-            }
-            if (presence.largeImageKey != null || presence.largeImageText != null) JsonObject().apply {
-                presence.largeImageKey?.let { addProperty("large_image", it) }
-                presence.largeImageText?.let { addProperty("large_text", it) }
-            }.let { add("assets", it) }
-            if (presence.buttons.isNotEmpty()) JsonArray().apply {
-                presence.buttons.forEach { (label, url) ->
-                    JsonObject().apply {
-                        addProperty("label", label)
-                        addProperty("url", url)
-                    }.let { add(it) }
-                }
-            }.let { add("buttons", it) }
-        }
-        return JsonObject().apply {
-            addProperty("cmd", "SET_ACTIVITY")
-            add(
-                "args",
-                JsonObject().apply {
-                    addProperty("pid", ProcessHandle.current().pid().toInt())
-                    add("activity", activity)
-                },
-            )
-            addProperty("nonce", UUID.randomUUID().toString())
-        }
-    }
+    private fun buildActivityPayload(presence: DiscordRichPresence) = buildActivityPayload(
+        presence,
+        ProcessHandle.current().pid().toInt(),
+        UUID.randomUUID().toString(),
+    )
 }
 

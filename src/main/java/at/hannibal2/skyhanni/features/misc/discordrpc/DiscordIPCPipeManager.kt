@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
-import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordIPCPipeManager.diagnoseUnix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import java.nio.file.Files
 import kotlin.io.path.Path

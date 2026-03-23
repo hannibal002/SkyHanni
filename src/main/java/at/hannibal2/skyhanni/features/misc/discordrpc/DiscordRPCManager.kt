@@ -80,7 +80,12 @@ object DiscordRPCManager {
             if (fromCommand) ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
         } catch (e: DiscordIPCException) {
             progress.end("discord not detected: ${e.message}")
-            scheduleRetry(e.message)
+            if (e.isSandboxIssue) {
+                updateDebugStatus(e.message ?: "sandbox issue", error = true)
+                ChatUtils.userError(e.message ?: "Discord RPC is blocked by a sandbox restriction")
+            } else {
+                scheduleRetry(e.message)
+            }
         } catch (e: Throwable) {
             progress.end("error: ${e.message}")
             updateDebugStatus("Unexpected error: ${e.message}", error = true)
@@ -242,20 +247,10 @@ object DiscordRPCManager {
         retryJob?.cancel()
         retryHelper.reset()
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
-        try {
-            progress.end("launchCoroutine")
-            with(SkyHanniMod) {
-                manualStartConfig.launchUnScopedCoroutine {
-                    start(progressCategory.start("discord rpc manual start"), fromCommand = true)
-                }
-            }
-        } catch (e: DiscordIPCException) {
-            progress.end("discord not detected: ${e.message}")
-            if (e.isSandboxIssue) {
-                updateDebugStatus(e.message ?: "sandbox issue", error = true)
-                ChatUtils.userError(e.message ?: "Discord RPC is blocked by a sandbox restriction")
-            } else {
-                scheduleRetry(e.message)
+        progress.end("launchCoroutine")
+        with(SkyHanniMod) {
+            manualStartConfig.launchUnScopedCoroutine {
+                start(progressCategory.start("discord rpc manual start"), fromCommand = true)
             }
         }
     }
