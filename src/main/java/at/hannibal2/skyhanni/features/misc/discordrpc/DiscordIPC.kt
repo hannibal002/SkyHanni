@@ -254,8 +254,14 @@ class DiscordIPC(private val clientId: Long) : Closeable {
      */
     private class WindowsIPCConnection(path: String) : IPCConnection {
         private val pipe = RandomAccessFile(path, "rw")
-        override val input: InputStream = FileInputStream(pipe.fd)
-        override val output: OutputStream = FileOutputStream(pipe.fd)
+        override val input: InputStream = object : InputStream() {
+            override fun read() = pipe.read()
+            override fun read(b: ByteArray, off: Int, len: Int) = pipe.read(b, off, len)
+        }
+        override val output: OutputStream = object : OutputStream() {
+            override fun write(b: Int) = pipe.write(b)
+            override fun write(b: ByteArray, off: Int, len: Int) = pipe.write(b, off, len)
+        }
         override fun close() = pipe.close()
     }
 
