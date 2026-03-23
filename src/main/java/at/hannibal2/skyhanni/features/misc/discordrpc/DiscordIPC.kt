@@ -211,6 +211,9 @@ class DiscordIPC(private val clientId: Long) : Closeable {
         val dirs = listOfNotNull(
             System.getenv("XDG_RUNTIME_DIR"),
             uid?.let { "/run/user/$it" },
+            uid?.let { "/run/user/$it/app/com.discordapp.Discord" },
+            uid?.let { "/run/user/$it/app/com.discordapp.DiscordCanary" },
+            uid?.let { "/run/user/$it/app/com.discordapp.DiscordPTB" },
             uid?.let { "/run/user/$it/snap.discord" },
             uid?.let { "/run/user/$it/snap.discord-canary" },
             uid?.let { "/run/user/$it/snap.discord-ptb" },
