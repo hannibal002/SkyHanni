@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import java.io.Closeable
@@ -182,6 +183,14 @@ class DiscordIPC(
         }
     }
 
+    private fun readProcEnviron(): Map<String, String> = runCatching {
+        java.io.File("/proc/self/environ").readBytes().toString(Charsets.UTF_8).split('\u0000').associateNotNull { entry ->
+            entry.split('=', limit = 2).takeIf {
+                it.size == 2
+            }?.let { it[0] to it[1] }
+        }
+    }.getOrDefault(emptyMap())
+
     /**
      * Locates an active Discord IPC pipe and returns an open [IPCConnection] to it.
      *
@@ -209,11 +218,14 @@ class DiscordIPC(
             }
         }.getOrNull()
 
+        val procEnviron = readProcEnviron()
+        fun env(key: String) = System.getenv(key) ?: procEnviron[key]
+
         // base dirs, env vars first, uid-derived as fallback
         val baseDirs = listOfNotNull(
-            System.getenv("XDG_RUNTIME_DIR"),
-            System.getenv("TMPDIR"),
-            System.getenv("TMP"),
+            env("XDG_RUNTIME_DIR"),
+            env("TMPDIR"),
+            env("TMP"),
             uid?.let { "/run/user/$it" },
             "/tmp",
         ).distinct()
@@ -251,6 +263,8 @@ class DiscordIPC(
                 "uid" to (uid ?: "null"),
                 "baseDirs" to baseDirs.joinToString("|"),
                 "flatpakDirs" to flatpakDirs.joinToString("|"),
+                "xdgFromEnv" to (System.getenv("XDG_RUNTIME_DIR") ?: "null"),
+                "xdgFromProc" to (procEnviron["XDG_RUNTIME_DIR"] ?: "null"),
                 "existsChecked" to allDirs.flatMap { dir ->
                     (0..9).map { i ->
                         val p = Path("$dir/discord-ipc-$i")
