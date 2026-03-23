@@ -26,7 +26,7 @@ import kotlin.io.path.exists
  *
  * @param clientId The Discord application client ID (from the Discord Developer Portal).
  */
-class DiscordIPC(private val clientId: Long) : Closeable {
+class DiscordIPC(private val clientId: Long, private val onUidResolved: (String?) -> Unit = {}) : Closeable {
 
     @Volatile
     private var _connected = false
@@ -35,9 +35,6 @@ class DiscordIPC(private val clientId: Long) : Closeable {
     /** Whether this client is currently connected to and ready for Discord IPC. */
     val isConnected: Boolean get() = _connected
     private val clientPayload = """{"v":1,"client_id":"$clientId"}"""
-
-    var lastResolvedUid: String? = null
-        private set
 
     /**
      * Discovers an active Discord IPC pipe, opens a connection, and performs the version-1 handshake.
@@ -208,31 +205,38 @@ class DiscordIPC(private val clientId: Long) : Closeable {
                 lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
             }
         }.getOrNull()
-        lastResolvedUid = uid
+        onUidResolved(uid)
 
+        // base dirs, env vars first, uid-derived as fallback
+        val baseDirs = listOfNotNull(
+            System.getenv("XDG_RUNTIME_DIR"),
+            System.getenv("TMPDIR"),
+            System.getenv("TMP"),
+            uid?.let { "/run/user/$it" },
+            "/tmp",
+        ).distinct()
+
+        // relative subdirs, flatpak and snap variants
+        val subDirs = listOf(
+            "",
+            "app/com.discordapp.Discord",
+            "app/com.discordapp.DiscordCanary",
+            "snap.discord",
+            "snap.discord-canary",
+            "snap.discord-ptb",
+        )
+
+        // flatpak per-app forwarded sockets
         val flatpakDirs = uid?.let {
             runCatching {
                 Files.list(Path("/run/user/$it/.flatpak")).map { app -> "$app/xdg-run" }.toList()
             }.getOrDefault(emptyList())
         }.orEmpty()
 
-        val dirs = listOfNotNull(
-            System.getenv("XDG_RUNTIME_DIR"),
-            uid?.let { "/run/user/$it" },
-            uid?.let { "/run/user/$it/app/com.discordapp.Discord" },
-            uid?.let { "/run/user/$it/app/com.discordapp.DiscordCanary" },
-            uid?.let { "/run/user/$it/app/com.discordapp.DiscordPTB" },
-            uid?.let { "/run/user/$it/snap.discord" },
-            uid?.let { "/run/user/$it/snap.discord-canary" },
-            uid?.let { "/run/user/$it/snap.discord-ptb" },
-            System.getenv("TMPDIR"),
-            System.getenv("TMP"),
-            System.getenv("TEMP"),
-            "/tmp",
-        ) + flatpakDirs
+        val allDirs = baseDirs.flatMap { base -> subDirs.map { if (it.isEmpty()) base else "$base/$it" } } + flatpakDirs
 
         var lastError: Throwable? = null
-        for (dir in dirs) {
+        for (dir in allDirs) {
             for (i in 0..9) {
                 val path = Path("$dir/discord-ipc-$i")
                 if (!path.exists()) continue
