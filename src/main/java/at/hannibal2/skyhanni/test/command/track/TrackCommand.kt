@@ -50,7 +50,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     protected abstract val config: TrackCommandConfig
     protected abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
 
-    // TODO: if there is ever a need for something besides a StringRenderable,
+    // TODO if there is ever a need for something besides a StringRenderable,
     //  this can and should be made to return a Renderable rather than a String
     abstract fun T.formatForDisplay(): String
     abstract fun T.formatForWorldRender(): String

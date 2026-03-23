@@ -20,8 +20,8 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
 ) {
     override val config get() = DevApi.config.debug.trackSound
 
-    // TODO: change this from a string arg to a qualified sound name arg
-    // TODO: add suggestion provider for sound names
+    // TODO change this from a string arg to a qualified sound name arg
+    // TODO add suggestion provider for sound names
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
         argCallback("sound_name", BrigadierArguments.string()) {
             val soundName = it.trim()
