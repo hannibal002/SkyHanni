@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -29,4 +28,3 @@ public class MixinEquipmentRenderer {
          return original;
      }
 }
-//~}
