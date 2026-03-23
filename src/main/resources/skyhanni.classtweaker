@@ -47,6 +47,7 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I
 accessible field net/minecraft/client/multiplayer/MultiPlayerGameMode destroyBlockPos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
+accessible field net/minecraft/world/entity/Avatar POSES Ljava/util/Map;
 
 #? < 1.21.11 {
 accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/rendertype/RenderType$CompositeState;
