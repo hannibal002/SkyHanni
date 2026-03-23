@@ -149,6 +149,14 @@ object InstanceChestProfit {
         "Enchanted Book \\((?<item>.+)(?:§.)+\\)",
     )
 
+    /**
+     * REGEX-TEST: §eRequires a Dungeon Chest Key
+     */
+    private val requiresDungeonChestKeyPattern by patternGroup.pattern(
+        "requiresadungeonchestkey",
+        "§eRequires a Dungeon Chest Key",
+    )
+
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
 
     private var croesusDisplay: Renderable? = null
@@ -258,6 +266,9 @@ object InstanceChestProfit {
                     itemPrice = getPrice(internalName)
                     essencePattern.matchMatcher(loreLine) {
                         itemPrice = getEssence(group("name"), group("count").toInt())
+                    }
+                    if (requiresDungeonChestKeyPattern.matches(loreLine) || loreLine.isEmpty()) {
+                        itemPrice = -1.0
                     }
                     if (dungeonChestKey.matches(loreLine)) {
                         cost += getPrice(internalName).times(-1)

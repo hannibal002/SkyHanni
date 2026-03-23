@@ -26,7 +26,7 @@ class About {
     @ConfigOption(name = "Check for Updates", desc = "Automatically check for updates on each startup")
     @Expose
     @ConfigEditorBoolean
-    var autoUpdates: Boolean = true
+    var checkForUpdates: Boolean = true
 
     @ConfigOption(name = "Auto Updates", desc = "Automatically download new version on each startup")
     @Expose
