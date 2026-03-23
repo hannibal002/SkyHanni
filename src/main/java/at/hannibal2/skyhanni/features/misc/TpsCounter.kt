@@ -59,7 +59,7 @@ object TpsCounter {
 
     @HandleEvent
     fun onSecondPassed() {
-        if (lastServerTick.passedSince() >= 1.seconds) {
+        if (lastServerTick.passedSince() >= 1.seconds && !msPerTickList.isEmpty()) {
             ChatUtils.debug("No server ticks detected for 1 second, clearing TPS data")
             msPerTickList.clear()
         }
