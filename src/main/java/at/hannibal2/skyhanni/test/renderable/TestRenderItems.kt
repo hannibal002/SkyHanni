@@ -45,13 +45,15 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     private val multiBounceDef = AnimatedBounceLocalStorage(
         AnimatedBounceDefinition(poleBounceDef, sideBounceDef)
     )
-    private val itemProviders: List<ItemStackProvider> = listOf(
-        ItemStack(Blocks.GLASS_PANE).asProvider(),
-        ItemStack(Items.DIAMOND_SWORD).asProvider(),
-        ItemStack(Items.PLAYER_HEAD).asProvider(),
-        ItemStack(Blocks.MELON).asProvider(),
-        bambooProvider
-    )
+    private val itemProviders: List<ItemStackProvider> by lazy {
+        listOf(
+            ItemStack(Blocks.GLASS_PANE).asProvider(),
+            ItemStack(Items.DIAMOND_SWORD).asProvider(),
+            ItemStack(Items.PLAYER_HEAD).asProvider(),
+            ItemStack(Blocks.MELON).asProvider(),
+            bambooProvider
+        )
+    }
     private val spinningStacks by lazy {
         Axis.entries.map {
             "${it.name.uppercase()} Axis" to Renderable.animatedItemStack {

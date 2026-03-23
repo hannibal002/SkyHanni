@@ -33,7 +33,7 @@ object GardenPlotIcon {
     private var lastClickedSlotId = -1
     private val originalStack = mutableMapOf<Int, ItemStack>()
     private val cachedStack = mutableMapOf<Int, ItemStack>()
-    private val editStack = ItemStack(Items.WOODEN_AXE)
+    private val editStack by lazy { ItemStack(Items.WOODEN_AXE) }
     private val whitelistedSlot =
         listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
 

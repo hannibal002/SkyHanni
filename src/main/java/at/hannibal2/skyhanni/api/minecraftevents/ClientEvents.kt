@@ -62,7 +62,10 @@ object ClientEvents {
             WorldChangeEvent.post()
         }
 
+        //? if < 26.1 {
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(
+        //? } else
+        //ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
             CompletableFuture.runAsync(

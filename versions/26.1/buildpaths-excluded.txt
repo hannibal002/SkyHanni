@@ -64,5 +64,4 @@ at.hannibal2.skyhanni.mixins.transformers.MixinEntityFireball.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGuiPlayerTabOverlay.java
 
 # 26.1 these mods not updated
-at.hannibal2.skyhanni.compat.ConfigModMenuInterop.kt
 at.hannibal2.skyhanni.compat.ReiCompat.kt
