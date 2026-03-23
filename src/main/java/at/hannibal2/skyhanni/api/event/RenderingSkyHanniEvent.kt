@@ -1,8 +1,13 @@
 package at.hannibal2.skyhanni.api.event
 
+//? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics
+//?} else
+//import net.minecraft.client.gui.GuiGraphicsExtractor
 
-/**
- * Used if the event is related to GUI rendering, needs a context passed to it
- */
-abstract class RenderingSkyHanniEvent(override val context: GuiGraphics) : SkyHanniEvent(), SkyHanniEvent.Rendering
+abstract class RenderingSkyHanniEvent(
+    //? if < 26.1 {
+    override val context: GuiGraphics
+    //?} else
+    //override val context: GuiGraphicsExtractor
+) : SkyHanniEvent(), SkyHanniEvent.Rendering

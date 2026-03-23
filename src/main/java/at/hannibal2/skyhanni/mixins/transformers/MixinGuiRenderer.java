@@ -57,14 +57,22 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
 
-    @WrapOperation(method = "addElementToMesh", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;"))
+    @WrapOperation(
+        method = "addElementToMesh",
+        //? if < 26.1 {
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+        //?} else
+        //at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+    )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
     // Here and below is to construct our own render pipeline for atlas-ed item rendering.
+    //? if < 26.1 {
     @Shadow
     private int frameNumber;
+    //?}
 
     @Shadow
     @Final
@@ -96,7 +104,11 @@ public class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
+            // TODO 26.1 frameNumber moved to atlas ?
+            //? if < 26.1 {
             frameNumber
+            //?} else
+            //0
         );
     }
 
@@ -113,7 +125,11 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
+            // TODO 26.1 frameNumber moved to atlas ?
+            //? if < 26.1 {
             frameNumber
+            //?} else
+            //0
         );
     }
 
