@@ -26,7 +26,10 @@ import kotlin.io.path.exists
  *
  * @param clientId The Discord application client ID (from the Discord Developer Portal).
  */
-class DiscordIPC(private val clientId: Long, private val onUidResolved: (String?) -> Unit = {}) : Closeable {
+class DiscordIPC(
+    private val clientId: Long,
+    private val onDebugInfo: (Map<String, String>) -> Unit = {},
+) : Closeable {
 
     @Volatile
     private var _connected = false
@@ -205,7 +208,6 @@ class DiscordIPC(private val clientId: Long, private val onUidResolved: (String?
                 lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
             }
         }.getOrNull()
-        onUidResolved(uid)
 
         // base dirs, env vars first, uid-derived as fallback
         val baseDirs = listOfNotNull(
@@ -243,6 +245,21 @@ class DiscordIPC(private val clientId: Long, private val onUidResolved: (String?
                 runCatching { return UnixIPCConnection(path) }.onFailure { lastError = it }
             }
         }
+
+        onDebugInfo(
+            mapOf(
+                "uid" to (uid ?: "null"),
+                "baseDirs" to baseDirs.joinToString("|"),
+                "flatpakDirs" to flatpakDirs.joinToString("|"),
+                "existsChecked" to allDirs.flatMap { dir ->
+                    (0..9).map { i ->
+                        val p = Path("$dir/discord-ipc-$i")
+                        "$p=${p.exists()}"
+                    }
+                }.filter { it.endsWith("=true") }.ifEmpty { listOf("none") }.joinToString("|"),
+            ),
+        )
+
         throw DiscordIPCException("No Discord IPC socket found on Unix. Is Discord running? Last error: ${lastError?.message}", lastError)
     }
 

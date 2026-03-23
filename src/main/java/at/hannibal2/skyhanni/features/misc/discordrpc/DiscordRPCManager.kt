@@ -53,7 +53,7 @@ object DiscordRPCManager {
     private val progressCategory = ChatProgressUpdates.category("Discord RPC")
     private val retryHelper = ConnectionRetryHelper(listOf(10.seconds, 20.seconds, 30.seconds))
     private var retryJob: Job? = null
-    private var lastResolvedUid: String? = null
+    private var lastDebugInfo: Map<String, String> = emptyMap()
 
     private val startConfig = CoroutineConfig("discord rpc start", timeout = Duration.INFINITE).withIOContext()
     private val presenceConfig = CoroutineConfig("discord rpc updatePresence", timeout = Duration.INFINITE).withIOContext()
@@ -68,7 +68,7 @@ object DiscordRPCManager {
         updateDebugStatus("Starting...")
         startTimestamp = SimpleTimeMark.now()
         try {
-            DiscordIPC(APPLICATION_ID, onUidResolved = { lastResolvedUid = it }).also {
+            DiscordIPC(APPLICATION_ID, onDebugInfo = { lastDebugInfo = it }).also {
                 it.connect()
                 client = it
             }
@@ -272,7 +272,7 @@ object DiscordRPCManager {
         } else event.addIrrelevant {
             add("no error detected.")
             add("status: $debugStatusMessage")
-            add("lastUid: ${lastResolvedUid ?: "null (not yet attempted or client cleared)"}")
+            lastDebugInfo.forEach { (k, v) -> add("$k: $v") }
         }
     }
 
