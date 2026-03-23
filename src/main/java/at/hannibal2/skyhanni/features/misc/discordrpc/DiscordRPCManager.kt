@@ -79,7 +79,7 @@ object DiscordRPCManager {
             if (fromCommand) ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
         } catch (e: DiscordIPCException) {
             progress.end("discord not detected: ${e.message}")
-            scheduleRetry()
+            scheduleRetry(e.message)
         } catch (e: Throwable) {
             progress.end("error: ${e.message}")
             updateDebugStatus("Unexpected error: ${e.message}", error = true)
@@ -87,10 +87,10 @@ object DiscordRPCManager {
         }
     }
 
-    private fun scheduleRetry() {
+    private fun scheduleRetry(reason: String? = null) {
         val retryDelay = retryHelper.onFailure()
         if (retryDelay != null) {
-            updateDebugStatus("Discord not detected, retrying in ${retryDelay.inWholeSeconds}s ${retryHelper.retriesLabel}")
+            updateDebugStatus("Retry ${retryHelper.retriesLabel} in ${retryDelay.inWholeSeconds}s: ${reason ?: "unknown"}")
             val retryCount = retryHelper.currentRetry
             retryJob = with(SkyHanniMod) {
                 CoroutineConfig("discord rpc autoretry $retryCount", timeout = Duration.INFINITE).withIOContext()
