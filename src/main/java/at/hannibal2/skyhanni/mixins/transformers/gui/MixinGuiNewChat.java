@@ -18,10 +18,10 @@ public class MixinGuiNewChat {
     //? if < 26.1 {
     @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"))
     private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageTag indicator, CallbackInfo ci) {
-    //?} else {
-    /*@Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"))
+    //? } else {
+    /*@Inject(method = "addMessage", at = @At("HEAD"))
     private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci) {*/
-    //?}
+    //? }
         GuiChatHook.setCurrentComponent(chatComponent);
     }
 }

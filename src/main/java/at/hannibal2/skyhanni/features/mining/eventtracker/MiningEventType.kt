@@ -39,7 +39,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.item(ItemStack(Items.COMPASS)) { scale = 0.45 }
+            val compass by lazy {
+                Renderable.item(ItemStack(Items.COMPASS)) { scale = 0.45 }
+            }
             val wind = Renderable.text("§9≈", scale = 0.75)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -59,8 +61,12 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = Renderable.item(DyeCompat.LIME.createStack()) { scale = 0.45 }
-            val dyePink = Renderable.item(DyeCompat.PINK.createStack()) { scale = 0.45 }
+            val dyeGreen by lazy {
+                Renderable.item(DyeCompat.LIME.createStack()) { scale = 0.45 }
+            }
+            val dyePink by lazy {
+                Renderable.item(DyeCompat.PINK.createStack()) { scale = 0.45 }
+            }
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f)
@@ -86,7 +92,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = Renderable.item(createPlayerHead()) { scale = 0.36 }
+            val steveHead by lazy {
+                Renderable.item(createPlayerHead()) { scale = 0.36 }
+            }
             val alexHead by lazy {
                 Renderable.item(
                     ItemUtils.createSkull(

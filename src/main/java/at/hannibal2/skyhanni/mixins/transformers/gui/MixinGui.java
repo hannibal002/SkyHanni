@@ -84,12 +84,21 @@ public class MixinGui {
 
     //? if < 1.21.11 {
     @ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V"))
-    //?} else
+    //? } else if < 26.1 {
     //@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V"), index = 5)
+    //? } else
+    //@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V"), index = 3)
+    //? if < 26.1 {
     private boolean modifyRenderText(boolean bool) {
         if (ChatPeek.peek()) return true;
         return bool;
     }
+    //? } else {
+    /*private ChatComponent.DisplayMode modifyRenderText(ChatComponent.DisplayMode mode) {
+        if (ChatPeek.peek()) return ChatComponent.DisplayMode.FOREGROUND;
+        return mode;
+    }*/
+    //? }
 
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {

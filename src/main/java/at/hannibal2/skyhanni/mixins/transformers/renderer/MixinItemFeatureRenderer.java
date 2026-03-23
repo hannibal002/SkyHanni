@@ -12,11 +12,20 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+//? if > 1.21.11 {
+/*import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.rendertype.RenderType;*/
+//? }
 
 @Mixin(ItemFeatureRenderer.class)
 public class MixinItemFeatureRenderer {
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
+    @WrapOperation(
+        //? if < 26.1 {
+        method = "render",
+        //? } else
+        //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
     private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
@@ -26,13 +35,25 @@ public class MixinItemFeatureRenderer {
         }
     }
 
+    //? if < 26.1 {
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V", ordinal = 1), index = 2)
     private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
             return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
-        } else {
-            return outlineConsumer;
         }
+        return outlineConsumer;
     }
+    //? } else {
+    /*@WrapOperation(
+        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
+    private VertexConsumer modifyOutlineVertexConsumerProvider(OutlineBufferSource outlineConsumer, RenderType renderType, Operation<VertexConsumer> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
+        Object obj = (Object) itemCommand;
+        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().getBuffer(renderType);
+        }
+        return original.call(outlineConsumer, renderType);
+    }*/
+    //? }
 }
