@@ -224,7 +224,7 @@ object GardenApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        // TODO: Reevaluate this if Hypixel ever adds right click harvest crops
+        // TODO Reevaluate this if Hypixel ever adds right click harvest crops
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         val blockState = event.blockState
