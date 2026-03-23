@@ -17,7 +17,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.UUID
 import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 /**
  * A lightweight Discord IPC client implementing the Rich Presence protocol over Discord's local IPC pipe.
@@ -199,7 +198,7 @@ class DiscordIPC(
      *
      * On Unix, resolves candidate socket directories from environment variables
      * (`XDG_RUNTIME_DIR`, `TMPDIR`, `TMP`, `TEMP`, `/tmp`) and tries
-     * `discord-ipc-{0..9}` within each, returning the first that exists and connects.
+     * `discord-ipc-{0..9}` within each.
      *
      * @return An open [IPCConnection] backed by either a named pipe or Unix domain socket.
      * @throws DiscordIPCException If no Discord IPC pipe is found across all candidates.
@@ -251,10 +250,10 @@ class DiscordIPC(
 
         var lastError: Throwable? = null
         for (dir in allDirs) {
-            for (i in 0..9) {
-                val path = Path("$dir/discord-ipc-$i")
-                if (!path.exists()) continue
-                runCatching { return UnixIPCConnection(path) }.onFailure { lastError = it }
+            for (dir in allDirs) {
+                for (i in 0..9) {
+                    runCatching { return UnixIPCConnection(Path("$dir/discord-ipc-$i")) }.onFailure { lastError = it }
+                }
             }
         }
 
@@ -265,12 +264,13 @@ class DiscordIPC(
                 "flatpakDirs" to flatpakDirs.joinToString("|"),
                 "xdgFromEnv" to (System.getenv("XDG_RUNTIME_DIR") ?: "null"),
                 "xdgFromProc" to (procEnviron["XDG_RUNTIME_DIR"] ?: "null"),
-                "existsChecked" to allDirs.flatMap { dir ->
-                    (0..9).map { i ->
-                        val p = Path("$dir/discord-ipc-$i")
-                        "$p=${p.exists()}"
+                "lastErrors" to allDirs.flatMap { dir ->
+                    (0..9).mapNotNull { i ->
+                        runCatching { UnixIPCConnection(Path("$dir/discord-ipc-$i")).also { it.close() } }
+                            .exceptionOrNull()
+                            ?.let { "$dir/discord-ipc-$i: ${it.message}" }
                     }
-                }.filter { it.endsWith("=true") }.ifEmpty { listOf("none") }.joinToString("|"),
+                }.ifEmpty { listOf("none") }.joinToString("|"),
             ),
         )
 
