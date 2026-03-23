@@ -272,8 +272,20 @@ class DiscordIPC(private val clientId: Long) : Closeable {
         private val channel = SocketChannel.open(StandardProtocolFamily.UNIX).apply {
             connect(UnixDomainSocketAddress.of(path))
         }
-        override val input: InputStream = Channels.newInputStream(channel)
-        override val output: OutputStream = Channels.newOutputStream(channel)
+        override val input: InputStream = object : InputStream() {
+            override fun read(): Int {
+                val buf = ByteBuffer.allocate(1)
+                return if (channel.read(buf) == -1) -1 else (buf.flip().get().toInt() and 0xFF)
+            }
+            override fun read(b: ByteArray, off: Int, len: Int) = channel.read(ByteBuffer.wrap(b, off, len))
+        }
+        override val output: OutputStream = object : OutputStream() {
+            override fun write(b: Int) = write(byteArrayOf(b.toByte()))
+            override fun write(b: ByteArray, off: Int, len: Int) {
+                val buf = ByteBuffer.wrap(b, off, len)
+                while (buf.hasRemaining()) channel.write(buf)
+            }
+        }
         override fun close() = channel.close()
     }
 }
