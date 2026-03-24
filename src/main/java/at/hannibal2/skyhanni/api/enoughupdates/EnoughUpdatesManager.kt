@@ -40,8 +40,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.nbt.StringTag
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
-import net.minecraft.world.level.block.Blocks
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
@@ -194,16 +192,15 @@ object EnoughUpdatesManager {
         useCache: Boolean = true,
         useReplacements: Boolean = false,
     ): ItemStack {
-        this ?: return ItemStack(Items.PAINTING)
+        this ?: return ItemStack.EMPTY
 
         var usingCache = useCache && !useReplacements
         if (internalName.asString() == "_") usingCache = false
         if (usingCache) itemStackCache[internalName]?.let { return it.copy() }
 
-        val defaultStack = ItemStack(Blocks.AIR.asItem())
         val convertedItem = ComponentUtils.convertMinecraftIdToModern(itemId, damage ?: 0)
-        val baseItem = convertedItem.getVanillaItem() ?: return defaultStack
-        val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return defaultStack
+        val baseItem = convertedItem.getVanillaItem() ?: return ItemStack.EMPTY
+        val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return ItemStack.EMPTY
 
         count?.let { stack.count = it }
         ComponentUtils.convertToComponents(stack, neuNbt)
