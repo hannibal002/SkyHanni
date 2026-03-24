@@ -181,6 +181,8 @@ object TabListReader {
         return columns
     }
 
+    // TODO refactor
+    @Suppress("CyclomaticComplexMethod")
     private fun TabColumn.matchFooterTabComponent(
         component: Component,
         previousComponent: Component?,
@@ -196,15 +198,12 @@ object TabListReader {
         if (godPotTimer != null && godPotPattern.matches(component)) return@apply
         if (effectCountPattern.matches(component)) return@apply
         if (effectsUseCommandPattern.matches(component)) return@apply
-
         activeEffectPattern.matchMatcher(component) {
-            when {
-                godPotTimer != null -> {
-                    addComponent(Component.literal("§a§lActive Effects:"))
-                    addComponent(Component.literal(" §cGod Potion§r: $godPotTimer"))
-                }
-
-                else -> addComponent(Component.literal("§a§lActive Effects: §e$effectCount"))
+            if (godPotTimer != null) {
+                addComponent(Component.literal("§a§lActive Effects:"))
+                addComponent(Component.literal(" §cGod Potion§r: $godPotTimer"))
+            } else {
+                addComponent(Component.literal("§a§lActive Effects: §e$effectCount"))
             }
             return@apply
         }
@@ -225,14 +224,14 @@ object TabListReader {
         dungeonBuffPattern.matchMatcher(component) {
             return@apply addComponent(component)
         }
-        if (component.startsWith("No Buffs active.") && lastIsDungeons) {
+        if (lastIsDungeons && component.startsWith("No Buffs active.")) {
             return@apply addComponent(Component.literal("§7 None Found"))
         }
 
         winterPowerUpsPattern.matchMatcher(component) {
             return@apply addComponent(component)
         }
-        if (component.startsWith("No Power Ups active.") && lastIsWinterPowerUps) {
+        if (lastIsWinterPowerUps && component.startsWith("No Power Ups active.")) {
             return@apply addComponent(Component.literal("§7 None"))
         }
 
