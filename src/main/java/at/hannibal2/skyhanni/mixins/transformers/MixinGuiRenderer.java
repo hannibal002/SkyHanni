@@ -68,11 +68,18 @@ public class MixinGuiRenderer {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    // Here and below is to construct our own render pipeline for atlas-ed item rendering.
     //? if < 26.1 {
     @Shadow
     private int frameNumber;
-    //?}
+    //? } else {
+    /*@Unique
+    private int frameNumber;
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
+        frameNumber++;
+    }*/
+    //? }
 
     @Shadow
     @Final
@@ -104,11 +111,7 @@ public class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
-            // TODO 26.1 frameNumber moved to atlas ?
-            //? if < 26.1 {
             frameNumber
-            //? } else
-            //0
         );
     }
 
@@ -125,11 +128,7 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
-            // TODO 26.1 frameNumber moved to atlas ?
-            //? if < 26.1 {
             frameNumber
-            //? } else
-            //0
         );
     }
 
