@@ -204,6 +204,11 @@ object DiscordRPCManager {
         progress.end("Successfully updated")
     }
 
+    @HandleEvent
+    fun onClientShutdown() {
+        stop()
+    }
+
     private fun getStatusByConfigId(entry: LineEntry) =
         DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
 
