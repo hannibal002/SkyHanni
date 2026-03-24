@@ -22,13 +22,14 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.features.mining.OreCategory
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.features.mining.tracker.MiningTracker.drawDisplay
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -41,7 +42,16 @@ import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.world.level.block.Blocks
+import java.util.EnumMap
 import kotlin.math.pow
+
+val OreCategory.miningCategory: MiningCategory
+    get() = when (this) {
+        OreCategory.GEMSTONE -> MiningCategory.GEMSTONES
+        OreCategory.DWARVEN_METAL -> MiningCategory.DWARVEN_METALS
+        OreCategory.ORE -> MiningCategory.ORES
+        OreCategory.BLOCK -> MiningCategory.BLOCKS
+    }
 
 
 enum class MiningCategory(val displayName: String, val jsonKey: String?) {
@@ -50,13 +60,12 @@ enum class MiningCategory(val displayName: String, val jsonKey: String?) {
     BLOCKS("Blocks/Stones", "Blocks/Stones"),
     ORES("Ores", "Ores"),
     MINING_FIESTA("Mining Fiesta Drops", "Mining Fiesta Drops"),
-    MISC("Misc", "Misc"),
-    OTHER("Other", null);
+    MISC("Misc", "Misc");
 
     override fun toString(): String = displayName
 
     companion object {
-        fun fromJsonKey(jsonKey: String): MiningCategory = entries.find { it.jsonKey == jsonKey } ?: OTHER
+        fun fromJsonKey(jsonKey: String): MiningCategory = entries.find { it.jsonKey == jsonKey } ?: MISC
     }
 }
 
@@ -107,10 +116,25 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         )
     }
 
-    // Associated data when hovering over tracker lines.
     data class BucketData(
-        @Expose var totalBlocksMined: Long = 0L
+        @Expose var blocksMined: MutableMap<MiningCategory, Long>? = null
     ) : BucketedItemTrackerData<MiningCategory, SessionUptime.Normal>(MiningCategory::class, SessionUptime.Normal::class) {
+
+        val safeBlocksMined: MutableMap<MiningCategory, Long>
+            get() {
+                if (blocksMined == null) {
+                    blocksMined = EnumMap(MiningCategory::class.java)
+                }
+                return blocksMined!!
+            }
+
+        fun getTotalBlocksMined(): Long {
+            return if (selectedBucket == null) {
+                safeBlocksMined.values.sum()
+            } else {
+                safeBlocksMined[selectedBucket] ?: 0L
+            }
+        }
 
         override fun MiningCategory.isBucketSelectable(): Boolean = true
         override fun bucketName(): String = "Mining Category"
@@ -118,8 +142,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         // Description when hovering over a tracker code line
         override fun getDescription(bucket: MiningCategory?, timesGained: Long): List<String> {
             /* times gained here is only every time the sack updates, so the best calculable
-                quantity is how often we gain it from sack */
-            // TODO: Find an actually useful metric to display, especially glossy/mineral drop rate
+                quantity is how often we gain it from sack- need to find a way to get individual item quantity */
             return listOf(
                 "§7Gained §e${timesGained.addSeparators()} §7times from sack/inventory updates."
             )
@@ -174,7 +197,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         val profit = drawItems(data, { true }, lists = this)
 
         // Rendering the total blocks mined field.
-        val totalBlocksMined = data.totalBlocksMined
+        val totalBlocksMined = data.getTotalBlocksMined()
         add(
             Renderable.hoverTips(
                 content = "§7Times mined: §e${totalBlocksMined.addSeparators()}",
@@ -185,7 +208,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         addAll(
             addTotalProfit(
                 profit,
-                data.totalBlocksMined,
+                totalBlocksMined,
                 "block",
                 duration,
                 "Blocks"
@@ -208,7 +231,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
 
     //endregion
 
-
+    // TODO: Fix OreMinedEvent!!
     // BlockType category control. All is for any minable quantity.
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
@@ -244,13 +267,15 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
             newBlock == Blocks.BEDROCK ||
             isTitanium(newState)
         ) {
-            if (OreBlock.getByStateOrNull(oldState) != null &&
+            val ore = OreBlock.getByStateOrNull(oldState)
+            if (ore != null &&
                 blockUpdateControl &&
                 event.location == lastClickedPos
             ) {
+                val category = ore.category.miningCategory
                 // Does NOT count spread
                 modify {
-                    it.totalBlocksMined += 1
+                    it.safeBlocksMined.addOrPut(category, 1L)
                 }
                 // necessary because it updates twice randomly
                 // TODO: Make an event handler to investigate and get rid of this switch condition

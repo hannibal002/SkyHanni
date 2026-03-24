@@ -132,7 +132,6 @@ class MiningConfig {
     @Expose
     @ConfigOption(name = "Mining Profit Tracker", desc = "Enable/Disable the mining profit tracker.")
     @Accordion
-    @FeatureToggle
     val miningTracker: MiningProfitTrackerConfig = MiningProfitTrackerConfig()
 
     @Expose
