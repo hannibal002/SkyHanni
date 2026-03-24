@@ -21,7 +21,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 //? if < 26.1 {
 import net.minecraft.client.gui.components.PlayerFaceRenderer
-//?}
+//?} else
+//import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -164,16 +165,18 @@ object TabListRenderer {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         val texture = playerInfo.skin.body().id()
+                        //? if < 26.1 {
                         PlayerFaceRenderer.draw(
                             DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )
+                        //? } else {
+                        /*PlayerFaceExtractor.extractRenderState(
+                            DrawContextUtils.drawContext, playerInfo.skin.body().texturePath(), middleX, middleY, 8, playerInfo.showHat(), false, -1,
+                        )*/
+                        //? }
                     }
                     middleX += 8 + 2
                 }
-                // TODO 26.1 PlayerFaceRenderer was removed in 26.1, we need to blit our own.
-                //? } else {
-                /*if (tabLine.type == TabStringType.PLAYER && !hideIcons) middleX += 8 + 2*/
-                //?}
 
                 val drawX = middleX + if (tabLine.type == TabStringType.TITLE) column.getMaxWidth() / 2f - tabLine.getWidth() / 2f else 0f
                 val drawY = middleY.toFloat()

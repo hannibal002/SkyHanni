@@ -99,13 +99,13 @@ object ClientEvents {
         val cancel = ChatManager.onChatAllow(message)
 
         if (cancel) {
-            // TODO 26.1 either need to access widen or re-implement
-            //? if < 26.1 {
             // the message doesn't get logged if we cancel it, so we do that ourselves
             val inGameHud = Minecraft.getInstance().gui
+            //? if < 26.1 {
             val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageTag.system())
+            //?} else
+            //val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
             inGameHud.chat.logChatMessage(chatHudLine)
-            //?}
         }
 
         // if we cancel then we don't allow the message
