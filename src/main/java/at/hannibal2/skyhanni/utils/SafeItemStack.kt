@@ -25,7 +25,7 @@ fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
     //? if < 26.1 {
     return ItemStack(item, count)
     //? } else {
-    /*return DeferredItemStack({ ItemStack(item, count) }, count)*/
+    /*return DeferredItemStack(item, { ItemStack(item, count) }, count)*/
     //?}
 }
 
@@ -37,7 +37,7 @@ fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit
     //? if < 26.1 {
     return ItemStack(item, count).also(extraOps)
     //? } else {
-    /*return DeferredItemStack({ ItemStack(item, count).also(extraOps) }, count)*/
+    /*return DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)*/
     //?}
 }
 

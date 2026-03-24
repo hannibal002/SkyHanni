@@ -11,7 +11,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ItemStack.class)
 public interface IItemStackAccessor {
     @Accessor("item") @Nullable Holder<Item> skyhanni$getItemHolder();
-    @Accessor("item") void skyhanni$setItemHolder(@Nullable Holder<Item> item);
     @Accessor("components") PatchedDataComponentMap skyhanni$getPatchedComponents();
-    @Accessor("components") void skyhanni$setPatchedComponents(PatchedDataComponentMap components);
 }
