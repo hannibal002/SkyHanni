@@ -262,7 +262,7 @@ object TabListReader {
                 inUpgrades = false
             }
 
-            "l" !in formatted -> addComponent(Component.literal(" ").append(component))
+            "§l" !in formatted -> addComponent(Component.literal(" ").append(component))
             else -> addComponent(component)
         }
     }
