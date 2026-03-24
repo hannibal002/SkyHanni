@@ -41,6 +41,7 @@ object StringUtils {
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
     private val formattingChars = "kmolnrKMOLNR".toSet()
     private val colorChars = "abcdefABCDEF0123456789zZ".toSet()
+    private val colorMap = ChatFormatting.entries.associateBy { it.toString()[1] }
 
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
@@ -210,7 +211,7 @@ object StringUtils {
             var newLine = ""
             var lastColor: TextColor? = null
             var lastFormatting = ""
-            line.accept { index, style, codePoint ->
+            line.accept { _, style, codePoint ->
                 val color = style.color
                 if (color != lastColor) {
                     lastColor = color
@@ -347,15 +348,10 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String =
         substring(0, pos) + char + substring(pos)
 
-    fun replaceIfNeeded(
-        original: Component,
-        newText: String,
-    ): Component? = replaceIfNeeded(original, newText.asComponent())
+    fun replaceIfNeeded(original: Component, newText: String): Component? =
+        replaceIfNeeded(original, newText.asComponent())
 
-    private val colorMap = ChatFormatting.entries.associateBy { it.toString()[1] }
-    fun enumChatFormattingByCode(char: Char): ChatFormatting? {
-        return colorMap[char]
-    }
+    fun enumChatFormattingByCode(char: Char): ChatFormatting? = colorMap[char]
 
     fun doLookTheSame(left: Component, right: Component): Boolean {
         class ChatIterator(var component: Component) {
@@ -525,14 +521,7 @@ object StringUtils {
 
     fun String.splitCamelCase() = replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
-    fun String.isValidUuid(): Boolean {
-        return try {
-            UUID.fromString(this)
-            true
-        } catch (e: IllegalArgumentException) {
-            false
-        }
-    }
+    fun String.isValidUuid(): Boolean = runCatching { UUID.fromString(this) }.isSuccess
 
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
