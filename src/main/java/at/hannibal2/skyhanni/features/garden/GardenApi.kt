@@ -223,8 +223,8 @@ object GardenApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
+        val cropBroken = event.getCropType() ?: return
         val blockState = event.getBlockState
-        val cropBroken = blockState.getCropType(event.position) ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
