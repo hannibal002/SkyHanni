@@ -77,6 +77,7 @@ mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder
 accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
 mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
 accessible field net/minecraft/world/item/Item descriptionId Ljava/lang/String;
+accessible method net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/core/Holder;ILnet/minecraft/core/component/PatchedDataComponentMap;)V
 
 inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/ChatLineData
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore

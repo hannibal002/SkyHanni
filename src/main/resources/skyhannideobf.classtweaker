@@ -58,6 +58,7 @@ mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder
 accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
 mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
 accessible field net/minecraft/world/item/Item descriptionId Ljava/lang/String;
+accessible method net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/core/Holder;ILnet/minecraft/core/component/PatchedDataComponentMap;)V
 
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor scissorStack Lnet/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack;
 accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
