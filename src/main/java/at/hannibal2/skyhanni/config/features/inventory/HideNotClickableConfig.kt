@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.config.features.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -32,9 +35,9 @@ class HideNotClickableConfig {
     var itemsBlockClicks: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Opacity", desc = "How strong should the items be grayed out?")
+    @ConfigOption(name = "Transparency", desc = "How transparent should the items be?")
     @ConfigEditorSlider(minValue = 0f, maxValue = 255f, minStep = 5f)
-    var opacity: Int = 180
+    var transparency: Int = 180
 
     @Expose
     @ConfigOption(
@@ -48,4 +51,13 @@ class HideNotClickableConfig {
     @ConfigOption(name = "Green Line", desc = "Add green line around items that are clickable.")
     @ConfigEditorBoolean
     var itemsGreenLine: Boolean = true
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            val base = "inventory.hideNotClickable"
+            event.move(126, "$base.opacity", "$base.transparency")
+        }
+    }
 }

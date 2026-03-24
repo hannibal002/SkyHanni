@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -29,12 +28,12 @@ object TestCopyRngMeterValues {
      */
     private val rngScorePattern by patternGroup.pattern(
         "rngscore",
-        "(?:(?:Slayer|Experimental|Nucleus|Frozen Corpse) XP|Dungeon Score): [\\d,.kM]+/(?<xp>[\\d,.kM]+)"
+        "(?:(?:Slayer|Experimental|Nucleus|Frozen Corpse) XP|Dungeon Score): [\\d,.kM]+/(?<xp>[\\d,.kM]+)",
     )
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!SkyHanniMod.feature.dev.debug.copyRngMeter) return
+        if (!DevApi.config.debug.copyRngMeter) return
 
         val map = mutableMapOf<NeuInternalName, Long>()
         for (item in event.inventoryItems.values) {

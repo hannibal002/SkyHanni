@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.TreeMap
-import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
 @SkyHanniModule
 object MobData {
@@ -75,16 +74,16 @@ object MobData {
     internal class RetryEntityInstancing(
         var entity: LivingEntity,
         var times: Int,
-        val roughType: MobType,
+        val roughCategory: MobCategory,
     ) {
         override fun hashCode() = entity.id
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
         fun toKeyValuePair() = entity.id to this
 
         fun outsideRange() =
-            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughType) {
-                MobType.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
-                MobType.PLAYER -> Double.POSITIVE_INFINITY
+            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughCategory) {
+                MobCategory.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
+                MobCategory.PLAYER -> Double.POSITIVE_INFINITY
                 else -> DETECTION_RANGE
             }
     }

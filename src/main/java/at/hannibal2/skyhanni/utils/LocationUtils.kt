@@ -30,7 +30,7 @@ object LocationUtils {
 
     private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.rayTrace(a, b)?.miss == true
 
-    fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
+    fun playerLocation() = PlayerUtils.getLocation()
 
     // Block heights are multiples of 1/16, so we subtract 1/16 to find the right block
     fun getBlockBelowPlayer() = playerLocation().add(0.0, -1.0 / 16.0, 0.0).roundToBlock()
@@ -44,6 +44,7 @@ object LocationUtils {
     fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
 
     fun Entity.distanceToPlayer() = getLorenzVec().distanceToPlayer()
+    fun Entity.distanceSqToPlayer() = getLorenzVec().distanceSqToPlayer()
 
     fun Entity.distanceTo(location: LorenzVec) = getLorenzVec().distance(location)
     fun Entity.distanceTo(other: Entity) = getLorenzVec().distance(other.getLorenzVec())
@@ -236,9 +237,7 @@ object LocationUtils {
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
-        val noBlocks = canSee(a, b, offset)
-        val notTooFar = a.distance(b) < viewDistance.toDouble()
-        return noBlocks && notTooFar
+        return a.distance(b) < viewDistance.toDouble() && canSee(a, b, offset)
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =

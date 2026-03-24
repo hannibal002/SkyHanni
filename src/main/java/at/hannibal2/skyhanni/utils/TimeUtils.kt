@@ -12,8 +12,14 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
+import java.time.temporal.WeekFields
+import java.util.Locale
 import java.util.regex.Matcher
 import kotlin.math.absoluteValue
+import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -236,6 +242,29 @@ object TimeUtils {
         else -> false
     }
 
+    private val weekFields: WeekFields = WeekFields.of(Locale.getDefault())
+    val weekFormatter: DateTimeFormatter =
+        DateTimeFormatterBuilder()
+            .appendValue(ChronoField.YEAR)
+            .appendLiteral('-')
+            .appendValue(weekFields.weekOfYear())
+            .parseDefaulting(ChronoField.DAY_OF_WEEK, weekFields.firstDayOfWeek.value.toLong())
+            .toFormatter()
+
+    val monthFormatter: DateTimeFormatter =
+        DateTimeFormatterBuilder().appendPattern("yyyy'-'MM").parseDefaulting(ChronoField.DAY_OF_MONTH, 1).toFormatter()
+
+    val yearFormatter: DateTimeFormatter =
+        DateTimeFormatterBuilder().appendPattern("yyyy").parseDefaulting(ChronoField.DAY_OF_YEAR, 1).toFormatter()
+
+    val weekTextFormatter: DateTimeFormatter =
+        DateTimeFormatterBuilder()
+            .appendValue(ChronoField.YEAR)
+            .appendLiteral(", week ")
+            .appendValue(weekFields.weekOfYear())
+            .parseDefaulting(ChronoField.DAY_OF_WEEK, weekFields.firstDayOfWeek.value.toLong())
+            .toFormatter()
+
     private fun Matcher.years(string: String) = groupOrNull(string)?.toLong()?.years ?: 0.seconds
     private fun Matcher.days(string: String) = groupOrNull(string)?.toLong()?.days ?: 0.seconds
     private fun Matcher.hours(string: String) = groupOrNull(string)?.toLong()?.hours ?: 0.seconds
@@ -243,6 +272,14 @@ object TimeUtils {
     private fun Matcher.minutes(string: String) = minutesOrNull(string) ?: 0.seconds
     private fun Matcher.secondsOrNull(string: String) = groupOrNull(string)?.toLong()?.seconds
     private fun Matcher.seconds(string: String) = secondsOrNull(string) ?: 0.seconds
+
+    fun String.dayToLocalDate(): LocalDate = LocalDate.parse(this)
+
+    fun String.weekToLocalDate(): LocalDate = LocalDate.parse(this, weekFormatter)
+
+    fun String.monthToLocalDate(): LocalDate = LocalDate.parse(this, monthFormatter)
+
+    fun String.yearToLocalDate(): LocalDate = LocalDate.parse(this, yearFormatter)
 }
 
 private const val FACTOR_SECONDS = 1000L
@@ -278,9 +315,13 @@ enum class TimeUnit(val factor: Long, private val shortName: String, private val
     }
 }
 
+val Duration.inPartialMilliseconds: Double get() = toDouble(DurationUnit.MILLISECONDS)
 val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)
-val Duration.inPartialMinutes: Double get() = inPartialSeconds / 60
-val Duration.inPartialHours: Double get() = inPartialSeconds / 3600
-val Duration.inPartialDays: Double get() = inPartialSeconds / 86_400
-val Duration.inPartialYears: Double get() = inPartialSeconds / (86_400 * 365.25)
+val Duration.inPartialMinutes: Double get() = toDouble(DurationUnit.MINUTES)
+val Duration.inPartialHours: Double get() = toDouble(DurationUnit.HOURS)
+val Duration.inPartialDays: Double get() = toDouble(DurationUnit.DAYS)
+
+val Duration.roundedUpSeconds: Int get() = ceil(inPartialSeconds).toInt()
+
 val Long.years: Duration get() = this.times(365.25).days
+

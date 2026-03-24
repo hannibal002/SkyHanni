@@ -78,8 +78,9 @@ object FlareDisplay {
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntitySpawn(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        if (!enabled) return
         val entity = event.entity
         if (entity.tickCount.ticks > MAX_FLARE_TIME) return
         if (isAlreadyKnownFlare(entity)) return

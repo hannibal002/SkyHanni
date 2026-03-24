@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -139,7 +139,7 @@ object TotemOfCorruption {
     }
 
     private fun getTimeRemaining(totem: ArmorStand): Duration? =
-        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
+        totem.getLorenzVec().getEntitiesNearby<ArmorStand>(2.0)
             .firstNotNullOfOrNull { entity ->
                 timeRemainingPattern.matchMatcher(entity.cleanName()) {
                     val minutes = group("min")?.toIntOrNull() ?: 0
@@ -149,7 +149,7 @@ object TotemOfCorruption {
             }
 
     private fun getOwner(totem: ArmorStand): String? =
-        EntityUtils.getEntitiesNearby<ArmorStand>(totem.getLorenzVec(), 2.0)
+        totem.getLorenzVec().getEntitiesNearby<ArmorStand>(2.0)
             .firstNotNullOfOrNull { entity ->
                 ownerPattern.matchMatcher(entity.cleanName()) {
                     group("owner")
@@ -181,7 +181,7 @@ object TotemOfCorruption {
         return totems.minByOrNull { it.distance }
     }
 
-    private fun getTotems(): List<Totem> = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(100.0)
+    private fun getTotems(): List<Totem> = getEntitiesNearby<ArmorStand>(100.0)
         .filter { totemNamePattern.matches(it.cleanName()) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null

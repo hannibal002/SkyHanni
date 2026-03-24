@@ -125,7 +125,7 @@ object CustomWardrobe {
 
     // Edit button in normal wardrobe while in edit mode
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
         val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return

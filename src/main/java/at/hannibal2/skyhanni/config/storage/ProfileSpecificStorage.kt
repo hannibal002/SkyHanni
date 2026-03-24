@@ -34,13 +34,13 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
+import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
@@ -571,9 +571,6 @@ class ProfileSpecificStorage(
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
-
-            @Expose
             var farmingLevel: Int = -1
 
             @Expose
@@ -599,9 +596,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
-
-            @Expose
-            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
@@ -646,6 +640,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var gardenBpsTracker: GardenBpsTracker.TimedData = GardenBpsTracker.TimedData()
 
         @Expose
         var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
@@ -821,7 +818,7 @@ class ProfileSpecificStorage(
 
     // - minion
     @Expose
-    var minions: Map<LorenzVec, MinionConfig>? = mutableMapOf()
+    var minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
 
     class MinionConfig {
         @Expose

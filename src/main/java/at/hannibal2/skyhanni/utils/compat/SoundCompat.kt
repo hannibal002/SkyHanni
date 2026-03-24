@@ -62,9 +62,4 @@ object SoundCompat {
     fun getModernSoundName(soundName: String): String {
         return soundMap[soundName] ?: soundName
     }
-
-    fun getLegacySoundName(soundName: String): String {
-        return soundMap.entries.firstOrNull { it.value == soundName }?.key ?: soundName
-    }
-
 }

@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 open class CoroutineConfig(
     val name: String,
     val timeout: Duration = 10.seconds,
-    val withIOContext: Boolean = false,
+    internal val withIOContext: Boolean = false,
 ) {
     fun withMutex(mutex: Mutex): MutexedCoroutineConfig = MutexedCoroutineConfig(name, mutex, timeout, withIOContext)
     open fun withIOContext(): CoroutineConfig = CoroutineConfig(name, timeout, withIOContext = true)
@@ -33,7 +33,7 @@ open class CoroutineConfig(
  * A [CoroutineConfig] that additionally holds a [Mutex], which will be acquired
  * before the coroutine block executes.
  */
-class MutexedCoroutineConfig(
+open class MutexedCoroutineConfig(
     name: String,
     val mutex: Mutex,
     timeout: Duration = 10.seconds,

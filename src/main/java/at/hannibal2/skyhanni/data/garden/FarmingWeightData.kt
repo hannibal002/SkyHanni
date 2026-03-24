@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -102,6 +103,7 @@ object FarmingWeightData {
                 EliteLeaderboardMode.ALL_TIME -> {
                     // we only update collections on garden join
                 }
+
                 EliteLeaderboardMode.MONTHLY ->
                     getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
             }
@@ -243,8 +245,8 @@ object FarmingWeightData {
     )
 
     private val weightStatic = ApiStaticGetPath(
-        "https://api.elitebot.dev/weights/all",
-        "Elitebot Farming Weights",
+        "${EliteDevApi.ELITE_API_URL}/weights/all",
+        "EliteSkyBlock Farming Weights",
     )
 
     private suspend fun getCropWeights() {
@@ -263,7 +265,7 @@ object FarmingWeightData {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shfarmingprofile") {
-            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            description = "Look up the farming profile from yourself or another player on ${EliteDevApi.ELITE_DOMAIN}"
             category = CommandCategory.USERS_ACTIVE
             argCallback("name", BrigadierArguments.string()) { name ->
                 openWebsite(name, ignoreCooldown = true)
@@ -282,7 +284,7 @@ object FarmingWeightData {
         lastOpenWebsite = SimpleTimeMark.now()
         lastName = name
 
-        OSUtils.openBrowser("https://elitebot.dev/@$name/")
+        OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/@$name".addSkyHanniUtm())
         ChatUtils.chat("Opening Farming Profile of player §b$name")
     }
 

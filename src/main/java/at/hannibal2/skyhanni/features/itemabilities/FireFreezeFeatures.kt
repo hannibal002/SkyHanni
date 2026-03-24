@@ -90,8 +90,8 @@ object FireFreezeFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         when (event.soundName) {
-            "mob.guardian.elder.idle" -> handleActiveSound(event)
-            "random.anvil_land" -> handleAnvilSound(event)
+            "entity.elder_guardian.ambient" -> handleActiveSound(event)
+            "block.anvil.land" -> handleAnvilSound(event)
         }
     }
 

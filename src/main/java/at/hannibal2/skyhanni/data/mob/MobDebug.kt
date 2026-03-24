@@ -56,7 +56,7 @@ object MobDebug {
 
         if (config.skyblockMob.isHighlight()) {
             MobData.skyblockMobs.highlight(event) {
-                (if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN).toChromaColor()
+                (if (it.category == MobCategory.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN).toChromaColor()
             }
         }
         if (config.displayNPC.isHighlight()) {

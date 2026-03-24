@@ -298,6 +298,7 @@ object HoppityEggsManager {
 
     private fun warn() {
         if (!unclaimedEggsConfig.warningsEnabled) return
+        if (SkyBlockUtils.isStrandedProfile) return
         if (ReminderUtils.isBusy() && !unclaimedEggsConfig.warnWhileBusy) return
         if (lastWarnTime.passedSince() < 1.minutes) return
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,17 +17,22 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object MinecraftData {
 
+    var hasLeftMainScreen: Boolean = false
+        private set
+
+    @HandleEvent(ClientConnectEvent::class, priority = HandleEvent.LOW)
+    fun onClientConnect() {
+        hasLeftMainScreen = true
+    }
+
     @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
-        when (val packet = event.packet) {
-            is ClientboundPingPacket -> {
-                if (lastPingParameter == packet.id) return
-                lastPingParameter = packet.id
+        val packet = event.packet as? ClientboundPingPacket ?: return
 
-                totalServerTicks++
-                ServerTickEvent.post()
-            }
-        }
+        if (lastPingParameter == packet.id) return
+        lastPingParameter = packet.id
+
+        ServerTickEvent(++totalServerTicks).post()
     }
 
     private var lastPingParameter = 0

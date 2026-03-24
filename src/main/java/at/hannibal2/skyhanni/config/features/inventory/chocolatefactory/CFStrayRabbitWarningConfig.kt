@@ -44,7 +44,7 @@ class CFStrayRabbitWarningConfig {
             "§cMust be a .ogg file"
     )
     @ConfigEditorText
-    val specialRabbitSound: Property<String> = Property.of("note.pling")
+    val specialRabbitSound: Property<String> = Property.of("block.note_block.pling")
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")

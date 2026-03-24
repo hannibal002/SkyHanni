@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -38,10 +38,12 @@ object AdvancedPlayerList {
      * REGEX-TEST: [290] Skirtwearer ꀾ♲
      * REGEX-TEST: [14] ColombianoGood Ⓑ
      * REGEX-TEST: [218] nightdives
+     * REGEX-TEST: [281] [YOUTUBE] Remittal
+     * REGEX-FAIL: SB Level§r§f: §r§8[§r§6419§r§8] §r§b8§r§3/§r§b100 XP
      */
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level.colorless",
-        ".*\\[(?<level>.*)] (?<name>.*)",
+        "^(?!SB Level).*\\[(?<level>(?:§.)*[\\d,]+)(?:§.)*] (?<name>.*)",
     )
 
     private var playerData = mutableMapOf<Component, PlayerData>()
@@ -76,19 +78,8 @@ object AdvancedPlayerList {
             }
             val playerData: PlayerData? = levelPattern.matchMatcher(line) {
                 val levelText = group("level")
-                val removeColor = levelText.removeColor()
-                try {
-                    val sbLevel = removeColor.toInt()
-                    readPlayerData(sbLevel, levelText, line)
-                } catch (e: NumberFormatException) {
-                    ErrorManager.logErrorWithData(
-                        e, "Advanced Player List failed to parse username",
-                        "line" to line,
-                        "i" to i,
-                        "original" to original,
-                    )
-                    null
-                }
+                val sbLevel = levelText.removeColor().formatIntOrNull() ?: return@matchMatcher null
+                readPlayerData(sbLevel, levelText, line)
             }
             playerData?.let {
                 val name = it.name
@@ -143,44 +134,32 @@ object AdvancedPlayerList {
         sbLevel: Int,
         levelText: String,
         line: String,
-    ): PlayerData {
-        val playerData = PlayerData(sbLevel)
+    ): PlayerData = PlayerData(sbLevel).apply {
         var index = 0
         val fullName = group("name")
         if (fullName.contains("[")) index++
+
         val name = fullName.split(" ")
         val coloredName = name[index]
-        if (index == 1) {
-            playerData.coloredName = name[0] + " " + coloredName
-        } else {
-            playerData.coloredName = coloredName
-        }
-        playerData.name = coloredName.removeColor()
-        playerData.levelText = levelText
+        this.coloredName = if (index == 1) name[0] + " " + coloredName else coloredName
+        this.name = coloredName.removeColor()
+        this.levelText = levelText
         index++
-        if (name.size > index) {
+        this.nameSuffix = if (name.size > index) {
             var nameSuffix = name.drop(index).joinToString(" ")
-            if (nameSuffix.contains("♲")) {
-                playerData.ironman = true
-            } else {
-                playerData.bingoLevel = BingoApi.getRank(line)
-            }
+
+            if (nameSuffix.contains("♲")) ironman = true
+            else bingoLevel = BingoApi.getRank(line)
+
             if (IslandType.CRIMSON_ISLE.isCurrent()) {
-                playerData.faction = if (line.contains("§c⚒")) {
-                    nameSuffix = nameSuffix.replace("§c⚒", "")
-                    CrimsonIsleFaction.BARBARIAN
-                } else if (line.contains("§5ቾ")) {
-                    nameSuffix = nameSuffix.replace("§5ቾ", "")
-                    CrimsonIsleFaction.MAGE
-                } else {
-                    CrimsonIsleFaction.NONE
+                CrimsonIsleFaction.entries.firstOrNull { it.isLine(line) }?.let {
+                    faction = it
+                    nameSuffix = nameSuffix.replace(it.pattern, "")
                 }
             }
-            playerData.nameSuffix = nameSuffix
-        } else {
-            playerData.nameSuffix = ""
-        }
-        return playerData
+
+            nameSuffix
+        } else ""
     }
 
     fun ignoreCustomTabList(): Boolean {
@@ -189,11 +168,13 @@ object AdvancedPlayerList {
     }
 
     private fun createCustomName(data: PlayerData): Component {
-
         val playerName = if (config.useLevelColorForName) {
-            val c = data.levelText[3]
-            "§$c" + data.name
-        } else if (config.hideRankColor) "§b" + data.name else data.coloredName
+            data.levelText.getOrNull(3)?.let { "§$it" + data.name } ?: data.coloredName
+        } else if (config.hideRankColor) {
+            "§b" + data.name
+        } else {
+            data.coloredName
+        }
 
         val level = if (!config.hideLevel) {
             if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
@@ -206,7 +187,8 @@ object AdvancedPlayerList {
         } else Component.literal(data.nameSuffix)
 
         if (config.markSpecialPersons) {
-            suffix.append(" ${getSocialIcon(data.name).icon()}")
+            val icon = getSocialIcon(data.name).icon()
+            if (icon.isNotEmpty()) suffix.append(" $icon")
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
@@ -218,7 +200,10 @@ object AdvancedPlayerList {
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            suffix.append(data.faction.icon.orEmpty())
+            data.faction.icon?.let {
+                if (suffix.formattedTextCompat().removeColor().isNotBlank()) suffix.append(" ")
+                suffix.append(it)
+            }
         }
 
         // todo: level and player name should also really be components
@@ -241,7 +226,6 @@ object AdvancedPlayerList {
     }
 
     class PlayerData(val sbLevel: Int) {
-
         var name: String = "?"
         var coloredName: String = "?"
         var nameSuffix: String = "?"
@@ -251,10 +235,19 @@ object AdvancedPlayerList {
         var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
     }
 
-    enum class CrimsonIsleFaction(val icon: String?) {
-        BARBARIAN(" §c⚒"),
-        MAGE(" §5ቾ"),
-        NONE(null)
+    enum class CrimsonIsleFaction(color: String?, private val symbol: String?) {
+        BARBARIAN("§c", "⚒"),
+        MAGE("§5", "ቾ"),
+        NONE(null, null)
+        ;
+
+        val icon: String? = color?.let { "$it$symbol" }
+
+        val pattern = Regex("(?:§.)*$symbol")
+
+        fun isLine(line: String): Boolean {
+            return line.contains(this.symbol ?: return false)
+        }
     }
 
     enum class SocialIcon(val icon: () -> String, val score: Int) {
