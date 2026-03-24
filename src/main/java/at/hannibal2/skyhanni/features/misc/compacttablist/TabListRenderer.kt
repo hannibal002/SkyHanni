@@ -160,7 +160,6 @@ object TabListRenderer {
                 val savedX = middleX
 
                 val hideIcons = config.advancedPlayerList.hidePlayerIcons && !AdvancedPlayerList.ignoreCustomTabList()
-                //? if < 26.1 {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
