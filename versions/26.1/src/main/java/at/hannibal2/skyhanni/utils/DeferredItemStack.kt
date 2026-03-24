@@ -15,7 +15,7 @@ internal class DeferredItemStack(
     count: Int,
 ) : ItemStack(null, count, PatchedDataComponentMap(DataComponentMap.EMPTY)) {
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "KotlinConstantConditions")
     private val accessor get() = (this as Any) as IItemStackAccessor
     private val emptyHolder = accessor.`skyhanni$getItemHolder`()
     private val emptyComponents = accessor.`skyhanni$getPatchedComponents`()
