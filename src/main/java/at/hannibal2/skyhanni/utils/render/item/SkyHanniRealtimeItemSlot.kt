@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.render.item
 
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
@@ -20,7 +21,10 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
     init { allocate(slotSize) }
 
     private fun allocate(size: Int) {
-        allocateTextures(size, "SkyHanni realtime item", "SkyHanni realtime item depth", 12)
+        allocateTextures(
+            size, "SkyHanni realtime item", "SkyHanni realtime item depth",
+            GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_TEXTURE_BINDING or GpuTexture.USAGE_COPY_DST,
+        )
     }
 
     fun render(

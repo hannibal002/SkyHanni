@@ -362,13 +362,13 @@ object MineshaftPityDisplay {
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
-        val displayItem: SafeItemStack,
+        private val displayItemProvider: () -> SafeItemStack,
     ) {
         MITHRIL(
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
+            { ColoredBlockCompat.LIGHT_BLUE.createWoolStack() },
         ),
 
         // cant rename enum because config explodes
@@ -376,40 +376,42 @@ object MineshaftPityDisplay {
             "Low Tier Gemstone",
             OreType.entries.filter { it.isLowTierGemstone() },
             8,
-            ColoredBlockCompat.RED.createGlassStack(),
+            { ColoredBlockCompat.RED.createGlassStack() },
         ),
         HIGH_TIER_GEMSTONE(
             "High Tier Gemstone",
             OreType.entries.filter { it.isHighTierGemstone() },
             10,
-            ColoredBlockCompat.BLUE.createGlassStack(),
+            { ColoredBlockCompat.BLUE.createGlassStack() },
         ),
         GLACITE(
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            SafeItemStack(Blocks.PACKED_ICE),
+            { SafeItemStack(Blocks.PACKED_ICE) },
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            SafeItemStack(Blocks.CLAY),
+            { SafeItemStack(Blocks.CLAY) },
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            SafeItemStack(Blocks.RED_SANDSTONE),
+            { SafeItemStack(Blocks.RED_SANDSTONE) },
         ),
 
         TITANIUM(
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            BlockCompat.createSmoothDiorite(),
+            { BlockCompat.createSmoothDiorite() },
         ),
         ;
+
+        val displayItem: SafeItemStack by lazy { displayItemProvider() }
 
         companion object {
 

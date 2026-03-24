@@ -25,7 +25,7 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
             .also { it.setTextureFilter(FilterMode.NEAREST, false) }
         //?}
         textureView = device.createTextureView(texture!!)
-        depthTexture = device.createTexture(depthLabel, 8, TextureFormat.DEPTH32, size, size, 1, 1)
+        depthTexture = device.createTexture(depthLabel, GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST, TextureFormat.DEPTH32, size, size, 1, 1)
         depthTextureView = device.createTextureView(depthTexture!!)
         device.createCommandEncoder().clearColorAndDepthTextures(texture!!, 0, depthTexture!!, 1.0)
     }

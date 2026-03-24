@@ -36,7 +36,8 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
 
     private val usage = GpuTexture.USAGE_RENDER_ATTACHMENT or
         GpuTexture.USAGE_TEXTURE_BINDING or
-        GpuTexture.USAGE_COPY_SRC
+        GpuTexture.USAGE_COPY_SRC or
+        GpuTexture.USAGE_COPY_DST
 
     override fun dumpContents(id: Identifier, path: Path) {
         val texture = this.texture ?: return
