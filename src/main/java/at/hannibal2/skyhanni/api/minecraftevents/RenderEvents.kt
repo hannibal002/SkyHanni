@@ -26,7 +26,12 @@ object RenderEvents {
         )
 
         SpecialGuiElementRegistry.register { ctx ->
-            SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
+            SkyHanniPipCoordinatorRenderer(
+                //? if < 26.1 {
+                ctx.vertexConsumers()
+                //? } else
+                //ctx.bufferSource()
+            )
         }
 
         // makes the lines render weird idk

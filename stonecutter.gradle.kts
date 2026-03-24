@@ -150,7 +150,6 @@ stonecutter parameters {
             replace("WorldRenderEvents", "LevelRenderEvents")
             replace("SpecialGuiElementRegistry", "PictureInPictureRendererRegistry")
             replace("createSpecialRenderer", "createRenderer")
-            replace("vertexConsumers", "bufferSource")
             replace("ClickType", "ContainerInput")
             replace("handleInventoryMouseClick", "handleContainerInput")
             replace("GuiGraphics", "GuiGraphicsExtractor")
