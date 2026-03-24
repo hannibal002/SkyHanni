@@ -83,8 +83,8 @@ object PartyChatCommands {
             { config.tpsCommand },
             requiresPartyLead = false,
             executable = {
-                TpsCounter.tps?.let {
-                    HypixelCommands.partyChat("Current TPS: %.2f".format(it), prefix = true)
+                TpsCounter.tps?.let { tps ->
+                    HypixelCommands.partyChat("Current TPS: %.2f".format(tps), prefix = true)
                 } ?: run {
                     ChatUtils.chat("Command sent too early to calculate TPS")
                 }
