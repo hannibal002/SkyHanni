@@ -261,7 +261,7 @@ object DiscordRPCManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Discord RPC")
         if (debugError) event.addData {
             add("Error detected!")

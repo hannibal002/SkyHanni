@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import java.io.Closeable
+import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.UUID
@@ -63,7 +64,7 @@ class DiscordIPC(
     override fun close() {
         if (_connected) runCatching { sendFrame(Opcode.CLOSE, clientPayload) }
         _connected = false
-        pipe?.close()
+        runCatching { pipe?.close() }
         pipe = null
     }
 
@@ -86,7 +87,7 @@ class DiscordIPC(
      *
      * Synchronized to guard against concurrent writes from the presence loop and [close].
      *
-     * @throws DiscordIPCException If there is no active pipe connection.
+     * @throws DiscordIPCException If there is no active pipe connection or the write fails.
      */
     @Synchronized
     private fun sendFrame(opcode: Opcode, json: String) {
@@ -96,8 +97,13 @@ class DiscordIPC(
             .putInt(opcode.id)
             .putInt(bytes.size)
             .put(bytes)
-        out.write(frame.array())
-        out.flush()
+        try {
+            out.write(frame.array())
+            out.flush()
+        } catch (e: IOException) {
+            _connected = false
+            throw DiscordIPCException("IPC write failed: ${e.message}", e)
+        }
     }
 
     /**
@@ -134,4 +140,3 @@ class DiscordIPC(
         UUID.randomUUID().toString(),
     )
 }
-
