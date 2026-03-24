@@ -30,6 +30,7 @@ import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+// TODO refactor
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
