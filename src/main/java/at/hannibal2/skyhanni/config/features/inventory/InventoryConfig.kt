@@ -373,4 +373,13 @@ class InventoryConfig {
     @FeatureToggle
     @SearchTag("pick block")
     var middleClickFix: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Museum Category Highlighter",
+        desc = "Highlights completed museum categories in green.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var museumCategoryHighlight: Boolean = true
 }
