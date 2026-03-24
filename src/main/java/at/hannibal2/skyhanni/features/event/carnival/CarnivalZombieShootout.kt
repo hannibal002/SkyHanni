@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -242,8 +243,8 @@ object CarnivalZombieShootout {
                     "zombie type for zombie entity helmet is null",
                     "helmet" to helmet,
                     "helmet.displayName" to helmet.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                    "helmet.item" to helmet.item,
-                    "helmet.unlocalizedName" to helmet.item.descriptionId,
+                    "helmet.item" to helmet.itemType,
+                    "helmet.unlocalizedName" to helmet.itemType.descriptionId,
                 )
                 return@mapNotNull null
             }

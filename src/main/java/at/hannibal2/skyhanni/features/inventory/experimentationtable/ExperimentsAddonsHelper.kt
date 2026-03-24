@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
@@ -266,7 +267,7 @@ object ExperimentsAddonsHelper {
         val userSizeNow = userChronomatronProgress.size
 
         val activeColors = inventoryItems.values.filter {
-            nextChronomatronItemPattern.matches(it.item.getIdentifierString())
+            nextChronomatronItemPattern.matches(it.itemType.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
 
         chronHasBeenEmpty = if (activeColors.isEmpty()) true

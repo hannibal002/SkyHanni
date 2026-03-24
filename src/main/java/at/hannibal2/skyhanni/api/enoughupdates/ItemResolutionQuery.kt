@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -179,7 +180,7 @@ class ItemResolutionQuery {
     }
 
     fun withItemStack(stack: SafeItemStack): ItemResolutionQuery {
-        this.itemType = stack.item
+        this.itemType = stack.itemType
         this.compound = stack.components
         return this
     }

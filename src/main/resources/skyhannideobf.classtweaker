@@ -52,6 +52,13 @@ accessible method net/minecraft/client/gui/components/ChatComponent addMessage (
 accessible field net/minecraft/world/entity/Avatar POSES Ljava/util/Map;
 accessible field net/minecraft/core/Holder$Reference components Lnet/minecraft/core/component/DataComponentMap;
 
+extendable class net/minecraft/world/item/ItemStack
+accessible field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
+mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
+accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
+mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
+accessible field net/minecraft/world/item/Item descriptionId Ljava/lang/String;
+
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor scissorStack Lnet/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack;
 accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack stack Ljava/util/Deque;

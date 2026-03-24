@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -181,7 +182,7 @@ enum class CarnivalGoal(
             if (!inventoryPattern.matches(event.inventoryName)) return
             for (stack in event.inventoryItems.values) {
                 val lore = stack.getLore()
-                val goal = getEntry(stack.item, lore) ?: continue
+                val goal = getEntry(stack.itemType, lore) ?: continue
                 val lastLine = lore.last()
                 goal.isReached = completePattern.matches(lastLine)
             }

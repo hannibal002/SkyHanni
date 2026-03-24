@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.player.Inventory
 import java.net.URLEncoder
@@ -50,7 +51,7 @@ object AuctionHouseOpenPriceWebsite {
     }
 
     private fun createDisplayItem() = ItemUtils.createItemStack(
-        "PAPER".toInternalName().getItemStack().item,
+        "PAPER".toInternalName().getItemStack().itemType,
         "§bPrice History",
         "§8(From SkyHanni)",
         "",

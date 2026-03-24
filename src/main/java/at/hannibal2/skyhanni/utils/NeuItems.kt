@@ -69,7 +69,7 @@ object NeuItems {
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
-            SafeItemStack(Blocks.BARRIER).item,
+            SafeItemStack(Blocks.BARRIER).itemType,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
         )

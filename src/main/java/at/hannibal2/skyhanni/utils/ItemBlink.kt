@@ -19,13 +19,13 @@ object ItemBlink {
         val stack = blinkItem ?: return this
         if (System.currentTimeMillis() > endOfBlink) return this
 
-        val offset: Long = if (!offsets.containsKey(item)) {
+        val offset: Long = if (!offsets.containsKey(itemType)) {
             lastOffset += 200
             val number = lastOffset % 1000
-            offsets[item] = number
+            offsets[itemType] = number
             number
         } else {
-            offsets[item]!!
+            offsets[itemType]!!
         }
         return if ((offset + System.currentTimeMillis()) % 1000 > 500) stack else this
     }

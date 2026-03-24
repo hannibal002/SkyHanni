@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotEmptyString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.core.registries.BuiltInRegistries
@@ -334,7 +335,7 @@ object MoongladeBeacon {
 
     private fun Slot.performColorApplicableSet(block: (Pair<BeaconTuneData, BeaconColor>) -> Unit): Boolean {
         val tuningData = if (this.item.hasEnchantGlint()) enchantedTuning else normalTuning
-        val stackColor = this.item?.item?.getColorOrNull() ?: return false
+        val stackColor = this.item?.itemType?.getColorOrNull() ?: return false
         block.invoke(tuningData to stackColor)
         return true
     }

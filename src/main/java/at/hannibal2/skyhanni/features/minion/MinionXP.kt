@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.itemType
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.ChestBlock
 import java.util.EnumMap
@@ -55,7 +56,7 @@ object MinionXP {
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return
 
-        collectItem = event.inventoryItems[48]?.item
+        collectItem = event.inventoryItems[48]?.itemType
         collectItemXPList.clear()
 
         val xpTotal = handleItems(event.inventoryItems, true)

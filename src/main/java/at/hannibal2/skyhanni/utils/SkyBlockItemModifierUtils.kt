@@ -295,7 +295,7 @@ object SkyBlockItemModifierUtils {
 
     fun SafeItemStack.getItemId() = getAttributeString("id")
 
-    fun SafeItemStack.getMinecraftId() = BuiltInRegistries.ITEM.getKey(item)
+    fun SafeItemStack.getMinecraftId() = BuiltInRegistries.ITEM.getKey(itemType)
 
     private val identifierPattern = "[a-z0-9_\\-.:]+".toRegex()
 

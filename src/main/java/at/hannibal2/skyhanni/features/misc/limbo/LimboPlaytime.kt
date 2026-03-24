@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
@@ -74,7 +75,7 @@ object LimboPlaytime {
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
             limboItem = ItemUtils.createItemStack(
-                itemID.getItemStack().item,
+                itemID.getItemStack().itemType,
                 ITEM_NAME,
                 *createItemLore()
             )

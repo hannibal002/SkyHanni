@@ -22,29 +22,26 @@ typealias SafeItemStack = ItemStack
  * Returns [ItemStack.EMPTY] if components are not yet loaded.
  */
 fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
-    if (!SafeItemStackUtils.componentsLoaded) return ItemStack.EMPTY
-    return try {
-        ItemStack(item, count)
-    } catch (e: NullPointerException) {
-        if (e.message == "Components not bound yet") {
-            SafeItemStackUtils.markComponentsNotLoaded()
-            ItemStack.EMPTY
-        } else throw e
-    }
+    //? if < 26.1 {
+    return ItemStack(item, count)
+    //? } else {
+    /*return DeferredItemStack({ ItemStack(item, count) }, count)*/
+    //?}
 }
 
 /**
  * Safely creates an [ItemStack] from [item] with [count], then applies [extraOps].
  * Returns [ItemStack.EMPTY] if components are not yet loaded.
  */
-fun SafeItemStack(item: Item, count: Int = 1, extraOps: ItemStack.() -> Unit): SafeItemStack {
-    if (!SafeItemStackUtils.componentsLoaded) return ItemStack.EMPTY
-    return try {
-        ItemStack(item, count).also(extraOps)
-    } catch (e: NullPointerException) {
-        if (e.message == "Components not bound yet") {
-            SafeItemStackUtils.markComponentsNotLoaded()
-            ItemStack.EMPTY
-        } else throw e
-    }
+fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit): SafeItemStack {
+    //? if < 26.1 {
+    return ItemStack(item, count).also(extraOps)
+    //? } else {
+    /*return DeferredItemStack({ ItemStack(item, count).also(extraOps) }, count)*/
+    //?}
 }
+
+//? if < 26.1 {
+val SafeItemStack.itemType: Item get() = item
+//? } else
+//val SafeItemStack.itemType: Item get() = item.value()

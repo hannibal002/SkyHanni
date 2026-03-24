@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -173,7 +174,7 @@ object EnoughUpdatesManager {
         val lore = stack.getLore()
 
         val json = JsonObject()
-        json.addProperty("itemid", stack.item.getIdentifierString())
+        json.addProperty("itemid", stack.itemType.getIdentifierString())
         json.addProperty("displayname", stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
         json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
 
