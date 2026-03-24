@@ -1067,8 +1067,8 @@ object DamageIndicatorManager {
             if (!data.firstDeath) {
                 data.firstDeath = true
                 if (event.entity.belongsToPlayer() && data.bossType != BossType.SLAYER_SPIDER_5_1) {
+                    ChatUtils.debug("Setting tarantulaFoundTime to farPast (death)")
                     tarantulaFoundTime = SimpleTimeMark.farPast()
-                    ChatUtils.debug("Set tarantulaFoundTime to farPast (death)")
                 }
                 DamageIndicatorDeathEvent(event.entity, data).post()
             }
