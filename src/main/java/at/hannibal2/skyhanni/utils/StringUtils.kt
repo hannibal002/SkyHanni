@@ -173,16 +173,9 @@ object StringUtils {
         }.removeSuffix("'s")
     }
 
-    fun String.cleanPlayerName(displayName: Boolean = false): String {
-        return if (displayName) {
-            if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
-                // TODO custom color
-                "§b" + internalCleanPlayerName()
-            } else this
-
-        } else {
-            internalCleanPlayerName()
-        }
+    fun String.cleanPlayerName(displayName: Boolean = false): String = internalCleanPlayerName().let { name ->
+        // TODO custom color
+        if (displayName && SkyHanniMod.feature.chat.playerMessage.playerRankHider) "§b$name" else name
     }
 
     fun String.isPlayerName() = UtilsPatterns.playerNamePattern.matches(this)
