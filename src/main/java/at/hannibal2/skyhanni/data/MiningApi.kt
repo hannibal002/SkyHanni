@@ -18,6 +18,9 @@ import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemCategory.Companion.containsItem
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -540,6 +543,8 @@ object MiningApi {
 
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
     }
+
+    fun isHoldingMiningTool() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

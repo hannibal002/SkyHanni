@@ -1,5 +1,3 @@
-@file:Suppress("DuplicatedCode")
-
 package at.hannibal2.skyhanni.features.mining.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -15,8 +13,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.MiningProfitTrackerConfig.GemstoneType
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.MiningApi.isHoldingMiningTool
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.features.mining.tracker.MiningTracker.drawDisplay
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -35,27 +36,45 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import net.minecraft.world.level.block.Blocks
-import kotlin.collections.orEmpty
 import kotlin.math.pow
-import kotlin.time.Duration.Companion.milliseconds
 
 
-typealias CategoryName = String
+enum class MiningCategory(val displayName: String, val jsonKey: String?) {
+    GEMSTONES("Gemstones", "Gemstones"),
+    DWARVEN_METALS("Dwarven Metals", "Dwarven Metals"),
+    BLOCKS("Blocks/Stones", "Blocks/Stones"),
+    ORES("Ores", "Ores"),
+    MINING_FIESTA("Mining Fiesta Drops", "Mining Fiesta Drops"),
+    MISC("Misc", "Misc"),
+    OTHER("Other", null);
+
+    override fun toString(): String = displayName
+
+    companion object {
+        fun fromJsonKey(jsonKey: String): MiningCategory = entries.find { it.jsonKey == jsonKey } ?: OTHER
+    }
+}
 
 @SkyHanniModule
-object MiningTracker {
+object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker.BucketData>(
+    "Mining Profit Tracker",
+    ::BucketData,
+    { it.mining.miningTracker },
+    { drawDisplay(it) },
+    trackerConfig = { SkyHanniMod.feature.mining.miningTracker.perTrackerConfig }
+) {
     // region Tracker init and data population
 
     // Fetching config values. See MiningProfitTrackerConfig.kt
     val config get() = SkyHanniMod.feature.mining.miningTracker
 
     // Block Types; see [https://github.com/hannibal002/SkyHanni-REPO/blob/main/constants/Mining.json]
-    private var BlockTypes: Map<String, List<NeuInternalName>>
+    private var blockTypes: Map<String, List<NeuInternalName>>
 
     private val group = RepoPattern.group("data.miningtracker")
 
@@ -63,9 +82,7 @@ object MiningTracker {
     private var blockUpdateControl = false
 
 
-    // Constant for "all" categories
-    private const val ALL: CategoryName = "All"
-    private var currentCategory: CategoryName = ALL
+    // (Category tracking is now handled by the selectedBucket property of BucketData)
     /**
      * REGEX-TEST: internalName:ROUGH_RUBY_GEM
      */
@@ -79,24 +96,27 @@ object MiningTracker {
 
     // Should the tracker show? Tracker display conditions
     init {
-        BlockTypes = emptyMap()
+        blockTypes = emptyMap()
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() },
+            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() && isHoldingMiningTool()},
             onRender = {
-                tracker.renderDisplay(config.position)
+                renderDisplay(config.position)
             },
         )
     }
 
     // Associated data when hovering over tracker lines.
-    data class Data(
+    data class BucketData(
         @Expose var totalBlocksMined: Long = 0L
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : BucketedItemTrackerData<MiningCategory, SessionUptime.Normal>(MiningCategory::class, SessionUptime.Normal::class) {
+
+        override fun MiningCategory.isBucketSelectable(): Boolean = true
+        override fun bucketName(): String = "Mining Category"
 
         // Description when hovering over a tracker code line
-        override fun getDescription(timesGained: Long): List<String> {
+        override fun getDescription(bucket: MiningCategory?, timesGained: Long): List<String> {
             /* times gained here is only every time the sack updates, so the best calculable
                 quantity is how often we gain it from sack */
             // TODO: Find an actually useful metric to display, especially glossy/mineral drop rate
@@ -105,10 +125,10 @@ object MiningTracker {
             )
         }
         // Add tracker line if coins are picked up. Maybe glacite creature mob kill coins?
-        override fun getCoinName(item: TrackedItem) = "§6Coins gained while mining"
+        override fun getCoinName(bucket: MiningCategory?, item: TrackedItem) = "§6Coins gained while mining"
 
         // Description when hovering over the above line
-        override fun getCoinDescription(item: TrackedItem): List<String> {
+        override fun getCoinDescription(bucket: MiningCategory?, item: TrackedItem): List<String> {
             val miningCoinsGained = item.totalAmount.shortFormat()
             return listOf(
                 "§7You have gained §6$miningCoinsGained coins §7from mining associated tasks."
@@ -144,22 +164,14 @@ object MiningTracker {
         }
     }
 
-    // Tracker initialization
-    private val tracker = SkyHanniItemTracker(
-        name = "Mining Profit Tracker",
-        ::Data,
-        getStorage = { it.mining.miningTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) { drawDisplay(data = it) }
-
     // What should be displayed on the tracker
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    fun drawDisplay(data: BucketData): List<Searchable> = buildList {
         addSearchString("§e§lMining Profit Tracker")
-        // Block Type blocks filter
-        val filter: (NeuInternalName) -> Boolean = addCategories(data)
+        
+        addBucketSelector(this, data, "Category")
 
         // Populates values into the tracker
-        val profit = tracker.drawItems(data, filter, lists = this)
+        val profit = drawItems(data, { true }, lists = this)
 
         // Rendering the total blocks mined field.
         val totalBlocksMined = data.totalBlocksMined
@@ -171,7 +183,7 @@ object MiningTracker {
         )
         val duration = data.getTotalUptime()
         addAll(
-            tracker.addTotalProfit(
+            addTotalProfit(
                 profit,
                 data.totalBlocksMined,
                 "block",
@@ -179,19 +191,19 @@ object MiningTracker {
                 "Blocks"
             )
         )
-        if (tracker.isInventoryOpen()) {
+        if (isInventoryOpen()) {
             addButton(
                 label = "Gemstone Type",
                 current = config.gemstoneType,
                 getName = { it.displayName },
                 onChange = {
                     config.gemstoneType = it
-                    tracker.update()
+                    update()
                 },
                 universe = GemstoneType.entries,
             )
         }
-        tracker.addPriceFromButton(this)
+        addPriceFromButton(this)
     }
 
     //endregion
@@ -201,8 +213,8 @@ object MiningTracker {
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!config.enabled || !IslandTypeTags.CUSTOM_MINING.inAny()) return
-        tracker.update()
-        if (event.clickType != at.hannibal2.skyhanni.data.ClickType.LEFT_CLICK) return
+        update()
+        if (event.clickType != ClickType.LEFT_CLICK) return
 
         val ore = OreBlock.getByStateOrNull(event.getBlockState)
         if (ore != null) {
@@ -215,7 +227,7 @@ object MiningTracker {
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!config.enabled || !IslandTypeTags.CUSTOM_MINING.inAny()) return
-        tracker.firstUpdate()
+        firstUpdate()
         val oldState = event.oldState
         val newState = event.newState
         val oldBlock = oldState.block
@@ -237,7 +249,7 @@ object MiningTracker {
                 event.location == lastClickedPos
             ) {
                 // Does NOT count spread
-                tracker.modify {
+                modify {
                     it.totalBlocksMined += 1
                 }
                 // necessary because it updates twice randomly
@@ -252,70 +264,33 @@ object MiningTracker {
         if (!config.enabled) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
-            if (config.enabled) return
             tryAddItem(event.internalName, event.amount, command = true)
             return
         }
 
-        DelayedRun.runDelayed(500.milliseconds) {
-            tryAddItem(event.internalName, event.amount, command = false)
-        }
+        tryAddItem(event.internalName, event.amount, command = false)
+
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (!isAllowedItem(internalName)) {
+        val bucket = categoryOf(internalName)
+        if (bucket == null) {
             ChatUtils.debug("Ignored non-mining item pickup: $internalName'")
             return
         }
 
-        tracker.addItem(internalName, amount, command)
+        addItem(bucket, internalName, amount, command)
     }
 
-    private fun isAllowedItem(internalName: NeuInternalName) = BlockTypes.any { internalName in it.value }
+    private fun categoryOf(internalName: NeuInternalName): MiningCategory? {
+        val entry = blockTypes.entries.find { internalName in it.value } ?: return null
+        return MiningCategory.fromJsonKey(entry.key)
+    }
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        BlockTypes = event.getConstant<MiningJson>("Mining").categories ?: emptyMap()
-    }
-
-    private fun MutableList<Searchable>.addCategories(data: Data): (NeuInternalName) -> Boolean {
-        val map = mutableMapOf<CategoryName, Int>()
-        // Max size will be the total number of items in data
-        map[ALL] = data.items.size
-        // To display count of items, from a specific block type
-        for ((name, items) in BlockTypes) {
-            val amt = items.count { it in data.items }
-            if (amt > 0) {
-                map[name] = amt
-            }
-        }
-        val list = map.keys.toList()
-        if (currentCategory !in list) {
-            currentCategory = ALL
-        }
-
-        if (tracker.isInventoryOpen()) {
-            addButton(
-                label = "Category",
-                current = currentCategory,
-                getName = { it + " §7(" + map[it] + ")" },
-                onChange = {
-                    currentCategory = it
-                    tracker.update()
-                },
-                universe = list,
-            )
-        }
-
-        val filter: (NeuInternalName) -> Boolean =
-            if (currentCategory == ALL) {
-                { true }
-            } else {
-                { it in (BlockTypes[currentCategory].orEmpty()) }
-            }
-
-        return filter
+        blockTypes = event.getConstant<MiningJson>("Mining").categories
     }
 
     @HandleEvent
@@ -323,7 +298,7 @@ object MiningTracker {
         event.registerBrigadier("shresetminingtracker") {
             description = "Resets the TOTAL Mining profit Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

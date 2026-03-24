@@ -806,8 +806,7 @@ class ProfileSpecificStorage(
         var flowstatePersonalBest = 0
 
         @Expose
-        var miningTracker: at.hannibal2.skyhanni.features.mining.tracker.MiningTracker.Data =
-            MiningTracker.Data()
+        var miningTracker: MiningTracker.BucketData = MiningTracker.BucketData()
 
         @Expose
         var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
