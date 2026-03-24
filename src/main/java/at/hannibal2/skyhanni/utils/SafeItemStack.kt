@@ -24,9 +24,8 @@ typealias SafeItemStack = ItemStack
 fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
     //? if < 26.1 {
     return ItemStack(item, count)
-    //? } else {
-    /*return DeferredItemStack(item, { ItemStack(item, count) }, count)*/
-    //?}
+    //? } else
+    //return DeferredItemStack(item, { ItemStack(item, count) }, count)
 }
 
 /**
@@ -36,9 +35,8 @@ fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
 fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit): SafeItemStack {
     //? if < 26.1 {
     return ItemStack(item, count).also(extraOps)
-    //? } else {
-    /*return DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)*/
-    //?}
+    //? } else
+    //return DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)
 }
 
 //? if < 26.1 {
