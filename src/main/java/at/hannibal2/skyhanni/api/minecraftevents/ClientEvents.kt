@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
+import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -78,6 +79,7 @@ object ClientEvents {
         ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
         ClientReceiveMessageEvents.GAME_CANCELED.register(::onCanceled)
 
+        ClientLifecycleEvents.CLIENT_STARTED.register { ComponentsLoadedEvent.post() }
         ClientLifecycleEvents.CLIENT_STOPPING.register { ClientShutdownEvent.post() }
     }
 

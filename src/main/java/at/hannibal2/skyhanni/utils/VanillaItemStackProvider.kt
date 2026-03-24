@@ -21,15 +21,10 @@ class VanillaItemStackProvider(
     override val stack get() = cached?.copy() ?: buildStack()
 
     private fun buildStack(): ItemStack {
-        val resolvedItem = item()
-        //? if > 1.21.11 {
-        /*val holder = resolvedItem.builtInRegistryHolder() ?: return ItemStack.EMPTY
-        if (holder.components == null) return ItemStack.EMPTY*/
-        //? }
-        return ItemStack(resolvedItem).also {
-            extraOps?.invoke(it)
-            cached = it
-        }.copy()
+        val built = if (extraOps != null) SafeItemStack(item()) { extraOps.invoke(this) } else SafeItemStack(item())
+        if (built.isEmpty) return ItemStack.EMPTY
+        cached = built
+        return built.copy()
     }
 }
 
