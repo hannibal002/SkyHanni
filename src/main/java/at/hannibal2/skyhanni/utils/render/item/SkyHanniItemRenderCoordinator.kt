@@ -106,7 +106,7 @@ internal object SkyHanniItemRenderCoordinator {
         if (isSettled) {
             val blitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
             if (blitted) return
-            // Atlas miss (overflow or not yet allocated) — fall through to realtime
+            // Atlas miss (overflow or not yet allocated) - fall through to realtime
         }
 
         realtimeSlotLastSeen[state.stableId] = frameNumber

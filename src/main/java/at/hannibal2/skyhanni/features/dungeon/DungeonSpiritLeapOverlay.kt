@@ -216,7 +216,7 @@ object DungeonSpiritLeapOverlay {
     private fun leapToPlayer(player: PlayerStackInfo) {
         val playerInfo = player.playerInfo ?: return
         if (playerInfo.playerDead) {
-            ChatUtils.chat("§cCannot leap — §e${playerInfo.username} §cis dead.")
+            ChatUtils.chat("§cCannot leap - §e${playerInfo.username} §cis dead.")
             return
         }
         InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = ClickType.MIDDLE)

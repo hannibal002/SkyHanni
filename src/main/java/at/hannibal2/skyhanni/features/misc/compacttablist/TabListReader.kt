@@ -168,7 +168,7 @@ object TabListReader {
 
         if (component.contains(hypixelAdvertisingString)) return@apply
 
-        // These lines were consumed into the active effects header — skip them
+        // These lines were consumed into the active effects header - skip them
         if (godPotTimer != null && godPotPattern.matches(component)) return@apply
         if (effectCountPattern.matches(component)) return@apply
         if (effectsUseCommandPattern.matches(component)) return@apply
@@ -185,7 +185,7 @@ object TabListReader {
             return@apply
         }
 
-        // For these three, the component itself is already correct — no reconstruction needed
+        // For these three, the component itself is already correct - no reconstruction needed
         cookiePattern.matchMatcher(component) {
             return@apply addComponent(component)
         }

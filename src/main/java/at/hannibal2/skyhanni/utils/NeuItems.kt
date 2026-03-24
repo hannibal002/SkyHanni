@@ -100,7 +100,7 @@ object NeuItems {
             // because builder blocks can have the same display name as normal items.
             if (internalName.startsWith("BUILDER_")) return@forEach
 
-            val stack = internalName.getItemStackOrNull() ?: run {
+            val stack = internalName.getItemStackOrNull()?.takeIf { it.isNotEmpty() } ?: run {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }

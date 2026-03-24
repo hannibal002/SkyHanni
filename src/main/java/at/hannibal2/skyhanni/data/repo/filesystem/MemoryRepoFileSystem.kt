@@ -57,7 +57,7 @@ class MemoryRepoFileSystem(
         val success = super.loadFromZip(progress, zipFile)
         check(flushResult == null) { "loadFromZip called twice on the same MemoryRepoFileSystem instance" }
 
-        // Snapshot the category reference now — storage may be cleared before the flush job reads it.
+        // Snapshot the category reference now - storage may be cleared before the flush job reads it.
         val progressCategory = progress.category
         val deferred = CompletableDeferred<Unit>()
         flushResult = deferred
@@ -89,7 +89,7 @@ class MemoryRepoFileSystem(
      * Waits for the background disk flush to complete, then disposes in-memory storage and
      * returns a [DiskRepoFileSystem] backed by [root].
      *
-     * If the flush failed, the error is logged and the transition still proceeds — callers
+     * If the flush failed, the error is logged and the transition still proceeds - callers
      * should treat unsuccessful repo constants as the signal that something went wrong on disk.
      */
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
@@ -101,7 +101,7 @@ class MemoryRepoFileSystem(
             runCatching { it.await() }.onFailure { e ->
                 // Disk state may be incomplete. We still transition so that memory is freed,
                 // but callers will observe failures via unsuccessfulConstants.
-                progress.update("disk flush failed — repo on disk may be incomplete: ${e.message}")
+                progress.update("disk flush failed - repo on disk may be incomplete: ${e.message}")
             }
         }
 

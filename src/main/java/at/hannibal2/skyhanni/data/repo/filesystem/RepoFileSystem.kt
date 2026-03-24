@@ -34,7 +34,7 @@ sealed interface RepoFileSystem {
     /**
      * Reads [zipFile], validates each entry path, and writes each file into this [RepoFileSystem].
      *
-     * This is a plain suspend function — callers are responsible for ensuring they are already
+     * This is a plain suspend function - callers are responsible for ensuring they are already
      * running in an appropriate dispatcher (e.g. IO). No extra coroutine is launched here.
      */
     suspend fun loadFromZip(progress: ChatProgressUpdates, zipFile: File): Boolean = runCatching {

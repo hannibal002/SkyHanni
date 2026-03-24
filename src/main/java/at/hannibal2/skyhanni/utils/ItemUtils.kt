@@ -302,6 +302,7 @@ object ItemUtils {
     }
 
     private fun SafeItemStack.grabInternalNameOrNull(): NeuInternalName? {
+        if (!SafeItemStackUtils.componentsLoaded) return null
         if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
@@ -652,6 +653,7 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
+        if (!SafeItemStackUtils.componentsLoaded) return "§c$this"
         if (this.isPet) {
             return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
