@@ -14,12 +14,12 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
@@ -38,14 +38,14 @@ object EquipmentApi {
 
     private val equipment get() = if (RiftApi.inRift()) storage?.riftSlots else storage?.slots
 
-    fun getEquipment(slot: EquipmentSlot): ItemStack? = equipment?.get(slot.ordinal)
+    fun getEquipment(slot: EquipmentSlot): SafeItemStack? = equipment?.get(slot.ordinal)
 
-    fun getSlots(): Map<EquipmentSlot, ItemStack?> =
+    fun getSlots(): Map<EquipmentSlot, SafeItemStack?> =
         EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
 
-    fun getAll(): List<ItemStack> = equipment?.filterNotNull() ?: emptyList()
+    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull() ?: emptyList()
 
-    private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) = equipment?.set(slot.ordinal, itemStack)
+    private fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) = equipment?.set(slot.ordinal, itemStack)
 
     private val repoGroup = RepoPattern.group("data.equipment")
 
@@ -57,7 +57,7 @@ object EquipmentApi {
         "§aYou equipped a (?<item>.+)§r§a!",
     )
 
-    private var lastClickedEquipment: Pair<ItemStack, EquipmentSlot>? = null
+    private var lastClickedEquipment: Pair<SafeItemStack, EquipmentSlot>? = null
     private var lastClickedEquipmentTime = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -112,10 +112,10 @@ object EquipmentApi {
         }
     }
 
-    private fun handleInventoryItem(slot: EquipmentSlot, itemStack: ItemStack?) {
+    private fun handleInventoryItem(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val item = if (itemStack != null && !itemStack.isStainedGlassPane()) itemStack else null
         setEquipment(slot, item)
     }
 
-    fun getEmptyEquipment(): MutableList<ItemStack?> = EquipmentSlot.entries.mapTo(mutableListOf()) { null }
+    fun getEmptyEquipment(): MutableList<SafeItemStack?> = EquipmentSlot.entries.mapTo(mutableListOf()) { null }
 }

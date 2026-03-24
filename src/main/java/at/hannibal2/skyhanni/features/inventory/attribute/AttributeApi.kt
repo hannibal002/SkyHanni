@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.Attribute
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsIgnoreOrder
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toPair
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -85,7 +85,7 @@ object AttributeApi {
         }
     }
 
-    fun ItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? =
+    fun SafeItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? =
         getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (name, level) ->
             AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
         }?.toPair()

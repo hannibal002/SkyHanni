@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -43,7 +44,6 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -228,7 +228,7 @@ object MoongladeBeacon {
         NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
-    private fun ItemStack.isPaused(): Boolean {
+    private fun SafeItemStack.isPaused(): Boolean {
         return this.item == Items.RED_TERRACOTTA
     }
 

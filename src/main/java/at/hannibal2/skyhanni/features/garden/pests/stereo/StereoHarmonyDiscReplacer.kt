@@ -11,15 +11,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatchesComponent
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object StereoHarmonyDiscReplacer {
 
     private val config get() = PestApi.config.stereoHarmony
 
-    private val iconCache: MutableMap<String, ItemStack> = mutableMapOf()
+    private val iconCache: MutableMap<String, SafeItemStack> = mutableMapOf()
 
     // TODO cache. load on inventory open only once, then read from a map slotId -> item stack
     @HandleEvent

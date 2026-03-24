@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ItemStars {
@@ -56,7 +56,7 @@ object ItemStars {
         event.stackTip = stars.toString()
     }
 
-    private fun ItemStack.grabStarCount(): Int? {
+    private fun SafeItemStack.grabStarCount(): Int? {
         val internalName = getInternalNameOrNull() ?: return null
         val baseStars = getDungeonStarCount() ?: getStarCount()
         if (!internalName.isKuudraArmor()) return baseStars

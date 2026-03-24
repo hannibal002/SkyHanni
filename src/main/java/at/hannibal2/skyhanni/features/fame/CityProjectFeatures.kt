@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -46,7 +47,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -198,7 +198,7 @@ object CityProjectFeatures {
         },
     ) { inInventory }
 
-    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
+    private fun fetchMaterials(item: SafeItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false

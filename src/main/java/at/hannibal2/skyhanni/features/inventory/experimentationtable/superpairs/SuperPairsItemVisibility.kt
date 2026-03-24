@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import net.minecraft.world.item.ItemStack
 
 // Todo: Merge this with SuperpairDataDisplay
 //  Store slots over there
@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack
 object SuperPairsItemVisibility {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.superpairs.clickedItemsVisible
-    private val superpairsSlotMap: MutableMap<Int, ItemStack> = mutableMapOf()
+    private val superpairsSlotMap: MutableMap<Int, SafeItemStack> = mutableMapOf()
     private val superpairsSlotsToRead: MutableSet<Int> = mutableSetOf()
 
     /**

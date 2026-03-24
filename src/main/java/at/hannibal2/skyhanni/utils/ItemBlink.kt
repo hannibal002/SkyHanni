@@ -1,21 +1,21 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 
 object ItemBlink {
 
     private val offsets = mutableMapOf<Item, Long>()
     private var lastOffset = 0L
     private var endOfBlink = 0L
-    private var blinkItem: ItemStack? = null
+    private var blinkItem: SafeItemStack? = null
 
-    fun setBlink(item: ItemStack?, durationMillis: Long) {
+    fun setBlink(item: SafeItemStack?, durationMillis: Long) {
         endOfBlink = System.currentTimeMillis() + durationMillis
         blinkItem = item
     }
 
-    fun ItemStack.checkBlinkItem(): ItemStack {
+    fun SafeItemStack.checkBlinkItem(): SafeItemStack {
         val stack = blinkItem ?: return this
         if (System.currentTimeMillis() > endOfBlink) return this
 

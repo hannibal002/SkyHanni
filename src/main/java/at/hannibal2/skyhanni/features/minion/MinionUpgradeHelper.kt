@@ -20,12 +20,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.player.Inventory
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 object MinionUpgradeHelper {
     private val config get() = SkyHanniMod.feature.misc.minions
 
-    private var displayItem: ItemStack? = null
+    private var displayItem: SafeItemStack? = null
     private var itemsNeeded: Int = 0
     private var internalName: NeuInternalName? = null
     private var itemsInSacks: Int = 0
@@ -97,9 +97,9 @@ object MinionUpgradeHelper {
         displayItem = null
     }
 
-    private fun createDisplayItem(internalName: NeuInternalName): ItemStack {
+    private fun createDisplayItem(internalName: NeuInternalName): SafeItemStack {
         val lore = createLore(internalName)
-        return ItemStack(Blocks.DIAMOND_BLOCK).setLoreString(lore).setCustomItemName("§bGet Required Items")
+        return SafeItemStack(Blocks.DIAMOND_BLOCK).setLoreString(lore).setCustomItemName("§bGet Required Items")
     }
 
     private fun createLore(internalName: NeuInternalName): List<String> {

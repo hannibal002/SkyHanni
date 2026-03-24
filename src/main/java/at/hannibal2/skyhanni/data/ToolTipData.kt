@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 
 // Please use ToolTipTextEvent over ToolTipEvent, ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
@@ -30,7 +30,7 @@ object ToolTipData {
     @JvmStatic
     fun processModernTooltip(
         context: GuiGraphics,
-        stack: ItemStack,
+        stack: SafeItemStack,
         originalToolTip: MutableList<Component>,
     ): MutableList<Component> {
         val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
@@ -56,7 +56,7 @@ object ToolTipData {
     }
 
     @JvmStatic
-    fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {
+    fun getTooltip(stack: SafeItemStack, toolTip: MutableList<String>) {
         val slot = lastSlot ?: return
         val itemStack = slot.item ?: return
         try {

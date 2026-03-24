@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
@@ -22,7 +23,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import java.text.DecimalFormat
 import kotlin.math.min
@@ -172,7 +172,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
     }
 
-    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
+    fun renderItemAndBackground(item: SafeItemStack, x: Int, y: Int, color: Int) {
         DrawContextUtils.drawItem(item, x, y)
         drawRect(x, y, x + 16, y + 16, color)
     }
@@ -326,7 +326,7 @@ object GuiRenderUtils {
     /**
      * Wrapper for rendering an item on screen, with the config pre-built.
      */
-    fun ItemStack.renderOnScreen(
+    fun SafeItemStack.renderOnScreen(
         x: Float,
         y: Float,
         config: ItemRenderableConfig,
@@ -346,7 +346,7 @@ object GuiRenderUtils {
      * rendered using the normal method (either is static, or 'small')
      */
     @Suppress("unused")
-    fun ItemStack.renderOnScreen(
+    fun SafeItemStack.renderOnScreen(
         x: Float,
         y: Float,
         scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -421,7 +421,7 @@ object GuiRenderUtils {
         return newRenderState.stableId
     }
 
-    private fun ItemStack.normalRenderOnScreen(
+    private fun SafeItemStack.normalRenderOnScreen(
         translateX: Float,
         translateY: Float,
         scale: Float

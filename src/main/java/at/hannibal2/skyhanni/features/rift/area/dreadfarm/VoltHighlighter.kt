@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -25,7 +26,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -95,7 +95,7 @@ object VoltHighlighter {
         DOING_LIGHTNING(ChromaColour.fromStaticRGB(0, 0, 255, 128)),
     }
 
-    private fun getVoltState(itemStack: ItemStack): VoltState {
+    private fun getVoltState(itemStack: SafeItemStack): VoltState {
         return when (itemStack.getSkullTexture()) {
             VOLT_DOING_LIGHTNING -> VoltState.DOING_LIGHTNING
             VOLT_FRIENDLY -> VoltState.FRIENDLY

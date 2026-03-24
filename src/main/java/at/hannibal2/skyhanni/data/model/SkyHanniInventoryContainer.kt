@@ -2,18 +2,18 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 
 class SkyHanniInventoryContainer(
     @Expose val internalName: String,
     @Expose val rowSize: Int,
-    @Expose var items: List<ItemStack?>,
+    @Expose var items: List<SafeItemStack?>,
     @Expose var displayName: String = internalName,
     @Expose val primaryCords: LorenzVec? = null,
     @Expose val secondaryCords: LorenzVec? = null,

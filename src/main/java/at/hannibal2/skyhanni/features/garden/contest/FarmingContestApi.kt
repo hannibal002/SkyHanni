@@ -16,13 +16,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -140,11 +140,11 @@ object FarmingContestApi {
         return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }
 
-    fun addContest(time: Long, item: ItemStack) {
+    fun addContest(time: Long, item: SafeItemStack) {
         contests.putIfAbsent(time, createContest(time, item))
     }
 
-    private fun createContest(time: Long, item: ItemStack): FarmingContest {
+    private fun createContest(time: Long, item: SafeItemStack): FarmingContest {
         val lore = item.getLore()
 
         val crop = cropPattern.firstMatcher(lore) {

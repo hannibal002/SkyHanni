@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
@@ -23,7 +24,6 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
@@ -48,12 +48,12 @@ open class Enchant : Comparable<Enchant> {
     val config by lazy { SkyHanniMod.feature.inventory.enchantParsing }
     val advanced by lazy { config.advancedEnchantColors }
 
-    open fun getComponent(level: Int, itemStack: ItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
+    open fun getComponent(level: Int, itemStack: SafeItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
         val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
         return Component.literal(text).setStyle(getStyle(level, itemStack))
     }
 
-    open fun getStyle(level: Int, itemStack: ItemStack? = null): Style {
+    open fun getStyle(level: Int, itemStack: SafeItemStack? = null): Style {
         val colorProperty: Property<out Any> = when {
             level >= maxLevel -> if (advanced.useAdvancedPerfectColor.get()) advanced.advancedPerfectColor else config.perfectEnchantColor
             level > goodLevel -> if (advanced.useAdvancedGreatColor.get()) advanced.advancedGreatColor else config.greatEnchantColor
@@ -92,9 +92,9 @@ open class Enchant : Comparable<Enchant> {
      * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
      *
      * @param level The level of the enchant currently being parsed
-     * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
+     * @param itemStack The SafeItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
-    private fun checkExceptions(level: Int, itemStack: ItemStack?): Style? {
+    private fun checkExceptions(level: Int, itemStack: SafeItemStack?): Style? {
         val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()
         val itemName = internalName?.repoItemName?.removeColor()
@@ -138,7 +138,7 @@ open class Enchant : Comparable<Enchant> {
     class Normal : Enchant()
 
     class Ultimate : Enchant() {
-        override fun getStyle(level: Int, itemStack: ItemStack?): Style {
+        override fun getStyle(level: Int, itemStack: SafeItemStack?): Style {
             return if (advanced.useAdvancedUltimateColor.get()) {
                 Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
             } else {
@@ -163,7 +163,7 @@ open class Enchant : Comparable<Enchant> {
 
         override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
 
-        fun progressString(item: ItemStack): String {
+        fun progressString(item: SafeItemStack): String {
             val nbtKey = nbtNum ?: return ""
             val levels = stackLevel ?: return ""
             val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
@@ -183,7 +183,7 @@ open class Enchant : Comparable<Enchant> {
 
         // Ensures enchants not yet in repo stay as vanilla formatting
         // (instead of that stupid dark red lowercase formatting *cough* sba *cough*)
-        override fun getComponent(level: Int, itemStack: ItemStack?, isRoman: Boolean, appendNewline: Boolean): Component {
+        override fun getComponent(level: Int, itemStack: SafeItemStack?, isRoman: Boolean, appendNewline: Boolean): Component {
             val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
             return Component.literal(text).withColor(ChatFormatting.BLUE)
         }

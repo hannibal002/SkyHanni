@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object PesthunterProfit {
@@ -66,13 +66,13 @@ object PesthunterProfit {
         display = buildRenderables(event.inventoryItems)
     }
 
-    private fun buildRenderables(items: Map<Int, ItemStack>) = buildList {
+    private fun buildRenderables(items: Map<Int, SafeItemStack>) = buildList {
         val table = items.mapNotNull { (slot, stack) -> readItem(slot, stack) }
         addString("§ePesthunter Shop Profit")
         add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
     }
 
-    private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
+    private fun readItem(slot: Int, item: SafeItemStack): DisplayTableEntry? {
         val itemName = item.hoverName.takeIf {
             it.string !in DENY_LIST_ITEMS && it.string.trim().isNotEmpty()
         } ?: return null
@@ -111,7 +111,7 @@ object PesthunterProfit {
         )
     }
 
-    private fun getRequiredItems(item: ItemStack): List<String> {
+    private fun getRequiredItems(item: SafeItemStack): List<String> {
         val lore = item.getLore().filter { !pestCostPattern.matches(it) }
 
         val startIndex = lore.indexOf("§7Cost") + 1
@@ -127,7 +127,7 @@ object PesthunterProfit {
         internalName.getPrice() * amount
     }
 
-    private fun getPestsCost(item: ItemStack): Int = pestCostPattern.firstMatcher(item.getLore()) {
+    private fun getPestsCost(item: SafeItemStack): Int = pestCostPattern.firstMatcher(item.getLore()) {
         group("pests")?.formatDoubleOrNull()?.toInt() ?: 0
     } ?: 0
 

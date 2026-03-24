@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.item.ItemStack
 
 /**
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
@@ -25,7 +25,7 @@ object DrawContextUtils {
             ErrorManager.skyHanniError("drawContext is null")
         }
 
-    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
+    fun drawItem(item: SafeItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
 
     fun setContext(context: GuiGraphics) {
         renderDepth++

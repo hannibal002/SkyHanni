@@ -4,38 +4,35 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 
 /**
- * Crash-safe replacement for `ItemStack(item)` construction in Minecraft 26.1+.
+ * Crash-safe drop-in replacement for [ItemStack] in Minecraft 26.1+.
  *
- * In 26.1, calling `ItemStack(item)` before item component data is bound throws
- * "Components not bound yet". Use `SafeItemStack(item)` instead — the `invoke`
- * operator guards creation behind a [componentsLoaded] check, returning
- * [ItemStack.EMPTY] when components are not yet ready.
+ * Use [SafeItemStack] everywhere you previously used [ItemStack] as a type.
+ * For construction, call `SafeItemStack(item)` instead of `ItemStack(item)` —
+ * the top-level factory functions below guard against "Components not bound yet"
+ * crashes by returning [ItemStack.EMPTY] when component data is not yet ready.
  *
- * Since [ItemStack] is final, [SafeItemStack] is an object with an `invoke` operator
- * that mirrors the [ItemStack] constructor signatures. The result is still a plain
- * [ItemStack], so it is usable anywhere [ItemStack] is accepted.
+ * Static access (`SafeItemStack.EMPTY`, etc.) works identically to [ItemStack].
  *
  * @see SafeItemStackUtils
  */
-object SafeItemStack {
+typealias SafeItemStack = ItemStack
 
-    private val componentsLoaded get() = SafeItemStackUtils.componentsLoaded
+/**
+ * Safely creates an [ItemStack] from [item] with [count].
+ * Returns [ItemStack.EMPTY] if components are not yet loaded.
+ */
+@Suppress("FunctionName")
+fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
+    if (!SafeItemStackUtils.componentsLoaded) return ItemStack.EMPTY
+    return ItemStack(item, count)
+}
 
-    /**
-     * Creates an [ItemStack] from [item] with [count].
-     * Returns [ItemStack.EMPTY] if components are not yet loaded.
-     */
-    operator fun invoke(item: Item, count: Int = 1): ItemStack {
-        if (!componentsLoaded) return ItemStack.EMPTY
-        return ItemStack(item, count)
-    }
-
-    /**
-     * Creates an [ItemStack] from [item] with [count], then applies [extraOps].
-     * Returns [ItemStack.EMPTY] if components are not yet loaded.
-     */
-    operator fun invoke(item: Item, count: Int = 1, extraOps: ItemStack.() -> Unit): ItemStack {
-        if (!componentsLoaded) return ItemStack.EMPTY
-        return ItemStack(item, count).also(extraOps)
-    }
+/**
+ * Safely creates an [ItemStack] from [item] with [count], then applies [extraOps].
+ * Returns [ItemStack.EMPTY] if components are not yet loaded.
+ */
+@Suppress("FunctionName")
+fun SafeItemStack(item: Item, count: Int = 1, extraOps: ItemStack.() -> Unit): SafeItemStack {
+    if (!SafeItemStackUtils.componentsLoaded) return ItemStack.EMPTY
+    return ItemStack(item, count).also(extraOps)
 }

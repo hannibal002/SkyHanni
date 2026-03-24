@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
@@ -83,7 +83,7 @@ object ReforgeHelper {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
-    private var itemToReforge: ItemStack? = null
+    private var itemToReforge: SafeItemStack? = null
     private var inventoryContainer: AbstractContainerMenu? = null
 
     private var currentReforge: ReforgeApi.Reforge? = null

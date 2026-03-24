@@ -10,16 +10,16 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AnvilApi {
     val inventory = InventoryDetector { name -> name == "Anvil" }
 
-    var left: ItemStack? = null
-    var right: ItemStack? = null
+    var left: SafeItemStack? = null
+    var right: SafeItemStack? = null
 
     // InventoryUpdatedEvent only reacts on packets from the server, but the anvil interactions are client side only
     @HandleEvent(priority = HandleEvent.HIGH)

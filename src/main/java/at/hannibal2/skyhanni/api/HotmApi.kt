@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +30,7 @@ object HotmApi {
 
     private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".toInternalName()
 
-    private val blueEggCache = TimeLimitedCache<ItemStack, Boolean>(10.0.seconds)
+    private val blueEggCache = TimeLimitedCache<SafeItemStack, Boolean>(10.0.seconds)
     val isBlueEggActive
         get() = InventoryUtils.getItemInHand()?.let {
             blueEggCache.getOrPut(it) {

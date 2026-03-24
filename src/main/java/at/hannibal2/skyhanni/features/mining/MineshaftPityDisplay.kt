@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -45,7 +46,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
@@ -362,7 +362,7 @@ object MineshaftPityDisplay {
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
-        val displayItem: ItemStack,
+        val displayItem: SafeItemStack,
     ) {
         MITHRIL(
             "Mithril",
@@ -388,19 +388,19 @@ object MineshaftPityDisplay {
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            ItemStack(Blocks.PACKED_ICE),
+            SafeItemStack(Blocks.PACKED_ICE),
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            ItemStack(Blocks.CLAY),
+            SafeItemStack(Blocks.CLAY),
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            ItemStack(Blocks.RED_SANDSTONE),
+            SafeItemStack(Blocks.RED_SANDSTONE),
         ),
 
         TITANIUM(

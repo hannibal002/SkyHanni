@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
@@ -16,7 +17,6 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
 import net.minecraft.world.inventory.MenuType
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object OtherInventoryData {
@@ -147,7 +147,7 @@ object OtherInventoryData {
         val windowId: Int,
         val title: String,
         val slotCount: Int,
-        val items: MutableMap<Int, ItemStack> = mutableMapOf(),
+        val items: MutableMap<Int, SafeItemStack> = mutableMapOf(),
         var fullyOpenedOnce: Boolean = false,
     )
 }

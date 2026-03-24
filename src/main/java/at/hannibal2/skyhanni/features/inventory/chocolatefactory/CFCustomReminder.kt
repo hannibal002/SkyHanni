@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFCustomReminder {
@@ -113,7 +113,7 @@ object CFCustomReminder {
     }
 
     // TODO add support for prestige
-    private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
+    private fun getCostAndName(item: SafeItemStack): Pair<Long, String>? {
         val list = item.getLore()
         val cost = CFApi.getChocolateBuyCost(list)
             ?: return milestoneCostLorePattern.firstMatcher(list) {

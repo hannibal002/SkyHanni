@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessageTag
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ItemStack
 import java.net.URI
 import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
@@ -163,7 +163,7 @@ var Component.hover: Component?
         value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
-var Component.stackHover: ItemStack?
+var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
     }?.let { (it as HoverEvent.ShowItem).item /*? if >= 26.1 {*/ /*.create() *//*?}*/ }

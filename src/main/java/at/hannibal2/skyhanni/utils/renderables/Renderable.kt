@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
@@ -42,7 +43,6 @@ import net.minecraft.client.gui.screens.PauseScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.max
 
@@ -93,7 +93,7 @@ interface Renderable {
             is Renderable -> any
             is String -> text(any)
             is Component -> text(any)
-            is ItemStack -> item(any) { scale = itemScale }
+            is SafeItemStack -> item(any) { scale = itemScale }
             else -> null
         }
 
@@ -254,7 +254,7 @@ interface Renderable {
             content: Any,
             tips: List<Any>,
             highlightsOnHoverSlots: List<Int> = listOf(),
-            stack: ItemStack? = null,
+            stack: SafeItemStack? = null,
             color: LorenzColor? = null,
             spacedTitle: Boolean = false,
             bypassChecks: Boolean = false,

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object FusionData {
@@ -26,7 +26,7 @@ object FusionData {
         currentFusionData = CurrentFusionData(firstShard, secondShard, outputShard)
     }
 
-    private fun processShard(stack: ItemStack?): FusionShard? {
+    private fun processShard(stack: SafeItemStack?): FusionShard? {
         val internalName = stack?.getInternalNameOrNull() ?: return null
         val amount = AttributeShardsData.requiredToFusePattern.firstMatcher(stack.getLore()) {
             group("amount").toInt()

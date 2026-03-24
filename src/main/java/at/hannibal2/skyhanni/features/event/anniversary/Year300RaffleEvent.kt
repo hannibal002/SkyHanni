@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -29,7 +29,7 @@ object Year300RaffleEvent {
     val ORANGE_CAKE = "EPOCH_CAKE_ORANGE".toInternalName()
 
     private val config get() = SkyHanniMod.feature.event.century
-    private val displayItem by lazy { ORANGE_CAKE.getItemStackOrNull() ?: ItemStack(Items.CLOCK) }
+    private val displayItem by lazy { ORANGE_CAKE.getItemStackOrNull() ?: SafeItemStack(Items.CLOCK) }
 
     private var lastTimerReceived = SimpleTimeMark.farPast()
     private var lastTimeAlerted = SimpleTimeMark.farPast()

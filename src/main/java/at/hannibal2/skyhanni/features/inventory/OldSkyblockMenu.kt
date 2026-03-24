@@ -15,12 +15,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.reflect.KFunction
 
@@ -89,7 +89,7 @@ object OldSkyblockMenu {
         private val itemData: ItemData,
         val requiresBoosterCookie: Boolean = true,
         var disabled: Boolean = false,
-        private val extraItemBuilding: ((ItemStack) -> ItemStack)? = null,
+        private val extraItemBuilding: ((SafeItemStack) -> SafeItemStack)? = null,
     ) {
         TRADES(
             HypixelCommands::trades,
@@ -159,8 +159,8 @@ object OldSkyblockMenu {
 
         val item get() = if (showWarning) itemWithCookieWarning else itemWithoutCookieWarning
         private val showWarning get() = requiresBoosterCookie && !BitsApi.hasCookieBuff()
-        private val itemWithCookieWarning: ItemStack by lazy { createItem(true) }
-        private val itemWithoutCookieWarning: ItemStack by lazy { createItem(false) }
+        private val itemWithCookieWarning: SafeItemStack by lazy { createItem(true) }
+        private val itemWithoutCookieWarning: SafeItemStack by lazy { createItem(false) }
 
         private fun buildLore(showCookieWarning: Boolean) = buildList {
             displayDescription.map { "§7$it" }.forEach { add(it) }
@@ -171,7 +171,7 @@ object OldSkyblockMenu {
             } else add("§eClick to execute /${command.name.lowercase()}")
         }
 
-        private fun createItem(showCookieWarning: Boolean): ItemStack {
+        private fun createItem(showCookieWarning: Boolean): SafeItemStack {
             val name = "§a$displayName"
             val lore = buildLore(showCookieWarning)
             val baseItem = when (itemData) {

@@ -14,6 +14,7 @@ class CompatRuleSetProvider : RuleSetProvider {
             ruleSetId,
             listOf(
                 MinecraftCompat(config),
+                VanillaItemStackImport(config),
             ),
         )
     }

@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -109,7 +109,7 @@ object GardenVisitorTooltip {
      * Called by VisitorListener when tooltip is rendered.
      * Modifies the tooltip to show calculated prices and times.
      */
-    fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
+    fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: MutableList<String>) {
         if (itemStack.cleanName() != "Accept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
@@ -125,7 +125,7 @@ object GardenVisitorTooltip {
      */
     // TODO throw an axe on this function to split it up
     @Suppress("LongMethod", "CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
-    private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: ItemStack?, toolTip: MutableList<String>) {
+    private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack?, toolTip: MutableList<String>) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
 
         var totalPrice = 0.0

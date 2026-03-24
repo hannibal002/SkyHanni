@@ -18,12 +18,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO: Split reading into ExperimentationSuperpairApi, leaving display to just use the data
@@ -320,7 +320,7 @@ object SuperpairDataDisplay {
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =
         ((currentExperiment.gridSize - 2) / 2) - currentFoundData.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
 
-    private fun ItemStack.convertToReward() = when {
+    private fun SafeItemStack.convertToReward() = when {
         guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
         hoverName.string.removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
         else -> hoverName.string.removeColor()
@@ -353,7 +353,7 @@ object SuperpairDataDisplay {
 
     private fun isReward(reward: String) = rewardPattern.matches(reward) || isPowerUp(reward)
 
-    private fun isMiscReward(item: ItemStack) = item.getInternalNameOrNull() in ExperimentationTableApi.miscRepoRewards
+    private fun isMiscReward(item: SafeItemStack) = item.getInternalNameOrNull() in ExperimentationTableApi.miscRepoRewards
 
     private fun isWaiting(itemName: String) = waitingMessagesPattern.matches(itemName)
 

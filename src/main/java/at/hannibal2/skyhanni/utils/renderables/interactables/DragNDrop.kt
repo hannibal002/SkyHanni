@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.decorators.RenderableDecoratorOnlyRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object DragNDrop {
     private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
     private val invalidItem by lazy {
-        Renderable.item(ItemStack(Blocks.BARRIER)) { scale = 1.0 }
+        Renderable.item(SafeItemStack(Blocks.BARRIER)) { scale = 1.0 }
     }
 
     @HandleEvent
@@ -87,14 +87,14 @@ object DragNDrop {
     }
 }
 
-fun ItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<ItemStack> {
+fun SafeItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<SafeItemStack> {
 
     val render = Renderable.item(this@toDragItem) {
         this.scale = scale
         xSpacing = 0
     }
 
-    override fun get(): ItemStack = this@toDragItem
+    override fun get(): SafeItemStack = this@toDragItem
 
     override fun onRender(mouseX: Int, mouseY: Int) = render.render(mouseX, mouseY)
 }

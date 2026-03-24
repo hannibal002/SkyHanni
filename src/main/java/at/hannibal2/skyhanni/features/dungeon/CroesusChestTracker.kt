@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
@@ -39,7 +40,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.days
 
@@ -153,7 +153,7 @@ object CroesusChestTracker {
         kismetAmountCache = getKismetAmount()
     }
 
-    private fun checkChests(inventory: Map<Int, ItemStack?>) {
+    private fun checkChests(inventory: Map<Int, SafeItemStack?>) {
         for ((run, item) in inventory.mapNotNull { (key, value) -> runSlots(key, value) }) {
             if (item == null) {
                 run.setValuesNull()
@@ -331,7 +331,7 @@ object CroesusChestTracker {
         else -> null
     }?.let { it + currentPage * 28 }
 
-    private fun ItemStack.isArrow() = this.item == Items.ARROW
+    private fun SafeItemStack.isArrow() = this.item == Items.ARROW
 
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }

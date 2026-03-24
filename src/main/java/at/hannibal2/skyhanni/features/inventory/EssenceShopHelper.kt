@@ -27,11 +27,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
@@ -64,7 +64,7 @@ object EssenceShopHelper {
     private var essenceOwned: Int = 0
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
-    private var infoItemStack: ItemStack? = null
+    private var infoItemStack: SafeItemStack? = null
 
     private val patternGroup = RepoPattern.group("inventory.essence-shop-helper")
 
@@ -260,7 +260,7 @@ object EssenceShopHelper {
         }
     }
 
-    private fun processEssenceShopUpgrades(essenceName: String, inventoryItems: Map<Int, ItemStack>) {
+    private fun processEssenceShopUpgrades(essenceName: String, inventoryItems: Map<Int, SafeItemStack>) {
         val purchasedUpgrades = EssenceUtils.extractPurchasedUpgrades(inventoryItems, SLOT_RANGE)
         currentProgress = EssenceShopProgress(essenceName, purchasedUpgrades)
     }

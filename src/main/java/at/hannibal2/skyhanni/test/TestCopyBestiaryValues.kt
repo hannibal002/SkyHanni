@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object TestCopyBestiaryValues {
@@ -69,7 +69,7 @@ object TestCopyBestiaryValues {
         copy(titleItem, event.inventoryItems)
     }
 
-    private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
+    private fun copy(titleItem: SafeItemStack, inventoryItems: Map<Int, SafeItemStack>) {
         val titleName = titleItem.hoverName.formattedTextCompatLeadingWhiteLessResets().removeWordsAtEnd(1)
 
         val obj = BestiaryObject()

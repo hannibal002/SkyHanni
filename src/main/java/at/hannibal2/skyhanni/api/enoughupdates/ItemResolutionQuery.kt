@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -34,7 +35,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 // Code taken from NotEnoughUpdates
@@ -178,7 +178,7 @@ class ItemResolutionQuery {
         }
     }
 
-    fun withItemStack(stack: ItemStack): ItemResolutionQuery {
+    fun withItemStack(stack: SafeItemStack): ItemResolutionQuery {
         this.itemType = stack.item
         this.compound = stack.components
         return this
@@ -389,7 +389,7 @@ class ItemResolutionQuery {
         return EnoughUpdatesManager.getItemById(internalName)
     }
 
-    fun resolveToItemStack(): ItemStack? {
+    fun resolveToItemStack(): SafeItemStack? {
         val neuItem = resolveToItemJson() ?: return null
         return EnoughUpdatesManager.neuItemToStack(neuItem)
     }

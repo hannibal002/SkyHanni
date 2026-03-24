@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
@@ -31,7 +32,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
@@ -172,7 +172,7 @@ object EntityUtils {
 
     fun Player.isNpc() = !isRealPlayer()
 
-    fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    fun LivingEntity.getArmorInventory(): Array<SafeItemStack?>? {
         if (this !is Player) return null
         return buildList {
             add(inventory.equipment.get(EquipmentSlot.FEET).orNull())

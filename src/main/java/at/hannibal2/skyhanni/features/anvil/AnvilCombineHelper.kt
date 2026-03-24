@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object AnvilCombineHelper {
@@ -27,7 +27,7 @@ object AnvilCombineHelper {
         highlightedSlots = updateSlots(AnvilApi.left, AnvilApi.right)
     }
 
-    private fun updateSlots(left: ItemStack?, right: ItemStack?): Set<Int> {
+    private fun updateSlots(left: SafeItemStack?, right: SafeItemStack?): Set<Int> {
         if (!isEnabled()) return emptySet()
 
         val leftStack = left?.getInternalName()

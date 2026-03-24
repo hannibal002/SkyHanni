@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
@@ -43,8 +43,8 @@ object CarnivalShopHelper {
     private var currentEventType: String = ""
     private var tokensOwned: Int = 0
     private var tokensNeeded: Int = 0
-    private var overviewInfoItemStack: ItemStack? = null
-    private var shopSpecificInfoItemStack: ItemStack? = null
+    private var overviewInfoItemStack: SafeItemStack? = null
+    private var shopSpecificInfoItemStack: SafeItemStack? = null
 
     private val patternGroup = RepoPattern.group("inventory.carnival-shop-helper")
 
@@ -249,7 +249,7 @@ object CarnivalShopHelper {
         return false
     }
 
-    private fun processEventShopUpgrades(inventoryItems: Map<Int, ItemStack>) {
+    private fun processEventShopUpgrades(inventoryItems: Map<Int, SafeItemStack>) {
         val purchasedUpgrades = EssenceUtils.extractPurchasedUpgrades(inventoryItems, SLOT_RANGE)
         currentProgress = EventShopProgress(currentEventType, purchasedUpgrades)
     }

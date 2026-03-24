@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CropAccessoryData {
@@ -56,7 +56,7 @@ object CropAccessoryData {
         }
     }
 
-    private fun bestCropAccessory(items: Collection<ItemStack>) =
+    private fun bestCropAccessory(items: Collection<SafeItemStack>) =
         items.mapNotNull { item -> CropAccessory.getByName(item.getInternalName()) }
             .maxOrNull() ?: CropAccessory.NONE
 

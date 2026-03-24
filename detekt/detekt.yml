@@ -8,6 +8,8 @@ GrammarRules:
 CompatRules:
     MinecraftCompat:
         active: true
+    VanillaItemStackImport:
+        active: true
 
 FormattingRules:
     CustomCommentSpacing:

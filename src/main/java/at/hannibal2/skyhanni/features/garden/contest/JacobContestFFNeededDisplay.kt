@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import net.minecraft.world.item.ItemStack
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -28,7 +28,7 @@ object JacobContestFFNeededDisplay {
     private val config get() = GardenApi.config.jacobContest
     private var display = emptyList<Renderable>()
     private var lastToolTipTime = SimpleTimeMark.farPast()
-    private val cache = mutableMapOf<ItemStack, List<Renderable>>()
+    private val cache = mutableMapOf<SafeItemStack, List<Renderable>>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {

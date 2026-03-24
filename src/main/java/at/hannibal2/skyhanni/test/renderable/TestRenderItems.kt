@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.renderables.ItemStackDirectProvider.Companion.asProvider
 import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.C
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.core.Direction.Axis
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 
@@ -47,10 +47,10 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
     )
     private val itemProviders: List<ItemStackProvider> by lazy {
         listOf(
-            ItemStack(Blocks.GLASS_PANE).asProvider(),
-            ItemStack(Items.DIAMOND_SWORD).asProvider(),
-            ItemStack(Items.PLAYER_HEAD).asProvider(),
-            ItemStack(Blocks.MELON).asProvider(),
+            SafeItemStack(Blocks.GLASS_PANE).asProvider(),
+            SafeItemStack(Items.DIAMOND_SWORD).asProvider(),
+            SafeItemStack(Items.PLAYER_HEAD).asProvider(),
+            SafeItemStack(Blocks.MELON).asProvider(),
             bambooProvider
         )
     }
@@ -108,7 +108,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                 table(tableContent),
                 horizontal(
                     text("Default:").renderBounds(),
-                    item(ItemStack(Items.DIAMOND_SWORD)).renderBounds(),
+                    item(SafeItemStack(Items.DIAMOND_SWORD)).renderBounds(),
                     spacing = 1,
                 ),
             ),

@@ -16,11 +16,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -58,7 +58,7 @@ object LimboPlaytime {
 
     private val itemID = "ENDER_PEARL".toInternalName()
     private const val ITEM_NAME = "§aLimbo"
-    private lateinit var limboItem: ItemStack
+    private lateinit var limboItem: SafeItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
     @HandleEvent

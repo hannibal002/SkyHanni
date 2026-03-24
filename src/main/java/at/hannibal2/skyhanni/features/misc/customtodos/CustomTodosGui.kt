@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 // Taken and modified from Not Enough Updates https://github.com/NotEnoughUpdates/NotEnoughUpdates
@@ -96,8 +96,8 @@ object CustomTodosGui {
         }
     }
 
-    fun parseItem(icon: String): ItemStack {
-        if (icon.isEmpty()) return ItemStack(Items.PAINTING)
+    fun parseItem(icon: String): SafeItemStack {
+        if (icon.isEmpty()) return SafeItemStack(Items.PAINTING)
         return NeuInternalName.fromItemName(icon).getItemStack()
     }
 

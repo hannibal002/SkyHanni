@@ -19,9 +19,7 @@ import org.spongepowered.asm.mixin.Unique;*/
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
 
-    //? if < 26.1 {
-    /*nothing needed*/
-    //?} else {
+    //? if > 1.21.11 {
     /*@Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 

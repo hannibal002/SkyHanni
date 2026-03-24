@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -44,7 +45,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
@@ -376,7 +376,7 @@ object FarmingFortuneDisplay {
         }
     }
 
-    fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
+    fun getToolFortune(tool: SafeItemStack?): Double = getToolFortune(tool?.getInternalName())
     fun getToolFortune(internalName: NeuInternalName?): Double {
         if (internalName == null) return 0.0
         val string = internalName.asString()
@@ -398,17 +398,17 @@ object FarmingFortuneDisplay {
         }
     }
 
-    fun getTurboCropFortune(tool: ItemStack?, cropType: CropType?): Double {
+    fun getTurboCropFortune(tool: SafeItemStack?, cropType: CropType?): Double {
         val crop = cropType ?: return 0.0
         return tool?.getHypixelEnchantments()?.get(crop.getTurboCrop())?.let { it * 5.0 } ?: 0.0
     }
 
-    fun getCollectionFortune(tool: ItemStack?): Double {
+    fun getCollectionFortune(tool: SafeItemStack?): Double {
         val string = tool?.getLore()?.nextAfter("§6Collection Analysis", 3) ?: return 0.0
         return collectionPattern.matchMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
     }
 
-    fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
+    fun getDedicationFortune(tool: SafeItemStack?, cropType: CropType?): Double {
         if (cropType == null) return 0.0
         val dedicationLevel = tool?.getHypixelEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
@@ -416,12 +416,12 @@ object FarmingFortuneDisplay {
         return dedicationMultiplier * cropMilestone
     }
 
-    fun getSunderFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("sunder") ?: 0) * 12.5
-    fun getHarvestingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("harvesting") ?: 0) * 12.5
-    fun getCultivatingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("cultivating") ?: 0) * 2.0
-    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("pesterminator") ?: 0) * 2.0
+    fun getSunderFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("sunder") ?: 0) * 12.5
+    fun getHarvestingFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("harvesting") ?: 0) * 12.5
+    fun getCultivatingFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("cultivating") ?: 0) * 2.0
+    fun getPesterminatorFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("pesterminator") ?: 0) * 2.0
 
-    fun getAbilityFortune(item: ItemStack?) = item?.let {
+    fun getAbilityFortune(item: SafeItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())
     } ?: 0.0
 
@@ -446,7 +446,7 @@ object FarmingFortuneDisplay {
         return 0.0
     }
 
-    fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
+    fun loadFortuneLineData(tool: SafeItemStack?, enchantmentFortune: Double) {
         displayedFortune = 0.0
         reforgeFortune = 0.0
         gemstoneFortune = 0.0

@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object BazaarOrderHelper {
@@ -57,7 +57,7 @@ object BazaarOrderHelper {
     )
 
 
-    private fun load(inventoryItems: Map<Int, ItemStack>): Map<Int, LorenzColor> {
+    private fun load(inventoryItems: Map<Int, SafeItemStack>): Map<Int, LorenzColor> {
         val slots = mutableMapOf<Int, LorenzColor>()
         val errorItems = mutableSetOf<NeuInternalName>()
         for ((slot, stack) in inventoryItems) {
@@ -92,7 +92,7 @@ object BazaarOrderHelper {
 
     private fun highlightItem(
         slot: Int,
-        stack: ItemStack,
+        stack: SafeItemStack,
         buyOrSell: Pair<Boolean, Boolean>,
         data: BazaarData,
         map: MutableMap<Int, LorenzColor>,

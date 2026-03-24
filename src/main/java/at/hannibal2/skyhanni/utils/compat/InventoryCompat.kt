@@ -5,6 +5,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.compat.ReiCompat
 //?}
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -12,17 +13,16 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-fun LocalPlayer.getItemOnCursor(): ItemStack? {
+fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
     val stack = this.containerMenu?.carried
     if (stack?.isEmpty == true) return null
     return stack
 }
 
-fun stackUnderCursor(): ItemStack? {
+fun stackUnderCursor(): SafeItemStack? {
     val screen = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return null
     var stack = screen.hoveredSlot?.item
     if (stack != null) return stack
@@ -73,14 +73,14 @@ object InventoryCompat {
     fun getWindowId(): Int =
         getWindowIdOrNull() ?: ErrorManager.skyHanniError("windowId is null")
 
-    fun Array<ItemStack?>?.filterNotNullOrEmpty(): List<ItemStack>? {
+    fun Array<SafeItemStack?>?.filterNotNullOrEmpty(): List<SafeItemStack>? {
         return this?.filterNotNull()?.filter { it.isNotEmpty() }
     }
 
-    fun Array<ItemStack?>?.convertEmptyToNull(): Array<ItemStack?>? {
+    fun Array<SafeItemStack?>?.convertEmptyToNull(): Array<SafeItemStack?>? {
         if (this == null) return null
         if (this.isEmpty()) return this
-        val new: MutableList<ItemStack?> = mutableListOf()
+        val new: MutableList<SafeItemStack?> = mutableListOf()
         for (stack in this) {
             if (!stack.isNotEmpty()) new.add(null)
             else new.add(stack)
@@ -89,7 +89,7 @@ object InventoryCompat {
     }
 
     @OptIn(ExperimentalContracts::class)
-    fun ItemStack?.isNotEmpty(): Boolean {
+    fun SafeItemStack?.isNotEmpty(): Boolean {
         contract {
             returns(true) implies (this@isNotEmpty != null)
         }
@@ -97,7 +97,7 @@ object InventoryCompat {
         return !this.isEmpty
     }
 
-    fun ItemStack?.orNull(): ItemStack? {
+    fun SafeItemStack?.orNull(): SafeItemStack? {
         return this?.takeUnless { it.isEmpty }
     }
 }

@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CarrolynHelper {
@@ -43,7 +43,7 @@ object CarrolynHelper {
         event.toolTip.add("§eClick to navigate to Carrolyn!")
     }
 
-    private fun ItemStack?.isCarrolynItem() = this?.getLore()?.any { lorePattern.matches(it) } ?: false
+    private fun SafeItemStack?.isCarrolynItem() = this?.getLore()?.any { lorePattern.matches(it) } ?: false
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
