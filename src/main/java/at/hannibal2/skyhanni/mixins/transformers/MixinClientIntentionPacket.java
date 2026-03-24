@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 //TODO: REMOVE THIS!!!!!!
+//? if > 1.21.11 {
 @Mixin(ClientIntentionPacket.class)
 public class MixinClientIntentionPacket {
     @ModifyVariable(
@@ -18,3 +19,4 @@ public class MixinClientIntentionPacket {
         return 775;
     }
 }
+//? }
