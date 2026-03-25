@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -66,6 +67,7 @@ object AchievementManager {
                 }
                 append("!")
                 hover = achievement.description
+                command = "/shachievements"
             }
         )
 
@@ -107,7 +109,7 @@ object AchievementManager {
             description = "Shows your current achievement progress"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.name != null}
+                val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.name != null }
                 TextHelper.displayPaginatedList(
                     "SkyHanni Achievements!",
                     achievementList,
@@ -119,8 +121,7 @@ object AchievementManager {
                             append("???") {
                                 withColor(ChatFormatting.DARK_GRAY)
                             }
-                        }
-                        else {
+                        } else {
                             append(achievement.name)
                         }
                         if (achievement.data.achieved) {
