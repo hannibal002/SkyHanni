@@ -297,7 +297,7 @@ tasks.jar {
     archiveClassifier.set("nodeps")
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
-tasks.assemble.get()/*.dependsOn(tasks.remapJar)*/
+tasks.assemble.get().dependsOn(tasks.shadowJar)
 
 if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {
