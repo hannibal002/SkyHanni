@@ -81,16 +81,10 @@ object PestSpawnTimer {
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    private fun getCustomCooldownTime(): Duration {
-        val config = if (Perk.PEST_ERADICATOR.isActive) {
-            config.customCooldownTimeFinnegan
-        } else {
-            config.customCooldownTime
-        }
-
-        return config.get().seconds
-    }
-
+    private fun getCustomCooldownTime(): Duration = with(config) {
+        if (Perk.PEST_ERADICATOR.isActive) customCooldownTimeFinnegan
+		else customCooldownTime
+    }.get().seconds
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
