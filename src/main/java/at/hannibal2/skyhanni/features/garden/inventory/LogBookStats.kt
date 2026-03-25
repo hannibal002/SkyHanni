@@ -58,7 +58,7 @@ object LogBookStats {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (IslandType.GARDEN_GUEST.isCurrent()) return
+        if (IslandType.GARDEN_GUEST.isInIsland()) return
         val inventoryName = event.inventoryName
         if (inventoryName != "Visitor's Logbook") return
 
@@ -95,7 +95,7 @@ object LogBookStats {
 
     @HandleEvent
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (IslandType.GARDEN_GUEST.isCurrent()) return
+        if (IslandType.GARDEN_GUEST.isInIsland()) return
         if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(
                 display,

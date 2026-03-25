@@ -222,7 +222,7 @@ object FastFairySoulsPathfinder {
                 }
             } ?: continue
 
-            if (island.isCurrent()) {
+            if (island.isInIsland()) {
                 data?.checkHaveAll()
             }
             totalFound[island] = found

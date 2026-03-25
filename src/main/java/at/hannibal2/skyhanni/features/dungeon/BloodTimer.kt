@@ -85,5 +85,5 @@ object BloodTimer {
         }
     }
 
-    private fun isEnabled() = SkyHanniMod.feature.dungeon.bloodCampTimer && IslandType.CATACOMBS.isCurrent()
+    private fun isEnabled() = SkyHanniMod.feature.dungeon.bloodCampTimer && IslandType.CATACOMBS.isInIsland()
 }

@@ -122,5 +122,5 @@ object DailyMiniBossHelper {
     }
 
     private fun getByDisplayName(name: String) = miniBosses.firstOrNull { it.displayName == name }
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.enabled.get()
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

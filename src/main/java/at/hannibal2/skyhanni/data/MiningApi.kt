@@ -193,19 +193,19 @@ object MiningApi {
 
     private var lastOreMinedTime = SimpleTimeMark.farPast()
 
-    fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isCurrent()
+    fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
 
-    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isCurrent() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
+    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isInIsland() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
 
-    fun inRegularDwarven() = IslandType.DWARVEN_MINES.isCurrent() && !inGlacialTunnels()
+    fun inRegularDwarven() = IslandType.DWARVEN_MINES.isInIsland() && !inGlacialTunnels()
 
-    fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
+    fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
 
     fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
 
-    fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
+    fun inMineshaft() = IslandType.MINESHAFT.isInIsland()
 
-    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
+    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
@@ -223,7 +223,7 @@ object MiningApi {
             }
         }
 
-        if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
+        if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             var found = false
             heatPattern.firstMatcher(event.new) {
                 found = true
@@ -534,9 +534,9 @@ object MiningApi {
         inMineshaft = inMineshaft()
         inDwarvenMines = inRegularDwarven()
         inCrystalHollows = inCrystalHollows()
-        inCrimsonIsle = IslandType.CRIMSON_ISLE.isCurrent()
-        inEnd = IslandType.THE_END.isCurrent()
-        inSpidersDen = IslandType.SPIDER_DEN.isCurrent()
+        inCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
+        inEnd = IslandType.THE_END.isInIsland()
+        inSpidersDen = IslandType.SPIDER_DEN.isInIsland()
 
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
     }

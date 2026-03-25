@@ -14,5 +14,5 @@ object ScoreboardEventBroodmother : ScoreboardEvent() {
 
     override val elementPatterns = listOf(SpidersDenApi.broodmotherPattern)
 
-    override fun showIsland() = IslandType.SPIDER_DEN.isCurrent()
+    override fun showIsland() = IslandType.SPIDER_DEN.isInIsland()
 }

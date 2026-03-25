@@ -201,7 +201,7 @@ object IslandGraphs {
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
     fun onAreaChange() {
-        if (!IslandType.DWARVEN_MINES.isCurrent()) {
+        if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
         }

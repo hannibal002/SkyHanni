@@ -91,5 +91,5 @@ object MineshaftWaypoints {
             }
     }
 
-    fun isEnabled() = IslandType.MINESHAFT.isCurrent() && config.mineshaftWaypoints.enabled
+    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.mineshaftWaypoints.enabled
 }

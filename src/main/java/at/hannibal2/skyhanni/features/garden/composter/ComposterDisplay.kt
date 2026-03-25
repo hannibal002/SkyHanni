@@ -193,7 +193,7 @@ object ComposterDisplay {
 
         if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
-        if (IslandType.GARDEN.isCurrent()) {
+        if (IslandType.GARDEN.isInIsland()) {
             ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(

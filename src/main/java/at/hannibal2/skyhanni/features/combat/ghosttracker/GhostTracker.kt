@@ -318,7 +318,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
-        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isCurrent()
+        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 

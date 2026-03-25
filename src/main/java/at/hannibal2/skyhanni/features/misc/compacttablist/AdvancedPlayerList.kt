@@ -151,7 +151,7 @@ object AdvancedPlayerList {
             if (nameSuffix.contains("♲")) ironman = true
             else bingoLevel = BingoApi.getRank(line)
 
-            if (IslandType.CRIMSON_ISLE.isCurrent()) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 CrimsonIsleFaction.entries.firstOrNull { it.isLine(line) }?.let {
                     faction = it
                     nameSuffix = nameSuffix.replace(it.pattern, "")
@@ -199,7 +199,7 @@ object AdvancedPlayerList {
             }
         }
 
-        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
             data.faction.icon?.let {
                 if (suffix.formattedTextCompat().removeColor().isNotBlank()) suffix.append(" ")
                 suffix.append(it)

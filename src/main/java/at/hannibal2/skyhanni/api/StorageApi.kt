@@ -97,7 +97,7 @@ object StorageApi {
             handleRead("Rift Storage $page", event.inventoryItemsWithNull.values)
             return
         }
-        if (!IslandType.PRIVATE_ISLAND.isCurrent() || !isPrivateIslandStorageEnabled()) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland() || !isPrivateIslandStorageEnabled()) return
         if (InventoryUtils.isInNormalChest(event.inventoryName)) {
             handlePrivateIslandRead(event.inventoryItemsWithNull.values)
         }

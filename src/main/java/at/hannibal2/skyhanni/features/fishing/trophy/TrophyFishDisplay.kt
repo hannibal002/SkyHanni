@@ -291,7 +291,7 @@ object TrophyFishDisplay {
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }
 
-    fun isEnabled() = (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile) && config.enabled.get()
+    fun isEnabled() = (IslandType.CRIMSON_ISLE.isInIsland() || SkyBlockUtils.isStrandedProfile) && config.enabled.get()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

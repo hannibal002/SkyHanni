@@ -104,7 +104,7 @@ object DailyQuestHelper {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
-            if (IslandType.CRIMSON_ISLE.isCurrent()) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 QuestLoader.loadFromTabList()
             }
         }
@@ -386,5 +386,5 @@ object DailyQuestHelper {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.enabled.get()
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.enabled.get()
 }

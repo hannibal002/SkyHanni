@@ -115,8 +115,10 @@ enum class IslandType(private val nameFallback: String) {
         }
     }
 
-    // TODO rename to isInIsland once the funciton in lorenz utils is gone
-    fun isCurrent() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
+    @Deprecated("old name", ReplaceWith("isInIsland()"))
+    fun isCurrent() = isInIsland()
+
+    fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
 }
 
 data class IslandData(

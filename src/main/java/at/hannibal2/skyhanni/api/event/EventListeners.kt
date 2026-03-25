@@ -107,7 +107,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
                 if (options.onlyOnIsland != IslandType.ANY) {
                     val island = options.onlyOnIsland
-                    add { _ -> island.isCurrent() }
+                    add { _ -> island.isInIsland() }
                 }
 
                 if (options.onlyOnIslands.isNotEmpty()) {

@@ -417,7 +417,7 @@ object InstanceChestProfit {
         add(Renderable.emptyText())
         add(Renderable.text("$color§lProfit $color${total.formatCoin()}"))
 
-        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
+        if (!IslandType.CATACOMBS.isInIsland() && !IslandType.KUUDRA_ARENA.isInIsland()) return@buildList
 
         add(Renderable.emptyText())
         add(Renderable.text("§d§lAll Chest Profits"))

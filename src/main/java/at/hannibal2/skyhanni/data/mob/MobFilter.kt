@@ -409,13 +409,13 @@ object MobFilter {
     private fun createBat(baseEntity: LivingEntity): MobResult? = when (baseEntity.baseMaxHealth.derpy()) {
         5_000_000 -> MobResult.found(MobFactories.basic(baseEntity, "Cinderbat"))
         75_000 -> MobResult.found(MobFactories.basic(baseEntity, "Thorn Bat"))
-        600 -> if (IslandType.GARDEN.isCurrent()) null else MobResult.notYetFound
+        600 -> if (IslandType.GARDEN.isInIsland()) null else MobResult.notYetFound
         100 -> MobResult.found(
             MobFactories.basic(
                 baseEntity,
                 when {
                     DungeonApi.inDungeon() -> "Dungeon Secret Bat"
-                    IslandType.PRIVATE_ISLAND.isCurrent() -> "Private Island Bat"
+                    IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
                     else -> "Mega Bat"
                 },
             ),

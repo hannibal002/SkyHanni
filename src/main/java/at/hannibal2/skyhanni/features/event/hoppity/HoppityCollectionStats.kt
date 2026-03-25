@@ -468,14 +468,14 @@ object HoppityCollectionStats {
 
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
-            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
+            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.RESIDENTS)) {
                 highlightMap[stack.hoverName.formattedTextCompatLeadingWhiteLessResets()] = HighlightRabbitTypes.RESIDENTS.color
             }
         }
 
         hotspotLocationPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
-            if (island.isCurrent() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
+            if (island.isInIsland() && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.HOTSPOTS)) {
                 highlightMap[stack.hoverName.formattedTextCompatLeadingWhiteLessResets()] = HighlightRabbitTypes.HOTSPOTS.color
             }
         }
