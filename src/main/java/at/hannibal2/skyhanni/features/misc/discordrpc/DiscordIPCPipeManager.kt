@@ -124,13 +124,14 @@ object DiscordIPCPipeManager {
             }
     }
 
-    private fun resolveUid(): String? = runCatching {
-        ProcessBuilder("id", "-u").start().inputStream.bufferedReader().readLine()?.trim()
-    }.getOrNull() ?: runCatching {
-        java.io.File("/proc/self/status").useLines { lines ->
-            lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
-        }
-    }.getOrNull()
+    private fun resolveUid(): String? =
+        System.getenv("XDG_RUNTIME_DIR")?.substringAfterLast('/')?.takeIf { it.isNotEmpty() && it.all(Char::isDigit) }
+            ?: runCatching { java.io.File("/proc/self/loginuid").readText().trim() }.getOrNull()
+            ?: runCatching {
+                java.io.File("/proc/self/status").useLines { lines ->
+                    lines.firstOrNull { it.startsWith("Uid:") }?.split("\t")?.getOrNull(1)
+                }
+            }.getOrNull()
 
     private fun readProcEnviron(): Map<String, String> = runCatching {
         java.io.File("/proc/self/environ").readBytes()

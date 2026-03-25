@@ -125,8 +125,6 @@ dependencies {
         mappings(target.mappingDependency)
     }
 
-    include(libs.junixsocket.common)
-    include(libs.junixsocket.native)
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
