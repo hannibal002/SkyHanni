@@ -83,9 +83,9 @@ object DiscordRPCManager {
             if (retryDelay != null) {
                 updateDebugStatus("Discord not detected, retrying in ${retryDelay.inWholeSeconds}s ${retryHelper.retriesLabel}")
 
-                retryJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc retry", timeout = Duration.INFINITE) {
+                retryJob = SkyHanniMod.launchNoScopeCoroutine("discord RPC retry", timeout = Duration.INFINITE) {
                     delay(retryDelay)
-                    val retryProgress = progressCategory.start("discord rpc autoretry ${retryHelper.currentRetry}")
+                    val retryProgress = progressCategory.start("discord RPC auto-retry ${retryHelper.currentRetry}")
                     start(retryProgress)
                 }
             } else {
@@ -162,8 +162,8 @@ object DiscordRPCManager {
 
     private fun setupPresenceJob(progress: ChatProgressUpdates) {
         progress.update("in setupPresenceJob")
-        var updatePresenceProgress: ChatProgressUpdates? = progressCategory.start("discord rpc updatePresence")
-        presenceJob = SkyHanniMod.launchNoScopeCoroutine("discord rpc updatePresence", timeout = Duration.INFINITE) {
+        var updatePresenceProgress: ChatProgressUpdates? = progressCategory.start("discord RPC updatePresence")
+        presenceJob = SkyHanniMod.launchNoScopeCoroutine("discord RPC updatePresence", timeout = Duration.INFINITE) {
             updatePresenceProgress?.update("started update presence loop first run")
             while (isConnected()) {
                 updatePresence(updatePresenceProgress)
@@ -255,7 +255,7 @@ object DiscordRPCManager {
         if (started || !isEnabled()) return
         if (SkyBlockUtils.inSkyBlock) {
             val progress = progressCategory.start("auto start in onTick")
-            SkyHanniMod.launchNoScopeCoroutine("discord rpc start", timeout = Duration.INFINITE) { start(progress) }
+            SkyHanniMod.launchNoScopeCoroutine("discord RPC start", timeout = Duration.INFINITE) { start(progress) }
             started = true
         }
     }
@@ -296,8 +296,8 @@ object DiscordRPCManager {
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             progress.end("launchCoroutine")
-            SkyHanniMod.launchCoroutine("discord rpc manual start") {
-                val startProgress = progressCategory.start("discord rpc manual start")
+            SkyHanniMod.launchCoroutine("discord RPC manual start") {
+                val startProgress = progressCategory.start("discord RPC manual start")
                 start(startProgress, true)
             }
 
@@ -306,7 +306,7 @@ object DiscordRPCManager {
             updateDebugStatus("Unable to start: ${e.message}", error = true)
             ErrorManager.logErrorWithData(
                 e,
-                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.",
+                "Unable to start Discord Rich Presence! Please report this on Discord and ping @NetheriteMiner.",
             )
         }
     }

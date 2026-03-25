@@ -118,7 +118,7 @@ object AgathaCouponProfit {
         )
     }
 
-    // TODO merge logic into core item utils logic, i think
+    // TODO merge logic into core item utils logic, I think
     private fun workOutInternalNameOrNull(item: ItemStack): Pair<NeuInternalName, Component>? {
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {

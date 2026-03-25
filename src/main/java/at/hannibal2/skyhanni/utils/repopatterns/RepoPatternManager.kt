@@ -57,7 +57,7 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    // idk what this is for
+    // I don't know what this is for
     private val insideTest = false
 
     var inTestDuplicateUsage = true

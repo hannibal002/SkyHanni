@@ -12,9 +12,9 @@ object ScoreboardEventRift : ScoreboardEvent() {
 
     private val importantPatterns = listOf(
         RiftBloodEffigies.heartsPattern,
-        ScoreboardPattern.riftHotdogTitlePattern,
+        ScoreboardPattern.riftHotDogTitlePattern,
         ScoreboardPattern.timeLeftPattern,
-        ScoreboardPattern.riftHotdogEatenPattern,
+        ScoreboardPattern.riftHotDogEatenPattern,
         ScoreboardPattern.riftAveikxPattern,
         ScoreboardPattern.riftHayEatenPattern,
         ScoreboardPattern.cluesPattern,

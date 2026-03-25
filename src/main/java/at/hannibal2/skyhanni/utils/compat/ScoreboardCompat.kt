@@ -20,7 +20,7 @@ fun Collection<PlayerScoreEntry>.getPlayerNames(scoreboard: Scoreboard): List<Co
                     else main.append(this)
                 }
                 // the soccer ball is because it is like that on 1.8
-                // this could be changed later but for now i think this is fine
+                // this could be changed later but for now I think this is fine
                 main.append("⚽")
                 team?.playerSuffix?.apply {
                     if (siblings.isNotEmpty()) siblings.forEach { sibling -> main.append(sibling) }

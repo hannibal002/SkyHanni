@@ -52,12 +52,12 @@ import kotlin.time.Duration.Companion.seconds
  * TODO
  * benefits of every island graphs:
  * global:
- * 	NEU's NPC's (auto acitvate when searching via neu)
+ * 	NEU's NPC's (auto activate when searching via neu)
  * 	races (end, park, winter, dungeon hub)
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
  * 	death location
- * 	% of island discvovered (every node was most closest node at least once)
+ * 	% of island discovered (every node was most closest node at least once)
  * hub:
  * 	12 starter NPC's
  * 	diana
@@ -72,7 +72,7 @@ import kotlin.time.Duration.Companion.seconds
  * 	relicts + throw spot
  * dwarven mines:
  * 	emissary
- * 	commssion areas
+ * 	commission areas
  * 	events: raffle, goblin slayer, donpieresso
  * deep
  * 	path to the bottom (Rhys NPC) (replace in DeepCavernsGuide.kt)
@@ -96,9 +96,9 @@ import kotlin.time.Duration.Companion.seconds
  *
  * Changes in graph editor:
  * 	fix rename not using tick but input event we have (+ create the input event in the first place)
- * 	toggle distance to node by node path lengh, instead of eye of sight lenght
+ * 	toggle distance to node by node path length, instead of eye of sight length
  * 	press test button again to enable "true test mode", with graph math and hiding other stuff
- * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
+ * 	option to compare two graphs, and store multiple graphs in the edit mode in parallel
  */
 
 @SkyHanniModule

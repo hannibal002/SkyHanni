@@ -44,7 +44,7 @@ object StorageApi {
      * REGEX-TEST: Ender Chest
      * REGEX-TEST: Ender Chest (1/9)
      */
-    private val enderchestPattern by RepoPattern.pattern(
+    private val enderChestPattern by RepoPattern.pattern(
         "storage.enderchest",
         "Ender Chest(?: \\((?<page>\\d+)/\\d+\\))?",
     )
@@ -67,7 +67,7 @@ object StorageApi {
     )
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
-    val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
+    val enderChest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
     val backpack: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Backpack", storage)
     val riftStorage: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Rift Storage", storage)
     private val mutableIslandChest: MutableMap<String, SkyHanniInventoryContainer>
@@ -82,7 +82,7 @@ object StorageApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        enderchestPattern.matchMatcher(event.inventoryName) {
+        enderChestPattern.matchMatcher(event.inventoryName) {
             val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return

@@ -131,7 +131,7 @@ value class Graph(
                 nodeData.position?.let { pos ->
                     val node = GraphNode(id, pos, nodeData.name, nodeData.tags, nodeData.extraWeight)
                     list.add(node)
-                    neighbourMap[node] = nodeData.neighbors
+                    neighbourMap[node] = nodeData.neighbours
                 }
             }
             return list to neighbourMap
@@ -141,7 +141,7 @@ value class Graph(
             var position: LorenzVec? = null,
             var name: String? = null,
             var tags: List<String> = emptyList(),
-            val neighbors: MutableList<Pair<Int, Double>> = mutableListOf(),
+            val neighbours: MutableList<Pair<Int, Double>> = mutableListOf(),
             var extraWeight: Int = 0,
         )
 
@@ -157,7 +157,7 @@ value class Graph(
                         LorenzVec(it[0].toDouble(), it[1].toDouble(), it[2].toDouble())
                     }
                     "ExtraWeight" -> data.extraWeight = reader.nextInt()
-                    "Neighbours" -> parseNeighbours(reader, data.neighbors)
+                    "Neighbours" -> parseNeighbours(reader, data.neighbours)
                     "Name" -> data.name = reader.nextString()
                     "Tags" -> data.tags = parseTags(reader)
                 }
@@ -165,9 +165,9 @@ value class Graph(
             return data
         }
 
-        private fun parseNeighbours(reader: JsonReader, neighbors: MutableList<Pair<Int, Double>>) {
+        private fun parseNeighbours(reader: JsonReader, neighbours: MutableList<Pair<Int, Double>>) {
             reader.beginObject()
-            while (reader.hasNext()) neighbors.add(reader.nextName().toInt() to reader.nextDouble())
+            while (reader.hasNext()) neighbours.add(reader.nextName().toInt() to reader.nextDouble())
             reader.endObject()
         }
 

@@ -104,16 +104,16 @@ object EliteFarmersLeaderboard {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (lastPassedMessage.passedSince() < 30.seconds) return
-        eliteLeaderboardData.forEach { lbtype ->
-            if (!getLeaderboardConfig(lbtype.key).showLbChange) return@forEach
-            val list = lbtype.value.passedPlayers
+        eliteLeaderboardData.forEach { lbType ->
+            if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
+            val list = lbType.value.passedPlayers
             if (list.isEmpty()) return@forEach
             if (list.size < 3) {
                 list.forEach { name ->
-                    farmingChatMessage("You passed §b$name §ein the §6${lbtype.key} §eLeaderboard!")
+                    farmingChatMessage("You passed §b$name §ein the §6${lbType.key} §eLeaderboard!")
                 }
             } else {
-                farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbtype.key} §eLeaderboard!")
+                farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbType.key} §eLeaderboard!")
             }
             list.clear()
         }
@@ -397,7 +397,7 @@ object EliteFarmersLeaderboard {
         if (diff >= 0.5 || abs(diff) >= 100) {
             when (leaderboardType.mode) {
                 EliteLeaderboardMode.ALL_TIME -> {
-                    // we handle all-time weight in the farmingweight class
+                    // we handle all-time weight in the FarmingWeight class
                     // we only update collections on garden join
                 }
 

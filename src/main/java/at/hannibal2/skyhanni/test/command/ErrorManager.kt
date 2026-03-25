@@ -414,7 +414,7 @@ object ErrorManager {
         }
     }
 
-    // tries to use the cause instead of the actual error. Returns itself if doesnt work.
+    // tries to use the cause instead of the actual error. Returns itself if it doesn't work.
     fun Throwable.maybeSkipError(): Throwable {
         val cause = cause ?: return this
         val causeClassName = this@maybeSkipError.javaClass.name

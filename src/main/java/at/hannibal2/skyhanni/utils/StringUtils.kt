@@ -490,7 +490,7 @@ object StringUtils {
     }
 
     /**
-     * Removes starting and ending reset formattings that don't sever a benefit at all.
+     * Removes starting and ending reset formatting's that don't sever a benefit at all.
      */
     fun String.stripHypixelMessage(): String {
         var message = this
@@ -553,8 +553,8 @@ object StringUtils {
         }
     }
 
-    fun String.addStrikethorugh(strikethorugh: Boolean = true): String {
-        if (!strikethorugh) return this
+    fun String.addStrikethrough(strikethrough: Boolean = true): String {
+        if (!strikethrough) return this
 
         val firstColor = getFirstColorCode()
         val clean = removeColor()

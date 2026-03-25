@@ -115,7 +115,7 @@ class ExtendedChatColor(
                             )
                         )
                         appendWithColor(" i did it! ", ChatFormatting.RED)
-                        appendWithColor("watch me count 0123456789 but this one isnt matched :(", ChatFormatting.BLUE)
+                        appendWithColor("watch me count 0123456789 but this one isn't matched :(", ChatFormatting.BLUE)
                     }
                     ChatUtils.chat(component)
                     ChatUtils.chat("matching \"count 0123456789\"")

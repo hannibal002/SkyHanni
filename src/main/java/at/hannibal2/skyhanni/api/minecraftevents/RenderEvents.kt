@@ -29,7 +29,7 @@ object RenderEvents {
             SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
         }
 
-        // makes the lines render weird idk
+        // makes the lines render weird I don't know
         /*WorldRenderEvents.END_MAIN.register { event ->
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
             val stack = event.matrices()

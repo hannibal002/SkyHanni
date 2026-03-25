@@ -158,7 +158,7 @@ enum class MiningEventType(
         CompressFormat.DEFAULT, null -> normalTextWithIcon
     }
 
-    // todo on 1.8 this used to make it darker, the shader we had for that is gone now so idk
+    // todo on 1.8 this used to make it darker, the shader we had for that is gone now so I don't know
     fun getRenderableAsPast(): Renderable = getRenderable()
 
     companion object {
