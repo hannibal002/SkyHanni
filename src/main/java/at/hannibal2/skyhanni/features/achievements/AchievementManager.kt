@@ -50,8 +50,39 @@ object AchievementManager {
     }
 
     fun setAchievement(id: String, achievement: Achievement) {
+        if (HypixelData.hypixelAlpha) return
         config[id] = achievement
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement set")
+    }
+
+    fun updateTieredAchievement(id: String, newProgress: Int) {
+        if (HypixelData.hypixelAlpha) return
+        val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
+        val currentTier = achievement.getCurrentTier() ?: 0
+        achievement.data.progress = newProgress
+        val newTier = achievement.getCurrentTier() ?: 0
+        if (newTier > currentTier) {
+            if (newTier == achievement.tiers.size) achievement.data.achieved = true
+            ChatUtils.chat(
+                componentBuilder {
+                    append("Achievement Get! ") {
+                        withColor(ChatFormatting.GOLD)
+                    }
+                    append(achievement.getName() ?: "?".asComponent()) {
+                        withColor(ChatFormatting.GREEN)
+                    }
+                    if (!achievement.data.achieved) {
+                        append(" $newProgress/${achievement.getAmountForNextTier()} to unlock the next tier")
+                    }
+                    append("!")
+                    hover = achievement.getDescription()
+                    command = "/shachievements"
+                }
+            )
+        }
+
+        config[id] = achievement
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
     }
 
     fun completeAchievement(id: String) {
@@ -65,11 +96,11 @@ object AchievementManager {
                 append("Achievement Get! ") {
                     withColor(ChatFormatting.GOLD)
                 }
-                append(achievement.name ?: "?".asComponent()) {
+                append(achievement.getName() ?: "?".asComponent()) {
                     withColor(ChatFormatting.GREEN)
                 }
                 append("!")
-                hover = achievement.description
+                hover = achievement.getDescription()
                 command = "/shachievements"
             }
         )
@@ -115,7 +146,7 @@ object AchievementManager {
             description = "Shows your current achievement progress"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.name != null }
+                val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.getName() != null }
                 TextHelper.displayPaginatedList(
                     "SkyHanni Achievements!",
                     achievementList,
@@ -128,7 +159,7 @@ object AchievementManager {
                                 withColor(ChatFormatting.DARK_GRAY)
                             }
                         } else {
-                            append(achievement.name ?: "?".asComponent()) {
+                            append(achievement.getName() ?: "?".asComponent()) {
                                 withColor(ChatFormatting.WHITE)
                             }
                         }
@@ -136,12 +167,12 @@ object AchievementManager {
                             append(" ✔") {
                                 withColor(ChatFormatting.GREEN)
                             }
-                        } else {
+                        } else if (!achievement.isTieredAchievement()) {
                             append(" ❌") {
                                 withColor(ChatFormatting.RED)
                             }
                         }
-                        hover = achievement.description
+                        hover = achievement.getDescription()
                     }
                 }
             }
