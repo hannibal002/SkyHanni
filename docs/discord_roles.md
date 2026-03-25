@@ -31,9 +31,10 @@ If those users talk to you, you know they aren't human.
 - **Elite**
     - Elite Farming bot offers /weight and other farming-related utility commands.
 - **SkyHelper**
-    - SkyHelper bot is the go-to SkyBlock utility command bot.
-
-[//]: # (This is a hidden comment: top 3 most used/most important commands that the bot can offer)
+    - SkyHelper is the go-to SkyBlock bot.
+    - `/networth`: Total worth of a player's or guild's items.
+    - `/missing`: Missing accessories with prices.
+    - `/leaderboard`: Player or guild leaderboards.
 
 - **Kuudra Gang**
     - Kuudra Gang bot helps with math around Kuudra runs or Kuudra items.
