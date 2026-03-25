@@ -60,37 +60,39 @@ object HoeLevelDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
         if (!isEnabled()) return
-        display = buildList {
-            add("§6Hoe Levels")
-            val heldItem = InventoryUtils.getItemInHand()
-            val hoeExp = heldItem?.getHoeExp() ?: return
-            var hoeLevel = heldItem.getHoeLevel() ?: return
-            val hoeLevels = hoeLevels ?: return
-            val next = if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1] else hoeOverflow
+        display = getDisplay()?.map(Renderable::text)
+    }
 
-            if (hoeLevel > hoeLevels.size && config.overflow) {
-                val uuid = heldItem.getItemUuid()
-                val overflowLevel = getOverflowHoeLevel(uuid)
-                if (overflowLevel != null) {
-                    hoeLevel += overflowLevel
-                }
-            }
-            add("§7Level §8$hoeLevel➜§3${hoeLevel + 1}")
+    private fun getDisplay(): List<String>? = buildList {
+        add("§6Hoe Levels")
+        val heldItem = InventoryUtils.getItemInHand()
+        val hoeExp = heldItem?.getHoeExp() ?: return null
+        var hoeLevel = heldItem.getHoeLevel() ?: return null
+        val hoeLevels = hoeLevels ?: return null
+        val next = if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1] else hoeOverflow
 
-            var colorPrefix = "§e"
-            if (hoeExp > next) {
-                colorPrefix = "§c§l"
-                if (hoeLevel >= OVERCLOCK_THRESHOLD) add("§3§lOVERCLOCK REQUIRED!")
-                else add("§c§lUPGRADE REQUIRED!")
+        if (hoeLevel > hoeLevels.size && config.overflow) {
+            val uuid = heldItem.getItemUuid()
+            val overflowLevel = getOverflowHoeLevel(uuid)
+            if (overflowLevel != null) {
+                hoeLevel += overflowLevel
             }
-            val formattedXp = hoeExp.addSeparators()
-            val formattedXpToNext = next.addSeparators()
-            add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
+        }
+        add("§7Level §8$hoeLevel➜§3${hoeLevel + 1}")
 
-            GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
-                add("§cNot gaining XP! (Wrong crop)")
-            }
-        }.map(Renderable::text)
+        var colorPrefix = "§e"
+        if (hoeExp > next) {
+            colorPrefix = "§c§l"
+            if (hoeLevel >= OVERCLOCK_THRESHOLD) add("§3§lOVERCLOCK REQUIRED!")
+            else add("§c§lUPGRADE REQUIRED!")
+        }
+        val formattedXp = hoeExp.addSeparators()
+        val formattedXpToNext = next.addSeparators()
+        add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
+
+        GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
+            add("§cNot gaining XP! (Wrong crop)")
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
