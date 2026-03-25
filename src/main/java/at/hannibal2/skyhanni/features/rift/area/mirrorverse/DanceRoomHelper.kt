@@ -173,8 +173,7 @@ object DanceRoomHelper {
     fun onServerTick() {
         if (!inRoom) return
 
-        if (countdownTicks <= 0) countdownTicks = 0
-        else countdownTicks -= 1
+        if (countdownTicks > 0) countdownTicks--
     }
 
     @HandleEvent
