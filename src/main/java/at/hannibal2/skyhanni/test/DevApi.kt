@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 /**
  * TODO for dev rework
@@ -20,7 +23,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
  * rename test to dev or debug (unclear)
  */
 
+@SkyHanniModule
 object DevApi {
 
     val config get() = SkyHanniMod.feature.dev
+
+    val mainToggles get() = config.mainToggles
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(127, "dev.damageIndicatorBackend", "dev.mainToggles.damageIndicator")
+        event.move(127, "dev.mobDebug.enable", "dev.mainToggles.mobDetection")
+        event.move(127, "dev.pingApi", "dev.mainToggles.pingApi")
+    }
 }

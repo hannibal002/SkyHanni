@@ -19,11 +19,11 @@ repositories {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.13.1")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("com.github.SkyHanniStudios:SkyHanniChangelogBuilder:1.1.3")
+    implementation(libs.gson)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.changelog.builder)
     implementation(files("../sharedVariables/build/libs/sharedVariables.jar"))
-    implementation("com.github.mizosoft.methanol:methanol:1.8.3")
+    implementation(libs.methanol)
 }
 
 tasks.withType<KotlinCompile> {

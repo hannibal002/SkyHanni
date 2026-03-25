@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -28,6 +27,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.features.slayer.spider.SlayerSpiderFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -388,7 +388,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onSkyHanniTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         data.values.forEach(::update)
         // TODO config to define between 100ms and 5 sec
@@ -1047,12 +1047,10 @@ object DamageIndicatorManager {
         }
     }
 
-    private val backendEnabled get() = SkyHanniMod.feature.dev.damageIndicatorBackend
-
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
-        if (!backendEnabled) {
+        if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")
         } else {
             event.addIrrelevant {
@@ -1067,5 +1065,5 @@ object DamageIndicatorManager {
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && backendEnabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && DevApi.mainToggles.damageIndicator
 }
