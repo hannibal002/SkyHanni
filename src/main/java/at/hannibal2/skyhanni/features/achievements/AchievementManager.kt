@@ -143,9 +143,12 @@ object AchievementManager {
     @HandleEvent
     fun onUserLuck(event: UserLuckCalculateEvent) {
         var luck = 0f
+        var hasDoneAllAchievements = true
         for ((_, achievement) in config) {
             luck += achievement.userLuckAmount
+            if (!achievement.data.achieved) hasDoneAllAchievements = false
         }
+        if (hasDoneAllAchievements) luck += 100
         if (luck == 0f) return
         event.addLuck(luck)
 
