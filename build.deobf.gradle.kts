@@ -1,12 +1,9 @@
-@file:OptIn(StonecutterExperimentalAPI::class)
-
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import jdk.internal.net.http.common.TimeSource.source
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -18,7 +15,7 @@ import skyhannibuildsystem.PublishToModrinth
 plugins {
     idea
     java
-    id("com.gradleup.shadow") version "9.3.1"
+    alias(libs.plugins.shadow)
     id("net.fabricmc.fabric-loom")
     kotlin("jvm")
     id("com.google.devtools.ksp")
@@ -42,6 +39,7 @@ val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 
 // Minecraft configuration:
+@OptIn(StonecutterExperimentalAPI::class)
 loom {
     val classTweakerFile = sc.process(
         rootProject.file("src/main/resources/skyhannideobf.classtweaker"),
@@ -125,7 +123,7 @@ dependencies {
     implementation(libs.fabricLanguageKotlin)
     target.modMenuVersion?.let { implementation("maven.modrinth:modmenu:$it") }
 
-    runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    runtimeOnly(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
     shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
@@ -137,36 +135,35 @@ dependencies {
         exclude(module = "gson")
     }
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("io.mockk:mockk:1.12.5")
+    testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.launcher)
+    testImplementation(libs.mockk)
 
     implementation(libs.hypixelmodapi)
     include(libs.hypixelmodapi.fabric)
-
 
     compileOnly(libs.roughlyenoughitems) {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-
     // getting clock offset
-    includeImplementation("commons-net:commons-net:3.11.1")
+    includeImplementation(libs.commons.net)
 
     // Calculator
-    includeImplementation("com.notkamui.libs:keval:1.1.1")
+    includeImplementation(libs.keval)
 
-    detektPlugins("org.notenoughupdates:detektrules:1.0.0")
+    detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+    detektPlugins(libs.detekt.formatting)
 
-    if (target != ProjectTarget.MODERN_12110) shadowImpl("org.apache.httpcomponents:httpclient:4.5.14")
+    if (target != ProjectTarget.MODERN_12110) shadowImpl(libs.httpclient)
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
     include(dep)
     implementation(dep)
 }
+
 tasks.withType(ValidateAccessWidenerTask::class.java).configureEach {
     enabled = false
 }
@@ -206,7 +203,7 @@ tasks.processResources {
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
     val props = buildMap {
         put("version", version)
-        put("minecraft", target.minecraftVersion.versionNameOverride?.replace("rc-", "rc.") ?: target.minecraftVersion.versionName)
+        put("minecraft", target.minecraftVersion.versionName)
         put("fapi", fapiVersion)
     }
     props.forEach(inputs::property)
@@ -263,7 +260,10 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
 excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
-    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedKotlinJvmTarget))
+    compilerOptions {
+        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedKotlinJvmTarget))
+        freeCompilerArgs.addAll("-Xbackend-threads=0")
+    }
 }
 
 tasks.withType(JavaCompile::class) {
@@ -298,12 +298,6 @@ tasks.jar {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
 tasks.assemble.get()/*.dependsOn(tasks.remapJar)*/
-
-tasks.withType(KotlinCompile::class) {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedKotlinJvmTarget))
-    }
-}
 
 if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {
@@ -359,7 +353,7 @@ tasks.withType<Detekt>().configureEach {
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && isCi && !skipDetekt }
 
-    val isDetektMain = (this.name == "detektMain")
+    val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
     val detektDir = rootProject.layout.buildDirectory.dir("reports/detekt").get().asFile.absolutePath
     reports {
@@ -382,10 +376,15 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }
 
-    val isMainBaseline = (this.name == "detektBaselineMain")
+    val isMainBaseline = name == "detektBaselineMain"
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
 }
+
+tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
+    enabled = false
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
