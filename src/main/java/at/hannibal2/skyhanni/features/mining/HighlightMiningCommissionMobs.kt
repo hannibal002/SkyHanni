@@ -37,7 +37,8 @@ object HighlightMiningCommissionMobs {
         "Glacite Walker Slayer" to { it.name.string == "Ice Walker" },
         "Golden Goblin Slayer" to { it.name.string.contains("Golden Goblin") },
         "Treasure Hoarder Puncher" to {
-            @Suppress("SpellCheckingInspection") // typo is intentional, that's on hypixel's end
+            // typo is intentional, that's on hypixel's end
+            @Suppress("SpellCheckingInspection")
             it.name.string == "Treasuer Hunter"
         },
 
