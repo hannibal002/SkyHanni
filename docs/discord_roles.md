@@ -11,15 +11,16 @@ If those users talk to you, their word is law.
 - **Admin**
     - Only the most trusted members.
     - Full control over the Discord server, manages role assignments.
-- **Staff**
-    - Legacy role with broad permissions. May be merged into Admin in the future.
-
-[//]: # (This is a hidden comment: Clarify why Staff role even exists: can this get merged with Admin eventually? Jani, can this go?)
 
 ## Core Team Roles
 
-Hand-picked by **Admins** from members who have already held the **Contributor** or **Community Helper** role for some time.
+Hand-picked by **Admins** from members who have already held the **Contributor** or **Community Helper** role for some time.  
 If those users talk to you, you better pay attention.
+
+- **Staff**
+    - Legacy role with many permissions. May be merged into Admin in the future.
+
+[//]: # (This is a hidden comment: Clarify why Staff role even exists: can this get merged with Admin eventually? Jani, can this go?)
 
 - **Moderator**
     - This role has moderation permissions (warn, mute, ban).
@@ -35,7 +36,7 @@ If those users talk to you, you better pay attention.
 
 ## Helper Roles
 
-People who help the mod.
+People who help the mod.  
 If those users talk to you, they probably know what they're talking about.
 
 - **Contributor**
@@ -47,7 +48,7 @@ If those users talk to you, they probably know what they're talking about.
 
 ## Fancy Roles
 
-These roles are purely cosmetic and exist to recognize specific community contributions or partnerships.
+These roles are purely cosmetic and exist to recognize specific community contributions or partnerships.  
 If those users talk to you, you read their name in cool colors.
 
 - **Bug Hunter**
@@ -55,12 +56,12 @@ If those users talk to you, you read their name in cool colors.
       issues.
 - **Makes Good Suggestions**
     - Awarded to members who suggest well-thought-out ideas for new or improved features.
-- **Cool Person**
-    - Friends of **Admins**.
 - **Cool Developer**
     - Developer or contributor of another SkyBlock-related resource: Third-party mods, websites, tools, etc.
 - **Cool Content Creator**
     - YouTuber, streamer, or admin of a third-party Discord server who helps spread the word about SkyHanni.
+- **Cool Person**
+    - Friends of **Admins**.
 - **Patreon Supporter**
     - Pay to win role.
 - **Server Booster**
@@ -76,7 +77,7 @@ If those users talk to you, congratulations, you found the chat.
 
 ## Ping Roles
 
-All those roles are self-selectable for all members.
+All those roles are self-selectable for all members.  
 If those users talk to you, you are yapping with a nerd.
 
 - **Announcements**
@@ -95,7 +96,7 @@ If those users talk to you, you are yapping with a nerd.
 
 ## Bot Roles
 
-Only for bots, with different levels of permissions.
+Only for bots, with different levels of permissions.  
 If those users talk to you, you know they aren't human.
 
 - **Bot**
@@ -127,7 +128,7 @@ If those users talk to you, you know they aren't human.
 
 ## Special Roles
 
-Hopefully you don't encounter such users in the wild.
+Hopefully you don't encounter such users in the wild.  
 If those users talk to you, you can ignore them.
 
 - **Muted**
