@@ -46,6 +46,7 @@ object DiscordRPCManager {
     private var started = false
     private var nextUpdate = SimpleTimeMark.farPast()
     private var presenceJob: Job? = null
+    private var readerJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
@@ -57,6 +58,8 @@ object DiscordRPCManager {
 
     private val startConfig = CoroutineConfig("discord rpc start", timeout = Duration.INFINITE).withIOContext()
     private val presenceConfig = CoroutineConfig("discord rpc updatePresence", timeout = Duration.INFINITE).withIOContext()
+    private val readerConfig = CoroutineConfig("discord rpc reader", timeout = Duration.INFINITE).withIOContext()
+    private val stopConfig = CoroutineConfig("discord rpc stop", timeout = Duration.INFINITE).withIOContext()
     private val manualStartConfig = CoroutineConfig("discord rpc manual start", timeout = Duration.INFINITE).withIOContext()
 
     private fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
@@ -118,6 +121,8 @@ object DiscordRPCManager {
     private fun stop() {
         if (!isConnected()) return
         updateDebugStatus("Stopped")
+        readerJob?.cancel()
+        readerJob = null
         client?.close()
         client = null
         started = false
@@ -134,11 +139,14 @@ object DiscordRPCManager {
                 progress.end("Successfully updated")
             } else presenceJob?.cancel()
         }
-        config.enabled.whenChanged { _, new -> if (!new) stop() }
+        config.enabled.whenChanged { _, new ->
+            if (!new) with(SkyHanniMod) { stopConfig.launchUnScopedCoroutine { stop() } }
+        }
     }
 
     private fun setupPresenceJob(progress: ChatProgressUpdates) {
         presenceJob?.cancel()
+        readerJob?.cancel()
         progress.update("in setupPresenceJob")
         var updatePresenceProgress: ChatProgressUpdates? = progressCategory.start("discord rpc updatePresence")
         presenceJob = with(SkyHanniMod) {
@@ -152,12 +160,18 @@ object DiscordRPCManager {
                 }
             }
         }
+        val activeClient = client
+        readerJob = with(SkyHanniMod) {
+            readerConfig.launchUnScopedCoroutine {
+                activeClient?.readerLoop()
+            }
+        }
     }
 
-    private val skyCryptUrl get(): String =
+    private fun getSkyCryptUrl() =
         "https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName.firstLetterUppercase()}".addSkyHanniUtm()
 
-    private val eliteSbUrl get(): String =
+    private fun getEliteSbUrl() =
         "${EliteDevApi.ELITE_URL}/@${PlayerUtils.getName()}/${HypixelData.profileName}".addSkyHanniUtm()
 
     private fun updatePresence(progress: ChatProgressUpdates?) {
@@ -172,17 +186,17 @@ object DiscordRPCManager {
         val presence = DiscordRichPresence(
             details = details,
             state = state,
-            startTimestamp = startTimestamp.toMillis(),
+            startTimestamp = startTimestamp.toMillis() / 1000L,
             largeImageKey = DiscordLocationKey.getDiscordIconKey(location),
             largeImageText = location,
             buttons = buildList {
                 if (config.showEliteSkyBlockButton.get()) DiscordRichPresence.Button(
                     label = "Open EliteSkyBlock",
-                    url = eliteSbUrl,
+                    url = getEliteSbUrl(),
                 ).let { add(it) }
                 if (config.showSkyCryptButton.get()) DiscordRichPresence.Button(
                     label = "Open SkyCrypt",
-                    url = skyCryptUrl,
+                    url = getSkyCryptUrl(),
                 ).let { add(it) }
             },
         )
@@ -192,6 +206,7 @@ object DiscordRPCManager {
         } catch (e: DiscordIPCException) {
             updateDebugStatus("Discord RPC disconnected: ${e.message}")
             client = null
+            scheduleRetry("Discord RPC disconnected")
         }
     }
 
@@ -275,6 +290,7 @@ object DiscordRPCManager {
         } else event.addIrrelevant {
             add("no error detected.")
             add("status: $debugStatusMessage")
+            add("lastActivityJson: ${client?.lastActivityJson ?: "none yet"}")
             lastDebugInfo.forEach { (k, v) -> add("$k: $v") }
         }
     }

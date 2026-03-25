@@ -7,7 +7,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
  *
  * @param details The primary description line shown beneath the application name.
  * @param state The secondary description line shown beneath [details].
- * @param startTimestamp Unix epoch milliseconds marking the start of the elapsed timer, or null for no timer.
+ * @param startTimestamp Unix epoch seconds marking the start of the elapsed timer, or null for no timer.
  * @param largeImageKey The asset key for the large image shown on the presence card.
  * @param largeImageText Tooltip text shown when hovering over the large image.
  * @param buttons Clickable buttons rendered on the presence card. Discord enforces a maximum of two.
