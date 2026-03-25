@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.command
@@ -53,6 +55,7 @@ object AchievementManager {
     }
 
     fun completeAchievement(id: String) {
+        if (HypixelData.hypixelAlpha) return
         val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
         if (achievement.data.achieved) return
         achievement.data.achieved = true
@@ -62,7 +65,7 @@ object AchievementManager {
                 append("Achievement Get! ") {
                     withColor(ChatFormatting.GOLD)
                 }
-                append(achievement.name ?: "?") {
+                append(achievement.name ?: "?".asComponent()) {
                     withColor(ChatFormatting.GREEN)
                 }
                 append("!")
@@ -79,7 +82,7 @@ object AchievementManager {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Test Achievement",
+            "Test Achievement".asComponent(),
             componentBuilder {
                 append("Run /shtestachievement to test the achievement system!") {
                     withColor(ChatFormatting.DARK_PURPLE)

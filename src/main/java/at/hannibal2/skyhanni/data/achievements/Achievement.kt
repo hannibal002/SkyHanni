@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
 
 data class Achievement(
-    val name: String? = null,
+    val name: Component? = null,
     val description: Component = Component.empty(),
     var userLuckAmount: Float = 0f,
     var secret: Boolean = false,
