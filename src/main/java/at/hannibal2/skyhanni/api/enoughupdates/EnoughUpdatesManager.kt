@@ -88,14 +88,9 @@ object EnoughUpdatesManager {
         loadItemMap(progress, tempItemMap)
 
         progress.update("synchronized itemMap")
-        synchronized(itemMap) {
-            itemMap.putAll(tempItemMap)
-            progress.update("putAll tempItemMap")
-        }
-
-        synchronized(internalNameSet) {
-            internalNameSet.addAll(itemMap.keys)
-        }
+        itemMap.putAll(tempItemMap)
+        progress.update("putAll tempItemMap")
+        internalNameSet.addAll(itemMap.keys)
     }
 
     fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
@@ -105,25 +100,35 @@ object EnoughUpdatesManager {
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
         progress.innerProgressStart(list.size)
-        val async = list.mapNotNullAsync { name ->
+        val parsedItems = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
                 val itemJson = fileSystem.readJson("items/$name").asJsonObject
-                val item = parseItem(
-                    internalName = internalName,
-                    json = itemJson,
-                )
+                val tryParsedItem = parseItem(itemJson)
                 progress.innerProgressStep()
-                val parsed = item ?: return@mapNotNullAsync null
-                internalName.toInternalName() to parsed
+                val parsedItem = tryParsedItem ?: return@mapNotNullAsync null
+                internalName.toInternalName() to parsedItem
             } catch (e: Exception) {
                 progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
                 null
             }
         }
-        async.forEach { (internalName, item) ->
+        parsedItems.forEach { (internalName, item) ->
             tempItemMap[internalName] = item
+            // Crafting type recipe
+            item.recipe?.loadAndRegister(item)
+            // Other types of recipes
+            item.recipes.forEach { recipe -> recipe.loadAndRegister(item) }
+            // Title word map
+            item.displayName?.let { displayName ->
+                for ((index, str) in displayName.split(" ").withIndex()) {
+                    val cleanedStr = str.cleanString()
+                    val internalMap = titleWordMap.getOrPut(cleanedStr) { TreeMap() }
+                    val indexList = internalMap.getOrPut(internalName.asString()) { mutableListOf() }
+                    indexList.add(index)
+                }
+            }
         }
     }
 
@@ -142,33 +147,18 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun parseItem(internalName: String, json: JsonObject): NeuItemJson? = runCatching {
+    private fun parseItem(json: JsonObject): NeuItemJson? = runCatching {
         val itemJson: NeuItemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
-        // If the itemId is vanilla, replace it with the vanilla item identifier
         itemJson.itemId.getVanillaItem()?.let { mcItem ->
             itemJson.itemId = mcItem.getIdentifierString()
-        }
-        // Crafting type recipe
-        itemJson.recipe?.loadAndRegister(itemJson)
-        // Other types of recipes
-        itemJson.recipes.forEach { recipe ->
-            recipe.loadAndRegister(itemJson)
-        }
-        itemJson.displayName?.let { displayName ->
-            synchronized(titleWordMap) {
-                for ((index, str) in displayName.split(" ").withIndex()) {
-                    val cleanedStr = str.cleanString()
-                    val internalMap = titleWordMap.getOrPut(cleanedStr) { TreeMap() }
-                    val indexList = internalMap.getOrPut(internalName) { mutableListOf() }
-                    indexList.add(index)
-                }
-            }
         }
         return itemJson
     }.getOrThrow()
 
-    fun getItemById(id: String): NeuItemJson? = itemMap[id.toInternalName()]
-    fun getItemById(internalName: NeuInternalName): NeuItemJson? = itemMap[internalName]
+    fun getItemById(id: String): NeuItemJson? = getItemById(id.toInternalName())
+    fun getItemById(internalName: NeuInternalName): NeuItemJson? =
+        if (inLoadingState()) null
+        else itemMap[internalName]
 
     fun stackToJson(stack: ItemStack): JsonObject {
         @Suppress("DEPRECATION")
