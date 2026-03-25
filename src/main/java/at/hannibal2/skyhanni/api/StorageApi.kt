@@ -80,6 +80,8 @@ object StorageApi {
     var currentStorage: SkyHanniInventoryContainer? = null
         private set
 
+    // TODO remove suppress once detekt rule gets fixed
+    @Suppress("IsInIslandEarlyReturn")
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         enderchestPattern.matchMatcher(event.inventoryName) {
