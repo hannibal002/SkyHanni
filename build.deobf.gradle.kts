@@ -132,7 +132,6 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
 
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
