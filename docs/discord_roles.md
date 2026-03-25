@@ -4,7 +4,7 @@ This is a list of all server roles on the SkyHanni Discord server.
 This explains why the roles exist and how to get them.
 **You can NOT apply to any of those roles directly.** (except ping roles)
 
-## Full Perm Roles
+## Full Permissions Roles
 
 If those users talk to you, their word is law.
 
@@ -36,7 +36,7 @@ If those users talk to you, you know they aren't human.
 [//]: # (This is a hidden comment: top 3 most used/most important commands that the bot can offer)
 
 - **Kuudra Gang**
-    - Kuudra Gang bot helps with math around Kuudra runs or Kuudra items
+    - Kuudra Gang bot helps with math around Kuudra runs or Kuudra items.
 - **Tanzanite**
     - Tanzanite bot does generic Discord utility stuff like logging, banning, or setting reminders.
 - **Carl Bot**
@@ -47,7 +47,7 @@ If those users talk to you, you know they aren't human.
 - **Fire**
     - Fire bot reacts to links of Discord messages with said Discord message.
 
-## High-end Roles
+## Core Team Roles
 
 Hand-picked by **Admins** from members who have already held the **Contributor** or **Community Helper** role for some time.
 If those users talk to you, don't ignore them.
@@ -64,7 +64,7 @@ If those users talk to you, don't ignore them.
     - Developers who help the project a lot over a long time.
     - A cosmetic role between **Contributor** and **Mod Maintainer**.
 
-## Main Roles
+## Helper Roles
 
 People who help the mod.
 If those users talk to you, better listen.
