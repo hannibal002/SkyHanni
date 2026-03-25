@@ -51,7 +51,7 @@ If those users talk to you, you know they aren't human.
 ## Core Team Roles
 
 Hand-picked by **Admins** from members who have already held the **Contributor** or **Community Helper** role for some time.
-If those users talk to you, don't ignore them.
+If those users talk to you, you better pay attention.
 
 - **Moderator**
     - This role has moderation permissions (warn, mute, ban).
@@ -68,7 +68,7 @@ If those users talk to you, don't ignore them.
 ## Helper Roles
 
 People who help the mod.
-If those users talk to you, better listen.
+If those users talk to you, they probably know what they're talking about.
 
 - **Contributor**
     - The role for everyone who makes meaningful code contributions to the mod on GitHub.
