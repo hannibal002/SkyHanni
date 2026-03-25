@@ -203,7 +203,7 @@ class MiscConfig {
     var brewingStandOverlay: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
+    @ConfigOption(name = "Crash on Death", desc = "Crashes your game every time you die in SkyBlock")
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
 
