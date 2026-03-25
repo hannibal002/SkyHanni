@@ -110,8 +110,6 @@ dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
 
-    // Discord RPC client
-    includeImplementation("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
@@ -139,8 +137,8 @@ dependencies {
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.mockk)
 
-    implementation(libs.hypixelmodapi)
-    include(libs.hypixelmodapi.fabric)
+    shadowImpl(libs.hypixelmodapi)
+    shadowImpl(libs.hypixelmodapi.fabric)
 
     compileOnly(libs.roughlyenoughitems) {
         exclude(group = "net.fabricmc.fabric-api")
@@ -160,8 +158,7 @@ dependencies {
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
-    include(dep)
-    implementation(dep)
+    add("shadowImpl", dep)
 }
 
 tasks.withType(ValidateAccessWidenerTask::class.java).configureEach {
@@ -284,8 +281,8 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
 }*/
 
 tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
-    archiveClassifier.set("all-dev")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+    archiveClassifier.set("")
     configurations = listOf(shadowImpl)
     exclude("META-INF/versions/**")
     mergeServiceFiles()
