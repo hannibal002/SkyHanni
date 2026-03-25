@@ -40,8 +40,7 @@ data class Achievement(
                 if (!data.achieved) {
                     append("${data.progress}/${getAmountForNextTier()} for the next tier.")
                     append("\n${data.progress}/${tiers.last()} to fully unlock!")
-                }
-                else {
+                } else {
                     append("Current Progress: ${data.progress} (you only needed ${tiers.last()} to fully unlock it)")
                 }
                 withColor(ChatFormatting.YELLOW)
