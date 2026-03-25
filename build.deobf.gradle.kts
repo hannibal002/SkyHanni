@@ -74,6 +74,11 @@ val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
+// Included in the shadow jar but NOT on the dev classpath.
+// Used for mods that would cause Fabric dependency resolution failures in the
+// non-remap loom dev environment (which has no synthetic "fabric" mod entry).
+val shadowOnly: Configuration by configurations.creating
+
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
@@ -138,7 +143,7 @@ dependencies {
     testImplementation(libs.mockk)
 
     shadowImpl(libs.hypixelmodapi)
-    shadowImpl(libs.hypixelmodapi.fabric)
+    shadowOnly(libs.hypixelmodapi.fabric)
 
     compileOnly(libs.roughlyenoughitems) {
         exclude(group = "net.fabricmc.fabric-api")
@@ -283,7 +288,7 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
 tasks.shadowJar {
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
     archiveClassifier.set("")
-    configurations = listOf(shadowImpl)
+    configurations = listOf(shadowImpl, shadowOnly)
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
