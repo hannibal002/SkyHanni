@@ -37,8 +37,13 @@ data class Achievement(
             return componentBuilder {
                 append(description_)
                 append("\n")
-                if (!data.achieved) append("${data.progress}/${getAmountForNextTier()} for the next tier.\n${data.progress}/${tiers.last()} to fully unlock!")
-                else append("Current Progress: ${data.progress} (you only needed ${tiers.last()} to fully unlock it)")
+                if (!data.achieved) {
+                    append("${data.progress}/${getAmountForNextTier()} for the next tier.")
+                    append("\n${data.progress}/${tiers.last()} to fully unlock!")
+                }
+                else {
+                    append("Current Progress: ${data.progress} (you only needed ${tiers.last()} to fully unlock it)")
+                }
                 withColor(ChatFormatting.YELLOW)
             }
         }

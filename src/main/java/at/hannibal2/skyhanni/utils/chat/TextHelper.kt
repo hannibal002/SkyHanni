@@ -270,8 +270,8 @@ object TextHelper {
     }
 
     fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
-        val atlas = Identifier.withDefaultNamespace(atlas)
+        val atlasId = Identifier.withDefaultNamespace(atlas)
         val texture = Identifier.fromNamespaceAndPath(namespace, sprite)
-        return Component.`object`(AtlasSprite(atlas, texture)).withColor(ChatFormatting.WHITE)
+        return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
     }
 }
