@@ -28,7 +28,7 @@ object TimeFeatures {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.REAL_TIME.isSelected()) return
         if (config.realTime) {
