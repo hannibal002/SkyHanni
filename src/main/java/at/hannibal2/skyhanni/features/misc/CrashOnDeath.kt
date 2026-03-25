@@ -18,8 +18,10 @@ object CrashOnDeath {
 
         if (event.isSelf) {
             Minecraft.getInstance().delayCrash(
-                CrashReport("Not Reading", Throwable("Don't toggle all the options")),
-            )
+                CrashReport(
+                    "SkyHanni Crash on Death",
+                    Throwable("Disable Crash on Death in SkyHanni if you want to stop crashing")),
+                )
         }
     }
 }
