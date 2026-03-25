@@ -60,7 +60,7 @@ class ChromaConfig {
     @Expose
     @ConfigOption(
         name = "Everything Chroma",
-        desc = "Render §4§l§oALL §r§7text in chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)",
+        desc = "Render §4§l§oALL §r§7text in chroma.",
     )
     @ConfigEditorBoolean
     var allChroma: Boolean = false

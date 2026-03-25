@@ -26,6 +26,7 @@ class SensitivityReducerConfig {
         TOOL("Farming tool"),
         FISHING_ROD("Fishing Rod"),
         KEYBIND("Holding Keybind"),
+        MOUSEMAT("Squeaky Mousemat"),
         ;
 
         override fun toString() = displayName

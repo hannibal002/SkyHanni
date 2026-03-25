@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features.misc
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.misc.discordrpc.AutoStatus
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -72,11 +75,10 @@ class DiscordRPCConfig {
     @ConfigEditorBoolean
     val showSkyCryptButton: Property<Boolean> = Property.of(true)
 
-    // TODO rename to showEliteSkyBlockButton
     @Expose
     @ConfigOption(name = "Show Button for EliteSkyBlock", desc = "Add a button to the RPC that opens your EliteSkyBlock profile.")
     @ConfigEditorBoolean
-    val showEliteBotButton: Property<Boolean> = Property.of(true)
+    val showEliteSkyBlockButton: Property<Boolean> = Property.of(true)
 
     enum class LineEntry(private val displayName: String) {
         NOTHING("Nothing"),
@@ -104,4 +106,12 @@ class DiscordRPCConfig {
     )
     @ConfigEditorInfoText
     val credits = ""
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(128, "gui.discordRPC.showEliteBotButton", "gui.discordRPC.showEliteSkyBlockButton")
+        }
+    }
 }

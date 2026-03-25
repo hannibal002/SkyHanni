@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import io.github.notenoughupdates.moulconfig.ChromaColour
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object LineToMobHandler {
 
         for ((mob, settings) in lines) {
             if (!settings.condition() || !mob.canBeSeen()) continue
-            event.drawLineToEye(
+            event.drawLineToCrosshair(
                 mob.centerCords,
                 settings.color,
                 settings.width,
