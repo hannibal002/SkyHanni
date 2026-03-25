@@ -190,7 +190,7 @@ object PestSpawnTimer {
     }
 
     @HandleEvent(IslandJoinEvent::class, onlyOnIsland = IslandType.GARDEN)
-    fun onIslandChange() {
+    fun onIslandJoin() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
