@@ -2,16 +2,15 @@ package at.hannibal2.skyhanni.detektrules.formatting
 
 import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
 import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.com.intellij.psi.PsiComment
 import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
 import org.jetbrains.kotlin.psi.psiUtil.nextLeaf
+import org.jetbrains.kotlin.psi.psiUtil.prevLeaf
 import org.jetbrains.kotlin.psi.psiUtil.siblings
 
 /**
@@ -48,6 +47,9 @@ class CustomAnnotationSpacing(config: Config) : SkyHanniRule(config) {
     }
 
     private fun PsiComment.isInvalid(): Boolean {
+        // Trailing comments (on the same line as the annotation) are always allowed
+        val prev = prevLeaf()
+        if (prev is PsiWhiteSpace && !prev.text.contains('\n')) return false
         return !text.containsPreprocessingPattern()
     }
 }
