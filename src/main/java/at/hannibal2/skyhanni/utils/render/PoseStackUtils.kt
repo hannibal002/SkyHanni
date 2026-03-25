@@ -11,15 +11,15 @@ object PoseStackUtils {
      * Returns true if a rotation was applied, false if the rotation vector was (0,0,0).
      */
     fun PoseStack.mulPose(rotationVector: Vec3): Boolean {
-        val quaternionf = Quaternionf()
+        val quaternion = Quaternionf()
         val xRad = Math.toRadians((rotationVector.x % 360)).toFloat()
         val yRad = Math.toRadians((rotationVector.y % 360)).toFloat()
         val zRad = Math.toRadians((rotationVector.z % 360)).toFloat()
 
         if (xRad == 0f && yRad == 0f && zRad == 0f) return false
 
-        quaternionf.rotateXYZ(xRad, yRad, zRad)
-        mulPose(quaternionf)
+        quaternion.rotateXYZ(xRad, yRad, zRad)
+        mulPose(quaternion)
         return true
     }
 }

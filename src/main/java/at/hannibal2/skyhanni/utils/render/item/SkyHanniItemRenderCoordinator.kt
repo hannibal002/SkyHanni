@@ -98,8 +98,8 @@ internal object SkyHanniItemRenderCoordinator {
         } ?: false
 
         if (isSettled) {
-            val blitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
-            if (blitted) return
+            val blitSucceeded = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
+            if (blitSucceeded) return
             // Atlas miss (overflow or not yet allocated) — fall through to realtime
         }
 

@@ -138,23 +138,23 @@ object PetUtils {
         basePetLeveling + customPetLeveling[petInternalName.getProperName()]?.petLevels.orEmpty()
 
     /**
-     * @param refPetInternalName The pet to compare against
-     * @param opPetInternalName The pet that is being compared to the reference.
+     * @param referencePetInternalName The pet to compare against.
+     * @param otherPetInternalName The pet that is being compared to the reference.
      *
      * @return An int (or null) representing the relationship between the two pets.
-     *  null in the case that the pets do not share a family
-     *      OR if either internal name passed is not a pet or cannot be parsed
-     *  1 if opPet is a higher rarity than refPet
-     *  0 if opPet is the same rarity as refPet
-     *  -1 if opPet is a lesser rarity than refPet
+     *  null in the case that the pets do not share a family.
+     *      OR if either internal name passed is not a pet or cannot be parsed.
+     *  1 if otherPet is a higher rarity than referencePet.
+     *  0 if otherPet is the same rarity as referencePet.
+     *  -1 if otherPet is a lesser rarity than referencePet.
      */
-    fun comparePets(refPetInternalName: NeuInternalName, opPetInternalName: NeuInternalName): Int? {
-        val (refProperName, refRarity) = splitInternalName(refPetInternalName) ?: return null
-        val (opProperName, opRarity) = splitInternalName(opPetInternalName) ?: return null
-        if (refProperName != opProperName) return null
+    fun comparePets(referencePetInternalName: NeuInternalName, otherPetInternalName: NeuInternalName): Int? {
+        val (referenceProperName, referenceRarity) = splitInternalName(referencePetInternalName) ?: return null
+        val (otherProperName, otherRarity) = splitInternalName(otherPetInternalName) ?: return null
+        if (referenceProperName != otherProperName) return null
 
         // Comparable.compareTo returns <0, 0 or >0, compareTo(0) maps that to exactly -1,0 or +1
-        return opRarity.compareTo(refRarity).compareTo(0)
+        return otherRarity.compareTo(referenceRarity).compareTo(0)
     }
 
     fun getCleanPetName(petInternalName: NeuInternalName, colored: Boolean = true): String {

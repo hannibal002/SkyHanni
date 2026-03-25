@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render.states
 
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
-import at.hannibal2.skyhanni.utils.render.SHVFE
+import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats.Element
 import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats.writeParams
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexConsumer
@@ -27,7 +27,7 @@ class SkyHanniRoundedRectOutlineRenderState(
         val buf = consumer as BufferBuilder
         buf.addVertex(matXScale * vx + matXTranslation, matYScale * vy + matYTranslation, 0f)
         buf.setColor(if (isTop) topColor else bottomColor)
-        buf.writeParams(radius, borderThickness, adjustedHalfSizeX, adjustedHalfSizeY, SHVFE.ROUNDED_PARAMS_0)
-        buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, borderBlur, 0f, SHVFE.ROUNDED_PARAMS_1)
+        buf.writeParams(radius, borderThickness, adjustedHalfSizeX, adjustedHalfSizeY, Element.ROUNDED_PARAMS_0)
+        buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, borderBlur, 0f, Element.ROUNDED_PARAMS_1)
     }
 }
