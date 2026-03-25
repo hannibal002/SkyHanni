@@ -339,7 +339,7 @@ object SkillProgress {
         val useCustomGoalLevel =
             skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
         var targetLevel = if (useCustomGoalLevel) skillInfo.customGoalLevel else level + 1
-        if (targetLevel <= level || targetLevel > 400) targetLevel = (level + 1)
+        if (targetLevel !in (level + 1)..400) targetLevel = (level + 1)
 
         val need = skillInfo.overflowCurrentXpMax
         val have = skillInfo.overflowCurrentXp

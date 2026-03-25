@@ -69,9 +69,9 @@ object PetUtils {
     ): AnimatedSkinJson? {
         val baseSkin = animatedPetSkins[skinInternalName.asString()]
         return when {
-            skinInternalName in seasonalVariants -> return getSeasonalVariantOrNull(skinInternalName) ?: baseSkin
-            skinInternalName in dayNightVariants -> return getDayNightVariantOrNull(skinInternalName) ?: baseSkin
-            skinInternalName in ciFactionVariants -> return getCiFactionVariantOrNull(skinInternalName) ?: baseSkin
+            skinInternalName in seasonalVariants -> getSeasonalVariantOrNull(skinInternalName) ?: baseSkin
+            skinInternalName in dayNightVariants -> getDayNightVariantOrNull(skinInternalName) ?: baseSkin
+            skinInternalName in ciFactionVariants -> getCiFactionVariantOrNull(skinInternalName) ?: baseSkin
             skinVariantIndex == null || skinVariantIndex == -1 -> baseSkin
             else -> {
                 val variantIdentifier = petSkinVariants[skinInternalName]?.get(skinVariantIndex)

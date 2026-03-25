@@ -247,7 +247,7 @@ object CrimsonMinibossRespawnTimer {
 
         companion object {
             fun fromName(spawnName: String) = entries.firstOrNull {
-                it.displayName.removeColor().lowercase() == spawnName.lowercase()
+                it.displayName.removeColor().equals(spawnName, ignoreCase = true)
             }
 
             fun MiniBoss.isTimerKnown(): Boolean {

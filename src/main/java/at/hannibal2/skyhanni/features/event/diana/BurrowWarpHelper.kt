@@ -81,7 +81,7 @@ object BurrowWarpHelper {
         if (cannotWarpUntil.isInFuture()) {
             GriffinBurrowHelper.addDebug("delaying warp for ${cannotWarpUntil.timeUntil()}")
             warpQueued = true
-            DelayedRun.runDelayed(cannotWarpUntil.timeUntil(), { warp() })
+            DelayedRun.runDelayed(cannotWarpUntil.timeUntil()) { warp() }
         } else warp()
     }
 
