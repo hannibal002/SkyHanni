@@ -10,7 +10,7 @@ If those users talk to you, their word is law.
 
 - **Admin**
     - Only the most trusted members.
-    - Full control over the discord server, manages role assignments.
+    - Full control over the Discord server, manages role assignments.
 - **Staff**
     - Legacy role with broad permissions. May be merged into Admin in the future.
 
@@ -26,26 +26,26 @@ If those users talk to you, you know they aren't human.
     - For all bots on the server.
     - This doesn't mean they have rights or something, we just want them to show up high in the member list.
 - **SH Bot**
-    - The SkyHanni bot does SkyHanni-specific stuff.
+    - SkyHanni bot does SkyHanni-specific stuff.
     - Mainly auto-tags and Pull Request linking.
 - **Elite**
-    - The elite farming bot offers /weight and other farming-related utility commands.
+    - Elite Farming bot offers /weight and other farming-related utility commands.
 - **SkyHelper**
-    - The SkyHelper bot is the go-to SkyBlock utility command bot.
+    - SkyHelper bot is the go-to SkyBlock utility command bot.
 
 [//]: # (This is a hidden comment: top 3 most used/most important commands that the bot can offer)
 
 - **Kuudra Gang**
-    - The Kuudra Gang bot helps you if you need help doing math around Kuudra runs or Kuudra items.
+    - Kuudra Gang bot helps with math around Kuudra runs or Kuudra items
 - **Tanzanite**
-    - Tanzanite Bot does generic Discord utility stuff like logging, banning, or setting reminders.
+    - Tanzanite bot does generic Discord utility stuff like logging, banning, or setting reminders.
 - **Carl Bot**
-    - The Carl bot does more Discord utility stuff, like logging.
+    - Carl bot also does Discord utility stuff.
 
 [//]: # (This is a hidden comment: Does Carl Bot actually only do logging? What else?)
 
 - **Fire**
-    - The fire bot reacts to links of Discord messages with said Discord message.
+    - Fire bot reacts to links of Discord messages with said Discord message.
 
 ## High-end Roles
 
@@ -57,7 +57,7 @@ If those users talk to you, don't ignore them.
     - Independent of coding/contributing.
     - Gets selected from **Community Helper** or higher roles.
 - **Mod Maintainer**
-    - Most trusted code guys without full access.
+    - Most trusted coders without full access.
     - They know SkyHanni very well.
     - If you have coding questions, ask them.
 - **Main Contributor**
@@ -116,7 +116,9 @@ If those users talk to you, you are yapping with a nerd.
     - When the mod updates to a shiny new release.
 - **Beta Ping**
     - When a new beta version is available for testing.
-    - This role may be renamed to Beta Tester in the future.
+
+[//]: # (This is a hidden comment: This role may be renamed to Beta Tester in the future.)
+
 - **Leaks Ping**
     - When a **Main Contributor** or higher decides to show off something new and cool.
 - **Stream Ping**
