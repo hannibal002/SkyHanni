@@ -185,9 +185,12 @@ object AdvancedPlayerList {
         }
 
         val playerName = if (config.useLevelColorForName) {
-            val c = data.levelText[3]
-            "§$c" + data.name
-        } else if (config.hideRankColor) "§b" + data.name else data.coloredName
+            data.levelText.getOrNull(3)?.let { "§$it" + data.name } ?: data.coloredName
+        } else if (config.hideRankColor) {
+            "§b" + data.name
+        } else {
+            data.coloredName
+        }
         list.add(playerName)
 
         if (config.hideEmblem) {
