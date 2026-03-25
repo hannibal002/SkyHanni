@@ -16,38 +16,6 @@ If those users talk to you, their word is law.
 
 [//]: # (This is a hidden comment: Clarify why Staff role even exists: can this get merged with Admin eventually? Jani, can this go?)
 
-## Bot Roles
-
-Only for bots, with different levels of permissions.
-If those users talk to you, you know they aren't human.
-
-- **Bot**
-    - Generic "this is a bot" role.
-    - For all bots on the server.
-    - This doesn't mean they have rights or something, we just want them to show up high in the member list.
-- **SH Bot**
-    - SkyHanni bot does SkyHanni-specific stuff.
-    - Mainly auto-tags and Pull Request linking.
-- **Elite**
-    - Elite Farming bot offers `/weight` and other farming-related utility commands.
-- **SkyHelper**
-    - SkyHelper is the go-to SkyBlock bot.
-    - `/networth`: Total worth of a player's or guild's items.
-    - `/missing`: Missing accessories with prices.
-    - `/leaderboard`: Player or guild leaderboards.
-
-- **Kuudra Gang**
-    - Kuudra Gang bot helps with math around Kuudra runs or Kuudra items.
-- **Tanzanite**
-    - Tanzanite bot does generic Discord utility stuff like logging, banning, or setting reminders.
-- **Carl Bot**
-    - Carl bot also does Discord utility stuff.
-
-[//]: # (This is a hidden comment: Does Carl Bot actually only do logging? What else?)
-
-- **Fire**
-    - Fire bot reacts to links of Discord messages with said Discord message.
-
 ## Core Team Roles
 
 Hand-picked by **Admins** from members who have already held the **Contributor** or **Community Helper** role for some time.
@@ -124,6 +92,38 @@ If those users talk to you, you are yapping with a nerd.
     - When a **Main Contributor** or higher decides to show off something new and cool.
 - **Stream Ping**
     - When someone actually streams while coding. It happens. Sometimes.
+
+## Bot Roles
+
+Only for bots, with different levels of permissions.
+If those users talk to you, you know they aren't human.
+
+- **Bot**
+    - Generic "this is a bot" role.
+    - For all bots on the server.
+    - This doesn't mean they have rights or something, we just want them to show up high in the member list.
+- **SH Bot**
+    - SkyHanni bot does SkyHanni-specific stuff.
+    - Mainly auto-tags and Pull Request linking.
+- **Elite**
+    - Elite Farming bot offers `/weight` and other farming-related utility commands.
+- **SkyHelper**
+    - SkyHelper is the go-to SkyBlock bot.
+    - `/networth`: Total worth of a player's or guild's items.
+    - `/missing`: Missing accessories with prices.
+    - `/leaderboard`: Player or guild leaderboards.
+
+- **Kuudra Gang**
+    - Kuudra Gang bot helps with math around Kuudra runs or Kuudra items.
+- **Tanzanite**
+    - Tanzanite bot does generic Discord utility stuff like logging, banning, or setting reminders.
+- **Carl Bot**
+    - Carl bot also does Discord utility stuff.
+
+[//]: # (This is a hidden comment: Does Carl Bot actually only do logging? What else?)
+
+- **Fire**
+    - Fire bot reacts to links of Discord messages with said Discord message.
 
 ## Special Roles
 
