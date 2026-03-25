@@ -83,8 +83,9 @@ object PestSpawnTimer {
 
     private fun getCustomCooldownTime(): Duration = with(config) {
         if (Perk.PEST_ERADICATOR.isActive) customCooldownTimeFinnegan
-		else customCooldownTime
+        else customCooldownTime
     }.get().seconds
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
@@ -121,12 +122,10 @@ object PestSpawnTimer {
                 pestSpawnTimes.add(spawnTime)
                 ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
             }
-            if (config.pestSpawnChatMessage) {
-                ChatUtils.notifyOrDisable(
-                    "Pests spawned in §b${spawnTime.format()}",
-                    option = config::pestSpawnChatMessage,
-                )
-            }
+            if (config.pestSpawnChatMessage) ChatUtils.notifyOrDisable(
+                "Pests spawned in §b${spawnTime.format()}",
+                option = config::pestSpawnChatMessage,
+            )
         }
 
         pestSpawned = true
@@ -206,7 +205,8 @@ object PestSpawnTimer {
     }
 
     private fun setCustomCooldown() {
-        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + getCustomCooldownTime()
+        if (!config.customCooldown.get()) return
+        pestCooldownEndTime = lastPestSpawnTime + getCustomCooldownTime()
     }
 
     private fun drawDisplay(): List<Renderable> {
