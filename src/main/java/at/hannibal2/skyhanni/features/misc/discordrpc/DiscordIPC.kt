@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import java.io.Closeable
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -24,6 +25,9 @@ class DiscordIPC(
     private var _connected = false
     private var pipe: DiscordIPCPipe? = null
 
+    // Because IPC is separate from the mod, we need our own registered hook
+    private var shutdownHook: Thread? = null
+
     // We need to use our own GSON here, rather than the ConfigManager one,
     // as we need NON-null serialization, as discord does not play nice with nulls.
     private val gson = com.google.gson.GsonBuilder().create()
@@ -44,7 +48,11 @@ class DiscordIPC(
         val (opcode, body) = readFrame()
         if (opcode != Opcode.FRAME) throw DiscordIPCException("Expected FRAME after handshake, got $opcode. Body: $body")
         _connected = true
+        shutdownHook = Thread(::close, "discord-rpc-shutdown").also(Runtime.getRuntime()::addShutdownHook)
     }
+
+    var lastActivityJson: String? = null
+        private set
 
     /**
      * Updates the rich presence activity displayed on the user's Discord profile.
@@ -54,7 +62,9 @@ class DiscordIPC(
      */
     fun setActivity(presence: DiscordRichPresence) {
         if (!_connected) throw DiscordIPCException("setActivity called while not connected")
-        sendFrame(Opcode.FRAME, gson.toJson(buildActivityPayload(presence)))
+        val json = gson.toJson(buildActivityPayload(presence))
+        lastActivityJson = json
+        sendFrame(Opcode.FRAME, json)
     }
 
     /**
@@ -62,6 +72,8 @@ class DiscordIPC(
      * Safe to call when not connected; errors during the close frame are silently swallowed.
      */
     override fun close() {
+        shutdownHook?.let { runCatching { Runtime.getRuntime().removeShutdownHook(it) } }
+        shutdownHook = null
         if (_connected) runCatching { sendFrame(Opcode.CLOSE, clientPayload) }
         _connected = false
         runCatching { pipe?.close() }
@@ -120,8 +132,11 @@ class DiscordIPC(
                 val (opcode, body) = readFrame()
                 when (opcode) {
                     Opcode.PING -> sendFrame(Opcode.PONG, body)
-                    Opcode.CLOSE -> _connected = false
-                    else -> Unit
+                    Opcode.CLOSE -> {
+                        _connected = false
+                        ChatUtils.debug("Discord RPC CLOSE frame: $body")
+                    }
+                    else -> ChatUtils.debug("Discord RPC frame ($opcode): $body")
                 }
             }
         } catch (_: DiscordIPCException) {
