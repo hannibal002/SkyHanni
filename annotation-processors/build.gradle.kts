@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.google.devtools.ksp:symbol-processing-api:2.3.4")
+    implementation(libs.ksp.api)
 }
 
 tasks.withType<JavaCompile> {
