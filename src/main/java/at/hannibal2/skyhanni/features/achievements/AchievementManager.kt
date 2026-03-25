@@ -98,6 +98,9 @@ object AchievementManager {
         event.registerBrigadier("shtestachievement") {
             description = "Tests achievement granting and revoking"
             category = CommandCategory.DEVELOPER_TEST
+            literalCallback("unlockall") {
+                ChatUtils.chat("you didnt think this would really work? did you...")
+            }
             simpleCallback {
                 val achievement = getAchievement(TEST_ACHIEVEMENT)
                 if (achievement.data.achieved) {
@@ -125,7 +128,9 @@ object AchievementManager {
                                 withColor(ChatFormatting.DARK_GRAY)
                             }
                         } else {
-                            append(achievement.name)
+                            append(achievement.name ?: "?".asComponent()) {
+                                withColor(ChatFormatting.WHITE)
+                            }
                         }
                         if (achievement.data.achieved) {
                             append(" ✔") {
