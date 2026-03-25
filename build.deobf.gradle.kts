@@ -6,6 +6,7 @@ import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import jdk.internal.net.http.common.TimeSource.source
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -126,17 +127,12 @@ dependencies {
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
-    // no moulconfig
-    /*val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {*/
-
-    // aaron's fork for 26.1 support: https://github.com/AzureAaron/MoulConfig/tree/26.1
-    shadowImpl("org.notenoughupdates.moulconfig:modern-26.1:9999.9999.9999:named") {
+    val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
+    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    // include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
-    include("org.notenoughupdates.moulconfig:modern-26.1:9999.9999.9999:named")
+    include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
 
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
