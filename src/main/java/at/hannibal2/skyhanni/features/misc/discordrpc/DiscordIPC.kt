@@ -107,6 +107,29 @@ class DiscordIPC(
     }
 
     /**
+     * Blocks reading frames from Discord until the connection is closed.
+     *
+     * Responds to [Opcode.PING] with [Opcode.PONG] to keep the connection alive.
+     * Returns when [isConnected] becomes false, Discord sends a CLOSE frame, or a read error occurs.
+     *
+     * Call from a background coroutine alongside the presence-update loop.
+     */
+    internal fun readerLoop() {
+        try {
+            while (_connected) {
+                val (opcode, body) = readFrame()
+                when (opcode) {
+                    Opcode.PING -> sendFrame(Opcode.PONG, body)
+                    Opcode.CLOSE -> _connected = false
+                    else -> Unit
+                }
+            }
+        } catch (_: DiscordIPCException) {
+            _connected = false
+        }
+    }
+
+    /**
      * Reads one framed IPC message from the pipe. Blocks until a full frame is available.
      *
      * Sets [isConnected] to false and throws if Discord closes the pipe mid-read.

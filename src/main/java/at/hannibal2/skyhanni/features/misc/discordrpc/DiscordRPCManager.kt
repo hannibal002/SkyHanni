@@ -46,6 +46,7 @@ object DiscordRPCManager {
     private var started = false
     private var nextUpdate = SimpleTimeMark.farPast()
     private var presenceJob: Job? = null
+    private var readerJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
@@ -57,6 +58,7 @@ object DiscordRPCManager {
 
     private val startConfig = CoroutineConfig("discord rpc start", timeout = Duration.INFINITE).withIOContext()
     private val presenceConfig = CoroutineConfig("discord rpc updatePresence", timeout = Duration.INFINITE).withIOContext()
+    private val readerConfig = CoroutineConfig("discord rpc reader", timeout = Duration.INFINITE).withIOContext()
     private val manualStartConfig = CoroutineConfig("discord rpc manual start", timeout = Duration.INFINITE).withIOContext()
 
     private fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
@@ -118,6 +120,8 @@ object DiscordRPCManager {
     private fun stop() {
         if (!isConnected()) return
         updateDebugStatus("Stopped")
+        readerJob?.cancel()
+        readerJob = null
         client?.close()
         client = null
         started = false
@@ -139,6 +143,7 @@ object DiscordRPCManager {
 
     private fun setupPresenceJob(progress: ChatProgressUpdates) {
         presenceJob?.cancel()
+        readerJob?.cancel()
         progress.update("in setupPresenceJob")
         var updatePresenceProgress: ChatProgressUpdates? = progressCategory.start("discord rpc updatePresence")
         presenceJob = with(SkyHanniMod) {
@@ -150,6 +155,12 @@ object DiscordRPCManager {
                     updatePresenceProgress = null
                     delay(5.seconds)
                 }
+            }
+        }
+        val activeClient = client
+        readerJob = with(SkyHanniMod) {
+            readerConfig.launchUnScopedCoroutine {
+                activeClient?.readerLoop()
             }
         }
     }
@@ -192,6 +203,7 @@ object DiscordRPCManager {
         } catch (e: DiscordIPCException) {
             updateDebugStatus("Discord RPC disconnected: ${e.message}")
             client = null
+            scheduleRetry("Discord RPC disconnected")
         }
     }
 
