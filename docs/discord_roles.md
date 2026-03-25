@@ -29,7 +29,7 @@ If those users talk to you, you know they aren't human.
     - SkyHanni bot does SkyHanni-specific stuff.
     - Mainly auto-tags and Pull Request linking.
 - **Elite**
-    - Elite Farming bot offers /weight and other farming-related utility commands.
+    - Elite Farming bot offers `/weight` and other farming-related utility commands.
 - **SkyHelper**
     - SkyHelper is the go-to SkyBlock bot.
     - `/networth`: Total worth of a player's or guild's items.
