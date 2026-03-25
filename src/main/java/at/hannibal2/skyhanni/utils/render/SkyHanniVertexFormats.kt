@@ -18,7 +18,7 @@ object SkyHanniVertexFormats {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
 
-    internal enum class Element(
+    internal enum class VertexElement(
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         private val usage: VFEUsage = VFEUsage.GENERIC,
@@ -68,8 +68,8 @@ object SkyHanniVertexFormats {
         VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("Color", VertexFormatElement.COLOR)
-            .add("RoundedParams0", Element.ROUNDED_PARAMS_0.element)
-            .add("RoundedParams1", Element.ROUNDED_PARAMS_1.element)
+            .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
             .build()
     }
 
@@ -78,7 +78,7 @@ object SkyHanniVertexFormats {
         y: Float,
         z: Float,
         w: Float,
-        format: Element,
+        format: VertexElement,
     ) {
         val element = format.element
         val ptr = (this@writeParams as MixinBufferBuilderAccessor).invokeBeginElement(element).takeIf {

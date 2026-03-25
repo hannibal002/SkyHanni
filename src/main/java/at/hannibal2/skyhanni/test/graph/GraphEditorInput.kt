@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RayUtils
+import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -177,12 +177,12 @@ object GraphEditorInput {
 
     private fun handleRayCast(): Boolean {
         if (!config.selectRaycastKey.isKeyClicked()) return false
-        val playerRay = RayUtils.createPlayerLookDirectionRay()
+        val playerRay = RaycastUtils.createPlayerLookDirectionRay()
         var minimumDistance = Double.MAX_VALUE
         var minimumNode: GraphingNode? = null
         for (node in nodes.filter { it.rendering }) {
             val nodeCenterPosition = node.position.add(0.5, 0.5, 0.5)
-            val distance = RayUtils.findDistanceToRay(playerRay, nodeCenterPosition)
+            val distance = RaycastUtils.findDistanceToRay(playerRay, nodeCenterPosition)
             if (distance > minimumDistance) {
                 continue
             }

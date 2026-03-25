@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RayUtils
+import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import net.minecraft.core.particles.ParticleTypes
@@ -34,7 +34,7 @@ object ArrowGuessBurrow {
     private const val EPSILON = 1e-6
 
     private val points: MutableSet<LorenzVec> = mutableSetOf()
-    private val recentFoundArrows = TimeLimitedSet<RayUtils.Ray>(18.seconds)
+    private val recentFoundArrows = TimeLimitedSet<RaycastUtils.Ray>(18.seconds)
     var lastArrowTime = SimpleTimeMark.farPast()
 
     private var failures = 0
@@ -103,7 +103,7 @@ object ArrowGuessBurrow {
     }
 
     @Suppress("ReturnCount")
-    private fun addGuessFromRay(ray: RayUtils.Ray, range: IntRange): LorenzVec? {
+    private fun addGuessFromRay(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: run {
             GriffinBurrowHelper.addDebug("couldnt get hub bounds")
             return null
@@ -113,7 +113,7 @@ object ArrowGuessBurrow {
             return null
         }
         // you technically don't need to find the endpoint for this, but it makes it simpler so why not
-        val endPoint = RayUtils.intersectAABBWithRay(bounds, ray)?.second ?: run {
+        val endPoint = RaycastUtils.intersectAABBWithRay(bounds, ray)?.second ?: run {
             GriffinBurrowHelper.addDebug("couldnt find endpoint")
             return null
         }
@@ -136,11 +136,11 @@ object ArrowGuessBurrow {
         val iterations = abs(endPointArray[axisIndex] - originArray[axisIndex])
         for (i in 1..iterations.toInt()) {
             val axisValue = originArray[axisIndex] + i * sign(directionArray[axisIndex])
-            val candidatePoint = RayUtils.findPointOnRay(ray, axisIndex, axisValue) ?: continue
+            val candidatePoint = RaycastUtils.findPointOnRay(ray, axisIndex, axisValue) ?: continue
             val candidateBlock = candidatePoint.roundToBlock()
             if (!GriffinBurrowHelper.isBlockValid(candidateBlock)) continue
             val blockCenter = candidateBlock.add(0.5, 0.5, 0.5)
-            val distanceToRay = RayUtils.findDistanceToRay(ray, blockCenter)
+            val distanceToRay = RaycastUtils.findDistanceToRay(ray, blockCenter)
 
             val distanceFromOrigin = candidatePoint.distance(ray.origin)
 
@@ -167,7 +167,7 @@ object ArrowGuessBurrow {
         return withinRange[0]
     }
 
-    private fun detectArrow(points: MutableSet<LorenzVec>): RayUtils.Ray? {
+    private fun detectArrow(points: MutableSet<LorenzVec>): RaycastUtils.Ray? {
         val line = findLine(points, SHAFT_LENGTH, PARTICLE_DETECTION_TOLERANCE)
         if (line.isEmpty()) return null
 
@@ -196,7 +196,7 @@ object ArrowGuessBurrow {
         val adjustedBase = base.down(1.5) // this is always an exact multiple of 0.5
         val adjustedTip = tip.down(1.5)
 
-        val ray = RayUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
+        val ray = RaycastUtils.Ray(adjustedBase, adjustedTip.minus(adjustedBase).normalize())
         if (recentFoundArrows.add(ray)) return null
         points.clear()
 

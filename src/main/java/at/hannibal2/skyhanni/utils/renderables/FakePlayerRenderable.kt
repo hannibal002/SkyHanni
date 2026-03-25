@@ -75,9 +75,9 @@ private fun drawEntityWithoutScissor(
     val o: Float = (y1 + y2).toFloat() / 2.0f
     val p = atan(((n - mouseX) / 40.0f).toDouble()).toFloat()
     val q = atan(((o - mouseY) / 40.0f).toDouble()).toFloat()
-    val quaternion = Quaternionf().rotateZ(3.1415927f)
-    val quaternion2 = Quaternionf().rotateX(q * 20.0f * 0.017453292f)
-    quaternion.mul(quaternion2)
+    val quaternionf = Quaternionf().rotateZ(3.1415927f)
+    val quaternionf2 = Quaternionf().rotateX(q * 20.0f * 0.017453292f)
+    quaternionf.mul(quaternionf2)
     val r: Float = entity.yBodyRot
     val s: Float = entity.getYRot()
     val t: Float = entity.getXRot()
@@ -99,8 +99,8 @@ private fun drawEntityWithoutScissor(
         y2,
         x,
         vector3f,
-        quaternion,
-        quaternion2,
+        quaternionf,
+        quaternionf2,
         entity
     )
     entity.yBodyRot = r
