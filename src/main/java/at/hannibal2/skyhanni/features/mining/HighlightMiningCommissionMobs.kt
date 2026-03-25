@@ -36,7 +36,10 @@ object HighlightMiningCommissionMobs {
         "Star Sentry Puncher" to { it.name.string == "Crystal Sentry" },
         "Glacite Walker Slayer" to { it.name.string == "Ice Walker" },
         "Golden Goblin Slayer" to { it.name.string.contains("Golden Goblin") },
-        "Treasure Hoarder Puncher" to { it.name.string == "Treasure Hunter" }, // typo is intentional
+        "Treasure Hoarder Puncher" to {
+            @Suppress("SpellCheckingInspection") // typo is intentional, that's on hypixel's end
+            it.name.string == "Treasuer Hunter"
+        },
 
         // Crystal Hollows
         "Automaton Slayer" to { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) },

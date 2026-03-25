@@ -167,7 +167,7 @@ interface CommandContextAwareObject {
 /**
  * An Argument that is used by a [ComplexCommand].
  * [T] is the [CommandContextAwareObject] that should be mutated by the [ComplexCommand].
- * @param documentation User facing descriptor of the argument.
+ * @param documentation User-facing descriptor of the argument.
  *
  * It should start with a listing of the parameters it takes in followed by a " - " and the description of what it does.
  *

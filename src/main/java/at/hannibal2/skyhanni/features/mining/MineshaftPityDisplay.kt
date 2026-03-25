@@ -371,7 +371,7 @@ object MineshaftPityDisplay {
             ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
         ),
 
-        // cant rename enum because config explodes
+        // can't rename enum because config explodes
         GEMSTONE(
             "Low Tier Gemstone",
             OreType.entries.filter { it.isLowTierGemstone() },

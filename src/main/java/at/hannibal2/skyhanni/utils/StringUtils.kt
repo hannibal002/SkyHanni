@@ -490,7 +490,7 @@ object StringUtils {
     }
 
     /**
-     * Removes starting and ending reset formatting's that don't sever a benefit at all.
+     * Removes leading and trailing reset formatting codes that serve no purpose.
      */
     fun String.stripHypixelMessage(): String {
         var message = this
