@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
+import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -110,6 +111,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     @HandleEvent
     fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
+        SkyHanniRoundedShapeRenderManager.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"

@@ -155,6 +155,29 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_rect_outline_deferred",
         depthWrite = false,
     ),
+    CIRCLE_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "circle_deferred",
+        depthWrite = false,
+    ),
+    ROUNDED_TEXTURED_RECT_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_TEX_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_texture_deferred",
+        sampler = "textureSampler",
+        depthWrite = false,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+    ),
+    RADIAL_GRADIENT_CIRCLE_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_ROUNDED_GRADIENT,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "radial_gradient_circle_deferred",
+        depthWrite = false,
+    ),
     ;
 
     private val _pipe: RenderPipeline = RenderPipelines.register(

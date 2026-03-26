@@ -33,8 +33,14 @@ object SkyHanniVertexFormats {
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
         ROUNDED_PARAMS_0,
-        // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
+        // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/angle1/0, angle2/0}
         ROUNDED_PARAMS_1,
+        // {angle, progress, phaseOffset, reverse(float)}
+        GRADIENT_PARAMS_0,
+        // {startColor R, G, B, A}
+        GRADIENT_PARAMS_1,
+        // {endColor R, G, B, A}
+        GRADIENT_PARAMS_2,
         ;
 
         // The ID we use to register the format element with Minecraft.
@@ -88,6 +94,26 @@ object SkyHanniVertexFormats {
             .add("Color", VertexFormatElement.COLOR)
             .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
             .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
+            .build()
+    }
+
+    val POSITION_TEX_ROUNDED: VertexFormat by lazy {
+        VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION)
+            .add("UV0", VertexFormatElement.UV0)
+            .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
+            .build()
+    }
+
+    val POSITION_ROUNDED_GRADIENT: VertexFormat by lazy {
+        VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION)
+            .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
+            .add("GradientParams0", SkyHanniVertexFormatElement.GRADIENT_PARAMS_0.element)
+            .add("GradientParams1", SkyHanniVertexFormatElement.GRADIENT_PARAMS_1.element)
+            .add("GradientParams2", SkyHanniVertexFormatElement.GRADIENT_PARAMS_2.element)
             .build()
     }
 

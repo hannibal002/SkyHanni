@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.render.item.atlas
+package at.hannibal2.skyhanni.utils.render.atlas
 
 internal class SkyHanniAtlasBinPacker(size: Int) {
 
