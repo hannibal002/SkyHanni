@@ -21,7 +21,7 @@ object DragNDrop {
 
     private const val BUTTON_MAPPED = KeyboardManager.LEFT_MOUSE
 
-    private val invalidItem = Renderable.item(ItemStack(Blocks.BARRIER), 1.0)
+    private val invalidItem = Renderable.item(ItemStack(Blocks.BARRIER)) { scale = 1.0 }
 
     @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
@@ -87,7 +87,10 @@ object DragNDrop {
 
 fun ItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<ItemStack> {
 
-    val render = Renderable.item(this@toDragItem, scale, 0)
+    val render = Renderable.item(this@toDragItem) {
+        this.scale = scale
+        xSpacing = 0
+    }
 
     override fun get(): ItemStack = this@toDragItem
 

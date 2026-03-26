@@ -78,6 +78,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -195,7 +196,9 @@ object EstimatedItemValueCalculator {
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
         val reforgeStoneName = internalName.repoItemName
-        val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
+        val applyCost = reforge.costs.takeIfNotEmpty()?.let {
+            getReforgeStoneApplyCost(stack, it, internalName)
+        } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
         list.add(" §7Stone: $reforgeStoneName ${reforgeStonePrice.formatCoinWithBrackets()}")

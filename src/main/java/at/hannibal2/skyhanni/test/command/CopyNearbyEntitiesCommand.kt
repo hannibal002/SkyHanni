@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
@@ -29,7 +30,7 @@ import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getInventoryItems
+import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Display
@@ -71,7 +72,7 @@ object CopyNearbyEntitiesCommand {
             if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
             add("displayName: '${displayName.formattedTextCompat()}'")
             add("entityId: ${entity.id}")
-            add("Type of Mob: ${getType(entity, mob)}")
+            add("Category of Mob: ${getCategory(entity, mob)}")
             add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
             add("location data:")
             add("-  vec: $vec")
@@ -128,7 +129,7 @@ object CopyNearbyEntitiesCommand {
                 is Display.BlockDisplay -> addBlockDisplayEntity(entity)
                 is Frog -> addFrogEntity(entity)
             }
-            if (mob != null && mob.mobType != Mob.Type.PLAYER) {
+            if (mob != null && mob.category != MobCategory.PLAYER) {
                 add("MobInfo: ")
                 addAll(getMobInfo(mob).map { "-  $it" })
             }
@@ -145,10 +146,10 @@ object CopyNearbyEntitiesCommand {
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
-        add("-  inventory:")
-        for ((id, stack) in entity.getInventoryItems().withIndex()) {
+        add("-  inventory equipment:")
+        for ((equipSlot, stack) in entity.getEquipmentSlots()) {
             val adjustedStack = stack.orNull()
-            add("-  id $id ($adjustedStack)")
+            add("-     ${equipSlot.name} (id ${equipSlot.id}) ($adjustedStack)")
             printItemStackData(adjustedStack)
         }
     }
@@ -267,7 +268,7 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
-            val skullTexture = stack.getSkullTexture()
+            val skullTexture = stack.getSkullTexture()?.trim()?.replace("\n", "")
             if (skullTexture != null) {
                 add("-     skullTexture:")
                 add("-     $skullTexture")
@@ -281,11 +282,11 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun getType(entity: Entity, mob: Mob?) = buildString {
+    private fun getCategory(entity: Entity, mob: Mob?) = buildString {
         if (entity is LivingEntity && entity.isDisplayNpc()) append("DisplayNPC, ")
         if (entity is Player && entity.isNpc()) append("NPC, ")
         if (entity is Player && entity.isRealPlayer()) append("RealPlayer, ")
-        if (mob?.mobType == Mob.Type.SUMMON) append("Summon, ")
+        if (mob?.category == MobCategory.SUMMON) append("Summon, ")
         if (entity.isSkyBlockMob()) {
             append("SkyblockMob(")
 
@@ -293,7 +294,7 @@ object CopyNearbyEntitiesCommand {
                 append(if (entity.distanceToPlayer() > MobData.DETECTION_RANGE) "Not in Range" else "None")
                 append(")")
             } else {
-                append(mob.mobType.name)
+                append(mob.category.name)
                 if (mob.baseEntity == entity) append("/Base")
                 append(")\"")
                 append(mob.name)
@@ -311,7 +312,7 @@ object CopyNearbyEntitiesCommand {
 
     fun getMobInfo(mob: Mob) = buildList<String> {
         add("Name: ${mob.name}")
-        add("Type: ${mob.mobType}")
+        add("Category: ${mob.category}")
         add("Base Entity: ${mob.baseEntity.asString()}")
         add("ArmorStand: ${mob.armorStand?.asString()}")
         if (mob.extraEntities.isNotEmpty()) {
@@ -328,7 +329,7 @@ object CopyNearbyEntitiesCommand {
             add("Owner: ${mob.owner.ownerName}")
         }
         add("Level or Tier: ${mob.levelOrTier.takeIf { it != -1 }}")
-        if (mob.mobType == Mob.Type.DUNGEON) {
+        if (mob.category == MobCategory.DUNGEON) {
             add("Is Starred: ${mob.hasStar}")
             add("Attribute: ${mob.attribute ?: "NONE"}")
         }

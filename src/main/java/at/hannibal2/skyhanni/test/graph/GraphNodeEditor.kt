@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -46,7 +46,7 @@ object GraphNodeEditor {
     private fun doRender() {
         if (!isEnabled()) return
 
-        config.namedNodesList.renderRenderables(
+        GraphEditor.config.namedNodesList.renderRenderables(
             getNodeNames(),
             posLabel = "Graph Nodes List",
         )
@@ -298,7 +298,4 @@ object GraphNodeEditor {
     }
 
     private fun isEnabled() = GraphEditor.isEnabled()
-
-    private val config get() = GraphEditor.config
-
 }

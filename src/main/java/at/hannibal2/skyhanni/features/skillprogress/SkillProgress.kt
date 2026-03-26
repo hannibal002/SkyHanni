@@ -78,7 +78,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -201,7 +201,7 @@ object SkillProgress {
         if (goalReached)
             chat("§lYou have reached your goal level of §b§l${skill.customGoalLevel} §e§lin the §b§l$skillName §e§lskill!")
 
-        SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
+        SoundUtils.createSound("entity.player.levelup", 1f, 1f).playSound()
     }
 
     @HandleEvent

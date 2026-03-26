@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.level.block.Blocks
@@ -58,7 +58,7 @@ object PowderChestTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (event.soundName == "random.levelup" && event.pitch == 1f && event.volume == 1.0f) {
+        if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
         }
     }
@@ -153,7 +153,7 @@ object PowderChestTimer {
     private fun SkyHanniRenderWorldEvent.drawFirstLine(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
         val (firstPos, firstTime) = list.first()
 
-        drawLineToEye(
+        drawLineToCrosshair(
             firstPos.blockCenter(),
             firstTime.timeUntil().getColorBasedOnTime(),
             lineWidth = 3,

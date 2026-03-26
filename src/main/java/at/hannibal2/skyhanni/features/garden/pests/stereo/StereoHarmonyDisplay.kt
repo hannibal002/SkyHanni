@@ -60,7 +60,7 @@ object StereoHarmonyDisplay {
         }
         val pest = vinyl.getPest()
         if (config.showHead.get()) {
-            add(Renderable.item(pest.internalName, scale = 1.67))
+            add(Renderable.item(pest.internalName) { scale = 1.67 })
         }
         val displayList = buildList {
             addString("§ePlaying: §a${vinyl.displayName}")

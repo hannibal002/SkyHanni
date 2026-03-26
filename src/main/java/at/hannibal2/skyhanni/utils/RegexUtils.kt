@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -100,6 +101,17 @@ object RegexUtils {
     fun Matcher.groupOrEmpty(groupName: String): String = groupOrNull(groupName).orEmpty()
 
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
+
+    fun Matcher.toLorenzVec(
+        xGroup: String = "x",
+        yGroup: String = "y",
+        zGroup: String = "z",
+    ): LorenzVec? {
+        val x = groupOrNull(xGroup)?.trim()?.formatDoubleOrNull() ?: return null
+        val y = groupOrNull(yGroup)?.trim()?.formatDoubleOrNull() ?: return null
+        val z = groupOrNull(zGroup)?.trim()?.formatDoubleOrNull() ?: return null
+        return LorenzVec(x, y, z)
+    }
 
     fun Pattern.indexOfFirstMatch(list: List<String>): Int? {
         for ((index, line) in list.withIndex()) {

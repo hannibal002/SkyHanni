@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -47,8 +48,10 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -58,12 +61,13 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
+import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import com.mojang.authlib.properties.PropertyMap
@@ -73,6 +77,7 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -615,7 +620,7 @@ object ItemUtils {
     var bazaarOverrides = mapOf<String, String>()
         private set
 
-    private data class BazaarOverride(
+    internal data class BazaarOverride(
         @Expose @SerializedName("stock") val bazaarInternalName: String,
         @Expose @SerializedName("id") val neuInternalName: String,
     )
@@ -630,9 +635,9 @@ object ItemUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
-        val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
-        bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+        bazaarOverrides = event.getConstant<List<BazaarOverride>>("bazaarstocks").associate {
+            it.bazaarInternalName to it.neuInternalName
+        }
 
         // clear the item name cache so any potential missing items are reloaded
         itemNameCache.clear()
@@ -742,11 +747,11 @@ object ItemUtils {
         }
     }
 
+    private val testItemCoroutineConfig = CoroutineConfig("shtestitem").withIOContext()
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
-
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine("shtestitem") {
+        testItemCoroutineConfig.launch {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -909,17 +914,22 @@ object ItemUtils {
         }.toMap()
     }
 
+    private val coinSkullCache = TimeLimitedCache<Number, ItemStack>(2.minutes)
+
     // Taken from NEU
-    fun getCoinItemStack(coinAmount: Number): ItemStack {
+    fun getCoinItemStack(coinAmount: Number): ItemStack = coinSkullCache.getOrPut(coinAmount) {
+        ChatUtils.debug("Generating coin skull for amount ${coinAmount.addSeparators()}")
         val amount = coinAmount.toDouble()
         val skull = when {
             amount >= 10000000 -> coinSkulls[COIN_TEXTURE_3]
             amount >= 100000 -> coinSkulls[COIN_TEXTURE_2]
             else -> coinSkulls[COIN_TEXTURE_1]
         } ?: coinSkulls.entries.first().value
-        skull.setCustomItemName(amount.formatCoin() + " Coins")
-        skull.extraAttributes = skull.extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
-        return skull
+
+        skull.copy().apply {
+            setCustomItemName(amount.formatCoin() + " Coins")
+            extraAttributes = extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
+        }
     }
 
     fun ItemStack.isSkull(): Boolean {
@@ -931,5 +941,17 @@ object ItemUtils {
         val identifier = this.get(DataComponents.ITEM_MODEL)
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
         return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
+    }
+
+    fun ItemStack.asTextComponent(): Component? {
+        val stack = this
+        if (this.item == Items.PLAYER_HEAD) {
+            return componentBuilder {
+                append(Component.`object`(PlayerSprite(stack.get(DataComponents.PROFILE), true))) {
+                    withColor(ChatFormatting.WHITE)
+                }
+            }
+        }
+        return null
     }
 }

@@ -95,7 +95,7 @@ interface Renderable {
             is Renderable -> any
             is String -> text(any)
             is Component -> text(any)
-            is ItemStack -> item(any, itemScale)
+            is ItemStack -> item(any) { scale = itemScale }
             else -> null
         }
 

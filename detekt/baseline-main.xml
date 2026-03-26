@@ -310,7 +310,6 @@
     <ID>ReturnCount:ItemResolutionQuery.kt$ItemResolutionQuery$private fun resolveContextualName(): String?</ID>
     <ID>ReturnCount:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>ReturnCount:MiningEventTracker.kt$MiningEventTracker$private fun sendData(eventName: String, time: String?)</ID>
-    <ID>ReturnCount:MobDetection.kt$MobDetection$private fun entitySpawn(entity: LivingEntity, roughType: Mob.Type): Boolean</ID>
     <ID>ReturnCount:MobFilter.kt$MobFilter$internal fun createSkyblockEntity(baseEntity: LivingEntity): MobResult</ID>
     <ID>ReturnCount:MobFilter.kt$MobFilter$private fun armorStandOnlyMobs(baseEntity: LivingEntity, armorStand: ArmorStand): MobResult?</ID>
     <ID>ReturnCount:MobFilter.kt$MobFilter$private fun exceptions(baseEntity: LivingEntity, nextEntity: LivingEntity?): MobResult?</ID>

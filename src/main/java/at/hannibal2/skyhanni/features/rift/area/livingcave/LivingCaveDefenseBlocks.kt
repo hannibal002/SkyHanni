@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.client.player.RemotePlayer
@@ -79,7 +79,7 @@ object LivingCaveDefenseBlocks {
             if (entity == null) {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
-                entity = EntityUtils.getEntitiesNearby<RemotePlayer>(compareLocation, 2.0)
+                entity = compareLocation.getEntitiesNearby<RemotePlayer>(2.0)
                     .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }
@@ -118,7 +118,7 @@ object LivingCaveDefenseBlocks {
             val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
             staticBlocks = staticBlocks.editCopy {
                 add(DefenseBlock(entity, location))
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                RenderLivingEntityHelper.setEntityColor(
                     entity,
                     color.addAlpha(50),
                 ) { isEnabled() && staticBlocks.any { it.entity == entity } }
@@ -148,7 +148,7 @@ object LivingCaveDefenseBlocks {
             if (time > System.currentTimeMillis()) {
                 val location = block.location
                 event.drawWaypointFilled(location, color)
-                event.drawLineToEye(
+                event.drawLineToCrosshair(
                     location.blockCenter(),
                     color,
                     1,

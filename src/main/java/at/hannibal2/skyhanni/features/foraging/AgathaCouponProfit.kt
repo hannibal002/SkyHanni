@@ -164,7 +164,7 @@ object AgathaCouponProfit {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
         config.agathaCouponProfitPos.renderRenderables(
             display,

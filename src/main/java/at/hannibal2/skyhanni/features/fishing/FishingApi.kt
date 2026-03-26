@@ -159,7 +159,7 @@ object FishingApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!holdingRod) return
-        if (event.soundName == "random.orb" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
+        if (event.soundName == "entity.experience_orb.pickup" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
