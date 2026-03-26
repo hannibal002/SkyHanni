@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findSuperClassTypeParameters
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -14,14 +15,17 @@ import java.lang.reflect.WildcardType
 import java.util.function.Consumer
 
 object ReflectionUtils {
-    fun Any.getPublicField(name: String): Field = javaClass.getField(name)
-    fun Class<*>.getPublicField(name: String): Field = getField(name)
-    fun Any.getPublicFieldValue(name: String): Any = requireNotNull(getPublicField(name).get(this)) {
-        "Field '$name' on ${javaClass.name} is null"
+    fun Any.getPublicField(fieldName: String): Field = javaClass.getField(fieldName)
+    fun Class<*>.getPublicField(fieldName: String): Field = getField(fieldName)
+    fun Any.getPublicFieldValue(fieldName: String): Any = requireNotNull(getPublicField(fieldName).get(this)) {
+        "Field '$fieldName' on ${javaClass.name} is null"
     }
 
-    fun Class<*>.getPublicFieldValue(name: String, instance: Any?): Any = requireNotNull(getPublicField(name).get(instance)) {
-        "Field '$name' on ${javaClass.name} is null"
+    fun <T> Class<T>.getPublicFieldValue(
+        fieldName: String,
+        classInstance: T?,
+    ): Any = requireNotNull(getPublicField(fieldName).get(classInstance)) {
+        "Field '$fieldName' on ${this.name} is null"
     }
 
     /**
@@ -31,19 +35,22 @@ object ReflectionUtils {
      * - [NullPointerException] - the field exists but its value is null at the time of access
      * You've been warned. -David
      */
-    fun Any.getPrivateField(name: String): Field = javaClass.getDeclaredField(name).makeAccessible()
-    fun Any.getPrivateField(index: Int): Field = javaClass.declaredFields[index].makeAccessible()
-    fun Class<*>.getPrivateField(name: String): Field = getDeclaredField(name).makeAccessible()
-    fun Any.getPrivateFieldValue(name: String): Any = requireNotNull(getPrivateField(name).get(this)) {
-        "Field '$name' on ${javaClass.name} is null"
+    fun Any.getPrivateField(fieldName: String): Field = javaClass.getDeclaredField(fieldName).makeAccessible()
+    fun Any.getPrivateField(fieldIndex: Int): Field = javaClass.declaredFields[fieldIndex].makeAccessible()
+    fun Class<*>.getPrivateField(fieldName: String): Field = getDeclaredField(fieldName).makeAccessible()
+    fun Any.getPrivateFieldValue(fieldName: String): Any = requireNotNull(getPrivateField(fieldName).get(this)) {
+        "Field '$fieldName' on ${javaClass.name} is null"
     }
 
-    fun Any.getPrivateFieldValue(index: Int): Any = requireNotNull(getPrivateField(index).get(this)) {
-        "Field at index $index on ${javaClass.name} is null"
+    fun Any.getPrivateFieldValue(fieldIndex: Int): Any = requireNotNull(getPrivateField(fieldIndex).get(this)) {
+        "Field at index $fieldIndex on ${javaClass.name} is null"
     }
 
-    fun Class<*>.getPrivateFieldValue(name: String, instance: Any?): Any = requireNotNull(getPrivateField(name).get(instance)) {
-        "Field '$name' on ${javaClass.name} is null"
+    fun <T> Class<T>.getPrivateFieldValue(
+        fieldName: String,
+        classInstance: T?,
+    ): Any = requireNotNull(getPrivateField(fieldName).get(classInstance)) {
+        "Field '$fieldName' on ${this.name} is null"
     }
 
     fun Field.makeAccessible() = also { isAccessible = true }
