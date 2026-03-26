@@ -94,6 +94,9 @@ object TitleManager {
         override fun toString() = displayName
     }
 
+    /**
+     * always combine this with notifyOrDisable!
+     */
     fun <E : Enum<E>> sendTitle(
         titleText: String,
         subtitleText: String? = null,
@@ -343,7 +346,7 @@ object TitleManager {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
         inventoryTitle.tryRenderInventoryTitle()

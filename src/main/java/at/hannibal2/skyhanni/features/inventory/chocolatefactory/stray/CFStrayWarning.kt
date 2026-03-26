@@ -164,7 +164,7 @@ object CFStrayWarning {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
