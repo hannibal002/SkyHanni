@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
@@ -45,8 +46,6 @@ private const val TANGENT_LOOKAHEAD = 1.5
 
 private const val NEAR_LINE_WIDTH = 6
 private const val FAR_LINE_WIDTH = 4
-
-private const val STANDING_EYE_HEIGHT = 1.62
 
 // distance in blocks above/below a water surface crossing where depth testing is disabled
 private const val PEEK_DISTANCE = 4.0

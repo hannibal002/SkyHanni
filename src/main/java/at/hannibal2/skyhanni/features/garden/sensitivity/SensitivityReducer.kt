@@ -14,7 +14,9 @@ import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -35,6 +37,8 @@ object SensitivityReducer {
     private val isActive get() = isAutoActive || isManualActive
     private val isAutoActive get() = SensitivityState.AUTO_REDUCED.isActive()
     private val isManualActive get() = SensitivityState.MANUAL_REDUCED.isActive()
+
+    private val squeakyMousematItem = "SQUEAKY_MOUSEMAT".toInternalName()
 
     @HandleEvent
     fun onTick() {
@@ -97,6 +101,7 @@ object SensitivityReducer {
                 SensitivityReducerConfig.Mode.TOOL -> isHoldingTool()
                 SensitivityReducerConfig.Mode.FISHING_ROD -> isHoldingFishingRod()
                 SensitivityReducerConfig.Mode.KEYBIND -> isHoldingKey()
+                SensitivityReducerConfig.Mode.MOUSEMAT -> isHoldingMousemat()
             }
         }
 
@@ -186,6 +191,7 @@ object SensitivityReducer {
         }
     }
 
+    private fun isHoldingMousemat(): Boolean = GardenApi.itemInHand?.getInternalName() == squeakyMousematItem
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
     private fun isHoldingFishingRod(): Boolean = FishingApi.holdingRod
     private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
