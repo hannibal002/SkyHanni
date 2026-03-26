@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.achievements
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
@@ -22,20 +23,35 @@ object PetAchievements {
     )
 
     private const val PET_SCORE_ACHIEVEMENT = "400 Pet Score"
+    private const val PET_EXP_ACHIEVEMENT = "Level 300 Pet"
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
-        val achievement = Achievement(
+        val petScoreAchievement = Achievement(
             "Oringo Competitor".asComponent(),
             "Oringo thinks true pet collectors have at least 400 Pet Score".asComponent(),
             14f,
         )
-        event.register(achievement, PET_SCORE_ACHIEVEMENT)
+        val petLevelAchievement = Achievement(
+            "Over Achiever".asComponent(),
+            "Have a Pet with enough XP to get Level 300".asComponent(),
+            30f,
+        )
+        event.register(petScoreAchievement, PET_SCORE_ACHIEVEMENT)
+        event.register(petLevelAchievement, PET_EXP_ACHIEVEMENT)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!event.inventoryName.startsWith("Pets")) return
+        val pets = ProfileStorageData.petProfiles?.pets ?: return
+        for (pet in pets) {
+            val xp = pet.exp ?: 0.0
+            if (xp >= 398_925_385) {
+                AchievementManager.completeAchievement(PET_EXP_ACHIEVEMENT)
+                break
+            }
+        }
         val lore = event.inventoryItems[47]?.getLoreComponent()?.reversed() ?: return
         for (line in lore) {
             petScorePattern.matchMatcher(line) {
