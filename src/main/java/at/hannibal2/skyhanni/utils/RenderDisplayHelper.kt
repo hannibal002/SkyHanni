@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
@@ -53,7 +54,13 @@ class RenderDisplayHelper(
             val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.renderIn(isInOwnInventory)) {
-                    display.render()
+                    if (display.outsideInventory && isInOwnInventory) {
+                        InventoryGuiScaleCompat.withOriginalHudScale {
+                            display.render()
+                        }
+                    } else {
+                        display.render()
+                    }
                 }
             }
         }
