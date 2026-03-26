@@ -237,9 +237,7 @@ object LocationUtils {
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
-        val noBlocks = canSee(a, b, offset)
-        val notTooFar = a.distance(b) < viewDistance.toDouble()
-        return noBlocks && notTooFar
+        return a.distance(b) < viewDistance.toDouble() && canSee(a, b, offset)
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =

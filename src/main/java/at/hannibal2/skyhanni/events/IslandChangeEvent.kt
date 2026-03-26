@@ -18,5 +18,8 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 @PrimaryFunction("onIslandChange")
 class IslandChangeEvent(val newIsland: IslandType, val oldIsland: IslandType) : SkyHanniEvent()
 
+@PrimaryFunction("onIslandJoin")
 class IslandJoinEvent(val island: IslandType, val previousIsland: IslandType) : SkyHanniEvent()
+
+@PrimaryFunction("onIslandLeave")
 class IslandLeaveEvent(val island: IslandType) : SkyHanniEvent()

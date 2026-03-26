@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -136,7 +135,7 @@ object ProfitPerDragon {
     private var lastScanned = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (lastScanned.passedSince() >= 1.seconds && !DragonFeatures.eggSpawned && !finishedLoot) {
             scanForLoot()
             lastScanned = SimpleTimeMark.now()

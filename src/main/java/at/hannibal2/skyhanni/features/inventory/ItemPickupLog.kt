@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
@@ -108,8 +108,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRender() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
@@ -249,7 +249,13 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        return if (compact) getInternalName().repoItemName else hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val default = hoverName.formattedTextCompatLeadingWhiteLessResets()
+        return runCatching {
+            if (compact) getInternalName().repoItemName else default
+        }.getOrElse {
+            ChatUtils.debug("Could not get dynamic name for $item - error:\n$it")
+            default
+        }
     }
 
     private fun ItemStack.hash(): Int {
