@@ -31,6 +31,9 @@ fun ArmorStand.getInventoryItems(): Array<ItemStack> =
         getItemBySlot(EquipmentSlot.OFFHAND),
     )
 
+fun ArmorStand.getEquipmentSlots(): Map<EquipmentSlot, ItemStack?> =
+    EquipmentSlot.entries.associateWith { getItemBySlot(it) }
+
 fun Entity.getEntityLevel(): Level =
     this.level()
 

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -58,7 +57,7 @@ object PageScrolling {
     private var cooldown = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         if (!currentlyScrollable && cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
