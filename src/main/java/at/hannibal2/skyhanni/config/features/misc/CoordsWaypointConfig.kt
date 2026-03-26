@@ -8,9 +8,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class PatcherCoordsWaypointConfig {
+class CoordsWaypointConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Highlight the coordinates sent by Patcher.")
+    @ConfigOption(name = "Enabled", desc = "Highlight coordinates sent in chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false

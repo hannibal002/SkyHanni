@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.misc
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraft.client.Minecraft
@@ -14,8 +14,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CurrentPing {
-
-    private val config get() = SkyHanniMod.feature.dev
 
     val averagePing: Duration
         get() = previousPings.takeIf { it.isNotEmpty() }?.average()?.milliseconds ?: Duration.ZERO
@@ -37,7 +35,7 @@ object CurrentPing {
                 if (!isEnabled()) {
                     ChatUtils.chatAndOpenConfig(
                         "This requires you to turn on \"Ping API\". Click this message to open the config.",
-                        config::pingApi,
+                        DevApi.mainToggles::pingApi,
                     )
                 } else {
                     ChatUtils.chat(getFormattedPing())
@@ -46,7 +44,7 @@ object CurrentPing {
         }
     }
 
-    fun isEnabled() = config.pingApi
+    fun isEnabled() = DevApi.mainToggles.pingApi
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
