@@ -13,7 +13,7 @@ object NpcSellLimitAchievement {
 
     private val sellLimitPattern by AchievementManager.group.pattern(
         "npc-sell-limit",
-        "You've reached the daily limit of coins you may earn from NPC shops.",
+        "You've reached the daily limit of coins you may earn from NPC shops\\.",
     )
 
     private const val NPC_SELL_LIMIT_ACHIEVEMENT = "npc sell limit"
