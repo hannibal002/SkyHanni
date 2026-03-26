@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
@@ -32,6 +34,7 @@ object AchievementManager {
     private val config get() = SkyHanniMod.achievementStorage.achievements
     private val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
     val group = RepoPattern.group("achievements")
+    private val achievementSound = SoundUtils.createSound("ui.toast.challenge_complete", 1f, .8f)
 
     @HandleEvent
     fun onInitFinished() {
@@ -83,6 +86,7 @@ object AchievementManager {
                         command = "/shachievements"
                     }
                 )
+                achievementSound.playSound()
             }
         }
 
@@ -110,6 +114,7 @@ object AchievementManager {
                     command = "/shachievements"
                 }
             )
+            achievementSound.playSound()
         }
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement completed")
