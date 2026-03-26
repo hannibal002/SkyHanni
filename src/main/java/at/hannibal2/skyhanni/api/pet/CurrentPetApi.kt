@@ -61,7 +61,7 @@ object CurrentPetApi {
             val cancelledByAp = lastApAssertion != null && lastApAssertion.passedSince() <= 5.seconds
 
             val lastMenAssertion = lastAssertion[PetDataAssertionSource.MENU]
-            val cancelledByMenu = lastMenAssertion != null && lastMenAssertion.passedSince() >= 5.seconds
+            val cancelledByMenu = lastMenAssertion != null && lastMenAssertion.passedSince() <= 5.seconds
 
             if (cancelledByMenu || cancelledByAp) return
         }
@@ -93,7 +93,7 @@ object CurrentPetApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("CurrentPetApi")
         event.addIrrelevant {
             val petInfo = when (currentPet) {

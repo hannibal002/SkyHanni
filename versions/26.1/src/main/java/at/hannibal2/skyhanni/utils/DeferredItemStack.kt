@@ -39,6 +39,8 @@ internal class DeferredItemStack private constructor(
         isBuilt = false
     }
 
+    override fun copy(): ItemStack = DeferredItemStack(sourceItem, factory, this.count)
+
     init {
         instances.add(this)
         rebuild()

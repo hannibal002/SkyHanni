@@ -25,6 +25,11 @@ object SafeItemStackUtils {
     var componentsLoaded: Boolean = false
         private set
 
+    init {
+        //? if < 26.1
+        //componentsLoaded = true
+    }
+
     @HandleEvent
     fun onComponentsLoaded(event: ComponentsLoadedEvent) {
         componentsLoaded = true

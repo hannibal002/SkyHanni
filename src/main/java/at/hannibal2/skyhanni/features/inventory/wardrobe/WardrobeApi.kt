@@ -177,7 +177,7 @@ object WardrobeApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
             if (slots.isEmpty()) {

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.network.protocol.game.ClientboundContainerClosePacket
+import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket
@@ -98,6 +99,31 @@ object OtherInventoryData {
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true
+        }
+
+        if (packet is ClientboundContainerSetContentPacket) {
+            if (!acceptItems) {
+                currentInventory?.let {
+                    if (it.windowId != packet.containerId) return
+                    it.items.clear()
+                    packet.items.take(it.slotCount).forEachIndexed { slot, itemStack ->
+                        if (itemStack.isNotEmpty()) {
+                            it.items[slot] = itemStack
+                        }
+                    }
+                    lateEvent = InventoryUpdatedEvent(it)
+                }
+                return
+            }
+            currentInventory?.let {
+                if (it.windowId != packet.containerId) return
+                packet.items.take(it.slotCount).forEachIndexed { slot, itemStack ->
+                    if (itemStack.isNotEmpty()) {
+                        it.items[slot] = itemStack
+                    }
+                }
+                done(it)
+            }
         }
 
         if (packet is ClientboundContainerSetSlotPacket) {

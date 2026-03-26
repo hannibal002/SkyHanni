@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 /**
- * Fired once when Minecraft's item component data has been fully bound
+ * Fired once when Minecraft's item component data has been fully bound,
  * and it is safe to create [net.minecraft.world.item.ItemStack] instances
  * from vanilla items.
  *

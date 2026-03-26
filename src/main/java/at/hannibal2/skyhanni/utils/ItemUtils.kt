@@ -303,6 +303,7 @@ object ItemUtils {
 
     private fun SafeItemStack.grabInternalNameOrNull(): NeuInternalName? {
         if (!SafeItemStackUtils.componentsLoaded) return null
+        if (isEmpty) return null
         if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
