@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.config.features.dev.TrackCommandConfig
 import at.hannibal2.skyhanni.events.CancellableWorldEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -159,10 +158,14 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         }
     }
 
-    open fun onDisconnect(event: ClientDisconnectEvent) {
-        if (!isRecording) return
-        endRecording()
+    private fun prematureStop() {
+        cutOffTime = SimpleTimeMark.now()
+        isRecording = false
+        tracked.clear()
     }
+
+    open fun onDisconnect() = prematureStop()
+    open fun onWorldChange() = prematureStop()
 
     open fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != config.toggleKeybind) return

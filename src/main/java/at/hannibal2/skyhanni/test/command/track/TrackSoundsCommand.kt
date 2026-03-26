@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -75,7 +74,10 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     override fun onCommandRegistration(event: CommandRegistrationEvent) = super.onCommandRegistration(event)
 
     @HandleEvent
-    override fun onDisconnect(event: ClientDisconnectEvent) = super.onDisconnect(event)
+    override fun onDisconnect() = super.onDisconnect()
+
+    @HandleEvent
+    override fun onWorldChange() = super.onWorldChange()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
