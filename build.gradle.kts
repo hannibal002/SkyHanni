@@ -188,6 +188,7 @@ afterEvaluate {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
         arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
+        arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
     }
 }
 

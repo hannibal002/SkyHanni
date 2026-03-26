@@ -21,34 +21,28 @@ class ModuleProcessor(
     modVersion: String,
     private val mcVersion: String,
     private val buildPaths: String?,
+    cacheDir: String?,
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
 
     private var skyHanniEvent: KSType? = null
     private val warnings = mutableListOf<String>()
-
-    companion object {
-        // Persists across builds within the same Gradle daemon.
-        // Maps mcVersion -> (filePath -> lastModified), used to detect which annotated files actually changed.
-        private val cachedFileStates = mutableMapOf<String, Map<String, Long>>()
-    }
+    private val stateFile: File? = cacheDir?.let { File(it, "ksp-module-state-$mcVersion.txt") }
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
         skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
 
         val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
 
-        val currentFileMtimes = symbols
+        val currentFileModTimes = symbols
             .mapNotNull { it.containingFile?.filePath }
             .toSet()
             .associateWith { File(it).lastModified() }
 
-        val cachedMtimes = cachedFileStates[mcVersion]
-        cachedFileStates[mcVersion] = currentFileMtimes
-
-        val dirtyFilePaths: Set<String> = if (cachedMtimes == null) {
-            currentFileMtimes.keys
+        val cachedModTimes = readStateFile()
+        val dirtyFilePaths: Set<String> = if (cachedModTimes == null) {
+            currentFileModTimes.keys
         } else {
-            currentFileMtimes.filter { (path, mtime) -> cachedMtimes[path] != mtime }.keys
+            currentFileModTimes.filter { (path, mtime) -> cachedModTimes[path] != mtime }.keys
         }
 
         val dirtyCount = symbols.count { it.containingFile?.filePath in dirtyFilePaths }
@@ -57,7 +51,23 @@ class ModuleProcessor(
         val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths) }
 
         if (validSymbols.isNotEmpty()) generateFile(validSymbols)
+        writeStateFile(currentFileModTimes)
         return emptyList()
+    }
+
+    private fun readStateFile(): Map<String, Long>? {
+        val file = stateFile?.takeIf { it.exists() } ?: return null
+        return file.readLines().mapNotNull { line ->
+            val idx = line.lastIndexOf('|')
+            if (idx < 0) return@mapNotNull null
+            line.substring(0, idx) to (line.substring(idx + 1).toLongOrNull() ?: return@mapNotNull null)
+        }.toMap()
+    }
+
+    private fun writeStateFile(mtimes: Map<String, Long>) {
+        val file = stateFile ?: return
+        file.parentFile?.mkdirs()
+        file.writeText(mtimes.entries.joinToString("\n") { (path, mtime) -> "$path|$mtime" })
     }
 
     private fun processBuildPaths(symbols: List<KSAnnotated>): List<KSAnnotated> {
