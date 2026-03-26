@@ -20,7 +20,7 @@ object ReflectionUtils {
         "Field '$name' on ${javaClass.name} is null"
     }
     fun Class<*>.getPublicFieldValue(name: String, instance: Any?): Any = requireNotNull(getPublicField(name).get(instance)) {
-        "Field '$name' on $name is null"
+        "Field '$name' on ${javaClass.name} is null"
     }
 
     /**
@@ -40,7 +40,7 @@ object ReflectionUtils {
         "Field at index $index on ${javaClass.name} is null"
     }
     fun Class<*>.getPrivateFieldValue(name: String, instance: Any?): Any = requireNotNull(getPrivateField(name).get(instance)) {
-        "Field '$name' on $name is null"
+        "Field '$name' on ${javaClass.name} is null"
     }
 
     fun Field.makeAccessible() = also { isAccessible = true }
