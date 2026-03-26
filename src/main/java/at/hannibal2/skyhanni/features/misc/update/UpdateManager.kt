@@ -71,7 +71,7 @@ object UpdateManager {
         if (hasCheckedForUpdate) return
         hasCheckedForUpdate = true
 
-        if (config.autoUpdates || config.fullAutoUpdates)
+        if (config.checkForUpdates || config.fullAutoUpdates)
             checkUpdate()
     }
 
@@ -128,11 +128,11 @@ object UpdateManager {
                             }
                         )
                         queueUpdate()
-                    } else if (config.autoUpdates) {
+                    } else if (config.checkForUpdates) {
                         ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                            config::autoUpdates,
+                            config::checkForUpdates,
                         )
                         ChatUtils.clickableChat(
                             "§e§lCLICK HERE §r§eto view changes.",

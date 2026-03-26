@@ -6,8 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,9 +19,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.ChatFormatting
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.network.chat.Component
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -49,17 +51,26 @@ object BarnFishingTimer {
         }
     }
 
-    private enum class AlertReason(display: String) {
-        TIME("Time Alert!"),
-        PERSONAL_CAP("Reached Personal Cap!"),
-        GLOBAL_CAP("Reached Global Cap!"),
-        NO_ALERT("You shouldn't see this, report this as a bug"),
+    private enum class AlertReason(val title: String, val message: String) {
+        TIME(
+            "Fishing Time Limit!",
+            "Reached barn fishing time limit!",
+        ),
+        PERSONAL_CAP(
+            "Reached Personal Cap!",
+            "Reached personal sea creature cap!",
+        ),
+        GLOBAL_CAP(
+            "Reached Global Cap!",
+            "Reached global sea creature cap!",
+        ),
+        NO_ALERT(
+            "You shouldn't see this, report this as a bug",
+            "You shouldn't see this, report this as a bug",
+        ),
         ;
 
-        val display: String = "§c$display"
-
         inline val isAlert: Boolean get() = this != NO_ALERT
-
     }
 
     private var ownMobs: Int = 0
@@ -88,7 +99,7 @@ object BarnFishingTimer {
     fun onSecondPassed() = update()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let {
             config.pos.renderRenderable(it, posLabel = "Fishing Timer")
@@ -126,8 +137,11 @@ object BarnFishingTimer {
         if (reason.isAlert) {
             lastWarning = ServerTimeMark.now()
             SoundUtils.plingSound.playSound()
-            TitleManager.sendTitle(reason.display, duration = 2.seconds)
-            ChatUtils.chat(reason.display, replaceSameMessage = true)
+            TitleManager.sendTitle("§c${reason.title}", duration = 2.seconds)
+            ChatUtils.chat(
+                Component.literal(reason.message).withColor(ChatFormatting.RED),
+                replaceSameMessage = true,
+            )
         }
 
         val timeColor = if (reason == AlertReason.TIME) "§c" else "§a"
@@ -187,12 +201,18 @@ object BarnFishingTimer {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        currentCap = FishingCap.getForIsland(event.newIsland)
-        enabledInIsland = updateLocation(event.newIsland)
+    fun onIslandJoin(event: IslandJoinEvent) {
+        currentCap = FishingCap.getForIsland(event.island)
+        enabledInIsland = updateLocation(event.island)
+    }
+
+    @HandleEvent
+    fun onIslandLeave() {
         reset()
     }
 
+    // `event` parameter is required because of the generic
+    @Suppress("UNUSED_PARAMETER")
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         enabledInIsland = if (config.showAnywhere) true else hubBarnFishingLocation.distanceToPlayer() < 50
