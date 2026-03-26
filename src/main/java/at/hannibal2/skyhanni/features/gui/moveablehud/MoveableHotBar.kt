@@ -8,15 +8,15 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object MovableXPBar : MovableHudOverlay(
-    RenderLayer.EXPERIENCE_BAR, RenderLayer.EXPERIENCE_NUMBER,
-    displayName = "XP Bar",
+object MoveableHotBar : MoveableHudOverlay(
+    RenderLayer.HOTBAR,
+    displayName = "Hotbar",
     width = 182,
-    height = 5,
+    height = 22,
     anchorOffsetX = 91,
-    anchorOffsetY = 29,
+    anchorOffsetY = 22,
 ) {
-    override val config get() = SkyHanniMod.feature.gui.xpBar
+    override val config get() = SkyHanniMod.feature.gui.hotbar
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     override fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) = super.onRenderOverlayPre(event)

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
-import kotlin.Suppress;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import com.mojang.blaze3d.vertex.PoseStack;
