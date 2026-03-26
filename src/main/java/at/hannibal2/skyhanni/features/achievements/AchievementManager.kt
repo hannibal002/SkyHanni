@@ -30,6 +30,7 @@ import net.minecraft.world.item.Items
 object AchievementManager {
 
     private val config get() = SkyHanniMod.achievementStorage.achievements
+    private val shouldShowMessages get() = SkyHanniMod.feature.misc.achievementMessages
     val group = RepoPattern.group("achievements")
 
     @HandleEvent
@@ -65,22 +66,24 @@ object AchievementManager {
         val newTier = achievement.getCurrentTier() ?: 0
         if (newTier > currentTier) {
             if (newTier == achievement.tiers.size) achievement.data.achieved = true
-            ChatUtils.chat(
-                componentBuilder {
-                    append("Achievement Get! ") {
-                        withColor(ChatFormatting.GOLD)
+            if (shouldShowMessages) {
+                ChatUtils.chat(
+                    componentBuilder {
+                        append("Achievement Get! ") {
+                            withColor(ChatFormatting.GOLD)
+                        }
+                        append(achievement.getName() ?: "?".asComponent()) {
+                            withColor(ChatFormatting.GREEN)
+                        }
+                        if (!achievement.data.achieved) {
+                            append(" $newProgress/${achievement.getAmountForNextTier()} to unlock the next tier")
+                        }
+                        append("!")
+                        hover = achievement.getDescription()
+                        command = "/shachievements"
                     }
-                    append(achievement.getName() ?: "?".asComponent()) {
-                        withColor(ChatFormatting.GREEN)
-                    }
-                    if (!achievement.data.achieved) {
-                        append(" $newProgress/${achievement.getAmountForNextTier()} to unlock the next tier")
-                    }
-                    append("!")
-                    hover = achievement.getDescription()
-                    command = "/shachievements"
-                }
-            )
+                )
+            }
         }
 
         config[id] = achievement
@@ -93,19 +96,21 @@ object AchievementManager {
         if (achievement.data.achieved) return
         achievement.data.achieved = true
         config[id] = achievement
-        ChatUtils.chat(
-            componentBuilder {
-                append("Achievement Get! ") {
-                    withColor(ChatFormatting.GOLD)
+        if (shouldShowMessages) {
+            ChatUtils.chat(
+                componentBuilder {
+                    append("Achievement Get! ") {
+                        withColor(ChatFormatting.GOLD)
+                    }
+                    append(achievement.getName() ?: "?".asComponent()) {
+                        withColor(ChatFormatting.GREEN)
+                    }
+                    append("!")
+                    hover = achievement.getDescription()
+                    command = "/shachievements"
                 }
-                append(achievement.getName() ?: "?".asComponent()) {
-                    withColor(ChatFormatting.GREEN)
-                }
-                append("!")
-                hover = achievement.getDescription()
-                command = "/shachievements"
-            }
-        )
+            )
+        }
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement completed")
     }
@@ -132,13 +137,14 @@ object AchievementManager {
             description = "Tests achievement granting and revoking"
             category = CommandCategory.DEVELOPER_TEST
             literalCallback("unlockall") {
-                ChatUtils.chat("you didnt think this would really work? did you...")
+                ChatUtils.chat("you didn't think this would really work? did you...")
             }
             simpleCallback {
                 val achievement = getAchievement(TEST_ACHIEVEMENT)
                 if (achievement.data.achieved) {
                     achievement.data.achieved = false
                     setAchievement(TEST_ACHIEVEMENT, achievement)
+                    ChatUtils.chat("Lost the test achievement :(")
                 } else {
                     completeAchievement(TEST_ACHIEVEMENT)
                 }
@@ -188,8 +194,8 @@ object AchievementManager {
         var luck = 0f
         var hasDoneAllAchievements = true
         for ((_, achievement) in config) {
-            luck += achievement.userLuckAmount
             if (!achievement.data.achieved) hasDoneAllAchievements = false
+            else luck += achievement.userLuckAmount
         }
         if (hasDoneAllAchievements) luck += 100
         if (luck == 0f) return

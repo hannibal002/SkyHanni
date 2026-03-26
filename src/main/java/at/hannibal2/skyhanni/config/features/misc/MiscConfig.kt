@@ -489,4 +489,13 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     var rainbowActionBar: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show Achievement Messages",
+        desc = "You can do §e/shachievements§7 to see them all!"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var achievementMessages: Boolean = true
 }
