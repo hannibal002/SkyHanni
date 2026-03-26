@@ -39,7 +39,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -243,7 +243,7 @@ object DungeonLividFinder {
 
         val color = lorenzColor.toChromaColor()
         event.drawFilledBoundingBox(boundingBox, color, 0.5f)
-        event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
+        event.drawLineToCrosshair(location.add(x = 0.5, z = 0.5), color, 3, true)
     }
 
     private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5

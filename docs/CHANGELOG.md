@@ -32,6 +32,8 @@
 + Added Remaining Slayer Kills Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4818)
     + Shows the names and remaining number of mob kills needed until the boss spawns.
     + Option to show mob level and health.
++ Added line to Tarantula Boss. - SillyGirlMarina (https://github.com/hannibal002/SkyHanni/pull/5392)
++ Added Avorius Helper for the Crimson Isle. - Destiny (https://github.com/hannibal002/SkyHanni/pull/5441)
 
 #### Farming
 
@@ -48,6 +50,8 @@
 #### Inventory
 
 + Added Supercrafting menu quantity preset overlay. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5296)
++ Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
+  + Highlights completed categories in green.
 
 #### Garden
 
@@ -56,6 +60,8 @@
 + Added Crop Break Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4703)
     + Shows the number of crops you have broken on the Garden and blocks per second (supports pest farming/visitors).
     + Can choose to display data from the following modes: Total, Session, Day, Week, Month, or Year.
++ Added an option to prevent breaking crops on the Garden while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5455)
++ Added option to reduce sensitivity while holding Squeaky Mousemat. - Nick-NCSU (https://github.com/hannibal002/SkyHanni/pull/5391)
 
 ### Improvements
 
@@ -66,6 +72,7 @@
     + Seen Rare Sea Creature Ding/Title.
     + Self Notify Upon Seeing.
 + Improved Fishing Timer with total mob count and more accurate despawn timing. - Empa & Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5247)
++ Made warnings from Barn Fishing Timer clearer. - Luna (https://github.com/hannibal002/SkyHanni/pull/5453)
 
 #### Event
 
@@ -77,6 +84,7 @@
 
 + Added the ability to block refusing Seymour's Special Armor visitor reward. - Luna (https://github.com/hannibal002/SkyHanni/pull/5311)
   + This includes Velvet Top Hat, Cashmere Jacket, Satin Trousers, and Oxford Shoes.
++ Hoe Levels Display now warns you if your tool is not gaining XP because you're farming the wrong crop. - Luna (https://github.com/hannibal002/SkyHanni/pull/5415)
 
 #### Misc
 
@@ -90,6 +98,8 @@
 + Improved visual quality of items in displays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5318)
 + Added a copy to clipboard for missing sack items. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/5351)
 + Improved pathfind lines to look prettier. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5417)
++ Renamed feature Patcher Coords Waypoints to Coords Waypoints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5424)
++ Significantly improved accuracy of server TPS measurement. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
 
 #### Garden
 
@@ -117,6 +127,7 @@
 + Fixed some Garden displays not rendering if you downgraded the mod. - nopo (https://github.com/hannibal002/SkyHanni/pull/5295)
 + Fixed error when first opening Composter with overlay enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5320)
 + Fixed composter overlay not reloading when repo does. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5350)
++ Fixed Greenhouse Growth Stage alert sometimes sending multiple times. - Luna (https://github.com/hannibal002/SkyHanni/pull/5438)
 
 #### Combat
 
@@ -133,6 +144,10 @@
 + Fixed Flare Display sometimes causing freezes. - nopo (https://github.com/hannibal002/SkyHanni/pull/5355)
   + Should also improve performance with Flare Display a little bit.
 + Fixed Kuudra Keys not counting Reputation Discount in croesus/Instance Chest Profit. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5292)
++ Fixed instance profit calculation. - Tommo (https://github.com/hannibal002/SkyHanni/pull/5452)
+  + Removed the dungeon key counting as profit.
+  + Removed empty items from display.
++ Fixed occasional performance issues with Mob Detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5456)
 
 #### GUI
 
@@ -143,7 +158,7 @@
 + Improved Custom Scoreboard performance by caching rendered lines. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5368)
 + Fixed Advanced Player List issues with YouTubers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5427)
 + Fixed double XP lines in tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5427)
-
++ Fixed error when using level color for player name in tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5445)
 
 #### Item Ability
 
@@ -189,6 +204,7 @@
 
 + Fixed sometimes getting an error in chat / disconnect when opening sacks. - Luna (https://github.com/hannibal002/SkyHanni/pull/5370)
 + Fixed multiple overclockers not being detected by Jacob bulk-claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5410)
++ Fixed error reading items in ItemPickupLog. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5444)
 
 #### Misc
 
@@ -300,6 +316,26 @@
 + Simplified Reforge data loading from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5380)
 + Started cleanup of `Graph` and its related classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5380)
 + Started defining `PrimaryFunctions` for events missing them. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5418)
++ `SkyHanniTickEvent` now fires at `END_CLIENT_TICK` instead of `START_WORLD_TICK`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5451)
+  + This avoids event handlers operating on stale data that is a tick behind.
++ Added `Duration.inPartialMilliseconds`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
++ Added `Duration.roundedUpSeconds`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
+  + Useful for countdowns, because `inWholeSeconds` will round down, often leading to undesirable behavior where, for example, your 5-second countdown starts at 4 and shows 0 for a full second before finishing.
++ Added `PlayerUtils.STANDING_EYE_HEIGHT` and `PlayerUtils.SNEAKING_EYE_HEIGHT` in place of. of previous hardcoded magic numbers. - Luna (https://github.com/hannibal002/SkyHanni/pull/5443)
+  + This also updates our outdated assumption of sneaking eye height being 1.54, which was true in Minecraft 1.8.9, but nowadays it is more like 1.27.
++ Added `SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5443)
++ Added `tick` and `timeMark` fields to `ServerTickEvent`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
++ Added ItemStack.asTextComponent. - nopo (https://github.com/hannibal002/SkyHanni/pull/5431)
++ Changed ArmorStand entity copying to use EquipmentSlot. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5442)
++ Fixed `SkyHanniTickEvent` post being delayed by DelayedRun calls. - Luna (https://github.com/hannibal002/SkyHanni/pull/5451)
++ Migrated all declared plugin + library versions to libs.version.toml. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5384)
++ Removed FeatureTogglesByDefaultAdapter. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5377)
++ Removed leftover files from patcher support. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5424)
++ Removed unused `Duration.inPartialYears`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
+  + The precise definition of a year is context-dependent anyway, so it's better not to have this.
++ Renamed `WorldRenderUtils.drawLineToEye` to `WorldRenderUtils.drawLineToCrosshair` to more accurately represent its function. - Luna (https://github.com/hannibal002/SkyHanni/pull/5443)
++ Unified separate gradle sub-projects to use dep resolution from libs.version.toml. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5384)
++ Updated Stonecutter to version 0.9. - Luna (https://github.com/hannibal002/SkyHanni/pull/5463)
 
 ### Removed Features
 

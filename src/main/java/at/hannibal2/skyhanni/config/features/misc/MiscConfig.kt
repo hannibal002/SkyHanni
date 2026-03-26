@@ -106,10 +106,11 @@ class MiscConfig {
     @Accordion
     val bits: BitsConfig = BitsConfig()
 
+    // TODO rename to coordsWaypoint
     @Expose
-    @ConfigOption(name = "Patcher Coords Waypoints", desc = "")
+    @ConfigOption(name = "Coords Waypoints", desc = "")
     @Accordion
-    val patcherCoordsWaypoint: PatcherCoordsWaypointConfig = PatcherCoordsWaypointConfig()
+    val patcherCoordsWaypoint: CoordsWaypointConfig = CoordsWaypointConfig()
 
     @Expose
     @ConfigOption(name = "Reminders", desc = "")
@@ -298,15 +299,6 @@ class MiscConfig {
     @SearchTag("Elizabeth Community Center")
     @FeatureToggle
     var accountUpgradeReminder: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Fix Patcher Lines",
-        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fixPatcherLines: Boolean = true
 
     @Expose
     @ConfigOption(name = "Time In Limbo", desc = "Show the time since you entered the limbo.")
