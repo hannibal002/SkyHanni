@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.RenderPipelines
 import kotlin.math.roundToInt
 
 //? if > 1.21.10
-// import com.mojang.blaze3d.textures.FilterMode
+//import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -66,7 +66,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
                 //? if < 1.21.11 {
                 TextureSetup.singleTexture(textureView),
                 //?} else
-                // TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+                //TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 state.pose(),
                 state.x0(), state.y0(), state.x1(), state.y1(),
                 0f,
