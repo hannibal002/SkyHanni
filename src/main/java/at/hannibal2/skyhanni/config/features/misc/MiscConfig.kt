@@ -393,7 +393,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fast Fairy Souls",
-        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ",
+        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island.",
     )
     @ConfigEditorBoolean
     var fastFairySouls: Boolean = false
