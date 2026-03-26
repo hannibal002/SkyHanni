@@ -353,11 +353,21 @@ detekt {
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
 }
 
+// Detekt is handled by a dedicated CI workflow; exclude it from the check/build lifecycle
+// so it doesn't slow down normal builds. It still runs when invoked explicitly.
+afterEvaluate {
+    tasks.findByName("check")?.setDependsOn(
+        tasks.getByName("check").dependsOn.filterNot { dep ->
+            (dep is Task && dep.name.startsWith("detekt")) ||
+            (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
+        }
+    )
+}
+
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12110
-    val isCi = System.getenv("CI") == "true"
     val skipDetekt = project.findProperty("skipDetekt") == "true"
-    onlyIf { isTargetVersion && isCi && !skipDetekt }
+    onlyIf { isTargetVersion && !skipDetekt }
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
