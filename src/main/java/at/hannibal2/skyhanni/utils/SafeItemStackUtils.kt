@@ -31,7 +31,7 @@ object SafeItemStackUtils {
     }
 
     @HandleEvent
-    fun onComponentsLoaded(event: ComponentsLoadedEvent) {
+    fun onComponentsLoaded() {
         componentsLoaded = true
     }
 

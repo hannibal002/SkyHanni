@@ -54,7 +54,7 @@ internal class DeferredItemStack private constructor(
             DeferredItemStack(sourceItem, factory, DeferredPatchedDataComponentMap(), count)
 
         @HandleEvent
-        fun onComponentsLoaded(event: ComponentsLoadedEvent) {
+        fun onComponentsLoaded() {
             instances.forEach { it.rebuild() }
         }
     }
