@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.config.features.dev.TrackCommandConfig
 import at.hannibal2.skyhanni.events.CancellableWorldEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -158,6 +159,11 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         }
     }
 
+    open fun onDisconnect(event: ClientDisconnectEvent) {
+        if (!isRecording) return
+        endRecording()
+    }
+
     open fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != config.toggleKeybind) return
         if (lastKeyToggle.passedSince() < 1.seconds) return
@@ -176,7 +182,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         }
     }
 
-    open fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    open fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (cutOffTime.isInPast()) return
         config.position.renderRenderables(display, posLabel = "Track $commonName log")
     }
