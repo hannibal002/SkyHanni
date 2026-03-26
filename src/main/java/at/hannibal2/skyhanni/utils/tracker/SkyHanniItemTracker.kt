@@ -74,9 +74,6 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
 
     private val itemTrackerConfig: ItemTrackerGenericConfig.ItemTrackerConfig get() = config.itemTracker
 
-    var a = ""
-    var b = 1
-
     private var scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) {
