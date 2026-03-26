@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.achievements
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -30,7 +31,7 @@ object SlothAchievement {
         event.register(achievement, SECURITY_SLOTH_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.cleanMessage.startsWith("[SECURITY] Sloth")) {
             AchievementManager.completeAchievement(SECURITY_SLOTH_ACHIEVEMENT)

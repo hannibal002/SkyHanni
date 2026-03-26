@@ -32,7 +32,7 @@ object SealAchievement {
         event.register(achievement, SEAL_BOUNCE_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         sealBouncePattern.matchMatcher(event.cleanMessage) {
             if (group("bounces").formatInt() >= 100) {

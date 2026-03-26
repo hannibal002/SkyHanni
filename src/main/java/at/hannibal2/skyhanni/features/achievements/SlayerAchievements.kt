@@ -48,7 +48,7 @@ object SlayerAchievements {
         event.register(achievement10m, RNG_ACHIEVEMENT_10M)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         rngMeterPattern.matchMatcher(event.cleanMessage) {
             val xp = group("xp").formatInt()

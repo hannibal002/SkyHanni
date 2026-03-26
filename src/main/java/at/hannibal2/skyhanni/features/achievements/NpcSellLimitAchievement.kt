@@ -28,7 +28,7 @@ object NpcSellLimitAchievement {
         event.register(achievement, NPC_SELL_LIMIT_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (sellLimitPattern.matches(event.cleanMessage)) {
             AchievementManager.completeAchievement(NPC_SELL_LIMIT_ACHIEVEMENT)

@@ -27,14 +27,14 @@ object SkillAchievement {
         event.register(achievement, SKILL_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSkillOverflowLevel(event: SkillOverflowLevelUpEvent) {
         val achievement = AchievementManager.getAchievement(SKILL_ACHIEVEMENT)
         if (achievement.data.progress >= event.newLevel) return
         AchievementManager.updateTieredAchievement(SKILL_ACHIEVEMENT, event.newLevel)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened() {
         if (!skillDetector.isInside()) return
         val storage = ProfileStorageData.profileSpecific?.skillData ?: return

@@ -31,7 +31,7 @@ object CakeSoulAchievement {
         event.register(achievement, CAKE_SOUL_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (cakeSoulPattern.matches(event.cleanMessage)) {
             AchievementManager.completeAchievement(CAKE_SOUL_ACHIEVEMENT)

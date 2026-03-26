@@ -26,7 +26,7 @@ object JerrySeedAchievement {
         event.register(achievement, JERRYSEED_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: OwnInventoryItemUpdateEvent) {
         val stack = event.itemStack
         if (stack.getInternalNameOrNull() != JERRYSEED) return

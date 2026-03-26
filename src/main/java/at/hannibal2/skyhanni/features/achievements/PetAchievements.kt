@@ -33,7 +33,7 @@ object PetAchievements {
         event.register(achievement, PET_SCORE_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!event.inventoryName.startsWith("Pets")) return
         val lore = event.inventoryItems[47]?.getLoreComponent()?.reversed() ?: return
