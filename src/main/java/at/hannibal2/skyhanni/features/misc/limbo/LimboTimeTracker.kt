@@ -152,7 +152,7 @@ object LimboTimeTracker {
         val duration = passedSince.format()
         val currentPB = (storage?.personalBest ?: 0).seconds
         val oldLuck = storage?.userLuck ?: 0f
-        if (passedSince > 6.hours) AchievementManager.completeAchievement(LIMBO_ACHIEVEMENT)
+        if (passedSince > 6.hours || currentPB > 6.hours) AchievementManager.completeAchievement(LIMBO_ACHIEVEMENT)
         if (passedSince > currentPB) {
             oldPB = currentPB
             storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
