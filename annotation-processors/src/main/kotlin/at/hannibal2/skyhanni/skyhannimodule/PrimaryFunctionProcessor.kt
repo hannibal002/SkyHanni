@@ -16,12 +16,17 @@ class PrimaryFunctionProcessor(
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
+        val newFiles = resolver.getNewFiles().toSet()
         val skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")
-            ?.asStarProjectedType() ?: return emptyList()
+            ?.asStarProjectedType()
 
         val symbols = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
             .filterIsInstance<KSClassDeclaration>()
-            .filter { skyHanniEvent.isAssignableFrom(it.asStarProjectedType()) }
+            .filter { symbol ->
+                // Skip expensive type resolution for unchanged files
+                if (symbol.containingFile !in newFiles) return@filter true
+                skyHanniEvent?.isAssignableFrom(symbol.asStarProjectedType()) == true
+            }
             .toList()
 
         generate(symbols)

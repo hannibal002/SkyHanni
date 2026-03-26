@@ -29,9 +29,13 @@ class ModuleProcessor(
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
         skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
 
+        val newFiles = resolver.getNewFiles().toSet()
         val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
-        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion")
-        val validSymbols = symbols.mapNotNull { validateSymbol(it) }
+        val dirtyCount = symbols.count { it.containingFile in newFiles }
+        val cachedCount = symbols.size - dirtyCount
+        val countFormat = "($dirtyCount revalidated, $cachedCount from cache)"
+        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion $countFormat")
+        val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile in newFiles) }
 
         if (validSymbols.isNotEmpty()) generateFile(validSymbols)
         return emptyList()
@@ -49,7 +53,14 @@ class ModuleProcessor(
         }
     }
 
-    private fun validateSymbol(symbol: KSAnnotated): KSClassDeclaration? {
+    /**
+     * Validates that a symbol is a valid `@SkyHanniModule` target.
+     *
+     * @param symbol The annotated symbol to validate.
+     * @param isDirty Whether the symbol's source file is new or modified since the last build.
+     *                If false, expensive type resolution is skipped as the symbol was already validated.
+     */
+    private fun validateSymbol(symbol: KSAnnotated, isDirty: Boolean): KSClassDeclaration? {
         if (!symbol.validate()) {
             logger.warn("Symbol is not valid: $symbol")
             return null
@@ -63,18 +74,20 @@ class ModuleProcessor(
             return null
         }
 
-        val className = symbol.qualifiedName?.asString() ?: "unknown"
-        for (function in symbol.getDeclaredFunctions()) {
-            if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
-                // It's technically nullable, idk man, safety and shit
-                val event = skyHanniEvent ?: return symbol
-                val firstParam = function.parameters.firstOrNull()?.type?.resolve()
-                val eventType = function.annotations.find { it.shortName.asString() == "HandleEvent" }
-                    ?.arguments?.find { it.name?.asString() == "eventType" }?.value
-                if ((firstParam == null && eventType == null) || (firstParam != null && !event.isAssignableFrom(firstParam)))
-                    warnings.add("Function in $className must have an event assignable from $event because it is annotated with @HandleEvent")
+        if (isDirty) {
+            val className = symbol.qualifiedName?.asString() ?: "unknown"
+            for (function in symbol.getDeclaredFunctions()) {
+                if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
+                    val event = skyHanniEvent ?: return symbol
+                    val firstParam = function.parameters.firstOrNull()?.type?.resolve()
+                    val eventType = function.annotations.find { it.shortName.asString() == "HandleEvent" }
+                        ?.arguments?.find { it.name?.asString() == "eventType" }?.value
+                    if ((firstParam == null && eventType == null) || (firstParam != null && !event.isAssignableFrom(firstParam)))
+                        warnings.add("Function in $className must have an event assignable from $event because it is annotated with @HandleEvent")
+                }
             }
         }
+
         return symbol
     }
 
