@@ -59,13 +59,13 @@ internal fun NeuInternalName.scaledItem(withTip: Boolean = true, scale: Double =
     itemRenderableCache.getOrPut(Triple(this, withTip, (scale * 100).toInt())) {
         val provider = providerFor(this)
         val glint = asString().startsWith("ENCHANTED_")
-        Renderable.item(
-            stackGetter = { provider.stack.copy().apply { if (glint) addEnchantGlint() } },
-            scale = scale,
-            xSpacing = 0,
-            ySpacing = 0,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-        ).let { if (withTip) it.withTip() else it }
+        Renderable.item(provider.stack.copy().apply { if (glint) addEnchantGlint() }) {
+            this.scale = scale
+            this.xSpacing = 0
+            this.ySpacing = 0
+        }.let {
+            if (withTip) it.withTip() else it
+        }
     }
 
 /** Raw rendered pixel size of an item at [scale], excluding slot padding. */
@@ -105,7 +105,11 @@ internal fun buildItemSlot(
             Renderable.placeholder(pixelSize, pixelSize).drawInSlot(filled = false, radiusScalar = scale)
 
         ingredient.internalName == COIN_ITEM ->
-            Renderable.item(ItemUtils.getCoinItemStack(ingredient.count), scale = scale, xSpacing = 0, ySpacing = 0).drawInSlot()
+            Renderable.item(ItemUtils.getCoinItemStack(ingredient.count)) {
+                this.scale = scale
+                this.xSpacing = 0
+                this.ySpacing = 0
+            }.drawInSlot()
 
         else -> {
             val canNavigate = !isOutput && ingredient.internalName != screen.internalName
