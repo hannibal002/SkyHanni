@@ -177,6 +177,7 @@ object GraphUtils {
     fun GenericNode.distanceToPlayer(): Double = position.distance(playerPosition)
     fun GenericNode.distanceSqToPlayer(): Double = position.distanceSq(playerPosition)
     fun distanceSqToPlayer(location: LorenzVec) = location.distanceSq(playerPosition)
+    fun GraphNode.distanceToNode(other: GraphNode): Double = findShortestDistance(this, other)
 
     interface GenericNode {
         val position: LorenzVec

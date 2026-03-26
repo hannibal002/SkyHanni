@@ -2,13 +2,11 @@ package at.hannibal2.skyhanni.config.features.event.diana
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -150,10 +148,12 @@ class DianaConfig {
     @ConfigLink(owner = DianaConfig::class, field = "burrowNearestWarp")
     val warpGuiPosition: Position = Position(327, 125, scale = 2.6f)
 
-    @Expose
-    @ConfigOption(name = "Ignored Warps", desc = "Warps listed here will not be suggested.")
-    @ConfigEditorDraggableList
-    val ignoredWarpsList: MutableList<BurrowWarpHelper.WarpPoint> = mutableListOf(BurrowWarpHelper.WarpPoint.TAYLOR)
+
+    // TODO add a way to ignore warps, maybe with ; list via name
+//     @Expose
+//     @ConfigOption(name = "Ignored Warps", desc = "Warps listed here will not be suggested.")
+//     @ConfigEditorDraggableList
+//     val ignoredWarps: MutableList<String> = mutableListOf()
 
     @Expose
     @ConfigOption(

@@ -21,7 +21,16 @@ enum class GraphNodeTag(
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map.", onlySkyblock = null),
 
     //     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
-    TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport.", onlySkyblock = null),
+
+    // TODO delete once no graph data contains this anymore
+    // deprecated, dont use anymore
+    TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport. Deprecated, split up to warp, jump pad, and teleport pad", onlySkyblock = null),
+    // teleports from any island to this location on this island
+    WARP("warp", LorenzColor.BLUE, "Warp", "A warp command target.", onlySkyblock = null),
+    // stand there, jumps to another island, name is the other island
+    JUMP_PAD("jump_pad", LorenzColor.BLUE, "Jump Pad", "jump pad or portal to another island.", onlySkyblock = null),
+    // teleports around on the same island.
+    TELEPORT_PAD("teleport_pad", LorenzColor.BLUE, "Teleport Pad", "Teleport pad inside the same island.", onlySkyblock = null),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Spots related to the Romeo and Juliette/Ring of Love quest line."),

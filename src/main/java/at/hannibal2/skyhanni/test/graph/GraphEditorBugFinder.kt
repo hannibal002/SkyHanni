@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
@@ -34,11 +35,29 @@ object GraphEditorBugFinder {
         checkConflictingTags(graph, errorsInWorld)
         checkConflictingAreas(graph, errorsInWorld)
         checkMissingData(graph, errorsInWorld)
+        checkDeprecatedTags(graph, errorsInWorld)
 
         this.errorsInWorld = errorsInWorld
         errorsInWorld.keys.minByOrNull {
             it.distanceSqToPlayer()
         }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
+    }
+
+    private fun checkDeprecatedTags(
+        graph: Graph,
+        errorsInWorld: MutableMap<GraphNode, String>,
+    ) {
+        for (node in graph) {
+            if (node.hasTag(GraphNodeTag.TELEPORT)) {
+                errorsInWorld[node] = "deprecated teleport node"
+            }
+
+            if (node.hasTag(GraphNodeTag.WARP)) {
+                if (node.name?.startsWith("/") == false) {
+                    errorsInWorld[node] = "invalid warp name"
+                }
+            }
+        }
     }
 
     private fun checkMissingData(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {

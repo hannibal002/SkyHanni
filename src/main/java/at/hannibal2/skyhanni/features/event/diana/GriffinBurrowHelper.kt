@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -222,15 +223,10 @@ object GriffinBurrowHelper {
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
-            // TODO: add island graphs here some day when the hub is fully added in the graph
-//             newLocation?.let {
-//                 IslandGraphs.find(it)
-//             }
-        }
-
-        if (config.burrowNearestWarp) {
-            targetLocation?.let {
-                BurrowWarpHelper.shouldUseWarps(it)
+            newLocation?.let {
+                IslandGraphs.pathFind(it.add(y = 2), "Diana Target") {
+                    isEnabled() && targetLocation == it
+                }
             }
         }
 
@@ -242,8 +238,6 @@ object GriffinBurrowHelper {
         if (!toDelete.isEmpty()) update()
     }
 
-    // TODO add option to only focus on last guess - highly requested method that is less optimal for money per hour. users choice
-    // TODO pathfind alg / check closest to any warp point
     private fun calculateNewTarget(): LorenzVec? {
         val locations = mutableListOf<LorenzVec>()
 
@@ -257,8 +251,7 @@ object GriffinBurrowHelper {
             allGuesses.forEach { locations.add(it.getCurrent()) }
             locations.addAll(RareMobWaypointShare.waypoints.values.map { it.location })
         }
-        val newLocation = locations.minByOrNull { it.distanceToPlayer() }
-        return newLocation
+        return locations.minByOrNull { it.distanceToPlayer() }
     }
 
     fun showUseSpadeTitle() {
@@ -398,7 +391,6 @@ object GriffinBurrowHelper {
         GriffinBurrowParticleFinder.reset()
         mobAlive = false
 
-        BurrowWarpHelper.currentWarp = null
         if (isEnabled()) {
             update()
         }
@@ -452,25 +444,16 @@ object GriffinBurrowHelper {
             renderRareMobs(event, playerLocation)
         }
 
-        val currentWarp = BurrowWarpHelper.currentWarp
         if (config.lineToNext) {
-            var color: ChromaColour?
-            val renderLocation = if (currentWarp != null) {
-                color = LorenzColor.AQUA.toChromaColor()
-                currentWarp.location
-            } else {
-                color = if (shouldFocusOnRareMob) LorenzColor.LIGHT_PURPLE.toChromaColor() else LorenzColor.WHITE.toChromaColor()
-                targetLocation?.blockCenter() ?: return
-            }
+            var color = if (shouldFocusOnRareMob) LorenzColor.LIGHT_PURPLE.toChromaColor() else LorenzColor.WHITE.toChromaColor()
+            val renderLocation = targetLocation?.blockCenter() ?: return
 
             val targetType = getGuess(targetLocation)?.burrowType
             val lineWidth = if (targetType != null && targetType != BurrowType.UNKNOWN) {
                 color = targetType.color
                 3
             } else 2
-            if (currentWarp == null) {
-                event.drawLineToCrosshair(renderLocation, color, lineWidth, false)
-            }
+            event.drawLineToCrosshair(renderLocation, color, lineWidth, false)
         }
 
         if (RareMobWaypointShare.waypoints.isNotEmpty() && config.rareMobsSharing.focus) {
@@ -484,7 +467,7 @@ object GriffinBurrowHelper {
             val location = target.getCurrent()
             val distance = location.distance(playerLocation)
             val text = when (target.burrowType) {
-                BurrowType.UNKNOWN -> "${if (currentWarp != null) "§b" else "§f"}Guess"
+                BurrowType.UNKNOWN -> "${"§f"}Guess"
                 else -> target.burrowType.text
             }
 
@@ -534,7 +517,7 @@ object GriffinBurrowHelper {
             if (burrowType == BurrowType.UNKNOWN) {
                 if (!config.guess) return
                 else {
-                    val textColor = if (BurrowWarpHelper.currentWarp != null && targetLocation == location) "§b" else "§f"
+                    val textColor = "§f"
                     text = "${textColor}Guess"
                     if (distance > 5) {
                         val formattedDistance = distance.toInt().addSeparators()

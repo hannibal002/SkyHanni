@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceToNode
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -139,10 +140,14 @@ object IslandGraphs {
     private var cachedNearbyNodes = listOf<GraphNode>()
     private var lastCacheUpdate = SimpleTimeMark.farPast()
 
+    // TODO create class for those things
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
     private var navigationLabel = ""
     private var lastDisplayedDistance = 0.0
+    private var warpIsBetter = false
+    private var bestWarpPoint: GraphNode? = null
+    private var distanceToBestWarp = 0.0
     private var totalDistance = 0.0
     private var pathColor = Color.WHITE
     private var allowRerouting = false
@@ -467,6 +472,9 @@ object IslandGraphs {
         goal = null
         pathRenderer = null
         currentTargetNode = null
+        warpIsBetter = false
+        bestWarpPoint = null
+        distanceToBestWarp = 0.0
         navigationLabel = ""
         totalDistance = 0.0
         lastDisplayedDistance = 0.0
@@ -518,6 +526,7 @@ object IslandGraphs {
         require(label.isNotEmpty()) { "Label cannot be empty." }
         resetNavigation()
         allowRerouting = false
+        currentTargetNode = getGraph().getNearestNode(location)
         initNavigation(location, label, color, onFound, onManualCancel, condition)
     }
 
@@ -552,6 +561,7 @@ object IslandGraphs {
 
     private fun updateNavigationProgress() {
         if (navigationLabel == "") return
+        checkForWarps()
         val distance = (pathRenderer?.remainingDistance ?: return).roundTo(1)
 
         if (distance == lastDisplayedDistance) return
@@ -568,6 +578,39 @@ object IslandGraphs {
         NavigationFeedback.sendPathFindMessage(component)
     }
 
+    private fun checkForWarps() {
+        val graph = getGraph()
+        val targetNode = currentTargetNode ?: error("currentTargetNode is null")
+
+        val warp = bestWarpPoint ?: run {
+            val possibleWarps = graph.filterByActive { it.hasTag(GraphNodeTag.WARP) }
+            val warp = possibleWarps.minByOrNull { targetNode.distanceToNode(it) } ?: run {
+                warpIsBetter = false
+                bestWarpPoint = null
+                return
+            }
+            println("found nearest node: ${warp.name}")
+            bestWarpPoint = warp
+            distanceToBestWarp = warp.distanceToNode(targetNode)
+            warp
+        }
+        val command = warp.name ?: error("warp node without name")
+        val genericMargin = 20
+        val newWarpIsBetter = distanceToBestWarp + genericMargin < lastDisplayedDistance
+        if (newWarpIsBetter != warpIsBetter) {
+            warpIsBetter = newWarpIsBetter
+            if (newWarpIsBetter) {
+                println("warp is better!")
+                ChatUtils.clickableChat(
+                    "click to run $command",
+                    onClick = {
+                        ChatUtils.sendMessageToServer(command)
+                    },
+                )
+            }
+        }
+    }
+
     fun cancelClick() {
         stopNavigation()
         onManualCancel()
@@ -576,7 +619,9 @@ object IslandGraphs {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
-        pathRenderer?.render(event)
+        if (!warpIsBetter) {
+            pathRenderer?.render(event)
+        }
     }
 
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == navigationLabel

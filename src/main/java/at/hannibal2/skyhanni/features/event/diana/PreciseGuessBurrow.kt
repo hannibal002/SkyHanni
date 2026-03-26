@@ -56,7 +56,8 @@ object PreciseGuessBurrow {
 
         if (bezierFitter.count() < 6) {
             val duration = (6 - bezierFitter.count()) * 100
-            BurrowWarpHelper.blockWarp(duration.milliseconds)
+            // why did we block it here? should be generic now
+//             BurrowWarpHelper.blockWarp(duration.milliseconds)
         }
 
         val guessPosition = guessBurrowLocation() ?: return
