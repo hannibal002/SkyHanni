@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.test.utils
 
 import at.hannibal2.skyhanni.utils.ReflectionUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.createConsumerFromMethod
-import at.hannibal2.skyhanni.utils.ReflectionUtils.createRunnableFromMethod
 import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateField
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
@@ -104,7 +102,7 @@ class ReflectUtilsTest {
     @Test fun `createConsumerFromMethod invokes method with argument`() {
         val target = ConsumerTarget()
         val method = ConsumerTarget::class.java.getMethod("accept", String::class.java)
-        createConsumerFromMethod(target, method).accept("hello")
+        ReflectionUtils.createConsumerFromMethod(target, method).accept("hello")
         assertEquals("hello", target.received)
     }
 
@@ -112,14 +110,14 @@ class ReflectUtilsTest {
         val target = RunnableTarget()
         val method = RunnableTarget::class.java.getMethod("run")
         assertThrows(IllegalArgumentException::class.java) {
-            createConsumerFromMethod(target, method)
+            ReflectionUtils.createConsumerFromMethod(target, method)
         }
     }
 
     @Test fun `createRunnableFromMethod invokes method`() {
         val target = RunnableTarget()
         val method = RunnableTarget::class.java.getMethod("run")
-        createRunnableFromMethod(target, method).run()
+        ReflectionUtils.createRunnableFromMethod(target, method).run()
         assertEquals(true, target.ran)
     }
 

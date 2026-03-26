@@ -164,12 +164,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
 
     @PublishedApi
-    internal fun readJsonElement(path: String): JsonElement? =
-        if (repoFileSystem.exists(path)) repoFileSystem.readJson(path)
-        else repoDirectory.resolve(path).takeIf { it.isFile }?.getJson() ?: run {
-            logger.logNonDestructiveError("Repo file not found: $path")
-            null
+    internal fun readJsonElement(path: String): JsonElement? {
+        if (repoFileSystem.exists(path)) return repoFileSystem.readJson(path)
+        val fallback = repoDirectory.resolve(path)
+        if (fallback.isFile) return fallback.getJson()
+        val repoDiagnostic = when {
+            !repoDirectory.exists() -> "repo directory does not exist at '${repoDirectory.absolutePath}'"
+            !repoDirectory.isDirectory -> "repo path exists but is not a directory: '${repoDirectory.absolutePath}'"
+            else -> repoDirectory.list()?.size?.let { "$it top-level entries in repo directory" }
+                ?: "repo directory exists but could not be listed"
         }
+        logger.logNonDestructiveError("Repo file not found: $path ($repoDiagnostic)")
+        return null
+    }
 
     @PublishedApi
     internal inline fun <reified T : Any> getRepoData(

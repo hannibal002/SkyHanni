@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getInventoryItems
+import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Display
@@ -146,10 +146,10 @@ object CopyNearbyEntitiesCommand {
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
-        add("-  inventory:")
-        for ((id, stack) in entity.getInventoryItems().withIndex()) {
+        add("-  inventory equipment:")
+        for ((equipSlot, stack) in entity.getEquipmentSlots()) {
             val adjustedStack = stack.orNull()
-            add("-  id $id ($adjustedStack)")
+            add("-     ${equipSlot.name} (id ${equipSlot.id}) ($adjustedStack)")
             printItemStackData(adjustedStack)
         }
     }
@@ -268,7 +268,7 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
-            val skullTexture = stack.getSkullTexture()
+            val skullTexture = stack.getSkullTexture()?.trim()?.replace("\n", "")
             if (skullTexture != null) {
                 add("-     skullTexture:")
                 add("-     $skullTexture")
