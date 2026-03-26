@@ -19,6 +19,7 @@ object ReflectionUtils {
     fun Any.getPublicFieldValue(name: String): Any = requireNotNull(getPublicField(name).get(this)) {
         "Field '$name' on ${javaClass.name} is null"
     }
+
     fun Class<*>.getPublicFieldValue(name: String, instance: Any?): Any = requireNotNull(getPublicField(name).get(instance)) {
         "Field '$name' on ${javaClass.name} is null"
     }
@@ -36,9 +37,11 @@ object ReflectionUtils {
     fun Any.getPrivateFieldValue(name: String): Any = requireNotNull(getPrivateField(name).get(this)) {
         "Field '$name' on ${javaClass.name} is null"
     }
+
     fun Any.getPrivateFieldValue(index: Int): Any = requireNotNull(getPrivateField(index).get(this)) {
         "Field at index $index on ${javaClass.name} is null"
     }
+
     fun Class<*>.getPrivateFieldValue(name: String, instance: Any?): Any = requireNotNull(getPrivateField(name).get(instance)) {
         "Field '$name' on ${javaClass.name} is null"
     }
@@ -52,6 +55,7 @@ object ReflectionUtils {
     }
 
     private data class TypeKey(val declaration: GenericDeclaration, val name: String)
+
     private val TypeVariable<*>.key get() = TypeKey(genericDeclaration, name)
 
     /**
@@ -77,6 +81,7 @@ object ReflectionUtils {
                 rawType.typeParameters.zip(type.actualTypeArguments).associateTo(universe) { (k, v) -> k.key to v }
                 findSuperClassTypeParameters(rawType.genericSuperclass, universe)
             }
+
             is Class<*> -> findSuperClassTypeParameters(type.genericSuperclass, universe)
             is TypeVariable<*> -> findSuperClassTypeParameters(universe[type.key] ?: return, universe)
         }
