@@ -47,6 +47,11 @@ interface Resettable {
 
     fun reset() {
         with(this::class) {
+            if (objectInstance != null) return@with ErrorManager.logErrorWithData(
+                IllegalStateException("Cannot reset a Kotlin object"),
+                "Failed to reset $classSimpleName",
+                "class" to this,
+            )
             // Find a constructor where all parameters have defaults. Equivalent to createInstance(),
             // but with isAccessible = true so private nested classes work correctly
             val ctor = constructors.firstOrNull { c ->
