@@ -21,9 +21,9 @@ object ReflectionUtils {
         "Field '$fieldName' on ${javaClass.name} is null"
     }
 
-    fun <T> Class<T>.getPublicFieldValue(
+    fun Class<*>.getPublicFieldValue(
         fieldName: String,
-        classInstance: T?,
+        classInstance: Any?,
     ): Any = requireNotNull(getPublicField(fieldName).get(classInstance)) {
         "Field '$fieldName' on ${this.name} is null"
     }
@@ -46,9 +46,9 @@ object ReflectionUtils {
         "Field at index $fieldIndex on ${javaClass.name} is null"
     }
 
-    fun <T> Class<T>.getPrivateFieldValue(
+    fun Class<*>.getPrivateFieldValue(
         fieldName: String,
-        classInstance: T?,
+        classInstance: Any?,
     ): Any = requireNotNull(getPrivateField(fieldName).get(classInstance)) {
         "Field '$fieldName' on ${this.name} is null"
     }
