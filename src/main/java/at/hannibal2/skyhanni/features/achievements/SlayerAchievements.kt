@@ -38,7 +38,7 @@ object SlayerAchievements {
             "Slayer Psycho".asComponent(),
             componentBuilder {
                 append("Get over 10m Stored RNG XP! ")
-                append("I hope you drop the dye soon") {
+                append("I hope you drop the dye soon!") {
                     withColor(ChatFormatting.DARK_PURPLE)
                 }
             },

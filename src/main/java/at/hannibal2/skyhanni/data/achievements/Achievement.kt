@@ -28,7 +28,7 @@ data class Achievement(
         if (tiers.size == 1) {
             return componentBuilder {
                 append(description_)
-                append(" ")
+                append(" \n")
                 if (!data.achieved) append("${data.progress}/${tiers.first()} to Unlock")
                 else append("Current Progress: ${data.progress} (you only needed ${tiers.first()} to unlock it)")
                 withColor(ChatFormatting.YELLOW)
