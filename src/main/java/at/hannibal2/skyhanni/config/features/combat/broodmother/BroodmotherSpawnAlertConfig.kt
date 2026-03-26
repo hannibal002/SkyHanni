@@ -22,7 +22,7 @@ class BroodmotherSpawnAlertConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    val testSound: Runnable = Runnable { playTestSound() }
+    val testSound: () -> Unit = { SoundUtils.createSound(alertSound, pitch).playSound() }
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")
@@ -37,9 +37,4 @@ class BroodmotherSpawnAlertConfig {
     @ConfigOption(name = "Text", desc = "The text with color to be displayed as the title notification.")
     @ConfigEditorText
     var text: String = "&4Broodmother has spawned!"
-
-    companion object {
-        @JvmStatic
-        fun BroodmotherSpawnAlertConfig.playTestSound() = SoundUtils.createSound(alertSound, pitch).playSound()
-    }
 }
