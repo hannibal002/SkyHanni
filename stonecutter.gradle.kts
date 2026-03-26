@@ -1,9 +1,9 @@
 plugins {
-    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" apply false
-    kotlin("jvm") version "2.2.21" apply false
-    kotlin("plugin.power-assert") version "2.0.0" apply false
-    id("com.google.devtools.ksp") version "2.2.21-2.0.4" apply false
-    id("io.gitlab.arturbosch.detekt") version "1.23.7" apply false
+    alias(libs.plugins.loom) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.powerAssert) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.detekt) apply false
     id("dev.kikugie.stonecutter")
 }
 
