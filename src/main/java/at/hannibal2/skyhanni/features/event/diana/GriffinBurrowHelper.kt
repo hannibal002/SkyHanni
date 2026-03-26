@@ -228,6 +228,15 @@ object GriffinBurrowHelper {
                     isEnabled() && targetLocation == it
                 }
             }
+        } else {
+            newLocation?.let {
+                val addTwo = it.add(y = 2)
+                if (IslandGraphs.isActive(addTwo, "Diana Target")) {
+                    IslandGraphs.pathFind(addTwo, "Diana Target") {
+                        isEnabled() && targetLocation == it
+                    }
+                }
+            }
         }
 
         // attempt to move all guesses
