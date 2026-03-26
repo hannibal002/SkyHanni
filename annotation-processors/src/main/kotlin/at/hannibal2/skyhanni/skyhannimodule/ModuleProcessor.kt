@@ -48,8 +48,14 @@ class ModuleProcessor(
         val dirtyCount = symbols.count { it.containingFile?.filePath in dirtyFilePaths }
         val cachedCount = symbols.size - dirtyCount
         logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion ($dirtyCount revalidated, $cachedCount from cache)")
-        val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths) }
 
+        if (dirtyFilePaths.isEmpty()) {
+            logger.warn("No @SkyHanniModule files changed, skipping LoadedModules regeneration")
+            writeStateFile(currentFileModTimes)
+            return emptyList()
+        }
+
+        val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths) }
         if (validSymbols.isNotEmpty()) generateFile(validSymbols)
         writeStateFile(currentFileModTimes)
         return emptyList()
