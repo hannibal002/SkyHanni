@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent.TransactionType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -215,7 +214,7 @@ object BazaarApi {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {
