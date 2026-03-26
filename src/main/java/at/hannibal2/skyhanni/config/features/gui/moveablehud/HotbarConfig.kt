@@ -33,8 +33,8 @@ class HotbarConfig : MoveableHudConfig {
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(127, "gui.hotbar.editable", "gui.hotbar.enabled")
-            event.move(127, "gui.hotbar.hotbar", "gui.hotbar.position")
+            event.move(129, "gui.hotbar.editable", "gui.hotbar.enabled")
+            event.move(129, "gui.hotbar.hotbar", "gui.hotbar.position")
         }
     }
 }
