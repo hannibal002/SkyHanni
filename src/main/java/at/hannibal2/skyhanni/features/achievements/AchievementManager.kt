@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
@@ -29,6 +30,7 @@ import net.minecraft.world.item.Items
 object AchievementManager {
 
     private val config get() = SkyHanniMod.achievementStorage.achievements
+    val group = RepoPattern.group("achievements")
 
     @HandleEvent
     fun onInitFinished() {
@@ -171,6 +173,8 @@ object AchievementManager {
                             append(" ❌") {
                                 withColor(ChatFormatting.RED)
                             }
+                        } else {
+                            append("/${achievement.tiers.size}")
                         }
                         hover = achievement.getDescription()
                     }
