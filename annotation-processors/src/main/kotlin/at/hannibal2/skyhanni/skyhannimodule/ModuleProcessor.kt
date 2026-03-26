@@ -26,16 +26,35 @@ class ModuleProcessor(
     private var skyHanniEvent: KSType? = null
     private val warnings = mutableListOf<String>()
 
+    companion object {
+        // Persists across builds within the same Gradle daemon.
+        // Maps mcVersion -> (filePath -> lastModified), used to detect which annotated files actually changed.
+        private val cachedFileStates = mutableMapOf<String, Map<String, Long>>()
+    }
+
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
         skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
 
-        val newFiles = resolver.getNewFiles().toSet()
         val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
-        val dirtyCount = symbols.count { it.containingFile in newFiles }
+
+        val currentFileMtimes = symbols
+            .mapNotNull { it.containingFile?.filePath }
+            .toSet()
+            .associateWith { File(it).lastModified() }
+
+        val cachedMtimes = cachedFileStates[mcVersion]
+        cachedFileStates[mcVersion] = currentFileMtimes
+
+        val dirtyFilePaths: Set<String> = if (cachedMtimes == null) {
+            currentFileMtimes.keys
+        } else {
+            currentFileMtimes.filter { (path, mtime) -> cachedMtimes[path] != mtime }.keys
+        }
+
+        val dirtyCount = symbols.count { it.containingFile?.filePath in dirtyFilePaths }
         val cachedCount = symbols.size - dirtyCount
-        val countFormat = "($dirtyCount revalidated, $cachedCount from cache)"
-        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion $countFormat")
-        val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile in newFiles) }
+        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion ($dirtyCount revalidated, $cachedCount from cache)")
+        val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths) }
 
         if (validSymbols.isNotEmpty()) generateFile(validSymbols)
         return emptyList()
