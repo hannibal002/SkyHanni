@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils.render.item
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
@@ -12,7 +15,16 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 
+@SkyHanniModule
 internal object SkyHanniItemRenderCoordinator {
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Item Atlas")
+        event.addIrrelevant {
+            atlas.atlasDebugInfo().onEach(::add)
+        }
+    }
 
     private data class FrameRenderResources(
         val bufferSource: BufferSource,
@@ -33,7 +45,7 @@ internal object SkyHanniItemRenderCoordinator {
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber
     private val settleTracker = HashMap<Int, SettleEntry>() // keyed by stableId, NOT atlasKey
-    private val atlas = SkyHanniItemAtlas()
+    private val atlas by lazy { SkyHanniItemAtlas() }
     private var lastEvictFrame = -1
 
     fun invalidateAtlas() {

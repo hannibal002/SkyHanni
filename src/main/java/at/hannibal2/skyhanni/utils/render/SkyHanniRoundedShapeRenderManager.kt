@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils.render
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlas
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlasKey
 import net.minecraft.client.gui.navigation.ScreenRectangle
@@ -22,9 +25,18 @@ import org.joml.Matrix3x2f
  * ## Thread safety
  * Must be called from the render thread only.
  */
+@SkyHanniModule
 object SkyHanniRoundedShapeRenderManager {
 
-    private val atlas = SkyHanniRoundedShapeAtlas()
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Rounded Shape Atlas")
+        event.addIrrelevant {
+            atlas.atlasDebugInfo().onEach(::add)
+        }
+    }
+
+    private val atlas by lazy { SkyHanniRoundedShapeAtlas() }
 
     // Shapes collected this frame that could be atlased next frame
     private val pendingKeys = ArrayList<SkyHanniRoundedShapeAtlasKey>()

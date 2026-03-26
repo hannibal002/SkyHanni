@@ -9,10 +9,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.resources.Identifier
-//? if > 1.21.10
-//import com.mojang.blaze3d.systems.RenderSystem
-//? if > 1.21.10
-//import com.mojang.blaze3d.textures.FilterMode
 
 class SkyHanniRoundedTexturedRectRenderState(
     x: Int,
@@ -30,11 +26,12 @@ class SkyHanniRoundedTexturedRectRenderState(
     override fun pipeline() = SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT_DEFERRED()
 
     override fun textureSetup(): TextureSetup {
-        val view = Minecraft.getInstance().textureManager.getTexture(texture).textureView
+        val fetchTexture = Minecraft.getInstance().textureManager.getTexture(texture)
+        val view = fetchTexture.textureView
         //? if < 1.21.11 {
         return TextureSetup.singleTexture(view)
         //? } else
-        //return TextureSetup.singleTexture(view, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST))
+        //return TextureSetup.singleTexture(view, fetchTexture.sampler)
     }
 
     override fun buildVertices(consumer: VertexConsumer) {

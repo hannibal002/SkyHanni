@@ -1,15 +1,27 @@
 package at.hannibal2.skyhanni.utils.render.atlas
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniAbstractItemTexture
 import com.mojang.blaze3d.platform.TextureUtil
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.Dumpable
 import net.minecraft.resources.Identifier
 import java.nio.file.Path
 
 abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : SkyHanniAbstractItemTexture(), Dumpable {
+
+    protected abstract val identifier: Identifier
+
+    init {
+        DelayedRun.runNextTick {
+            ChatUtils.debug("Registering SkyHanniAbstractAtlas $identifier")
+            Minecraft.getInstance().textureManager.register(identifier, this)
+        }
+    }
 
     protected var sizePixels = 0
         private set
@@ -46,6 +58,13 @@ abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : 
         return u to v
     }
 
+    internal fun atlasDebugInfo(): List<String> = listOf(
+        "identifier: $identifier",
+        "hasTexture: ${texture != null}",
+        "entryCount: ${entries.size}",
+        "sizePixels: $sizePixels",
+    )
+
     fun invalidate() {
         entries.clear()
         close()
@@ -57,7 +76,8 @@ abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : 
     }
 
     override fun dumpContents(id: Identifier, path: Path) {
-        val texture = this.texture ?: return
+        ChatUtils.debug("dumping $id to $path")
+        val texture = this.texture ?: return ChatUtils.debug("no texture")
         try {
             TextureUtil.writeAsPNG(path, id.toDebugFileName(), texture, 0) { i -> i }
         } catch (e: Exception) {

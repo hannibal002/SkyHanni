@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render.atlas
 
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
@@ -31,9 +30,11 @@ import java.util.OptionalInt
 
 internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRoundedShapeAtlasKey, SkyHanniRoundedShapeAtlasEntry>() {
 
-    companion object {
-        val identifier: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "rounded_shape_atlas")
+    override val identifier: Identifier by lazy {
+        Identifier.fromNamespaceAndPath("skyhanni", "rounded_shape_atlas")
+    }
 
+    companion object {
         private const val PADDING = 5
     }
 
@@ -48,10 +49,6 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
             "SkyHanni rounded shape atlas", 1000.0f, 11000.0f, true,
         ).also { projectionBuffer = it }
     //?}
-
-    init {
-        Minecraft.getInstance().textureManager.register(identifier, this)
-    }
 
     /**
      * Pre-renders any new static [shapes] into atlas slots before the GUI render pass.

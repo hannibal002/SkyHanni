@@ -167,7 +167,7 @@ enum class SkyHanniRenderPipeline(
         vFormat = SkyHanniVertexFormats.POSITION_TEX_ROUNDED,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_texture_deferred",
-        sampler = "textureSampler",
+        sampler = "Sampler0",
         depthWrite = false,
         irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),

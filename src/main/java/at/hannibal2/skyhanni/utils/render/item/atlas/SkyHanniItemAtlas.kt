@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAbstractAtlas
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAtlasBinPacker
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
 //? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
@@ -16,18 +15,14 @@ import net.minecraft.resources.Identifier
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
 
-    companion object {
-        private val identifier = Identifier.fromNamespaceAndPath("skyhanni", "item_atlas")
+    override val identifier: Identifier by lazy {
+        Identifier.fromNamespaceAndPath("skyhanni", "item_atlas")
     }
 
     override val colorLabel = "SkyHanni item atlas"
     override val depthLabel = "SkyHanni item atlas depth"
 
     private var renderer: SkyHanniItemAtlasRenderer? = null
-
-    init {
-        Minecraft.getInstance().textureManager.register(identifier, this)
-    }
 
     override fun onAllocated() {
         @Suppress("UnsafeCallOnNullableType")

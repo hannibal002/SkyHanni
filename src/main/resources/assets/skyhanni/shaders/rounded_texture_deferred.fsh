@@ -4,7 +4,7 @@ in vec2 texCoord;
 in vec4 roundedParams0;
 in vec4 roundedParams1;
 
-uniform sampler2D textureSampler;
+uniform sampler2D Sampler0;
 
 out vec4 outColor;
 
@@ -21,5 +21,5 @@ void main() {
 
     float distance = roundedRectSDF(gl_FragCoord.xy - centerPos, halfSize, radius);
     float smoothed = 1.0 - smoothstep(0.0, smoothness, distance);
-    outColor = texture(textureSampler, texCoord) * vec4(1.0, 1.0, 1.0, smoothed * alpha);
+    outColor = texture(Sampler0, texCoord) * vec4(1.0, 1.0, 1.0, smoothed * alpha);
 }
