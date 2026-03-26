@@ -125,10 +125,6 @@ dependencies {
         mappings(target.mappingDependency)
     }
 
-    // Discord RPC client
-    includeImplementation(libs.discord.ipc)
-    include(libs.junixsocket.common)
-    include(libs.junixsocket.native)
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
