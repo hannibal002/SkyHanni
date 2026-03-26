@@ -19,6 +19,7 @@ import java.time.temporal.WeekFields
 import java.util.Locale
 import java.util.regex.Matcher
 import kotlin.math.absoluteValue
+import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -314,10 +315,13 @@ enum class TimeUnit(val factor: Long, private val shortName: String, private val
     }
 }
 
+val Duration.inPartialMilliseconds: Double get() = toDouble(DurationUnit.MILLISECONDS)
 val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)
-val Duration.inPartialMinutes: Double get() = inPartialSeconds / 60
-val Duration.inPartialHours: Double get() = inPartialSeconds / 3600
-val Duration.inPartialDays: Double get() = inPartialSeconds / 86_400
-val Duration.inPartialYears: Double get() = inPartialSeconds / (86_400 * 365.25)
+val Duration.inPartialMinutes: Double get() = toDouble(DurationUnit.MINUTES)
+val Duration.inPartialHours: Double get() = toDouble(DurationUnit.HOURS)
+val Duration.inPartialDays: Double get() = toDouble(DurationUnit.DAYS)
+
+val Duration.roundedUpSeconds: Int get() = ceil(inPartialSeconds).toInt()
+
 val Long.years: Duration get() = this.times(365.25).days
 

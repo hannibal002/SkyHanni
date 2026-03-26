@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
@@ -26,4 +27,17 @@ class SpiderConfig {
     @ConfigEditorBoolean
     var phaseDisplay: Boolean = false
 
+    @Expose
+    @ConfigOption(name = "Line to Tarantula Boss", desc = "Adds a line to your Tarantula Broodfather Boss.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var lineToBoss: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Line to Tarantula Width",
+        desc = "The width of the line pointing to your Tarantula Broodfather.",
+    )
+    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
+    var slayerLineWidth: Int = 3
 }
