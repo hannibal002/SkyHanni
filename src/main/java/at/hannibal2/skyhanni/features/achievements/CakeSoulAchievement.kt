@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component
 object CakeSoulAchievement {
 
     private val cakeSoulPattern by AchievementManager.group.pattern(
-        "rng-meter",
+        "cake-soul",
         "You found a Cake Soul!",
     )
 
