@@ -57,12 +57,6 @@ object TrackParticlesCommand : TrackCommand<ReceiveParticleEvent, Identifier>(co
     override fun onCommandRegistration(event: CommandRegistrationEvent) = super.onCommandRegistration(event)
 
     @HandleEvent
-    override fun onDisconnect() = super.onDisconnect()
-
-    @HandleEvent
-    override fun onWorldChange() = super.onWorldChange()
-
-    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(94, "dev.debug.trackParticlePosition", "dev.debug.trackParticle.position")
     }

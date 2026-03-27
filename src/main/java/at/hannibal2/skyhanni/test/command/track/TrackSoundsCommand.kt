@@ -49,10 +49,10 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     override fun PlaySoundEvent.shouldAcceptTrackableEvent(): Boolean = when {
         soundName == "game.player.hurt" && pitch == 0f && volume == 0f -> false // remove random useless sound
         soundName.isEmpty() -> false // sound with empty name aren't useful
-        else -> {
+        else ->  runCatching {
             distanceToPlayer // Need to call to initialize Lazy
             true
-        }
+        }.getOrDefault(false)
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
@@ -72,12 +72,6 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
 
     @HandleEvent
     override fun onCommandRegistration(event: CommandRegistrationEvent) = super.onCommandRegistration(event)
-
-    @HandleEvent
-    override fun onDisconnect() = super.onDisconnect()
-
-    @HandleEvent
-    override fun onWorldChange() = super.onWorldChange()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
