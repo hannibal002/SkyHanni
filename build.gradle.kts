@@ -2,6 +2,7 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
+import dev.kikugie.stonecutter.build.task.StonecutterPrepareTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
@@ -398,16 +399,17 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
 }
 
-tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    notCompatibleWithConfigurationCache("Access wideners need to be pre-processed by Stonecutter")
-}
-
 tasks.withType<RemapSourcesJarTask>().configureEach {
     enabled = false
 }
 
 tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
     enabled = false
+}
+
+tasks.withType<ValidateAccessWidenerTask>().configureEach {
+    // This must be explicitly declared because of configuration cache shenanigans
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {
