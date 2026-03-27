@@ -55,7 +55,7 @@ object BurrowWarpHelper {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.burrowNearestWarp) return
         if (!DianaApi.isDoingDiana()) return
