@@ -43,7 +43,7 @@ object MobUtils {
 
     fun ArmorStand.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
 
-    class OwnerShip(val ownerName: String) {
+    class Ownership(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
         override fun equals(other: Any?): Boolean {
             if (other is Player) return ownerPlayer == other || ownerName == other.cleanName()

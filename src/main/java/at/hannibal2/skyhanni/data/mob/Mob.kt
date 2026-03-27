@@ -79,7 +79,7 @@ class Mob(
     var armorStand: ArmorStand? = null,
     val name: String = "",
     additionalEntities: List<LivingEntity>? = null,
-    ownerName: String? = null,
+    var ownerName: String? = null,
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
@@ -89,7 +89,7 @@ class Mob(
     private val uniqueId: UUID = UUID.randomUUID()
     val id = baseEntity.id
 
-    val owner: MobUtils.OwnerShip?
+    val owner: MobUtils.Ownership?
 
     val ownerNameOrEmpty: String get() = owner?.ownerName.orEmpty()
 
@@ -196,11 +196,14 @@ class Mob(
         // Inlined updateBoundingBox()
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
 
-        owner = (
-            ownerName ?: if (category == MobCategory.SLAYER) hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
-            } else null
-            )?.let { MobUtils.OwnerShip(it) }
+        if (category == MobCategory.SLAYER) {
+            hologram2?.let {
+                summonOwnerPattern.matchMatcher(it.cleanName()) {
+                    ownerName = group("name")
+                }
+            }
+        }
+        ownerName?.let { owner = MobUtils.Ownership(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
