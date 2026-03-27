@@ -63,6 +63,11 @@
 + Added an option to prevent breaking crops on the Garden while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5455)
 + Added option to reduce sensitivity while holding Squeaky Mousemat. - Nick-NCSU (https://github.com/hannibal002/SkyHanni/pull/5391)
 
+#### Chat
+
++ Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
+  + Do /shachievements to see them all.
+
 ### Improvements
 
 #### Fishing
@@ -79,6 +84,10 @@
 + Added hiding of Bingo-related NPCs on the Hub island graph when not playing on a Bingo profile. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5316)
 + Made Diana Tracker show exact burrows per hour when above 1000. - nopo (https://github.com/hannibal002/SkyHanni/pull/5340)
 + Added `/shresetshinyorbtracker` command to reset Shiny Orb Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5421)
++ When a Diana burrow guess fails, the error message will no longer mention sounds or ask you to turn off Hypixel music. - Luna (https://github.com/hannibal002/SkyHanni/pull/5470)
+  + We no longer rely on sounds at all for guesses.
++ When a Diana burrow guess fails, we will now recommend `/particlequality extreme` instead of `/particlequality high`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5470)
+  + This is just to make sure we have the highest possible particle quality just in case.
 
 #### Farming
 
@@ -100,6 +109,7 @@
 + Improved pathfind lines to look prettier. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5417)
 + Renamed feature Patcher Coords Waypoints to Coords Waypoints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5424)
 + Significantly improved accuracy of server TPS measurement. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
++ TPS counter will now climb back up to 20 more gradually when the server was completely unresponsive for over a second. - Luna (https://github.com/hannibal002/SkyHanni/pull/5467)
 
 #### Garden
 
@@ -117,6 +127,9 @@
 + Fixed Custom Keybinds for Garden not working when setting multiple mouse buttons. - Taubsie (https://github.com/hannibal002/SkyHanni/pull/5290)
 + Fixed issues loading some items from NEU repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4576)
 + Fixed the commands `/shrepostatus` and `/neurepostatus` showing no feedback in chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5321)
++ Fixed Discord Rich Presence not connecting. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5448)
++ Fixed not switching to backup repo when files on disk are corrupt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5446)
++ Fixed rare error loading recipes from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5385)
 
 #### Garden
 
@@ -199,6 +212,8 @@
 #### Rift
 
 + Fixed holographs not appearing in Crafting Room Helper. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5327)
++ Fixed Dance Room Helper getting out of sync. - Luna (https://github.com/hannibal002/SkyHanni/pull/5433)
+  + It should now remain accurate even if the server is lagging.
 
 #### Inventory
 
@@ -216,6 +231,7 @@
 + Fixed multiple different errors all related to island type detection, this time for real. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5408)
 + Fixed issues with backup repo not loading. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5343)
 + Fixed tracker uptime data not being saved between sessions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5412)
++ Fixed `!tps` party command not rounding TPS to 2 decimal points. - Luna (https://github.com/hannibal002/SkyHanni/pull/5467)
 
 #### Commands
 
@@ -336,6 +352,28 @@
 + Renamed `WorldRenderUtils.drawLineToEye` to `WorldRenderUtils.drawLineToCrosshair` to more accurately represent its function. - Luna (https://github.com/hannibal002/SkyHanni/pull/5443)
 + Unified separate gradle sub-projects to use dep resolution from libs.version.toml. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5384)
 + Updated Stonecutter to version 0.9. - Luna (https://github.com/hannibal002/SkyHanni/pull/5463)
++ Added more case-detection for gradle failure in github workflows. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5371)
++ Added SHDiscordIPC, and reworked DiscordRPCManager. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5448)
++ Added verbose debug when File I/O errors are hit in repo management. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5446)
++ Detekt will no longer run during local builds. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5449)
+  + Still runs automatically on CI for all PRs.
+  + Can be triggered locally with `./gradlew detektMain`.
++ Fixed `cleanMessage` field in `PartyChatEvent.Allow` and `PartyChatEvent.Modify` being the whole message rather than just the actual message portion. - Luna (https://github.com/hannibal002/SkyHanni/pull/5467)
++ Fixed Resettable not working on private classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5440)
++ Fixed unnecessary debug logging in TpsCounter if player is in limbo or server is stalled for an extended period of time. - Luna (https://github.com/hannibal002/SkyHanni/pull/5465)
++ Heavily reduced build times. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5449)
++ Moved ErrorManager cleanup constants to repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4514)
++ Moved sync-dependent data population to single safe block. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5385)
++ Removed dependency on `kdiscordipc`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5448)
++ Removed superfluous synchronize blocks in NEU loading. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5385)
++ Renamed `cleanedAuthor` field in `PartyChatEvent.Allow` and `PartyChatEvent.Modify` to `authorName`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5467)
++ Split annotation processors by area. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5449)
+  + LoadedModules, PrimaryFunction, and VersionConstants.
++ Updated Crash on Death to use PlayerDeathEvent. - Luna (https://github.com/hannibal002/SkyHanni/pull/5471)
++ Updated github actions to Node24 versions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5449)
+  + Prep for June 2026 deprecation of Node 20.
++ Upgraded gradle from 9.3 to 9.4.1. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5449)
+  + New version fixed some caching issues.
 
 ### Removed Features
 
