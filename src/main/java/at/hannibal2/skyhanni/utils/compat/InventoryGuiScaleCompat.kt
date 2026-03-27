@@ -8,7 +8,7 @@ object InventoryGuiScaleCompat {
 
     fun <T> withOriginalHudScale(action: () -> T): T {
         val window = mc.window
-        val currentScale = window.guiScale.toInt()
+        val currentScale = window.guiScale
         val originalScale = window.calculateScale(mc.options.guiScale().get(), mc.isEnforceUnicode)
 
         if (currentScale == originalScale) return action()
