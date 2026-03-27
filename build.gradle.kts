@@ -2,7 +2,6 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-import dev.kikugie.stonecutter.build.task.StonecutterPrepareTask
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
