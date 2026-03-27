@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.SkullBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.IntegerProperty
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 
 object BlockUtils {
@@ -43,16 +44,15 @@ object BlockUtils {
         return result?.location?.toLorenzVec()
     }
 
-    fun raycast(start: LorenzVec, end: LorenzVec): net.minecraft.world.phys.BlockHitResult? =
-        world.clip(
-            ClipContext(
-                start.toVec3(),
-                end.toVec3(),
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE,
-                MinecraftCompat.localPlayer,
-            ),
-        )
+    fun raycast(start: LorenzVec, end: LorenzVec): BlockHitResult? = world.clip(
+        ClipContext(
+            start.toVec3(),
+            end.toVec3(),
+            ClipContext.Block.COLLIDER,
+            ClipContext.Fluid.NONE,
+            MinecraftCompat.localPlayer,
+        ),
+    )
 
     fun getTargetedBlock(): LorenzVec? =
         Minecraft.getInstance().hitResult?.takeIf { it.type == HitResult.Type.BLOCK }
