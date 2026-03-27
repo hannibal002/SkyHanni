@@ -209,6 +209,11 @@ object AchievementManager {
                         } else {
                             append("/${achievement.tiers.size}")
                         }
+                        val luck = achievement.userLuckAmount
+                        append(" $luck✴") {
+                            withColor(ChatFormatting.GREEN)
+                            hover = "Gain §a$luck✴ SkyHanni User Luck§r for completing this achievement".asComponent()
+                        }
                         hover = achievement.getDescription()
                     }
                 }
