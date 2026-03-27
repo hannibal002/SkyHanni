@@ -203,7 +203,7 @@ class Mob(
                 }
             }
         }
-        ownerName?.let { owner = MobUtils.Ownership(it) }
+        owner = ownerName?.let { MobUtils.Ownership(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
