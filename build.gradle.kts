@@ -5,6 +5,7 @@ import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
+import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -395,6 +396,12 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     val isMainBaseline = name == "detektBaselineMain"
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
     baseline.set(file(rootProject.layout.projectDirectory.file("detekt/$outputFileName.xml")))
+}
+
+tasks.withType<ValidateAccessWidenerTask>().configureEach {
+    notCompatibleWithConfigurationCache(
+        "Access widener validation fails with configuration cache enabled",
+    )
 }
 
 tasks.withType<RemapSourcesJarTask>().configureEach {
