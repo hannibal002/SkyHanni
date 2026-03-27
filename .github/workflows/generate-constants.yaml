@@ -50,6 +50,7 @@ jobs:
                 with:
                     repository: ${{ env.data_repo }}
                     branch: main
+                    persist-credentials: false
             -   uses: actions/download-artifact@v4
                 name: Upload generated repo regexes
                 with:
