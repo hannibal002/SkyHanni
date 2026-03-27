@@ -339,9 +339,9 @@ publishing.publications {
 }
 
 detekt {
-    buildUponDefaultConfig = true // preconfigure defaults
-    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml")) // a way of suppressing issues before introducing detekt
+    buildUponDefaultConfig = true
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
+    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
 }
 
@@ -360,16 +360,7 @@ tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     val jvmVersion = JavaVersion.current().majorVersion.toInt()
-    onlyIf {
-        if (isTargetVersion && !skipDetekt && jvmVersion > 21) {
-            logger.error(
-                "Detekt requires Java \u2264 21, but Gradle is running on Java $jvmVersion." +
-                    "Run with JAVA_HOME pointing to Java 21, or pass -PskipDetekt=true to skip."
-            )
-            false
-        } else isTargetVersion && !skipDetekt
-    }
-    jvmTarget = "21"
+    onlyIf { isTargetVersion && !skipDetekt }
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"

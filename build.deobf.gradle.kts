@@ -192,8 +192,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.2"
         }
     }
 }
@@ -343,9 +342,9 @@ publishing.publications {
 }
 
 detekt {
-    buildUponDefaultConfig = true // preconfigure defaults
-    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml")) // a way of suppressing issues before introducing detekt
+    buildUponDefaultConfig = true
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
+    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
 }
 
