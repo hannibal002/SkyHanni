@@ -191,10 +191,7 @@ object WorldRenderUtils {
         val buf = vertexConsumers.getBuffer(layer)
         matrices.pushPose()
 
-        //? < 1.21.11 {
-        ShapeRenderer.addChainedFilledBoxVertices(
-            //? } else
-            //addChainedFilledBoxVertices(
+        addChainedFilledBoxVertices(
             matrices,
             buf,
             effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,

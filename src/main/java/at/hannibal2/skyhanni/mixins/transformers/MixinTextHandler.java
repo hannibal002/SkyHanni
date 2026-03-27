@@ -11,24 +11,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.List;
-//? if > 1.21.10
-//import java.util.function.BiConsumer;
 
 @Mixin(StringSplitter.class)
 public class MixinTextHandler {
-
-    //? if < 1.21.11 {
-    @WrapMethod(
-        method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;Lnet/minecraft/network/chat/FormattedText;)Ljava/util/List;"
-    )
-    private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, FormattedText wrappedLinePrefix, Operation<List<FormattedText>> original) {
-        ModifyVisualWords.INSTANCE.setChangeWords(false);
-
-        List<FormattedText> lines = original.call(text, maxWidth, style, wrappedLinePrefix);
-        ModifyVisualWords.INSTANCE.setChangeWords(true);
-        return lines;
-    }
-    //? }
 
     @WrapMethod(
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;)Ljava/util/List;"

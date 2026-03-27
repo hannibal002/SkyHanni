@@ -117,9 +117,6 @@ dependencies {
     if (target.mappingDependency == "official") {
         mappings(loom.layered {
             officialMojangMappings()
-            if (versionName == "1.21.10") {
-                mappings("dev.lambdaurora:yalmm-mojbackward:1.21.10+build.3")
-            }
         })
     } else {
         mappings(target.mappingDependency)

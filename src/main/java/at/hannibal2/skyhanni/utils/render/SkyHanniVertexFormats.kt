@@ -11,12 +11,12 @@ import org.lwjgl.system.MemoryUtil
 private typealias VFEType = VertexFormatElement.Type
 //? if < 26.1 {
 private typealias VFEUsage = VertexFormatElement.Usage
-//?}
+//? }
 internal typealias SHVFE = SkyHanniVertexFormats.SkyHanniVertexFormatElement
 
 object SkyHanniVertexFormats {
 
-    // 1.21.10, Minecraft registers 0-5, on 1.21.11 they register 0-6, so load the last registered ID dynamically.
+    // Different versions of MC use differing counts, so load the last registered ID dynamically.
     val lastRegisteredId by lazy {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
@@ -28,7 +28,7 @@ object SkyHanniVertexFormats {
         private val usage: VFEUsage = VFEUsage.GENERIC,
         //? } else {
         /*private val normalized: Boolean = false,*/
-        //?}
+        //? }
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
@@ -47,11 +47,8 @@ object SkyHanniVertexFormats {
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
         val element by lazy {
-            //? if < 26.1 {
+            //~ if > 1.21.11 'usage' -> 'false'
             safeRegister(registrationId, index, type, usage, count)
-            //? } else {
-            /*safeRegister(registrationId, index, type, false, count)*/
-            //?}
         }
     }
 
@@ -82,10 +79,8 @@ object SkyHanniVertexFormats {
             "VertexFormatElement ID $desiredId was already taken, using $id instead",
             "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
-        //? if < 26.1 {
+        //~ if > 1.21.11 'usage' -> 'normalized'
         return VertexFormatElement.register(id, index, type, usage, count)
-        //? } else
-        //return VertexFormatElement.register(id, index, type, normalized, count)
     }
 
     val POSITION_COLOR_ROUNDED: VertexFormat by lazy {

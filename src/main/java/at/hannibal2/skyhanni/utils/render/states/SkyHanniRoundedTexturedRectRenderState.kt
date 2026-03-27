@@ -28,10 +28,7 @@ class SkyHanniRoundedTexturedRectRenderState(
     override fun textureSetup(): TextureSetup {
         val fetchTexture = Minecraft.getInstance().textureManager.getTexture(texture)
         val view = fetchTexture.textureView
-        //? if < 1.21.11 {
-        return TextureSetup.singleTexture(view)
-        //? } else
-        //return TextureSetup.singleTexture(view, fetchTexture.sampler)
+        return TextureSetup.singleTexture(view, fetchTexture.sampler)
     }
 
     override fun buildVertices(consumer: VertexConsumer) {

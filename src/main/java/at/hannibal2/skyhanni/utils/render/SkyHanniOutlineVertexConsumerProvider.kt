@@ -90,10 +90,6 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
                     TextureFormat.DEPTH32,
                     lastWidth, lastHeight, 1, 1,
                 )
-                //? if < 1.21.11 {
-                depthAttachment.setTextureFilter(FilterMode.NEAREST, false)
-                depthAttachment.setAddressMode(AddressMode.CLAMP_TO_EDGE)
-                //?}
                 customDepthAttachment = depthAttachment
                 customDepthAttachmentView = device.createTextureView(depthAttachment)
             } catch (e: Exception) {

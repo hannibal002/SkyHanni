@@ -32,7 +32,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 //? if > 1.21.11
-//import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//import net.minecraft.client.GuiMessageSource
 
 @SkyHanniModule
 object ClientEvents {

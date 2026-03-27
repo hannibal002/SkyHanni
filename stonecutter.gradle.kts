@@ -123,7 +123,7 @@ allprojects {
     }
 }
 
-stonecutter active "1.21.10"
+stonecutter active "1.21.11"
 
 stonecutter handlers {
     inherit("accesswidener", "classtweaker")
@@ -135,9 +135,6 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed >= "1.21.11") {
-            replace($$"com.google.gson.internal.`$Gson$Types`", "com.google.gson.internal.GsonTypes")
-        }
         string(current.parsed >= "26.1") {
             replace("ClientWorldEvents", "ClientLevelEvents")
             replace("START_WORLD_TICK", "START_LEVEL_TICK")

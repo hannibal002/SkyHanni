@@ -51,7 +51,6 @@ stonecutter {
                 version(version).buildscript = "build.gradle.kts"
             }
         }
-        setup("1.21.10")
         setup("1.21.11")
         setup("26.1")
     }

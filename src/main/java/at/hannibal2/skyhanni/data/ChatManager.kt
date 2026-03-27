@@ -26,7 +26,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
 //? if > 1.21.11
-//import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//import net.minecraft.client.GuiMessageSource
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
@@ -258,7 +258,7 @@ object ChatManager {
                 predicate(it)
             }.takeIf { it != -1 }?.let {
                 val chatLine = this[it]
-                val counter = chatLine.addedTime()
+                val counter = chatLine.addedTime
                 val id = chatLine.signature
                 val oldComponent = chatLine.content
                 val newComponent = component(chatLine.content)

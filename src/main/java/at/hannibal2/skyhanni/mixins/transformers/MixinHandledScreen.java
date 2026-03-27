@@ -20,7 +20,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 //? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
 //? } else
-//import net.minecraft.client.gui.GuiGraphicsExtractor;
+//import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.Slot;
@@ -46,7 +46,7 @@ public abstract class MixinHandledScreen {
     private void renderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         //? } else {
     /*@Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
-    private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
+    private void renderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
         if (GlobalRender.INSTANCE.getRenderDisabled()) return;
         AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) (Object) this;
@@ -66,7 +66,7 @@ public abstract class MixinHandledScreen {
     private void renderTail(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         //? } else {
     /*@Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
-    private void renderTail(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
+    private void renderTail(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
         if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
     }
@@ -75,8 +75,8 @@ public abstract class MixinHandledScreen {
     @Inject(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         //? } else {
-    /*@Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
-    private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
+    /*@Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
+    private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
         //?}
         if (MinecraftCompat.INSTANCE.getLocalWorldExists() && MinecraftCompat.INSTANCE.getLocalPlayerExists()) {
             new DrawBackgroundEvent(context).post();
@@ -87,8 +87,8 @@ public abstract class MixinHandledScreen {
     @ModifyArg(method = "renderTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphics drawContext) {
         //? } else {
-    /*@ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
-    private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphicsExtractor drawContext) {*/
+    /*@ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
+    private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphics drawContext) {*/
         //?}
         if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
@@ -119,7 +119,7 @@ public abstract class MixinHandledScreen {
     //? if < 26.1 {
     @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     //? } else
-    //@ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
+    //@ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     private int customForegroundTextColor(int colour) {
         return BetterContainers.getTextColor(colour);
     }

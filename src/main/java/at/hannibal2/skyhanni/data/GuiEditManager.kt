@@ -19,7 +19,7 @@ import net.minecraft.client.Minecraft
 //? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics
 //? } else
-//import net.minecraft.client.gui.GuiGraphicsExtractor
+//import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
@@ -102,7 +102,7 @@ object GuiEditManager {
     //? if < 26.1 {
     fun renderLast(context: GuiGraphics) {
     //? } else
-    //fun renderLast(context: GuiGraphicsExtractor) {
+    //fun renderLast(context: GuiGraphics) {
         if (GlobalRender.renderDisabled) return
         if (!isInGui()) return
 

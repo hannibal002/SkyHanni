@@ -43,7 +43,7 @@ abstract class MixinGenericContainerScreen {
     //? if < 26.1 {
     private void cancelWardrobeBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
     //? } else
-    //private void cancelWardrobeBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
+    //private void cancelWardrobeBackground(GuiGraphics graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
         if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
             ci.cancel();
         }

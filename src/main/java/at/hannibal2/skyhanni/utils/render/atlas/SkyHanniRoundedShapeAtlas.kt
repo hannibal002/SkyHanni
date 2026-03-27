@@ -24,9 +24,7 @@ import org.joml.Vector4f
 import java.util.OptionalDouble
 import java.util.OptionalInt
 //?}
-
-//? if > 1.21.10
-//import com.mojang.blaze3d.textures.FilterMode
+import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRoundedShapeAtlasKey, SkyHanniRoundedShapeAtlasEntry>() {
 
@@ -172,11 +170,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
             Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
             Vector4f(1.0f, 1.0f, 1.0f, 1.0f),
             Vector3f(),
-            //? if < 1.21.11 {
-            RenderSystem.getTextureMatrix(),
-            RenderSystem.getShaderLineWidth(),
-            //? } else
-            //Matrix4f(),
+            Matrix4f(),
         )
 
         RoundedShapeDrawer.roundedBufferSlice = RoundedShapeDrawer.roundedUniform.writeWith(
@@ -251,10 +245,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
-                //? if < 1.21.11 {
-                TextureSetup.singleTexture(textureView!!),
-                //? } else
-                //TextureSetup.singleTexture(textureView!!, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+                TextureSetup.singleTexture(textureView!!, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 pose,
                 x0, y0, x1, y1,
                 uContent, u1, vContent, v1,

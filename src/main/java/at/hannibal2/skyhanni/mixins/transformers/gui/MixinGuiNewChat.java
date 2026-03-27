@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.network.chat.MessageSignature;
 //? if >= 26.1
-//import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+//import net.minecraft.client.GuiMessageSource;
 
 @Mixin(ChatComponent.class)
 public class MixinGuiNewChat {

@@ -7,7 +7,7 @@ import net.minecraft.client.gui.Font;
 //? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
 //? } else
-//import net.minecraft.client.gui.GuiGraphicsExtractor;
+//import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if < 26.1 {
 @Mixin(GuiGraphics.class)
 //? } else
-//@Mixin(GuiGraphicsExtractor.class)
+//@Mixin(GuiGraphics.class)
 public class MixinDrawContext {
 
     //? if < 26.1 {
@@ -33,7 +33,7 @@ public class MixinDrawContext {
     //? } else {
     /*@Inject(method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At("RETURN"))
     private void drawItemPost(LivingEntity entity, Level world, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
-        RenderItemHookKt.renderItemReturn((GuiGraphicsExtractor) (Object) this, stack, x, y);
+        RenderItemHookKt.renderItemReturn((GuiGraphics) (Object) this, stack, x, y);
     }*/
     //?}
 
@@ -45,7 +45,7 @@ public class MixinDrawContext {
     //? } else {
     /*@Inject(method = "itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void drawItemDecorationsPost(Font textRenderer, ItemStack stack, int x, int y, String stackCountText, CallbackInfo ci) {
-        RenderItemHookKt.renderItemOverlayPost((GuiGraphicsExtractor) (Object) this, stack, x, y, stackCountText);
+        RenderItemHookKt.renderItemOverlayPost((GuiGraphics) (Object) this, stack, x, y, stackCountText);
     }*/
     //?}
 

@@ -21,7 +21,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
-import com.google.gson.internal.`$Gson$Types` as InternalGsonTypes
+import com.google.gson.internal.GsonTypes as InternalGsonTypes
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)

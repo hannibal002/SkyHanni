@@ -28,10 +28,9 @@ import org.joml.Matrix4f;
 /*import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;*/
 //?}
-//? if > 1.21.10
-//import com.mojang.blaze3d.textures.GpuSampler;
+import com.mojang.blaze3d.textures.GpuSampler;
 
-// Adapted from 1.21.7 and 1.21.10 fabric api implementation
+// Adapted from Fabric API implementation
 // The fabric api event makes our lines render strange
 @Mixin(LevelRenderer.class)
 public class MixinReplacementLevelRenderer {
@@ -68,39 +67,20 @@ public class MixinReplacementLevelRenderer {
     }*/
     //?}
 
-    //? if < 1.21.11 {
     @WrapOperation(
-        method = "method_62214",
-        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;)V", ordinal = 0)
-    )
-    private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, Operation<Void> original) {
-        original.call(instance, group);
-        //? } else if < 26.1 {
-    /*@WrapOperation(
+        //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
         method = "method_62214",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
     )
     private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
-        original.call(instance, group, gpuSampler);*/
-        //? } else {
-    /*@WrapOperation(
-        method = "lambda$addMainPass$0",
-        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
-    )
-    private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
-        original.call(instance, group, gpuSampler);*/
-        //?}
+        original.call(instance, group, gpuSampler);
         if (contextMatrixStack == null) return;
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             contextMatrixStack,
-            //? if < 26.1 {
+            //~ if > 1.21.11 'currentCamera' -> 'currentCameraState'
             currentCamera,
-            //? } else
-            //currentCameraState,
             renderBuffers.bufferSource(),
             currentTickCounter.getGameTimeDeltaPartialTick(true),
             true
@@ -109,12 +89,8 @@ public class MixinReplacementLevelRenderer {
         contextMatrixStack = null;
     }
 
-    @ModifyExpressionValue(
-        //? if < 26.1 {
-        method = "method_62214",
-        //? } else
-        //method = "lambda$addMainPass$0",
-        at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
+    //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
+    @ModifyExpressionValue(method = "method_62214", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
     private PoseStack onCreateMatrixStack(PoseStack matrixStack) {
         contextMatrixStack = matrixStack;
         return matrixStack;
