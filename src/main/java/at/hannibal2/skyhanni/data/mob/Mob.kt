@@ -196,7 +196,7 @@ class Mob(
         // Inlined updateBoundingBox()
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
 
-        if (category == MobCategory.SLAYER) {
+        if (ownerName == null && category == MobCategory.SLAYER) {
             hologram2?.let {
                 summonOwnerPattern.matchMatcher(it.cleanName()) {
                     ownerName = group("name")
