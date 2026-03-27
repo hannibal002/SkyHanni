@@ -9,12 +9,15 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.orEmpty
+import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
+import net.minecraft.network.chat.contents.objects.AtlasSprite
+import net.minecraft.resources.Identifier
 import java.awt.Color
 import java.util.Optional
 
@@ -278,4 +281,10 @@ object TextHelper {
     }
 
     private fun MutableComponent.isNotEmpty() = string.isNotEmpty()
+
+    fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
+        val atlasId = Identifier.withDefaultNamespace(atlas)
+        val texture = Identifier.fromNamespaceAndPath(namespace, sprite)
+        return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
+    }
 }

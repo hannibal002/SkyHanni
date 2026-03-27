@@ -7,10 +7,13 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -19,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -28,6 +32,7 @@ import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -124,6 +129,22 @@ object LimboTimeTracker {
         config.showTimeInLimboPosition.renderString("§eIn Limbo since §b$duration", posLabel = "Limbo Time Tracker")
     }
 
+    private const val LIMBO_ACHIEVEMENT = "Limbo Time"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Forgot to turn off the PC".asComponent(),
+            componentBuilder {
+                append("Spend 6 hours in limbo at once! ")
+                append("What a waste of electricity :(") {
+                    withColor(ChatFormatting.DARK_GRAY)
+                }
+            }
+        )
+        event.register(achievement, LIMBO_ACHIEVEMENT)
+    }
+
     private fun leaveLimbo() {
         inLimbo = false
         if (!isEnabled()) return
@@ -131,6 +152,7 @@ object LimboTimeTracker {
         val duration = passedSince.format()
         val currentPB = (storage?.personalBest ?: 0).seconds
         val oldLuck = storage?.userLuck ?: 0f
+        if (passedSince > 6.hours || currentPB > 6.hours) AchievementManager.completeAchievement(LIMBO_ACHIEVEMENT)
         if (passedSince > currentPB) {
             oldPB = currentPB
             storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)

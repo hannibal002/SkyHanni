@@ -43,7 +43,7 @@ object PartyChatCommands {
             { config.transferCommand },
             triggerableBySelf = false,
             executable = {
-                HypixelCommands.partyTransfer(it.cleanedAuthor)
+                HypixelCommands.partyTransfer(it.authorName)
             },
         ),
         PartyChatCommand(
@@ -83,8 +83,8 @@ object PartyChatCommands {
             { config.tpsCommand },
             requiresPartyLead = false,
             executable = {
-                TpsCounter.tps?.let {
-                    HypixelCommands.partyChat("Current TPS: $it", prefix = true)
+                TpsCounter.tps?.let { tps ->
+                    HypixelCommands.partyChat("Current TPS: %.2f".format(tps), prefix = true)
                 } ?: run {
                     ChatUtils.chat("Command sent too early to calculate TPS")
                 }
@@ -119,10 +119,10 @@ object PartyChatCommands {
 
     @HandleEvent
     fun onPartyCommand(event: PartyChatEvent.Allow) {
-        if (event.message.firstOrNull() !in commandPrefixes) return
-        val commandLabel = event.message.substring(1).substringBefore(' ')
+        if (event.cleanMessage.firstOrNull() !in commandPrefixes) return
+        val commandLabel = event.cleanMessage.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
-        val name = event.cleanedAuthor
+        val name = event.authorName
         if (name == PlayerUtils.getName() && (!command.triggerableBySelf || !config.selfTriggerCommands)) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
