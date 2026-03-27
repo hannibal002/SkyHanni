@@ -400,19 +400,19 @@ private fun replace(
     var hasEdited = false
 
     component.visit(
-        { style: Style?, string: String? ->
+        { style: Style, string: String ->
             var edit = string
             if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
                 edit = when (oldValue) {
-                    is String -> string?.replace(oldValue, newValue)
-                    is Regex -> string?.replace(oldValue, newValue)
+                    is String -> string.replace(oldValue, newValue)
+                    is Regex -> string.replace(oldValue, newValue)
 
                     else -> ErrorManager.skyHanniError("replace oldValue is not Regex or String")
                 }
             }
             if (edit != string) hasEdited = true
 
-            newComp.append(edit.orEmpty().asComponent().withStyle(style.orEmpty()))
+            newComp.append(edit.asComponent().withStyle(style))
             Optional.empty<Component>()
         },
         Style.EMPTY,
@@ -431,12 +431,12 @@ fun Component.replace(
     val newComp = Component.empty()
     val hasEdited = AtomicBoolean(false)
 
-    val replaceInSegment = { currentStyle: Style?, string: String? ->
-        val component = if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited.get()) && predicate(currentStyle)) {
+    val replaceInSegment = { currentStyle: Style, string: String ->
+        val component = if (oldValue in string && (!onlyReplaceFirst || !hasEdited.get()) && predicate(currentStyle)) {
             val split = string.split(oldValue)
             buildReplacedSegment(split, currentStyle, onlyReplaceFirst, hasEdited, newValue, oldValue)
         } else {
-            string.orEmpty().asComponent().withStyle(currentStyle.orEmpty())
+            string.asComponent().withStyle(currentStyle)
         }
         newComp.append(component)
         Optional.empty<Component>()
@@ -449,14 +449,14 @@ fun Component.replace(
 
 private fun buildReplacedSegment(
     split: List<String>,
-    currentStyle: Style?,
+    currentStyle: Style,
     onlyReplaceFirst: Boolean,
     hasEdited: AtomicBoolean,
     newValue: Component,
     oldValue: String,
 ): Component = componentBuilder {
     for ((index, str) in split.withIndex()) {
-        this.append(str.asComponent().withStyle(currentStyle.orEmpty()))
+        append(str.asComponent().withStyle(currentStyle))
         if (index < split.size - 1) {
             appendReplacement(onlyReplaceFirst, hasEdited, newValue, oldValue, currentStyle)
         }
@@ -468,14 +468,14 @@ private fun MutableComponent.appendReplacement(
     hasEdited: AtomicBoolean,
     newValue: Component,
     oldValue: String,
-    currentStyle: Style?,
+    currentStyle: Style,
 ) {
     if (!onlyReplaceFirst || !hasEdited.get()) {
         append(newValue)
         hasEdited.set(true)
     } else {
         append(oldValue) {
-            style = currentStyle.orEmpty()
+            style = currentStyle
         }
     }
 }

@@ -64,18 +64,18 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun getByComponent(component: Component, stringMatch: String): LorenzRarity? {
             var rarity: LorenzRarity? = null
-            TextHelper.matcher(component, stringMatch)?.visit({ style: Style?, string: String? ->
+            TextHelper.matcher(component, stringMatch)?.visit({ style: Style, string: String ->
                 if (string == stringMatch) {
-                    rarity = when {
-                        (style?.color?.name == "dark_red") -> ULTIMATE
-                        (style?.color?.name == "red") -> SPECIAL // special and very special are the same name
-                        (style?.color?.name == "aqua") -> DIVINE
-                        (style?.color?.name == "light_purple") -> MYTHIC
-                        (style?.color?.name == "gold") -> LEGENDARY
-                        (style?.color?.name == "dark_purple") -> EPIC
-                        (style?.color?.name == "blue") -> RARE
-                        (style?.color?.name == "green") -> UNCOMMON
-                        (style?.color?.name == "white") -> COMMON
+                    rarity = when (style.color?.name) {
+                        "dark_red" -> ULTIMATE
+                        "red" -> SPECIAL // special and very special are the same name
+                        "aqua" -> DIVINE
+                        "light_purple" -> MYTHIC
+                        "gold" -> LEGENDARY
+                        "dark_purple" -> EPIC
+                        "blue" -> RARE
+                        "green" -> UNCOMMON
+                        "white" -> COMMON
                         else -> null
                     }
                 }

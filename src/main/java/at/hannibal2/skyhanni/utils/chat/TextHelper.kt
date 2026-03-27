@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.orEmpty
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
@@ -212,10 +211,10 @@ object TextHelper {
         var currentString = ""
 
         component.visit(
-            { style: Style?, string: String? ->
-                if (string.isNullOrEmpty()) return@visit Optional.empty()
+            { style: Style, string: String ->
+                if (string.isEmpty()) return@visit Optional.empty()
 
-                fun String.newText() = asComponent().withStyle(style.orEmpty())
+                fun String.newText() = asComponent().withStyle(style)
                 for (c in string) {
                     if (index >= match.length) {
                         if (!currentString.isEmpty()) {
@@ -251,11 +250,11 @@ object TextHelper {
         var currentComponent = Component.empty()
 
         component.visit(
-            { style: Style?, string: String? ->
-                if (string.isNullOrEmpty()) return@visit Optional.empty()
+            { style: Style, string: String ->
+                if (string.isEmpty()) return@visit Optional.empty()
 
                 val split = string.split(delimiter)
-                fun String.toStyledComponent() = this.asComponent().withStyle(style.orEmpty())
+                fun String.toStyledComponent() = this.asComponent().withStyle(style)
                 if (split.isEmpty() || split.size == 1) {
                     currentComponent.append(string.toStyledComponent())
                 } else {
