@@ -79,7 +79,7 @@ class Mob(
     var armorStand: ArmorStand? = null,
     val name: String = "",
     additionalEntities: List<LivingEntity>? = null,
-    var ownerName: String? = null,
+    private var ownerName: String? = null,
     val hasStar: Boolean = false,
     val attribute: MobFilter.DungeonAttribute? = null,
     val levelOrTier: Int = -1,
