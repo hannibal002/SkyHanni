@@ -399,9 +399,7 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    notCompatibleWithConfigurationCache(
-        "Access widener validation fails with configuration cache enabled",
-    )
+    notCompatibleWithConfigurationCache("Access wideners need to be pre-processed by Stonecutter")
 }
 
 tasks.withType<RemapSourcesJarTask>().configureEach {
