@@ -212,12 +212,10 @@ class Mob(
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
-    private fun makeRelativeBoundingBox() = (
-        baseEntity.boundingBox.union(
-            extraEntities.filter { it !is ArmorStand }
-                .mapNotNull { it.boundingBox },
-        )
-        )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
+    private fun makeRelativeBoundingBox() = baseEntity.boundingBox.union(
+        extraEntities.filter { it !is ArmorStand }
+            .mapNotNull { it.boundingBox },
+    )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
