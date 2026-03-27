@@ -6,14 +6,12 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -27,10 +25,10 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
-open class Enchant : Comparable<Enchant> {
+private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
+private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
 
-    private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
-    private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
+open class Enchant : Comparable<Enchant> {
 
     // TODO move this away. split json data from logic
     @Expose
