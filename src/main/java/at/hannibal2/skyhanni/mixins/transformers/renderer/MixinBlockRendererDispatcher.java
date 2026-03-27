@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 //? } else
 // import net.minecraft.client.renderer.block.BlockStateModelSet;
+//~ if > 1.21.11 'model.BlockStateModel' -> 'dispatch.BlockStateModel'
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

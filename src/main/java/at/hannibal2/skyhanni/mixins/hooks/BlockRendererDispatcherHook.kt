@@ -6,32 +6,23 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.client.renderer.block.BlockRenderDispatcher
 //? } else
 //import net.minecraft.client.renderer.block.BlockStateModelSet
+//~ if > 1.21.11 'model.BlockStateModel' -> 'dispatch.BlockStateModel'
 import net.minecraft.client.renderer.block.model.BlockStateModel
 import net.minecraft.world.level.block.state.BlockState
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-//? if < 26.1 {
 fun modifyGetModelFromBlockState(
+    //? if > 1.21.11 {
     blockRendererDispatcher: BlockRenderDispatcher,
+    //? } else
+    //modelSet: BlockStateModelSet,
     state: BlockState?,
     cir: CallbackInfoReturnable<BlockStateModel>,
 ) {
     if (!SkyBlockUtils.inSkyBlock) return
     val returnState = MiningCommissionsBlocksColor.processState(state)
     if (returnState != state) {
+        //~ if > 1.21.11 'blockRendererDispatcher.blockModelShaper.getBlockModel' -> 'modelSet.get'
         cir.returnValue = blockRendererDispatcher.blockModelShaper.getBlockModel(returnState)
     }
 }
-//? } else {
-/*fun modifyGetModelFromBlockState(
-    modelSet: BlockStateModelSet,
-    state: BlockState?,
-    cir: CallbackInfoReturnable<BlockStateModel>,
-) {
-    if (!SkyBlockUtils.inSkyBlock) return
-    val returnState = MiningCommissionsBlocksColor.processState(state)
-    if (returnState != state) {
-        cir.returnValue = modelSet.get(returnState)
-    }
-}*/
-//?}

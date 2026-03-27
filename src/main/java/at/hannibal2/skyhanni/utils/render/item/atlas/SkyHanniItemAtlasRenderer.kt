@@ -84,6 +84,7 @@ internal class SkyHanniItemAtlasRenderer(
         val slotF = pixelSize.toFloat()
         val u1 = u + slotF / size
         val v1 = v + (-slotF) / size
+        //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

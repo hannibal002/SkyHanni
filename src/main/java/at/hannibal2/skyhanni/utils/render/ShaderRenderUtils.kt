@@ -311,7 +311,7 @@ object ShaderRenderUtils {
      */
     fun drawRoundRectDeferred(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
         if (!tryBlitRoundedRect(x, y, width, height, color, radius, smoothness)) {
-            DrawContextUtils.drawContext.guiRenderState.submitGuiElement(buildRoundedRectState(x, y, width, height, color, radius, smoothness))
+            DrawContextUtils.addGuiElement(buildRoundedRectState(x, y, width, height, color, radius, smoothness))
         }
     }
 
@@ -333,7 +333,7 @@ object ShaderRenderUtils {
         smoothness: Float = 1f,
     ) {
         if (topColor == bottomColor && tryBlitRoundedRect(x, y, width, height, topColor, radius, smoothness)) return
-        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(
+        DrawContextUtils.addGuiElement(
             buildRoundedRectGradientState(x, y, width, height, topColor, bottomColor, radius, smoothness)
         )
     }
@@ -381,7 +381,7 @@ object ShaderRenderUtils {
         blur: Float = 0.7f,
     ) {
         val state = buildRoundedRectOutlineState(x, y, width, height, topColor, bottomColor, borderThickness, radius, blur)
-        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+        DrawContextUtils.addGuiElement(state)
     }
 
     /**
@@ -403,7 +403,7 @@ object ShaderRenderUtils {
     ) {
         if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
         val state = buildRoundedTexturedRectState(x, y, width, height, radius, smoothness, texture, alpha)
-        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+        DrawContextUtils.addGuiElement(state)
     }
 
     /**
@@ -441,6 +441,7 @@ object ShaderRenderUtils {
             )
             if (blitted) return
         }
+        //~ if > 1.21.11 'submitGuiElement' -> 'addGuiElement'
         guiRenderState.submitGuiElement(buildCircleState(x, y, radius, color.rgb, smoothness, angle1, angle2))
     }
 
@@ -475,7 +476,7 @@ object ShaderRenderUtils {
             x, y, radius, startColor.destructToFloatArray(), endColor.destructToFloatArray(),
             angle - Math.PI.toFloat(), progress, phaseOffset, smoothness, reverse,
         )
-        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+        DrawContextUtils.addGuiElement(state)
     }
 
     private fun buildRoundedRectState(

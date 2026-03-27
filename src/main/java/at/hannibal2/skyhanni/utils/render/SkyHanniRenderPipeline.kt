@@ -7,7 +7,13 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChro
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
+//? if < 26.1 {
 import com.mojang.blaze3d.platform.DepthTestFunction
+//? } else {
+/*import com.mojang.blaze3d.pipeline.ColorTargetState
+import com.mojang.blaze3d.pipeline.DepthStencilState
+import com.mojang.blaze3d.platform.CompareOp*/
+//? }
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
@@ -25,6 +31,7 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
+    //~ if > 1.21.11 'DepthTestFunction ' -> 'CompareOp '
     depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
     val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {

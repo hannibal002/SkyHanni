@@ -71,6 +71,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
     ) {
         val textureView = textureView ?: return
         // u/v: full slot occupies [0,1] x [0,1] in the per-item texture
+        //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

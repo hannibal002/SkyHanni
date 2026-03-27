@@ -166,10 +166,6 @@ stonecutter parameters {
                 replace("import net.minecraft.client.gui.render.state.$it", "import net.minecraft.client.renderer.state.gui.$it")
             }
 
-            replace(
-                "import net.minecraft.client.renderer.block.model.BlockStateModel",
-                "import net.minecraft.client.renderer.block.dispatch.BlockStateModel"
-            )
             replace(".addedTime", ".addedTime()")
             replace("drawContext.renderItem(", "drawContext.item(")
             replace("drawContext.drawString(", "drawContext.text(")
@@ -189,16 +185,8 @@ stonecutter parameters {
             replace("this.renderMenuBackground(", "this.extractMenuBackground(")
             replace("renderMenuBackground(DrawContextUtils", "extractMenuBackground(DrawContextUtils")
 
-            replace(
-                "import com.mojang.blaze3d.platform.DepthTestFunction",
-                "import com.mojang.blaze3d.pipeline.ColorTargetState\nimport com.mojang.blaze3d.pipeline.DepthStencilState\nimport com.mojang.blaze3d.platform.CompareOp"
-            )
-            replace("DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp = CompareOp.LESS_THAN_OR_EQUAL")
             replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
             replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
-            replace("DepthTestFunction", "CompareOp")
-            replace("submitBlitToCurrentLayer(", "addBlitToCurrentLayer(")
-            replace("submitGuiElement(", "addGuiElement(")
         }
     }
 
