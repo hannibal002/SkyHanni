@@ -70,6 +70,5 @@ jobs:
                     git commit -m "Update regexes based on https://github.com/hannibal002/Skyhanni/commit/$GITHUB_SHA"
             -   name: Publish new repository
                 run: |
-                    git config --unset-all http.https://github.com/.extraheader
                     git remote add restream https://user:${{secrets.REPO_PAT}}@github.com/${{env.data_repo}}
                     git push restream HEAD:main
