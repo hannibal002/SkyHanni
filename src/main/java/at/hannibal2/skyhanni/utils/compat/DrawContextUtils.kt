@@ -26,6 +26,7 @@ object DrawContextUtils {
             ErrorManager.skyHanniError("drawContext is null")
         }
 
+    //~ if > 1.21.11 '.renderItem' -> '.item'
     fun drawItem(item: SafeItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
 
     fun setContext(context: GuiGraphics) {

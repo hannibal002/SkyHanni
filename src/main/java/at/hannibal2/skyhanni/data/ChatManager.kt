@@ -258,7 +258,7 @@ object ChatManager {
                 predicate(it)
             }.takeIf { it != -1 }?.let {
                 val chatLine = this[it]
-                val counter = chatLine.addedTime
+                val counter = chatLine.addedTime()
                 val id = chatLine.signature
                 val oldComponent = chatLine.content
                 val newComponent = component(chatLine.content)

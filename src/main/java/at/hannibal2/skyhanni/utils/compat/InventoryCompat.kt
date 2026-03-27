@@ -26,6 +26,7 @@ fun stackUnderCursor(): SafeItemStack? {
     val screen = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return null
     var stack = screen.hoveredSlot?.item
     if (stack != null) return stack
+    // TODO 26.1 REI compat needed
     //? if < 26.1 {
     stack = ReiCompat.getHoveredStackFromRei()
     //?}
@@ -48,6 +49,7 @@ object InventoryCompat {
     fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: Int) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = Minecraft.getInstance().player ?: return
+        //~ if > 1.21.11 'handleInventoryMouseClick' -> 'handleContainerInput'
         controller.handleInventoryMouseClick(windowId, slotId, mouseButton, ClickType.entries[mode], player)
     }
 

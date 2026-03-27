@@ -97,11 +97,7 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
-    this.javaLauncher.set(
-        javaToolchains.launcherFor {
-            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-        },
-    )
+    this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
@@ -364,7 +360,17 @@ afterEvaluate {
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val skipDetekt = project.findProperty("skipDetekt") == "true"
-    onlyIf { isTargetVersion && !skipDetekt }
+    val jvmVersion = JavaVersion.current().majorVersion.toInt()
+    onlyIf {
+        if (isTargetVersion && !skipDetekt && jvmVersion > 21) {
+            logger.error(
+                "Detekt requires Java \u2264 21, but Gradle is running on Java $jvmVersion." +
+                    "Run with JAVA_HOME pointing to Java 21, or pass -PskipDetekt=true to skip."
+            )
+            false
+        } else isTargetVersion && !skipDetekt
+    }
+    jvmTarget = "21"
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"

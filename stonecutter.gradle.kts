@@ -145,45 +145,24 @@ stonecutter parameters {
             replace("AfterClientWorldChange", "AfterClientLevelChange")
             replace("net.fabricmc.fabric.api.client.rendering.v1.world", "net.fabricmc.fabric.api.client.rendering.v1.level")
             replace("WorldRenderEvents", "LevelRenderEvents")
-            replace("SpecialGuiElementRegistry", "PictureInPictureRendererRegistry")
-            replace("createSpecialRenderer", "createRenderer")
             replace("ClickType", "ContainerInput")
-            replace("handleInventoryMouseClick", "handleContainerInput")
             replace("GuiGraphics", "GuiGraphicsExtractor")
             replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
             replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
 
-            val states = listOf(
+            listOf(
                 "GlyphRenderState",
                 "GuiElementRenderState",
                 "GuiRenderState",
                 "GuiItemRenderState",
                 "BlitRenderState",
                 "pip.PictureInPictureRenderState"
-            )
-
-            states.forEach {
-                replace("import net.minecraft.client.gui.render.state.$it", "import net.minecraft.client.renderer.state.gui.$it")
+            ).forEach {
+                replace(
+                    "import net.minecraft.client.gui.render.state.$it",
+                    "import net.minecraft.client.renderer.state.gui.$it"
+                )
             }
-
-            replace(".addedTime", ".addedTime()")
-            replace("drawContext.renderItem(", "drawContext.item(")
-            replace("drawContext.drawString(", "drawContext.text(")
-            replace("\"renderItemHotbar\"", "\"extractItemHotbar\"")
-            replace("\"renderHotbarAndDecorations\"", "\"extractHotbarAndDecorations\"")
-            replace("\"renderTabList\"", "\"extractTabList\"")
-            replace("\"renderSelectedItemName\"", "\"extractSelectedItemName\"")
-            replace("\"renderOverlayMessage\"", "\"extractOverlayMessage\"")
-            replace("\"renderChat\"", "\"extractChat\"")
-            replace("ContextualBarRenderer;render(", "ContextualBarRenderer;extractRenderState(")
-            replace("ContextualBarRenderer;renderExperienceLevel(", "ContextualBarRenderer;extractExperienceLevel(")
-            replace("PlayerTabOverlay;render(", "PlayerTabOverlay;extractRenderState(")
-
-            replace("override fun render(context: GuiGraphics", "override fun extractRenderState(context: GuiGraphicsExtractor")
-            replace("super.render(context,", "super.extractRenderState(context,")
-            replace("override fun renderBackground(context: GuiGraphics", "override fun extractBackground(context: GuiGraphicsExtractor")
-            replace("this.renderMenuBackground(", "this.extractMenuBackground(")
-            replace("renderMenuBackground(DrawContextUtils", "extractMenuBackground(DrawContextUtils")
 
             replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
             replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")

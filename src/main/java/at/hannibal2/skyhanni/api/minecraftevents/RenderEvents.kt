@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
+//~ if > 1.21.11 'SpecialGuiElementRegistry' -> 'PictureInPictureRendererRegistry'
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
@@ -26,12 +27,11 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
+        //~ if > 1.21.11 'SpecialGuiElementRegistry' -> 'PictureInPictureRendererRegistry'
         SpecialGuiElementRegistry.register { ctx ->
             SkyHanniPipCoordinatorRenderer(
-                //? if < 26.1 {
+                //~ if > 1.21.11 'vertexConsumers' -> 'bufferSource'
                 ctx.vertexConsumers()
-                //? } else
-                //ctx.bufferSource()
             )
         }
 

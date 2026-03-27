@@ -66,7 +66,7 @@ object CopyChat {
         val visibleLine = visibleLines[lineIndex]
 
         val matchingLines = chatGui.allMessages.filter {
-            it.addedTime == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
+            it.addedTime() == visibleLine.addedTime() && it.content.formattedTextCompat().isNotBlank()
         }
 
         return when {

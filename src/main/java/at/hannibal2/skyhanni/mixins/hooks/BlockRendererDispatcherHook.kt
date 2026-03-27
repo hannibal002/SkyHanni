@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 fun modifyGetModelFromBlockState(
-    //? if > 1.21.11 {
+    //? if < 26.1 {
     blockRendererDispatcher: BlockRenderDispatcher,
     //? } else
     //modelSet: BlockStateModelSet,
@@ -20,7 +20,7 @@ fun modifyGetModelFromBlockState(
     cir: CallbackInfoReturnable<BlockStateModel>,
 ) {
     if (!SkyBlockUtils.inSkyBlock) return
-    val returnState = MiningCommissionsBlocksColor.processState(state)
+    val returnState = MiningCommissionsBlocksColor.processState(state) ?: return
     if (returnState != state) {
         //~ if > 1.21.11 'blockRendererDispatcher.blockModelShaper.getBlockModel' -> 'modelSet.get'
         cir.returnValue = blockRendererDispatcher.blockModelShaper.getBlockModel(returnState)
