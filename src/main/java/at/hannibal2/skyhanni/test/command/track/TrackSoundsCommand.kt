@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -13,17 +14,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.core.registries.BuiltInRegistries
 
 @SkyHanniModule
-object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
+object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(
     commonName = "sound",
 ) {
     override val config get() = DevApi.config.debug.trackSound
 
-    // todo change this from a string arg to a qualified sound name arg
-    // todo add suggestion provider for sound names
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
-        argCallback("sound_name", BrigadierArguments.string()) {
+        argCallback("sound_name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { allSoundIds }) {
             val soundName = it.trim()
             if (soundName.isEmpty()) {
                 ChatUtils.chat("§cSound name cannot be empty")
@@ -35,7 +37,7 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
 
     override fun PlaySoundEvent.getTypeIdentifier() = soundName
 
-    override fun PlaySoundEvent.formatForDisplay() = "§3$soundName §8p:$pitch §7v:$volume"
+    override fun PlaySoundEvent.formatForDisplay() = Renderable.text("§3$soundName §8p:$pitch §7v:$volume")
 
     override fun PlaySoundEvent.formatForWorldRender(): String {
         val volumeColor = when (volume) {
@@ -49,10 +51,17 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     override fun PlaySoundEvent.shouldAcceptTrackableEvent(): Boolean = when {
         soundName == "game.player.hurt" && pitch == 0f && volume == 0f -> false // remove random useless sound
         soundName.isEmpty() -> false // sound with empty name aren't useful
-        else ->  runCatching {
+        else -> runCatching {
             distanceToPlayer // Need to call to initialize Lazy
             true
         }.getOrDefault(false)
+    }
+
+    // PlaySoundEvent.soundName strips the namespace prefix, so suggestions mirror that
+    private val allSoundIds: List<String> by lazy {
+        BuiltInRegistries.SOUND_EVENT.keySet()
+            .map { it.toString().removePrefix("minecraft:") }
+            .sorted()
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
