@@ -8,6 +8,6 @@ class VersionConstantsProvider : SymbolProcessorProvider {
         environment.codeGenerator,
         environment.logger,
         environment.options["skyhanni.modver"] ?: "0.0.0",
-        environment.options["skyhanni.mcver"] ?: "1.21.10",
+        environment.options["skyhanni.mcver"] ?: "1.21.11",
     )
 }
