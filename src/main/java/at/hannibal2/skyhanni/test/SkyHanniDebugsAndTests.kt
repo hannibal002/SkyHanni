@@ -89,7 +89,7 @@ object SkyHanniDebugsAndTests {
             add("[SkyHanni] Graph Area: ${SkyBlockUtils.graphArea}")
         }
 
-        registerDebugScreenEntry("ray_traced_ore_block", SkyBlockUtils::inSkyBlock) {
+        registerDebugScreenEntry("raycasted_ore_block", SkyBlockUtils::inSkyBlock) {
             BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                 OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                     add("[SkyHanni] Looking at: ${ore.name} (${pos.toCleanString()})")

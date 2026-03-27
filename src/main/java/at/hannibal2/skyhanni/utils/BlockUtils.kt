@@ -36,15 +36,15 @@ object BlockUtils {
         return getValue(property) == 0
     }
 
-    private fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
+    private fun raycast(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
         val target = start + direction.normalize() * distance
-        val result = rayTrace(start, target)
+        val result = raycast(start, target)
 
         return result?.location?.toLorenzVec()
     }
 
-    fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.world.phys.BlockHitResult? {
-        return world.clip(
+    fun raycast(start: LorenzVec, end: LorenzVec): net.minecraft.world.phys.BlockHitResult? =
+        world.clip(
             ClipContext(
                 start.toVec3(),
                 end.toVec3(),
@@ -53,15 +53,12 @@ object BlockUtils {
                 MinecraftCompat.localPlayer,
             ),
         )
-    }
 
-    fun getTargetedBlock(): LorenzVec? {
-        val mouseOverObject = Minecraft.getInstance().hitResult ?: return null
-        if (mouseOverObject.type != HitResult.Type.BLOCK) return null
-        return mouseOverObject.location.toLorenzVec().roundToBlock()
-    }
+    fun getTargetedBlock(): LorenzVec? =
+        Minecraft.getInstance().hitResult?.takeIf { it.type == HitResult.Type.BLOCK }
+            ?.location?.toLorenzVec()?.roundToBlock()
 
-    fun getTargetedBlockAtDistance(distance: Double) = rayTrace(
+    fun getTargetedBlockAtDistance(distance: Double) = raycast(
         LocationUtils.playerEyeLocation(),
         MinecraftCompat.localPlayer.lookAngle.toLorenzVec(),
         distance,
@@ -91,7 +88,8 @@ object BlockUtils {
         distance: Int,
         radius: Int = distance,
         filter: Block,
-    ): Map<LorenzVec, BlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
+    ): Map<LorenzVec, BlockState> =
+        nearbyBlocks(center, distance, radius, condition = { it.block == filter })
 
     val redstoneOreBlocks = buildList { addRedstoneOres() }
 }
