@@ -5,8 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.achievements.Achievement
+import at.hannibal2.skyhanni.data.achievements.AchievementUserData
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -144,6 +147,22 @@ object AchievementManager {
             category = CommandCategory.DEVELOPER_TEST
             literalCallback("unlockall") {
                 ChatUtils.chat("you didn't think this would really work? did you...")
+            }
+            argCallback(
+                "lock",
+                BrigadierArguments.greedyString(),
+                BrigadierUtils.dynamicSuggestionProvider {
+                    config.filter { it.value.getName() != null }.map { it.key }
+                }
+            ) { id ->
+                val achievement = config[id]
+                if (achievement == null) {
+                    ChatUtils.chat("Unknown Achievement")
+                    return@argCallback
+                } else {
+                    achievement.data = AchievementUserData()
+                    setAchievement(id, achievement)
+                }
             }
             simpleCallback {
                 val achievement = getAchievement(TEST_ACHIEVEMENT)
