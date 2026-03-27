@@ -67,8 +67,9 @@ object AchievementManager {
         val currentTier = achievement.getCurrentTier() ?: 0
         achievement.data.progress = newProgress
         val newTier = achievement.getCurrentTier() ?: 0
-        if (newTier > currentTier) {
-            if (newTier == achievement.tiers.size) achievement.data.achieved = true
+        val isMaxed = newTier == achievement.tiers.size
+        if (newTier > currentTier || (isMaxed && !achievement.data.achieved)) {
+            if (isMaxed) achievement.data.achieved = true
             if (shouldShowMessages) {
                 ChatUtils.chat(
                     componentBuilder {

@@ -49,7 +49,7 @@ data class Achievement(
     }
 
     fun getCurrentTier(): Int? {
-        if (tiers.size < 2) return null
+        if (tiers.isEmpty()) return null
         var currentTier = 0
         for (tier in tiers) {
             if (data.progress >= tier) currentTier++
