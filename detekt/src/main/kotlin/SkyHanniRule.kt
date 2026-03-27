@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.detektrules
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Rule
+import dev.detekt.api.CodeSmell
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Rule
 import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 
 abstract class SkyHanniRule(config: Config) : Rule(config) {

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.detektrules.style
 
 import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.rules.hasAnnotation
+import dev.detekt.api.Config
+import dev.detekt.api.Debt
+import dev.detekt.api.Issue
+import dev.detekt.api.Severity
+import dev.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction

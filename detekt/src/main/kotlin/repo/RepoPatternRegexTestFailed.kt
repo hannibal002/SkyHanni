@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.detektrules.repo
 
 import at.hannibal2.skyhanni.detektrules.RepoPatternElement.Companion.asRepoPatternElement
 import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import dev.detekt.api.Config
+import dev.detekt.api.Debt
+import dev.detekt.api.Issue
+import dev.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
 class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(config) {

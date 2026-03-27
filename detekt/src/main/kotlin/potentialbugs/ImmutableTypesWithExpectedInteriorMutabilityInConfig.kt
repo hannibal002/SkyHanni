@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.detektrules.potentialbugs
 
 import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.RequiresTypeResolution
-import io.gitlab.arturbosch.detekt.rules.fqNameOrNull
+import dev.detekt.api.Config
+import dev.detekt.api.Debt
+import dev.detekt.api.Issue
+import dev.detekt.api.Severity
+import dev.detekt.api.internal.RequiresTypeResolution
+import dev.detekt.rules.fqNameOrNull
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtFile

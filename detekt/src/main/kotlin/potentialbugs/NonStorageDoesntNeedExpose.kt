@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.detektrules.potentialbugs
 import at.hannibal2.skyhanni.detektrules.SkyHanniRule
 import at.hannibal2.skyhanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.CONFIG_PACKAGE
 import at.hannibal2.skyhanni.detektrules.potentialbugs.StorageNeedsExpose.Companion.STORAGE_PACKAGE
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.rules.hasAnnotation
+import dev.detekt.api.Config
+import dev.detekt.api.Debt
+import dev.detekt.api.Issue
+import dev.detekt.api.Severity
+import dev.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate

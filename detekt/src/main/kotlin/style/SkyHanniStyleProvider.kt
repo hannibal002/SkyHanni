@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.detektrules.style
 
 import com.google.auto.service.AutoService
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.RuleSet
-import io.gitlab.arturbosch.detekt.api.RuleSetProvider
+import dev.detekt.api.Config
+import dev.detekt.api.RuleSet
+import dev.detekt.api.RuleSetProvider
 
 @AutoService(RuleSetProvider::class)
 class SkyHanniStyleProvider : RuleSetProvider {
