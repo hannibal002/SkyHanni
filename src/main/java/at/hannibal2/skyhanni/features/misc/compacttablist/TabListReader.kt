@@ -266,8 +266,11 @@ object TabListReader {
         }
     }
 
+    // TODO refactor
     @Suppress("CyclomaticComplexMethod")
     private fun parseFooterAsColumn(component: Component): TabColumn? {
+        inUpgrades = false
+
         val lines = TextHelper.split(component, "\n") ?: listOf(component)
 
         val godPotTimer = lines.firstNotNullOfOrNull {
