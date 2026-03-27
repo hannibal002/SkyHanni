@@ -85,6 +85,7 @@ object DamageIndicatorManager {
 
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
+    // TODO use repoPattern
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
 
@@ -276,7 +277,7 @@ object DamageIndicatorManager {
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
                     val formatDamage = "§c${currentDamage.shortFormat()}"
-                    val formatHealing = "§a${currentHealing.shortFormat()}"
+                    val formatHealing = "§a+${currentHealing.shortFormat()}"
                     val finalResult = if (currentHealing == 0L) {
                         formatDamage
                     } else if (currentDamage == 0L) {

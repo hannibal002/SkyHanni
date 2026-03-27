@@ -72,6 +72,7 @@ class MobFinder {
     // F5
     private var floor5lividEntity: RemotePlayer? = null
     private var floor5lividEntitySpawnTime = SimpleTimeMark.farPast()
+    // TODO use RepoPattern
     private val correctLividPattern = "\\[BOSS] (.*) Livid: Impossible! How did you figure out which one I was\\?!".toPattern()
 
     // F6
@@ -490,7 +491,7 @@ class MobFinder {
 
     fun handleChat(message: String) {
         if (!DungeonApi.inDungeon()) return
-        // TODO Use RepoPattern
+        // TODO use RepoPattern
         when (message) {
             // F1
             "[BOSS] Bonzo: Gratz for making it this far, but I'm basically unbeatable." -> {
