@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.tree.CommandNode
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -20,7 +21,9 @@ object HelpCommand {
     private const val COMMANDS_PER_PAGE = 15
     private val messageId = ChatUtils.getUniqueMessageId()
 
-    private fun createCommandEntry(command: CommandData, dispatcher: CommandDispatcher<Any?>): Component {
+    private fun Map.Entry<CommandNode<*>, String>.format() = "§7 - §e/${key.name} $value"
+
+    private fun createCommandEntry(command: CommandData, dispatcher: CommandDispatcher<FabricClientCommandSource>): Component {
         val category = command.category
         val color = category.color
         val description = command.descriptor.splitLines(300).replace("§r", "§7")
@@ -30,7 +33,6 @@ object HelpCommand {
         val usage = if (command is BaseBrigadierBuilder) {
             val node = command.node
             val map = dispatcher.getSmartUsage(node, null)
-            fun Map.Entry<CommandNode<Any?>, String>.format() = "§7 - §e/${node.name} $value"
             if (map.isEmpty()) null
             else buildString {
                 appendLine()
@@ -57,7 +59,12 @@ object HelpCommand {
         }
     }
 
-    private fun showPage(page: Int, search: String, commands: List<CommandData>, dispatcher: CommandDispatcher<Any?>) {
+    private fun showPage(
+        page: Int,
+        search: String,
+        commands: List<CommandData>,
+        dispatcher: CommandDispatcher<FabricClientCommandSource>,
+    ) {
         val filtered = commands.filter { cmd ->
             cmd.getAllNames().any { it.contains(search, ignoreCase = true) } ||
                 cmd.descriptor.contains(search, ignoreCase = true)
@@ -75,7 +82,7 @@ object HelpCommand {
         ) { createCommandEntry(it, dispatcher) }
     }
 
-    fun onCommand(args: Array<String>, commands: List<CommandData>, dispatcher: CommandDispatcher<Any?>) {
+    fun onCommand(args: Array<String>, commands: List<CommandData>, dispatcher: CommandDispatcher<FabricClientCommandSource>) {
         val page: Int
         val search: String
         if (args.firstOrNull() == "-p") {

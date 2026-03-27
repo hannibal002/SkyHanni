@@ -32,7 +32,7 @@ object ModifyVisualWords {
         stringVisitableCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords =
             userModifiedWords.map { visualWordText -> visualWordText.toVisualWord() }.toMutableList()
-        Minecraft.getInstance().gui?.chat?.refreshTrimmedMessages()
+        Minecraft.getInstance().gui.chat.refreshTrimmedMessages()
     }
 
     var changeWords = true
@@ -67,7 +67,7 @@ object ModifyVisualWords {
             if (replace) characters = doReplacements(characters)
 
             val outputTexts = mutableListOf<FormattedCharSequence>()
-            var lastStyle: Style? = null
+            var lastStyle: Style = Style.EMPTY
             val textStringBuilder = StringBuilder()
 
             for (character in characters) {

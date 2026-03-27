@@ -207,35 +207,40 @@ object TextHelper {
 
     fun matcher(component: Component, match: String): Component? {
         var index = 0
-        var newComponent: Component = Component.empty()
+        var newComponent = Component.empty()
         var currentString = ""
 
-        component.visit({ style: Style?, string: String? ->
-            if (string.isNullOrEmpty()) return@visit Optional.empty()
-            for (c in string) {
-                if (index >= match.length) {
-                    if (!currentString.isEmpty()) {
-                        newComponent.append(Component.literal(currentString).withStyle(style))
-                    }
-                    currentString = ""
-                    return@visit Optional.of(newComponent)
-                }
-                if (c == match[index]) {
-                    currentString += c
-                    index++
-                } else {
-                    currentString = ""
-                    newComponent = Component.empty()
-                    index = 0
-                }
-            }
-            if (!currentString.isEmpty()) {
-                newComponent.append(Component.literal(currentString).withStyle(style))
-            }
-            currentString = ""
+        component.visit(
+            { style: Style, string: String ->
+                if (string.isEmpty()) return@visit Optional.empty()
 
-            Optional.empty()
-        }, Style.EMPTY)
+                fun String.newText() = asComponent().withStyle(style)
+                for (c in string) {
+                    if (index >= match.length) {
+                        if (!currentString.isEmpty()) {
+                            newComponent.append(currentString.newText())
+                        }
+                        currentString = ""
+                        return@visit Optional.of(newComponent)
+                    }
+                    if (c == match[index]) {
+                        currentString += c
+                        index++
+                    } else {
+                        currentString = ""
+                        newComponent = Component.empty()
+                        index = 0
+                    }
+                }
+                if (!currentString.isEmpty()) {
+                    newComponent.append(currentString.newText())
+                }
+                currentString = ""
+
+                Optional.empty()
+            },
+            Style.EMPTY,
+        )
         if (newComponent.string.isEmpty()) return null
         return newComponent
     }
@@ -244,30 +249,37 @@ object TextHelper {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
-        component.visit({ style: Style?, string: String? ->
-            if (string.isNullOrEmpty()) return@visit Optional.empty()
-            val split = string.split(delimiter)
-            if (split.isEmpty() || split.size == 1) {
-                currentComponent.append(Component.literal(string).withStyle(style))
-            } else {
-                currentComponent.append(Component.literal(split.first()).withStyle(style))
-                if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
-                currentComponent = Component.empty()
-                for ((index, str) in split.withIndex()) {
-                    if (index == 0) continue
-                    currentComponent.append(Component.literal(str).withStyle(style))
-                    if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+        component.visit(
+            { style: Style, string: String ->
+                if (string.isEmpty()) return@visit Optional.empty()
+
+                val split = string.split(delimiter)
+                fun String.toStyledComponent() = this.asComponent().withStyle(style)
+                if (split.isEmpty() || split.size == 1) {
+                    currentComponent.append(string.toStyledComponent())
+                } else {
+                    currentComponent.append(split.first().toStyledComponent())
+                    if (currentComponent.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
+                    for ((index, str) in split.withIndex()) {
+                        if (index == 0) continue
+                        currentComponent.append(str.toStyledComponent())
+                        if (currentComponent.isNotEmpty()) newComponents.add(currentComponent)
+                        currentComponent = Component.empty()
+                    }
                 }
-            }
 
-            Optional.empty<Component>()
-        }, Style.EMPTY)
+                Optional.empty<Component>()
+            },
+            Style.EMPTY,
+        )
 
-        if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+        if (currentComponent.isNotEmpty()) newComponents.add(currentComponent)
         if (newComponents.isEmpty()) return null
         return newComponents
     }
+
+    private fun MutableComponent.isNotEmpty() = string.isNotEmpty()
 
     fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
         val atlasId = Identifier.withDefaultNamespace(atlas)

@@ -195,8 +195,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.2"
         }
     }
 }

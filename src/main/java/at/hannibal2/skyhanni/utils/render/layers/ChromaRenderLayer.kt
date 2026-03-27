@@ -69,8 +69,9 @@ class ChromaRenderLayer(
                 .use { renderPass ->
                     RenderSystem.bindDefaultUniforms(renderPass)
                     renderPass.setUniform("DynamicTransforms", dynamicTransforms)
-                    renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
-
+                    GuiRendererHook.chromaBufferSlice?.let {
+                        renderPass.setUniform("SkyHanniChromaUniforms", it)
+                    }
 
                     renderPass.setPipeline(renderPipeline)
                     renderPass.setVertexBuffer(0, gpuBuffer)
