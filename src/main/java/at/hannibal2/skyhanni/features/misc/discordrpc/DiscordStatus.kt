@@ -282,9 +282,10 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
                         break
                     }
                 }
-                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val stackingEnchantData = EstimatedItemValue.stackingEnchants[stackingEnchant]
+                val levels = stackingEnchantData?.levels ?: listOf(0)
                 val level = enchantments.getIntOrDefault(stackingEnchant)
-                val amount = extraAttributes.getIntOrDefault(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
+                val amount = stackingEnchantData?.let { extraAttributes.getIntOrDefault(it.statName) } ?: 0
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

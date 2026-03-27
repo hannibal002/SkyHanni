@@ -75,12 +75,13 @@ class ChromaRenderLayer(
             val gpuBuffer = renderPipeline.vertexFormat.uploadImmediateVertexBuffer(buffer.vertexBuffer())
             val gpuBuffer2: GpuBuffer
             val indexType: VertexFormat.IndexType
-            if (buffer.indexBuffer() == null) {
+            val indexBuffer = buffer.indexBuffer()
+            if (indexBuffer == null) {
                 val shapeIndexBuffer = RenderSystem.getSequentialBuffer(buffer.drawState().mode())
                 gpuBuffer2 = shapeIndexBuffer.getBuffer(buffer.drawState().indexCount())
                 indexType = shapeIndexBuffer.type()
             } else {
-                gpuBuffer2 = renderPipeline.vertexFormat.uploadImmediateIndexBuffer(buffer.indexBuffer())
+                gpuBuffer2 = renderPipeline.vertexFormat.uploadImmediateIndexBuffer(indexBuffer)
                 indexType = buffer.drawState().indexType()
             }
 
@@ -90,8 +91,9 @@ class ChromaRenderLayer(
                 .use { renderPass ->
                     RenderSystem.bindDefaultUniforms(renderPass)
                     renderPass.setUniform("DynamicTransforms", dynamicTransforms)
-                    renderPass.setUniform("SkyHanniChromaUniforms", GuiRendererHook.chromaBufferSlice)
-
+                    GuiRendererHook.chromaBufferSlice?.let {
+                        renderPass.setUniform("SkyHanniChromaUniforms", it)
+                    }
 
                     renderPass.setPipeline(renderPipeline)
                     renderPass.setVertexBuffer(0, gpuBuffer)
