@@ -1,23 +1,14 @@
-package at.hannibal2.skyhanni.detektrules.grammar
+package grammar
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import SkyHanniRule
 import dev.detekt.api.Config
-import dev.detekt.api.Debt
-import dev.detekt.api.Issue
-import dev.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
  * This rule reports all usages of the british spelling over the american spelling in the codebase,
  * this will ignore any type annotations, i.e., `@ConfigEditorColour` will not be reported.
  */
-class AvoidBritishSpelling(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "AvoidBritishSpelling",
-        Severity.Style,
-        "Avoid using the british spelling over the american spelling.",
-        Debt.FIVE_MINS,
-    )
+class AvoidBritishSpelling(config: Config) : SkyHanniRule(config, "Avoid using the british spelling over the american spelling.") {
 
     private val scannedWords = mapOf(
         "colour" to "color",

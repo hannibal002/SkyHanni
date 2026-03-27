@@ -1,19 +1,13 @@
-package at.hannibal2.skyhanni.detektrules.style
+package style
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import SkyHanniRule
 import dev.detekt.api.Config
-import dev.detekt.api.Debt
-import dev.detekt.api.Issue
-import dev.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
-class OnlyOnIslandSpecificity(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "OnlyOnIslandSpecificity",
-        Severity.Style,
-        "`onlyOnSkyblock = true` provides no value when `onlyOnIsland` is present, as it is implicitly true.",
-        Debt.FIVE_MINS
-    )
+class OnlyOnIslandSpecificity(config: Config) : SkyHanniRule(
+    config,
+    "`onlyOnSkyblock = true` provides no value when `onlyOnIsland` is present, as it is implicitly true.",
+) {
 
     override fun visitNamedFunction(function: KtNamedFunction) {
         val annotations = function.annotationEntries

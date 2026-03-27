@@ -1,22 +1,16 @@
-package at.hannibal2.skyhanni.detektrules.repo
+package repo
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import SkyHanniRule
 import dev.detekt.api.Config
-import dev.detekt.api.Debt
-import dev.detekt.api.Issue
-import dev.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
  * This rule reports all instances of hard-coded skull textures in the codebase.
  */
-class SkullTexturesUseRepo(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "SkullTexturesUseRepo",
-        Severity.Style,
-        "Avoid hard-coding skull textures in strings. Use the SkullTextureHolder instead, and add the texture to Skulls.json in the repository.",
-        Debt.FIVE_MINS,
-    )
+class SkullTexturesUseRepo(config: Config) : SkyHanniRule(
+    config,
+    "Avoid hard-coding skull textures in strings. Use the SkullTextureHolder instead, and add the texture to Skulls.json in the repository.",
+) {
 
     private val scannedTextureStarts = listOf(
         "ewogICJ0aW1l",

@@ -1,19 +1,20 @@
-package at.hannibal2.skyhanni.detektrules.grammar
+package grammar
 
 import com.google.auto.service.AutoService
-import dev.detekt.api.Config
+import dev.detekt.api.RuleName
 import dev.detekt.api.RuleSet
+import dev.detekt.api.RuleSetId
 import dev.detekt.api.RuleSetProvider
 
 @AutoService(RuleSetProvider::class)
 class GrammarRuleSetProvider : RuleSetProvider {
-    override val ruleSetId: String = "GrammarRules"
+    override val ruleSetId: RuleSetId = RuleSetId("GrammarRules")
 
-    override fun instance(config: Config): RuleSet {
+    override fun instance(): RuleSet {
         return RuleSet(
             ruleSetId,
-            listOf(
-                AvoidBritishSpelling(config),
+            mapOf(
+                RuleName("AvoidBritishSpelling") to ::AvoidBritishSpelling,
             ),
         )
     }

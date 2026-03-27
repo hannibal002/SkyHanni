@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.detekt.api)
+    compileOnly(libs.detekt.api)
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
     implementation(libs.detektrules.ktlint)

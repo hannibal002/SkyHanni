@@ -1,24 +1,18 @@
-package at.hannibal2.skyhanni.detektrules.style
+package style
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import SkyHanniRule
 import dev.detekt.api.Config
-import dev.detekt.api.Debt
-import dev.detekt.api.Issue
-import dev.detekt.api.Severity
-import dev.detekt.rules.hasAnnotation
+import utils.DetektUtils.hasAnnotation
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
-class InSkyBlockEarlyReturn(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "InSkyBlockEarlyReturn",
-        Severity.Style,
-        ".inSkyBlock checks should be removed and replaced with onlyOnSkyblock = true in @HandleEvent annotation",
-        Debt.FIVE_MINS
-    )
+class InSkyBlockEarlyReturn(config: Config) : SkyHanniRule(
+    config,
+    ".inSkyBlock checks should be removed and replaced with onlyOnSkyblock = true in @HandleEvent annotation",
+) {
 
     private fun KtExpression.containsInSkyBlockCheck(): Boolean = text.contains("SkyBlockUtils.inSkyBlock")
     private fun KtExpression.isEarlyReturn(): Boolean = this is KtIfExpression && then is KtReturnExpression

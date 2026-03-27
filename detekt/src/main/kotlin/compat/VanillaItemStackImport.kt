@@ -1,19 +1,13 @@
-package at.hannibal2.skyhanni.detektrules.compat
+package compat
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
+import SkyHanniRule
 import dev.detekt.api.Config
-import dev.detekt.api.Debt
-import dev.detekt.api.Issue
-import dev.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtImportDirective
 
-class VanillaItemStackImport(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "VanillaItemStackImport",
-        Severity.Style,
-        "Use SafeItemStack instead of the vanilla ItemStack import to avoid 'Components not bound yet' crashes.",
-        Debt.FIVE_MINS,
-    )
+class VanillaItemStackImport(config: Config) : SkyHanniRule(
+    config,
+    "Use SafeItemStack instead of the vanilla ItemStack import to avoid 'Components not bound yet' crashes.",
+) {
 
     override fun visitImportDirective(importDirective: KtImportDirective) {
         val filePath = importDirective.containingFile.virtualFile.path

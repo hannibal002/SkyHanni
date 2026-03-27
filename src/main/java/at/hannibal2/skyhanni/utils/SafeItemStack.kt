@@ -42,4 +42,4 @@ fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit
 //? if < 26.1 {
 val SafeItemStack.itemType: Item get() = item
 //? } else
-//val SafeItemStack.itemType: Item get() = item.value()
+//val SafeItemStack.itemType: Item get() = item!!.value()
