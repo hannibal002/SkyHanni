@@ -161,8 +161,10 @@ object AchievementManager {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.getName() != null }
+                val totalCount = achievementList.size
+                val unlocked = achievementList.count { it.data.achieved }
                 TextHelper.displayPaginatedList(
-                    "SkyHanni Achievements!",
+                    "SkyHanni Achievements! ($unlocked/$totalCount)",
                     achievementList,
                     ChatUtils.getUniqueMessageId(),
                     "No Achievements Found"
