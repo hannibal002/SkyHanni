@@ -200,7 +200,7 @@ class Mob(
             ownerName ?: if (category == MobCategory.SLAYER) hologram2?.let {
                 summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
-        )?.let { MobUtils.OwnerShip(it) }
+            )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
@@ -217,7 +217,7 @@ class Mob(
             extraEntities.filter { it !is ArmorStand }
                 .mapNotNull { it.boundingBox },
         )
-    )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
+        )?.move(-baseEntity.position().x, -baseEntity.position().y, -baseEntity.position().z)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
