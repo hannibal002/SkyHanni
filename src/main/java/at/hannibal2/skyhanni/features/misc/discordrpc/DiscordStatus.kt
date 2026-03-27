@@ -234,7 +234,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
             }
             if (autoReturn == "") { // if we didn't find any useful information, display the fallback
                 val fallbackID = DiscordRPCManager.config.auto.get().ordinal
-                autoReturn = if (fallbackID == AUTO.ordinal) {
+                autoReturn = if (fallbackID == this.ordinal) {
                     NONE.getDisplayString()
                 } else {
                     DiscordStatus.entries[fallbackID].getDisplayString()
