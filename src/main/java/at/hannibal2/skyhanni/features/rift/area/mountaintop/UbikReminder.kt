@@ -96,16 +96,15 @@ object UbikReminder {
         if (!config.ubikReminder || !config.ubikGui) return
         val storage = storage ?: return
         val remindTime = storage.ubikRemindTime
-        val renderable: Renderable
-        if (remindTime.isFarFuture()) {
-            renderable = Renderable.horizontal {
+        val renderable = if (remindTime.isFarFuture()) {
+            Renderable.horizontal {
                 addItemStack(cube)
                 addString("§aReady!")
             }
         } else if (config.ubikOnlyWhenReady) {
             return
         } else {
-            renderable = Renderable.horizontal {
+            Renderable.horizontal {
                 addItemStack(cube)
                 addString("§e${remindTime.timeUntil().format()}")
             }

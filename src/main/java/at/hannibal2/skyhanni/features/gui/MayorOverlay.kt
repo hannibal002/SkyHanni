@@ -86,7 +86,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         }
 
         @HandleEvent
-        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
