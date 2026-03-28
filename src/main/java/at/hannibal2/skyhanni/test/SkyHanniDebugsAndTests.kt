@@ -317,7 +317,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun copyLocation(parameter: String? = null) {
-        val location = LocationUtils.playerLocation().add(0.001, 0.001, 0.001).roundTo(1)
+        val location = LocationUtils.playerLocation().add(0.001).roundTo(1)
         val (clipboard, format) = formatLocation(location, parameter)
         OSUtils.copyToClipboard(clipboard)
         ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)

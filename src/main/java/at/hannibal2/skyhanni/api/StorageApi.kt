@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
 import at.hannibal2.skyhanni.utils.VectorUtils.add
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
@@ -203,9 +204,9 @@ object StorageApi {
 
     private fun getNeighbourBlocks(position: Vec3): List<Pair<Vec3, Block>> = listOf(
         position.add(x = 1.0),
-        position.add(x = -1.0),
+        position.subtract(x = 1.0),
         position.add(z = 1.0),
-        position.add(z = -1.0),
+        position.subtract(z = 1.0),
     ).map { it to it.getBlockAt() }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)

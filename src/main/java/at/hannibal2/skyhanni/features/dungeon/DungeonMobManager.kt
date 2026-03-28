@@ -104,7 +104,7 @@ object DungeonMobManager {
 
         felOnTheGround.forEach { mob ->
             event.drawWaypointFilled(
-                mob.baseEntity.position().add(-0.5, -0.23, -0.5),
+                mob.baseEntity.position().subtract(0.5, 0.23, 0.5),
                 color.toColor(),
                 seeThroughBlocks = false,
                 beacon = false,

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.down
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -86,7 +87,7 @@ object DungeonSecretTrackerLocator {
         if (distance > 3) {
             val formattedDistance = distance.toInt().addSeparators()
             event.drawDynamicText(location, "§d§lSECRET", 1.7)
-            event.drawDynamicText(location.add(0.0, -0.1 - distance / (12 * 1.7), 0.0), " §r§e${formattedDistance}m", 1.0)
+            event.drawDynamicText(location.down(0.1 + distance / (12 * 1.7)), " §r§e${formattedDistance}m", 1.0)
         } else {
             reset()
         }

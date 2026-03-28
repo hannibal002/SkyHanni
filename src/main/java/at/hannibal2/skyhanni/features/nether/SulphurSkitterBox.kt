@@ -52,8 +52,8 @@ object SulphurSkitterBox {
         if (location == closestSponge) return
         closestSponge = location
         renderBox = location?.let {
-            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
-            val pos2 = it.add(RADIUS + 1, RADIUS + 1, RADIUS + 1)
+            val pos1 = it.subtract(RADIUS)
+            val pos2 = it.add(RADIUS + 1)
             pos1.axisAlignedTo(pos2).expandBlock()
         }
     }

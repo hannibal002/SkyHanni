@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -53,7 +54,7 @@ object RiftMotesOrb {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!enabled) return
-        val location = event.location.add(-0.5, 0.0, -0.5)
+        val location = event.location.subtract(x = 0.5, z = 0.5)
 
         if (event.type == ParticleTypes.ENTITY_EFFECT) {
             val orb = motesOrbs.find { it.location.distanceTo(location) < 3 }

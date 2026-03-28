@@ -70,7 +70,7 @@ object AshfangHighlights {
             val color = config.gravityOrbs.color.toColor()
             gravityOrbs.forEach {
                 val location = event.exactLocation(it)
-                event.drawCylinderInWorld(color, location.add(-0.5, -2.0, -0.5), 3.5f, 4.5f)
+                event.drawCylinderInWorld(color, location.subtract(0.5, 2.0, 0.5), 3.5f, 4.5f)
                 event.drawBlendedColorString(location, "Gravity Orb")
             }
         }

@@ -34,8 +34,8 @@ object PrecisionMiningHighlight {
             !Minecraft.getInstance().options.keyAttack.isDown
         ) return
 
-        val particleBoundingBox = event.location.subtract(0.12, 0.12, 0.12)
-            .axisAlignedTo(event.location.add(0.12, 0.12, 0.12))
+        val particleBoundingBox = event.location.subtract(0.12)
+            .axisAlignedTo(event.location.add(0.12))
 
         val blockBoundingBox = BlockUtils.getTargetedBlock()?.let {
             it.axisAlignedTo(it.add(1.0))

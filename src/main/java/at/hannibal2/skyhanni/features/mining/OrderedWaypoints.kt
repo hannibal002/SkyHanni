@@ -137,7 +137,7 @@ object OrderedWaypoints {
             val eyeHeight = if (config.sneakingDuringRoute) SNEAKING_EYE_HEIGHT else STANDING_EYE_HEIGHT
             event.draw3DLine(
                 currentWP.location.add(0.5, 1.0 + eyeHeight, 0.5),
-                traceWP.location.add(0.5, 0.5, 0.5),
+                traceWP.location.add(0.5),
                 setupModeLineColor,
                 config.setupModeLineThickness.toInt(),
                 depth = true,

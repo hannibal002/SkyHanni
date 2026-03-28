@@ -125,8 +125,8 @@ object BeachBallCatchHelper {
     }
 
     private fun Vec3.getAABB(variant: Variant): AABB = when (variant) {
-        Variant.NORMAL -> add(-0.3, -0.3, -0.3).boundingToOffset(0.6, 0.6, 0.6)
-        Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
+        Variant.NORMAL -> subtract(0.3).boundingToOffset(0.6, 0.6, 0.6)
+        Variant.GIANT -> subtract(0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

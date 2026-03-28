@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
-import at.hannibal2.skyhanni.utils.VectorUtils.addHalf
 import at.hannibal2.skyhanni.utils.VectorUtils.minus
 import at.hannibal2.skyhanni.utils.VectorUtils.nearestPointOnLine
 import at.hannibal2.skyhanni.utils.VectorUtils.plus
@@ -73,7 +72,7 @@ private data class CurveEnd(val pos: Vec3, val tangent: Vec3, val nextIdx: Int)
 class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: Vec3) {
 
     private val pathPoints: List<PathPoint> =
-        subdividePositions(path.map { it.position.addHalf() }).map { PathPoint(it, it.isWater()) }
+        subdividePositions(path.map { it.position.add(0.5) }).map { PathPoint(it, it.isWater()) }
     private var nearCurveLength: Double = 0.0
     var remainingDistance: Double = 0.0
         private set
@@ -81,7 +80,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     fun render(event: SkyHanniRenderWorldEvent) {
         renderPathSegments(event)
         val lastNode = path.lastOrNull()?.position ?: return
-        event.draw3DLine(lastNode.addHalf(), targetLocation.addHalf(), color, FAR_LINE_WIDTH, !pathPoints.last().isPeek)
+        event.draw3DLine(lastNode.add(0.5), targetLocation.add(0.5), color, FAR_LINE_WIDTH, !pathPoints.last().isPeek)
         event.drawWaypointFilled(targetLocation, color, seeThroughBlocks = true)
     }
 
@@ -217,7 +216,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         for (i in closestIdx until pathPoints.lastIndex) {
             distance += pathPoints[i].pos.distanceTo(pathPoints[i + 1].pos)
         }
-        return distance + pathPoints.last().pos.distanceTo(targetLocation.addHalf())
+        return distance + pathPoints.last().pos.distanceTo(targetLocation.add(0.5))
     }
 
     fun nearestPathDistanceSq(): Double =

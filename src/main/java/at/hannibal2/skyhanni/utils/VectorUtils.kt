@@ -86,7 +86,7 @@ object VectorUtils {
 
     fun Vec3.add(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): Vec3 = add(x, y, z)
 
-    fun Vec3.addHalf(): Vec3 = add(0.5, 0.5, 0.5)
+    fun Vec3.subtract(x: Double = 0.0, y: Double = 0.0, z: Double = 0.0): Vec3 = subtract(x, y, z)
 
     fun Vec3.minOfEachElement(other: Vec3) =
         Vec3(min(x, other.x), min(y, other.y), min(z, other.z))
@@ -134,7 +134,7 @@ object VectorUtils {
 
     fun Vec3.roundToBlock() = Vec3(floor(x), floor(y), floor(z))
 
-    fun Vec3.blockCenter(): Vec3 = roundToBlock().add(0.5, 0.5, 0.5)
+    fun Vec3.blockCenter(): Vec3 = roundToBlock().add(0.5)
 
     fun Vec3.slope(other: Vec3, factor: Double) = this + (other - this).scale(factor)
 

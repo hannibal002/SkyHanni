@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -51,7 +52,7 @@ object ThunderSparksHighlight {
             val block = sparkLocation.getBlockAt()
             val seeThroughBlocks = sparkLocation.distanceToPlayer() < 6 && (block in FishingApi.lavaBlocks)
             event.drawWaypointFilled(
-                sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
+                sparkLocation.subtract(x = 0.5, z = 0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
             )
             if (sparkLocation.distanceToPlayer() < 10) {
                 event.drawString(sparkLocation.up(1.5), "Thunder Spark", seeThroughBlocks = seeThroughBlocks)

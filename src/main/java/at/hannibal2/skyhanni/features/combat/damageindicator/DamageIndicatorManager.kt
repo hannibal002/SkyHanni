@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.VectorUtils.printWithAccuracy
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -207,7 +208,7 @@ object DamageIndicatorManager {
                 val loc = entity.position()
                 if (data.dead) data.deathLocation = loc
                 loc
-            }.add(-0.5, 0.0, -0.5)
+            }.subtract(x = 0.5, z = 0.5)
 
             if (showNameAndHealth) {
                 event.drawDynamicText(location, healthText, sizeHealth, smallestViewDistance = smallestViewDistance)

@@ -78,8 +78,8 @@ class LivingCaveSnake(
         val isSelected = isSelected()
         drawColor(location, state.chromaColor, alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
-            drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)
-            drawString(location.add(0.5, 0.2, 0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
+            drawString(location.add(0.5), state.display, seeThroughBlocks = true)
+            drawString(location.add(0.5), "§b${blocks.size} blocks", seeThroughBlocks = true)
         }
     }
 

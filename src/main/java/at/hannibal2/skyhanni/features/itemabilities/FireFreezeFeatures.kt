@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -197,7 +198,7 @@ object FireFreezeFeatures {
                 LorenzColor.RED,
                 percent,
             )
-            val exactLocation = mob.baseEntity.position().add(-0.5, 0.0, -0.5)
+            val exactLocation = mob.baseEntity.position().subtract(x = 0.5, z = 0.5)
 
             if (config.mobTimer) {
                 val format = timeUntil.formatTime()

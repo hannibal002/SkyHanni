@@ -864,7 +864,7 @@ object WorldRenderUtils {
             )
         } else {
             emptyList()
-        } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
+        } + path.toPositionsList().map { it.add(0.5) }
         LineDrawer.draw3D(this, lineWidth, depth) {
             drawPath(
                 points,

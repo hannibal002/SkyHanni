@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -171,7 +172,7 @@ object CrimsonIsleReputationHelper {
     }
 
     fun readLocationData(locations: List<Double>): Vec3? =
-        locations.takeIfNotEmpty()?.toVec3()?.add(-1.0, 0.0, -1.0)
+        locations.takeIfNotEmpty()?.toVec3()?.subtract(x = 1.0, z = 1.0)
 
     fun showLocations() = when (config.showLocation) {
         ShowLocationEntry.ALWAYS -> true

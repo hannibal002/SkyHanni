@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.LocationUtils.canSeeFace
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceSqIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.down
 import at.hannibal2.skyhanni.utils.VectorUtils.interpolate
 import at.hannibal2.skyhanni.utils.VectorUtils.inverse
 import at.hannibal2.skyhanni.utils.VectorUtils.max
@@ -46,8 +47,8 @@ object LocationUtils {
 
     fun playerLocation() = PlayerUtils.getLocation()
 
-    // Block heights are multiples of 1/16, so we subtract 1/16 to find the right block
-    fun getBlockBelowPlayer() = playerLocation().add(0.0, -1.0 / 16.0, 0.0).roundToBlock()
+    // Block heights are multiples of 1/16, so we subtract 1/16 from y to find the right block
+    fun getBlockBelowPlayer() = playerLocation().down(1.0 / 16.0).roundToBlock()
 
     fun Vec3.distanceToPlayer() = distanceTo(playerLocation())
 

@@ -141,7 +141,7 @@ object CarnivalZombieShootout {
 
     private fun SkyHanniRenderWorldEvent.renderLines() = lamp?.let {
         drawLineToCrosshair(
-            it.pos.add(0.5, 0.5, 0.5),
+            it.pos.add(0.5),
             Color.RED,
             3,
             false,

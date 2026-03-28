@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
@@ -167,7 +168,7 @@ object FlareDisplay {
 
         if (config.displayType != FlareConfig.DisplayType.GUI) {
             for (flare in flares) {
-                val location = flare.location.add(-0.5, 0.0, -0.5)
+                val location = flare.location.subtract(x = 0.5, z = 0.5)
                 val name = flare.type.displayName
                 val time = "§b${getRemainingTime(flare).format()}"
                 event.drawDynamicText(location, name, 1.5, seeThroughBlocks = false)

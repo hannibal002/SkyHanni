@@ -169,8 +169,8 @@ object GraphEditorRenderer {
         }
 
         draw3DLine(
-            edge.node1.position.add(0.5, 0.5, 0.5),
-            edge.node2.position.add(0.5, 0.5, 0.5),
+            edge.node1.position.add(0.5),
+            edge.node2.position.add(0.5),
             color,
             7,
             !seeThroughBlocks,

@@ -158,7 +158,7 @@ object MinionFeatures {
             val time = config.lastClickedMinion.time * 1_000
             if (lastMinionOpened + time > System.currentTimeMillis()) {
                 event.drawWaypointFilled(
-                    loc.add(-0.5, 0.0, -0.5),
+                    loc.subtract(x = 0.5, z = 0.5),
                     color,
                     true,
                     extraSize = -0.25,

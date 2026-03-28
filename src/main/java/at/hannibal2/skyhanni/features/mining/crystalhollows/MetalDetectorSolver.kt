@@ -195,7 +195,7 @@ object MetalDetectorSolver {
         predictedChestLocations.forEach {
             // TODO add chroma color support via config
             event.drawColor(it, LorenzColor.GOLD.toChromaColor())
-            event.drawLineToCrosshair(it.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toChromaColor(), 3, false)
+            event.drawLineToCrosshair(it.add(0.5), LorenzColor.WHITE.toChromaColor(), 3, false)
             event.drawWaypointFilled(it, LorenzColor.RED.toColor(), seeThroughBlocks = true, beacon = true)
             event.drawString(it, "Treasure: §e${it.distanceToPlayer().roundTo(1)}m", true)
         }

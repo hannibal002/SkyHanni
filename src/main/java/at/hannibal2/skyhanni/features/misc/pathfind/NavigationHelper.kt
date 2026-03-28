@@ -131,7 +131,7 @@ object NavigationHelper {
             description = "Using path finder to go to locations"
             aliases = listOf("shnav")
             argCallback("coords", Vec3ArgumentType.double()) { location ->
-                pathFind(location.add(-1.0, -1.0, -1.0), "Custom Goal", condition = { true })
+                pathFind(location.subtract(1.0), "Custom Goal", condition = { true })
                 ChatUtils.chat(
                     "Started navigating to custom goal at §f${location.toLocalFormat()}",
                     messageId = messageId,

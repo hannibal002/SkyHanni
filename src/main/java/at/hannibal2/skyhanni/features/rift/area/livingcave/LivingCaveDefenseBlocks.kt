@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -62,7 +63,7 @@ object LivingCaveDefenseBlocks {
             staticBlocks.any { others -> others.location.distanceTo(it.location) < 1.5 }
         }
 
-        val location = event.location.add(-0.5, 0.0, -0.5)
+        val location = event.location.subtract(x = 0.5, z = 0.5)
 
         // Ignore particles around blocks
         if (staticBlocks.any { it.location.distanceTo(location) < 3 }) {
@@ -88,7 +89,7 @@ object LivingCaveDefenseBlocks {
 
             if (entity == null) {
                 // read new entity data
-                val compareLocation = event.location.add(-0.5, -1.5, -0.5)
+                val compareLocation = event.location.subtract(0.5, 1.5, 0.5)
                 entity = compareLocation.getEntitiesNearby<RemotePlayer>(2.0)
                     .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
                     .filter { !it.isAtFullHealth() }

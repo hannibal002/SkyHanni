@@ -114,7 +114,7 @@ object EntityUtils {
     }
 
     private fun getArmorStandsInRadius(center: Vec3, radius: Double): List<ArmorStand> {
-        val a = center.add(-radius, -radius - 3, -radius)
+        val a = center.subtract(radius, radius + 3, radius)
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
         return getEntitiesInBoundingBox<ArmorStand>(alignedBB)

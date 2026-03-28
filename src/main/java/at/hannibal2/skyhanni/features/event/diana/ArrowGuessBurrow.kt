@@ -143,7 +143,7 @@ object ArrowGuessBurrow {
             val candidatePoint = RaycastUtils.findPointOnRay(ray, axisIndex, axisValue) ?: continue
             val candidateBlock = candidatePoint.roundToBlock()
             if (!GriffinBurrowHelper.isBlockValid(candidateBlock)) continue
-            val blockCenter = candidateBlock.add(0.5, 0.5, 0.5)
+            val blockCenter = candidateBlock.add(0.5)
             val distanceToRay = RaycastUtils.findDistanceToRay(ray, blockCenter)
 
             val distanceFromOrigin = candidatePoint.distanceTo(ray.origin)

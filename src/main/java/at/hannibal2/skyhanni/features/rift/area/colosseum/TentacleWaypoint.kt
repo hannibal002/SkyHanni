@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.skyhanni.utils.VectorUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -61,7 +62,7 @@ object TentacleWaypoint {
         for ((tentacle, hits) in tentacleHits) {
             val location = tentacle.position()
             event.drawWaypointFilled(
-                location.add(-0.5, 0.0, -0.5),
+                location.subtract(x = 0.5, z = 0.5),
                 Color.RED,
                 seeThroughBlocks = true,
                 beacon = true,
