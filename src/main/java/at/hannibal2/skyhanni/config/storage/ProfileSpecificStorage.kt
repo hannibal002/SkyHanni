@@ -981,11 +981,16 @@ class ProfileSpecificStorage(
     }
 
     @Expose
-    var spiderRelics: SpiderRelicsStorage = SpiderRelicsStorage()
+    var spider: SpiderStorage = SpiderStorage()
 
-    class SpiderRelicsStorage {
+    class SpiderStorage {
         @Expose
-        var found: MutableSet<LorenzVec> = mutableSetOf()
+        var relics: SpiderRelicsStorage = SpiderRelicsStorage()
+
+        class SpiderRelicsStorage {
+            @Expose
+            var found: MutableSet<LorenzVec> = mutableSetOf()
+        }
     }
 
     @Expose

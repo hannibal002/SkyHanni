@@ -412,6 +412,7 @@ class MiscConfig {
         desc = "Uses a fast pathfinder route to get to all Relics in Spider's Den.",
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var spiderRelicPathfinder: Boolean = false
 
     @Expose

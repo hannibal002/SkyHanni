@@ -257,9 +257,8 @@ object SpiderDenRelicPathfinder {
                 neighborhoodSize = 50,
             ).toMutableList()
 
-            val duration = calculatingStart.passedSince()
-            "§e[SkyHanni] Calculated Relic route in §b${duration.format(showMilliSeconds = true)}"
-                .asComponent().send(calculatingMessageId)
+            val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
+            "§e[SkyHanni] Calculated Relic route in §b$duration".asComponent().send(calculatingMessageId)
             calculating = false
 
             if (currentIsland == SkyBlockUtils.currentIsland) {
@@ -283,7 +282,7 @@ object SpiderDenRelicPathfinder {
         nodes.filter { it.hasTag(GraphNodeTag.SPIDER_RELIC) }
 
     private fun foundRelicsStore(): MutableSet<LorenzVec> =
-        ProfileStorageData.profileSpecific?.spiderRelics?.found ?: mutableSetOf()
+        ProfileStorageData.profileSpecific?.spider?.relics?.found ?: mutableSetOf()
 
     private fun isEnabled() =
         SkyBlockUtils.inSkyBlock && isOnSpiderDen() && config.spiderRelicPathfinder
