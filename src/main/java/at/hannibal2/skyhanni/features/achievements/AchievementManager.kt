@@ -148,20 +148,28 @@ object AchievementManager {
             literalCallback("unlockall") {
                 ChatUtils.chat("you didn't think this would really work? did you...")
             }
-            argCallback(
-                "lock",
-                BrigadierArguments.greedyString(),
-                BrigadierUtils.dynamicSuggestionProvider {
-                    config.filter { it.value.getName() != null }.map { it.key }
-                }
-            ) { id ->
-                val achievement = config[id]
-                if (achievement == null) {
-                    ChatUtils.chat("Unknown Achievement")
-                    return@argCallback
-                } else {
-                    achievement.data = AchievementUserData()
-                    setAchievement(id, achievement)
+            literal("lock") {
+                argCallback(
+                    "id",
+                    BrigadierArguments.greedyString(),
+                    BrigadierUtils.dynamicSuggestionProvider {
+                        config.filter { it.value.getName() != null }.map { it.key }
+                    }
+                ) { id ->
+                    val achievement = config[id]
+                    if (achievement == null) {
+                        ChatUtils.chat("Unknown Achievement")
+                    } else {
+                        achievement.data = AchievementUserData()
+                        setAchievement(id, achievement)
+                        ChatUtils.chat(
+                            componentBuilder {
+                                append(achievement.getName())
+                                append(" is now locked!")
+                            }
+
+                        )
+                    }
                 }
             }
             simpleCallback {
