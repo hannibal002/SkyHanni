@@ -179,7 +179,7 @@ object AdvancedPlayerList {
         }
 
         if (!config.hideLevel) {
-            val level = if (config.hideLevelBrackets) levelText else "§8[${levelText}§8]"
+            val level = if (config.hideLevelBrackets) levelText else "§8[$levelText§8]"
             add(level)
         }
 
