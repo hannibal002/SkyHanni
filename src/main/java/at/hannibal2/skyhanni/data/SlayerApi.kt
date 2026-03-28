@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -16,6 +17,8 @@ import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.slayer.SlayerDataJson
+import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterToolTipFeatures
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -60,9 +63,19 @@ object SlayerApi {
         "quest.complete",
         "\\s*SLAYER QUEST COMPLETE!",
     )
+
+    /**
+     * REGEX-TEST: Revenant Horror RNG Meter
+     */
+    val rngMeterSlayerTypePattern by patternGroup.pattern(
+        "rngmeter.type",
+        "(?<type>.+) RNG Meter",
+    )
     // </editor-fold>
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
+
+    var slayerJsonData: SlayerDataJson? = null
 
     var questStartTime = SimpleTimeMark.farPast()
 
@@ -282,6 +295,11 @@ object SlayerApi {
                 updateArea()
             }
         }
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        slayerJsonData = event.getConstant<SlayerDataJson>("Slayer")
     }
 
     // TODO USE SH-REPO

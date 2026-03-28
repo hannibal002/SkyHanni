@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
@@ -85,17 +83,11 @@ object RemainingSlayerKills {
         @Expose val xp: Double,
     )
 
-    private var data: SlayerData? = null
     private var display = emptyList<Renderable>()
     private var lastMissing: Double? = null
     private var baseCombatWisdom: Int? = null
     private var lastReminder = SimpleTimeMark.farPast()
     private var killComboWisdom = 0
-
-    @HandleEvent(priority = HIGHEST)
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        data = event.getConstant<SlayerData>("Slayer")
-    }
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
@@ -170,7 +162,7 @@ object RemainingSlayerKills {
     }
 
     private fun getMobs(): List<Mob>? {
-        val data = data ?: return null
+        val data = SlayerApi.slayerJsonData ?: return null
         val areas = data.normalMobs[SlayerApi.currentAreaType] ?: mapOf()
         val normalMobs = areas[SkyBlockUtils.graphArea] ?: listOf()
 
@@ -189,7 +181,7 @@ object RemainingSlayerKills {
 
         combatWisdom += killComboWisdom
 
-        data?.let { data ->
+        SlayerApi.slayerJsonData?.let { data ->
             data.weapons[SlayerApi.activeType]?.get(InventoryUtils.itemInHandId)?.let { wisdom ->
                 combatWisdom += wisdom
                 combatWisdom += countHabaneroOnArmor()

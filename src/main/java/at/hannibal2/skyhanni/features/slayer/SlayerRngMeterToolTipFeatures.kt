@@ -35,14 +35,6 @@ object SlayerRngMeterToolTipFeatures {
     private val patternGroup = RepoPattern.group("slayer")
 
     /**
-     * REGEX-TEST: Revenant Horror RNG Meter
-     */
-    private val rngMeterSlayerTypePattern by patternGroup.pattern(
-        "rngmeter.type",
-        "(?<type>.+) RNG Meter",
-    )
-
-    /**
      * REGEX-TEST: Odds: RNGesus Incarnate (0.0136% 0.0174%)
      * REGEX-TEST: Odds: Occasional (13.6082%)
      */
@@ -68,13 +60,15 @@ object SlayerRngMeterToolTipFeatures {
         "✔ LVL (?<level>\\d)",
     )
 
+    private const val SLAYER_COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
+
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
         val convertToFractions = config.rngMeterFractions
         val coinsPerBoss = config.rngMeterCoinsPerBoss
         if (!convertToFractions && !coinsPerBoss) return
 
-        val slayerName = rngMeterSlayerTypePattern.matchMatcher(
+        val slayerName = SlayerApi.rngMeterSlayerTypePattern.matchMatcher(
             InventoryUtils.openInventoryName(),
         ) { group("type") } ?: return
         val slayerType = SlayerType.getByName(slayerName)
@@ -88,7 +82,7 @@ object SlayerRngMeterToolTipFeatures {
         var scoreNeeded = 0L
 
         if (coinsPerBoss) {
-            val slayerCosts = SlayerRngMeterDisplay.slayerData?.spawnCosts?.get(slayerType) ?: return
+            val slayerCosts = SlayerApi.slayerJsonData?.spawnCosts?.get(slayerType) ?: return
             val maxTier = slayerCosts.keys.maxOrNull() ?: return
             spawnCost = slayerType?.calculateSpawnCost(maxTier) ?: return
 
@@ -101,7 +95,7 @@ object SlayerRngMeterToolTipFeatures {
             }
 
             val xpBuff = Perk.SLAYER_XP_BUFF in ElectionCandidate.AATROX.activePerks
-            val baseGained = SlayerRngMeterDisplay.slayerData?.xpGains?.get(slayerType)?.get(maxTier) ?: return
+            val baseGained = SlayerApi.slayerJsonData?.xpGains?.get(slayerType)?.get(maxTier) ?: return
             scoreGainedPer = baseGained * (if (xpBuff) 1.25 else 1.0)
             scoreNeeded = SlayerRngMeterDisplay.rngScore[slayerName]?.get(internalName) ?: return
         }
@@ -140,10 +134,11 @@ object SlayerRngMeterToolTipFeatures {
     fun onPurseChange(event: PurseChangeEvent) {
         if (event.reason != PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) return
 
-        val expectedCoins = SlayerRngMeterDisplay.slayerData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
+        val expectedCoins = SlayerApi.slayerJsonData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
+        val changeNegation = event.coins * -1
 
-        val hasSlayerBonusRewards = event.coins * -1 == expectedCoins * 0.96 // -4% from Slayer Bonus Rewards
-        val hasBartender = event.coins * -1 == expectedCoins * 0.95 // -5% from Brewery city project
+        val hasSlayerBonusRewards = changeNegation == expectedCoins * 0.96 // -4% from Slayer Bonus Rewards
+        val hasBartender = changeNegation * -1 == expectedCoins * 0.95 // -5% from Brewery city project
 
         if (hasSlayerBonusRewards) ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = 7
         ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction = hasBartender
@@ -177,7 +172,7 @@ object SlayerRngMeterToolTipFeatures {
         val line = buildString {
             append("§7Coins/Boss: ")
 
-            maxItemPrice?.let { append("${calculateCoinsPerBoss(bossesNeeded, spawnCost, maxItemPrice)} §7to ") }
+            maxItemPrice?.let { append("${calculateCoinsPerBoss(bossesNeeded, spawnCost, it)} §7to ") }
 
             append(calculateCoinsPerBoss(bossesNeeded, spawnCost, minItemPrice))
         }.let { Component.literal(it) }
@@ -189,16 +184,16 @@ object SlayerRngMeterToolTipFeatures {
         ((itemPrice / bossesNeeded) - cost).formatCoin()
 
     fun SlayerType.calculateSpawnCost(tier: Int): Double? {
-        val base = SlayerRngMeterDisplay.slayerData?.spawnCosts?.get(this)?.get(tier) ?: return null
+        val base = SlayerApi.slayerJsonData?.spawnCosts?.get(this)?.get(tier) ?: return null
 
         val reduction = when {
             ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true -> 0.95
-            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == 7 -> 0.96
+            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == SLAYER_COST_REDUCTION_LEVEL -> 0.96
             else -> 1.0
         }
 
         var cost = base * reduction
-        if (Perk.SLASHED_PRICING in ElectionCandidate.AATROX.activePerks) cost *= 0.5
+        if (Perk.SLASHED_PRICING.isActive) cost *= 0.5
         return cost
     }
 

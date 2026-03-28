@@ -207,11 +207,13 @@ class SlayerConfig {
     @Expose
     @ConfigOption(name = "RNG Meter Fractions", desc = "Converts the percentages in the RNG Meter to fractions.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var rngMeterFractions: Boolean = false
 
     @Expose
     @ConfigOption(name = "RNG Meter Coins/Boss", desc = "Adds Coins/Boss to description of the drops in the RNG Meter.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var rngMeterCoinsPerBoss: Boolean = false
 
     @SkyHanniModule

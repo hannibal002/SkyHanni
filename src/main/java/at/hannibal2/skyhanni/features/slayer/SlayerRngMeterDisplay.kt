@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterToolTipFeatures.calculateSpawnCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -49,10 +49,6 @@ object SlayerRngMeterDisplay {
     private val config get() = SlayerApi.config.rngMeterDisplay
 
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
-    private val inventoryNamePattern by patternGroup.pattern(
-        "inventoryname",
-        "(?<name>.*) RNG Meter",
-    )
     private val slayerInventoryNamePattern by patternGroup.pattern(
         "inventoryname.slayer",
         "Slayer",
@@ -81,7 +77,6 @@ object SlayerRngMeterDisplay {
     private var timesUpdatedSinceLastDrop = 0
 
     var rngScore = mapOf<String, Map<NeuInternalName, Long>>()
-    var slayerData: SlayerData? = null
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -192,11 +187,11 @@ object SlayerRngMeterDisplay {
     }
 
     private fun readRngMeterInventory(event: InventoryFullyOpenedEvent) {
-        val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
-            group("name")
+        val type = SlayerApi.rngMeterSlayerTypePattern.matchMatcher(event.inventoryName) {
+            group("type")
         } ?: return
 
-        if (name != getCurrentSlayer()) return
+        if (type != getCurrentSlayer()) return
 
         val internalName = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         setNewGoal(internalName?.getInternalName())
@@ -245,18 +240,16 @@ object SlayerRngMeterDisplay {
         rngScore = event.getConstant<NeuRNGScore>("rngscore").slayer
     }
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        slayerData = event.getConstant<SlayerData>("Slayer")
-    }
-
     private fun update() {
         display = listOf(makeLink(drawDisplay()))
     }
 
     private fun makeLink(content: Renderable) = Renderable.clickable(
         content,
-        onLeftClick = {},
+        tips = listOf("§eClick to open RNG Meter Inventory."),
+        onLeftClick = {
+            HypixelCommands.showRng("slayer", SlayerApi.activeType?.rngName)
+        },
     )
 
     fun drawDisplay(): Renderable {
@@ -297,7 +290,7 @@ object SlayerRngMeterDisplay {
                         val bossesNeeded = ceil(goalNeeded.toDouble() / gainPerBoss).toInt().takeIf { it > 0 } ?: return@buildList
 
                         val slayerType = SlayerApi.activeType ?: return@buildList
-                        val slayerXpGains = slayerData?.xpGains?.get(slayerType) ?: return@buildList
+                        val slayerXpGains = SlayerApi.slayerJsonData?.xpGains?.get(slayerType) ?: return@buildList
                         val slayerTier = slayerXpGains.entries.firstOrNull {
                             val baseBaseXp = it.value.toLong()
                             baseBaseXp == gainPerBoss || baseBaseXp == (gainPerBoss / 1.25).toLong()
