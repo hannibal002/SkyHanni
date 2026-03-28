@@ -92,7 +92,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
     open fun onMouseReleased(originalMouseX: Int, originalMouseY: Int, state: Int) {}
 
     override fun mouseDragged(click: MouseButtonEvent, mouseX: Double, mouseY: Double): Boolean {
-        // TODO I don't know if mouseX is correct or if it should be click.x
+        // TODO idk if mouseX is correct or if it should be click.x
         postMouseClickMove(mouseX.toInt(), mouseY.toInt(), click.button(), 0L)
         postHandleMouseInput()
         return super.mouseDragged(click, mouseX, mouseY)

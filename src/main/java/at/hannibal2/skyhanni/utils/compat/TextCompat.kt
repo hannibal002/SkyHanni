@@ -134,7 +134,7 @@ fun MutableComponent.withColor(color: TextColor): MutableComponent {
 }
 
 /**
- * This might have performance issues if you render it every frame I don't know
+ * This might have performance issues if you render it every frame idk
  */
 fun MutableComponent.withColor(hex: String): MutableComponent {
     return this.withStyle { it.withColor(ColorUtils.getColorFromHex(hex)) }

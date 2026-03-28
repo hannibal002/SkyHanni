@@ -80,7 +80,7 @@ class BazaarConfig {
     @ConfigLink(owner = BazaarConfig::class, field = "maxPurseItems")
     val maxPurseItemsPosition: Position = Position(346, 90, centerX = true, centerY = false)
 
-    // TODO rename and move (I don't know where or what, hanni TODO)
+    // TODO rename and move (idk where or what, hanni TODO)
     @Expose
     @ConfigOption(
         name = "Craft Materials Bazaar",
