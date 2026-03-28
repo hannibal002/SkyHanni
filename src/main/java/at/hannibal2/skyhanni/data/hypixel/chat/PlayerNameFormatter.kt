@@ -257,27 +257,30 @@ object PlayerNameFormatter {
         levelColor: String?,
         removeColor: String,
         rankColor: String,
-    ): ComponentSpan = when {
-        MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
-            (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
-                .setStyle(name.sampleStyleAtStart()).intoSpan()
+    ): ComponentSpan {
+        val style = name.sampleStyleAtStart() ?: error("style is null")
+        return when {
+            MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
+                (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
+                    .setStyle(style).intoSpan()
 
-        levelColor != null && config.useLevelColorForName ->
-            (levelColor + removeColor).asComponent()
-                .setStyle(name.sampleStyleAtStart())
-                .intoSpan()
+            levelColor != null && config.useLevelColorForName ->
+                (levelColor + removeColor).asComponent()
+                    .setStyle(style)
+                    .intoSpan()
 
-        config.playerRankHider ->
-            removeColor.asComponent()
-                .setStyle(name.sampleStyleAtStart())
-                .style { withColor(ChatFormatting.AQUA) }
-                .intoSpan()
+            config.playerRankHider ->
+                removeColor.asComponent()
+                    .setStyle(style)
+                    .style { withColor(ChatFormatting.AQUA) }
+                    .intoSpan()
 
-        else ->
-            if (rankColor.isEmpty()) name
-            else (rankColor + removeColor).asComponent()
-                .setStyle(name.sampleStyleAtStart())
-                .intoSpan()
+            else ->
+                if (rankColor.isEmpty()) name
+                else (rankColor + removeColor).asComponent()
+                    .setStyle(style)
+                    .intoSpan()
+        }
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable

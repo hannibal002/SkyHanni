@@ -211,7 +211,7 @@ object TextHelper {
         var currentString = ""
 
         component.visit(
-            { style: Style?, string: String? ->
+            { style: Style, string: String? ->
                 if (string.isNullOrEmpty()) return@visit Optional.empty()
                 for (c in string) {
                     if (index >= match.length) {
@@ -248,7 +248,7 @@ object TextHelper {
         var currentComponent = Component.empty()
 
         component.visit(
-            { style: Style?, string: String? ->
+            { style: Style, string: String? ->
                 if (string.isNullOrEmpty()) return@visit Optional.empty()
                 val split = string.split(delimiter)
                 if (split.isEmpty() || split.size == 1) {
