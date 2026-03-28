@@ -392,7 +392,7 @@ object IslandGraphs {
         val nodeDistance = first?.distanceToPlayer() ?: 0.0
         if (first != null && second != null) {
             val direct = second.distanceToPlayer()
-            val firstPath = first.neighbours[second] ?: 0.0
+            val firstPath = first.neighbors[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
                 applyPath(Graph(path.drop(1)) to (distance - firstPath + direct))

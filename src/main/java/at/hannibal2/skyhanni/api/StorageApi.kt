@@ -150,7 +150,7 @@ object StorageApi {
             when {
                 chest.primaryCords.distanceSqToPlayer() > 30 * 30 -> false
                 chest.primaryCords.getBlockAt() !is ChestBlock -> true
-                chest.secondaryCords == null -> getNeighbourBlocks(chest.primaryCords).any { it.second is ChestBlock }
+                chest.secondaryCords == null -> getNeighborBlocks(chest.primaryCords).any { it.second is ChestBlock }
                 else -> chest.secondaryCords.getBlockAt() !is ChestBlock
             }.also {
                 if (it) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
@@ -199,7 +199,7 @@ object StorageApi {
     private var lastChestClicked: LorenzVec? = null
     private var doubleChestCord: LorenzVec? = null
 
-    private fun getNeighbourBlocks(position: LorenzVec) =
+    private fun getNeighborBlocks(position: LorenzVec) =
         listOf(position.add(x = 1), position.add(x = -1), position.add(z = 1), position.add(z = -1)).map {
             it to it.getBlockAt()
         }
@@ -210,7 +210,7 @@ object StorageApi {
         if (!isPrivateIslandStorageEnabled()) return
         val chest = event.getBlockState.block as? ChestBlock ?: return
         // Double Chest Check
-        val otherChest = getNeighbourBlocks(event.position).firstOrNull { it.second == chest }?.first
+        val otherChest = getNeighborBlocks(event.position).firstOrNull { it.second == chest }?.first
         if (otherChest == null) {
             lastChestClicked = event.position
             doubleChestCord = null

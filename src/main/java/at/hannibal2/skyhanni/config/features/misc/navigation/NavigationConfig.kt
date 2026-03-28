@@ -14,7 +14,7 @@ class NavigationConfig {
     val areasList: AreasListConfig = AreasListConfig()
 
     @Expose
-    @ConfigOption(name = "Show in World", desc = "Shows neighbouring area names as waypoints at their borders.")
+    @ConfigOption(name = "Show in World", desc = "Shows neighboring area names as waypoints at their borders.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showInWorld: Boolean = false
