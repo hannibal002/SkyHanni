@@ -116,15 +116,13 @@ object CommandUtils {
                 internalPattern,
                 start,
                 uppercaseStart,
-                { NeuItems.findInternalNameStartingWithWithoutNPCs(it, validItems) },
-            )
+            ) { NeuItems.findInternalNameStartingWithWithoutNPCs(it, validItems) }
 
             NameSource.ITEM_NAME -> resultAdd(
                 namePattern,
                 start,
                 lowercaseStart,
-                { NeuItems.findItemNameStartingWithWithoutNPCs(it, validItems) },
-            )
+            ) { NeuItems.findItemNameStartingWithWithoutNPCs(it, validItems) }
 
             null -> {
                 val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1

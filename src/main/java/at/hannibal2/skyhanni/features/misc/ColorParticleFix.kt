@@ -18,10 +18,10 @@ object ColorParticleFix {
         if (!isEnabled()) return
         if (particleOptions is ColorParticleOption) {
             particleOptions.color = ARGB.colorFromFloat(
-                particleOptions.getAlpha(),
-                (1 - event.packet.getXDist()),
-                (1 - event.packet.getZDist()),
-                (1 - event.packet.getYDist())
+                particleOptions.alpha,
+                (1 - event.packet.xDist),
+                (1 - event.packet.zDist),
+                (1 - event.packet.yDist)
             )
         }
         event.particleOptions = particleOptions
