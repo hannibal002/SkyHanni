@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
-import at.hannibal2.skyhanni.features.chat.translation.TranslatorCommand.getNativeLanguage
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -43,7 +42,7 @@ object GoogleTranslator {
         val message = args.joinToString(" ").removeColor()
 
         CoroutineConfig("translator toNativeLanguage", 10.seconds).launchCoroutine {
-            val translation = getTranslation(message, getNativeLanguage())
+            val translation = getTranslation(message, TranslatorCommand.getNativeLanguage())
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
 
@@ -72,7 +71,7 @@ object GoogleTranslator {
         val message = args.drop(1).joinToString(" ")
 
         CoroutineConfig("translator fromNativeLanguage").launchCoroutine {
-            val translation = getTranslation(message, language, getNativeLanguage())?.get(0) ?: "Error!"
+            val translation = getTranslation(message, language, TranslatorCommand.getNativeLanguage())?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
                 onClick = {

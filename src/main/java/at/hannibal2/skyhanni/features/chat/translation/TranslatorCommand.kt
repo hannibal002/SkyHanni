@@ -52,6 +52,8 @@ object TranslatorCommand {
     }
 
     // I can't handle the abstract event because NPC chat and show items inherit from it
+    // TODO make it so that the plugin doesnt detect this function as an event function
+    @Suppress("HandleEventInspection")
     fun replaceChatComponent(event: AbstractSourcedChatEvent.Modify) {
         if (!isEnabled()) return
 
