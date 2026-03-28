@@ -118,7 +118,7 @@ object DrawContextUtils {
         postTranslateScale: Float? = null,
         onError: (Exception) -> T = { throw it },
         action: () -> T,
-    ): T = pushPopResult(onError = onError) {
+    ): T = pushPopResult(onError) {
         translate(x.toFloat(), y.toFloat())
         postTranslateScale?.let { scale(it, it) }
         return action()

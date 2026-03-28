@@ -67,7 +67,7 @@ open class BezierFitter(private val degree: Int) {
 
     fun reset() {
         points.clear()
-        fitters.map { it.reset() }
+        fitters.forEach { it.reset() }
         lastCurve = null
     }
 }

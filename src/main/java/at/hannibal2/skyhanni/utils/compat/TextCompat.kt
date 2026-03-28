@@ -302,7 +302,7 @@ fun Component.changeColor(color: LorenzColor): Component =
 fun Component.convertToJsonString(): String {
     return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
         com.mojang.serialization.JsonOps.INSTANCE,
-        this
+        this,
     ).orThrow.toString()
 }
 
@@ -375,7 +375,7 @@ fun Component.replace(
     oldValue: String,
     newValue: String,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
@@ -384,7 +384,7 @@ fun Component.replace(
     oldValue: Regex,
     newValue: String,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
@@ -394,28 +394,31 @@ private fun replace(
     oldValue: Any,
     newValue: String,
     onlyReplaceFirst: Boolean,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
-    component.visit({ style: Style?, string: String? ->
-        var edit = string
-        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
-            edit = when (oldValue) {
-                is String -> string?.replace(oldValue, newValue)
-                is Regex -> string?.replace(oldValue, newValue)
-                else -> {
-                    ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+    component.visit(
+        { style: Style?, string: String? ->
+            var edit = string
+            if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+                edit = when (oldValue) {
+                    is String -> string?.replace(oldValue, newValue)
+                    is Regex -> string?.replace(oldValue, newValue)
+                    else -> {
+                        ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+                    }
                 }
             }
-        }
-        if (edit != string) hasEdited = true
+            if (edit != string) hasEdited = true
 
-        val safeStyle = style ?: Style.EMPTY
-        newComp.append(Component.literal(edit.orEmpty()).withStyle(safeStyle))
-        Optional.empty<Component>()
-    }, Style.EMPTY)
+            val safeStyle = style ?: Style.EMPTY
+            newComp.append(Component.literal(edit.orEmpty()).withStyle(safeStyle))
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
 
     if (!hasEdited) return null
     return newComp
@@ -425,37 +428,40 @@ fun Component.replace(
     oldValue: String,
     newValue: Component,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
-    this.visit({ currentStyle: Style?, string: String? ->
-        val safeCurrentStyle = currentStyle ?: Style.EMPTY
-        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
-            val split = string.split(oldValue)
-            newComp.append(
-                componentBuilder {
-                    for ((index, str) in split.withIndex()) {
-                        append(Component.literal(str).withStyle(safeCurrentStyle))
-                        if (index < split.size - 1) {
-                            if (!onlyReplaceFirst || !hasEdited) {
-                                append(newValue)
-                                hasEdited = true
-                            } else {
-                                append(oldValue) {
-                                    style = safeCurrentStyle
+    this.visit(
+        { currentStyle: Style?, string: String? ->
+            val safeCurrentStyle = currentStyle ?: Style.EMPTY
+            if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+                val split = string.split(oldValue)
+                newComp.append(
+                    componentBuilder {
+                        for ((index, str) in split.withIndex()) {
+                            append(Component.literal(str).withStyle(safeCurrentStyle))
+                            if (index < split.size - 1) {
+                                if (!onlyReplaceFirst || !hasEdited) {
+                                    append(newValue)
+                                    hasEdited = true
+                                } else {
+                                    append(oldValue) {
+                                        style = safeCurrentStyle
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            )
-        } else {
-            newComp.append(Component.literal(string.orEmpty()).withStyle(safeCurrentStyle))
-        }
-        Optional.empty<Component>()
-    }, Style.EMPTY)
+                    },
+                )
+            } else {
+                newComp.append(Component.literal(string.orEmpty()).withStyle(safeCurrentStyle))
+            }
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
 
     if (!hasEdited) return null
     return newComp

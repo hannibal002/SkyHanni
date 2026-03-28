@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
  * [DrawContextUtils.popMatrix] are used directly here — [DrawContextUtils.pushPop] cannot be
  * applied across function boundaries.
  */
-abstract class MovableHudOverlay(
+abstract class MoveableHudOverlay(
     private vararg val layers: RenderLayer,
     private val displayName: String,
     private val width: Int,
@@ -51,7 +51,4 @@ abstract class MovableHudOverlay(
         DrawContextUtils.popMatrix()
         matrixPushed = false
     }
-
-    protected fun isInSkyBlockOrEnabled(outsideSkyblock: Boolean, enabled: Boolean) =
-        (SkyBlockUtils.inSkyBlock || (MinecraftCompat.localPlayerExists && outsideSkyblock)) && enabled
 }

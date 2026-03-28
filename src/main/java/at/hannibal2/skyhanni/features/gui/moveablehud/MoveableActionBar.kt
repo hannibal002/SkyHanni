@@ -8,15 +8,15 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object MovableHeldItemTooltip : MovableHudOverlay(
-    RenderLayer.HELD_ITEM_TOOLTIP,
-    displayName = "Held Item Tooltip",
+object MoveableActionBar : MoveableHudOverlay(
+    RenderLayer.ACTION_BAR,
+    displayName = "Action Bar",
     width = 182,
     height = 10,
     anchorOffsetX = 91,
-    anchorOffsetY = 59,
+    anchorOffsetY = 72,
 ) {
-    override val config get() = SkyHanniMod.feature.gui.heldItemTooltip
+    override val config get() = SkyHanniMod.feature.gui.actionBar
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     override fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) = super.onRenderOverlayPre(event)

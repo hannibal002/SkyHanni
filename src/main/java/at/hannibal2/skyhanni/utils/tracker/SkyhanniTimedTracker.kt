@@ -97,11 +97,11 @@ abstract class SkyhanniTimedTracker<Data : TimedTrackerData<*>>(name: String) : 
     private fun getCurrentData(): Data? = getData()?.getOrPutCurrentData(getDisplayMode()) as? Data
 
     override fun getDisplay(): List<Renderable> {
-        val searchables = getCurrentData()?.let { drawDisplayF(it) } ?: return emptyList()
+        val displayLines = getCurrentData()?.let { drawDisplayF(it) } ?: return emptyList()
         return if (trackerConfig.trackerSearchEnabled.get()) {
-            buildFinalDisplay(searchables.buildSearchBox(textInput))
+            buildFinalDisplay(displayLines.buildSearchBox(textInput))
         } else {
-            buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
+            buildFinalDisplay(Renderable.vertical(displayLines.toRenderable()))
         }
     }
 

@@ -79,17 +79,17 @@ private fun drawEntityWithoutScissor(
     val quaternionf2 = Quaternionf().rotateX(q * 20.0f * 0.017453292f)
     quaternionf.mul(quaternionf2)
     val r: Float = entity.yBodyRot
-    val s: Float = entity.getYRot()
-    val t: Float = entity.getXRot()
+    val s: Float = entity.yRot
+    val t: Float = entity.xRot
     val u: Float = entity.yHeadRotO
     val v: Float = entity.yHeadRot
     entity.yBodyRot = 180.0f + p * 20.0f
-    entity.setYRot(180.0f + p * 40.0f)
-    entity.setXRot(-q * 20.0f)
-    entity.yHeadRot = entity.getYRot()
-    entity.yHeadRotO = entity.getYRot()
-    val w: Float = entity.getScale()
-    val vector3f = Vector3f(0.0f, entity.getBbHeight() / 2.0f + scale * w, 0.0f)
+    entity.yRot = 180.0f + p * 40.0f
+    entity.xRot = -q * 20.0f
+    entity.yHeadRot = entity.yRot
+    entity.yHeadRotO = entity.yRot
+    val w: Float = entity.scale
+    val vector3f = Vector3f(0.0f, entity.bbHeight / 2.0f + scale * w, 0.0f)
     val x: Float = size.toFloat() / w
     InventoryScreen.renderEntityInInventory(
         guiGraphics,
@@ -104,8 +104,8 @@ private fun drawEntityWithoutScissor(
         entity
     )
     entity.yBodyRot = r
-    entity.setYRot(s)
-    entity.setXRot(t)
+    entity.yRot = s
+    entity.xRot = t
     entity.yHeadRotO = u
     entity.yHeadRot = v
     //?} else

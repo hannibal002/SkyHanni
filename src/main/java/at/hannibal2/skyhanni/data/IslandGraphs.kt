@@ -52,14 +52,12 @@ import kotlin.time.Duration.Companion.seconds
  * TODO
  * benefits of every island graphs:
  * global:
- * 	NEU's NPC's (auto acitvate when searching via neu)
  * 	races (end, park, winter, dungeon hub)
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
  * 	death location
  * 	% of island discvovered (every node was most closest node at least once)
  * hub:
- * 	12 starter NPC's
  * 	diana
  * farming:
  * 	pelt farming area
@@ -67,7 +65,6 @@ import kotlin.time.Duration.Companion.seconds
  * 	eyes
  * 	big quests
  * 	blood effigies
- * 	avoid area around enderman
  * spider:
  * 	relicts + throw spot
  * dwarven mines:
@@ -95,9 +92,8 @@ import kotlin.time.Duration.Companion.seconds
  *  support cross island paths (have a list of all node names in all islands)
  *
  * Changes in graph editor:
- * 	fix rename not using tick but input event we have (+ create the input event in the first place)
  * 	toggle distance to node by node path lengh, instead of eye of sight lenght
- * 	press test button again to enable "true test mode", with graph math and hiding other stuff
+ * 	press test button again to enable "true test mode", with hiding other stuff
  * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
  */
 
