@@ -53,7 +53,7 @@ object AdvancedPlayerList {
     private var playerData = mutableMapOf<Component, PlayerData>()
 
     fun createTabLine(component: Component, type: TabStringType) = playerData[component]?.let {
-        TabLine(component, type, createCustomName(it))
+        TabLine(component, type, it.createCustomName())
     } ?: TabLine(component, type)
 
     // Todo split up into smaller functions
@@ -171,7 +171,7 @@ object AdvancedPlayerList {
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 
-    private fun createCustomName(data: PlayerData): Component = buildList<Component> {
+    private fun PlayerData.createCustomName(): Component = buildList<Component> {
         fun MutableList<Component>.add(string: String?) {
             string?.takeIfNotEmpty()?.let {
                 add(it.asComponent())
@@ -179,41 +179,41 @@ object AdvancedPlayerList {
         }
 
         if (!config.hideLevel) {
-            val level = if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
+            val level = if (config.hideLevelBrackets) levelText else "§8[${levelText}§8]"
             add(level)
         }
 
         val playerName = if (config.useLevelColorForName) {
-            data.levelText.getOrNull(3)?.let { "§$it" + data.name } ?: data.coloredName
+            levelText.getOrNull(3)?.let { "§$it" + name } ?: coloredName
         } else if (config.hideRankColor) {
-            "§b" + data.name
+            "§b" + name
         } else {
-            data.coloredName
+            coloredName
         }
         add(playerName)
 
         if (config.hideEmblem) {
-            if (data.ironman) {
+            if (ironman) {
                 add("§7♲")
             } else {
-                data.bingoLevel?.let {
+                bingoLevel?.let {
                     add(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
                 }
             }
         } else {
-            add(data.nameSuffix)
+            add(nameSuffix)
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            add(data.faction.icon)
+            add(faction.icon)
         }
 
         if (config.markSpecialPersons) {
-            add(getSocialIcon(data.name).icon())
+            add(getSocialIcon(name).icon())
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
-            Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
+            Minecraft.getInstance().connection?.getPlayerInfo(name)?.let { playerInfo ->
                 ContributorManager.getSuffix(playerInfo.profile.id)?.let {
                     add(it)
                 }
