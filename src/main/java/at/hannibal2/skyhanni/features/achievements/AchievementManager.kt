@@ -75,6 +75,9 @@ object AchievementManager {
         achievement.data.progress = newProgress
         val newTier = achievement.getCurrentTier() ?: 0
         val isMaxed = newTier == achievement.tiers.size
+        if (newTier < currentTier) {
+            achievement.data.achieved = false
+        }
         if (newTier > currentTier || (isMaxed && !achievement.data.achieved)) {
             if (isMaxed) achievement.data.achieved = true
             if (shouldShowMessages) {

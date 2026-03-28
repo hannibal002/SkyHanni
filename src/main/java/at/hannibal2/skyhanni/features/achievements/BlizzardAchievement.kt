@@ -18,7 +18,7 @@ object BlizzardAchievement {
     private val blizzardPattern by AchievementManager.group.pattern(
         "blizzard",
         "BLIZZARD! (?<name>.*) opened a Blizzard in a Bottle, improving everyone's " +
-                "Fishing Stats for the next 10 minutes and causing it to snow!",
+            "Fishing Stats for the next 10 minutes and causing it to snow!",
     )
 
     private const val BLIZZARD_ACHIEVEMENT = "Blizzard"

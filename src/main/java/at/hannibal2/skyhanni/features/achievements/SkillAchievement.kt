@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
@@ -37,13 +38,12 @@ object SkillAchievement {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened() {
         if (!skillDetector.isInside()) return
-        val storage = ProfileStorageData.profileSpecific?.skillData ?: return
-        var highestSkill = 0
-        for ((_, info) in storage) {
-            if (info.overflowLevel > highestSkill) highestSkill = info.overflowLevel
-        }
-        val achievement = AchievementManager.getAchievement(SKILL_ACHIEVEMENT)
-        if (highestSkill > achievement.data.progress) {
+        DelayedRun.runNextTick {
+            val storage = ProfileStorageData.profileSpecific?.skillData ?: return@runNextTick
+            var highestSkill = 0
+            for ((_, info) in storage) {
+                if (info.overflowLevel > highestSkill) highestSkill = info.overflowLevel
+            }
             AchievementManager.updateTieredAchievement(SKILL_ACHIEVEMENT, highestSkill)
         }
     }
