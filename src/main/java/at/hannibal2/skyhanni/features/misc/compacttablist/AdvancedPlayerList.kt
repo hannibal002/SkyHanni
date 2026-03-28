@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlinx.coroutines.flow.merge
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -170,9 +171,7 @@ object AdvancedPlayerList {
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 
-    private fun createCustomName(data: PlayerData): Component {
-        val list = mutableListOf<Component>()
-
+    private fun createCustomName(data: PlayerData): Component = buildList<Component> {
         fun MutableList<Component>.add(string: String?) {
             string?.takeIfNotEmpty()?.let {
                 add(it.asComponent())
@@ -181,7 +180,7 @@ object AdvancedPlayerList {
 
         if (!config.hideLevel) {
             val level = if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
-            list.add(level)
+            add(level)
         }
 
         val playerName = if (config.useLevelColorForName) {
@@ -191,38 +190,37 @@ object AdvancedPlayerList {
         } else {
             data.coloredName
         }
-        list.add(playerName)
+        add(playerName)
 
         if (config.hideEmblem) {
             if (data.ironman) {
-                list.add("§7♲")
+                add("§7♲")
             } else {
                 data.bingoLevel?.let {
-                    list.add(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
+                    add(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
                 }
             }
         } else {
-            list.add(data.nameSuffix)
+            add(data.nameSuffix)
         }
 
         if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            list.add(data.faction.icon)
+            add(data.faction.icon)
         }
 
         if (config.markSpecialPersons) {
-            list.add(getSocialIcon(data.name).icon())
+            add(getSocialIcon(data.name).icon())
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
             Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
                 ContributorManager.getSuffix(playerInfo.profile.id)?.let {
-                    list.add(it)
+                    add(it)
                 }
             }
         }
 
-        return list.merge()
-    }
+    }.merge()
 
     private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
