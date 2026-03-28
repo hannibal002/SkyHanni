@@ -222,12 +222,12 @@ object StringUtils {
                     }
                 }
                 var newFormatting = ""
-                if (style.isBold) newFormatting = "§l"
-                else if (style.isItalic) newFormatting = "§o"
-                else if (style.isUnderlined) newFormatting = "§n"
-                else if (style.isStrikethrough) newFormatting = "§m"
-                else if (style.isObfuscated) newFormatting = "§k"
-                else newFormatting = ""
+                newFormatting = if (style.isBold) "§l"
+                else if (style.isItalic) "§o"
+                else if (style.isUnderlined) "§n"
+                else if (style.isStrikethrough) "§m"
+                else if (style.isObfuscated) "§k"
+                else ""
 
                 if (newFormatting != lastFormatting) {
                     lastFormatting = newFormatting

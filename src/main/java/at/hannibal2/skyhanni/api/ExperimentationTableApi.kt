@@ -294,7 +294,7 @@ object ExperimentationTableApi {
         }
     }
 
-    data class ExperimentationDataSet(
+    private data class ExperimentationDataSet(
         var type: ExperimentationTaskType? = null,
         var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
