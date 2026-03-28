@@ -210,35 +210,30 @@ object TextHelper {
         var newComponent: Component = Component.empty()
         var currentString = ""
 
-        component.visit(
-            { style: Style, string: String? ->
-                if (string.isNullOrEmpty()) return@visit Optional.empty()
-                for (c in string) {
-                    if (index >= match.length) {
-                        if (!currentString.isEmpty()) {
-                            newComponent.append(Component.literal(currentString).withStyle(style))
-                        }
-                        currentString = ""
-                        return@visit Optional.of(newComponent)
+        component.visitNonEmpty { style, string ->
+            for (c in string) {
+                if (index >= match.length) {
+                    if (currentString.isNotEmpty()) {
+                        newComponent.append(Component.literal(currentString).withStyle(style))
                     }
-                    if (c == match[index]) {
-                        currentString += c
-                        index++
-                    } else {
-                        currentString = ""
-                        newComponent = Component.empty()
-                        index = 0
-                    }
+                    currentString = ""
+                    return@visitNonEmpty Optional.of(newComponent)
                 }
-                if (!currentString.isEmpty()) {
-                    newComponent.append(Component.literal(currentString).withStyle(style))
+                if (c == match[index]) {
+                    currentString += c
+                    index++
+                } else {
+                    currentString = ""
+                    newComponent = Component.empty()
+                    index = 0
                 }
-                currentString = ""
-
-                Optional.empty()
-            },
-            Style.EMPTY,
-        )
+            }
+            if (currentString.isNotEmpty()) {
+                newComponent.append(Component.literal(currentString).withStyle(style))
+            }
+            currentString = ""
+            Optional.empty<Component>()
+        }
         if (newComponent.string.isEmpty()) return null
         return newComponent
     }
@@ -247,28 +242,23 @@ object TextHelper {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
-        component.visit(
-            { style: Style, string: String? ->
-                if (string.isNullOrEmpty()) return@visit Optional.empty()
-                val split = string.split(delimiter)
-                if (split.isEmpty() || split.size == 1) {
-                    currentComponent.append(Component.literal(string).withStyle(style))
-                } else {
-                    currentComponent.append(Component.literal(split.first()).withStyle(style))
+        component.visitNonEmpty { style, string ->
+            val split = string.split(delimiter)
+            if (split.isEmpty() || split.size == 1) {
+                currentComponent.append(Component.literal(string).withStyle(style))
+            } else {
+                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
+                currentComponent = Component.empty()
+                for ((index, str) in split.withIndex()) {
+                    if (index == 0) continue
+                    currentComponent.append(Component.literal(str).withStyle(style))
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
-                    for ((index, str) in split.withIndex()) {
-                        if (index == 0) continue
-                        currentComponent.append(Component.literal(str).withStyle(style))
-                        if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
-                        currentComponent = Component.empty()
-                    }
                 }
-
-                Optional.empty<Component>()
-            },
-            Style.EMPTY,
-        )
+            }
+            Optional.empty<Component>()
+        }
 
         if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
         if (newComponents.isEmpty()) return null
@@ -280,6 +270,12 @@ object TextHelper {
         val texture = Identifier.fromNamespaceAndPath(namespace, sprite)
         return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
     }
+
+    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> =
+        this.visit<T>({ style, string ->
+            if (string.isNullOrEmpty()) Optional.empty()
+            else visitor(style, string)
+        }, Style.EMPTY)
 
     fun List<Component>.merge(): MutableComponent {
         val component = "".asComponent()
