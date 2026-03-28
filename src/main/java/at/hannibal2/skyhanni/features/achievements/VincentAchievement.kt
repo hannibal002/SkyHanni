@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.achievements
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -33,7 +34,7 @@ object VincentAchievement {
         event.register(achievement, VINCENT_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!vincentPattern.matches(event.cleanMessage)) return
         val achievement = AchievementManager.getAchievement(VINCENT_ACHIEVEMENT)
