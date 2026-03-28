@@ -68,7 +68,7 @@ object FishingHookDisplay {
 
     // TODO add a cache instead of re-calculating every frame
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         isRendering = false
 

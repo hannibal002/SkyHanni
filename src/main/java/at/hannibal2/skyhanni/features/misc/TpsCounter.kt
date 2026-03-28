@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import at.hannibal2.skyhanni.utils.inPartialMilliseconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -31,11 +31,11 @@ object TpsCounter {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    private val msPerTickList = TimeAndSizeLimitedCache<Long, Double>(100, 5.seconds)
+    private val msPerTickList = SizeLimitedCache<Long, Double>(100)
     val tps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
-            msPerTickList.isEmpty() -> 0.0
+            msPerTickList.isEmpty() || lastServerTick.passedSince() >= 1.seconds -> 0.0
             else -> (1000.0 / msPerTickList.values.average()).coerceIn(0.0..20.0).also {
                 if (!it.isFinite()) printError(it)
             }
@@ -59,11 +59,6 @@ object TpsCounter {
 
     @HandleEvent
     fun onSecondPassed() {
-        if (lastServerTick.passedSince() >= 1.seconds && !msPerTickList.isEmpty()) {
-            ChatUtils.debug("No server ticks detected for 1 second, clearing TPS data")
-            msPerTickList.clear()
-        }
-
         display = Renderable.text(getTpsString(compact = true))
 
         if (pendingTpsCommand) {

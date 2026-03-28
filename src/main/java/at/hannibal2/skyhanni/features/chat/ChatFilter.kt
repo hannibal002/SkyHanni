@@ -84,7 +84,7 @@ object ChatFilter {
         "§7Request join for Hub (.*)\\.\\.\\.".toPattern(),
         "§7Request join for Dungeon Hub #(.*)\\.\\.\\.".toPattern(),
         // warp portals on public islands
-        // (canvas room – flower house, election room – community center, void sepulchre – the end)
+        // (Canvas Room – Flower House, Election Room – Community Center, Void Sepulture – The End)
         "§dWarped to (.*)§r§d!".toPattern(),
     )
     private val warpingMessages = listOf(

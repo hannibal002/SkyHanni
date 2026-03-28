@@ -4,14 +4,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addsToMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
@@ -233,6 +237,7 @@ object CropMilestonesApi {
         if (tierProgress >= tierCutoff) {
             val oldLevel = this.getCurrentMilestoneTier() ?: return
             val newLevel = this.milestoneCalculateCurrentTier() ?: return
+            if (newLevel >= 500) AchievementManager.completeAchievement(CROP_MILESTONE_ACHIEVEMENT)
 
             if (config.overflow.chat && sendLevelUp) {
                 if (newLevel > (maxTier)) {
@@ -402,5 +407,17 @@ object CropMilestonesApi {
                 add("Crop: ${crop.key}, Progress: ${crop.value}")
             }
         }
+    }
+
+    private const val CROP_MILESTONE_ACHIEVEMENT = "Expert Gardener"
+
+    @HandleEvent
+    fun onAchievementRegistered(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Expert Gardener".asComponent(),
+            "Get a crop milestone to level 500".asComponent(),
+            15f,
+        )
+        event.register(achievement, CROP_MILESTONE_ACHIEVEMENT)
     }
 }

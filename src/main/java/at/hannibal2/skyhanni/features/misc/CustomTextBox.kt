@@ -39,7 +39,7 @@ object CustomTextBox {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.onlyInGui) return
         if (!isEnabled()) return
 

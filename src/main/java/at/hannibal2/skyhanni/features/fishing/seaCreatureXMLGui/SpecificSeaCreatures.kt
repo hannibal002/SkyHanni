@@ -144,7 +144,7 @@ class SpecificSeaCreatures(
     }
 
     @Bind
-    fun showLootshare() {
+    fun showLootshareSphere() {
         openXML("lootsharesphere")
     }
 

@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.awt.Color
-import kotlin.let
 
-// Extension Functions are not inside there Companion Object as it would be ambiguous on import.
+// Extension Functions are not inside their Companion Objects, as it would be ambiguous on import.
 // Therefore, they are in the top level and the constructors are just internal not private as they should be.
 
 fun Renderable.Companion.text(

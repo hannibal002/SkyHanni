@@ -148,7 +148,7 @@ object DungeonCopilot {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         val nextStep = nextStep ?: return
         config.pos.renderRenderable(nextStep, posLabel = "Dungeon Copilot")

@@ -17,7 +17,7 @@ object InWaterDisplay {
     private val outOfWaterRenderable = Renderable.text("§7In Water: §cFalse")
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.inWaterDisplay) return
 
         val display = if (MinecraftCompat.localPlayer.isInWater) inWaterRenderable else outOfWaterRenderable

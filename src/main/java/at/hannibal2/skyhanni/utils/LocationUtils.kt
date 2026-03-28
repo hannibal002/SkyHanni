@@ -28,7 +28,7 @@ object LocationUtils {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.rayTrace(a, b)?.miss == true
+    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b)?.miss == true
 
     fun playerLocation() = PlayerUtils.getLocation()
 
