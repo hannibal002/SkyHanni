@@ -154,7 +154,7 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
-        var scores = scoreboard.listPlayerScores(objective)
+        val scores = scoreboard.listPlayerScores(objective)
         val list = scores.getPlayerNames(scoreboard)
         return list.map { it.formattedTextCompatLessResets() }
     }

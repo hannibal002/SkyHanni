@@ -35,6 +35,9 @@ class MemoryRepoFileSystem(
         storage[path] = data
     }
 
+    override fun pathDiagnostics(path: String) =
+        "path='$path', inMemory=${storage.containsKey(path)}, totalEntries=${storage.size}"
+
     override fun deleteRecursively(path: String) {
         if (path.isEmpty()) storage.clear()
         else storage.keys.removeIf { it == path || it.startsWith("$path/") }
