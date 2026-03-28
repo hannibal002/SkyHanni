@@ -32,6 +32,6 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
         fun getByName(name: String) = getByNameOrNull(name) ?: error("Unknown Skill Type: '$name'")
 
         fun getByNameOrNull(name: String) =
-            entries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
+            entries.firstOrNull { it.displayName.equals(name, ignoreCase = true) }
     }
 }

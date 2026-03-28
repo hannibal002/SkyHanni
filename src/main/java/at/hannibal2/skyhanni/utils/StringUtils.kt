@@ -41,7 +41,7 @@ object StringUtils {
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
-    fun String.takeIfNotEmpty(): String? = if (this.isNotEmpty()) this else null
+    fun String.takeIfNotEmpty(): String? = this.ifEmpty { null }
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -222,12 +222,12 @@ object StringUtils {
                     }
                 }
                 var newFormatting = ""
-                if (style.isBold) newFormatting = "§l"
-                else if (style.isItalic) newFormatting = "§o"
-                else if (style.isUnderlined) newFormatting = "§n"
-                else if (style.isStrikethrough) newFormatting = "§m"
-                else if (style.isObfuscated) newFormatting = "§k"
-                else newFormatting = ""
+                newFormatting = if (style.isBold) "§l"
+                else if (style.isItalic) "§o"
+                else if (style.isUnderlined) "§n"
+                else if (style.isStrikethrough) "§m"
+                else if (style.isObfuscated) "§k"
+                else ""
 
                 if (newFormatting != lastFormatting) {
                     lastFormatting = newFormatting

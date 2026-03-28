@@ -65,7 +65,7 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     override fun onRenderWorld(event: SkyHanniRenderWorldEvent) = super.onRenderWorld(event)
 
     @HandleEvent
-    override fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onRenderOverlay(event)
+    override fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onGuiRenderOverlay(event)
 
     @HandleEvent
     override fun onTick() = super.onTick()
