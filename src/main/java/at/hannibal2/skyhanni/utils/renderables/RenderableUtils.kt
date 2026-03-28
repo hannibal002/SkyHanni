@@ -35,7 +35,7 @@ internal object RenderableUtils {
         var index = 0
         return buildList {
             while (true) {
-                val x = content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                val x = content.map { it.getOrNull(index) }.takeIf { list -> list.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(x)
@@ -59,7 +59,7 @@ internal object RenderableUtils {
         buildList {
             add(0)
             while (true) {
-                buffer += rows.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                buffer += rows.map { it.getOrNull(index) }.takeIf { list -> list.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)

@@ -34,7 +34,7 @@ object CustomTextBox {
     }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.CUSTOM_TEXT_BOX])
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.onlyInGui || !config.enabled) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")

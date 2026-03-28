@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.EnumSet
 
 /**
- * Each [IslandTypeTag] consists of one or more
+ * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
  */
 enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType {
 

@@ -118,7 +118,7 @@ object CrimsonIsleReputationHelper {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
 
         if (config.useHotkey && !isHotkeyHeld()) {

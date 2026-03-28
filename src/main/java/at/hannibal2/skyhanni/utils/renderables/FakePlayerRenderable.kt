@@ -104,7 +104,7 @@ internal fun drawEntityWithoutScissor(
     entity.xRot = -q * 20.0f
     entity.yHeadRot = entity.yRot
     entity.yHeadRotO = entity.yRot
-    val w: Float = entity.getScale()
+    val w: Float = entity.scale
     val vector3f = Vector3f(0.0f, entity.bbHeight / 2.0f + scale * w, 0.0f)
     val x: Float = size.toFloat() / w
     InventoryScreen.renderEntityInInventory(guiGraphics, x1, y1, x2, y2, x, vector3f, quaternionf, quaternionf2, entity)
