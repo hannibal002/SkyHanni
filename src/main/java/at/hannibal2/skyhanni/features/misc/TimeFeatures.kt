@@ -27,7 +27,7 @@ object TimeFeatures {
     }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.REAL_TIME])
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.realTime) {
             val timeFormat = if (config.realTimeFormatToggle) {
                 // 12 h format

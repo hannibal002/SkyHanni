@@ -166,7 +166,7 @@ object KingTalismanHelper {
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "King Talisman Helper")

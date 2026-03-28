@@ -85,8 +85,8 @@ object RaycastUtils {
         val dirArray = ray.direction.toDoubleArray()
         val originArray = ray.origin.toDoubleArray()
 
-        var tmin = -Double.MAX_VALUE
-        var tmax = Double.MAX_VALUE
+        var tMin = -Double.MAX_VALUE
+        var tMax = Double.MAX_VALUE
 
         // Iterate over each axis (x, y, z)
         for (i in 0..2) {
@@ -102,18 +102,18 @@ object RaycastUtils {
                 // Ensure t1 is the intersection with the near plane, and t2 with the far plane
                 if (t1 > t2) t1 = t2.also { t2 = t1 }
 
-                // Update tmin and tmax to compute the intersection interval
-                tmin = max(tmin, t1)
-                tmax = min(tmax, t2)
+                // Update tMin and tMax to compute the intersection interval
+                tMin = max(tMin, t1)
+                tMax = min(tMax, t2)
 
                 // If the interval becomes invalid, there is no intersection
-                if (tmin > tmax) return null
+                if (tMin > tMax) return null
             }
         }
 
         // If we reach here, the ray intersects the AABB on all 3 axes
-        val entry = ray.origin.plus(ray.direction.times(tmin))
-        val exit = ray.origin.plus(ray.direction.times(tmax))
+        val entry = ray.origin.plus(ray.direction.times(tMin))
+        val exit = ray.origin.plus(ray.direction.times(tMax))
         return Pair(entry, exit)
     }
 
