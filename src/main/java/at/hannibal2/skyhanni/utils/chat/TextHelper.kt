@@ -27,6 +27,7 @@ object TextHelper {
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
+    val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
@@ -199,12 +200,6 @@ object TextHelper {
         return text
     }
 
-    private val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
-
-    fun getChromaColorStyle(): TextColor {
-        return chromaStyle
-    }
-
     fun matcher(component: Component, match: String): Component? {
         var index = 0
         var newComponent: Component = Component.empty()
@@ -236,8 +231,7 @@ object TextHelper {
             }
             currentString = ""
         }
-        if (newComponent.string.isEmpty()) return null
-        return newComponent
+        return newComponent.takeIf { it.string.isNotEmpty() }
     }
 
     fun split(component: Component, delimiter: String): List<Component>? {
@@ -262,8 +256,7 @@ object TextHelper {
         }
 
         if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
-        if (newComponents.isEmpty()) return null
-        return newComponents
+        return newComponents.takeIf { it.isNotEmpty() }
     }
 
     fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {

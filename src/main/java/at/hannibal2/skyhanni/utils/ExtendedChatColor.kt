@@ -62,7 +62,7 @@ class ExtendedChatColor(
                             append("example") {
                                 underlined = true
                                 hover = Component.literal("ඞ")
-                                withColor(TextHelper.getChromaColorStyle())
+                                withColor(TextHelper.chromaStyle)
                             }
                             append(". ")
                             append {
