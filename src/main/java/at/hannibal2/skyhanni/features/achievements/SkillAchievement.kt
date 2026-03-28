@@ -44,7 +44,10 @@ object SkillAchievement {
             for ((_, info) in storage) {
                 if (info.overflowLevel > highestSkill) highestSkill = info.overflowLevel
             }
-            AchievementManager.updateTieredAchievement(SKILL_ACHIEVEMENT, highestSkill)
+            val achievement = AchievementManager.getAchievement(SKILL_ACHIEVEMENT)
+            if (achievement.data.progress != highestSkill) {
+                AchievementManager.updateTieredAchievement(SKILL_ACHIEVEMENT, highestSkill)
+            }
         }
     }
 

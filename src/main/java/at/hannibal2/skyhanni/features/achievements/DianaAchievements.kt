@@ -23,7 +23,7 @@ object DianaAchievements {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSkillOverflowLevel(event: PlayerDeathEvent.Allow) {
+    fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
         if (!event.isSelf) return
         if (!event.reason.contains("Minos Inquisitor")) return
         AchievementManager.completeAchievement(INQ_ACHIEVEMENT)

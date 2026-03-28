@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import kotlin.time.Duration.Companion.seconds
 
-
 @SkyHanniModule
 object VanquisherAchievement {
 
@@ -35,7 +34,7 @@ object VanquisherAchievement {
         event.register(achievement, VANQUISHER_ACHIEVEMENT)
     }
 
-    var lastVanquisher = SimpleTimeMark.farPast()
+    private var lastVanquisher = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {

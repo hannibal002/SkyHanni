@@ -183,7 +183,7 @@ object CompactStarlynSisters {
 
     private fun SkyHanniChatEvent.Allow.achievements() {
         pointsEarnedPattern.matchMatcher(message) {
-            if (group("pointsInteger").formatInt() > 20_000) {
+            if (group("pointsInteger").formatInt() >= 20_000) {
                 AchievementManager.completeAchievement(AGATHA_ACHIEVEMENT)
             }
         }

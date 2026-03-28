@@ -33,7 +33,7 @@ import net.minecraft.world.item.Items
 
 /**
  * If you came here to find out what all the achievements are,
- * I curse you will -100000 SkyHanni User Luck for life
+ * I curse you with -100000 SkyHanni User Luck for life
  */
 @SkyHanniModule
 object AchievementManager {
