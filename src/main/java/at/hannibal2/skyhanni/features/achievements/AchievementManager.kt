@@ -31,6 +31,10 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 
+/**
+ * If you came here to find out what all the achievements are,
+ * I curse you will -100000 SkyHanni User Luck for life
+ */
 @SkyHanniModule
 object AchievementManager {
 
@@ -76,6 +80,11 @@ object AchievementManager {
             if (shouldShowMessages) {
                 ChatUtils.chat(
                     componentBuilder {
+                        if (achievement.secret) {
+                            append("Secret ") {
+                                withColor(ChatFormatting.GRAY)
+                            }
+                        }
                         append("Achievement Get! ") {
                             withColor(ChatFormatting.GOLD)
                         }
@@ -107,6 +116,11 @@ object AchievementManager {
         if (shouldShowMessages) {
             ChatUtils.chat(
                 componentBuilder {
+                    if (achievement.secret) {
+                        append("Secret ") {
+                            withColor(ChatFormatting.GRAY)
+                        }
+                    }
                     append("Achievement Get! ") {
                         withColor(ChatFormatting.GOLD)
                     }
