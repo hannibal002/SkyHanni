@@ -55,7 +55,7 @@ enum class KuudraTier(val displayName: String) {
         }
 
         private fun getTierByNameOrNull(name: String) = entries.firstOrNull {
-            it.displayName.lowercase() == name.lowercase() || it.name.lowercase() == name.lowercase()
+            it.displayName.equals(name, ignoreCase = true) || it.name.equals(name, ignoreCase = true)
         }
 
         fun addRepoData(

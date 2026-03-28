@@ -53,15 +53,13 @@ object BingoCardReader {
                 else -> continue
             }
             val name = stack.hoverName.string.removeColor()
-            var index = 0
             val builder = StringBuilder()
-            for (s in lore) {
+            for ((index, s) in lore.withIndex()) {
                 if (index > 1) {
                     if (s == "") break
                     builder.append(s)
                     builder.append(" ")
                 }
-                index++
             }
             var description = builder.toString()
             if (description.endsWith(" ")) {

@@ -65,7 +65,7 @@ object CustomScoreboard {
     private var lastLines: List<ScoreboardLine> = emptyList()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return
 
