@@ -75,7 +75,7 @@ object HolographicEntities {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val hologram = debugHologram ?: return
-        event.renderHolographicEntity(hologram, holographicness = debugHologramTransparency)
+        event.renderHolographicEntity(hologram, opacity = debugHologramTransparency)
     }
 
     /**
@@ -157,11 +157,11 @@ object HolographicEntities {
     }
 
     /**
-     * Render a fake [HolographicEntity]. To render a fully opaque entity, set [holographicness] to `1F`.
+     * Render a fake [HolographicEntity]. To render a fully opaque entity, set [opacity] to `1F`.
      */
     fun <T : LivingEntity> SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
-        holographicness: Float = 0.3f,
+        opacity: Float = 0.3f,
     ) {
         val entity = holographicEntity.entity
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
@@ -195,7 +195,7 @@ object HolographicEntities {
 
         activeHolographicEntities.add(entity)
         try {
-            EntityTransparencyManager.withHolographicTransparency(entity, holographicness) {
+            EntityTransparencyManager.withHolographicTransparency(entity, opacity) {
                 client.entityRenderDispatcher.submit(
                     entityRenderState,
                     cameraRenderState,

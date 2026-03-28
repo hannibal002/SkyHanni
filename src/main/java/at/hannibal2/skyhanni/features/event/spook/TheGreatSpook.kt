@@ -146,7 +146,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) {
