@@ -46,7 +46,7 @@ object Year300RaffleEvent {
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enableActiveTimer && SkyBlockTime(301).toTimeMark().isInPast()
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         config.activeTimerPosition.renderRenderable(
             overlay ?: return,
             posLabel = "300þ Anniversary Active Timer",
