@@ -8,7 +8,7 @@ jobs:
   check-imports:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         name: Checkout code
       - name: Check imports
         run: |

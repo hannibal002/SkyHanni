@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
-import java.util.EnumMap
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
@@ -282,7 +281,7 @@ enum class SkyblockStat(
     }
 }
 
-class SkyblockStatList : EnumMap<SkyblockStat, Double>(SkyblockStat::class.java), Map<SkyblockStat, Double> {
+class SkyblockStatList : LinkedHashMap<SkyblockStat, Double>(), Map<SkyblockStat, Double> {
     operator fun minus(other: SkyblockStatList): SkyblockStatList {
         return SkyblockStatList().apply {
             val keys = this.keys + other.keys

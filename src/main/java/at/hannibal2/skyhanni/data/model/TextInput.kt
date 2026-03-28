@@ -85,9 +85,13 @@ open class TextInput {
         @JvmStatic
         fun shouldCancelGuiInput(): Boolean {
             if (activeInstance == null) return false
-            val escHeld = GLFW.GLFW_KEY_ESCAPE.isKeyHeld()
-            if (escHeld) disable()
-            return !escHeld
+
+            if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) {
+                disable()
+                return false
+            }
+
+            return true
         }
 
         private var carriage

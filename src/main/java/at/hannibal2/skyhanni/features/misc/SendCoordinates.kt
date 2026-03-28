@@ -21,11 +21,11 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object PatcherSendCoordinates {
+object SendCoordinates {
 
     private val config get() = SkyHanniMod.feature.misc.patcherCoordsWaypoint
-    private val patcherBeacon = mutableListOf<PatcherBeacon>()
-    private val logger = LorenzLogger("misc/patchercoords")
+    private val waypoints = mutableListOf<SharedWaypoint>()
+    private val logger = LorenzLogger("misc/send_coords")
 
     /**
      * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4
@@ -55,8 +55,8 @@ object PatcherSendCoordinates {
 
                 split.first().toFloat()
             } else end.toFloat()
-            patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
-            logger.log("got Patcher coords and username")
+            waypoints.add(SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
+            logger.log("got waypoint coords and username")
         }
     }
 
@@ -64,7 +64,7 @@ object PatcherSendCoordinates {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
 
-        for (beacon in patcherBeacon) {
+        for (beacon in waypoints) {
             val location = beacon.location
             val distance = location.distanceToPlayer()
             val formattedDistance = distance.toInt().addSeparators()
@@ -81,20 +81,20 @@ object PatcherSendCoordinates {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()
-        // removed Patcher beacon!
-        patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + 5 && location.distanceIgnoreY(it.location) < 5 }
+        // removed beacon!
+        waypoints.removeIf { System.currentTimeMillis() / 1000 > it.time + 5 && location.distanceIgnoreY(it.location) < 5 }
 
-        // removed Patcher beacon after time!
-        patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
+        // removed beacon after time!
+        waypoints.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        patcherBeacon.clear()
+        waypoints.clear()
         logger.log("Reset everything (world change)")
     }
 
-    data class PatcherBeacon(val location: LorenzVec, val name: String, val time: Long)
+    data class SharedWaypoint(val location: LorenzVec, val name: String, val time: Long)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

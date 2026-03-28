@@ -290,7 +290,7 @@ object GardenVisitorDropStatistics {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
         if (GardenApi.hideExtraGuis()) return
         if (config.onlyOnBarn.get() && !GardenApi.onBarnPlot) return

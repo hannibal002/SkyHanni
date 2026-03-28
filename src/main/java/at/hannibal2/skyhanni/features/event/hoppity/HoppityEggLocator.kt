@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.projectile.FishingHook
@@ -116,13 +116,16 @@ object HoppityEggLocator {
             } else "§aGuess #${index + 1}"
             drawEggWaypoint(eggLocation, name)
             if (waypointsConfig.showLine) {
-                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toChromaColor(), 2, false)
+                drawLineToCrosshair(eggLocation.blockCenter(), LorenzColor.GREEN.toChromaColor(), 2, false)
             }
         }
     }
 
     private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
-        if (!waypointsConfig.highlightDuplicates || !waypointsConfig.showNearbyDuplicates) return
+        if (!waypointsConfig.highlightDuplicates) return
+        if (!waypointsConfig.showNearbyDuplicates) return
+        if (HoppityEggLocations.foundAllOnThisIsland) return
+
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
@@ -136,7 +139,11 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
-        val shouldMarkDuplicate = waypointsConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
+        val shouldMarkDuplicate =
+            waypointsConfig.highlightDuplicates &&
+                HoppityEggLocations.hasCollectedEgg(location) &&
+                !HoppityEggLocations.foundAllOnThisIsland
+
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
 
         if (!shouldMarkDuplicate) {

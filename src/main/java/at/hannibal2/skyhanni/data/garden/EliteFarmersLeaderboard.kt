@@ -454,7 +454,7 @@ object EliteFarmersLeaderboard {
 
         val currentLeaderboardPos = leaderboardPosMap?.get(leaderboardType) ?: Int.MAX_VALUE
 
-        if (goal < 1 || goal >= currentLeaderboardPos) {
+        if (goal !in 1..<currentLeaderboardPos) {
             if (goal < 1 && !hasWarned) {
                 getLeaderboardRankConfig(leaderboardType)?.let { prop ->
                     ChatUtils.chatAndOpenConfig(
@@ -493,7 +493,7 @@ object EliteFarmersLeaderboard {
             message,
             listOf(
                 "§eClick to open your Farming Weight",
-                "§eprofile on §celitebot.dev",
+                "§eprofile on §c${EliteDevApi.ELITE_DOMAIN}",
             ),
             "/shfarmingprofile ${PlayerUtils.getName()}",
         )

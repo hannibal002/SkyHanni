@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test.command.track
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -11,15 +10,15 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import kotlin.ranges.contains
 
 @SkyHanniModule
 object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
-    commonName = "sound"
+    commonName = "sound",
 ) {
-    override val config get() = SkyHanniMod.feature.dev.debug.trackSound
+    override val config get() = DevApi.config.debug.trackSound
 
     // todo change this from a string arg to a qualified sound name arg
     // todo add suggestion provider for sound names
@@ -66,7 +65,7 @@ object TrackSoundsCommand : TrackCommand<PlaySoundEvent, String>(
     override fun onRenderWorld(event: SkyHanniRenderWorldEvent) = super.onRenderWorld(event)
 
     @HandleEvent
-    override fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onRenderOverlay(event)
+    override fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) = super.onGuiRenderOverlay(event)
 
     @HandleEvent
     override fun onTick() = super.onTick()

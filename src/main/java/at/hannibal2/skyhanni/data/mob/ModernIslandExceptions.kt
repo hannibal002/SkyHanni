@@ -22,52 +22,52 @@ object ModernIslandExceptions {
 
         baseEntity is Tadpole && armorStand == null ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Birries"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Birries"),
             )
 
         baseEntity is Frog && armorStand == null ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Mossybit"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Mossybit"),
             )
 
         baseEntity is Panda && baseEntity.isBrown ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Mochibear"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Mochibear"),
             )
 
         baseEntity is Panda && baseEntity.variant == Panda.Gene.NORMAL ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Bambuleaf"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Bambuleaf"),
             )
 
         baseEntity is Axolotl ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Coralot"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Coralot"),
             )
 
         baseEntity is Cod ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Cod"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Cod"),
             )
 
         baseEntity is Salmon ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Salmon"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Salmon"),
             )
 
         baseEntity is TropicalFish && baseEntity.patternColor == DyeColor.LIGHT_BLUE ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Azure"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Azure"),
             )
 
         baseEntity is TropicalFish && baseEntity.patternColor == DyeColor.GREEN ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Verdant"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Verdant"),
             )
 
         baseEntity is Shulker && baseEntity.color == DyeColor.GREEN ->
             MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.BASIC, name = "Hideonleaf"),
+                Mob(baseEntity, MobCategory.BASIC, name = "Hideonleaf"),
             )
 
         else -> null
