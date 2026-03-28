@@ -53,7 +53,7 @@ object JyrreTimer {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display?.let {
             config.pos.renderRenderable(it, posLabel = "Refined Jyrre Timer")

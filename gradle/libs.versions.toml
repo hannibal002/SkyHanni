@@ -16,12 +16,9 @@ methanol = "1.8.3"
 shadow = "9.3.1"
 loom = "1.15-SNAPSHOT"
 kotlin = "2.2.21"
-kotlin-powerAssert = "2.0.0"
-ksp = "2.2.21-2.0.4"
-ksp-api = "2.3.4"
+ksp = "2.3.4"
 detekt = "1.23.7"
 
-discord-ipc = "0.2.3"
 junixsocket = "2.6.2"
 devauth = "1.2.1"
 junit = "5.11.0"
@@ -47,7 +44,6 @@ changelog-builder = { module = "com.github.SkyHanniStudios:SkyHanniChangelogBuil
 methanol = { module = "com.github.mizosoft.methanol:methanol", version.ref = "methanol" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
-discord-ipc = { module = "com.github.caoimhebyrne:KDiscordIPC", version.ref = "discord-ipc" }
 junixsocket-common = { module = "com.kohlschutter.junixsocket:junixsocket-common", version.ref = "junixsocket" }
 junixsocket-native = { module = "com.kohlschutter.junixsocket:junixsocket-native-common", version.ref = "junixsocket" }
 devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
@@ -64,12 +60,12 @@ detekt-test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref 
 detektrules-neu = { module = "org.notenoughupdates:detektrules", version.ref = "detektrules-neu" }
 detektrules-authors = { module = "io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors", version.ref = "detekt" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp-api" }
+ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin-powerAssert" }
+kotlin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

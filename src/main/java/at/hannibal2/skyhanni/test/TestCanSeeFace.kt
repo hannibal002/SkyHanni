@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TestCanSeeFace {
 
-    data class FaceCheckContext(
+    private data class FaceCheckContext(
         var aabbs: List<AABB> = emptyList(),
         var blockPos: LorenzVec? = null,
         var waitingForPunch: Boolean = false,
