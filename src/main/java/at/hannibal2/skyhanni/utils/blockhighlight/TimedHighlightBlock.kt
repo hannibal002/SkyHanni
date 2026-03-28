@@ -1,17 +1,22 @@
 package at.hannibal2.skyhanni.utils.blockhighlight
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * A highlighted block that will un-highlight itself after a certain amount of time has passed without it being updated.
+ * A highlighted block that will un-highlight itself after a certain amount of time has passed
+ * without it being updated.
  *
- * When a block in the same spot as an already highlighted [TimedHighlightBlock] is highlighted the [update] method will be called
- * refreshing the [lastUpdate] property.
+ * When a block in the same spot as an already highlighted [TimedHighlightBlock] is highlighted, the
+ * [update] method will be called, refreshing the [lastUpdate] property.
  */
-class TimedHighlightBlock(loc: LorenzVec, private val expirationDuration: Duration = 0.seconds) : AbstractHighlightedBlock(loc) {
+class TimedHighlightBlock(
+    loc: Vec3,
+    private val expirationDuration: Duration = 0.seconds,
+) : AbstractHighlightedBlock(loc) {
+
     private var lastUpdate: SimpleTimeMark = SimpleTimeMark.now()
 
     fun update() {
@@ -21,5 +26,4 @@ class TimedHighlightBlock(loc: LorenzVec, private val expirationDuration: Durati
     override fun extraCondition(): Boolean {
         return lastUpdate.passedSince() < expirationDuration
     }
-
 }

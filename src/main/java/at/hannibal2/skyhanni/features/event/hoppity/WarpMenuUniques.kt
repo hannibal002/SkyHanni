@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object WarpMenuUniques {
@@ -26,7 +26,7 @@ object WarpMenuUniques {
         "§[ab](?<name>[\\w ']+)(?:§7 - §b.*)?",
     )
 
-    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
+    private val collectedEggStorage: MutableMap<IslandType, MutableSet<Vec3>>?
         get() = CFApi.profileStorage?.collectedEggLocations
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs.warpMenu

@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -135,7 +134,7 @@ object GardenVisitorStatus {
      * Finds the actual NPC entity near the nametag armor stand.
      */
     private fun findEntity(nameTag: ArmorStand, visitor: VisitorApi.Visitor) {
-        val nameTagVec = nameTag.getLorenzVec()
+        val nameTagVec = nameTag.position()
         nameTagVec.getEntitiesNearby<LivingEntity>(5.0) { entity ->
             entity !is ArmorStand && entity !is LocalPlayer &&
                 entity.distanceToIgnoreY(nameTagVec) < 0.5

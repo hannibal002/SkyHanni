@@ -6,31 +6,32 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class LivingCaveSnake(
-    val blocks: MutableList<LorenzVec>,
+    val blocks: MutableList<Vec3>,
     private var lastRemoveTime: SimpleTimeMark = SimpleTimeMark.farPast(),
     var lastAddTime: SimpleTimeMark = SimpleTimeMark.farPast(),
     var state: State = State.SPAWNING,
     var lastCalmTime: SimpleTimeMark = SimpleTimeMark.farPast(),
     var lastHitTime: SimpleTimeMark = SimpleTimeMark.farPast(),
     var invalidHeadSince: SimpleTimeMark? = null,
-    private var lastBrokenBlock: LorenzVec? = null,
+    private var lastBrokenBlock: Vec3? = null,
 ) {
     val head get() = blocks.first()
     private val tail get() = blocks.last()
 
     fun invalidShape(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
-        a.distance(b) > 3
+        a.distanceTo(b) > 3
     }
 
     private fun invalidHeadRightNow(): Boolean = head.getBlockAt() != Blocks.LAPIS_BLOCK
@@ -39,7 +40,8 @@ class LivingCaveSnake(
 
     private fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
 
-    private fun LorenzVec.isNotTouchingAir(): Boolean = LorenzVec.directions.none { plus(it).getBlockAt() == Blocks.AIR }
+    private fun Vec3.isNotTouchingAir(): Boolean =
+        VectorUtils.directions.none { add(it).getBlockAt() == Blocks.AIR }
 
     private fun isSelected() = LivingCaveSnakeFeatures.selectedSnake == this
 
@@ -72,7 +74,7 @@ class LivingCaveSnake(
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
+    private fun SkyHanniRenderWorldEvent.renderBlock(location: Vec3) {
         val isSelected = isSelected()
         drawColor(location, state.chromaColor, alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
@@ -99,8 +101,8 @@ class LivingCaveSnake(
         }
     }
 
-    fun removeSnakeBlock(location: LorenzVec, lastClickedBlock: LorenzVec?): Boolean {
-        // hypixel sends the packet information again when clicking
+    fun removeSnakeBlock(location: Vec3, lastClickedBlock: Vec3?): Boolean {
+        // Hypixel sends the packet information again when clicking
         if (head == location && location == lastClickedBlock && blocks.size > 1) return false
         blocks.remove(location)
         if (blocks.isEmpty()) {
@@ -115,7 +117,7 @@ class LivingCaveSnake(
         return false
     }
 
-    enum class State(private val color: LorenzColor, label: String) {
+    enum class State(color: LorenzColor, label: String) {
         SPAWNING(LorenzColor.AQUA, "Spawning"),
         ACTIVE(LorenzColor.YELLOW, "Active"),
         NOT_TOUCHING_AIR(LorenzColor.RED, "Not touching air"),

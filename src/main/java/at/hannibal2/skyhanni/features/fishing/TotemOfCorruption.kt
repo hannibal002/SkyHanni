@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,10 +22,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -36,6 +35,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -95,7 +95,7 @@ object TotemOfCorruption {
 
         for (totem in totems) {
             if (event.type == ParticleTypes.WITCH && event.speed == 0f) {
-                if (totem.location.distance(event.location) < 4.0) {
+                if (totem.location.distanceTo(event.location) < 4.0) {
                     event.cancel()
                 }
             }
@@ -139,7 +139,7 @@ object TotemOfCorruption {
     }
 
     private fun getTimeRemaining(totem: ArmorStand): Duration? =
-        totem.getLorenzVec().getEntitiesNearby<ArmorStand>(2.0)
+        totem.position().getEntitiesNearby<ArmorStand>(2.0)
             .firstNotNullOfOrNull { entity ->
                 timeRemainingPattern.matchMatcher(entity.cleanName()) {
                     val minutes = group("min")?.toIntOrNull() ?: 0
@@ -149,7 +149,7 @@ object TotemOfCorruption {
             }
 
     private fun getOwner(totem: ArmorStand): String? =
-        totem.getLorenzVec().getEntitiesNearby<ArmorStand>(2.0)
+        totem.position().getEntitiesNearby<ArmorStand>(2.0)
             .firstNotNullOfOrNull { entity ->
                 ownerPattern.matchMatcher(entity.cleanName()) {
                     group("owner")
@@ -195,7 +195,7 @@ object TotemOfCorruption {
                 TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
                 warnedTotems.add(totem.uuid)
             }
-            Totem(totem.getLorenzVec(), timeRemaining, owner)
+            Totem(totem.position(), timeRemaining, owner)
         }
 
     private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
@@ -203,7 +203,7 @@ object TotemOfCorruption {
 }
 
 private class Totem(
-    val location: LorenzVec,
+    val location: Vec3,
     val timeRemaining: Duration,
     val ownerName: String,
     val distance: Double = location.distanceToPlayer(),

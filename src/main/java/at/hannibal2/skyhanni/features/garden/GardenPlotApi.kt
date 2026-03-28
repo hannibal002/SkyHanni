@@ -17,21 +17,24 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
+import at.hannibal2.skyhanni.utils.VectorUtils.add
+import at.hannibal2.skyhanni.utils.VectorUtils.axisAlignedTo
+import at.hannibal2.skyhanni.utils.VectorUtils.with
+import at.hannibal2.skyhanni.utils.VectorUtils.middle
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -129,7 +132,7 @@ object GardenPlotApi {
         return currentPlot?.greenhouse ?: false
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec)
+    data class Plot(val id: Int, val inventorySlot: Int, val box: AABB, val middle: Vec3)
 
     private var currentPlot: Plot? = null
 
@@ -290,7 +293,7 @@ object GardenPlotApi {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
-    fun getPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }
+    fun getPlot(location: Vec3) = plots.find { it.box.contains(location) }
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) HypixelCommands.teleportToPlot("barn")
@@ -314,9 +317,9 @@ object GardenPlotApi {
                 val minY = ((y - 2) * 96 - 48).toDouble()
                 val maxX = ((x - 2) * 96 + 48).toDouble()
                 val maxY = ((y - 2) * 96 + 48).toDouble()
-                val a = LorenzVec(minX, 0.0, minY)
-                val b = LorenzVec(maxX, 256.0, maxY)
-                val middle = a.middle(b).copy(y = 10.0)
+                val a = Vec3(minX, 0.0, minY)
+                val b = Vec3(maxX, 256.0, maxY)
+                val middle = a.middle(b).with(y = 10.0)
                 val box = a.axisAlignedTo(b).inflate(0.0001, 0.0, 0.0001)
                 list.add(Plot(id, slot, box, middle))
                 slot++
@@ -459,10 +462,11 @@ object GardenPlotApi {
     ) {
 
         // These don't refer to Minecraft chunks but rather garden plots, but I use
-        // the word chunk as the logic closely represents how chunk borders are rendered in latter mc versions
+        // the word chunk as the logic closely represents how chunk borders are rendered
         val plotSize = 96
-        val chunkX = floor((plot.middle.x + 48) / plotSize).toInt()
-        val chunkZ = floor((plot.middle.z + 48) / plotSize).toInt()
+        val plotSizeDbl = plotSize.toDouble()
+        val chunkX = floor((plot.middle.x + 48) / plotSize)
+        val chunkZ = floor((plot.middle.z + 48) / plotSize)
         val chunkMinX = (chunkX * plotSize) - 48
         val chunkMinZ = (chunkZ * plotSize) - 48
 
@@ -473,30 +477,42 @@ object GardenPlotApi {
         // Render 4 vertical corners
         for (i in 0..plotSize step plotSize) {
             for (j in 0..plotSize step plotSize) {
-                val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
-                val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
+                val start = Vec3(chunkMinX + i, minHeight.toDouble(), chunkMinZ + j)
+                val end = Vec3(chunkMinX + i, maxHeight.toDouble(), chunkMinZ + j)
                 tryDraw3DLine(start, end, cornerColor, 3, true)
             }
         }
 
         // Render vertical on X-Axis
         for (x in 4..<plotSize step 4) {
-            val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
-            val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
+            val start = Vec3(chunkMinX + x, minHeight.toDouble(), chunkMinZ)
+            val end = Vec3(chunkMinX + x, maxHeight.toDouble(), chunkMinZ)
             // Front lines
             tryDraw3DLine(start, end, lineColor, 2, true)
             // Back lines
-            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 2, true)
+            tryDraw3DLine(
+                start.add(z = plotSizeDbl),
+                end.add(z = plotSizeDbl),
+                lineColor,
+                2,
+                true,
+            )
         }
 
         // Render vertical on Z-Axis
         for (z in 4..<plotSize step 4) {
-            val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
-            val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
+            val start = Vec3(chunkMinX, minHeight.toDouble(), chunkMinZ + z)
+            val end = Vec3(chunkMinX, maxHeight.toDouble(), chunkMinZ + z)
             // Left lines
             tryDraw3DLine(start, end, lineColor, 2, true)
             // Right lines
-            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 2, true)
+            tryDraw3DLine(
+                start.add(x = plotSizeDbl),
+                end.add(x = plotSizeDbl),
+                lineColor,
+                2,
+                true,
+            )
         }
 
         // Render horizontal
@@ -507,24 +523,50 @@ object GardenPlotApi {
             minHeight..maxHeight step 4
         }
         for (y in iterable) {
-            val start = LorenzVec(chunkMinX, y, chunkMinZ)
+            val start = Vec3(chunkMinX, y.toDouble(), chunkMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor
             val depth = if (isRedLine) 3 else 2
+
             // (minX, minZ) -> (minX, minZ + 96)
-            tryDraw3DLine(start, start.add(z = plotSize), color, depth, true)
+            tryDraw3DLine(
+                start,
+                start.add(z = plotSizeDbl),
+                color,
+                depth,
+                true,
+            )
+
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)
-            tryDraw3DLine(start.add(z = plotSize), start.add(x = plotSize, z = plotSize), color, depth, true)
+            tryDraw3DLine(
+                start.add(z = plotSizeDbl),
+                start.add(x = plotSizeDbl, z = plotSizeDbl),
+                color, depth,
+                true,
+            )
+
             // (minX + 96, minZ + 96) -> (minX + 96, minZ)
-            tryDraw3DLine(start.add(x = plotSize, z = plotSize), start.add(x = plotSize), color, depth, true)
+            tryDraw3DLine(
+                start.add(x = plotSizeDbl, z = plotSizeDbl),
+                start.add(x = plotSizeDbl),
+                color,
+                depth,
+                true,
+            )
+
             // (minX + 96, minZ) -> (minX, minZ)
-            tryDraw3DLine(start.add(x = plotSize), start, color, depth, true)
+            tryDraw3DLine(
+                start.add(x = plotSizeDbl),
+                start, color,
+                depth,
+                true,
+            )
         }
     }
 
     private fun SkyHanniRenderWorldEvent.tryDraw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
+        p1: Vec3,
+        p2: Vec3,
         color: Color,
         lineWidth: Int,
         depth: Boolean,
@@ -534,12 +576,6 @@ object GardenPlotApi {
         draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
-    private fun isOutOfBorders(location: LorenzVec) = when {
-        location.x > 240 -> true
-        location.x < -240 -> true
-        location.z > 240 -> true
-        location.z < -240 -> true
-
-        else -> false
-    }
+    private fun isOutOfBorders(location: Vec3) =
+        location.x !in -240.0..240.0 || location.z !in -240.0..240.0
 }

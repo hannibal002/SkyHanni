@@ -1,16 +1,25 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent) {
 
+    @PublishedApi
+    internal fun VertexConsumer.addColoredVertex(point: Vec3, color: Color) {
+        addVertex(point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
+            .setColor(color.red, color.green, color.blue, color.alpha)
+    }
+
     inline fun draw(
-        middlePoint: LorenzVec,
-        sidePoint1: LorenzVec,
-        sidePoint2: LorenzVec,
-        c: Color,
+        middlePoint: Vec3,
+        sidePoint1: Vec3,
+        sidePoint2: Vec3,
+        color: Color,
     ) {
         val layer = SkyHanniRenderLayers.getQuads(false)
         val buf = event.vertexConsumers.getBuffer(layer)
@@ -23,14 +32,10 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         val lastPoint = sidePoint1 + sidePoint2 - middlePoint
         val newLastPoint = lastPoint - viewerPos
 
-        buf.addVertex(newSidePoint1.x.toFloat(), newSidePoint1.y.toFloat(), newSidePoint1.z.toFloat())
-            .setColor(c.red, c.green, c.blue, c.alpha)
-        buf.addVertex(newMidPoint.x.toFloat(), newMidPoint.y.toFloat(), newMidPoint.z.toFloat())
-            .setColor(c.red, c.green, c.blue, c.alpha)
-        buf.addVertex(newSidePoint2.x.toFloat(), newSidePoint2.y.toFloat(), newSidePoint2.z.toFloat())
-            .setColor(c.red, c.green, c.blue, c.alpha)
-        buf.addVertex(newLastPoint.x.toFloat(), newLastPoint.y.toFloat(), newLastPoint.z.toFloat())
-            .setColor(c.red, c.green, c.blue, c.alpha)
+        buf.addColoredVertex(newSidePoint1, color)
+        buf.addColoredVertex(newMidPoint, color)
+        buf.addColoredVertex(newSidePoint2, color)
+        buf.addColoredVertex(newLastPoint, color)
 
         event.matrices.popPose()
     }

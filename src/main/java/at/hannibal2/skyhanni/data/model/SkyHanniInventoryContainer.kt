@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.RenderableInventory.fakeInventory
@@ -9,14 +8,15 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 
 class SkyHanniInventoryContainer(
     @Expose val internalName: String,
     @Expose val rowSize: Int,
     @Expose var items: List<ItemStack?>,
     @Expose var displayName: String = internalName,
-    @Expose val primaryCords: LorenzVec? = null,
-    @Expose val secondaryCords: LorenzVec? = null,
+    @Expose val primaryCords: Vec3? = null,
+    @Expose val secondaryCords: Vec3? = null,
 ) {
     fun toRenderable(scale: Double = 1.0): Renderable = with(Renderable) {
         vertical(

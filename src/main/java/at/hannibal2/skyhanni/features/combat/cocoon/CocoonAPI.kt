@@ -15,12 +15,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceSqIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceSqOnlyY
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,7 +41,7 @@ object CocoonAPI {
     data class CocoonMob(
         val mob: Mob,
         val seaCreature: LivingSeaCreatureData?,
-        val coordinates: LorenzVec,
+        val coordinates: Vec3,
         val spawnTime: SimpleTimeMark,
         val cocoonID: Int,
         var hasBeenSeen: Boolean,
@@ -58,7 +60,7 @@ object CocoonAPI {
         if (IslandType.THE_RIFT.isCurrent()) return
         val entity = event.entity
         if (!entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
-        val position = entity.getLorenzVec()
+        val position = entity.position()
         val id = entity.id
         if (isSameCocoonGroup(position, id)) return
         val mob = getCocoonMob(position) ?: return
@@ -85,13 +87,13 @@ object CocoonAPI {
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 
-    private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
-        val mob = skyblockMobs.minByOrNull { it.baseEntity.getLorenzVec().distanceIgnoreY(cocoonVector) } ?: return null
-        if (mob.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
+    private fun getCocoonMob(cocoonVector: Vec3): Mob? {
+        val mob = skyblockMobs.minByOrNull { it.baseEntity.position().distanceIgnoreY(cocoonVector) } ?: return null
+        if (mob.baseEntity.position().distanceSqOnlyY(cocoonVector) > 4.0) return null
         return mob
     }
 
-    private fun isSameCocoonGroup(currentPos: LorenzVec, currentID: Int): Boolean {
+    private fun isSameCocoonGroup(currentPos: Vec3, currentID: Int): Boolean {
         return existingCocoons.any { it.coordinates.distanceSqIgnoreY(currentPos) < 0.5 || it.cocoonID == currentID }
     }
 

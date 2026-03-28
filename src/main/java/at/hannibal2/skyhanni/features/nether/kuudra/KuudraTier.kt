@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.nether.kuudra
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.phys.Vec3
 
 enum class KuudraTier(val displayName: String) {
     BASIC("Basic"),
@@ -19,16 +19,16 @@ enum class KuudraTier(val displayName: String) {
 
     var doneToday: Boolean = false
 
-    private var intLocation: LorenzVec? = null
+    private var intLocation: Vec3? = null
     private var intTierNumber: Int = ordinal + 1
     private var intDisplayItem: NeuInternalName = "KUUDRA_${name}_TIER_KEY".toInternalName()
 
-    val location: LorenzVec? get() = intLocation
+    val location: Vec3? get() = intLocation
     val tierNumber: Int get() = intTierNumber
     val displayItem: NeuInternalName get() = intDisplayItem
 
     private fun setTierNumber(tierNumber: Int) { this.intTierNumber = tierNumber }
-    private fun setLocation(location: LorenzVec?) { this.intLocation = location }
+    private fun setLocation(location: Vec3?) { this.intLocation = location }
     private fun setDisplayItem(displayItem: NeuInternalName) { this.intDisplayItem = displayItem }
 
     fun getTieredDisplayName() = "Tier $intTierNumber ($displayName)"
@@ -61,7 +61,7 @@ enum class KuudraTier(val displayName: String) {
         fun addRepoData(
             displayName: String,
             displayItem: NeuInternalName,
-            location: LorenzVec?,
+            location: Vec3?,
             tier: Int,
         ) {
             val target = entries.firstOrNull { it.displayName == displayName } ?: return

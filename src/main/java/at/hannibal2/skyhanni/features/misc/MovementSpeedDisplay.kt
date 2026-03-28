@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -36,11 +35,8 @@ object MovementSpeedDisplay {
         if (!SkyBlockUtils.onHypixel) return
 
         speed = with(MinecraftCompat.localPlayer) {
-            val oldPos = LorenzVec(xOld, yOld, zOld)
-            val newPos = LorenzVec(position().x, position().y, position().z)
-
             // Distance from previous tick, multiplied by TPS
-            oldPos.distance(newPos) * 20
+            oldPosition().distanceTo(position()) * 20
         }
 
         if (isEnabled()) {

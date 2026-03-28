@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo
 import at.hannibal2.skyhanni.data.IslandType
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import net.minecraft.world.phys.Vec3
 
 data class WarpsJson(
     @Expose val warpCommands: List<String>,
@@ -16,4 +17,6 @@ data class WarpLocationData(
     @Expose val y: Double,
     @Expose val z: Double,
     @Expose @SerializedName("extra_diana_warp_blocks") val extraDianaWarpBlocks: Int,
-)
+) {
+    val vec = Vec3(x, y, z)
+}

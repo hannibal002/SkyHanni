@@ -7,13 +7,14 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.QuadDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.inflateBlock
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 @SkyHanniModule
@@ -58,14 +59,14 @@ object CrystalHollowsWalls {
 
     private val nucleusBBOffsetY get() = nucleusBB.move(0.0, yViewOffset, 0.0)
 
-    private fun Double.shiftPX() = this + LorenzVec.expandVector.x * EXPAND_TIMES
-    private fun Double.shiftNX() = this - LorenzVec.expandVector.x * EXPAND_TIMES
+    private fun Double.shiftPX() = this + VectorUtils.expandVector.x * EXPAND_TIMES
+    private fun Double.shiftNX() = this - VectorUtils.expandVector.x * EXPAND_TIMES
 
-    private fun Double.shiftPY() = this + LorenzVec.expandVector.y * EXPAND_TIMES
-    private fun Double.shiftNY() = this - LorenzVec.expandVector.y * EXPAND_TIMES
+    private fun Double.shiftPY() = this + VectorUtils.expandVector.y * EXPAND_TIMES
+    private fun Double.shiftNY() = this - VectorUtils.expandVector.y * EXPAND_TIMES
 
-    private fun Double.shiftPZ() = this + LorenzVec.expandVector.z * EXPAND_TIMES
-    private fun Double.shiftNZ() = this - LorenzVec.expandVector.z * EXPAND_TIMES
+    private fun Double.shiftPZ() = this + VectorUtils.expandVector.z * EXPAND_TIMES
+    private fun Double.shiftNZ() = this - VectorUtils.expandVector.z * EXPAND_TIMES
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -73,7 +74,7 @@ object CrystalHollowsWalls {
         val position = WorldRenderUtils.getViewerPos()
         when {
             position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
-            nucleusBBOffsetY.contains(position.toVec3()) -> {
+            nucleusBBOffsetY.contains(position) -> {
                 if (!config.nucleus) return
                 drawNucleus(event)
             }
@@ -115,9 +116,9 @@ object CrystalHollowsWalls {
     private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event) {
         val heatHeight = HEAT_HEIGHT.shiftNY()
         draw(
-            LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
-            LorenzVec(nucleusBB.maxX, heatHeight, nucleusBB.minZ),
-            LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.maxZ),
+            Vec3(nucleusBB.minX, heatHeight, nucleusBB.minZ),
+            Vec3(nucleusBB.maxX, heatHeight, nucleusBB.minZ),
+            Vec3(nucleusBB.minX, heatHeight, nucleusBB.maxZ),
             Area.NUCLEUS.color,
         )
 
@@ -143,49 +144,49 @@ object CrystalHollowsWalls {
             draw(
                 southEastCorner,
                 southEastTopCorner,
-                LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
+                Vec3(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
                 Area.JUNGLE.color,
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
-                LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
+                Vec3(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
                 Area.JUNGLE.color,
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
-                LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
+                Vec3(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
                 Area.PRECURSOR.color,
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
-                LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
+                Vec3(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
                 Area.PRECURSOR.color,
             )
             draw(
                 southWestCorner,
                 southWestTopCorner,
-                LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
+                Vec3(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
                 Area.GOBLIN.color,
             )
             draw(
                 southWestCorner,
                 southWestTopCorner,
-                LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
+                Vec3(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
                 Area.GOBLIN.color,
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
-                LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
+                Vec3(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
                 Area.MITHRIL.color,
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
-                LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
+                Vec3(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
                 Area.MITHRIL.color,
             )
         }
@@ -207,10 +208,10 @@ object CrystalHollowsWalls {
 
         val heatHeight = HEAT_HEIGHT.shiftPY()
 
-        val nucleusBase = LorenzVec(nucleusX, heatHeight, nucleusZ)
+        val nucleusBase = Vec3(nucleusX, heatHeight, nucleusZ)
 
-        val nucleusZSideBase = LorenzVec(middleX, heatHeight, nucleusZ)
-        val nucleusXSideBase = LorenzVec(nucleusX, heatHeight, middleZ)
+        val nucleusZSideBase = Vec3(middleX, heatHeight, nucleusZ)
+        val nucleusXSideBase = Vec3(nucleusX, heatHeight, middleZ)
 
         drawHeatArea(
             Area.HEAT.color,
@@ -224,26 +225,26 @@ object CrystalHollowsWalls {
         )
         draw(
             nucleusXSideBase,
-            LorenzVec(nucleusX, MAX_HEIGHT, middleZ),
-            LorenzVec(x, heatHeight, middleZ),
+            Vec3(nucleusX, MAX_HEIGHT, middleZ),
+            Vec3(x, heatHeight, middleZ),
             color1,
         )
         draw(
             nucleusZSideBase,
-            LorenzVec(middleX, MAX_HEIGHT, nucleusZ),
-            LorenzVec(middleX, heatHeight, z),
+            Vec3(middleX, MAX_HEIGHT, nucleusZ),
+            Vec3(middleX, heatHeight, z),
             color2,
         )
         draw(
             nucleusXSideBase,
             nucleusBase,
-            LorenzVec(nucleusX, MAX_HEIGHT, middleZ),
+            Vec3(nucleusX, MAX_HEIGHT, middleZ),
             Area.NUCLEUS.color,
         )
         draw(
             nucleusZSideBase,
             nucleusBase,
-            LorenzVec(middleX, MAX_HEIGHT, nucleusZ),
+            Vec3(middleX, MAX_HEIGHT, nucleusZ),
             Area.NUCLEUS.color,
         )
     }
@@ -274,24 +275,24 @@ object CrystalHollowsWalls {
         middleZ: Double,
         z: Double,
     ) {
-        val nucleusBase = LorenzVec(nucleusX, heatHeight, nucleusZ)
+        val nucleusBase = Vec3(nucleusX, heatHeight, nucleusZ)
 
         draw(
             nucleusBase,
-            LorenzVec(nucleusX, heatHeight, z),
-            LorenzVec(middleX, heatHeight, nucleusZ),
+            Vec3(nucleusX, heatHeight, z),
+            Vec3(middleX, heatHeight, nucleusZ),
             color,
         )
         draw(
             nucleusBase,
-            LorenzVec(x, heatHeight, nucleusZ),
-            LorenzVec(nucleusX, heatHeight, middleZ),
+            Vec3(x, heatHeight, nucleusZ),
+            Vec3(nucleusX, heatHeight, middleZ),
             color,
         )
         draw(
             nucleusBase,
-            LorenzVec(x, heatHeight, nucleusZ),
-            LorenzVec(nucleusX, heatHeight, z),
+            Vec3(x, heatHeight, nucleusZ),
+            Vec3(nucleusX, heatHeight, z),
             color,
         )
     }

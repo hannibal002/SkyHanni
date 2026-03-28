@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -33,11 +32,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.phys.Vec3
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -75,15 +76,15 @@ object FastFairySoulsPathfinder {
      */
     private val loreSoulPattern by patternGroup.pattern(
         "new.colorless",
-        "Fairy Souls: (?<found>.*)\\/(?<total>.*)",
+        "Fairy Souls: (?<found>.*)/(?<total>.*)",
     )
 
     private class Data(
         var found: Int,
         val total: Int,
-        val route: MutableList<LorenzVec>,
-        val allSouls: Set<LorenzVec>,
-        var foundButNotClickedSoul: LorenzVec? = null,
+        val route: MutableList<Vec3>,
+        val allSouls: Set<Vec3>,
+        var foundButNotClickedSoul: Vec3? = null,
     ) {
         var disabled = total > 0 && found == total
         var debugState: String? = null
@@ -96,16 +97,16 @@ object FastFairySoulsPathfinder {
             pathToNext()
         }
 
-        private fun getNearestSoul(): LorenzVec? {
+        private fun getNearestSoul(): Vec3? {
             val playerLocation = LocationUtils.playerLocation()
-            val nearest = allSouls.minByOrNull { it.distanceSq(playerLocation) } ?: return null
+            val nearest = allSouls.minByOrNull(playerLocation::distanceToSqr) ?: return null
             if (nearest.distanceToPlayer() < 10) return nearest
 
             val inAir = PlayerUtils.inAir()
             if (inAir) {
-                val abovePlayer = playerLocation.up(10)
-                val aboveNearest = allSouls.minByOrNull { it.distanceSq(abovePlayer) } ?: return null
-                if (aboveNearest.distance(abovePlayer) < 10) return aboveNearest
+                val abovePlayer = playerLocation.up(10.0)
+                val aboveNearest = allSouls.minByOrNull(abovePlayer::distanceToSqr) ?: return null
+                if (aboveNearest.distanceTo(abovePlayer) < 10) return aboveNearest
             }
 
             IslandGraphs.reportLocation(
@@ -119,7 +120,7 @@ object FastFairySoulsPathfinder {
             return null
         }
 
-        private fun found(nearest: LorenzVec) {
+        private fun found(nearest: Vec3) {
             if (route.remove(nearest)) {
                 found++
             }
@@ -147,7 +148,7 @@ object FastFairySoulsPathfinder {
             }
         }
 
-        private fun pathTo(loc: LorenzVec) {
+        private fun pathTo(loc: Vec3) {
             val percentage = (found.toDouble() / total) * 100
             val percentageLabel = "§8(§b${percentage.roundTo(1)}%§8)"
             IslandGraphs.pathFind(
@@ -254,7 +255,7 @@ object FastFairySoulsPathfinder {
                 }
             } else {
                 val size = foundSouls.size
-                Data(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
+                Data(found = size, total = size, route = mutableListOf(), allSouls = foundSouls).also {
                     it.debugState = "found all souls on ${SkyBlockUtils.currentIsland}"
                 }
             }
@@ -281,11 +282,11 @@ object FastFairySoulsPathfinder {
     }
 
     private fun setData(
-        foundSouls: MutableSet<LorenzVec>,
+        foundSouls: MutableSet<Vec3>,
         allSouls: List<GraphNode>,
-        route: MutableList<LorenzVec>,
+        route: MutableList<Vec3>,
     ) {
-        this.data = Data(
+        data = Data(
             found = foundSouls.size,
             total = allSouls.size,
             route,
@@ -396,8 +397,8 @@ object FastFairySoulsPathfinder {
     fun amountFoundOnCurrentIsland(): Int = amountFoundOnIsland(SkyBlockUtils.currentIsland)
     fun amountFoundOnIsland(island: IslandType): Int = totalFound.getOrDefault(island, 0)
 
-    fun foundSoulsOnCurrentIsland(): MutableSet<LorenzVec> = foundSoulsOnIsland(SkyBlockUtils.currentIsland)
-    fun foundSoulsOnIsland(island: IslandType): MutableSet<LorenzVec> = foundSouls.getOrPut(island) { mutableSetOf() }
+    fun foundSoulsOnCurrentIsland(): MutableSet<Vec3> = foundSoulsOnIsland(SkyBlockUtils.currentIsland)
+    fun foundSoulsOnIsland(island: IslandType): MutableSet<Vec3> = foundSouls.getOrPut(island) { mutableSetOf() }
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 

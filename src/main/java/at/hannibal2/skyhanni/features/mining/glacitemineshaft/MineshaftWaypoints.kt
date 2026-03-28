@@ -12,6 +12,9 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.add
+import at.hannibal2.skyhanni.utils.VectorUtils.down
+import at.hannibal2.skyhanni.utils.VectorUtils.toChatFormat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -44,14 +47,14 @@ object MineshaftWaypoints {
         }
 
         if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = MinecraftCompat.localPlayer.direction.unitVec3i
+            val vec = MinecraftCompat.localPlayer.direction.unitVec3
             val location = playerLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)
                 // Adjust 2 blocks to the right to be in the center of the ladder shaft
                 .add(x = vec.z * -2, z = vec.x * 2)
                 // Move 15 blocks down to be at the bottom of the ladder shaft
-                .add(y = -15)
+                .down(15.0)
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = location))
         }
     }

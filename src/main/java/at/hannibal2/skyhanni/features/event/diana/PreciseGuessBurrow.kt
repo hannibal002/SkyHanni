@@ -12,10 +12,13 @@ import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.down
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import at.hannibal2.skyhanni.utils.VectorUtils.toCleanString
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,7 +51,7 @@ object PreciseGuessBurrow {
             bezierFitter.addPoint(currLoc)
             return
         }
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
+        val distToLast = bezierFitter.getLastPoint()?.distanceTo(currLoc) ?: return
 
         if (distToLast == 0.0 || distToLast > 3.0) return
 
@@ -76,7 +79,7 @@ object PreciseGuessBurrow {
 
     }
 
-    private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
+    private fun guessBurrowLocation(): Vec3? = bezierFitter.solve()
 
     private var lastDianaSpade = SimpleTimeMark.farPast()
     private var lastLavaParticle = SimpleTimeMark.farPast()
@@ -114,8 +117,8 @@ object PreciseGuessBurrow {
             add("Rounded Guess: " + (guess?.down(0.5)?.roundToBlock()?.toCleanString() ?: "No Guess"))
             add("Particle Locations:")
             addAll(
-                bezierFitter.points.mapIndexed { index, lorenzVec ->
-                    "$index:  ${lorenzVec.toCleanString()}"
+                bezierFitter.points.mapIndexed { index, vec ->
+                    "$index:  ${vec.toCleanString()}"
                 },
             )
         }

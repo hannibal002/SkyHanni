@@ -16,14 +16,13 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.spawnTime
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerPosData
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.common.cache.RemovalCause
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,12 +50,12 @@ object SeaCreatureDetectionApi {
     private val recentMobs = mutableMapOf<Mob, ServerTimeMark>()
 
     private var babyMagmaSlugsToFind = 0
-    private var lastMagmaSlugLocation: LorenzVec? = null
+    private var lastMagmaSlugLocation: Vec3? = null
     private var lastMagmaSlugTime = SimpleTimeMark.farPast()
 
     private val recentBabyMagmaSlugs = mutableMapOf<Mob, ServerTimeMark>()
 
-    var lastBobberLocation: LorenzVec? = null
+    var lastBobberLocation: Vec3? = null
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -97,7 +96,7 @@ object SeaCreatureDetectionApi {
             data.forceRemove()
             if (data.isOwn) {
                 if (mob.name == "Magma Slug") {
-                    lastMagmaSlugLocation = mob.getLorenzVec()
+                    lastMagmaSlugLocation = mob.position()
                     babyMagmaSlugsToFind += 3
                     lastMagmaSlugTime = SimpleTimeMark.now()
                     handleBabySlugs()
@@ -200,7 +199,7 @@ object SeaCreatureDetectionApi {
             return@removeIf true
         }
         val bobber = FishingApi.bobber ?: return
-        lastBobberLocation = bobber.getLorenzVec()
+        lastBobberLocation = bobber.position()
         if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 2.seconds) babyMagmaSlugsToFind = 0
     }
 
@@ -215,10 +214,10 @@ object SeaCreatureDetectionApi {
         }
     }
 
-    private fun assumeDeathIfAreaLeft(data: LivingSeaCreatureData, playerPos: LorenzVec): Boolean {
+    private fun assumeDeathIfAreaLeft(data: LivingSeaCreatureData, playerPos: Vec3): Boolean {
         if (data.exists()) return false
         val lastPos = data.actualLastPos ?: return false
-        if (lastPos.distance(playerPos) > MAX_WAIT_DEATH_DISTANCE) return false
+        if (lastPos.distanceTo(playerPos) > MAX_WAIT_DEATH_DISTANCE) return false
         val timeAroundPos = PlayerPosData.timeAtPos(lastPos, MAX_WAIT_DEATH_DISTANCE) ?: return false
         return timeAroundPos >= 5.seconds
     }

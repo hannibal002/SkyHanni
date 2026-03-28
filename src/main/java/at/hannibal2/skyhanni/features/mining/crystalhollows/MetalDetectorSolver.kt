@@ -17,10 +17,9 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -29,6 +28,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.VectorUtils.add
+import at.hannibal2.skyhanni.utils.VectorUtils.inverse
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -39,11 +43,14 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MetalDetectorSolver {
+
+    private val config get() = SkyHanniMod.feature.mining.metalDetector
 
     /**
      * REGEX-TEST: §7§65,453/5,078❤     §a927§a❈ Defense     §3§lTREASURE: §b79.2m§r
@@ -63,14 +70,12 @@ object MetalDetectorSolver {
         "§aYou found .*with your §r§cMetal Detector§r§a!",
     )
 
-    private val config get() = SkyHanniMod.feature.mining.metalDetector
-
-    private var chestLocations: List<LorenzVec> = listOf()
-    private val predictedChestLocations: MutableList<LorenzVec> = mutableListOf()
-    private var baseCoordinates: LorenzVec? = null
-    private var ignoreLocation: LorenzVec? = null
-    private var lastSearchedForBase: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var lastLoc: LorenzVec? = null
+    private var chestLocations = emptyList<Vec3>()
+    private val predictedChestLocations = mutableListOf<Vec3>()
+    private var baseCoordinates: Vec3? = null
+    private var ignoreLocation: Vec3? = null
+    private var lastSearchedForBase = SimpleTimeMark.farPast()
+    private var lastLoc: Vec3? = null
     private var playedPling = false
     private var lastTreasureFound = SimpleTimeMark.farPast()
     private val DWARVEN_LAPIS_SWORD = "DWARVEN_LAPIS_SWORD".toInternalName()
@@ -118,13 +123,13 @@ object MetalDetectorSolver {
 
             predictedChestLocations.clear()
             chestLocations.forEach {
-                val loc = baseCoordinatesNonNull.plus(it.negated())
+                val loc = baseCoordinatesNonNull + it.inverse()
 
                 if (loc == ignoreLocation) {
                     ignoreLocation = null
                     return
                 }
-                if (loc.add(0, 1, 0).distanceToPlayer().roundTo(1) == distance) {
+                if (loc.up().distanceToPlayer().roundTo(1) == distance) {
                     if (predictedChestLocations.isEmpty() && !playedPling) {
                         SoundUtils.plingSound.playSound()
                         playedPling = true
@@ -227,9 +232,11 @@ object MetalDetectorSolver {
         for (i in -50 until 50) {
             for (j in 30 downTo -30) {
                 for (k in -50 until 50) {
-                    val blockPosition = player.add(i, j, k).roundToBlock()
-                    val nextBlockPosition = blockPosition.add(0, 13, 0)
-                    if (blockPosition.getBlockAt() == Blocks.QUARTZ_STAIRS && nextBlockPosition.getBlockAt() == Blocks.BARRIER) {
+                    val blockPosition = player.add(i.toDouble(), j.toDouble(), k.toDouble()).roundToBlock()
+                    val nextBlockPosition = blockPosition.add(0.0, 13.0, 0.0)
+                    if (blockPosition.getBlockAt() == Blocks.QUARTZ_STAIRS &&
+                        nextBlockPosition.getBlockAt() == Blocks.BARRIER
+                    ) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)
                         return
                     }
@@ -238,23 +245,26 @@ object MetalDetectorSolver {
         }
     }
 
-    // Finds the barrier block near the Jade crystal (middle of Mines of Divan) with the highest x, y, z values (chest locations are offset from this point).
-    private fun getBaseCoordinates(blockPosition: LorenzVec): LorenzVec {
+    /**
+     * Finds the barrier block near the Jade Crystal (middle of Mines of Divan) with the highest
+     * x, y, z values (chest locations are offset from this point).
+     */
+    private fun getBaseCoordinates(blockPosition: Vec3): Vec3 {
         var changed = true
         var currentPosition = blockPosition
         while (changed) {
             changed = false
-            if (currentPosition.add(1, 0, 0).getBlockAt() == Blocks.BARRIER) {
+            if (currentPosition.add(x = 1.0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
-                currentPosition = currentPosition.add(1, 0, 0)
+                currentPosition = currentPosition.add(x = 1.0)
             }
-            if (currentPosition.add(0, 1, 0).getBlockAt() == Blocks.BARRIER) {
+            if (currentPosition.add(y = 1.0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
-                currentPosition = currentPosition.add(0, 1, 0)
+                currentPosition = currentPosition.add(y = 1.0)
             }
-            if (currentPosition.add(0, 0, 1).getBlockAt() == Blocks.BARRIER) {
+            if (currentPosition.add(z = 1.0).getBlockAt() == Blocks.BARRIER) {
                 changed = true
-                currentPosition = currentPosition.add(0, 0, 1)
+                currentPosition = currentPosition.add(z = 1.0)
             }
         }
         return currentPosition

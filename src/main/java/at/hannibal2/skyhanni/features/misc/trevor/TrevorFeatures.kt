@@ -26,16 +26,18 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.with
+import at.hannibal2.skyhanni.utils.VectorUtils.down
+import at.hannibal2.skyhanni.utils.VectorUtils.isZero
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -164,13 +166,13 @@ object TrevorFeatures {
         }
 
         talbotPatternAbove.matchMatcher(formattedMessage) {
-            val height = group("height").toInt()
+            val height = group("height").toDouble()
             val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, true)
             TalbotCircles.addResult(height, angle)
         }
         talbotPatternBelow.matchMatcher(formattedMessage) {
-            val height = group("height").toInt()
+            val height = group("height").toDouble()
             val angle = group("angle").toInt()
             TrevorSolver.findMobHeight(height, false)
             TalbotCircles.addResult(-height, angle)
@@ -225,7 +227,7 @@ object TrevorFeatures {
         if (!active) trapperReady = true
         else inBetweenQuests = true
 
-        if (TrevorSolver.mobCoordinates != LorenzVec(0.0, 0.0, 0.0) && active) {
+        if (!TrevorSolver.mobCoordinates.isZero() && active) {
             TrevorSolver.mobLocation = previousLocation
         }
         questActive = active
@@ -276,7 +278,7 @@ object TrevorFeatures {
             RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color) {
                 config.cooldown
             }
-            entityTrapper.getLorenzVec().let {
+            entityTrapper.position().let {
                 if (it.distanceToPlayer() < 15) {
                     event.drawString(it.up(2.23), currentLabel)
                 }
@@ -289,13 +291,13 @@ object TrevorFeatures {
             var location = TrevorSolver.mobLocation.coordinates
             if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
             if (TrevorSolver.averageHeight != 0.0) {
-                location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
+                location = location.with(y = TrevorSolver.averageHeight)
             }
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
                 mobFound = true
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
+                event.drawWaypointFilled(location.down(2.0), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), displayName, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)

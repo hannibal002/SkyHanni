@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.rgb
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -24,7 +23,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
@@ -32,6 +30,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeIn
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -47,7 +46,11 @@ object FlareDisplay {
 
     private var activeWarning = false
 
-    class Flare(val type: FlareType, val entity: ArmorStand, val location: LorenzVec = entity.getLorenzVec())
+    data class Flare(
+        val type: FlareType,
+        val entity: ArmorStand,
+        val location: Vec3 = entity.position(),
+    )
 
     private val MAX_FLARE_TIME = 3.minutes
 
@@ -208,7 +211,7 @@ object FlareDisplay {
         if (!config.hideParticles) return
 
         val location = event.location
-        val distance = flares.minOfOrNull { it.location.distance(location) } ?: return
+        val distance = flares.minOfOrNull { it.location.distanceTo(location) } ?: return
         if (distance < 2.5) {
             if (event.type == ParticleTypes.FLAME) {
                 event.cancel()

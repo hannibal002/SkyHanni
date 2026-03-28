@@ -15,14 +15,15 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.toVec3
+import at.hannibal2.skyhanni.utils.VectorUtils.toChatFormat
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
@@ -39,13 +40,13 @@ object CorpseLocator {
         "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
 
-    private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
+    private val sharedWaypoints = mutableListOf<Vec3>()
 
     // TODO: use entity events
     @OptIn(AllEntitiesGetter::class)
     private fun findCorpse() {
         EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()
-            .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distance(corpse.getLorenzVec()) <= 3 } }
+            .filterNot { corpse -> MineshaftWaypoints.waypoints.any { it.location.distanceTo(corpse.position()) <= 3 } }
             .filter { entity ->
                 entity.showArms() && entity.showBasePlate().not() && !entity.isInvisible
             }
@@ -53,7 +54,7 @@ object CorpseLocator {
                 val helmetName = entity.getStandHelmet()?.getInternalName() ?: return
                 val corpseType = MineshaftWaypointType.getByHelmetOrNull(helmetName) ?: return
 
-                val canSee = entity.getLorenzVec().canBeSeen(-1..3)
+                val canSee = entity.position().canBeSeen(-1..3)
                 if (canSee) {
                     val article = if (corpseType.displayText == "Umber Corpse") "an" else "a"
                     ChatUtils.chat("Located $article ${corpseType.displayText} and marked its location with a waypoint.")
@@ -61,8 +62,7 @@ object CorpseLocator {
                     MineshaftWaypoints.waypoints.add(
                         MineshaftWaypoint(
                             waypointType = corpseType,
-                            location = entity.getLorenzVec().up(),
-                            isCorpse = true,
+                            location = entity.position().up(),
                         ),
                     )
                 }
@@ -72,7 +72,7 @@ object CorpseLocator {
     private fun shareCorpse() {
         val closestCorpse = MineshaftWaypoints.waypoints.filter { it.isCorpse && !it.shared }
             .filterNot { corpse ->
-                sharedWaypoints.any { corpse.location.distance(it) <= 5 }
+                sharedWaypoints.any { corpse.location.distanceTo(it) <= 5 }
             }
             .filter { it.location.distanceToPlayer() <= 5 }
             .minByOrNull { it.location.distanceToPlayer() } ?: return
@@ -117,10 +117,10 @@ object CorpseLocator {
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
-            val location = toLorenzVec() ?: return
+            val location = toVec3() ?: return
 
             // Return if someone had already sent a location nearby
-            if (sharedWaypoints.any { it.distance(location) <= 5 }) return
+            if (sharedWaypoints.any { it.distanceTo(location) <= 5 }) return
             sharedWaypoints.add(location)
         }
     }

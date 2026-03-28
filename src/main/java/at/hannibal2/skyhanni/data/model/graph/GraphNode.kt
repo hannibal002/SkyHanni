@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.data.model.graph
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import net.minecraft.world.phys.Vec3
 
 class GraphNode(
     val id: Int,
-    override val position: LorenzVec,
+    override val position: Vec3,
     val name: String? = null,
     val tagNames: List<String> = emptyList(),
     val extraWeight: Int = 0,

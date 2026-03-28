@@ -27,15 +27,15 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.toLocalFormat
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -116,9 +117,9 @@ object IslandGraphs {
     var disabledNodesReason: String? = null
         private set
 
-    fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
+    fun disableNodes(reason: String, center: Vec3, radius: Double) {
         disabledNodesReason = reason
-        for (node in getGraph().filter { it.position.distance(center) < radius }) {
+        for (node in getGraph().filter { it.position.distanceTo(center) < radius }) {
             node.enabled = false
         }
     }
@@ -135,7 +136,7 @@ object IslandGraphs {
     private var cachedNearbyNodes = listOf<GraphNode>()
     private var lastCacheUpdate = SimpleTimeMark.farPast()
 
-    private var currentTarget: LorenzVec? = null
+    private var currentTarget: Vec3? = null
     private var currentTargetNode: GraphNode? = null
     private var navigationLabel = ""
     private var lastDisplayedDistance = 0.0
@@ -503,7 +504,7 @@ object IslandGraphs {
      * @param condition The pathfinding stops when the condition is no longer valid.
      */
     fun pathFind(
-        location: LorenzVec,
+        location: Vec3,
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
@@ -529,7 +530,7 @@ object IslandGraphs {
         getGraph().nodesAround(node, condition)
 
     private fun initNavigation(
-        location: LorenzVec,
+        location: Vec3,
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
@@ -542,7 +543,7 @@ object IslandGraphs {
         this.onFound = onFound
         this.onManualCancel = onManualCancel
         this.activeCondition = condition
-        goal = getGraph().minByActive { it.position.distance(currentTarget!!) }
+        goal = getGraph().minByActive { it.position.distanceTo(currentTarget!!) }
         updateNavigationProgress()
     }
 
@@ -575,11 +576,16 @@ object IslandGraphs {
         pathRenderer?.render(event)
     }
 
-    fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == navigationLabel
+    fun isActive(testTarget: Vec3, testLabel: String): Boolean =
+        testTarget == currentTarget && testLabel == navigationLabel
 
-    fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = DEFAULT_NODE_SEARCH_RADIUS): GraphNode? {
+    fun findClosestNode(
+        location: Vec3,
+        condition: (GraphNode) -> Boolean = { true },
+        radius: Double = DEFAULT_NODE_SEARCH_RADIUS,
+    ): GraphNode? {
         val found = getGraph().getNearestNode(location, condition)
-        return found.takeIf { it.position.distance(location) < radius }
+        return found.takeIf { it.position.distanceTo(location) < radius }
     }
 
     @HandleEvent
@@ -618,7 +624,7 @@ object IslandGraphs {
     }
 
     fun reportLocation(
-        location: LorenzVec,
+        location: Vec3,
         userFacingReason: String,
         technicalInfo: String? = null,
         vararg extraData: Pair<String, Any?>,
@@ -632,7 +638,7 @@ object IslandGraphs {
     }
 
     private fun sendReportLocation(
-        location: LorenzVec,
+        location: Vec3,
         reasonForReport: String,
         technicalInfo: String? = null,
         vararg extraData: Pair<String, Any?>,

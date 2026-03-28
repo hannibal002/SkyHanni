@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrE
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.entity.Entity
@@ -29,6 +28,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import java.util.UUID
 
@@ -291,7 +291,7 @@ class Mob(
 
     val isAlive: Boolean get() = baseEntity.isAlive
 
-    fun getLorenzVec() = baseEntity.getLorenzVec()
+    fun position(): Vec3 = baseEntity.position()
 }
 
 enum class MobCategory {

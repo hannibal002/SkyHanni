@@ -9,14 +9,15 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -26,8 +27,8 @@ object CosmeticFollowingLine {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
-    private var locations = mapOf<LorenzVec, LocationSpot>()
-    private var latestLocations = mapOf<LorenzVec, LocationSpot>()
+    private var locations = emptyMap<Vec3, LocationSpot>()
+    private var latestLocations = emptyMap<Vec3, LocationSpot>()
 
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 
@@ -118,7 +119,7 @@ object CosmeticFollowingLine {
             val playerLocation = LocationUtils.playerLocation().up(0.3)
 
             locations.keys.lastOrNull()?.let {
-                if (it.distance(playerLocation) < 0.1) return
+                if (it.distanceTo(playerLocation) < 0.1) return
             }
 
             locations = locations.editCopy {

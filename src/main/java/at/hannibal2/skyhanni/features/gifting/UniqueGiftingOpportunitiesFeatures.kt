@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -59,7 +58,7 @@ object UniqueGiftingOpportunitiesFeatures {
         if (!config.useArmorStandDetection) return
         if (entity.name.formattedTextCompatLessResets() != HAS_GIFTED_NAMETAG) return
 
-        val matchedPlayer = entity.getLorenzVec().getEntitiesNearby<Player>(2.0)
+        val matchedPlayer = entity.position().getEntitiesNearby<Player>(2.0)
             .singleOrNull { !it.isNpc() } ?: return
         addGiftedPlayer(matchedPlayer.name.formattedTextCompatLessResets())
     }

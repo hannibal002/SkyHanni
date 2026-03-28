@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.phys.Vec3
 import java.util.Collections
 import kotlin.collections.buildList
 import kotlin.time.Duration
@@ -49,7 +49,7 @@ object KingTalismanHelper {
         update()
     }
 
-    private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
+    private val kingLocation = Vec3(129.6, 196.5, 194.1)
     private val kingCircles = listOf(
         "Brammor",
         "Emkam",

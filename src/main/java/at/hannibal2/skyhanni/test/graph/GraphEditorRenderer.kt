@@ -8,8 +8,11 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.VectorUtils.div
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.times
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
@@ -17,6 +20,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.KeyMapping
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.math.min
 import at.hannibal2.skyhanni.utils.KeyboardManager.WasdInputMatrix as Wasd
@@ -183,17 +187,15 @@ object GraphEditorRenderer {
         val quad2 = edge.node1.position + lineVec * (3.0 / 4.0)
 
         val pyramidSize =
-            lineVec.normalize().times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
+            lineVec.normalize() * min(lineVec.length() / 10.0, 1.0) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
 
-        val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
+        val lineOffsetVec = Vec3(0.5, 0.5, 0.5)
 
-        fun pyramidDraw(
-            pos: LorenzVec,
-        ) {
-            this.drawPyramid(
+        fun pyramidDraw(pos: Vec3) {
+            drawPyramid(
                 pos + lineOffsetVec + pyramidSize,
                 pos + lineOffsetVec,
-                pos.crossProduct(lineVec).normalize().times(pyramidSize.length() / 2.5) + pos + lineOffsetVec,
+                pos.cross(lineVec).normalize() * (pyramidSize.length() / 2.5) + pos + lineOffsetVec,
                 color,
             )
         }

@@ -9,14 +9,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.VectorUtils.add
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotClass
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
@@ -25,6 +24,7 @@ import net.minecraft.world.entity.monster.spider.CaveSpider
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 // TODO fix looking at direction, slime size, helmet/skull of zombie
 @SkyHanniModule
@@ -57,15 +57,14 @@ object CraftRoomHolographicMob {
 
         for (entity in nonPlayerEntities) {
             val holographicBase = entityToHolographicEntity[entity::class] ?: continue
-            val currentLocation = entity.getLorenzVec()
-            if (!craftRoomArea.isInside(currentLocation)) continue
+            val currentLocation = entity.position()
+            if (!craftRoomArea.contains(currentLocation)) continue
 
             val existing = holograms[entity.id]
             val instance = if (existing != null) {
                 existing.first.also { it.moveTo(currentLocation.mirror(), 0f) }
             } else {
-                val previousLocation = LorenzVec(entity.xo, entity.yo, entity.zo)
-                val new = holographicBase.instance(previousLocation.mirror(), 0f) ?: continue
+                val new = holographicBase.instance(entity.oldPosition().mirror(), 0f) ?: continue
                 new.isChild = entity.isBaby
                 new.moveTo(currentLocation.mirror(), 0f)
                 new
@@ -92,7 +91,7 @@ object CraftRoomHolographicMob {
         if (!enabled) return
         holograms.values.forEach { (mob, string) ->
             event.renderHolographicEntity(mob)
-            event.drawString(mob.position.add(y = mob.entity.eyeHeight + .5), string.orEmpty())
+            event.drawString(mob.position.up(mob.entity.eyeHeight + 0.5), string.orEmpty())
         }
     }
 
@@ -103,8 +102,8 @@ object CraftRoomHolographicMob {
     }
 
     private const val WALL_Z = -116.5
-    private fun LorenzVec.mirror(): LorenzVec {
-        require(z <= WALL_Z) { "mirror() assumes z <= WALL_Z, z was ${z.roundTo(1)} instead" }
+    private fun Vec3.mirror(): Vec3 {
+        require(z <= WALL_Z) { "mirror() expected z <= WALL_Z, got ${z.roundTo(1)} instead" }
         val dist = WALL_Z - z
         return add(z = dist * 2)
     }

@@ -10,15 +10,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object JoinCrystalHollows {
 
     private var lastWrongPassTime = 0L
-    private val location = LorenzVec(88, 198, -99)
+    private val location = Vec3(88.0, 198.0, -99.0)
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {

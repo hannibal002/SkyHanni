@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.Vec3ArgumentType
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -43,17 +43,19 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.asStoredString
+import at.hannibal2.skyhanni.utils.VectorUtils.roundTo
+import at.hannibal2.skyhanni.utils.VectorUtils.toCleanString
+import at.hannibal2.skyhanni.utils.VectorUtils.toLocalFormat
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -71,6 +73,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
+import net.minecraft.world.phys.Vec3
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -114,7 +117,7 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
-    private var testLocation: LorenzVec? = null
+    private var testLocation: Vec3? = null
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -124,12 +127,12 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    private fun waypoint(location: LorenzVec? = null, pathfind: Boolean = false) {
+    private fun waypoint(location: Vec3? = null, pathfind: Boolean = false) {
         SoundUtils.playBeepSound()
 
         if (location == null) {
             testLocation = null
-            ChatUtils.chat("reset test waypoint")
+            ChatUtils.chat("Reset test waypoint")
             IslandGraphs.stopNavigation()
             return
         }
@@ -138,7 +141,7 @@ object SkyHanniDebugsAndTests {
         if (pathfind) {
             IslandGraphs.pathFind(location, "/shtestwaypoint", condition = { true })
         }
-        ChatUtils.chat("set test waypoint")
+        ChatUtils.chat("Set test waypoint to $location")
     }
 
     private fun testCommand(args: Array<String>) {
@@ -320,13 +323,13 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)
     }
 
-    private fun formatLocation(location: LorenzVec, parameter: String?): Pair<String, String> {
+    private fun formatLocation(location: Vec3, parameter: String?): Pair<String, String> {
         val localFormat = location.toLocalFormat()
         return when (parameter) {
             "json" -> location.asStoredString() to "json"
             "pathfind" -> "`/shtestwaypoint $localFormat pathfind`" to "pathfind"
             "navigate" -> "`/shnavigate $localFormat`" to "navigate"
-            else -> "LorenzVec(${location.x}, ${location.y}, ${location.z})" to "LorenzVec"
+            else -> location.toString() to "Vec3"
         }
     }
 
@@ -533,7 +536,7 @@ object SkyHanniDebugsAndTests {
             }
         }
         event.registerBrigadier("shcopylocation") {
-            description = "Copies the player location as LorenzVec format to the clipboard"
+            description = "Copies the player location as Vec3 format to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
             literalCallback("json") {
                 copyLocation("json")
@@ -565,7 +568,7 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shtestwaypoint") {
             description = "Set a waypoint on that location"
             category = CommandCategory.DEVELOPER_TEST
-            arg("waypoint", LorenzVecArgumentType.double()) { vec ->
+            arg("waypoint", Vec3ArgumentType.double()) { vec ->
                 literalCallback("pathfind") {
                     waypoint(getArg(vec), true)
                 }

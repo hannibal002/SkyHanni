@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -61,9 +60,9 @@ object DebugEntitySkinCommand {
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        for (location in foundEntities.map { it.getLorenzVec() }) {
-            event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor())
-            event.drawDynamicText(location, "Skin", 1.5)
+        foundEntities.forEach { entity ->
+            event.drawWaypointFilled(entity.position(), LorenzColor.YELLOW.toColor())
+            event.drawDynamicText(entity.position(), "Skin", 1.5)
         }
     }
 }

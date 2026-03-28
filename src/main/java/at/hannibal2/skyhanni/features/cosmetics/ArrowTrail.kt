@@ -9,14 +9,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.getPrevLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import net.minecraft.world.entity.projectile.arrow.Arrow
+import net.minecraft.world.phys.Vec3
 import java.util.LinkedList
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -26,7 +24,7 @@ object ArrowTrail {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.arrowTrail
 
-    private data class Line(val start: LorenzVec, val end: LorenzVec, val deathTime: SimpleTimeMark)
+    private data class Line(val start: Vec3, val end: Vec3, val deathTime: SimpleTimeMark)
 
     private val listAllArrow: MutableList<Line> = LinkedList<Line>()
     private val listYourArrow: MutableList<Line> = LinkedList<Line>()
@@ -44,7 +42,7 @@ object ArrowTrail {
         listYourArrow.removeIf { it.deathTime.isInPast() }
 
         for (arrow in EntityUtils.getEntities<Arrow>()) {
-            val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
+            val line = Line(arrow.oldPosition(), arrow.position(), deathTime)
             if (arrow.owner.isLocalPlayer) {
                 listYourArrow.add(line)
             } else {

@@ -16,24 +16,25 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.toVec3
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.VectorUtils.toChatFormat
+import at.hannibal2.skyhanni.utils.VectorUtils.toLocalFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
+import net.minecraft.world.phys.Vec3
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -87,12 +88,12 @@ object RareMobWaypointShare {
     val waypoints: Map<String, SharedRareMob>
         get() = _waypoints
 
-    class SharedRareMob(
+    data class SharedRareMob(
         val fromPlayer: String,
         val playerDisplayName: String,
-        val location: LorenzVec,
+        val location: Vec3,
         val spawnTime: SimpleTimeMark,
-        val mobName: String
+        val mobName: String,
     )
 
     @HandleEvent
@@ -229,7 +230,7 @@ object RareMobWaypointShare {
             ChatUtils.chat("§cRare Mob is dead")
             return
         }
-        val location = rareMob.getLorenzVec().toChatFormat()
+        val location = rareMob.position().toChatFormat()
         val mobName = rareMob.name.string.orEmpty()
         val name = if (mobName.isEmpty()) "" else "| $mobName"
         HypixelCommands.partyChat("$location $name")
@@ -240,7 +241,7 @@ object RareMobWaypointShare {
     private fun Matcher.detectFromChat(): Boolean {
         if (block()) return false
         val rawPlayerName = group("playerName")
-        val location = toLorenzVec() ?: return false
+        val location = toVec3() ?: return false
 
         val rawMobName = if (hasGroup("mobName")) group("mobName").replace(" | ", "").trim().lowercase() else "Rare Mob"
         var mobName = "Rare Mob"

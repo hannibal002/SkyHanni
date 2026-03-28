@@ -35,6 +35,9 @@ import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.down
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
@@ -46,7 +49,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
@@ -89,15 +91,15 @@ object VampireSlayerFeatures {
         val start = LocationUtils.playerLocation()
         if (configOwnBoss.highlight || configOtherBoss.highlight || configCoopBoss.highlight) {
             for (player in EntityUtils.getEntities<RemotePlayer>()) {
-                val distance = start.distance(player.blockPosition().toLorenzVec())
+                val distance = start.distanceToPlayer()
                 if (distance <= 15)
                     player.process()
             }
         }
         if (configBloodIchor.highlight || configKillerSpring.highlight) {
             for (stand in EntityUtils.getEntities<ArmorStand>()) {
-                val vec = stand.blockPosition().toLorenzVec()
-                val distance = start.distance(vec)
+                val vec = stand.blockPosition().toVec3()
+                val distance = start.distanceTo(vec)
                 val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
                 if (!isIchor && !stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) continue
                 val chromaColour = if (isIchor) configBloodIchor.color else configKillerSpring.color
@@ -254,7 +256,7 @@ object VampireSlayerFeatures {
                 if (!it.canBeSeen(15)) continue
                 val vec = event.exactLocation(it)
                 event.drawLineToCrosshair(
-                    vec.up(SNEAKING_EYE_HEIGHT),
+                    vec.up(SNEAKING_EYE_HEIGHT.toDouble()),
                     config.lineColor,
                     config.lineWidth,
                     true,
@@ -263,7 +265,7 @@ object VampireSlayerFeatures {
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
         for (stand in EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()) {
-            val vec = stand.blockPosition().toLorenzVec()
+            val vec = stand.blockPosition().toVec3()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
             val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
@@ -279,12 +281,12 @@ object VampireSlayerFeatures {
                     (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toColor()
                 val text = if (isIchor) "§4Ichor" else "§4Spring"
                 event.drawColor(
-                    stand.blockPosition().toLorenzVec().up(2.0),
+                    stand.blockPosition().toVec3().up(2.0),
                     LorenzColor.DARK_RED.toChromaColor(),
                     alpha = 1f,
                 )
                 event.drawDynamicText(
-                    stand.blockPosition().toLorenzVec().add(0.5, 2.5, 0.5),
+                    stand.blockPosition().toVec3().add(0.5, 2.5, 0.5),
                     text,
                     1.5,
                     seeThroughBlocks = false,
@@ -306,7 +308,7 @@ object VampireSlayerFeatures {
             }
             if (configBloodIchor.renderBeam && isIchor && stand.isAlive) {
                 event.drawWaypointFilled(
-                    event.exactLocation(stand).add(0, y = -2, 0),
+                    event.exactLocation(stand).down(2.0),
                     configBloodIchor.color.toColor(),
                     beacon = true,
                 )

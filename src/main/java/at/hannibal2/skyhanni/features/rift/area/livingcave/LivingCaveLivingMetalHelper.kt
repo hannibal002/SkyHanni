@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,8 +23,8 @@ import kotlin.time.Duration.Companion.seconds
 object LivingCaveLivingMetalHelper {
 
     private val config get() = RiftApi.config.area.livingCave.livingMetal
-    private var lastClicked: LorenzVec? = null
-    private var pair: Pair<LorenzVec, LorenzVec>? = null
+    private var lastClicked: Vec3? = null
+    private var pair: Pair<Vec3, Vec3>? = null
     private var animationStartTime = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -55,7 +55,7 @@ object LivingCaveLivingMetalHelper {
         if (event.new != "lapis_ore") return
 
         lastClicked?.let {
-            val distance = location.distance(it)
+            val distance = location.distanceTo(it)
             if (distance < 2) {
                 pair = Pair(it, location)
                 animationStartTime = SimpleTimeMark.now()
@@ -84,7 +84,7 @@ object LivingCaveLivingMetalHelper {
         if (!config.hideParticles) return
 
         pair?.let {
-            if (it.second.distance(event.location) < 3) {
+            if (it.second.distanceTo(event.location) < 3) {
                 event.cancel()
             }
         }

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.phys.BlockHitResult
@@ -14,20 +14,18 @@ import net.minecraft.world.phys.HitResult
 
 object MinecraftInputHook {
     @JvmStatic
-    fun shouldCancelMouseRightClick(hitResult: HitResult?): Boolean =
-        handleClick(
-            hitResult,
-            ClickType.RIGHT_CLICK,
-            ServerboundInteractPacket.ActionType.INTERACT_AT,
-        )
+    fun shouldCancelMouseRightClick(hitResult: HitResult?): Boolean = handleClick(
+        hitResult,
+        ClickType.RIGHT_CLICK,
+        ServerboundInteractPacket.ActionType.INTERACT_AT,
+    )
 
     @JvmStatic
-    fun shouldCancelMouseLeftClick(hitResult: HitResult?): Boolean =
-        handleClick(
-            hitResult,
-            ClickType.LEFT_CLICK,
-            ServerboundInteractPacket.ActionType.ATTACK,
-        )
+    fun shouldCancelMouseLeftClick(hitResult: HitResult?): Boolean = handleClick(
+        hitResult,
+        ClickType.LEFT_CLICK,
+        ServerboundInteractPacket.ActionType.ATTACK,
+    )
 
     @JvmStatic
     fun shouldCancelContinuedBlockBreak(
@@ -44,7 +42,7 @@ object MinecraftInputHook {
 
         return BlockClickEvent(
             ClickType.LEFT_CLICK,
-            position.toLorenzVec(),
+            position.toVec3(),
             InventoryUtils.getItemInHand(),
         ).also {
             if (clickCancelled) it.cancel()
@@ -70,7 +68,7 @@ object MinecraftInputHook {
                 val pos = (hitResult as BlockHitResult).blockPos
                 BlockClickEvent(
                     clickType,
-                    pos.toLorenzVec(),
+                    pos.toVec3(),
                     itemInHand,
                 ).also {
                     if (clickCancelled) it.cancel()

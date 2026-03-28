@@ -1,24 +1,25 @@
 package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
 import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object FrozenTreasureHighlighter {
+
+    private const val Y_OFFSET = 2.0
 
     private val config get() = SkyHanniMod.feature.event.winter.frozenTreasureHighlighter
 
@@ -28,13 +29,6 @@ object FrozenTreasureHighlighter {
         colorProvider = { config.treasureColor },
     )
 
-    private fun isEnabled(): Boolean {
-        return IslandType.WINTER.isCurrent() && WinterApi.inGlacialCave() && config.enabled
-    }
-
-    private const val yOffset = 2
-
-    @HandleEvent(onlyOnIsland = IslandType.WINTER)
     fun onTick() {
         if (!isEnabled()) return
 
@@ -44,8 +38,10 @@ object FrozenTreasureHighlighter {
             val standHelmet = armorStand.getStandHelmet().orNull() ?: continue
             if (standHelmet.isSkull() && standHelmet.hoverName.string.endsWith("Head")) continue
 
-            val treasureLocation = armorStand.blockPosition().toLorenzVec().up(yOffset)
+            val treasureLocation = armorStand.blockPosition().toVec3().up(Y_OFFSET)
             blockHighlighter.addBlock(TimedHighlightBlock(treasureLocation))
         }
     }
+
+    private fun isEnabled() = config.enabled && WinterApi.inGlacialCave()
 }

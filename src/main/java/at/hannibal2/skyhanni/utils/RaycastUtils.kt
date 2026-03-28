@@ -1,57 +1,52 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.VectorUtils.isNormalized
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.times
+import at.hannibal2.skyhanni.utils.VectorUtils.toDoubleArray
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 object RaycastUtils {
 
-    const val EPSILON = 1e-12
+    private const val EPSILON = 1e-12
 
-    data class Ray(
-        val origin: LorenzVec,
-        val direction: LorenzVec,
-    ) {
+    data class Ray(val origin: Vec3, val direction: Vec3) {
         init {
             require(direction.isNormalized())
         }
     }
 
-    data class Plane(
-        val origin: LorenzVec,
-        val normal: LorenzVec,
-    ) {
+    data class Plane(val origin: Vec3, val normal: Vec3) {
         init {
             require(normal.isNormalized())
         }
     }
 
-    fun createPlayerLookDirectionRay(): Ray {
-        return Ray(
-            LocationUtils.playerEyeLocation(),
-            MinecraftCompat.localPlayer.lookAngle.toLorenzVec()
-        )
-    }
+    fun createPlayerLookDirectionRay() = Ray(
+        LocationUtils.playerEyeLocation(),
+        MinecraftCompat.localPlayer.lookAngle,
+    )
 
     /**
      * Create a plane that contains [point] and is orthogonal to [ray].
      */
-    fun createOrthogonalPlaneToRayAtPoint(
-        ray: Ray,
-        point: LorenzVec,
-    ): Plane {
-        return Plane(point, ray.direction)
-    }
+    fun createOrthogonalPlaneToRayAtPoint(ray: Ray, point: Vec3) =
+        Plane(point, ray.direction)
 
     /**
      * Intersect a plane (of any orientation) with a ray. The ray and plane may not be parallel to each other.
      */
-    fun intersectPlaneWithRay(plane: Plane, ray: Ray): LorenzVec {
-//         require(plane.normal.dotProduct(ray.direction).absoluteValue != 0.0)
-        val intersectionPointDistanceAlongRay =
-            (plane.normal.dotProduct(plane.origin) - plane.normal.dotProduct(ray.origin)) / plane.normal.dotProduct(ray.direction)
+    fun intersectPlaneWithRay(plane: Plane, ray: Ray): Vec3 {
+        // require(plane.normal.dotProduct(ray.direction).absoluteValue != 0.0)
+        val intersectionPointDistanceAlongRay = with(plane.normal) {
+            (dot(plane.origin) - dot(ray.origin)) / dot(ray.direction)
+        }
         return ray.origin + ray.direction.scale(intersectionPointDistanceAlongRay)
     }
 
@@ -59,28 +54,27 @@ object RaycastUtils {
      * Finds the distance between the given ray and the point. If the point is behind the ray origin (according to the ray's direction),
      * returns [Double.MAX_VALUE] instead.
      */
-    fun findDistanceToRay(ray: Ray, point: LorenzVec): Double {
+    fun findDistanceToRay(ray: Ray, point: Vec3): Double {
         val plane = createOrthogonalPlaneToRayAtPoint(ray, point)
         val intersectionPoint = intersectPlaneWithRay(plane, ray)
-        if ((intersectionPoint - ray.origin).dotProduct(ray.direction) < 0) return Double.MAX_VALUE
-        return intersectionPoint.distance(point)
+        if ((intersectionPoint - ray.origin).dot(ray.direction) < 0) return Double.MAX_VALUE
+        return intersectionPoint.distanceTo(point)
     }
 
-    inline fun <T> createDistanceToRayEstimator(ray: Ray, crossinline position: (T) -> LorenzVec): (T) -> Double {
-        return {
-            findDistanceToRay(ray, position(it))
-        }
-    }
+    inline fun <T> createDistanceToRayEstimator(
+        ray: Ray,
+        crossinline position: (T) -> Vec3,
+    ): (T) -> Double = { findDistanceToRay(ray, position(it)) }
 
     /**
      * Intersect an axis-aligned bounding box with a ray.
-     * Returns a pair of LorenzVec (entry point, exit point) if the ray hits the box.
+     * Returns a pair of Vec3 (entry point, exit point) if the ray hits the box.
      * The entry point may be behind the ray origin if the ray starts inside the box.
      * Returns null if the ray points away from the box or misses it entirely.
      */
-    fun intersectAABBWithRay(aabb: AABB, ray: Ray): Pair<LorenzVec, LorenzVec>? {
-        val aabbMin = LorenzVec(aabb.minX, aabb.minY, aabb.minZ).toDoubleArray()
-        val aabbMax = LorenzVec(aabb.maxX, aabb.maxY, aabb.maxZ).toDoubleArray()
+    fun intersectAABBWithRay(aabb: AABB, ray: Ray): Pair<Vec3, Vec3>? {
+        val aabbMin = Vec3(aabb.minX, aabb.minY, aabb.minZ).toDoubleArray()
+        val aabbMax = Vec3(aabb.maxX, aabb.maxY, aabb.maxZ).toDoubleArray()
 
         val dirArray = ray.direction.toDoubleArray()
         val originArray = ray.origin.toDoubleArray()
@@ -112,8 +106,9 @@ object RaycastUtils {
         }
 
         // If we reach here, the ray intersects the AABB on all 3 axes
-        val entry = ray.origin.plus(ray.direction.times(tMin))
-        val exit = ray.origin.plus(ray.direction.times(tMax))
+        val entry = ray.origin + ray.direction * tMin
+        val exit = ray.origin + ray.direction * tMax
+
         return Pair(entry, exit)
     }
 
@@ -121,7 +116,7 @@ object RaycastUtils {
      * Find the point on a ray where a specific axis has a given value.
      * Axis of 0, 1, 2 is x, y, z respectively
      */
-    fun findPointOnRay(ray: Ray, axis: Int, targetValue: Double): LorenzVec? {
+    fun findPointOnRay(ray: Ray, axis: Int, targetValue: Double): Vec3? {
         val originArray = ray.origin.toDoubleArray()
         val dirComponent = ray.direction.toDoubleArray()[axis]
 
@@ -142,8 +137,6 @@ object RaycastUtils {
     }
 
     // TODO make private or no longer generic
-    fun <T : Any> List<T>.findClosestPointToRay(ray: Ray, positionExtractor: (T) -> LorenzVec): T? {
-        return minByOrNull(createDistanceToRayEstimator(ray, positionExtractor))
-    }
-
+    fun <T : Any> List<T>.findClosestPointToRay(ray: Ray, positionExtractor: (T) -> Vec3): T? =
+        minByOrNull(createDistanceToRayEstimator(ray, positionExtractor))
 }

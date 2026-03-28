@@ -31,10 +31,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -46,26 +44,28 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.Vec3
+import kotlin.math.min
 
 @SkyHanniModule
 object MinionFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.minions
-    private var lastClickedEntity: LorenzVec? = null
-    private var newMinion: LorenzVec? = null
+    private var lastClickedEntity: Vec3? = null
+    private var newMinion: Vec3? = null
     private var newMinionName: String? = null
     private var lastMinionOpened = 0L
 
@@ -104,12 +104,12 @@ object MinionFeatures {
         "^§aCollect All$",
     )
 
-    var lastMinion: LorenzVec? = null
-    private var lastStorage: LorenzVec? = null
+    var lastMinion: Vec3? = null
+    private var lastStorage: Vec3? = null
     var minionInventoryOpen = false
     var minionStorageInventoryOpen = false
 
-    private val minions: MutableMap<LorenzVec, ProfileSpecificStorage.MinionConfig>?
+    private val minions: MutableMap<Vec3, ProfileSpecificStorage.MinionConfig>?
         get() = ProfileStorageData.profileSpecific?.minions
 
     @HandleEvent
@@ -118,7 +118,7 @@ object MinionFeatures {
         if (event.action != ClickAction.RIGHT_CLICK_BLOCK) return
 
         val vec = event.face?.unitVec3i ?: return
-        val lookingAt = event.pos?.offset(vec)?.toLorenzVec() ?: return
+        val lookingAt = event.pos?.offset(vec)?.toVec3() ?: return
         val equipped = InventoryUtils.getItemInHand() ?: return
 
         if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
@@ -135,7 +135,7 @@ object MinionFeatures {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        lastClickedEntity = event.clickedEntity.getLorenzVec()
+        lastClickedEntity = event.clickedEntity.position()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -229,7 +229,7 @@ object MinionFeatures {
         if (!IslandType.PRIVATE_ISLAND.isCurrent()) return
         val minions = minions ?: return
 
-        val removedEntities = mutableListOf<LorenzVec>()
+        val removedEntities = mutableListOf<Vec3>()
         for (location in minions.keys) {
             if (location.distanceToPlayer() > 30) continue
             val entitiesNearby = location.getEntitiesNearby<ArmorStand>(5.0).map { it.distanceTo(location) }
@@ -369,14 +369,10 @@ object MinionFeatures {
     fun onRenderLastEmptied(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
             val location = minion.key.up()
-            if (location.distanceToPlayer() > 50) continue
-
-            val lastEmptied = minion.value.lastClicked
-            if (playerLocation.distance(location) >= config.emptiedTime.distance) continue
+            if (location.distanceToPlayer() > min(config.emptiedTime.distance, 50)) continue
 
             if (config.nameDisplay) {
                 val displayName = minion.value.displayName
@@ -386,6 +382,7 @@ object MinionFeatures {
                 event.drawString(location.up(0.65), name, true)
             }
 
+            val lastEmptied = minion.value.lastClicked
             if (config.emptiedTime.display && !lastEmptied.isFarPast()) {
                 val format = lastEmptied.passedSince().format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
@@ -404,8 +401,8 @@ object MinionFeatures {
         } ?: return
         val minions = minions ?: return
 
-        val loc = entity.getLorenzVec()
-        if (minions.any { it.key.distance(loc) < 5 }) {
+        val loc = entity.position()
+        if (minions.any { it.key.distanceTo(loc) < 5 }) {
             event.cancel()
         }
     }

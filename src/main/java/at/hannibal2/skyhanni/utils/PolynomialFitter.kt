@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.toDoubleArray
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
+import net.minecraft.world.phys.Vec3
 import kotlin.math.pow
 
 class PolynomialFitter(private val degree: Int) {
@@ -30,9 +32,11 @@ class PolynomialFitter(private val degree: Int) {
 }
 
 open class BezierFitter(private val degree: Int) {
-    val points: MutableList<LorenzVec> = mutableListOf()
+    val points: MutableList<Vec3> = mutableListOf()
+
     private val fitters = arrayOf(PolynomialFitter(degree), PolynomialFitter(degree), PolynomialFitter(degree))
-    fun addPoint(point: LorenzVec) {
+
+    fun addPoint(point: Vec3) {
         require(point.x.isFinite() && point.y.isFinite() && point.z.isFinite()) { "Points may not contain NaN!" }
         val locationArray = point.toDoubleArray()
         for ((i, fitter) in fitters.withIndex()) {
@@ -42,13 +46,9 @@ open class BezierFitter(private val degree: Int) {
         lastCurve = null
     }
 
-    fun getLastPoint(): LorenzVec? {
-        return points.lastOrNull()
-    }
+    fun getLastPoint(): Vec3? = points.lastOrNull()
 
-    fun isEmpty(): Boolean {
-        return points.isEmpty()
-    }
+    fun isEmpty(): Boolean = points.isEmpty()
 
     fun count() = points.size
 
@@ -73,7 +73,7 @@ open class BezierFitter(private val degree: Int) {
 }
 
 class ParticlePathBezierFitter(degree: Int) : BezierFitter(degree) {
-    fun solve(): LorenzVec? {
+    fun solve(): Vec3? {
         val bezierCurve = fit() ?: return null
 
         val startPointDerivative = bezierCurve.derivativeAt(0.0)
@@ -92,7 +92,7 @@ class BezierCurve(private val coefficients: List<DoubleArray>) {
         require(coefficients.size == 3) { "Coefficients must be for a 3d curve!" }
     }
 
-    fun derivativeAt(t: Double): LorenzVec {
+    fun derivativeAt(t: Double): Vec3 {
         return coefficients.map {
             var result = 0.0
             val reversed = it.reversedArray().dropLast(1)
@@ -100,10 +100,10 @@ class BezierCurve(private val coefficients: List<DoubleArray>) {
                 result = result * t + coeff * (reversed.size - i)
             }
             result
-        }.toLorenzVec()
+        }.toVec3()
     }
 
-    fun at(t: Double): LorenzVec {
+    fun at(t: Double): Vec3 {
         return coefficients.map {
             var result = 0.0
             val reversed = it.reversed()
@@ -111,6 +111,6 @@ class BezierCurve(private val coefficients: List<DoubleArray>) {
                 result = result * t + coeff
             }
             result
-        }.toLorenzVec()
+        }.toVec3()
     }
 }

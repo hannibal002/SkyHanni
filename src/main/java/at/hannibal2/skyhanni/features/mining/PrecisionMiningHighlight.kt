@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.axisAlignedTo
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import net.minecraft.client.Minecraft
 import net.minecraft.core.particles.ParticleTypes
@@ -33,11 +34,11 @@ object PrecisionMiningHighlight {
             !Minecraft.getInstance().options.keyAttack.isDown
         ) return
 
-        val particleBoundingBox = event.location.add(-0.12, -0.12, -0.12)
-            .axisAlignedTo(event.location.clone().add(0.12, 0.12, 0.12))
+        val particleBoundingBox = event.location.subtract(0.12, 0.12, 0.12)
+            .axisAlignedTo(event.location.add(0.12, 0.12, 0.12))
 
         val blockBoundingBox = BlockUtils.getTargetedBlock()?.let {
-            it.axisAlignedTo(it.add(1.0, 1.0, 1.0))
+            it.axisAlignedTo(it.add(1.0))
         } ?: return
         if (!blockBoundingBox.intersects(particleBoundingBox)) return
 

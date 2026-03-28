@@ -21,26 +21,27 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object EnigmaSoulWaypoints {
 
     private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
-    var soulLocations = mapOf<String, Map<String, LorenzVec>>()
+    var soulLocations = mapOf<String, Map<String, Vec3>>()
     private val trackedSouls = mutableMapOf<String, MutableList<String>>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true

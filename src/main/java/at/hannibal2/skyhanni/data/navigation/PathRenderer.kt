@@ -5,8 +5,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
+import at.hannibal2.skyhanni.utils.VectorUtils.addHalf
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.nearestPointOnLine
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.times
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
@@ -14,6 +19,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DBezier2
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 /**
@@ -52,19 +58,19 @@ private const val PEEK_DISTANCE = 4.0
 
 private val waterBlocks = buildList { addWaters() }
 
-private fun LorenzVec.isWater(): Boolean = getBlockAt() in waterBlocks
+private fun Vec3.isWater(): Boolean = getBlockAt() in waterBlocks
 
-private class PathPoint(val pos: LorenzVec, val isWater: Boolean) {
+private class PathPoint(val pos: Vec3, val isWater: Boolean) {
     // depth testing disabled near a water surface crossing so the line renders through water
     var isPeek: Boolean = false
 }
 
-private data class CurveEnd(val pos: LorenzVec, val tangent: LorenzVec, val nextIdx: Int)
+private data class CurveEnd(val pos: Vec3, val tangent: Vec3, val nextIdx: Int)
 
 /**
  * Uses tick and render events to calculate the final pathfind lines.
  */
-class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: LorenzVec) {
+class PathRenderer(val path: Graph, private val color: Color, private val targetLocation: Vec3) {
 
     private val pathPoints: List<PathPoint> =
         subdividePositions(path.map { it.position.addHalf() }).map { PathPoint(it, it.isWater()) }
@@ -90,12 +96,12 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         }
 
         val (startPos, nextPathIdx) = projectOntoPath(eyePos)
-        val walkPositions: List<LorenzVec> = listOf(startPos) + pathPoints.drop(nextPathIdx).map { it.pos }
+        val walkPositions: List<Vec3> = listOf(startPos) + pathPoints.drop(nextPathIdx).map { it.pos }
         val curveEnd = findBezierEnd(walkPositions, nextPathIdx) ?: return
 
         val dirToCurve = (curveEnd.pos - eyePos).normalize()
-        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
-        val scale = anchor.distance(curveEnd.pos) * CONTROL_POINT_SCALE
+        val anchor = Vec3(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToCurve * ANCHOR_FORWARD_DIST
+        val scale = anchor.distanceTo(curveEnd.pos) * CONTROL_POINT_SCALE
         val controlPoint = curveEnd.pos - curveEnd.tangent * scale
         val bezierDepth = !WorldRenderUtils.isRenderingUnderwater()
         event.draw3DBezier2(anchor, controlPoint, curveEnd.pos, color, NEAR_LINE_WIDTH, bezierDepth)
@@ -112,14 +118,14 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
 
     private fun renderSingleNodeCurve(
         event: SkyHanniRenderWorldEvent,
-        eyePos: LorenzVec,
+        eyePos: Vec3,
         anchorY: Double,
         point: PathPoint,
     ) {
         val nodePos = point.pos
         val dirToNode = (nodePos - eyePos).normalize()
-        val anchor = LorenzVec(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
-        val scale = anchor.distance(nodePos) * CONTROL_POINT_SCALE
+        val anchor = Vec3(eyePos.x, anchorY + ANCHOR_Y_OFFSET, eyePos.z) + dirToNode * ANCHOR_FORWARD_DIST
+        val scale = anchor.distanceTo(nodePos) * CONTROL_POINT_SCALE
         val controlPoint = nodePos - dirToNode * scale
         event.draw3DBezier2(
             p1 = anchor,
@@ -131,29 +137,29 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         )
     }
 
-    private fun walkTangent(walkPositions: List<LorenzVec>, startSegIdx: Int, startPos: LorenzVec): LorenzVec {
+    private fun walkTangent(walkPositions: List<Vec3>, startSegIdx: Int, startPos: Vec3): Vec3 {
         var remaining = TANGENT_LOOKAHEAD
         var prev = startPos
         for (i in startSegIdx until walkPositions.size) {
             val next = walkPositions[i]
-            val d = prev.distance(next)
+            val d = prev.distanceTo(next)
             if (d >= remaining) {
                 return (prev + (next - prev).normalize() * remaining - startPos).normalize()
             }
             remaining -= d
             prev = next
         }
-        return if (prev.distanceSq(startPos) > 0.0001) (prev - startPos).normalize()
+        return if (prev.distanceToSqr(startPos) > 0.0001) (prev - startPos).normalize()
         else (walkPositions.last() - walkPositions[walkPositions.lastIndex - 1]).normalize()
     }
 
-    private fun findBezierEnd(walkPositions: List<LorenzVec>, nextPathIdx: Int): CurveEnd? {
+    private fun findBezierEnd(walkPositions: List<Vec3>, nextPathIdx: Int): CurveEnd? {
         var totalDist = 0.0
         var result: CurveEnd? = null
         for (i in 1..walkPositions.lastIndex) {
             val segStart = walkPositions[i - 1]
             val segEnd = walkPositions[i]
-            val segLen = segStart.distance(segEnd)
+            val segLen = segStart.distanceTo(segEnd)
             val remaining = nearCurveLength - totalDist
             if (segLen >= remaining) {
                 val endPos = segStart + (segEnd - segStart).normalize() * remaining
@@ -165,13 +171,13 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return result
     }
 
-    private fun projectOntoPath(eyePos: LorenzVec): Pair<LorenzVec, Int> {
+    private fun projectOntoPath(eyePos: Vec3): Pair<Vec3, Int> {
         var bestDistSq = Double.MAX_VALUE
         var bestPos = pathPoints[0].pos
         var bestNextIdx = 1
         for (i in 0 until pathPoints.lastIndex) {
             val proj = eyePos.nearestPointOnLine(pathPoints[i].pos, pathPoints[i + 1].pos)
-            val distSq = eyePos.distanceSq(proj)
+            val distSq = eyePos.distanceToSqr(proj)
             if (distSq < bestDistSq) {
                 bestDistSq = distSq
                 bestPos = proj
@@ -189,7 +195,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         var totalDist = 0.0
         for (i in (closestIdx + 1)..pathPoints.lastIndex) {
             if (!pathPoints[i].pos.canBeSeen()) break
-            totalDist += pathPoints[i - 1].pos.distance(pathPoints[i].pos)
+            totalDist += pathPoints[i - 1].pos.distanceTo(pathPoints[i].pos)
             if (totalDist >= CURVE_RADIUS) {
                 totalDist = CURVE_RADIUS
                 break
@@ -207,19 +213,17 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     }
 
     private fun calculateDistance(closestIdx: Int): Double {
-        var distance = pathPoints[closestIdx].pos.distance(playerPosition)
+        var distance = pathPoints[closestIdx].pos.distanceTo(playerPosition)
         for (i in closestIdx until pathPoints.lastIndex) {
-            distance += pathPoints[i].pos.distance(pathPoints[i + 1].pos)
+            distance += pathPoints[i].pos.distanceTo(pathPoints[i + 1].pos)
         }
-        return distance + pathPoints.last().pos.distance(targetLocation.addHalf())
+        return distance + pathPoints.last().pos.distanceTo(targetLocation.addHalf())
     }
 
-    fun nearestPathDistanceSq(): Double {
-        if (pathPoints.isEmpty()) return Double.MAX_VALUE
-        return pathPoints.minOf { it.pos.distanceSq(playerPosition) }
-    }
+    fun nearestPathDistanceSq(): Double =
+        pathPoints.minOfOrNull { it.pos.distanceSqToPlayer() } ?: Double.MAX_VALUE
 
-    private fun catmullRomPoint(p0: LorenzVec, p1: LorenzVec, p2: LorenzVec, p3: LorenzVec, t: Double): LorenzVec {
+    private fun catmullRomPoint(p0: Vec3, p1: Vec3, p2: Vec3, p3: Vec3, t: Double): Vec3 {
         val t2 = t * t
         val t3 = t2 * t
         val a = p1 * 2.0
@@ -229,16 +233,16 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return (a + b + c + d) * 0.5
     }
 
-    private fun subdividePositions(positions: List<LorenzVec>): List<LorenzVec> {
+    private fun subdividePositions(positions: List<Vec3>): List<Vec3> {
         if (positions.size < 2) return positions
-        val result = mutableListOf<LorenzVec>()
+        val result = mutableListOf<Vec3>()
         result.add(positions.first())
         for (i in 0 until positions.lastIndex) {
             val p0 = positions.getOrElse(i - 1) { positions[i] }
             val p1 = positions[i]
             val p2 = positions[i + 1]
             val p3 = positions.getOrElse(i + 2) { positions[i + 1] }
-            val steps = (p1.distance(p2) / SUBDIVISION_STEP).toInt().coerceAtLeast(1)
+            val steps = (p1.distanceTo(p2) / SUBDIVISION_STEP).toInt().coerceAtLeast(1)
             for (step in 1..steps) {
                 result.add(catmullRomPoint(p0, p1, p2, p3, step.toDouble() / steps))
             }
@@ -246,6 +250,6 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
         return result
     }
 
-    private fun findClosestIndex(positions: List<PathPoint>, referencePos: LorenzVec): Int =
-        positions.indices.minBy { positions[it].pos.distance(referencePos) }
+    private fun findClosestIndex(positions: List<PathPoint>, referencePos: Vec3): Int =
+        positions.indices.minBy { positions[it].pos.distanceTo(referencePos) }
 }

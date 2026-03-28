@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -88,7 +88,7 @@ object DungeonMobManager {
             val color = getFelColor()
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {
                 event.drawLineToCrosshair(
-                    it.baseEntity.getLorenzVec().add(y = 0.15),
+                    it.baseEntity.position().up(0.15),
                     color,
                     3,
                     true,
@@ -104,7 +104,7 @@ object DungeonMobManager {
 
         felOnTheGround.forEach { mob ->
             event.drawWaypointFilled(
-                mob.baseEntity.getLorenzVec().add(-0.5, -0.23, -0.5),
+                mob.baseEntity.position().add(-0.5, -0.23, -0.5),
                 color.toColor(),
                 seeThroughBlocks = false,
                 beacon = false,

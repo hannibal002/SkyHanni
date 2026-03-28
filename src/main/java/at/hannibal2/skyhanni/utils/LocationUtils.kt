@@ -1,10 +1,25 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LocationUtils.canSeeFace
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceSqIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.interpolate
+import at.hannibal2.skyhanni.utils.VectorUtils.inverse
+import at.hannibal2.skyhanni.utils.VectorUtils.max
+import at.hannibal2.skyhanni.utils.VectorUtils.maxOfEachElement
+import at.hannibal2.skyhanni.utils.VectorUtils.min
+import at.hannibal2.skyhanni.utils.VectorUtils.minOfEachElement
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import at.hannibal2.skyhanni.utils.VectorUtils.times
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -17,49 +32,45 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-typealias PointSet = TimeLimitedSet<Pair<LorenzVec, Boolean>>
+typealias PointSet = TimeLimitedSet<Pair<Vec3, Boolean>>
 typealias FacePointEntry = Map.Entry<Direction, PointSet>
 typealias FacePointSet = MutableMap<Direction, PointSet>
 
 @Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 object LocationUtils {
 
-    fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
-        return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
-    }
+    fun canSee(a: Vec3, b: Vec3, offset: Double? = null): Boolean =
+        canSee0(a, b) && offset?.let { canSee0(a.up(it), b.up(it)) } ?: true
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b)?.miss == true
+    private fun canSee0(a: Vec3, b: Vec3): Boolean = BlockUtils.raycast(a, b)?.miss == true
 
     fun playerLocation() = PlayerUtils.getLocation()
 
     // Block heights are multiples of 1/16, so we subtract 1/16 to find the right block
     fun getBlockBelowPlayer() = playerLocation().add(0.0, -1.0 / 16.0, 0.0).roundToBlock()
 
-    fun LorenzVec.distanceToPlayer() = distance(playerLocation())
+    fun Vec3.distanceToPlayer() = distanceTo(playerLocation())
 
-    fun LorenzVec.distanceToPlayerIgnoreY() = distanceIgnoreY(playerLocation())
+    fun Vec3.distanceToPlayerIgnoreY() = distanceIgnoreY(playerLocation())
 
-    fun LorenzVec.distanceSqToPlayer() = distanceSq(playerLocation())
+    fun Vec3.distanceSqToPlayer() = distanceToSqr(playerLocation())
 
-    fun LorenzVec.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
+    fun Vec3.distanceToPlayerSqIgnoreY() = distanceSqIgnoreY(playerLocation())
 
-    fun Entity.distanceToPlayer() = getLorenzVec().distanceToPlayer()
-    fun Entity.distanceSqToPlayer() = getLorenzVec().distanceSqToPlayer()
+    fun Entity.distanceToPlayer() = position().distanceToPlayer()
+    fun Entity.distanceSqToPlayer() = position().distanceSqToPlayer()
 
-    fun Entity.distanceTo(location: LorenzVec) = getLorenzVec().distance(location)
-    fun Entity.distanceTo(other: Entity) = getLorenzVec().distance(other.getLorenzVec())
+    fun Entity.distanceTo(location: Vec3) = position().distanceTo(location)
+    fun Entity.distanceTo(other: Entity) = position().distanceTo(other.position())
 
-    fun Entity.distanceToIgnoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
+    fun Entity.distanceToIgnoreY(location: Vec3) = position().distanceIgnoreY(location)
 
-    fun playerEyeLocation(): LorenzVec {
-        val player = MinecraftCompat.localPlayer
-        val vec = player.getLorenzVec()
-        return vec.up(player.eyeHeight.toDouble())
+    fun playerEyeLocation(): Vec3 = with(MinecraftCompat.localPlayer) {
+        position().up(eyeHeight.toDouble())
     }
 
-    fun AABB.isInside(vec: LorenzVec) = contains(vec.toVec3())
 
-    fun AABB.isPlayerInside() = isInside(playerLocation())
+    fun AABB.isPlayerInside() = contains(playerLocation())
 
     /**
      * Extension function on top of [canSeeFace], allowing checking of more than one face with a singular call.
@@ -69,8 +80,8 @@ object LocationUtils {
      * @return True if any face can be seen, false otherwise.
      */
     fun canSeeAnyFace(
-        min: LorenzVec,
-        max: LorenzVec,
+        min: Vec3,
+        max: Vec3,
         viewDistance: Number = 150.0,
         stepCount: Int = 0,
         stepDensity: Int = 4,
@@ -111,8 +122,8 @@ object LocationUtils {
      */
     fun canSeeFace(
         face: Direction,
-        min: LorenzVec,
-        max: LorenzVec,
+        min: Vec3,
+        max: Vec3,
         viewDistance: Number = 150.0,
         stepCount: Int = 0,
         stepDensity: Int = 4,
@@ -125,7 +136,7 @@ object LocationUtils {
         val center = aabb.getBoxCenter()
         val faceCenter = face.getCenterPos(center, aabb)
 
-        if (eye.distance(faceCenter) > viewDistance.toDouble()) return false
+        if (eye.distanceTo(faceCenter) > viewDistance.toDouble()) return false
         val wrappedSuccess = pointFill.wrapCanSee(face, eye, faceCenter, offset, resultLifespan)
 
         return if (wrappedSuccess && pointFill == null) true
@@ -139,8 +150,8 @@ object LocationUtils {
 
     private fun Direction.performStepping(
         aabb: AABB,
-        faceCenter: LorenzVec,
-        eye: LorenzVec,
+        faceCenter: Vec3,
+        eye: Vec3,
         viewDistance: Number,
         stepCount: Int,
         stepDensity: Int,
@@ -165,7 +176,7 @@ object LocationUtils {
             stepLoop@for (step in 1..stepCount) {
                 val frac = step.toDouble() / (stepCount + 1)
                 val testPoint = faceCenter + dirVec * (boundaryDist * frac)
-                if (eye.distance(testPoint) > viewDistance.toDouble()) continue@stepLoop
+                if (eye.distanceTo(testPoint) > viewDistance.toDouble()) continue@stepLoop
                 val wrappedSuccess = pointFill.wrapCanSee(this, eye, testPoint, offset, resultLifespan)
                 if (wrappedSuccess && pointFill == null) return true
             }
@@ -175,8 +186,8 @@ object LocationUtils {
 
     private fun FacePointSet?.wrapCanSee(
         face: Direction,
-        a: LorenzVec,
-        b: LorenzVec,
+        a: Vec3,
+        b: Vec3,
         offset: Double?,
         resultLifespan: Duration = 5.seconds,
     ): Boolean {
@@ -185,21 +196,21 @@ object LocationUtils {
         return canSeeResult
     }
 
-    private fun Direction.getCenterPos(center: LorenzVec, aabb: AABB) = when (this) {
-        Direction.DOWN -> LorenzVec(center.x, aabb.minY, center.z)
-        Direction.UP -> LorenzVec(center.x, aabb.maxY, center.z)
-        Direction.NORTH -> LorenzVec(center.x, center.y, aabb.minZ)
-        Direction.SOUTH -> LorenzVec(center.x, center.y, aabb.maxZ)
-        Direction.WEST -> LorenzVec(aabb.minX, center.y, center.z)
-        Direction.EAST -> LorenzVec(aabb.maxX, center.y, center.z)
+    private fun Direction.getCenterPos(center: Vec3, aabb: AABB) = when (this) {
+        Direction.DOWN -> Vec3(center.x, aabb.minY, center.z)
+        Direction.UP -> Vec3(center.x, aabb.maxY, center.z)
+        Direction.NORTH -> Vec3(center.x, center.y, aabb.minZ)
+        Direction.SOUTH -> Vec3(center.x, center.y, aabb.maxZ)
+        Direction.WEST -> Vec3(aabb.minX, center.y, center.z)
+        Direction.EAST -> Vec3(aabb.maxX, center.y, center.z)
     }
 
-    private val xIdentityVector = LorenzVec(1.0, 0.0, 0.0)
-    private val yIdentityVector = LorenzVec(0.0, 1.0, 0.0)
-    private val zIdentityVector = LorenzVec(0.0, 0.0, 1.0)
+    private val xIdentityVector = Vec3(1.0, 0.0, 0.0)
+    private val yIdentityVector = Vec3(0.0, 1.0, 0.0)
+    private val zIdentityVector = Vec3(0.0, 0.0, 1.0)
 
     // Cache the identity vectors for each face to avoid recalculating them every time
-    private val faceMap: Map<Direction, Pair<LorenzVec, LorenzVec>> by lazy {
+    private val faceMap: Map<Direction, Pair<Vec3, Vec3>> by lazy {
         val verticalSet = xIdentityVector to zIdentityVector
         val northSouthSet = xIdentityVector to yIdentityVector
         val eastWestSet = zIdentityVector to yIdentityVector
@@ -228,28 +239,28 @@ object LocationUtils {
     }
 
     private data class FaceRayConfig(
-        val axis1: LorenzVec,
-        val axis2: LorenzVec,
+        val axis1: Vec3,
+        val axis2: Vec3,
         val ext1: Double,
         val ext2: Double,
     )
 
-    fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
+    fun Vec3.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
-        return a.distance(b) < viewDistance.toDouble() && canSee(a, b, offset)
+        return a.distanceTo(b) < viewDistance.toDouble() && canSee(a, b, offset)
     }
 
-    fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
+    fun Vec3.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
         yOffsetRange.any { offset ->
-            up(offset).canBeSeen(radius)
+            up(offset.toDouble()).canBeSeen(radius)
         }
 
-    fun AABB.minBox() = LorenzVec(minX, minY, minZ)
+    fun AABB.minBox() = Vec3(minX, minY, minZ)
 
-    fun AABB.maxBox() = LorenzVec(maxX, maxY, maxZ)
+    fun AABB.maxBox() = Vec3(maxX, maxY, maxZ)
 
-    fun AABB.rayIntersects(origin: LorenzVec, direction: LorenzVec): Boolean {
+    fun AABB.rayIntersects(origin: Vec3, direction: Vec3): Boolean {
         // Reference for Algorithm https://tavianator.com/2011/ray_box.html
         val rayDirectionInverse = direction.inverse()
         val t1 = (this.minBox() - origin) * rayDirectionInverse
@@ -309,23 +320,20 @@ object LocationUtils {
         return yaw
     }
 
-    fun calculatePlayerFacingDirection(): LorenzVec {
-        val yaw = calculatePlayerYaw() + 180
-        return when {
-            yaw < 45 -> LorenzVec(0, 0, -1)
-            yaw < 135 -> LorenzVec(1, 0, 0)
-            yaw < 225 -> LorenzVec(0, 0, 1)
-            yaw < 315 -> LorenzVec(-1, 0, 0)
-            else -> LorenzVec(0, 0, -1)
-        }
+    fun calculatePlayerFacingDirection(): Vec3 = when (calculatePlayerYaw() + 180) {
+        in 0f..<45f -> Vec3(0.0, 0.0, -1.0)
+        in 45f..<135f -> Vec3(1.0, 0.0, 0.0)
+        in 135f..<225f -> Vec3(0.0, 0.0, 1.0)
+        in 225f..<315f -> Vec3(-1.0, 0.0, 0.0)
+        else -> Vec3(0.0, 0.0, -1.0)
     }
 
     fun interpolateOverTime(
         startTime: SimpleTimeMark,
         maxTime: Duration,
-        from: LorenzVec,
-        to: LorenzVec,
-    ): LorenzVec {
+        from: Vec3,
+        to: Vec3,
+    ): Vec3 {
         if (startTime == SimpleTimeMark.farPast()) return from
         val now = SimpleTimeMark.now()
 
@@ -337,15 +345,15 @@ object LocationUtils {
         return location
     }
 
-    fun AABB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
-        val bottomLeftFront = LorenzVec(minX, minY, minZ)
-        val bottomLeftBack = LorenzVec(minX, minY, maxZ)
-        val topLeftFront = LorenzVec(minX, maxY, minZ)
-        val topLeftBack = LorenzVec(minX, maxY, maxZ)
-        val bottomRightFront = LorenzVec(maxX, minY, minZ)
-        val bottomRightBack = LorenzVec(maxX, minY, maxZ)
-        val topRightFront = LorenzVec(maxX, maxY, minZ)
-        val topRightBack = LorenzVec(maxX, maxY, maxZ)
+    fun AABB.calculateEdges(): Set<Pair<Vec3, Vec3>> {
+        val bottomLeftFront = Vec3(minX, minY, minZ)
+        val bottomLeftBack = Vec3(minX, minY, maxZ)
+        val topLeftFront = Vec3(minX, maxY, minZ)
+        val topLeftBack = Vec3(minX, maxY, maxZ)
+        val bottomRightFront = Vec3(maxX, minY, minZ)
+        val bottomRightBack = Vec3(maxX, minY, maxZ)
+        val topRightFront = Vec3(maxX, maxY, minZ)
+        val topRightBack = Vec3(maxX, maxY, maxZ)
 
         return setOf(
             // Bottom face
@@ -366,9 +374,10 @@ object LocationUtils {
         )
     }
 
-    fun computePitchWeight(derivative: LorenzVec) = sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
+    fun computePitchWeight(derivative: Vec3) =
+        sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
 
-    private fun getPitchFromDerivative(derivative: LorenzVec): Double {
+    private fun getPitchFromDerivative(derivative: Vec3): Double {
         val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
         val pitchRadians = -atan2(derivative.y, xzLength)
         // Solve y = atan2(sin(x) - 0.75, cos(x)) for x from y
@@ -390,12 +399,10 @@ object LocationUtils {
         return guessPitch
     }
 
-    fun AABB.getCornersAtHeight(y: Double): List<LorenzVec> {
-        val cornerOne = LorenzVec(minX, y, minZ)
-        val cornerTwo = LorenzVec(minX, y, maxZ)
-        val cornerThree = LorenzVec(maxX, y, maxZ)
-        val cornerFour = LorenzVec(maxX, y, minZ)
-
-        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
-    }
+    fun AABB.getCornersAtHeight(y: Double) = listOf(
+        Vec3(minX, y, minZ),
+        Vec3(minX, y, maxZ),
+        Vec3(maxX, y, maxZ),
+        Vec3(maxX, y, minZ),
+    )
 }

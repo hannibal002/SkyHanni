@@ -21,12 +21,13 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.projectile.FishingHook
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,8 +49,8 @@ object HoppityEggLocator {
 
     private var drawLocations = false
 
-    var sharedEggLocation: LorenzVec? = null
-    var possibleEggLocations = listOf<LorenzVec>()
+    var sharedEggLocation: Vec3? = null
+    var possibleEggLocations = emptyList<Vec3>()
     var currentEggType: HoppityEggType? = null
     var currentEggNote: String? = null
 
@@ -121,7 +123,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
+    private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<Vec3>) {
         if (!waypointsConfig.highlightDuplicates) return
         if (!waypointsConfig.showNearbyDuplicates) return
         if (HoppityEggLocations.foundAllOnThisIsland) return
@@ -138,7 +140,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
+    private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: Vec3, label: String) {
         val shouldMarkDuplicate =
             waypointsConfig.highlightDuplicates &&
                 HoppityEggLocations.hasCollectedEgg(location) &&
@@ -171,7 +173,7 @@ object HoppityEggLocator {
         }
 
         val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
+        val dist = lastPoint.distanceTo(pos)
         if (dist == 0.0 || dist > 3.0) return
 
         if (pos.getEntitiesNearby<FishingHook>(0.3).any()) return
@@ -200,11 +202,11 @@ object HoppityEggLocator {
         }
     }
 
-    private fun guessEggLocation(): LorenzVec? {
+    private fun guessEggLocation(): Vec3? {
         val guessLocation = bezierFitter.solve() ?: return null
 
         val guessEgg = HoppityEggLocations.islandLocations.sortedWith { a, b ->
-            sign(a.distanceSq(guessLocation) - b.distanceSq(guessLocation)).toInt()
+            sign(a.distanceToSqr(guessLocation) - b.distanceToSqr(guessLocation)).toInt()
         }.firstOrNull()
 
         return guessEgg
@@ -218,8 +220,8 @@ object HoppityEggLocator {
         IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { waypointsConfig.showPathFinder })
     }
 
-    fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any {
-        it.distance(location) < 5.0
+    fun isValidEggLocation(location: Vec3): Boolean = HoppityEggLocations.islandLocations.any {
+        it.distanceTo(location) < 5.0
     }
 
     private fun ReceiveParticleEvent.isVillagerParticle() = type == ParticleTypes.HAPPY_VILLAGER && speed == 0f && count == 1

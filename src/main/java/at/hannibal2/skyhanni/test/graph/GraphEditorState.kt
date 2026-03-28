@@ -77,7 +77,7 @@ class GraphEditorState {
         for (oldNode in this.nodes) {
             val newNode = GraphingNode(
                 oldNode.id,
-                oldNode.position.copy(),
+                oldNode.position,
                 oldNode.name,
                 ArrayList(oldNode.tags),
                 oldNode.extraWeight,

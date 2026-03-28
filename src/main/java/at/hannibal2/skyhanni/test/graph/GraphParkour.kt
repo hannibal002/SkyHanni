@@ -11,10 +11,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.isEnabled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.VectorUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.copyLocations
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object GraphParkour {
@@ -40,19 +41,11 @@ object GraphParkour {
     private fun saveParkour() {
         val graph = GraphEditorIO.compileGraph()
         val list = graphToList(graph) ?: return
-
-        val resultList = list.map { location ->
-            val x = location.x.toString().replace(",", ".")
-            val y = location.y.toString().replace(",", ".")
-            val z = location.z.toString().replace(",", ".")
-            "\"$x:$y:$z\"".replace(".0", "")
-        }
-
-        OSUtils.copyToClipboard(resultList.joinToString(",\n"))
+        list.copyLocations()
         ChatUtils.chat("Saved graph as parkour to clipboard!")
     }
 
-    private fun graphToList(graph: Graph): List<LorenzVec>? {
+    private fun graphToList(graph: Graph): List<Vec3>? {
         val start = validateStartNode(graph) ?: return null
         validateEndNode(graph) ?: return null
         return validatePath(graph, start)
@@ -96,7 +89,7 @@ object GraphParkour {
         return ends.first()
     }
 
-    fun validatePath(graph: Graph, start: GraphNode): List<LorenzVec>? {
+    fun validatePath(graph: Graph, start: GraphNode): List<Vec3>? {
         val startNeighbours = start.neighbours.entries.first()
         val list = mutableListOf<GraphNode>()
         list.add(start)
@@ -136,12 +129,12 @@ object GraphParkour {
         return list.map { it.position }
     }
 
-    private fun showErrorAt(vec: LorenzVec) {
+    private fun showErrorAt(vec: Vec3) {
         IslandGraphs.pathFind(vec, "Node error", LorenzColor.RED.toColor(), condition = ::isEnabled)
     }
 
     private fun loadParkour() {
-        val locations = readListFromClipboard() ?: return
+        val locations = VectorUtils.readListFromClipboard().takeIfNotEmpty() ?: return
         val graph = listToGraph(locations)
         GraphEditor.enable()
         GraphEditorHistory.save("load parkour")
@@ -154,15 +147,7 @@ object GraphParkour {
         ChatUtils.chat("Graph Editor loaded a parkour from clipboard!")
     }
 
-    private fun readListFromClipboard(): List<LorenzVec>? {
-        val clipboard = OSUtils.readFromClipboard() ?: return null
-        return clipboard.split("\n").map { line ->
-            val raw = line.replace("\"", "").replace(",", "")
-            raw.split(":").map { it.toDouble() }.toLorenzVec()
-        }
-    }
-
-    private fun listToGraph(locations: List<LorenzVec>): Graph {
+    private fun listToGraph(locations: List<Vec3>): Graph {
         val nodes = locations.mapIndexed { index, location ->
             val name = when (index) {
                 0 -> "start"
@@ -176,12 +161,12 @@ object GraphParkour {
 
         for (node in nodes) {
             nodes.getOrNull(node.id - 1)?.let { previous ->
-                val distance = previous.position.distance(node.position)
+                val distance = previous.position.distanceTo(node.position)
                 addNeighbour(node, previous, distance)
                 addNeighbour(previous, node, distance)
             }
             nodes.getOrNull(node.id + 1)?.let { next ->
-                val distance = next.position.distance(node.position)
+                val distance = next.position.distanceTo(node.position)
                 addNeighbour(node, next, distance)
                 addNeighbour(next, node, distance)
             }

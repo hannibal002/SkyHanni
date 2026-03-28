@@ -8,15 +8,14 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,11 +42,11 @@ object EntityMovementData {
         val startTime: SimpleTimeMark = SimpleTimeMark.now()
     }
 
-    private val entityLocation = mutableMapOf<LivingEntity, LorenzVec>()
+    private val entityLocation = mutableMapOf<LivingEntity, Vec3>()
 
     fun addToTrack(entity: LivingEntity) {
         if (entity !in entityLocation) {
-            entityLocation[entity] = entity.getLorenzVec()
+            entityLocation[entity] = entity.position()
         }
     }
 
@@ -93,12 +92,11 @@ object EntityMovementData {
     fun onTick() {
         addToTrack(MinecraftCompat.localPlayer)
 
-        for (entity in entityLocation.keys) {
+        for ((entity, oldLocation) in entityLocation) {
             if (entity.deceased) continue
 
-            val newLocation = entity.getLorenzVec()
-            val oldLocation = entityLocation[entity]!!
-            val distance = newLocation.distance(oldLocation)
+            val newLocation = entity.position()
+            val distance = newLocation.distanceTo(oldLocation)
             if (distance > 0.01) {
                 entityLocation[entity] = newLocation
                 EntityMoveEvent(entity, oldLocation, newLocation, distance).post()

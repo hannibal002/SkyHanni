@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.network.chat.Component
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 @SkyHanniModule
@@ -109,9 +109,9 @@ object DeferredDrawer {
     }
 
     fun deferPyramid(
-        topPoint: LorenzVec,
-        baseCenterPoint: LorenzVec,
-        baseEdgePoint: LorenzVec,
+        topPoint: Vec3,
+        baseCenterPoint: Vec3,
+        baseEdgePoint: Vec3,
         color: Color,
         depth: Boolean = true,
     ) {
@@ -124,7 +124,7 @@ object DeferredDrawer {
     }
 
     fun deferString(
-        location: LorenzVec,
+        location: Vec3,
         text: String,
         color: Color?,
         scale: Double,
@@ -142,7 +142,7 @@ object DeferredDrawer {
     }
 
     fun deferString(
-        location: LorenzVec,
+        location: Vec3,
         component: Component,
         color: Color?,
         scale: Double,
@@ -166,14 +166,14 @@ object DeferredDrawer {
     )
 
     data class DeferredPyramid(
-        val topPoint: LorenzVec,
-        val baseCenterPoint: LorenzVec,
-        val baseEdgePoint: LorenzVec,
+        val topPoint: Vec3,
+        val baseCenterPoint: Vec3,
+        val baseEdgePoint: Vec3,
         val color: Color,
     )
 
     data class DeferredString(
-        val location: LorenzVec,
+        val location: Vec3,
         val text: String?,
         val component: Component?,
         val color: Color?,
@@ -182,5 +182,4 @@ object DeferredDrawer {
         val yOffset: Float,
         val backgroundColor: Int,
     )
-
 }

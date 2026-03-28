@@ -8,18 +8,17 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils.getNearestToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import kotlin.collections.orEmpty
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object GraphEditorNodeFinder {
 
-    private val nodesAlreadyFound = mutableListOf<LorenzVec>()
-    private val nodesToFind: List<LorenzVec>
+    private val nodesAlreadyFound = mutableListOf<Vec3>()
+    private val nodesToFind: List<Vec3>
         get() = IslandGraphs.currentIslandGraph?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
-    private var currentNodeToFind: LorenzVec? = null
+    private var currentNodeToFind: Vec3? = null
     var active = false
 
     fun handleAllNodeFind() {
@@ -41,7 +40,7 @@ object GraphEditorNodeFinder {
         calculateNewAllNodeFind()
     }
 
-    fun calculateNewAllNodeFind(): LorenzVec {
+    fun calculateNewAllNodeFind(): Vec3 {
         val next = GraphUtils.findShortestDistancesOnCurrentIsland(nodesToFind).lastVisitedNode.position
 
         val max = IslandGraphs.currentIslandGraph?.size ?: -1

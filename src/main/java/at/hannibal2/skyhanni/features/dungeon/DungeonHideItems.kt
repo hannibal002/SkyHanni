@@ -14,12 +14,12 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -156,7 +156,7 @@ object DungeonHideItems {
 
         val packetLocation = event.location
         for (armorStand in hideParticles.filterValues { it.passedSince() < 100.milliseconds }.keys) {
-            val distance = packetLocation.distance(armorStand.getLorenzVec())
+            val distance = armorStand.distanceTo(packetLocation)
             if (distance < 2) {
                 if (event.type == ParticleTypes.FIREWORK) {
                     event.cancel()

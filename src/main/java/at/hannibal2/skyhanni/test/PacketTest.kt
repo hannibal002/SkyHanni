@@ -10,13 +10,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.common.ClientboundKeepAlivePacket
 import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket
@@ -55,6 +53,7 @@ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.Vec3
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.Pos as EntityRelMove
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.PosRot as EntityLookMove
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket.Rot as EntityLook
@@ -203,31 +202,16 @@ object PacketTest {
         }.let { println(it) }
     }
 
-    private fun getDistance(location: LorenzVec?): Double {
+    private fun getDistance(location: Vec3?): Double {
         return location?.distanceToPlayer()?.roundTo(1) ?: 0.0
     }
 
-    private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {
-        if (packet is ClientboundLevelParticlesPacket) {
-            return LorenzVec(packet.x, packet.y, packet.z)
-        }
-
-        if (packet is ClientboundAddEntityPacket) {
-            return LorenzVec(packet.x, packet.y, packet.z)
-        }
-
-        if (packet is ServerboundMovePlayerPacket) {
-            return LorenzVec(packet.getX(0.0), packet.getY(0.0), packet.getZ(0.0))
-        }
-        if (packet is ClientboundLevelEventPacket) {
-            return packet.pos.toLorenzVec()
-        }
-
-        if (entity != null) {
-            return entity.getLorenzVec()
-        }
-
-        return null
+    private fun getLocation(packet: Packet<*>, entity: Entity?): Vec3? = when (packet) {
+        is ClientboundLevelParticlesPacket -> Vec3(packet.x, packet.y, packet.z)
+        is ClientboundAddEntityPacket -> Vec3(packet.x, packet.y, packet.z)
+        is ServerboundMovePlayerPacket -> Vec3(packet.getX(0.0), packet.getY(0.0), packet.getZ(0.0))
+        is ClientboundLevelEventPacket -> packet.pos.toVec3()
+        else -> entity?.position()
     }
 
     private fun getEntity(packet: Packet<*>, id: Int?): Entity? {
@@ -266,7 +250,7 @@ object PacketTest {
                 packet.javaClass.getDeclaredField("entityId").makeAccessible().get(packet) as Int */
             else -> null
         }
-    } catch (e: NoSuchFieldException) {
+    } catch (_: NoSuchFieldException) {
         null
     }
 

@@ -36,10 +36,8 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -53,12 +51,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.printWithAccuracy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
 import net.minecraft.client.player.RemotePlayer
@@ -69,6 +67,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.zombie.Zombie
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
@@ -111,17 +110,16 @@ object DamageIndicatorManager {
     fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
     fun getDistanceTo(vararg types: BossType): Double {
-        val playerLocation = LocationUtils.playerLocation()
-        return data.values.filter { it.bossType in types }.map { it.entity.getLorenzVec().distance(playerLocation) }.let { list ->
+        return data.values.filter { it.bossType in types }.map { it.entity.distanceToPlayer() }.let { list ->
             if (list.isEmpty()) Double.MAX_VALUE else list.minOf { it }
         }
     }
 
     fun getAllMobs(): Collection<LivingEntity> = data.values.map { it.entity }
 
-    fun getNearestDistanceTo(location: LorenzVec): Double {
-        return data.values.map { it.entity.getLorenzVec() }.minOfOrNull { it.distance(location) } ?: Double.MAX_VALUE
-    }
+    fun getNearestDistanceTo(location: Vec3): Double =
+        data.values.map { it.entity.position() }.minOfOrNull { it.distanceTo(location) }
+            ?: Double.MAX_VALUE
 
     fun removeDamageIndicator(type: BossType) {
         data.removeIf { it.value.bossType == type }
@@ -202,10 +200,11 @@ object DamageIndicatorManager {
                 }
             }
 
-            val location = if (data.dead && data.deathLocation != null) {
-                data.deathLocation!!
+            val deathLocation = data.deathLocation
+            val location = if (data.dead && deathLocation != null) {
+                deathLocation
             } else {
-                val loc = entity.getLorenzVec()
+                val loc = entity.position()
                 if (data.dead) data.deathLocation = loc
                 loc
             }.add(-0.5, 0.0, -0.5)
@@ -244,13 +243,13 @@ object DamageIndicatorManager {
 
             val icons = iconCache.getOrPut(data) {
                 buildList {
-                    if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
+                    if (config.shurikenIndicator && entity.getNameTagWith(3.0, "§b✯") != null) {
                         add(
                             if (config.compactStatusEffects) "§b✯"
                             else "§bShuriken",
                         )
                     }
-                    if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
+                    if (config.twilightIndicator && entity.getNameTagWith(3.0, "§5ᛤ") != null) {
                         add(
                             if (config.compactStatusEffects) "§5ᛤ"
                             else "§5Twilight",
@@ -370,14 +369,14 @@ object DamageIndicatorManager {
 
     val list = mutableListOf<Highlight>()
 
-    class Highlight(val location: LorenzVec, val text: String, val decayAt: SimpleTimeMark)
+    data class Highlight(val location: Vec3, val text: String, val decayAt: SimpleTimeMark)
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn) {
         val mob = event.mob
 
         if (SkyBlockUtils.debug) {
-            list.add(Highlight(mob.baseEntity.getLorenzVec(), "${mob.name} - ${mob.category}", 5.seconds.fromNow()))
+            list.add(Highlight(mob.baseEntity.position(), "${mob.name} - ${mob.category}", 5.seconds.fromNow()))
         }
         if (!isEnabled()) return
         try {
@@ -536,7 +535,7 @@ object DamageIndicatorManager {
             )
 
             BossType.SLAYER_ZOMBIE_5 -> {
-                if ((entity as Zombie).hasNameTagWith(3, "Boom!")) {
+                if ((entity as Zombie).hasNameTagWith(3.0, "Boom!")) {
                     // TODO fix
                     // val ticksAlive = entity.ticksExisted % (20 * 5)
                     // val remainingTicks = (5 * 20).toLong() - ticksAlive
@@ -551,14 +550,13 @@ object DamageIndicatorManager {
             BossType.SLAYER_WOLF_3,
             BossType.SLAYER_WOLF_4,
             -> {
-                if ((entity as Wolf).hasNameTagWith(2, "Calling the pups!")) {
+                if ((entity as Wolf).hasNameTagWith(2.0, "Calling the pups!")) {
                     return "Pups!"
                 }
             }
 
             BossType.NETHER_BARBARIAN_DUKE -> {
-                val location = entity.getLorenzVec()
-                entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
+                entityData.ignoreBlocks = entity.y == 117.0 && entity.distanceToPlayer() < 15
             }
 
             BossType.BACTE -> return checkBacte(entityData)
@@ -594,7 +592,7 @@ object DamageIndicatorManager {
     private fun checkBlazeSlayer(entity: Mob, entityData: EntityData, health: Int, maxHealth: Int): String {
         var found = false
         for (shield in HellionShield.entries) {
-            entity.getNameTagWith(3, shield.name)?.let { armorStand ->
+            entity.getNameTagWith(3.0, shield.name)?.let { armorStand ->
                 val number = armorStand.name.formattedTextCompatLessResets().split(" ♨")[1].substring(0, 1)
                 entity.setHellionShield(shield)
                 if (SlayerApi.config.blazes.hellion.coloredMobs) {
@@ -680,9 +678,8 @@ object DamageIndicatorManager {
         }
 
         // hide while in the middle
-//        val position = entity.getLorenzVec()
         // TODO other logic or something
-//        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
+//        entityData.healthLineHidden = entity.x == -368.0 && entity.z == -804.0
 
         var calcHealth = -1
         for (line in ScoreboardData.sidebarLinesRaw) {
@@ -786,7 +783,7 @@ object DamageIndicatorManager {
 
         // Hit phase
         var hitPhaseText: String? = null
-        val armorStandHits = entity.getNameTagWith(3, " Hit")
+        val armorStandHits = entity.getNameTagWith(3.0, " Hit")
         if (armorStandHits != null) {
             val maxHits = when (entityData.bossType) {
                 BossType.SLAYER_ENDERMAN_1 -> 15
@@ -994,7 +991,7 @@ object DamageIndicatorManager {
         val entity = event.entity
 
         val entityData = data.values.find {
-            val distance = it.entity.getLorenzVec().distance(entity.getLorenzVec())
+            val distance = it.entity.distanceTo(entity)
             distance < 4.5
         } ?: return
 
@@ -1104,7 +1101,7 @@ object DamageIndicatorManager {
                 add("Active mobs: ${data.size}")
                 for (entityData in data.values) {
                     val type = entityData.bossType
-                    val loc = entityData.entity.getLorenzVec()
+                    val loc = entityData.entity.position()
                     add("  - $type ${loc.printWithAccuracy(1)}")
                 }
             }

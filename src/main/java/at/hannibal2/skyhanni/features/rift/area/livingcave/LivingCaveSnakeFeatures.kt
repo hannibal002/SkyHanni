@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.rift.area.livingcave.snake.LivingCaveSnake
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.Vec3
 import java.util.concurrent.ConcurrentLinkedQueue
 
 @SkyHanniModule
@@ -28,7 +28,7 @@ object LivingCaveSnakeFeatures {
     private val config get() = RiftApi.config.area.livingCave.snakeHelper
     private val snakes = mutableListOf<LivingCaveSnake>()
 
-    private val originalBlocks = mutableMapOf<LorenzVec, Block>()
+    private val originalBlocks = mutableMapOf<Vec3, Block>()
 
     var selectedSnake: LivingCaveSnake? = null
 
@@ -44,8 +44,8 @@ object LivingCaveSnakeFeatures {
 
     private var currentRole: Role? = null
 
-    private val addedList = ConcurrentLinkedQueue<LorenzVec>()
-    private val removedList = ConcurrentLinkedQueue<LorenzVec>()
+    private val addedList = ConcurrentLinkedQueue<Vec3>()
+    private val removedList = ConcurrentLinkedQueue<Vec3>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockChange(event: ServerBlockChangeEvent) {
@@ -64,7 +64,7 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    private fun addSnakeBlock(location: LorenzVec) {
+    private fun addSnakeBlock(location: Vec3) {
         val snake = fixCollisions(findNearbySnakeHeads(location))
         if (snake == null) {
             snakes.add(LivingCaveSnake(mutableListOf(location)))
@@ -87,7 +87,7 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    private var lastClickedBlock: LorenzVec? = null
+    private var lastClickedBlock: Vec3? = null
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
@@ -150,10 +150,9 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    // sqrt(3) =~ 1.73
-    private fun findNearbySnakeHeads(location: LorenzVec): List<LivingCaveSnake> =
-        snakes.filter { it.blocks.isNotEmpty() && it.head.distance(location) < 1.74 }
-            .sortedBy { it.head.distance(location) }
+    private fun findNearbySnakeHeads(location: Vec3): List<LivingCaveSnake> =
+        snakes.filter { it.blocks.isNotEmpty() && it.head.distanceToSqr(location) < 3 }
+            .sortedBy { it.head.distanceTo(location) }
 
     private fun fixCollisions(found: List<LivingCaveSnake>): LivingCaveSnake? {
         if (found.size <= 1) return found.firstOrNull()

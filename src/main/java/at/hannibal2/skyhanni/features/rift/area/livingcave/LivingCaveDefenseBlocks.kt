@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -14,8 +13,9 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
@@ -25,41 +25,53 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.StainedGlassBlock
+import net.minecraft.world.phys.Vec3
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
 
     private val config get() = RiftApi.config.area.livingCave.defenseBlock
-    private var movingBlocks = mapOf<DefenseBlock, Long>()
-    private var staticBlocks = emptyList<DefenseBlock>()
 
-    class DefenseBlock(val entity: RemotePlayer, val location: LorenzVec, var hidden: Boolean = false)
+    private val movingBlocks = ConcurrentHashMap<DefenseBlock, SimpleTimeMark>()
+    private val staticBlocks = ConcurrentHashMap.newKeySet<DefenseBlock>()
+
+    data class DefenseBlock(
+        val entity: RemotePlayer,
+        val location: Vec3,
+    ) {
+        var hidden: Boolean = false
+    }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled()) return
-        staticBlocks = staticBlocks.editCopy { removeIf { it.entity.deceased } }
+        staticBlocks.removeIf { it.entity.deceased }
     }
 
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
 
-        movingBlocks = movingBlocks.editCopy {
-            values.removeIf { System.currentTimeMillis() > it + 2000 }
-            keys.removeIf { staticBlocks.any { others -> others.location.distance(it.location) < 1.5 } }
+        movingBlocks.values.removeIf { it.passedSince() > 2.seconds }
+        movingBlocks.keys.removeIf {
+            staticBlocks.any { others -> others.location.distanceTo(it.location) < 1.5 }
         }
 
         val location = event.location.add(-0.5, 0.0, -0.5)
 
         // Ignore particles around blocks
-        if (staticBlocks.any { it.location.distance(location) < 3 }) {
+        if (staticBlocks.any { it.location.distanceTo(location) < 3 }) {
             if (config.hideParticles) {
                 event.cancel()
             }
             return
         }
-        if (config.hideParticles && movingBlocks.keys.any { it.location.distance(location) < 3 }) {
+        if (config.hideParticles && movingBlocks.keys.any { it.location.distanceTo(location) < 3 }) {
             event.cancel()
         }
 
@@ -68,10 +80,8 @@ object LivingCaveDefenseBlocks {
 
             // read old entity data
             getNearestMovingDefenseBlock(location)?.let {
-                if (it.location.distance(location) < 0.5) {
-                    movingBlocks = movingBlocks.editCopy {
-                        it.hidden = true
-                    }
+                if (it.location.distanceTo(location) < 0.5) {
+                    it.hidden = true
                     entity = it.entity
                 }
             }
@@ -87,7 +97,7 @@ object LivingCaveDefenseBlocks {
 
             val defenseBlock = entity?.let { DefenseBlock(it, location) } ?: return
 
-            movingBlocks = movingBlocks.editCopy { this[defenseBlock] = System.currentTimeMillis() + 250 }
+            movingBlocks[defenseBlock] = SimpleTimeMark.now() + 250.milliseconds
             if (config.hideParticles) {
                 event.cancel()
             }
@@ -107,37 +117,39 @@ object LivingCaveDefenseBlocks {
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    fun onServerBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
+
         val location = event.location
-        val old = event.old
-        val new = event.new
+        val old = event.oldState
+        val new = event.newState
 
         // spawn block
-        if (old == "air" && (new == "stained_glass" || new == "diamond_block")) {
+        if (old.block == Blocks.AIR && (new.block is StainedGlassBlock || new.block == Blocks.DIAMOND_BLOCK)) {
             val entity = getNearestMovingDefenseBlock(location)?.entity ?: return
-            staticBlocks = staticBlocks.editCopy {
-                add(DefenseBlock(entity, location))
+            staticBlocks.add(DefenseBlock(entity, location))
+            staticBlocks.forEach { block ->
                 RenderLivingEntityHelper.setEntityColor(
-                    entity,
+                    block.entity,
                     color.addAlpha(50),
-                ) { isEnabled() && staticBlocks.any { it.entity == entity } }
+                ) { isEnabled() && staticBlocks.any { it.entity == block.entity } }
             }
         }
 
         // despawn block
         val nearestBlock = getNearestStaticDefenseBlock(location)
-        if (new == "air" && location == nearestBlock?.location) {
-            staticBlocks = staticBlocks.editCopy { remove(nearestBlock) }
+        if (new.block == Blocks.AIR && location == nearestBlock?.location) {
+            staticBlocks.remove(nearestBlock)
         }
     }
 
-    private fun getNearestMovingDefenseBlock(location: LorenzVec) =
-        movingBlocks.keys.filter { it.location.distance(location) < 15 }
-            .minByOrNull { it.location.distance(location) }
+    private fun getNearestMovingDefenseBlock(location: Vec3) =
+        movingBlocks.keys.filter { it.location.distanceTo(location) < 15 }
+            .minByOrNull { it.location.distanceTo(location) }
 
-    private fun getNearestStaticDefenseBlock(location: LorenzVec) =
-        staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
+    private fun getNearestStaticDefenseBlock(location: Vec3) =
+        staticBlocks.filter { it.location.distanceTo(location) < 15 }
+            .minByOrNull { it.location.distanceTo(location) }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -145,7 +157,7 @@ object LivingCaveDefenseBlocks {
 
         for ((block, time) in movingBlocks) {
             if (block.hidden) continue
-            if (time > System.currentTimeMillis()) {
+            if (time.isInFuture()) {
                 val location = block.location
                 event.drawWaypointFilled(location, color)
                 event.drawLineToCrosshair(

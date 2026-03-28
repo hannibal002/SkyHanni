@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.spawnTime
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,10 +21,10 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.Items
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,9 +58,9 @@ object VanquisherApi {
 
     private var lastPossibleSpawnEntity: ArmorStand? = null
 
-    private var lastSpawnEntityPos: LorenzVec? = null
+    private var lastSpawnEntityPos: Vec3? = null
     private var lastSpawnEntityTime = SimpleTimeMark.farPast()
-    private var lastSoundPos: LorenzVec? = null
+    private var lastSoundPos: Vec3? = null
     private var lastSoundTime = SimpleTimeMark.farPast()
 
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
@@ -93,7 +92,7 @@ object VanquisherApi {
         val entity = event.entity as? ArmorStand ?: return
         val helmet = entity.getStandHelmet() ?: return
         if (helmet.item != Items.WITHER_SKELETON_SKULL) return
-        lastSpawnEntityPos = entity.getLorenzVec()
+        lastSpawnEntityPos = entity.position()
         lastPossibleSpawnEntity = entity
         lastSpawnEntityTime = SimpleTimeMark.now()
         DelayedRun.runNextTick(::handleOwnVanquisher)
@@ -107,7 +106,7 @@ object VanquisherApi {
         if (now - lastSoundTime > vanquisherShortTimeout) return
         if (now - lastSpawnEntityTime > vanquisherShortTimeout) return
         if (now - lastOwnTime > vanquisherShortTimeout) return
-        if (soundPos.distance(entityPos) > 3) return
+        if (soundPos.distanceTo(entityPos) > 3) return
         spawnEntity = entity
         lastSpawnEntityPos = null
         lastSoundPos = null

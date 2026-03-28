@@ -56,7 +56,7 @@ object GraphEditorIO {
                 val otherNode = edge.getOther(node)
                 val compiledOther = compiledNodeMap[otherNode.id]
                     ?: error("Invalid node ID ${otherNode.id} referenced in edge")
-                val distance = node.position.distance(otherNode.position)
+                val distance = node.distanceTo(otherNode)
                 val extraWeight = node.extraWeight + otherNode.extraWeight
                 compiledOther to distance + extraWeight
             }.sortedBy { it.second }.toMap()
@@ -104,7 +104,7 @@ object GraphEditorIO {
 
     private fun showStats(networkCount: Int) {
         if (!GraphEditor.config.showsStats) return
-        val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
+        val length = edges.sumOf { it.node1.distanceTo(it.node2) }.toInt().addSeparators()
         val namedNodes = nodes.count { it.name != null }.addSeparators()
         ChatUtils.chat(
             "§lStats\n" +

@@ -9,16 +9,16 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object HideonleafFinder {
     private val config get() = SkyHanniMod.feature.hunting
 
-    private var route: MutableList<LorenzVec>? = null
+    private var route: MutableList<Vec3>? = null
     private var navigating = false
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
@@ -53,7 +53,7 @@ object HideonleafFinder {
         route = null
     }
 
-    private fun calculateRoute(): MutableList<LorenzVec>? {
+    private fun calculateRoute(): MutableList<Vec3>? {
         val graph = IslandGraphs.currentIslandGraph ?: return null
         val list = graph.filter { it.hasTag(GraphNodeTag.HIDEONLEAF) }
 

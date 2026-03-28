@@ -15,17 +15,19 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.toBlockPos
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.phys.Vec3
 import java.util.EnumMap
 
 @SkyHanniModule
@@ -44,7 +46,7 @@ object MinionXP {
 
     data class XPInfo(val type: SkillType, val amount: Double)
 
-    private data class MinionStorage(val position: LorenzVec, val xpList: EnumMap<SkillType, Double>) {
+    private data class MinionStorage(val position: Vec3, val xpList: EnumMap<SkillType, Double>) {
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
 
@@ -74,12 +76,12 @@ object MinionXP {
     }
 
     private fun getStorageXPAndUpdateTotal(
-        minionPosition: LorenzVec,
+        minionPosition: Vec3,
         xpTotal: EnumMap<SkillType, Double>,
     ): Boolean {
-        if (!getHasStorage(minionPosition)) return false
+        if (!hasStorage(minionPosition)) return false
         val storage = minionStorages.firstOrNull {
-            it.position.distanceSq(minionPosition) <= 2.5 && it.timestamp.passedSince().inWholeMinutes < 20
+            it.position.distanceToSqr(minionPosition) <= 2.5 && it.timestamp.passedSince().inWholeMinutes < 20
         }
 
         return if (storage != null) {
@@ -92,14 +94,17 @@ object MinionXP {
         }
     }
 
-    // TODO find the correct name of the list
-    private val listWithMissingName = listOf(21..26, 30..35, 39..44)
+    private val slotIds = listOf(
+        21..26,
+        30..35,
+        39..44,
+    )
 
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
         val xpTotal = enumMapOf<SkillType, Double>()
         val list = inventoryItems.filter {
             it.value.getLore().isNotEmpty() &&
-                (!isMinion || it.key in listWithMissingName.flatten())
+                (!isMinion || it.key in slotIds.flatten())
         }.values
             .map { toPrimitiveItemStack(it) }
         for (item in list) {
@@ -132,10 +137,12 @@ object MinionXP {
     private fun collectMessage(type: SkillType, amount: Double) =
         "§7Collect to get: §b${amount.addSeparators()} §e${type.displayName} XP"
 
-    private fun getHasStorage(minionPosition: LorenzVec): Boolean {
+    private fun hasStorage(minionPosition: Vec3): Boolean {
         val positionsToCheck = listOf(
-            LorenzVec(1, 0, 0), LorenzVec(0, 0, 1),
-            LorenzVec(-1, 0, 0), LorenzVec(0, 0, -1),
+            Vec3(1.0, 0.0, 0.0),
+            Vec3(0.0, 0.0, 1.0),
+            Vec3(-1.0, 0.0, 0.0),
+            Vec3(0.0, 0.0, -1.0),
         )
 
         return positionsToCheck.any { position ->

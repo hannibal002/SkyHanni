@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.compat.DamageSourceCompat
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.entity.LivingEntity
@@ -55,12 +54,12 @@ object TentacleWaypoint {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRender(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         tentacleHits.removeIfKey { it.deceased || it.findHealthReal() == 0f }
 
         for ((tentacle, hits) in tentacleHits) {
-            val location = tentacle.getLorenzVec()
+            val location = tentacle.position()
             event.drawWaypointFilled(
                 location.add(-0.5, 0.0, -0.5),
                 Color.RED,

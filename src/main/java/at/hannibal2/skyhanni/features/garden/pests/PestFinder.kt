@@ -28,18 +28,19 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.with
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -197,7 +198,7 @@ object PestFinder {
 
     private fun drawName(
         plot: GardenPlotApi.Plot,
-        playerLocation: LorenzVec,
+        playerLocation: Vec3,
         event: SkyHanniRenderWorldEvent,
     ) {
         val pests = plot.pests
@@ -205,7 +206,7 @@ object PestFinder {
         val plotName = plot.name
         val middle = plot.middle
         val isInaccurate = plot.isPestCountInaccurate
-        val location = playerLocation.copy(x = middle.x, z = middle.z)
+        val location = playerLocation.with(x = middle.x, z = middle.z)
         event.drawWaypointFilled(location, LorenzColor.RED.toColor())
         val number = if (isInaccurate) "?" else pests
         event.drawDynamicText(location, "§e$number §c$pestsName §7in §b$plotName", 1.5)

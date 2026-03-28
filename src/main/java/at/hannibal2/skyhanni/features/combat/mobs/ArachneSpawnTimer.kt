@@ -7,14 +7,15 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.roundTo
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,7 +42,7 @@ object ArachneSpawnTimer {
         "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$",
     )
 
-    private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)
+    private val arachneAltarLocation = Vec3(-283.0, 51.0, -179.0)
     private var arachneSpawnTime = SimpleTimeMark.farPast()
     private var saveNextTickParticles = false
     private var particleCounter = 0
@@ -100,7 +101,7 @@ object ArachneSpawnTimer {
         }
 
         val location = event.location.roundTo(2)
-        if (arachneAltarLocation.distance(location) > 30) return
+        if (arachneAltarLocation.distanceTo(location) > 30) return
         if (event.type == ParticleTypes.DUST && event.speed == 1f) {
             particleCounter += 1
         }

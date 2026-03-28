@@ -12,13 +12,15 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object SendCoordinates {
@@ -44,8 +46,8 @@ object SendCoordinates {
         val message = event.cleanMessage
         coordinatePattern.matchMatcher(message) {
             var description = group("playerName").split(" ").last()
-            val x = group("x").toFloat()
-            val y = group("y").toFloat()
+            val x = group("x").toDouble()
+            val y = group("y").toDouble()
 
             val end = group("z")
             val z = if (end.contains(" ")) {
@@ -53,9 +55,9 @@ object SendCoordinates {
                 val extra = split.drop(1).joinToString(" ").take(50)
                 description += " $extra"
 
-                split.first().toFloat()
-            } else end.toFloat()
-            waypoints.add(SharedWaypoint(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
+                split.first().toDouble()
+            } else end.toDouble()
+            waypoints.add(SharedWaypoint(Vec3(x, y, z), description, System.currentTimeMillis() / 1000))
             logger.log("got waypoint coords and username")
         }
     }
@@ -94,7 +96,7 @@ object SendCoordinates {
         logger.log("Reset everything (world change)")
     }
 
-    data class SharedWaypoint(val location: LorenzVec, val name: String, val time: Long)
+    data class SharedWaypoint(val location: Vec3, val name: String, val time: Long)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

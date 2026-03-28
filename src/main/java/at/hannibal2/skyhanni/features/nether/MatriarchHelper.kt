@@ -16,15 +16,17 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.up
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
+import net.minecraft.world.phys.Vec3
 import java.util.TreeSet
 
 @SkyHanniModule
@@ -33,7 +35,7 @@ object MatriarchHelper {
     private val config get() = SkyHanniMod.feature.crimsonIsle.matriarchHelper
 
     private val pearlList = TreeSet<Pair<Mob, GraphNode>> { first, second ->
-        first.first.baseEntity.getLorenzVec().y.compareTo(second.first.baseEntity.getLorenzVec().y)
+        first.first.baseEntity.y.compareTo(second.first.baseEntity.y)
     }
 
     private const val EXIT_LABEL = "Heavy Pearls"
@@ -45,7 +47,7 @@ object MatriarchHelper {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onMobSpawn(event: MobEvent.Spawn.Special) {
         if (!isHeavyPearl(event)) return
-        val node = IslandGraphs.findClosestNode(event.mob.baseEntity.getLorenzVec().up(1.2), { true })
+        val node = IslandGraphs.findClosestNode(event.mob.baseEntity.position().up(1.2))
         if (node == null) {
             ErrorManager.logErrorStateWithData(
                 "Something went wrong with the Heavy Pearl detection",
@@ -75,14 +77,14 @@ object MatriarchHelper {
         pearlList.removeIf { it.first == event.mob }
     }
 
-    private val path = mutableListOf<LorenzVec>()
+    private val path = mutableListOf<Vec3>()
 
-    private var tspCache: List<LorenzVec>? = null
+    private var tspCache = emptyList<Vec3>()
     private var lastTspPearls = 0
 
-    private fun accessPearls(): List<LorenzVec> {
-        if (config.useShortestDistance) {
-            val path = tspCache ?: NavigationUtils.getRoute(
+    private fun accessPearls(): List<Vec3> {
+        return if (config.useShortestDistance) {
+            tspCache.takeIfNotEmpty() ?: NavigationUtils.getRoute(
                 pearlList.map { it.second },
                 maxIterations = 5,
             ).also {
@@ -92,9 +94,8 @@ object MatriarchHelper {
                     lastTspPearls = pearls
                 }
             }
-            return path
         } else {
-            return pearlList.map { it.first.baseEntity.getLorenzVec().up(1.2) }
+            pearlList.map { it.first.baseEntity.position().up(1.2) }
         }
     }
 
@@ -105,14 +106,14 @@ object MatriarchHelper {
         path.addAll(accessPearls())
         val exitNode = exitNode ?: exitNodeLazy() ?: return
         val end = path.lastOrNull() ?: LocationUtils.playerLocation()
-        val endNode = IslandGraphs.findClosestNode(end, { true }) ?: return
+        val endNode = IslandGraphs.findClosestNode(end) ?: return
         path.addAll(GraphUtils.findShortestPath(endNode, exitNode).drop(1).map { it.blockCenter() })
     }
 
-    @HandleEvent(GraphAreaChangeEvent::class, onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGraphAreaChange() {
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onGraphAreaChange(event: GraphAreaChangeEvent) {
         if (SkyBlockUtils.graphArea != AREA_NAME) {
-            tspCache = null
+            tspCache = emptyList()
             lastTspPearls = 0
             path.clear()
             pearlList.clear()

@@ -17,11 +17,12 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -30,14 +31,13 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -229,18 +229,18 @@ object FishingApi {
         }
     }
 
-    private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
+    private val frostyNpcLocation = Vec3(-1.5, 76.0, 92.5)
 
     private fun countIsZero(entity: ArmorStand): Boolean {
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.cleanName()
         // a dragon, will always be fought
         if (name == "Reindrake") return true
 
         // a npc shop
-        if (name == "§5Frosty the Snow Blaster") return true
+        if (name == "Frosty the Snow Blaster") return true
 
         if (name == "Frosty") {
-            if (entity.getLorenzVec().distance(frostyNpcLocation) < 1) {
+            if (entity.distanceTo(frostyNpcLocation) < 1) {
                 return true
             }
         }

@@ -9,18 +9,19 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object CrystalHollowsNamesInCore {
 
     private val config get() = SkyHanniMod.feature.mining
+
     private val coreLocations = mapOf(
-        LorenzVec(550, 116, 550) to "§8Precursor Remnants",
-        LorenzVec(552, 116, 474) to "§bMithril Deposits",
-        LorenzVec(477, 116, 476) to "§aJungle",
-        LorenzVec(474, 116, 554) to "§6Goblin Holdout",
+        Vec3(550.0, 116.0, 550.0) to "§8Precursor Remnants",
+        Vec3(552.0, 116.0, 474.0) to "§bMithril Deposits",
+        Vec3(477.0, 116.0, 476.0) to "§aJungle",
+        Vec3(474.0, 116.0, 554.0) to "§6Goblin Holdout",
     )
 
     private var showWaypoints = false

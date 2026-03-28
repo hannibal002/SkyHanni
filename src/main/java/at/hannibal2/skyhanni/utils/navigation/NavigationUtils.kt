@@ -4,12 +4,16 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import net.minecraft.world.phys.Vec3
 
 object NavigationUtils {
 
-    fun getRoute(input: List<GraphNode>, maxIterations: Int = 50, neighborhoodSize: Int = 6): List<LorenzVec> {
+    fun getRoute(
+        input: List<GraphNode>,
+        maxIterations: Int = 50,
+        neighborhoodSize: Int = 6,
+    ): List<Vec3> {
         if (input.isEmpty()) return emptyList()
         val output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
 
@@ -29,7 +33,7 @@ object NavigationUtils {
         targetNodes: List<GraphNode>,
         maxIterations: Int,
         neighborhoodSize: Int,
-    ): List<LorenzVec> {
+    ): List<Vec3> {
         val distanceMap = computeDistanceMap(targetNodes)
         var tspRoute = improvedTSP(distanceMap, maxIterations, neighborhoodSize)
 
@@ -195,9 +199,9 @@ object NavigationUtils {
 
     private fun adjustRouteForCurrentLocation(
         route: List<GraphNode>,
-        currentLocation: LorenzVec,
+        currentLocation: Vec3,
     ): List<GraphNode> {
-        val closestNode = route.minByOrNull { it.position.distanceSq(currentLocation) } ?: route.first()
+        val closestNode = route.minByOrNull { it.position.distanceToSqr(currentLocation) } ?: route.first()
         val idx = route.indexOf(closestNode)
         return route.drop(idx) + route.take(idx)
     }

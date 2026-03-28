@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.model.graph.DijkstraTree
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.findPathToDestination
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import net.minecraft.world.phys.Vec3
 import java.util.PriorityQueue
 import java.util.Stack
 
@@ -121,26 +123,24 @@ object GraphUtils {
     }
 
     @JvmName("findShortestDistancesOnCurrentIslandWithTargets")
-    fun findShortestDistancesOnCurrentIsland(
-        target: Collection<GraphNode>,
-    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(), target::contains)
+    fun findShortestDistancesOnCurrentIsland(target: Collection<GraphNode>): DijkstraTree =
+        findDijkstraDistances(nearestNodeOnCurrentIsland(), target::contains)
 
-    fun findShortestDistancesOnCurrentIsland(
-        target: Collection<LorenzVec>,
-    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland()) { target.contains(it.position) }
+    fun findShortestDistancesOnCurrentIsland(target: Collection<Vec3>): DijkstraTree =
+        findDijkstraDistances(nearestNodeOnCurrentIsland()) { target.contains(it.position) }
 
     fun findAllShortestDistancesOnCurrentIsland(
         bailout: (GraphNode) -> Boolean = { false },
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(), bailout)
 
     fun findAllShortestDistancesOnCurrentIsland(
-        start: LorenzVec,
+        start: Vec3,
         bailout: (GraphNode) -> Boolean = { false },
     ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
 
     fun nearestNodeOnCurrentIsland() = nearestNodeOnCurrentIsland(playerPosition)
 
-    fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
+    fun nearestNodeOnCurrentIsland(location: Vec3): GraphNode {
         val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
         return graph.getNearestNode(location)
     }
@@ -157,42 +157,47 @@ object GraphUtils {
         return distances.findPathToDestination(end)
     }
 
-    fun findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = findShortestPathAsGraph(start, end).toPositionsList()
+    fun findShortestPath(start: GraphNode, end: GraphNode): Collection<Vec3> =
+        findShortestPathAsGraph(start, end).toPositionsList()
 
-    fun findShortestDistance(start: GraphNode, end: GraphNode): Double = findShortestPathAsGraphWithDistance(start, end).second
+    fun findShortestDistance(start: GraphNode, end: GraphNode): Double =
+        findShortestPathAsGraphWithDistance(start, end).second
 
-    fun calculatePathLength(path: List<LorenzVec>): Double {
+    fun calculatePathLength(path: Collection<Vec3>): Double {
         if (path.size < 2) return 0.0
         val mappedNodes = path.map { nearestNodeOnCurrentIsland(it) }
         return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
     }
 
-    var playerPosition = LorenzVec(0, 0, 0)
+    var playerPosition: Vec3 = Vec3.ZERO
         private set
 
     fun updatePlayerPosition() {
         playerPosition = LocationUtils.playerEyeLocation().roundToBlock()
     }
 
-    fun GenericNode.distanceToPlayer(): Double = position.distance(playerPosition)
-    fun GenericNode.distanceSqToPlayer(): Double = position.distanceSq(playerPosition)
-    fun distanceSqToPlayer(location: LorenzVec) = location.distanceSq(playerPosition)
+    fun GenericNode.distanceToPlayer(): Double = position.distanceTo(playerPosition)
+    fun GenericNode.distanceSqToPlayer(): Double = position.distanceToSqr(playerPosition)
+    fun distanceSqToPlayer(location: Vec3) = location.distanceToSqr(playerPosition)
 
     interface GenericNode {
-        val position: LorenzVec
+        val position: Vec3
+
+        fun distanceTo(other: GenericNode) = position.distanceTo(other.position)
+        fun distanceToSqr(other: GenericNode) = position.distanceToSqr(other.position)
     }
 
-    fun <N : GenericNode, T : List<N>> T.getNearestNode(
-        location: LorenzVec = playerPosition,
+    fun <N : GenericNode, T : Iterable<N>> T.getNearestNode(
+        location: Vec3 = playerPosition,
         condition: (N) -> Boolean = { true },
     ): N = asSequence()
         .filter(condition)
-        .minBy { it.position.distanceSq(location) }
+        .minBy { it.position.distanceToSqr(location) }
 
-    fun <T : List<LorenzVec>> T.getNearestToPlayer(
-        location: LorenzVec = playerPosition,
-        condition: (LorenzVec) -> Boolean = { true },
-    ): LorenzVec = asSequence()
+    fun <T : Iterable<Vec3>> T.getNearestToPlayer(
+        location: Vec3 = playerPosition,
+        condition: (Vec3) -> Boolean = { true },
+    ): Vec3 = asSequence()
         .filter(condition)
-        .minBy { it.distanceSq(location) }
+        .minBy(location::distanceToSqr)
 }

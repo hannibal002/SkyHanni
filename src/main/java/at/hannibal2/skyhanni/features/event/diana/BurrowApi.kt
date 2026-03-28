@@ -1,18 +1,16 @@
 package at.hannibal2.skyhanni.features.event.diana
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.world.phys.Vec3
 
 object BurrowApi {
 
     var lastBurrowRelatedChatMessage = SimpleTimeMark.farPast()
-    var lastBurrowInteracted: LorenzVec? = null
+    var lastBurrowInteracted: Vec3? = null
         private set
 
-    fun setBurrowInteracted(interacted: LorenzVec?) {
-        if (interacted != null) {
-            GriffinBurrowHelper.addDebug("set last interacted burrow to [${interacted.x}, ${interacted.y}, ${interacted.z}]")
-        } else GriffinBurrowHelper.addDebug("set last interacted burrow to null")
+    fun setBurrowInteracted(interacted: Vec3?) {
+        GriffinBurrowHelper.addDebug("set last interacted burrow to $interacted")
         lastBurrowInteracted = interacted
     }
 }

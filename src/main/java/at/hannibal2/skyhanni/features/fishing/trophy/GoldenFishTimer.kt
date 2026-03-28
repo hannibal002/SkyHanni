@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -189,10 +190,10 @@ object GoldenFishTimer {
         if (!config.nametag) return
         val entity = confirmedGoldenFishEntity ?: return
 
-        val location = event.exactLocation(entity).add(y = 2.5)
+        val location = event.exactLocation(entity).up(2.5)
         if (location.distanceToPlayer() > 20) return
-        event.drawString(location.add(y = 0.5), "§b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}", false)
-        if (interactions >= MAX_INTERACTIONS) event.drawString(location.add(y = 0.25), "§cPULL", false)
+        event.drawString(location.up(0.5), "§b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}", false)
+        if (interactions >= MAX_INTERACTIONS) event.drawString(location.up(0.25), "§cPULL", false)
         event.drawString(location, "§6Golden Fish §a($interactions/$MAX_INTERACTIONS)", false)
     }
 

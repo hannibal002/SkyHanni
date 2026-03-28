@@ -14,21 +14,24 @@ import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.axisAlignedTo
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object SulphurSkitterBox {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
-    private var spongeLocations = listOf<LorenzVec>()
-    private var closestSponge: LorenzVec? = null
+
+    private const val RADIUS = 4.0
+
+    private var spongeLocations = emptyList<Vec3>()
+    private var closestSponge: Vec3? = null
     private var renderBox: AABB? = null
-    private const val RADIUS = 4
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -58,7 +61,7 @@ object SulphurSkitterBox {
     private fun calculateSpongeLocations() {
         spongeLocations = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
-            distance = 15,
+            distance = 15.0,
             filter = Blocks.SPONGE,
         ).map { it.key }
     }

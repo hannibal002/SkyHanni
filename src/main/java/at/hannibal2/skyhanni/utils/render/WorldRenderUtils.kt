@@ -12,17 +12,21 @@ import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.component1
+import at.hannibal2.skyhanni.utils.VectorUtils.component2
+import at.hannibal2.skyhanni.utils.VectorUtils.component3
+import at.hannibal2.skyhanni.utils.VectorUtils.inflate
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.times
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.expand
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
@@ -33,6 +37,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.cos
@@ -44,12 +49,12 @@ object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
-    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
-        this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: Vec3, rgb: Int) {
+        renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
     }
 
-    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, color: Color) {
-        this.renderBeaconBeam(vec.x, vec.y, vec.z, color.rgb)
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: Vec3, color: Color) {
+        renderBeaconBeam(vec.x, vec.y, vec.z, color.rgb)
     }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(
@@ -76,7 +81,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawColor(
-        location: LorenzVec,
+        location: Vec3,
         color: ChromaColour,
         beacon: Boolean = false,
         alpha: Float = -1f,
@@ -105,7 +110,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawWaypointFilled(
-        location: LorenzVec,
+        location: Vec3,
         color: Color,
         seeThroughBlocks: Boolean = false,
         beacon: Boolean = false,
@@ -204,12 +209,12 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
+        location: Vec3,
         text: String?,
         component: Component?,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
-        scale: Double = 0.53333333,
+        scale: Double = 8.0 / 15.0,
         shadow: Boolean = false,
         /**
          * Screen-space vertical offset applied after camera-facing rotation.
@@ -228,7 +233,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
+        location: Vec3,
         text: String,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
@@ -285,7 +290,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawString(
-        location: LorenzVec,
+        location: Vec3,
         text: Component,
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
@@ -345,7 +350,7 @@ object WorldRenderUtils {
         drawCircleWireframe(exactLocation(entity), rad, color)
     }
 
-    fun SkyHanniRenderWorldEvent.drawCircleWireframe(location: LorenzVec, rad: Double, color: Color) {
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(location: Vec3, rad: Double, color: Color) {
         val x = location.x
         val y = location.y
         val z = location.z
@@ -362,7 +367,7 @@ object WorldRenderUtils {
                 val x2 = x + rad * cos(theta2)
                 val z2 = z + rad * sin(theta2)
 
-                draw3DLine(LorenzVec(x1, y, z1), LorenzVec(x2, y, z2), color)
+                draw3DLine(Vec3(x1, y, z1), Vec3(x2, y, z2), color)
             }
         }
     }
@@ -418,7 +423,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
-        location: LorenzVec,
+        location: Vec3,
         radius: Float,
         height: Float,
     ) {
@@ -467,9 +472,9 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawPyramid(
-        topPoint: LorenzVec,
-        baseCenterPoint: LorenzVec,
-        baseEdgePoint: LorenzVec,
+        topPoint: Vec3,
+        baseCenterPoint: Vec3,
+        baseEdgePoint: Vec3,
         color: Color,
         depth: Boolean = true,
     ) {
@@ -490,11 +495,11 @@ object WorldRenderUtils {
         val edgeVec = baseEdge - baseCenter
         val topVecNorm = (newTop - baseCenter).normalize()
         val corner1 = baseEdge
-        val corner2 = topVecNorm.crossProduct(edgeVec).normalize() * edgeVec.length() + baseCenter
+        val corner2 = topVecNorm.cross(edgeVec).normalize() * edgeVec.length() + baseCenter
         val corner3 = baseCenter - edgeVec
-        val corner4 = edgeVec.crossProduct(topVecNorm).normalize() * edgeVec.length() + baseCenter
+        val corner4 = edgeVec.cross(topVecNorm).normalize() * edgeVec.length() + baseCenter
 
-        fun tri(a: LorenzVec, b: LorenzVec, c: LorenzVec) {
+        fun tri(a: Vec3, b: Vec3, c: Vec3) {
             buf.addVertex(a.x.toFloat(), a.y.toFloat(), a.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
             buf.addVertex(b.x.toFloat(), b.y.toFloat(), b.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
             buf.addVertex(c.x.toFloat(), c.y.toFloat(), c.z.toFloat()).setColor(color.red, color.green, color.blue, color.alpha)
@@ -513,7 +518,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
-        location: LorenzVec,
+        location: Vec3,
         radius: Float,
         segments: Int = 32,
     ) {
@@ -571,7 +576,7 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
-        location: LorenzVec,
+        location: Vec3,
         radius: Float,
         segments: Int = 32,
     ) {
@@ -605,10 +610,10 @@ object WorldRenderUtils {
                     val y4 = y + radius * cos(Math.PI * phi / segments)
                     val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
-                    val p1 = LorenzVec(x1, y1, z1)
-                    val p2 = LorenzVec(x2, y2, z2)
-                    val p3 = LorenzVec(x3, y3, z3)
-                    val p4 = LorenzVec(x4, y4, z4)
+                    val p1 = Vec3(x1, y1, z1)
+                    val p2 = Vec3(x2, y2, z2)
+                    val p3 = Vec3(x3, y3, z3)
+                    val p4 = Vec3(x4, y4, z4)
                     drawPath(listOf(p1, p2, p3, p4), color, -1.0)
                 }
             }
@@ -616,7 +621,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
-        location: LorenzVec,
+        location: Vec3,
         text: String,
         scaleMultiplier: Double,
         /**
@@ -662,13 +667,13 @@ object WorldRenderUtils {
             (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
         val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
 
-        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+        val renderLocation = Vec3(resultX, resultY, resultZ)
 
         drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
     }
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
-        location: LorenzVec,
+        location: Vec3,
         text: Component,
         scaleMultiplier: Double,
         /**
@@ -714,13 +719,13 @@ object WorldRenderUtils {
             (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
         val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
 
-        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+        val renderLocation = Vec3(resultX, resultY, resultZ)
 
         drawString(renderLocation, text, seeThroughBlocks, null, scale, true, yOff, 0)
     }
 
     // TODO add chroma color support
-    fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun SkyHanniRenderWorldEvent.drawEdges(location: Vec3, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(this, lineWidth, depth) {
             drawEdges(location, color)
         }
@@ -734,8 +739,8 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
+        p1: Vec3,
+        p2: Vec3,
         color: ChromaColour,
         lineWidth: Int,
         depth: Boolean,
@@ -744,8 +749,8 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DLine(
-        p1: LorenzVec,
-        p2: LorenzVec,
+        p1: Vec3,
+        p2: Vec3,
         color: Color,
         lineWidth: Int,
         depth: Boolean,
@@ -754,7 +759,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DPolyline(
-        points: List<LorenzVec>,
+        points: Collection<Vec3>,
         color: Color,
         lineWidth: Int,
         depth: Boolean,
@@ -766,9 +771,9 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DBezier2(
-        p1: LorenzVec,
-        control: LorenzVec,
-        p3: LorenzVec,
+        p1: Vec3,
+        control: Vec3,
+        p3: Vec3,
         color: Color,
         lineWidth: Int,
         depth: Boolean,
@@ -813,11 +818,21 @@ object WorldRenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(
+        location: Vec3,
+        color: ChromaColour,
+        lineWidth: Int,
+        depth: Boolean,
+    ) {
         drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(
+        location: Vec3,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
+    ) {
         draw3DLine(
             exactPlayerCrosshairLocation(),
             location,
@@ -844,9 +859,8 @@ object WorldRenderUtils {
         val points = if (startAtEye) {
             listOf(
                 this.exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle
-                    .toLorenzVec()
                     /* .rotateXZ(-Math.PI / 72.0) */
-                    .times(2),
+                    .times(2.0),
             )
         } else {
             emptyList()
@@ -869,35 +883,35 @@ object WorldRenderUtils {
         }
     }
 
-    fun AABB.getFaceCorners(face: Direction): List<LorenzVec> = when (face) {
+    fun AABB.getFaceCorners(face: Direction): List<Vec3> = when (face) {
         Direction.UP -> getCornersAtHeight(maxY)
         Direction.DOWN -> getCornersAtHeight(minY).asReversed()
         Direction.NORTH -> listOf(
-            LorenzVec(minX, minY, minZ),
-            LorenzVec(maxX, minY, minZ),
-            LorenzVec(maxX, maxY, minZ),
-            LorenzVec(minX, maxY, minZ),
+            Vec3(minX, minY, minZ),
+            Vec3(maxX, minY, minZ),
+            Vec3(maxX, maxY, minZ),
+            Vec3(minX, maxY, minZ),
         )
 
         Direction.SOUTH -> listOf(
-            LorenzVec(maxX, minY, maxZ),
-            LorenzVec(minX, minY, maxZ),
-            LorenzVec(minX, maxY, maxZ),
-            LorenzVec(maxX, maxY, maxZ),
+            Vec3(maxX, minY, maxZ),
+            Vec3(minX, minY, maxZ),
+            Vec3(minX, maxY, maxZ),
+            Vec3(maxX, maxY, maxZ),
         )
 
         Direction.WEST -> listOf(
-            LorenzVec(minX, minY, maxZ),
-            LorenzVec(minX, minY, minZ),
-            LorenzVec(minX, maxY, minZ),
-            LorenzVec(minX, maxY, maxZ),
+            Vec3(minX, minY, maxZ),
+            Vec3(minX, minY, minZ),
+            Vec3(minX, maxY, minZ),
+            Vec3(minX, maxY, maxZ),
         )
 
         Direction.EAST -> listOf(
-            LorenzVec(maxX, minY, minZ),
-            LorenzVec(maxX, minY, maxZ),
-            LorenzVec(maxX, maxY, maxZ),
-            LorenzVec(maxX, maxY, minZ),
+            Vec3(maxX, minY, minZ),
+            Vec3(maxX, minY, maxZ),
+            Vec3(maxX, maxY, maxZ),
+            Vec3(maxX, maxY, minZ),
         )
     }
 
@@ -926,13 +940,13 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawFaceRayWorld(
-        origin: LorenzVec,
+        origin: Vec3,
         face: Direction,
         color: Color,
         length: Double = 0.5,
         thickness: Double = 0.02,
     ) {
-        val dir = LorenzVec(face.stepX.toDouble(), face.stepY.toDouble(), face.stepZ.toDouble())
+        val dir = Vec3(face.stepX.toDouble(), face.stepY.toDouble(), face.stepZ.toDouble())
         val end = origin + dir * length
         val minX = minOf(origin.x, end.x) - thickness
         val minY = minOf(origin.y, end.y) - thickness
@@ -950,40 +964,30 @@ object WorldRenderUtils {
     }
 
     fun getViewerPos() =
-        Minecraft.getInstance().gameRenderer.mainCamera?.let { exactLocation(it) } ?: LorenzVec()
+        Minecraft.getInstance().gameRenderer.mainCamera?.position ?: Vec3.ZERO
 
-    fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
-    fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
+    fun AABB.expandBlock(n: Int = 1) = inflate(VectorUtils.expandVector * n.toDouble())
+    fun AABB.inflateBlock(n: Int = 1) = inflate(VectorUtils.expandVector * -n.toDouble())
 
-    fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
-        if (!entity.isAlive) return entity.getLorenzVec()
-        val x = entity.xOld + (entity.x - entity.xOld) * partialTicks
-        val y = entity.yOld + (entity.y - entity.yOld) * partialTicks
-        val z = entity.zOld + (entity.z - entity.zOld) * partialTicks
-        return LorenzVec(x, y, z)
-    }
+    fun exactLocation(entity: Entity, partialTicks: Float): Vec3 =
+        if (entity.isAlive) entity.position()
+        else entity.oldPosition().lerp(entity.position(), partialTicks.toDouble())
 
     fun SkyHanniRenderWorldEvent.exactLocation(mob: Mob) = exactLocation(mob.baseEntity)
 
-    fun exactLocation(camera: Camera): LorenzVec {
-        val pos = camera.position
-        return LorenzVec(pos.x, pos.y, pos.z)
-    }
-
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
-        val player = MinecraftCompat.localPlayer
-        val eyeHeight = player.eyeHeight.toDouble()
-        return exactLocation(player).add(y = eyeHeight)
-    }
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): Vec3 =
+        MinecraftCompat.localPlayer.let { player ->
+            exactLocation(player).up(player.eyeHeight.toDouble())
+        }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
-        exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
+    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): Vec3 =
+        exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle * 2.0
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
         if (entity.deceased) return entity.boundingBox
-        val offset = exactLocation(entity) - entity.getLorenzVec()
+        val offset = exactLocation(entity) - entity.position()
         return entity.boundingBox.move(offset.x, offset.y, offset.z)
     }
 
@@ -994,8 +998,8 @@ object WorldRenderUtils {
         ) ?: aabb
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
-        exactLocation(player).up(player.getEyeHeight(player.pose))
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): Vec3 =
+        exactLocation(player).up(player.getEyeHeight(player.pose).toDouble())
 
     private fun addChainedFilledBoxVertices(
         matrices: PoseStack,

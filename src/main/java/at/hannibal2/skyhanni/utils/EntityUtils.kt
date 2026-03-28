@@ -11,6 +11,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.axisAlignedTo
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.printWithAccuracy
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -35,6 +40,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 @RequiresOptIn(
     "getAllEntities or getEntities should only be used when necessary," +
@@ -50,7 +56,7 @@ object EntityUtils {
     // TODO remove this relatively heavy call everywhere
     @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.hasNameTagWith(
-        y: Int,
+        y: Double,
         contains: String,
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
@@ -71,13 +77,13 @@ object EntityUtils {
     fun LivingEntity.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<ArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
+    ): List<ArmorStand> = getArmorStandsInRadius(position().up(3.0), radius).filter {
         it.name.string.contains(contains)
     }
 
     @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.getNameTagWith(
-        y: Int,
+        y: Double,
         contains: String,
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
@@ -86,28 +92,28 @@ object EntityUtils {
 
     @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.getAllNameTagsWith(
-        y: Int,
+        y: Double,
         contains: String,
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): List<ArmorStand> {
-        val center = getLorenzVec().up(y)
+        val center = position().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.formattedTextCompatLessResets().contains(contains)
             if (debugWrongEntity && !result) {
-                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name.formattedTextCompatLessResets() + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '${it.name.formattedTextCompatLessResets()}'")
             }
             if (debugRightEntity && result) {
-                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: ${center.printWithAccuracy(2)}")
+                ChatUtils.consoleLog("nametag: ${it.position().printWithAccuracy(2)}")
+                ChatUtils.consoleLog("accuracy: ${(it.position() - center).printWithAccuracy(3)}")
             }
             result
         }
     }
 
-    private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<ArmorStand> {
+    private fun getArmorStandsInRadius(center: Vec3, radius: Double): List<ArmorStand> {
         val a = center.add(-radius, -radius - 3, -radius)
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
@@ -147,7 +153,7 @@ object EntityUtils {
         LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
-    inline fun <reified T : Entity> LorenzVec.getEntitiesNearby(
+    inline fun <reified T : Entity> Vec3.getEntitiesNearby(
         radius: Double,
         noinline predicate: (T) -> Boolean = ALWAYS,
     ): List<T> {
@@ -155,7 +161,7 @@ object EntityUtils {
     }
 
     @AllEntitiesGetter
-    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
+    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: Vec3, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
 
     fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
@@ -187,16 +193,19 @@ object EntityUtils {
     @AllEntitiesGetter
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
-    inline fun <reified E : Entity> getEntitiesInBox(pos: LorenzVec, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
+    inline fun <reified E : Entity> getEntitiesInBox(pos: Vec3, radius: Double, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
         return getEntitiesInBoundingBox(pos.boundingCenter(radius), predicate)
     }
 
-    // More efficient than filtering by type, and then for distance, as Minecraft already first filters the chunks that contain the aabb,
-    // and then filters both for entity type and with the predicate for entities inside those chunks.
-    inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
-        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return world.getEntitiesOfClass<E>(E::class.java, aabb, predicate)
-    }
+    // More efficient than filtering by type, and then for distance, as Minecraft already first
+    // filters the chunks that contain the AABB, and then filters both for entity type and with
+    // the predicate for entities inside those chunks.
+    inline fun <reified E : Entity> getEntitiesInBoundingBox(
+        aabb: AABB,
+        noinline predicate: (E) -> Boolean = ALWAYS,
+    ): List<E> =
+        MinecraftCompat.localWorldOrNull?.getEntitiesOfClass<E>(E::class.java, aabb, predicate)
+            ?: emptyList()
 
     @AllEntitiesGetter
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.entitiesForRendering()?.let {
@@ -219,7 +228,7 @@ object EntityUtils {
         if (deceased) return false
         // TODO add cache that only updates e.g. 10 times a second
         if (!ignoreFrustum && !FrustumUtils.isVisible(boundingBox)) return false
-        return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
+        return position().up(vecYOffset).canBeSeen(viewDistance)
     }
 
     fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntity(entityId)

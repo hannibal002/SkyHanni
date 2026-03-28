@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.chat.Component
+import net.minecraft.world.phys.Vec3
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +35,7 @@ object BarnFishingTimer {
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private const val GLOBAL_CAP = 60
     private val warningDelay = 5.seconds
-    private val hubBarnFishingLocation = LorenzVec(108, 89, -252)
+    private val hubBarnFishingLocation = Vec3(108.0, 89.0, -252.0)
 
     private enum class FishingCap(val island: IslandType, islandPersonalCap: Int? = null) {
         CRIMSON_ISLE(IslandType.CRIMSON_ISLE, 5),

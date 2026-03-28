@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceChebyshevIgnoreY
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.animal.feline.Ocelot
@@ -98,7 +98,7 @@ object IslandExceptions {
         baseEntity: LivingEntity,
     ) = when {
         armorStand?.isDefaultValue() != false ->
-            if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
+            if (baseEntity.position().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
                 // TODO fix to always include Valid Mobs on Private Island
                 MobData.MobResult.found(MobFactories.minionMob(baseEntity))
             } else MobData.MobResult.notYetFound

@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,17 +14,19 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,7 +37,7 @@ object TimiteHelper {
     private var holdingClick = SimpleTimeMark.farPast()
     private var lastClick = SimpleTimeMark.farPast()
     private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
-    private var currentPos: LorenzVec? = null
+    private var currentPos: Vec3? = null
     private var currentBlockState: BlockState? = null
     private var doubleTimeShooting = false
 
@@ -87,20 +88,23 @@ object TimiteHelper {
         val timeLeft = holdingClick + time.milliseconds
         if (!timeLeft.isInPast()) {
             val formattedTime = timeLeft.timeUntil().format(showMilliSeconds = true)
-            config.timerPosition.renderString("§b$formattedTime", 0, 0, "Timite Helper")
+            config.timerPosition.renderRenderable(
+                Renderable.text("§b$formattedTime"),
+                "Timite Helper",
+            )
         }
     }
 
-    private val locations = mutableMapOf<LorenzVec, SimpleTimeMark>()
+    private val locations = mutableMapOf<Vec3, SimpleTimeMark>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled()) return
         if (!config.expiryTimer) return
 
         val map = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
-            distance = 15,
+            distance = 15.0,
             condition = { it.isStainedGlassPane() },
         )
 

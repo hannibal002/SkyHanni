@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -25,6 +24,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.add
+import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.toBlockPos
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -34,6 +36,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.ChestBlockEntity
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -45,8 +48,8 @@ object PowderChestTimer {
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
     private var display: String? = null
-    private val minedBlocks = TimeLimitedSet<LorenzVec>(5.seconds)
-    private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
+    private val minedBlocks = TimeLimitedSet<Vec3>(5.seconds)
+    private val chests = TimeLimitedCache<Vec3, SimpleTimeMark>(61.seconds)
     private val maxDuration = 60.seconds
     private const val MAX_CHEST_DISTANCE = 15
     private const val NEAR_PLAYER_DISTANCE = 25
@@ -150,7 +153,9 @@ object PowderChestTimer {
         event.drawRemainingLines(chestToConnect)
     }
 
-    private fun SkyHanniRenderWorldEvent.drawFirstLine(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
+    private fun SkyHanniRenderWorldEvent.drawFirstLine(
+        list: List<Map.Entry<Vec3, SimpleTimeMark>>,
+    ) {
         val (firstPos, firstTime) = list.first()
 
         drawLineToCrosshair(
@@ -161,7 +166,9 @@ object PowderChestTimer {
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.drawRemainingLines(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
+    private fun SkyHanniRenderWorldEvent.drawRemainingLines(
+        list: List<Map.Entry<Vec3, SimpleTimeMark>>,
+    ) {
         for ((first, second) in list.zipWithNext()) {
             val (current, currentTime) = first
             val (next, _) = second
@@ -171,7 +178,9 @@ object PowderChestTimer {
         }
     }
 
-    private fun sortChests(chests: Map<LorenzVec, SimpleTimeMark>): List<Map.Entry<LorenzVec, SimpleTimeMark>> {
+    private fun sortChests(
+        chests: Map<Vec3, SimpleTimeMark>,
+    ): List<Map.Entry<Vec3, SimpleTimeMark>> {
         val sortedChests = when (config.lineMode) {
             PowderChestTimerConfig.LineMode.OLDEST -> chests.entries.sortedBy { it.value.timeUntil() }
             PowderChestTimerConfig.LineMode.NEAREST -> chests.entries.sortedBy { it.key.distanceToPlayer() }
@@ -181,7 +190,7 @@ object PowderChestTimer {
         return sortedChests.take(config.drawLineToChestAmount)
     }
 
-    private fun SkyHanniRenderWorldEvent.renderChests(chests: Map<LorenzVec, SimpleTimeMark>) {
+    private fun SkyHanniRenderWorldEvent.renderChests(chests: Map<Vec3, SimpleTimeMark>) {
         val playerY = LocationUtils.playerLocation().y
         for ((loc, time) in chests) {
             val timeLeft = time.timeUntil()
@@ -219,7 +228,7 @@ object PowderChestTimer {
         return Color(red, green, 0)
     }
 
-    private fun LorenzVec.isOpened() = !chests.containsKey(this)
+    private fun Vec3.isOpened() = this !in chests.keys
 
     private fun isEnabled() = config.enabled && (!config.onlyMaxGreatExplorer || HotmData.GREAT_EXPLORER.isMaxLevel)
 }

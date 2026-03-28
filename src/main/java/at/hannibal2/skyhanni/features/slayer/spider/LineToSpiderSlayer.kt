@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 
 @SkyHanniModule
@@ -40,7 +40,7 @@ object LineToSpiderSlayer {
         val seenMobs = bosses.filter { it.baseEntity.canBeSeen(30) && it.isAlive }
         seenMobs.forEach { mob ->
             event.drawLineToCrosshair(
-                mob.baseEntity.getLorenzVec().up(),
+                mob.baseEntity.position().up(),
                 LorenzColor.AQUA.toChromaColor(),
                 config.slayerLineWidth,
                 true,

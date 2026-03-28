@@ -25,13 +25,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
@@ -60,8 +60,8 @@ object CopyNearbyEntitiesCommand {
         val start = LocationUtils.playerLocation()
         for (entity in EntityUtils.getAllEntities().sortedBy { it.id }) {
             val position = entity.blockPosition()
-            val vec = position.toLorenzVec()
-            val distance = start.distance(vec)
+            val vec = position.toVec3()
+            val distance = start.distanceTo(vec)
             val mob = MobData.entityToMob[entity]
             if (distance >= searchRadius) continue
 
@@ -141,8 +141,8 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.addArmorStand(entity: ArmorStand) {
         add("EntityArmorStand:")
-        val headRotation = entity.headPose.toLorenzVec()
-        val bodyRotation = entity.bodyPose.toLorenzVec()
+        val headRotation = entity.headPose.toVec3()
+        val bodyRotation = entity.bodyPose.toVec3()
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 

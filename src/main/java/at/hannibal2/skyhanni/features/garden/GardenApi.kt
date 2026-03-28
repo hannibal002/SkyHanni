@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -57,6 +56,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -219,12 +219,12 @@ object GardenApi {
         return lastBrokenCropType ?: cropInHand ?: brokenCrop
     }
 
-    private var lastLocation: LorenzVec? = null
+    private var lastLocation: Vec3? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         val blockState = event.getBlockState
-        val cropBroken = blockState.getCropType(event.position) ?: return
+        val cropBroken = blockState.getCropType() ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position

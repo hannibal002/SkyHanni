@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
@@ -86,11 +86,10 @@ object BlazeSlayerDaggerHelper {
         if (lastNearestCheck.passedSince() < 100.milliseconds) return lastNearest
         lastNearestCheck = SimpleTimeMark.now()
 
-        val playerLocation = LocationUtils.playerLocation()
         return HellionShieldHelper.hellionShieldMobs
-            .filter { !it.key.deceased && it.key.getLorenzVec().distance(playerLocation) < 10 && it.key.findHealthReal() > 0 }
+            .filter { !it.key.deceased && it.key.distanceToPlayer() < 10 && it.key.findHealthReal() > 0 }
             .toSortedMap { a, b ->
-                if (a.getLorenzVec().distance(playerLocation) > b.getLorenzVec().distance(playerLocation)) 1 else 0
+                if (a.distanceToPlayer() > b.distanceToPlayer()) 1 else 0
             }.firstNotNullOfOrNull { it.value }
     }
 

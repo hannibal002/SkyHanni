@@ -18,16 +18,18 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
+import at.hannibal2.skyhanni.utils.VectorUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.ChestBlock
+import net.minecraft.world.phys.Vec3
 import java.util.NavigableMap
 import java.util.TreeMap
 
@@ -196,13 +198,15 @@ object StorageApi {
         shouldSave = true
     }
 
-    private var lastChestClicked: LorenzVec? = null
-    private var doubleChestCord: LorenzVec? = null
+    private var lastChestClicked: Vec3? = null
+    private var doubleChestCord: Vec3? = null
 
-    private fun getNeighbourBlocks(position: LorenzVec) =
-        listOf(position.add(x = 1), position.add(x = -1), position.add(z = 1), position.add(z = -1)).map {
-            it to it.getBlockAt()
-        }
+    private fun getNeighbourBlocks(position: Vec3): List<Pair<Vec3, Block>> = listOf(
+        position.add(x = 1.0),
+        position.add(x = -1.0),
+        position.add(z = 1.0),
+        position.add(z = -1.0),
+    ).map { it to it.getBlockAt() }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBlockClick(event: BlockClickEvent) {
@@ -214,7 +218,7 @@ object StorageApi {
         if (otherChest == null) {
             lastChestClicked = event.position
             doubleChestCord = null
-        } else if (otherChest.lengthSquared() > event.position.lengthSquared()) {
+        } else if (otherChest.lengthSqr() > event.position.lengthSqr()) {
             lastChestClicked = event.position
             doubleChestCord = otherChest
         } else {

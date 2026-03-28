@@ -14,13 +14,14 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.isCompletelyDefault
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingCenter
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object InvisibugHighlighter {
@@ -29,7 +30,7 @@ object InvisibugHighlighter {
     private const val DISTANCE = 5.0
 
     private val invisibugEntities = mutableSetOf<LivingEntity>()
-    private var locationsToRender = listOf<LorenzVec>()
+    private var locationsToRender = emptyList<Vec3>()
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onParticle(event: ReceiveParticleEvent) {
@@ -48,14 +49,14 @@ object InvisibugHighlighter {
 
     }
 
-    private val renderOffset = LorenzVec(0.4, -0.2, 0.4)
+    private val renderOffset = Vec3(0.4, -0.2, 0.4)
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
         if (!config.enabled) return
         locationsToRender = invisibugEntities.mapNotNull {
-            if (it.canBeSeen(32)) it.getLorenzVec() else null
+            if (it.canBeSeen(32)) it.position() else null
         }
     }
 

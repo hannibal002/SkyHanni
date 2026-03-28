@@ -1,24 +1,23 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.copyLocations
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.client.Minecraft
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -26,7 +25,7 @@ object ParkourWaypointSaver {
 
     private val config get() = DevApi.config.waypoint
     private var timeLastSaved = SimpleTimeMark.farPast()
-    private var locations = mutableListOf<LorenzVec>()
+    private var locations = mutableListOf<Vec3>()
     private var parkourHelper: ParkourHelper? = null
 
     @HandleEvent
@@ -40,14 +39,14 @@ object ParkourWaypointSaver {
         when (event.keyCode) {
             config.deleteKey -> {
                 if (locations.isEmpty()) {
-                    loadClipboard()
+                    locations = VectorUtils.readListFromClipboard().toMutableList()
                 } else {
                     if (PlayerUtils.isSneaking()) {
                         locations.clear()
                     } else {
-                        locations = locations.dropLast(1).toMutableList()
+                        locations.removeLast()
                     }
-//                     update()
+                    // update()
                 }
             }
 
@@ -66,43 +65,13 @@ object ParkourWaypointSaver {
      *       "-728:122:-998"
      */
 
-    private fun loadClipboard() {
-        SkyHanniMod.launchCoroutine("parkour waypoint load clipboard") {
-            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
-            try {
-                locations = clipboard.split("\n").map { line ->
-                    val raw = line.replace("\"", "").replace(",", "")
-                    raw.split(":").map { it.toDouble() }.toLorenzVec()
-                }.toMutableList()
-            } catch (e: NumberFormatException) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    "Failed to load parkour waypoint data from clipboard.",
-                    "clipboard" to clipboard,
-                )
-            }
-            update()
-        }
-    }
-
     private fun update() {
+        timeLastSaved = SimpleTimeMark.now()
         locations.copyLocations()
         parkourHelper = ParkourHelper(locations, emptyList()).also {
             it.showEverything = true
             it.rainbowColor = true
         }
-    }
-
-    private fun MutableList<LorenzVec>.copyLocations() {
-        val resultList = mutableListOf<String>()
-        timeLastSaved = SimpleTimeMark.now()
-        for (location in this) {
-            val x = location.x.toString().replace(",", ".")
-            val y = location.y.toString().replace(",", ".")
-            val z = location.z.toString().replace(",", ".")
-            resultList.add("\"$x:$y:$z\"")
-        }
-        OSUtils.copyToClipboard(resultList.joinToString((",\n")))
     }
 
     @HandleEvent
@@ -112,12 +81,10 @@ object ParkourWaypointSaver {
 
         if (locations.size > 1) {
             parkourHelper?.render(event)
-        } else {
-            for (location in locations) {
-                val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
-                // TODO add chroma color support via config
-                event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toChromaColor(), 1f)
-            }
+        } else if (locations.isNotEmpty()) {
+            val aabb = locations.first().boundingToOffset(1.0, 1.0, 1.0).expandBlock()
+            // TODO add chroma color support via config
+            event.drawFilledBoundingBox(aabb, LorenzColor.GREEN.toChromaColor(), 1f)
         }
     }
 }

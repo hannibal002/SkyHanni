@@ -13,21 +13,21 @@ import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBos
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.axisAlignedTo
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.level.block.entity.BeaconBlockEntity
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -114,7 +114,7 @@ object CrimsonMinibossRespawnTimer {
 
         val isBossInArea = MobData.skyblockMobs.filter {
             it.name == boss.displayName
-        }.any { boss.area.isInside(it.baseEntity.blockPosition().toLorenzVec()) }
+        }.any { boss.area.contains(it.baseEntity.blockPosition().toVec3()) }
         if (isBossInArea) {
             boss.spawned = true
             boss.foundBeacon = null
@@ -124,7 +124,7 @@ object CrimsonMinibossRespawnTimer {
         boss.spawned = false
 
         val isThereBeacon = EntityUtils.getAllTileEntities().filter { it is BeaconBlockEntity }.any {
-            boss.area.isInside(it.blockPos.toLorenzVec())
+            boss.area.contains(it.blockPos.toVec3())
         }
         if (boss.foundBeacon == true && !isThereBeacon) {
             boss.foundBeacon = false
@@ -212,6 +212,7 @@ object CrimsonMinibossRespawnTimer {
         }
     }
 
+    // TODO use repo
     enum class MiniBoss(
         val displayName: String,
         val area: AABB,
@@ -223,23 +224,23 @@ object CrimsonMinibossRespawnTimer {
     ) {
         BLADESOUL(
             "Bladesoul",
-            LorenzVec(-330, 80, -486).axisAlignedTo(LorenzVec(-257, 107, -545)),
+            Vec3(-330.0, 80.0, -486.0).axisAlignedTo(Vec3(-257.0, 107.0, -545.0)),
         ),
         MAGE_OUTLAW(
             "Mage Outlaw",
-            LorenzVec(-200, 98, -843).axisAlignedTo(LorenzVec(-162, 116, -878)),
+            Vec3(-200.0, 98.0, -843.0).axisAlignedTo(Vec3(-162.0, 116.0, -878.0)),
         ),
         BARBARIAN_DUKE_X(
             "Barbarian Duke X",
-            LorenzVec(-550, 101, -890).axisAlignedTo(LorenzVec(-522, 131, -918)),
+            Vec3(-550.0, 101.0, -890.0).axisAlignedTo(Vec3(-522.0, 131.0, -918.0)),
         ),
         ASHFANG(
             "Ashfang",
-            LorenzVec(-462, 155, -1035).axisAlignedTo(LorenzVec(-507, 131, -955)),
+            Vec3(-462.0, 155.0, -1035.0).axisAlignedTo(Vec3(-507.0, 131.0, -955.0)),
         ),
         MAGMA_BOSS(
             "Magma Boss",
-            LorenzVec(-318, 59, -751).axisAlignedTo(LorenzVec(-442, 90, -851)),
+            Vec3(-318.0, 59.0, -751.0).axisAlignedTo(Vec3(-442.0, 90.0, -851.0)),
         ),
         ;
 

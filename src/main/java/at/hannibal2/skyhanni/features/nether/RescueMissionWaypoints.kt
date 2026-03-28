@@ -23,12 +23,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object RescueMissionWaypoints {
@@ -175,7 +175,7 @@ object RescueMissionWaypoints {
         }
     }
 
-    private fun createParkour(locations: List<LorenzVec>) = ParkourHelper(
+    private fun createParkour(locations: List<Vec3>) = ParkourHelper(
         locations,
         emptyList(),
         platformSize = 1.0,
@@ -256,15 +256,17 @@ object RescueMissionWaypoints {
     // through an area where the rescue mission would fail
     // or where guards are located.
     // therefore we remove some nodes from the network to only show the correct path
+    // TODO use repo
     private fun tweakGraphNetwork() {
         val reason = "rescue mission"
+
         // outside cathedral
-        IslandGraphs.disableNodes(reason, LorenzVec(6.9, 105.0, -852.0), 3.0)
+        IslandGraphs.disableNodes(reason, Vec3(6.9, 105.0, -852.0), 3.0)
 
         // in cathedral
-        IslandGraphs.disableNodes(reason, LorenzVec(-9.2, 114.1, -882.1), 3.0)
-        IslandGraphs.disableNodes(reason, LorenzVec(-30.9, 114.0, -884.1), 3.0)
-        IslandGraphs.disableNodes(reason, LorenzVec(-37.4, 114.1, -888.5), 3.0)
+        IslandGraphs.disableNodes(reason, Vec3(-9.2, 114.1, -882.1), 3.0)
+        IslandGraphs.disableNodes(reason, Vec3(-30.9, 114.0, -884.1), 3.0)
+        IslandGraphs.disableNodes(reason, Vec3(-37.4, 114.1, -888.5), 3.0)
     }
 
     private fun navigateToParkourStart() {

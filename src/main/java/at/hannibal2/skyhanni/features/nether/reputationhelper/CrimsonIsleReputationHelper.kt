@@ -20,13 +20,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object CrimsonIsleReputationHelper {
@@ -168,11 +170,8 @@ object CrimsonIsleReputationHelper {
         update()
     }
 
-    fun readLocationData(locations: List<Double>): LorenzVec? {
-        if (locations.isEmpty()) return null
-        val (x, y, z) = locations
-        return LorenzVec(x, y, z).add(-1, 0, -1)
-    }
+    fun readLocationData(locations: List<Double>): Vec3? =
+        locations.takeIfNotEmpty()?.toVec3()?.add(-1.0, 0.0, -1.0)
 
     fun showLocations() = when (config.showLocation) {
         ShowLocationEntry.ALWAYS -> true

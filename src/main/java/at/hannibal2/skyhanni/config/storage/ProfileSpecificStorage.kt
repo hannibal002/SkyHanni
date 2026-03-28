@@ -66,7 +66,6 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -76,6 +75,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
@@ -298,7 +298,7 @@ class ProfileSpecificStorage(
         var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
 
         @Expose
-        var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
+        var collectedEggLocations: MutableMap<IslandType, MutableSet<Vec3>> = enumMapOf()
 
         @Expose
         var residentRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
@@ -557,10 +557,10 @@ class ProfileSpecificStorage(
         var scoreboardPests: Int = 0
 
         @Expose
-        var cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
+        var cropStartLocations: MutableMap<CropType, Vec3> = enumMapOf()
 
         @Expose
-        var cropLastFarmedLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
+        var cropLastFarmedLocations: MutableMap<CropType, Vec3> = enumMapOf()
 
         @Expose
         var farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
@@ -629,7 +629,7 @@ class ProfileSpecificStorage(
         }
 
         @Expose
-        var npcVisitorLocations: MutableMap<String, LorenzVec> = mutableMapOf()
+        var npcVisitorLocations: MutableMap<String, Vec3> = mutableMapOf()
 
         @Expose
         var customGoalMilestone: MutableMap<CropType, Int> = enumMapOf()
@@ -675,7 +675,7 @@ class ProfileSpecificStorage(
 
     class ExperimentationStorage {
         @Expose
-        var tablePos: LorenzVec = LorenzVec()
+        var tablePos: Vec3 = Vec3.ZERO
 
         @Expose
         var dryStreak: ExperimentsDryStreakStorage = ExperimentsDryStreakStorage()
@@ -813,7 +813,7 @@ class ProfileSpecificStorage(
 
     // - minion
     @Expose
-    var minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
+    var minions: MutableMap<Vec3, MinionConfig>? = mutableMapOf()
 
     class MinionConfig {
         @Expose
@@ -977,7 +977,7 @@ class ProfileSpecificStorage(
         var totalFound: MutableMap<IslandType, Int> = mutableMapOf()
 
         @Expose
-        var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
+        var found: MutableMap<IslandType, MutableSet<Vec3>> = mutableMapOf()
     }
 
     @Expose

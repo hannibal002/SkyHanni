@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -33,7 +33,7 @@ object FishingHotspotRadar {
     private var lastParticle = SimpleTimeMark.farPast()
     private var lastAbilityUse = SimpleTimeMark.farPast()
     private val bezierFitter = ParticlePathBezierFitter(3)
-    private var hotspotLocation: LorenzVec? = null
+    private var hotspotLocation: Vec3? = null
     private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
     private var foundTime = SimpleTimeMark.farPast()
     private var lastUpdate = SimpleTimeMark.farPast()
@@ -54,7 +54,7 @@ object FishingHotspotRadar {
             bezierFitter.addPoint(currLoc)
             return
         }
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
+        val distToLast = bezierFitter.getLastPoint()?.distanceTo(currLoc) ?: return
 
         if (distToLast == 0.0 || distToLast > 3.0) return
 
@@ -73,7 +73,7 @@ object FishingHotspotRadar {
         }
     }
 
-    private fun pathFind(location: LorenzVec) {
+    private fun pathFind(location: Vec3) {
         if (!config.guessHotspotRadarPathFind) return
 
         foundTime = SimpleTimeMark.farFuture()
@@ -114,7 +114,7 @@ object FishingHotspotRadar {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val location = hotspotLocation ?: return
-        val distance = location.distance(event.exactPlayerEyeLocation())
+        val distance = location.distanceTo(event.exactPlayerEyeLocation())
         if (config.lineToHotspot) {
             event.drawLineToCrosshair(location, LorenzColor.LIGHT_PURPLE.toChromaColor(), lineWidth = 3, depth = false)
         }

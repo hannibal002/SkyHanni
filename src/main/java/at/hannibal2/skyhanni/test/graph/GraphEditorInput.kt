@@ -15,18 +15,22 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.middle
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.rotateXZ
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.phys.Vec3
 import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
@@ -268,7 +272,7 @@ object GraphEditorInput {
         }
     }
 
-    private var moveToStart: LorenzVec? = null
+    private var moveToStart: Vec3? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
@@ -310,11 +314,11 @@ object GraphEditorInput {
         KeyboardManager.WasdInputMatrix.s.handleEditClicks(vector.rotateXZ(Math.toRadians(180.0)))
         KeyboardManager.WasdInputMatrix.d.handleEditClicks(vector.rotateXZ(Math.toRadians(270.0)))
 
-        KeyboardManager.WasdInputMatrix.up.handleEditClicks(LorenzVec(0, 1, 0))
-        KeyboardManager.WasdInputMatrix.down.handleEditClicks(LorenzVec(0, -1, 0))
+        KeyboardManager.WasdInputMatrix.up.handleEditClicks(Vec3(0.0, 1.0, 0.0))
+        KeyboardManager.WasdInputMatrix.down.handleEditClicks(Vec3(0.0, -1.0, 0.0))
     }
 
-    private fun KeyMapping.handleEditClicks(vector: LorenzVec) {
+    private fun KeyMapping.handleEditClicks(vector: Vec3) {
         if (!this.key.value.isKeyClicked()) return
         GraphEditorHistory.save("moved node")
         state.activeNode?.let {

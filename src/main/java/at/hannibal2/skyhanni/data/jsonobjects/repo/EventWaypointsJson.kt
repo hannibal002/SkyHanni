@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import net.minecraft.world.phys.Vec3
 
 data class EventWaypointsJson(
     @Expose val presents: Map<String, List<EventWaypointData>>,
@@ -11,5 +11,5 @@ data class EventWaypointsJson(
 
 data class EventWaypointData(
     @Expose val name: String,
-    @Expose val position: LorenzVec,
+    @Expose val position: Vec3,
 )

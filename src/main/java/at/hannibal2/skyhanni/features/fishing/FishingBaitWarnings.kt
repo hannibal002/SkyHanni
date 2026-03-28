@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.item.ItemEntity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -52,7 +51,7 @@ object FishingBaitWarnings {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<ItemEntity>) {
         if (KuudraApi.inKuudra || !FishingApi.isFishing()) return
-        val bobberDistance = event.entity.distanceTo(FishingApi.bobber?.getLorenzVec() ?: return)
+        val bobberDistance = event.entity.distanceTo(FishingApi.bobber?.position() ?: return)
         if (bobberDistance > 2) return
         DelayedRun.runNextTick {
             if (event.entity.item.isBait()) {

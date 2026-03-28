@@ -15,18 +15,17 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -50,7 +49,7 @@ object RiftBloodEffigies {
 
     private val config get() = RiftApi.config.area.stillgoreChateau.bloodEffigies
 
-    private var locations: List<LorenzVec> = emptyList()
+    private var locations = emptyList<Vec3>()
     private val effigies = (0..5).associateWith { Effigy() }
 
     private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
@@ -82,7 +81,7 @@ object RiftBloodEffigies {
     )
 
     private fun getIndex(entity: ArmorStand): Int? =
-        locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
+        locations.minByOrNull { entity.distanceToSqr(it) }?.let { locations.indexOf(it) }
 
     @HandleEvent
     fun onWorldChange() {

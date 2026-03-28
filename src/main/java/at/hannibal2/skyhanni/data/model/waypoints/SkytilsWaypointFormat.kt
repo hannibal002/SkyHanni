@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.data.model.waypoints
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.auto.service.AutoService
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
+import net.minecraft.world.phys.Vec3
 import java.io.ByteArrayInputStream
 import java.util.Base64
 import java.util.zip.GZIPInputStream
@@ -32,7 +32,7 @@ class SkytilsWaypointFormat : WaypointFormat {
             val waypoints = list.mapIndexed { index, wp ->
                 val number = index + 1
                 SkyHanniWaypoint(
-                    LorenzVec(wp.x, wp.y, wp.z),
+                    Vec3(wp.x, wp.y, wp.z),
                     number,
                     mutableMapOf("name" to wp.name),
                 )

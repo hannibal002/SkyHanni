@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
-import at.hannibal2.skyhanni.utils.LorenzVec
+import net.minecraft.world.phys.Vec3
 
 data class MineshaftWaypoint(
     val waypointType: MineshaftWaypointType,
-    val location: LorenzVec,
-    var shared: Boolean = false,
-    var isCorpse: Boolean = false
-)
+    val location: Vec3,
+) {
+    val isCorpse: Boolean = waypointType.helmet != null
+
+    var shared: Boolean = false
+}

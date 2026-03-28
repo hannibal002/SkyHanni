@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBoxExtraEntities
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 class LivingSeaCreatureData(
     val isOwn: Boolean,
@@ -23,7 +23,7 @@ class LivingSeaCreatureData(
 ) {
 
     /** This tracks the last position of the sea creature that the user was able to see. */
-    var pos: LorenzVec?
+    var pos: Vec3?
         private set
 
     /** This tracks the last bounding box of the sea creature that the user was able to see. */
@@ -34,19 +34,19 @@ class LivingSeaCreatureData(
         private set
 
     /** This tracks the real last position of the sea creature. Don't display this to the user */
-    internal var actualLastPos: LorenzVec?
+    internal var actualLastPos: Vec3?
         private set
 
     init {
         if (canBeSeen()) {
             aabb = mob?.boundingBox
-            pos = mob?.getLorenzVec()
+            pos = mob?.position()
         } else {
             aabb = null
             pos = null
         }
         updateCanBeSeen()
-        actualLastPos = mob?.getLorenzVec()
+        actualLastPos = mob?.position()
     }
 
     inline val name: String get() = seaCreature.name
@@ -97,7 +97,7 @@ class LivingSeaCreatureData(
     fun updateNonWorld() {
         lastUpdate = SimpleTimeMark.now()
         val mob = mob ?: return
-        actualLastPos = mob.getLorenzVec()
+        actualLastPos = mob.position()
         if (!updateCanBeSeen()) return
     }
 

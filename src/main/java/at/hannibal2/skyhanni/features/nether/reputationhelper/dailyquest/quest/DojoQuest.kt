@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import net.minecraft.world.phys.Vec3
 
 class DojoQuest(
     val dojoName: String,
-    location: LorenzVec?,
+    location: Vec3?,
     displayItem: NeuInternalName,
     dojoRankGoal: String,
     state: QuestState,

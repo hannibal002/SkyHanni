@@ -2,14 +2,36 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.edges
+import at.hannibal2.skyhanni.utils.VectorUtils.inverse
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.times
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import com.mojang.blaze3d.vertex.PoseStack.Pose
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
 
     private val queuedLines = mutableListOf<QueuedLine>()
+
+    //? if < 1.21.11
+    @Suppress("UNUSED_PARAMETER")
+    private fun VertexConsumer.addLineVertex(
+        matrix: Pose,
+        point: Vec3,
+        normal: Vec3,
+        color: Color,
+        lineWidth: Float,
+    ) {
+        addVertex(matrix.pose(), point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
+            .setNormal(matrix, normal.x.toFloat(), normal.y.toFloat(), normal.z.toFloat())
+            .setColor(color.red, color.green, color.blue, color.alpha)
+        /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
+    }
 
     @PublishedApi
     internal fun drawQueuedLines() {
@@ -20,21 +42,14 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         val matrix = event.matrices.last()
 
         for (line in queuedLines) {
-            buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
-                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-            /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
-
-            buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
-                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-            /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
+            buf.addLineVertex(matrix, line.p1, line.normal, line.color, lineWidth.toFloat())
+            buf.addLineVertex(matrix, line.p2, line.normal, line.color, lineWidth.toFloat())
         }
 
         queuedLines.clear()
     }
 
-    private fun addQueuedLine(p1: LorenzVec, p2: LorenzVec, color: Color) {
+    private fun addQueuedLine(p1: Vec3, p2: Vec3, color: Color) {
         val last = queuedLines.lastOrNull()
 
         if (last == null) {
@@ -49,7 +64,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         queuedLines.add(QueuedLine(p1, p2, color))
     }
 
-    fun drawPath(path: List<LorenzVec>, color: Color, bezierPoint: Double = 1.0) {
+    fun drawPath(path: List<Vec3>, color: Color, bezierPoint: Double = 1.0) {
         if (bezierPoint < 0) {
             path.zipWithNext().forEach {
                 draw3DLine(it.first, it.second, color)
@@ -57,7 +72,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         } else {
             val pathLines = path.zipWithNext()
             pathLines.forEachIndexed { index, pathLine ->
-                val reduce = pathLine.second.minus(pathLine.first).normalize().times(bezierPoint)
+                val reduce = (pathLine.second - pathLine.first).normalize() * bezierPoint
                 draw3DLine(
                     if (index != 0) pathLine.first + reduce else pathLine.first,
                     if (index != pathLines.lastIndex) pathLine.second - reduce else pathLine.second,
@@ -65,15 +80,17 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
                 )
             }
             path.zipWithNext3().forEach {
-                val p1 = it.second.minus(it.second.minus(it.first).normalize().times(bezierPoint))
-                val p3 = it.second.minus(it.second.minus(it.third).normalize().times(bezierPoint))
-                val p2 = it.second
-                drawBezier2(p1, p2, p3, color)
+                drawBezier2(
+                    (it.second - (it.second - it.first).normalize()) * bezierPoint,
+                    it.second,
+                    (it.second - (it.second - it.third).normalize()) * bezierPoint,
+                    color,
+                )
             }
         }
     }
 
-    fun drawEdges(location: LorenzVec, color: Color) {
+    fun drawEdges(location: Vec3, color: Color) {
         for ((p1, p2) in location.edges) {
             draw3DLine(p1, p2, color)
         }
@@ -86,14 +103,14 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         }
     }
 
-    fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color) {
+    fun draw3DLine(p1: Vec3, p2: Vec3, color: Color) {
         addQueuedLine(p1, p2, color)
     }
 
     fun drawBezier2(
-        p1: LorenzVec,
-        p2: LorenzVec,
-        p3: LorenzVec,
+        p1: Vec3,
+        p2: Vec3,
+        p3: Vec3,
         color: Color,
         segments: Int = 30,
     ) {
@@ -108,16 +125,16 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         }
     }
 
-    private fun calculateBezierPoint(t: Float, p1: LorenzVec, p2: LorenzVec, p3: LorenzVec): LorenzVec {
+    private fun calculateBezierPoint(t: Float, p1: Vec3, p2: Vec3, p3: Vec3): Vec3 {
         val u = 1 - t
         val tt = t * t
         val uu = u * u
 
-        val x = uu * p1.x + 2 * u * t * p2.x + tt * p3.x
-        val y = uu * p1.y + 2 * u * t * p2.y + tt * p3.y
-        val z = uu * p1.z + 2 * u * t * p2.z + tt * p3.z
-
-        return LorenzVec(x, y, z)
+        return Vec3(
+            uu * p1.x + 2 * u * t * p2.x + tt * p3.x,
+            uu * p1.y + 2 * u * t * p2.y + tt * p3.y,
+            uu * p1.z + 2 * u * t * p2.z + tt * p3.z,
+        )
     }
 
     companion object {
@@ -129,7 +146,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         ) {
             event.matrices.pushPose()
 
-            val inverseView = WorldRenderUtils.getViewerPos().negated()
+            val inverseView = WorldRenderUtils.getViewerPos().inverse()
             event.matrices.translate(inverseView.x, inverseView.y, inverseView.z)
 
             val lineDrawer = LineDrawer(event, lineWidth, depth)
@@ -142,9 +159,9 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 }
 
 private data class QueuedLine(
-    val p1: LorenzVec,
-    val p2: LorenzVec,
+    val p1: Vec3,
+    val p2: Vec3,
     val color: Color,
 ) {
-    val normal = p2.minus(p1).normalize()
+    val normal: Vec3 = (p2 - p1).normalize()
 }

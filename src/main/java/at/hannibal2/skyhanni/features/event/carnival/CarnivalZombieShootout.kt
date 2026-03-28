@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -18,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -35,6 +33,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -45,7 +44,7 @@ object CarnivalZombieShootout {
 
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
-    private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
+    private data class ShootoutLamp(var pos: Vec3, var time: SimpleTimeMark)
     private data class ShootoutZombie(val entity: Zombie, val type: ZombieType)
 
     private var content = Renderable.empty()
@@ -107,7 +106,7 @@ object CarnivalZombieShootout {
                 val height = if (isSmall) entity.bbHeight / 2 else entity.bbHeight
 
                 drawDynamicText(
-                    entity.getLorenzVec().add(-0.5, height + 0.5, -0.5),
+                    entity.position().add(-0.5, height + 0.5, -0.5),
                     "$prefix${timer.toString(DurationUnit.SECONDS, 1)}",
                     scaleMultiplier = 1.25,
                 )

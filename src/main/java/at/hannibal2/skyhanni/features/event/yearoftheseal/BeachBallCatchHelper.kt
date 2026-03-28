@@ -12,21 +12,24 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.with
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -42,12 +45,12 @@ object BeachBallCatchHelper {
 
     fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
-            predictors.putIfAbsent(entity.id, Predictor(entity.getLorenzVec(), Variant.NORMAL))
+            predictors.putIfAbsent(entity.id, Predictor(entity.position(), Variant.NORMAL))
             println("normal detected")
             return
         }
 //         if (entity.wearingSkullTexture(GIANT_BEACH_BALL)) {
-//             predictors.putIfAbsent(entity.entityId, Predictor(entity.getLorenzVec(), Variant.GIANT))
+//             predictors.putIfAbsent(entity.entityId, Predictor(entity.position(), Variant.GIANT))
 //             println("giant detected")
 //             return
 //         }
@@ -64,7 +67,7 @@ object BeachBallCatchHelper {
         if (!isEnabled()) return
         predictors.removeIf { (id, predict) ->
             val entity = EntityUtils.getEntityByID(id) ?: return@removeIf true
-            predict.newData(entity.getLorenzVec())
+            predict.newData(entity.position())
             false
         }
     }
@@ -85,16 +88,16 @@ object BeachBallCatchHelper {
 
     private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
         if (!config.bouncyBallLandingSpot.get()) return
-        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayer, partialTicks).add(y = 1)
+        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayer, partialTicks).up()
         for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
             val entity = e ?: continue
-            val location = WorldRenderUtils.exactLocation(entity, partialTicks).copy(y = player.y)
+            val location = WorldRenderUtils.exactLocation(entity, partialTicks).with(y = player.y)
             renderBlock(location, player, predictor)
             renderString(predictor, location)
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderString(predictor: Predictor, location: LorenzVec) {
+    private fun SkyHanniRenderWorldEvent.renderString(predictor: Predictor, location: Vec3) {
         val counter = predictor.bounceCounter
         val (qualityColor, quality) = when {
             counter < 2 -> "§c" to null // aww man
@@ -105,11 +108,11 @@ object BeachBallCatchHelper {
             else -> "§d" to "INSANE"
         }
         val qualityString = quality?.let { " §8- $qualityColor§l$it!" }.orEmpty()
-        drawString(location.add(y = 0.7), "$qualityColor§l$counter$qualityString")
+        drawString(location.up(0.7), "$qualityColor§l$counter$qualityString")
     }
 
-    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec, player: LorenzVec, predictor: Predictor) {
-        val distance = location.distance(player)
+    private fun SkyHanniRenderWorldEvent.renderBlock(location: Vec3, player: Vec3, predictor: Predictor) {
+        val distance = location.distanceTo(player)
         drawFilledBoundingBox(
             location.getAABB(predictor.variant),
             // TODO add chroma color support via config
@@ -121,7 +124,7 @@ object BeachBallCatchHelper {
         )
     }
 
-    private fun LorenzVec.getAABB(variant: Variant): AABB = when (variant) {
+    private fun Vec3.getAABB(variant: Variant): AABB = when (variant) {
         Variant.NORMAL -> add(-0.3, -0.3, -0.3).boundingToOffset(0.6, 0.6, 0.6)
         Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
@@ -143,26 +146,27 @@ object BeachBallCatchHelper {
         GIANT,
     }
 
-    private class Predictor(start: LorenzVec, val variant: Variant) {
+    private class Predictor(start: Vec3, val variant: Variant) {
 
-        private val data = mutableListOf<LorenzVec>()
+        private val data = mutableListOf<Vec3>()
 
         private var startIndex = 0
         private var minY = 0.0
 
-        var predictedPath = emptyList<LorenzVec>()
+        var predictedPath = emptyList<Vec3>()
             private set
 
-        var prePath = emptyList<LorenzVec>()
+        var prePath = emptyList<Vec3>()
+            private set
 
         private var updated = 0
-        var lastPosition: LorenzVec = start
+        var lastPosition: Vec3 = start
 
         init {
             newData(start)
         }
 
-        fun newData(new: LorenzVec) {
+        fun newData(new: Vec3) {
             updateDirection(new)
             data.add(new)
             if (new.distanceToPlayer() < 2.1) {
@@ -183,8 +187,8 @@ object BeachBallCatchHelper {
         var lastChange = SimpleTimeMark.now()
         var bounceCounter = 0
 
-        private fun updateDirection(newPosition: LorenzVec) {
-            if (lastPosition.distance(newPosition) < 0.3) return
+        private fun updateDirection(newPosition: Vec3) {
+            if (lastPosition.distanceTo(newPosition) < 0.3) return
             if (lastChange.passedSince() < 800.milliseconds) return
             val diff = (newPosition - lastPosition).y
             val isPositive = diff > 0
@@ -197,10 +201,10 @@ object BeachBallCatchHelper {
             lastPosition = newPosition
         }
 
-        fun predict(startIndex: Int, minY: Double): List<LorenzVec> {
+        fun predict(startIndex: Int, minY: Double): List<Vec3> {
             val presentValues = data.lastIndex - startIndex
 
-            val modelList = mapOf<(List<LorenzVec>) -> Model, Int>(::SmallPoly to 1, ::AveragePoly to 2, ::SpreadPoly to 1)
+            val modelList = mapOf<(List<Vec3>) -> Model, Int>(::SmallPoly to 1, ::AveragePoly to 2, ::SpreadPoly to 1)
                 .mapKeys { it.key(data) }
                 .filterKeys { it.minimumToPredict <= presentValues }
 
@@ -229,7 +233,7 @@ object BeachBallCatchHelper {
     private fun <K : Number, V : Number> Map<K, V>.weightedAverage() =
         entries.sumOf { it.key.toDouble() * it.value.toDouble() } / sumAllValues()
 
-    private abstract class PolyModel(override val given: List<LorenzVec>) : Model {
+    private abstract class PolyModel(override val given: List<Vec3>) : Model {
         abstract fun getT1(start: Int, current: Int, minY: Double): Int
         abstract fun getT2(start: Int, current: Int, minY: Double): Int
         abstract fun getT3(start: Int, current: Int, minY: Double): Int
@@ -238,7 +242,7 @@ object BeachBallCatchHelper {
         open fun dX(start: Int, current: Int, minY: Double) = given[current].x - given[current - 1].x
         open fun dZ(start: Int, current: Int, minY: Double) = given[current].z - given[current - 1].z
 
-        override fun predict(start: Int, current: Int, minY: Double): List<LorenzVec> {
+        override fun predict(start: Int, current: Int, minY: Double): List<Vec3> {
             val t1 = getT1(start, current, minY)
             val t2 = getT2(start, current, minY)
             val t3 = getT3(start, current, minY)
@@ -256,20 +260,23 @@ object BeachBallCatchHelper {
             val dx = dX(start, current, minY)
             val dz = dZ(start, current, minY)
 
-            val r = (current + 1..current + 300).asSequence().map { it to poly(it) }.takeWhileInclusive { it.second > minY }
-                .runningFold(given[t1]) { prev, (_, y) -> LorenzVec(prev.x + dx, y, prev.z + dz) }.toList()
-            return r
+            return (current + 1..current + 300)
+                .asSequence()
+                .map { it to poly(it) }
+                .takeWhileInclusive { it.second > minY }
+                .runningFold(given[t1]) { prev, (_, y) -> Vec3(prev.x + dx, y, prev.z + dz) }
+                .toList()
         }
     }
 
-    private class SmallPoly(given: List<LorenzVec>) : PolyModel(given) {
+    private class SmallPoly(given: List<Vec3>) : PolyModel(given) {
         override val minimumToPredict = 3
         override fun getT1(start: Int, current: Int, minY: Double): Int = current
         override fun getT2(start: Int, current: Int, minY: Double): Int = current - 1
         override fun getT3(start: Int, current: Int, minY: Double): Int = current - 2
     }
 
-    private class AveragePoly(given: List<LorenzVec>) : PolyModel(given) {
+    private class AveragePoly(given: List<Vec3>) : PolyModel(given) {
         override val minimumToPredict = 7
         override fun getT1(start: Int, current: Int, minY: Double): Int = current - 1
         override fun getT2(start: Int, current: Int, minY: Double): Int = current - 3
@@ -288,7 +295,7 @@ object BeachBallCatchHelper {
         ).average()
     }
 
-    private class SpreadPoly(given: List<LorenzVec>) : PolyModel(given) {
+    private class SpreadPoly(given: List<Vec3>) : PolyModel(given) {
         override val minimumToPredict = 5
         override fun getT1(start: Int, current: Int, minY: Double): Int = current - 1
         override fun getT2(start: Int, current: Int, minY: Double): Int = (current - start) / 2 + start
@@ -297,21 +304,21 @@ object BeachBallCatchHelper {
     }
 
     // TODO find correct d and g values
-    /*     private class ProjectileModel(override val given: List<LorenzVec>) : Model {
+    /*     private class ProjectileModel(override val given: List<Vec3>) : Model {
 
             override val minimumToPredict = 2
 
             private val d = 0.031
             private val g = 8.0
 
-            override fun predict(start: Int, current: Int, minY: Double): List<LorenzVec> {
+            override fun predict(start: Int, current: Int, minY: Double): List<Vec3> {
                 val r0 = given[start]
                 val v0 = given[start + 1] - given[start]
 
-                fun getVec(t: Int): LorenzVec {
+                fun getVec(t: Int): Vec3 {
                     val dt = t - start
                     val drag = 1 / d * (1 - exp(-d * dt))
-                    return LorenzVec(
+                    return Vec3(
                         r0.x + v0.x * drag,
                         r0.y + (v0.y + g / d) * drag - g / d * dt,
                         r0.z + v0.z * drag,
@@ -325,8 +332,8 @@ object BeachBallCatchHelper {
         } */
 
     private interface Model {
-        fun predict(start: Int, current: Int, minY: Double): List<LorenzVec>
-        val given: List<LorenzVec>
+        fun predict(start: Int, current: Int, minY: Double): List<Vec3>
+        val given: List<Vec3>
         val minimumToPredict: Int
     }
 }

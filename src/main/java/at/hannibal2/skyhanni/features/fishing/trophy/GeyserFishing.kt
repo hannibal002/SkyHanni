@@ -9,19 +9,19 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object GeyserFishing {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.geyserOptions
 
-    private val geyserOffset = LorenzVec(0.1f, 0.6f, 0.1f)
+    private val geyserOffset = Vec3(0.1, 0.6, 0.1)
 
-    private var geyser: LorenzVec? = null
+    private var geyser: Vec3? = null
     private var geyserBox: AABB? = null
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)

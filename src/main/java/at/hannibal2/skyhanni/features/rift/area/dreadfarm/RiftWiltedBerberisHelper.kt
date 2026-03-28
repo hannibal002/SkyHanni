@@ -15,15 +15,17 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -40,8 +42,8 @@ object RiftWiltedBerberisHelper {
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
 
-    data class WiltedBerberis(var currentParticles: LorenzVec) {
-        var previous: LorenzVec? = null
+    class WiltedBerberis(var currentParticles: Vec3) {
+        var previous: Vec3? = null
         var moving = true
         var y = 0.0
         var lastTime = SimpleTimeMark.now()
@@ -61,9 +63,9 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
-        list.filter { it.currentParticles.distanceSq(location) < 8 }
-            .minByOrNull { it.currentParticles.distanceSq(location) }
+    private fun nearestBerberis(location: Vec3): WiltedBerberis? =
+        list.filter { it.currentParticles.distanceToSqr(location) < 8 }
+            .minByOrNull { it.currentParticles.distanceToSqr(location) }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -92,7 +94,7 @@ object RiftWiltedBerberisHelper {
         with(berberis) {
             val isMoving = currentParticles != location
             if (isMoving) {
-                if (currentParticles.distance(location) > 3) {
+                if (currentParticles.distanceTo(location) > 3) {
                     previous = null
                     moving = true
                 }
@@ -152,14 +154,11 @@ object RiftWiltedBerberisHelper {
         event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
     }
 
-    private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
+    private fun axisAlignedBB(loc: Vec3) =
+        loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
-    private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
-        val x = x - 0.5
-        val y = wiltedBerberis.y
-        val z = z - 0.5
-        return LorenzVec(x, y, z)
-    }
+    private fun Vec3.fixLocation(wiltedBerberis: WiltedBerberis) =
+        Vec3(x - 0.5, wiltedBerberis.y, z - -0.5)
 
     private fun isEnabled() = RiftApi.inDreadfarm() && config.enabled
 

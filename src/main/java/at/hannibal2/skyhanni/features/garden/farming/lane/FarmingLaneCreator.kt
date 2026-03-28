@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import net.minecraft.world.phys.Vec3
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
@@ -25,9 +25,9 @@ object FarmingLaneCreator {
     val config get() = FarmingLaneApi.config
 
     var detection = false
-    private var start: LorenzVec? = null
-    private var lastLocation: LorenzVec? = null
-    private var potentialEnd: LorenzVec? = null
+    private var start: Vec3? = null
+    private var lastLocation: Vec3? = null
+    private var potentialEnd: Vec3? = null
     private var crop: CropType? = null
     private var maxDistance = 0.0
 
@@ -60,11 +60,11 @@ object FarmingLaneCreator {
             reset()
             return
         }
-        if (lastLocation.distance(location) < 0.5) return
+        if (lastLocation.distanceTo(location) < 0.5) return
 
         this.lastLocation = location
         val start = start ?: error("start can not be null")
-        val distance = start.distance(location)
+        val distance = start.distanceTo(location)
         if (distance > maxDistance) {
             maxDistance = distance
             potentialEnd = null
@@ -73,14 +73,14 @@ object FarmingLaneCreator {
                 potentialEnd = location
                 return
             }
-            if (potentialEnd.distance(location) > 2) {
+            if (potentialEnd.distanceTo(location) > 2) {
                 val crop = crop ?: error("crop can not be null")
                 saveLane(start, potentialEnd, crop)
             }
         }
     }
 
-    private fun saveLane(a: LorenzVec, b: LorenzVec, crop: CropType) {
+    private fun saveLane(a: Vec3, b: Vec3, crop: CropType) {
         val lane = createLane(a, b)
         val lanes = FarmingLaneApi.lanes ?: return
         if (crop.isTimeFlower()) {
@@ -94,7 +94,7 @@ object FarmingLaneCreator {
         reset()
     }
 
-    private fun createLane(a: LorenzVec, b: LorenzVec): FarmingLane {
+    private fun createLane(a: Vec3, b: Vec3): FarmingLane {
         val diffX = a.x - b.x
         val diffZ = a.z - b.z
         val direction =

@@ -10,15 +10,16 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.down
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.world.phys.Vec3
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,14 +58,14 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
     abstract fun T.shouldAcceptTrackableEvent(): Boolean
     abstract fun T.getTypeIdentifier(): K
 
-    private var lastKeyToggle: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastKeyToggle = SimpleTimeMark.farPast()
     private var isRecording = false
-    private var display: List<Renderable> = emptyList()
+    private var display = emptyList<Renderable>()
     private var cutOffTime = SimpleTimeMark.farPast()
     private var startTime = SimpleTimeMark.farPast()
-    private var worldTracked: Map<LorenzVec, List<T>> = emptyMap()
+    private var worldTracked = emptyMap<Vec3, List<T>>()
 
-    private val ignoredTypes: MutableList<K> = mutableListOf()
+    private val ignoredTypes = mutableListOf<K>()
     private val tracked = ConcurrentLinkedDeque<Tracked<T>>()
     private val commandName = "shtrack$commonNamePlural"
 
@@ -129,7 +130,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         isRecording = false
     }
 
-    private fun SkyHanniRenderWorldEvent.drawSingleInWorld(vec: LorenzVec, event: T) {
+    private fun SkyHanniRenderWorldEvent.drawSingleInWorld(vec: Vec3, event: T) {
         drawDynamicText(vec, "§7§l${event.getTypeIdentifier()}", 0.8)
         drawDynamicText(
             vec.down(0.2),
@@ -138,7 +139,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         )
     }
 
-    private fun SkyHanniRenderWorldEvent.drawMultipleInWorld(vec: LorenzVec, events: List<T>) {
+    private fun SkyHanniRenderWorldEvent.drawMultipleInWorld(vec: Vec3, events: List<T>) {
         drawDynamicText(vec, "§e${events.size} $commonNamePlural", 0.8)
         var offset = 0.2
         events.groupBy { it.getTypeIdentifier() }.forEach { (groupName, events) ->

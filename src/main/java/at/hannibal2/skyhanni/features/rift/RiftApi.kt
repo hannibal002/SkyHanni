@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
@@ -93,7 +92,7 @@ object RiftApi {
 
         if (temporalPillars.isNotEmpty()) {
             for (mob in temporalPillars) {
-                val location = mob.baseEntity.getLorenzVec()
+                val location = mob.baseEntity.position()
                 IslandGraphs.disableNodes("Temporal Pillar", location, 7.0)
             }
             IslandGraphs.refreshNavigation(force = true)

@@ -13,12 +13,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.ambient.Bat
@@ -38,6 +36,7 @@ import net.minecraft.world.entity.monster.skeleton.AbstractSkeleton
 import net.minecraft.world.entity.monster.spider.Spider
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -454,26 +453,24 @@ class MobFinder {
             return it
         }
 
-        val middle = LorenzVec(-8, 0, 56)
-
-        val loc = entity.getLorenzVec()
+        val middle = Vec3(-8.0, 0.0, 56.0)
 
         val pos: Int
 
         val type: BossType
-        if (loc.x > middle.x && loc.z > middle.z) {
+        if (entity.x > middle.x && entity.z > middle.z) {
             // first
             pos = 2
             type = BossType.DUNGEON_F6_GIANT_3
-        } else if (loc.x > middle.x && loc.z < middle.z) {
+        } else if (entity.x > middle.x && entity.z < middle.z) {
             // second
             pos = 3
             type = BossType.DUNGEON_F6_GIANT_4
-        } else if (loc.x < middle.x && loc.z < middle.z) {
+        } else if (entity.x < middle.x && entity.z < middle.z) {
             // third
             pos = 0
             type = BossType.DUNGEON_F6_GIANT_1
-        } else if (loc.x < middle.x && loc.z > middle.z) {
+        } else if (entity.x < middle.x && entity.z > middle.z) {
             // fourth
             pos = 1
             type = BossType.DUNGEON_F6_GIANT_2

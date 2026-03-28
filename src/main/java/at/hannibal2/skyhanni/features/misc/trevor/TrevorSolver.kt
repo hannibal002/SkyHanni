@@ -10,14 +10,15 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.roundTo
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.phys.Vec3
 
 object TrevorSolver {
 
@@ -27,11 +28,11 @@ object TrevorSolver {
     private var maxHeight: Double = 0.0
     private var minHeight: Double = 0.0
     private var foundID = -1
-    var mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+    var mobCoordinates = Vec3.ZERO
     var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
 
-    fun findMobHeight(height: Int, above: Boolean) {
+    fun findMobHeight(height: Double, above: Boolean) {
         val playerPosition = LocationUtils.playerLocation().roundTo(2)
         val mobHeight = if (above) playerPosition.y + height else playerPosition.y - height
         if (maxHeight == 0.0) {
@@ -81,7 +82,7 @@ object TrevorSolver {
                             TrevorFeatures.lastTitle = TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")
                         }
                         mobLocation = TrapperMobArea.FOUND
-                        mobCoordinates = entity.blockPosition().toLorenzVec()
+                        mobCoordinates = entity.blockPosition().toVec3()
                     }
                 } else {
                     foundID = entity.id
@@ -90,7 +91,7 @@ object TrevorSolver {
             }
         }
         if (foundID != -1) {
-            mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+            mobCoordinates = Vec3.ZERO
             foundID = -1
         }
     }
@@ -103,6 +104,6 @@ object TrevorSolver {
         minHeight = 0.0
         averageHeight = (minHeight + maxHeight) / 2
         foundID = -1
-        mobCoordinates = LorenzVec(0.0, 0.0, 0.0)
+        mobCoordinates = Vec3.ZERO
     }
 }

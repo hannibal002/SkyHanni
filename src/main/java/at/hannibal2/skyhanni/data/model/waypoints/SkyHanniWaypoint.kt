@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data.model.waypoints
 
-import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.gson.annotations.Expose
+import net.minecraft.world.phys.Vec3
 
 class SkyHanniWaypoint(
     @Expose
-    val location: LorenzVec,
+    val location: Vec3,
     @Expose
     var number: Int,
     @Expose

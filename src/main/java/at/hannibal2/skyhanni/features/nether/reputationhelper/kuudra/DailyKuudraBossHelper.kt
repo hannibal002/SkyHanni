@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQu
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -21,13 +20,14 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object DailyKuudraBossHelper {
 
     val kuudraTiers get() = KuudraTier.entries
 
-    private var kuudraLocation: LorenzVec? = null
+    private var kuudraLocation: Vec3? = null
     private var allKuudraDone = true
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper

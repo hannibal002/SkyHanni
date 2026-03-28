@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.equalsIgnoreY
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
@@ -55,9 +55,9 @@ object ChumBucketHider {
 
         // Second text line
         if (name.contains("/10 §aChums")) {
-            val entityLocation = entity.getLorenzVec()
+            val entityLocation = entity.position()
             for (title in titleEntity) {
-                if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
+                if (entityLocation.equalsIgnoreY(title.position())) {
                     hiddenEntities[entity] = true
                     event.cancel()
                     return
@@ -71,9 +71,9 @@ object ChumBucketHider {
                 it != null && (it.hoverName.string == "Empty Chum Bucket" || it.hoverName.string == "Empty Chumcap Bucket")
             }
         ) {
-            val entityLocation = entity.getLorenzVec()
+            val entityLocation = entity.position()
             for (title in titleEntity) {
-                if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
+                if (entityLocation.equalsIgnoreY(title.position())) {
                     hiddenEntities[entity] = true
                     event.cancel()
                     return

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
+import net.minecraft.world.phys.Vec3
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -102,15 +103,16 @@ object RegexUtils {
 
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
-    fun Matcher.toLorenzVec(
+    fun Matcher.toVec3(
         xGroup: String = "x",
         yGroup: String = "y",
         zGroup: String = "z",
-    ): LorenzVec? {
-        val x = groupOrNull(xGroup)?.trim()?.formatDoubleOrNull() ?: return null
-        val y = groupOrNull(yGroup)?.trim()?.formatDoubleOrNull() ?: return null
-        val z = groupOrNull(zGroup)?.trim()?.formatDoubleOrNull() ?: return null
-        return LorenzVec(x, y, z)
+    ): Vec3? {
+        return Vec3(
+            groupOrNull(xGroup)?.trim()?.formatDoubleOrNull() ?: return null,
+            groupOrNull(yGroup)?.trim()?.formatDoubleOrNull() ?: return null,
+            groupOrNull(zGroup)?.trim()?.formatDoubleOrNull() ?: return null,
+        )
     }
 
     fun Pattern.indexOfFirstMatch(list: List<String>): Int? {

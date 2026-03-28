@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.Avatar
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 object PlayerUtils {
@@ -14,13 +16,10 @@ object PlayerUtils {
     val STANDING_EYE_HEIGHT = Avatar.POSES.getValue(Pose.STANDING).eyeHeight
     val SNEAKING_EYE_HEIGHT = Avatar.POSES.getValue(Pose.CROUCHING).eyeHeight
 
-    // thirdPersonView on 1.8.9
     // 0 == normal
     // 1 == f3 behind
     // 2 == selfie
-    fun isFirstPersonView(): Boolean {
-        return Minecraft.getInstance().options.cameraType.isFirstPerson
-    }
+    fun isFirstPersonView(): Boolean = Minecraft.getInstance().options.cameraType.isFirstPerson
 
     fun isThirdPersonView(): Boolean {
         val perspective = Minecraft.getInstance().options.cameraType
@@ -28,9 +27,7 @@ object PlayerUtils {
         return !perspective.isMirrored && !perspective.isFirstPerson
     }
 
-    fun isReversedView(): Boolean {
-        return Minecraft.getInstance().options.cameraType.isMirrored
-    }
+    fun isReversedView(): Boolean = Minecraft.getInstance().options.cameraType.isMirrored
 
     fun getWalkSpeed(): Float {
         val speed = MinecraftCompat.localPlayer.getAttributeBaseValue(Attributes.MOVEMENT_SPEED)
@@ -39,7 +36,7 @@ object PlayerUtils {
         return (speed * 1000).roundTo(2).toFloat()
     }
 
-    fun getUuid() = getRawUuid().toUnDashedUUID()
+    fun getUuid(): String = getRawUuid().toUnDashedUUID()
 
     fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uuid
 
@@ -48,9 +45,9 @@ object PlayerUtils {
     fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
     fun inAir(): Boolean = !onGround()
 
-    fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
+    fun blockPosition(): Vec3 = MinecraftCompat.localPlayer.blockPosition().toVec3()
 
-    fun getLocation() = MinecraftCompat.localPlayer.getLorenzVec()
+    fun getLocation(): Vec3 = MinecraftCompat.localPlayer.position()
 
     fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

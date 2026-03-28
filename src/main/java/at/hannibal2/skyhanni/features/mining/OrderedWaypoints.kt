@@ -29,6 +29,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.down
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import at.hannibal2.skyhanni.utils.VectorUtils.toCleanString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -350,7 +353,7 @@ object OrderedWaypoints {
     }
 
     private fun add(number: Int) {
-        val pos = LocationUtils.playerLocation().add(0, -1, 0).roundToBlock()
+        val pos = LocationUtils.playerLocation().down().roundToBlock()
 
         if (number < 1 || number > orderedWaypointsList.size + 1) {
             return ChatUtils.userError("$number is not between 1 and ${orderedWaypointsList.size + 1}.")

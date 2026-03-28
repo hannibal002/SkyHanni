@@ -16,15 +16,14 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.toVec3
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
@@ -59,7 +58,7 @@ object HighlightVisitorsOutsideOfGarden {
         val possibleJsons = visitorJson[island] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position.distance(entity.blockPosition().toLorenzVec()) < 1) &&
+            (it.position == null || it.position.distanceTo(entity.blockPosition().toVec3()) < 1) &&
                 it.skinOrType == skinOrType
         }
     }
@@ -77,14 +76,14 @@ object HighlightVisitorsOutsideOfGarden {
             }
     }
 
-    private val shouldBlock
+    private val shouldBlock: Boolean
         get() = when (config.blockInteracting) {
             VisitorBlockBehaviour.DONT -> false
             VisitorBlockBehaviour.ALWAYS -> true
             VisitorBlockBehaviour.ONLY_ON_BINGO -> SkyBlockUtils.isBingoProfile
         }
 
-    private fun isVisitorNearby(location: LorenzVec) =
+    private fun isVisitorNearby(location: Vec3) =
         location.getEntitiesNearby<LivingEntity>(2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -92,7 +91,7 @@ object HighlightVisitorsOutsideOfGarden {
         if (!shouldBlock) return
         if (PlayerUtils.isSneaking()) return
         val entity = event.clickedEntity
-        if (isVisitor(entity) || (entity is ArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
+        if (isVisitor(entity) || (entity is ArmorStand && isVisitorNearby(entity.position()))) {
             ChatUtils.chatAndOpenConfig(
                 "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                 VisitorApi.config::blockInteracting,

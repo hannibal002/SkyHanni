@@ -10,14 +10,19 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.up
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.Vec3
+import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object RiftMotesOrb {
@@ -26,21 +31,21 @@ object RiftMotesOrb {
     private val enabled get() = config.enabled
 
     /**
-     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+10 Motes§r§d!
-     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+25 Motes§r§d, recovered §r§a+2ф Rift Time§r§d!
+     * REGEX-TEST: ORB! Picked up +10 Motes!
+     * REGEX-TEST: ORB! Picked up +25 Motes, recovered +2ф Rift Time!
      */
     private val motesPattern by RepoPattern.pattern(
-        "rift.everywhere.motesorb",
-        "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*",
+        "rift.everywhere.motesorb.colorless",
+        "ORB! Picked up \\+\\d+ Motes.*",
     )
 
-    private var motesOrbs = emptyList<MotesOrb>()
+    private val motesOrbs = ConcurrentLinkedQueue<MotesOrb>()
 
     class MotesOrb(
-        var location: LorenzVec,
+        var location: Vec3,
         var counter: Int = 0,
-        var startTime: Long = System.currentTimeMillis(),
-        var lastTime: Long = System.currentTimeMillis(),
+        var startTime: SimpleTimeMark = SimpleTimeMark.now(),
+        var lastTime: SimpleTimeMark = SimpleTimeMark.now(),
         var isOrb: Boolean = false,
         var pickedUp: Boolean = false,
     )
@@ -51,13 +56,11 @@ object RiftMotesOrb {
         val location = event.location.add(-0.5, 0.0, -0.5)
 
         if (event.type == ParticleTypes.ENTITY_EFFECT) {
-            val orb =
-                motesOrbs.find { it.location.distance(location) < 3 } ?: MotesOrb(location).also {
-                    motesOrbs = motesOrbs.editCopy { add(it) }
-                }
+            val orb = motesOrbs.find { it.location.distanceTo(location) < 3 }
+                ?: MotesOrb(location).also { motesOrbs.add(it) }
 
             orb.location = location
-            orb.lastTime = System.currentTimeMillis()
+            orb.lastTime = SimpleTimeMark.now()
             orb.counter++
             orb.pickedUp = false
             if (config.hideParticles && orb.isOrb) {
@@ -79,17 +82,18 @@ object RiftMotesOrb {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
 
-        motesOrbs = motesOrbs.editCopy { removeIf { System.currentTimeMillis() > it.lastTime + 2000 } }
+        motesOrbs.removeIf { it.lastTime.passedSince() > 2.seconds }
 
         for (orb in motesOrbs) {
-            val ageInSeconds = (System.currentTimeMillis() - orb.startTime).toDouble() / 1000
-            if (ageInSeconds < 0.5) continue
+            val age = orb.startTime.passedSince()
+            if (age < 0.5.seconds) continue
 
-            val particlesPerSecond = (orb.counter.toDouble() / ageInSeconds).roundTo(1)
+            val particlesPerSecond = (orb.counter / age.inPartialSeconds).roundTo(1)
             if (particlesPerSecond !in 60.0..90.0) continue
+
             orb.isOrb = true
 
-            if (System.currentTimeMillis() > orb.lastTime + 300) {
+            if (orb.lastTime.passedSince() > 300.milliseconds) {
                 orb.pickedUp = true
             }
 

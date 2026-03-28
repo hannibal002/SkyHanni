@@ -16,16 +16,15 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.expand
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -34,6 +33,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBox
 import net.minecraft.core.Rotations
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -45,7 +45,7 @@ object FireFreezeFeatures {
     private const val PARTICLE_OFFSET = 3.921568568330258E-4
 
     private data class FireFreezeArea(
-        val center: LorenzVec,
+        val center: Vec3,
         val lastPitch: Float,
         var startTime: ServerTimeMark = timeFromPitch(lastPitch),
         var knownTime: Boolean = false,
@@ -64,11 +64,11 @@ object FireFreezeFeatures {
             if (frozen) return
             frozen = true
             for (mob in MobData.skyblockMobs) {
-                if (isInside(pos = mob.baseEntity.getLorenzVec(), extra = 0.0)) freezeMob(mob)
+                if (isInside(pos = mob.baseEntity.position(), extra = 0.0)) freezeMob(mob)
             }
         }
 
-        fun isInside(pos: LorenzVec, extra: Double = 0.5): Boolean =
+        fun isInside(pos: Vec3, extra: Double = 0.5): Boolean =
             center.distanceIgnoreY(pos) < (RADIUS + extra) // add extra for possibly loose particles
     }
 
@@ -82,7 +82,7 @@ object FireFreezeFeatures {
     private val ARMORSTAND_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("FIRE_FREEZE_SKULLS") }
 
     private val affectedMobs = ConcurrentHashMap<Mob, ServerTimeMark>()
-    private val fireFreezes = ConcurrentHashMap<LorenzVec, FireFreezeArea>()
+    private val fireFreezes = ConcurrentHashMap<Vec3, FireFreezeArea>()
 
     private const val RADIUS = 5.0
     private val freezeDuration = 10.seconds
@@ -117,7 +117,8 @@ object FireFreezeFeatures {
         fireFreezes.remove(event.location)
     }
 
-    private fun LorenzVec.isInAnyFireFreeze(): Boolean = fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
+    private fun Vec3.isInAnyFireFreeze(): Boolean =
+        fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
 
     private fun ReceiveParticleEvent.isFreezeParticle(): Boolean {
         return offset.x == PARTICLE_OFFSET && offset.y == PARTICLE_OFFSET && offset.z == PARTICLE_OFFSET
@@ -170,7 +171,7 @@ object FireFreezeFeatures {
     private fun SkyHanniRenderWorldEvent.renderCustomCircle() {
         for (fireFreeze in fireFreezes.values) {
             if (fireFreeze.hasFinished()) continue
-            drawCircleWireframe(fireFreeze.center.up(1), RADIUS, config.displayColor.toColor())
+            drawCircleWireframe(fireFreeze.center.up(), RADIUS, config.displayColor.toColor())
         }
     }
 
@@ -178,7 +179,7 @@ object FireFreezeFeatures {
         for (fireFreeze in fireFreezes.values) {
             if (fireFreeze.hasFinished()) continue
             drawDynamicText(
-                location = fireFreeze.center.up(1),
+                location = fireFreeze.center.up(),
                 text = "§b❄ ${LorenzColor.AQUA.getChatColor()}${fireFreeze.startTime.timeUntil().formatTime()}",
                 scaleMultiplier = 1.0,
             )
@@ -196,7 +197,7 @@ object FireFreezeFeatures {
                 LorenzColor.RED,
                 percent,
             )
-            val exactLocation = mob.baseEntity.getLorenzVec().add(-0.5, 0.0, -0.5)
+            val exactLocation = mob.baseEntity.position().add(-0.5, 0.0, -0.5)
 
             if (config.mobTimer) {
                 val format = timeUntil.formatTime()
@@ -211,7 +212,7 @@ object FireFreezeFeatures {
                 )
             }
             if (config.mobHighlight) {
-                val aabb = exactBoundingBox(mob.baseEntity).expand(0.1)
+                val aabb = exactBoundingBox(mob.baseEntity).inflate(0.1)
                 drawFilledBoundingBox(aabb, color, 0.5f)
             }
         }

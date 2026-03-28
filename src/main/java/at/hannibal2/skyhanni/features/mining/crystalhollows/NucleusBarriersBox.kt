@@ -9,13 +9,14 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.VectorUtils.axisAlignedTo
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object NucleusBarriersBox {
@@ -29,27 +30,27 @@ object NucleusBarriersBox {
         val configColorOption: Property<ChromaColour>,
     ) {
         AMBER(
-            LorenzVec(474, 124, 524).axisAlignedTo(LorenzVec(485, 111, 535))
+            Vec3(474.0, 124.0, 524.0).axisAlignedTo(Vec3(485.0, 111.0, 535.0))
                 .expandBlock(),
             colorConfig.amber,
         ),
         AMETHYST(
-            LorenzVec(474, 124, 492).axisAlignedTo(LorenzVec(485, 111, 503))
+            Vec3(474.0, 124.0, 492.0).axisAlignedTo(Vec3(485.0, 111.0, 503.0))
                 .expandBlock(),
             colorConfig.amethyst,
         ),
         TOPAZ(
-            LorenzVec(508, 124, 473).axisAlignedTo(LorenzVec(519, 111, 484))
+            Vec3(508.0, 124.0, 473.0).axisAlignedTo(Vec3(519.0, 111.0, 484.0))
                 .expandBlock(),
             colorConfig.topaz,
         ),
         JADE(
-            LorenzVec(542, 124, 492).axisAlignedTo(LorenzVec(553, 111, 503))
+            Vec3(542.0, 124.0, 492.0).axisAlignedTo(Vec3(553.0, 111.0, 503.0))
                 .expandBlock(),
             colorConfig.jade,
         ),
         SAPPHIRE(
-            LorenzVec(542, 124, 524).axisAlignedTo(LorenzVec(553, 111, 535))
+            Vec3(542.0, 124.0, 524.0).axisAlignedTo(Vec3(553.0, 111.0, 535.0))
                 .expandBlock(),
             colorConfig.sapphire,
         ),

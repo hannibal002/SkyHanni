@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.PlaySoundEvent;
-import at.hannibal2.skyhanni.utils.LorenzVec;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +25,7 @@ public class MixinSoundEngine {
         if (
             new PlaySoundEvent(
                 StringUtils.removeStart(soundInstance.getIdentifier().toString(), "minecraft:"),
-                new LorenzVec(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ()),
+                new Vec3(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ()),
                 soundInstance.getPitch(),
                 soundInstance.getVolume()
             ).post()
@@ -33,5 +33,4 @@ public class MixinSoundEngine {
             cir.setReturnValue(SoundEngine.PlayResult.NOT_STARTED);
         }
     }
-
 }

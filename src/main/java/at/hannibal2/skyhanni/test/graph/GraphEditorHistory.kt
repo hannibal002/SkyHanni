@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.test.graph.GraphEditor.state
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import net.minecraft.world.phys.Vec3
 import org.lwjgl.glfw.GLFW
 
 object GraphEditorHistory {
@@ -18,7 +18,7 @@ object GraphEditorHistory {
     private data class HistoryEntry(
         val state: GraphEditorState,
         val label: String,
-        val playerPos: LorenzVec,
+        val playerPos: Vec3,
     )
 
     private val undoStack = java.util.Stack<HistoryEntry>()
@@ -86,12 +86,12 @@ object GraphEditorHistory {
         val stackSize = if (type == "Undo") undoStack.size else redoStack.size
         sendUndoRedoMessage("§a$type: ${entry.label} §7($stackSize left)")
 
-        if (entry.playerPos.distance(GraphUtils.playerPosition) <= 5.0) return
+        if (entry.playerPos.distanceTo(GraphUtils.playerPosition) <= 5.0) return
         IslandGraphs.pathFind(
             entry.playerPos,
             "$type: ${entry.label}",
             java.awt.Color.ORANGE,
-            condition = { isEnabled() },
+            condition = ::isEnabled,
         )
     }
 }

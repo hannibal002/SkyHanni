@@ -20,12 +20,14 @@ import at.hannibal2.skyhanni.utils.FacePointSet
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
 import at.hannibal2.skyhanni.utils.LocationUtils.minBox
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import at.hannibal2.skyhanni.utils.VectorUtils.toBlockPos
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
@@ -37,45 +39,45 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TestCanSeeFace {
 
-    private data class FaceCheckContext(
-        var aabbs: List<AABB> = emptyList(),
-        var blockPos: LorenzVec? = null,
-        var waitingForPunch: Boolean = false,
-        var pointSet: FacePointSet = mutableMapOf(),
-        var finished: Boolean = false,
-        var debugRenderable: Renderable? = null,
-        var lastBlockStateHash: Int = 0,
-    ) : Resettable {
+    private class FaceCheckContext : Resettable {
+        var aabbs: List<AABB> = emptyList()
+        var vec: Vec3? = null
+        var waitingForPunch: Boolean = false
+        val pointSet: FacePointSet = mutableMapOf()
+        var finished: Boolean = false
+        var debugRenderable: Renderable? = null
+        var lastBlockStateHash: Int = 0
 
         fun refreshAABBsFromBlockState() {
-            val blockPos = blockPos ?: return
+            val vec = vec ?: return
             val level = Minecraft.getInstance().level ?: return
 
-            val mcBlockPos = blockPos.toBlockPos()
-            val currentState = level.getBlockState(mcBlockPos)
-            val shape = currentState.getShape(level, mcBlockPos)
+            val blockPos = vec.toBlockPos()
+            val currentState = level.getBlockState(blockPos)
+            val shape = currentState.getShape(level, blockPos)
             val rawAabbs = shape.toAabbs()
             val currentHash = rawAabbs.hashCode()
             if (currentHash != lastBlockStateHash) {
                 lastBlockStateHash = currentHash
                 aabbs = if (!shape.isEmpty) rawAabbs.map { bounds ->
                     AABB(
-                        blockPos.x + bounds.minX, blockPos.y + bounds.minY, blockPos.z + bounds.minZ,
-                        blockPos.x + bounds.maxX, blockPos.y + bounds.maxY, blockPos.z + bounds.maxZ,
+                        vec.x + bounds.minX, vec.y + bounds.minY, vec.z + bounds.minZ,
+                        vec.x + bounds.maxX, vec.y + bounds.maxY, vec.z + bounds.maxZ,
                     )
-                } else listOf(blockPos.boundingToOffset(1.0, 1.0, 1.0))
+                } else listOf(vec.boundingToOffset(1.0, 1.0, 1.0))
             }
         }
 
         fun resetFromClickedBlock(event: BlockClickEvent) {
             this.reset()
-            blockPos = event.position.floor()
+            vec = event.position.roundToBlock()
             refreshAABBsFromBlockState()
         }
 
@@ -144,12 +146,8 @@ object TestCanSeeFace {
         regenDebugRenderable()
     }
 
-    private fun LorenzVec.shortFormatVec(): String {
-        val xFormat = this.x.roundTo(2)
-        val yFormat = this.y.roundTo(2)
-        val zFormat = this.z.roundTo(2)
-        return "($xFormat, $yFormat, $zFormat)"
-    }
+    private fun Vec3.shortFormatVec(): String =
+        "(${x.roundTo(2)}, ${y.roundTo(2)}, ${z.roundTo(2)})"
 
     private var currentVisibilityState: RayVisibilityState = RayVisibilityState.ALL
     private var lastRenderable: Renderable? = null
@@ -281,7 +279,7 @@ object TestCanSeeFace {
 
     private fun SkyHanniRenderWorldEvent.drawRaysFromFacePoints(
         face: Direction,
-        points: Collection<Pair<LorenzVec, Boolean>>,
+        points: Collection<Pair<Vec3, Boolean>>,
     ) {
         if (!rayConfig.enabled.get() || faceStates[face] == FaceState.HIDDEN) return
         for ((point, isSeen) in points) {

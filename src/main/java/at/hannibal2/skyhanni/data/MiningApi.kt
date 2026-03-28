@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -28,10 +27,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
+import at.hannibal2.skyhanni.utils.VectorUtils.toCleanString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.Vec3
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
@@ -115,16 +117,16 @@ object MiningApi {
     }
 
     // normal mining
-    private val recentClickedBlocks = ConcurrentHashMap<LorenzVec, SimpleTimeMark>()
-    private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
+    private val recentClickedBlocks = ConcurrentHashMap<Vec3, SimpleTimeMark>()
+    private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, Vec3>>()
 
-    private var lastClickedPos: LorenzVec? = null
+    private var lastClickedPos: Vec3? = null
     private var lastClicked = SimpleTimeMark.farPast()
     private var ignoreInit = false
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
-    private var initBlockPos: LorenzVec? = null
+    private var initBlockPos: Vec3? = null
     private var waitingForInitSound = true
 
     private var waitingForEffMinerSound = false
@@ -133,8 +135,8 @@ object MiningApi {
     // pickobulus
     private var lastPickobulusUse = SimpleTimeMark.farPast()
     private var lastPickobulusExplosion = SimpleTimeMark.farPast()
-    private var pickobulusExplosionPos: LorenzVec? = null
-    private val pickobulusMinedBlocks = ConcurrentLinkedQueue<Pair<LorenzVec, OreBlock>>()
+    private var pickobulusExplosionPos: Vec3? = null
+    private val pickobulusMinedBlocks = ConcurrentLinkedQueue<Pair<Vec3, OreBlock>>()
 
     private val pickobulusActive get() = lastPickobulusUse.passedSince() < 2.seconds
 
@@ -282,7 +284,6 @@ object MiningApi {
             pickobulusMinedBlocks.clear()
             return
         }
-
     }
 
     @HandleEvent
@@ -354,7 +355,7 @@ object MiningApi {
         val pos = event.location
         if (pickobulusActive && pickobulusWaitingForBlock) {
             val explosionPos = pickobulusExplosionPos ?: return
-            if (explosionPos.distance(pos) > 15) return
+            if (explosionPos.distanceTo(pos) > 15) return
             val ore = OreBlock.getByStateOrNull(oldState) ?: return
             if (pickobulusMinedBlocks.any { it.first == pos }) return
             pickobulusMinedBlocks += pos to ore

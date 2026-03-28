@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTime
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -148,22 +147,20 @@ enum class CropType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid crop type '$name'")
 
-        fun BlockState.getCropType(pos: LorenzVec): CropType? {
-            return when (block) {
-                Blocks.WHEAT -> WHEAT
-                Blocks.CARROTS -> CARROT
-                Blocks.POTATOES -> POTATO
-                Blocks.CARVED_PUMPKIN -> PUMPKIN
-                Blocks.SUGAR_CANE -> SUGAR_CANE
-                Blocks.MELON -> MELON
-                Blocks.CACTUS -> CACTUS
-                Blocks.COCOA -> COCOA_BEANS
-                Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM -> MUSHROOM
-                Blocks.NETHER_WART -> NETHER_WART
-                Blocks.ROSE_BUSH -> WILD_ROSE
-                Blocks.SUNFLOWER -> getTimeFlower()
-                else -> null
-            }
+        fun BlockState.getCropType(): CropType? = when (block) {
+            Blocks.WHEAT -> WHEAT
+            Blocks.CARROTS -> CARROT
+            Blocks.POTATOES -> POTATO
+            Blocks.CARVED_PUMPKIN -> PUMPKIN
+            Blocks.SUGAR_CANE -> SUGAR_CANE
+            Blocks.MELON -> MELON
+            Blocks.CACTUS -> CACTUS
+            Blocks.COCOA -> COCOA_BEANS
+            Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM -> MUSHROOM
+            Blocks.NETHER_WART -> NETHER_WART
+            Blocks.ROSE_BUSH -> WILD_ROSE
+            Blocks.SUNFLOWER -> getTimeFlower()
+            else -> null
         }
 
         fun getTimeFlower(): CropType {

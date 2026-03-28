@@ -10,11 +10,15 @@ import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.down
+import at.hannibal2.skyhanni.utils.VectorUtils.printWithAccuracy
+import at.hannibal2.skyhanni.utils.VectorUtils.roundTo
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -22,9 +26,9 @@ object GriffinBurrowParticleFinder {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val burrows = mutableMapOf<LorenzVec, Burrow>()
+    private val burrows = mutableMapOf<Vec3, Burrow>()
 
-    fun containsBurrow(location: LorenzVec): Boolean = burrows.containsKey(location)
+    fun containsBurrow(location: Vec3): Boolean = burrows.containsKey(location)
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.burrows")
 
@@ -65,8 +69,9 @@ object GriffinBurrowParticleFinder {
 
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-        // TODO the rounding is a workaround, may need to be removed once we know what is going on exactly and can fix this properly
-        val location = event.location.roundToBlock().down()
+        // TODO the rounding is a workaround, may need to be removed once we know exactly what is
+        //  going on and can fix this properly
+        val location = event.location.roundToBlock().down(1.0)
 
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
@@ -102,18 +107,35 @@ object GriffinBurrowParticleFinder {
     // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
-            { type == ParticleTypes.ENCHANTED_HIT && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            {
+                type == ParticleTypes.ENCHANTED_HIT &&
+                    count == 4 &&
+                    speed == 0.01f &&
+                    offset.roundTo(2) == Vec3(0.5, 0.1, 0.5)
+            },
         ),
         MOB(
-            { type == ParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
+            {
+                type == ParticleTypes.CRIT &&
+                    count == 3 &&
+                    speed == 0.01f &&
+                    offset.roundTo(2) == Vec3(0.5, 0.1, 0.5)
+            },
         ),
         TREASURE(
-            { type == ParticleTypes.DRIPPING_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
+            {
+                type == ParticleTypes.DRIPPING_LAVA &&
+                    count == 2 &&
+                    speed == 0.01f &&
+                    offset.roundTo(2) == Vec3(0.35, 0.1, 0.35)
+            },
         ),
         ENCHANT(
             {
-                type == ParticleTypes.ENCHANT && count == 5 && speed == 0.05f && offset.roundTo(2) ==
-                    LorenzVec(0.5, 0.4, 0.5)
+                type == ParticleTypes.ENCHANT &&
+                    count == 5 &&
+                    speed == 0.05f &&
+                    offset.roundTo(2) == Vec3(0.5, 0.4, 0.5)
             },
         )
     }
@@ -148,7 +170,7 @@ object GriffinBurrowParticleFinder {
     }
 
     class Burrow(
-        var location: LorenzVec,
+        var location: Vec3,
         var hasFootstep: Boolean = true,
         var hasEnchant: Boolean = false,
         var type: Int = -1,
@@ -156,7 +178,7 @@ object GriffinBurrowParticleFinder {
         var lastSeen: SimpleTimeMark = SimpleTimeMark.now(),
     ) {
 
-        fun getType(): BurrowType = when (this.type) {
+        fun getType(): BurrowType = when (type) {
             0 -> BurrowType.START
             1 -> BurrowType.MOB
             2 -> BurrowType.TREASURE

@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -409,10 +409,9 @@ object TunnelsMaps {
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
-        val playerPosition = LocationUtils.playerLocation()
-        val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
+        val nodeDistance = first?.position?.distanceToPlayer() ?: 0.0
         if (first != null && second != null) {
-            val direct = playerPosition.distance(second.position)
+            val direct = second.position.distanceToPlayer()
             val firstPath = first.neighbours[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {

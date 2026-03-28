@@ -17,13 +17,14 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.maxBox
 import at.hannibal2.skyhanni.utils.LocationUtils.minBox
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.roundToBlock
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -38,6 +39,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.core.Direction
 import net.minecraft.world.level.block.Blocks.DRAGON_EGG
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -78,9 +80,9 @@ object DarkMonolithFeatures {
     )
 
     internal data class DarkMonolithData(
-        var knownEggs: Set<LorenzVec> = setOf(),
-        var foundEggVec: LorenzVec? = null,
-        var lastFoundEggVec: LorenzVec? = null,
+        var knownEggs: Set<Vec3> = emptySet(),
+        var foundEggVec: Vec3? = null,
+        var lastFoundEggVec: Vec3? = null,
         var renderBox: AABB? = null,
         var nextBlockCheck: SimpleTimeMark = SimpleTimeMark.farPast(),
     ) : Resettable
@@ -131,7 +133,7 @@ object DarkMonolithFeatures {
         if (!anyEnabled()) return
         data.knownEggs = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
-            distance = 40,
+            distance = 40.0,
             filter = DRAGON_EGG,
         ).keys
     }
@@ -146,8 +148,8 @@ object DarkMonolithFeatures {
         }
     }
 
-    private fun canSeeFaces(vec: LorenzVec): Boolean {
-        val aabb = vec.floor().boundingToOffset(1.0, 1.0, 1.0)
+    private fun canSeeFaces(vec: Vec3): Boolean {
+        val aabb = vec.roundToBlock().boundingToOffset(1.0, 1.0, 1.0)
         return LocationUtils.canSeeAnyFace(
             min = aabb.minBox(),
             max = aabb.maxBox(),

@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -26,6 +25,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.VectorUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.asStoredString
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
@@ -40,6 +41,7 @@ import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -49,7 +51,8 @@ import kotlin.time.Duration.Companion.milliseconds
 private typealias J_UUID = UUID
 
 /**
- * All entries are automatically registered in [BaseGsonBuilder.gson] via [GsonBuilder.registerSkyHanniAdapters]
+ * All entries are automatically registered in [BaseGsonBuilder.gson] via
+ * [GsonBuilder.registerSkyHanniAdapters].
  */
 enum class SkyHanniTypeAdapters(
     val clazz: Class<*>,
@@ -57,15 +60,15 @@ enum class SkyHanniTypeAdapters(
 ) {
     UUID(
         J_UUID::class.java,
-        SimpleStringTypeAdapter({ this.toString() }, { StringUtils.parseUUID(this) }),
+        SimpleStringTypeAdapter({ toString() }, StringUtils::parseUUID),
     ),
     NBT_BOOLEAN(
         NbtBoolean::class.java,
-        SimpleStringTypeAdapter({ this.asString() }, { NbtBoolean.fromString(this) }),
+        SimpleStringTypeAdapter({ asString() }, NbtBoolean::fromString),
     ),
     VEC(
-        LorenzVec::class.java,
-        SimpleStringTypeAdapter(LorenzVec::asStoredString, LorenzVec::decodeFromString),
+        Vec3::class.java,
+        SimpleStringTypeAdapter({ asStoredString() }, VectorUtils::fromStoredString),
     ),
     TROPHY_RARITY(
         TrophyRarity::class.java,

@@ -20,16 +20,17 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.VectorUtils.printWithAccuracy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
+import net.minecraft.world.phys.Vec3
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -145,7 +146,7 @@ object BurrowWarpHelper {
         event.addData(list)
     }
 
-    fun shouldUseWarps(target: LorenzVec, debug: MutableList<String>? = null) {
+    fun shouldUseWarps(target: Vec3, debug: MutableList<String>? = null) {
         debug?.add("target: ${target.printWithAccuracy(1)}")
         val playerLocation = LocationUtils.playerLocation()
         debug?.add("playerLocation: ${playerLocation.printWithAccuracy(1)}")
@@ -155,7 +156,7 @@ object BurrowWarpHelper {
         }
         debug?.add("warpPoint: ${warpPoint.displayName}")
 
-        val playerDistance = playerLocation.distance(target)
+        val playerDistance = playerLocation.distanceTo(target)
         debug?.add("playerDistance: ${playerDistance.roundTo(1)}")
         val warpDistance = warpPoint.distance(target)
         debug?.add("warpDistance: ${warpDistance.roundTo(1)}")
@@ -166,7 +167,7 @@ object BurrowWarpHelper {
         currentWarp = if (setWarpPoint) warpPoint else null
     }
 
-    private fun getNearestWarpPoint(location: LorenzVec): WarpPoint? =
+    private fun getNearestWarpPoint(location: Vec3): WarpPoint? =
         WarpPoint.entries.filter { it.unlocked && !it.ignored() }.map { it to it.distance(location) }
             .sorted().firstOrNull()?.first
 
@@ -232,37 +233,22 @@ object BurrowWarpHelper {
         TAYLOR,
         ;
 
-        val displayName: String get() {
-            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
-            for (entry in locationData) {
-                if (entry.key.equals(this.name, true)) {
-                    return entry.value.displayName
-                }
-            }
-            ErrorManager.skyHanniError("repo invalid for diana warp")
+        private val data: WarpLocationData by lazy {
+            warpLocationData.orEmpty().entries.firstNotNullOfOrNull { (key, value) ->
+                value.takeIf { key.equals(name, ignoreCase = true) }
+            } ?: ErrorManager.skyHanniError("Repo invalid for Diana warp")
         }
 
-        val location: LorenzVec get() {
-            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
-            for (entry in locationData) {
-                if (entry.key.equals(this.name, true)) {
-                    return LorenzVec(entry.value.x, entry.value.y, entry.value.z)
-                }
-            }
-            ErrorManager.skyHanniError("repo invalid for diana warp")
-        }
+        val displayName: String
+            get() = data.displayName
 
-        private val extraBlocks: Int get() {
-            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
-            for (entry in locationData) {
-                if (entry.key.equals(this.name, true)) {
-                    return entry.value.extraDianaWarpBlocks
-                }
-            }
-            ErrorManager.skyHanniError("repo invalid for diana warp")
-        }
+        val location: Vec3
+            get() = data.vec
 
-        fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
+        private val extraBlocks: Int
+            get() = data.extraDianaWarpBlocks
+
+        fun distance(other: Vec3): Double = other.distanceTo(location) + extraBlocks
 
         fun ignored(): Boolean = config.ignoredWarpsList.contains(this)
     }

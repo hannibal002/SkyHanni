@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSetti
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
+import net.minecraft.world.phys.Vec3
 
 @SkyHanniModule
 object SeaCreatureLootshareSphere {
@@ -18,9 +18,9 @@ object SeaCreatureLootshareSphere {
     private const val RANGE = 30.0f
 
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
-    private val existingCircles = mutableSetOf<LorenzVec>()
+    private val existingCircles = mutableSetOf<Vec3>()
 
-    fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
+    fun isInRange(pos: Vec3): Boolean = pos.distanceToPlayer() < RANGE
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -37,7 +37,7 @@ object SeaCreatureLootshareSphere {
             val pos = seaCreature.pos ?: continue
             var circleCount = 0
             existingCircles.forEach {
-                if (it.distance(pos) < 10) circleCount++
+                if (it.distanceTo(pos) < 10) circleCount++
             }
             if (circleCount > 2) continue
             val color = if (seaCreature.isOwn || isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE

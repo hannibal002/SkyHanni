@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -14,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.VectorUtils.toBlockPos
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
@@ -37,31 +37,22 @@ object WorldEdit {
     )
 
     private val aabb
-        get() = leftPos?.let { l ->
-            rightPos?.let { r ->
-                funAABB(l, r)
+        get() = leftPos?.let { left ->
+            rightPos?.let { right ->
+                funAABB(left, right)
             }
         }
 
-    fun copyToClipboard(useModern: Boolean) {
-        ClipboardUtils.copyToClipboard(generateCodeSnippet(useModern))
+    fun copyToClipboard() {
+        ClipboardUtils.copyToClipboard(generateCodeSnippet())
         ChatUtils.chat("Copied text to clipboard.")
     }
 
-    private const val legacyBlockPos = "net.minecraft.util.BlockPos"
-    private const val modernBlockPos = "net.minecraft.util.math.BlockPos"
-    private const val legacyAABB = "net.minecraft.util.AxisAlignedBB"
-    private const val modernAABB = "net.minecraft.util.math.Box"
-
-    private fun generateCodeSnippet(useModern: Boolean): String {
-        val blockPosText = if (useModern) modernBlockPos else legacyBlockPos
-        val aabbText = if (useModern) modernAABB else legacyAABB
-        var text = ""
-        leftPos?.run { text += "val redLeft = $blockPosText($x, $y, $z)\n" }
-        rightPos?.run { text += "val blueRight = $blockPosText($x, $y, $z)\n" }
-        aabb?.run { text += "val aabb = $aabbText($minX, $minY, $minZ, $maxX, $maxY, $maxZ)\n" }
-        return text
-    }
+    private fun generateCodeSnippet() = buildList {
+        leftPos?.run { add("val redLeft = BlockPos($x, $y, $z)") }
+        rightPos?.run { add("val blueRight = BlockPos($x, $y, $z)") }
+        aabb?.run { add("val aabb = AABB($minX, $minY, $minZ, $maxX, $maxY, $maxZ)") }
+    }.joinToString("\n")
 
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
@@ -117,11 +108,8 @@ object WorldEdit {
                 )
             }
             literal("copy") {
-                argCallback("useModern", BrigadierArguments.bool()) { modern ->
-                    copyToClipboard(modern)
-                }
                 simpleCallback {
-                    copyToClipboard(false)
+                    copyToClipboard()
                 }
             }
             literalCallback("reset") {

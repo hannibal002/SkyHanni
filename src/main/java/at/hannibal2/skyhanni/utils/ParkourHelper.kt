@@ -6,6 +6,11 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
+import at.hannibal2.skyhanni.utils.VectorUtils.plus
+import at.hannibal2.skyhanni.utils.VectorUtils.slope
+import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -14,11 +19,12 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.outlineTopFace
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
-    private val locations: List<LorenzVec>,
+    private val locations: List<Vec3>,
     private val shortCuts: List<ParkourShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
@@ -38,7 +44,7 @@ class ParkourHelper(
 
     fun inParkour() = current != -1
 
-    fun getStartLocation(): LorenzVec = locations.first()
+    fun getStartLocation(): Vec3 = locations.first()
 
     fun reset() {
         current = -1
@@ -123,7 +129,7 @@ class ParkourHelper(
     }
 
     private fun SkyHanniRenderWorldEvent.renderSteps(
-        inProgressVec: List<Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>>,
+        inProgressVec: List<Pair<IndexedValue<Vec3>, IndexedValue<Vec3>>>,
     ) {
         for ((index, location) in locations.asSequence().withIndex().drop(current)
             .take(lookAhead) + inProgressVec.map { it.second }) {
@@ -138,23 +144,26 @@ class ParkourHelper(
                 if (outline) outlineTopFace(aabb, 2, Color.BLACK, depth)
             }
             if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
-                drawString(location.offsetCenter().up(1), "§a§l$index", seeThroughBlocks = true)
+                drawString(location.offsetCenter().up(1.0), "§a§l$index", seeThroughBlocks = true)
             }
         }
     }
 
-    private fun LorenzVec.offsetCenter() = add(platformSize / 2, 1.0, platformSize / 2)
+    private fun Vec3.offsetCenter() = add(platformSize / 2, 1.0, platformSize / 2)
 
-    private fun getInProgressPair(): Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>? {
+    private fun getInProgressPair(): Pair<IndexedValue<Vec3>, IndexedValue<Vec3>>? {
         if (current < 0 || current + lookAhead >= locations.size) return null
         val currentPosition = locations[current].offsetCenter()
         val nextPosition = locations[current + 1].offsetCenter()
         val lookAheadStart = locations[current + lookAhead - 1]
         val lookAheadEnd = locations[current + lookAhead]
 
-        if (LocationUtils.playerLocation().distance(nextPosition) > currentPosition.distance(nextPosition)) return null
+        if (LocationUtils.playerLocation().distanceTo(nextPosition) >
+            currentPosition.distanceTo(nextPosition)
+        ) return null
 
-        val factor = LocationUtils.playerLocation().distance(currentPosition) / currentPosition.distance(nextPosition)
+        val factor = LocationUtils.playerLocation().distanceTo(currentPosition) /
+            currentPosition.distanceTo(nextPosition)
         val slopeLocation = lookAheadStart.slope(lookAheadEnd, factor)
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
@@ -162,7 +171,7 @@ class ParkourHelper(
         )
     }
 
-    private fun axisAlignedBB(loc: LorenzVec) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
+    private fun axisAlignedBB(loc: Vec3) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
 
     private fun colorForIndex(index: Int) = if (rainbowColor) {
         RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f).toChromaColor()

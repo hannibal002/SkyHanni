@@ -152,7 +152,7 @@ object HalloweenBasketWaypoints {
             IslandGraphs.currentIslandGraph?.let {
                 val halloweenNodes = it.getNodesWithTags(GraphNodeTag.HALLOWEEN_BASKET)
                 basketList = halloweenNodes.map { node ->
-                    EventWaypoint(position = node.position, isFound = false)
+                    EventWaypoint(position = node.position)
                 }.toSet()
                 closestBasket = getClosest(halloweenNodes)
                 if (config.pathfind.get() && config.enabled.get()) startPathfinding()
@@ -188,7 +188,7 @@ object HalloweenBasketWaypoints {
         val currentNode = IslandGraphs.closestNode ?: return null
 
         val closestNode = unFoundNodes.minByOrNull { GraphUtils.findShortestDistance(currentNode, it) } ?: return null
-        return EventWaypoint(position = closestNode.position, isFound = false)
+        return EventWaypoint(position = closestNode.position)
     }
 
     private fun disableFeature() {

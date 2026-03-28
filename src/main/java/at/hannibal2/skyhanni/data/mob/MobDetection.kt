@@ -16,13 +16,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.distanceChebyshevIgnoreY
+import at.hannibal2.skyhanni.utils.VectorUtils.minus
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundLoginPacket
@@ -319,11 +320,11 @@ object MobDetection {
                 MobData.logger.log(
                     "`${retry.entity.name.formattedTextCompatLessResets()}`${retry.entity.id} missed {\n " +
                         "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
-                        "\n Position: ${retry.entity.getLorenzVec()}\n " +
+                        "\n Position: ${retry.entity.position()}\n " +
                         "DistanceC: ${
-                            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                            entity.position().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                         }\n" +
-                        "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
+                        "Relative Position: ${entity.position() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
                 // Uncomment this to make it closed a loop

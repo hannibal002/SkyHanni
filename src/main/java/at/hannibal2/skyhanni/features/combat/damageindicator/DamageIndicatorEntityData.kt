@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraft.world.phys.Vec3
 
 class DamageIndicatorEntityData(
     val mob: Mob,
@@ -22,7 +22,7 @@ class DamageIndicatorEntityData(
     var nameAbove: String = "",
     var dead: Boolean = false,
     var firstDeath: Boolean = false, // TODO this defines if HP is very low, replace dead with this later
-    var deathLocation: LorenzVec? = null,
+    var deathLocation: Vec3? = null,
     var serverTicksAlive: Long = 0L,
 ) {
 

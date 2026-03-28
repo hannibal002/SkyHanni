@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data.model.graph
 
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.VectorUtils
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -13,9 +13,9 @@ import com.google.gson.annotations.Expose
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import net.minecraft.world.phys.Vec3
 import java.util.Collection
 import java.util.function.IntFunction
-import kotlin.collections.iterator
 
 // TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
@@ -53,9 +53,9 @@ value class Graph(
     fun filterByActive(predicate: (GraphNode) -> Boolean): List<GraphNode> =
         asSequence().filter(predicate).filter { it.enabled }.toList()
     fun getNearestNode(
-        location: LorenzVec = GraphUtils.playerPosition,
+        location: Vec3 = GraphUtils.playerPosition,
         condition: (GraphNode) -> Boolean = { true },
-    ): GraphNode = filterByActive(condition).minBy { it.position.distanceSq(location) }
+    ): GraphNode = filterByActive(condition).minBy { it.position.distanceToSqr(location) }
     fun toPositionsList() = map { it.position }
     fun toJson(): String = gson.toJson(this)
 
@@ -138,7 +138,7 @@ value class Graph(
         }
 
         private data class NodeData(
-            var position: LorenzVec? = null,
+            var position: Vec3? = null,
             var name: String? = null,
             var tags: List<String> = emptyList(),
             val neighbors: MutableList<Pair<Int, Double>> = mutableListOf(),
@@ -153,9 +153,7 @@ value class Graph(
                     continue
                 }
                 when (reader.nextName()) {
-                    "Position" -> data.position = reader.nextString().split(":").let {
-                        LorenzVec(it[0].toDouble(), it[1].toDouble(), it[2].toDouble())
-                    }
+                    "Position" -> data.position = VectorUtils.fromStoredString(reader.nextString())
                     "ExtraWeight" -> data.extraWeight = reader.nextInt()
                     "Neighbours" -> parseNeighbours(reader, data.neighbors)
                     "Name" -> data.name = reader.nextString()
