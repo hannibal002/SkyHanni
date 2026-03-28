@@ -27,6 +27,8 @@ object VincentAchievement {
             "Strawberry Collector".asComponent(),
             "Attempt to turn a rose into a strawberry".asComponent(),
             10f,
+            false,
+            listOf(10)
         )
         event.register(achievement, VINCENT_ACHIEVEMENT)
     }
