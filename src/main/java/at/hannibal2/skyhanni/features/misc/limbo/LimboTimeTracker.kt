@@ -140,7 +140,8 @@ object LimboTimeTracker {
                 append("What a waste of electricity :(") {
                     withColor(ChatFormatting.DARK_GRAY)
                 }
-            }
+            },
+            6f,
         )
         event.register(achievement, LIMBO_ACHIEVEMENT)
     }
