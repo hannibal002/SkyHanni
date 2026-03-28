@@ -254,7 +254,7 @@ object AchievementManager {
             if (!achievement.data.achieved) hasDoneAllAchievements = false
             else luck += achievement.userLuckAmount
         }
-        if (hasDoneAllAchievements) luck += 100
+        if (hasDoneAllAchievements) luck += 1000
         if (luck == 0f) return
         event.addLuck(luck)
 
