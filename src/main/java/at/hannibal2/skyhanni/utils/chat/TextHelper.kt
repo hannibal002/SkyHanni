@@ -209,15 +209,18 @@ object TextHelper {
         var index = 0
         var newComponent: Component = Component.empty()
         var currentString = ""
+        var done = false
 
-        component.visitNonEmpty { style, string ->
+        component.forEachNonEmpty { style, string ->
+            if (done) return@forEachNonEmpty
             for (c in string) {
                 if (index >= match.length) {
                     if (currentString.isNotEmpty()) {
                         newComponent.append(Component.literal(currentString).withStyle(style))
                     }
                     currentString = ""
-                    return@visitNonEmpty Optional.of(newComponent)
+                    done = true
+                    return@forEachNonEmpty
                 }
                 if (c == match[index]) {
                     currentString += c
@@ -232,7 +235,6 @@ object TextHelper {
                 newComponent.append(Component.literal(currentString).withStyle(style))
             }
             currentString = ""
-            Optional.empty<Component>()
         }
         if (newComponent.string.isEmpty()) return null
         return newComponent
@@ -242,7 +244,7 @@ object TextHelper {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
-        component.visitNonEmpty { style, string ->
+        component.forEachNonEmpty { style, string ->
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
                 currentComponent.append(Component.literal(string).withStyle(style))
@@ -257,7 +259,6 @@ object TextHelper {
                     currentComponent = Component.empty()
                 }
             }
-            Optional.empty<Component>()
         }
 
         if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
@@ -271,11 +272,20 @@ object TextHelper {
         return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
     }
 
-    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> =
-        this.visit<T>({ style, string ->
+    private fun Component.forEachNonEmpty(visitor: (Style, String) -> Unit) {
+        visitNonEmpty { style, string ->
+            visitor(style, string)
+            Optional.empty()
+        }
+    }
+
+    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit<T>(
+        { style, string ->
             if (string.isNullOrEmpty()) Optional.empty()
             else visitor(style, string)
-        }, Style.EMPTY)
+        },
+        Style.EMPTY,
+    )
 
     fun List<Component>.merge(): MutableComponent {
         val component = "".asComponent()
