@@ -125,7 +125,7 @@ object CustomWardrobe {
 
     // Edit button in normal wardrobe while in edit mode
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
         val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
@@ -282,7 +282,7 @@ object CustomWardrobe {
 
         for (equipment in net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
-            if (armorOrdinal < 0 || armorOrdinal > 3) continue
+            if (armorOrdinal !in 0..3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
             if (stack == null) stack = ItemStack.EMPTY
             fakePlayer.equipment.set(equipment, stack)

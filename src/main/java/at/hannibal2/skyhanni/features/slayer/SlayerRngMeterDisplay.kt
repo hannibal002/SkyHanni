@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterToolTipFeatures.calculateSpawnCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -95,7 +94,7 @@ object SlayerRngMeterDisplay {
     }
 
     @HandleEvent
-    fun onSlayerChange(event: SlayerChangeEvent) {
+    fun onSlayerChange() {
         update()
     }
 

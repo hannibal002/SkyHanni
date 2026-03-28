@@ -64,7 +64,7 @@ private fun Component.computeUnformattedTextCompat(): String {
 }
 
 fun Component.unformattedTextCompat(): String =
-    iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
+    iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
 // has to be a separate function for pattern mappings
 fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
@@ -291,10 +291,10 @@ fun HoverEvent.value(): Component {
 
 fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? {
     if (action == null) return null
-    when (action) {
-        HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
+    return when (action) {
+        HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
         // I really don't think anyone is using the other 2 lol
-        else -> return null
+        else -> null
     }
 }
 
@@ -304,7 +304,7 @@ fun Component.changeColor(color: LorenzColor): Component =
 fun Component.convertToJsonString(): String {
     return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
         com.mojang.serialization.JsonOps.INSTANCE,
-        this
+        this,
     ).orThrow.toString()
 }
 
@@ -377,7 +377,7 @@ fun Component.replace(
     oldValue: String,
     newValue: String,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
@@ -386,7 +386,7 @@ fun Component.replace(
     oldValue: Regex,
     newValue: String,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     return replace(this, oldValue, newValue, onlyReplaceFirst, predicate)
 }
@@ -396,7 +396,7 @@ private fun replace(
     oldValue: Any,
     newValue: String,
     onlyReplaceFirst: Boolean,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
@@ -426,36 +426,39 @@ fun Component.replace(
     oldValue: String,
     newValue: Component,
     onlyReplaceFirst: Boolean = false,
-    predicate: (Style?) -> Boolean = ALWAYS
+    predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
     var hasEdited = false
 
-    this.visit({ currentStyle: Style?, string: String? ->
-        if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
-            val split = string.split(oldValue)
-            newComp.append(
-                componentBuilder {
-                    for ((index, str) in split.withIndex()) {
-                        append(Component.literal(str).withStyle(currentStyle))
-                        if (index < split.size - 1) {
-                            if (!onlyReplaceFirst || !hasEdited) {
-                                append(newValue)
-                                hasEdited = true
-                            } else {
-                                append(oldValue) {
-                                    style = currentStyle
+    this.visit(
+        { currentStyle: Style?, string: String? ->
+            if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+                val split = string.split(oldValue)
+                newComp.append(
+                    componentBuilder {
+                        for ((index, str) in split.withIndex()) {
+                            append(Component.literal(str).withStyle(currentStyle))
+                            if (index < split.size - 1) {
+                                if (!onlyReplaceFirst || !hasEdited) {
+                                    append(newValue)
+                                    hasEdited = true
+                                } else {
+                                    append(oldValue) {
+                                        style = currentStyle
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            )
-        } else {
-            newComp.append(Component.literal(string).withStyle(currentStyle))
-        }
-        Optional.empty<Component>()
-    }, Style.EMPTY)
+                    },
+                )
+            } else {
+                newComp.append(Component.literal(string).withStyle(currentStyle))
+            }
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
 
     if (!hasEdited) return null
     return newComp
@@ -470,6 +473,5 @@ fun componentBuilder(init: MutableComponent.() -> Unit): Component {
 }
 
 fun Component.copyIfNeeded(): MutableComponent {
-    if (this is MutableComponent) return this
-    else return this.copy()
+    return this as? MutableComponent ?: this.copy()
 }

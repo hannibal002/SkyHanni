@@ -78,6 +78,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -195,7 +196,9 @@ object EstimatedItemValueCalculator {
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
         val reforgeStoneName = internalName.repoItemName
-        val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
+        val applyCost = reforge.costs.takeIfNotEmpty()?.let {
+            getReforgeStoneApplyCost(stack, it, internalName)
+        } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
         list.add(" §7Stone: $reforgeStoneName ${reforgeStonePrice.formatCoinWithBrackets()}")
@@ -628,15 +631,13 @@ object EstimatedItemValueCalculator {
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (names.isEmpty()) return 0.0
         list.add("§7Enchantments: " + totalPrice.formatCoin())
-        var i = 0
-        for (name in names) {
+        for ((i, name) in names.withIndex()) {
             if (i == enchantmentsCap) {
                 val missing = names.size - enchantmentsCap
                 list.add(" §7§o$missing more enchantments..")
                 break
             }
             list.add(name)
-            i++
         }
         return totalPrice
     }

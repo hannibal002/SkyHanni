@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -24,7 +25,6 @@ import kotlin.time.Duration.Companion.seconds
 object PartyChatCommands {
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
-    private val devConfig get() = SkyHanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,
@@ -43,7 +43,7 @@ object PartyChatCommands {
             { config.transferCommand },
             triggerableBySelf = false,
             executable = {
-                HypixelCommands.partyTransfer(it.cleanedAuthor)
+                HypixelCommands.partyTransfer(it.authorName)
             },
         ),
         PartyChatCommand(
@@ -70,7 +70,7 @@ object PartyChatCommands {
                 if (!CurrentPing.isEnabled()) {
                     ChatUtils.notifyOrDisable(
                         "Ping API is disabled, the ping command won't work!",
-                        devConfig::pingApi,
+                        DevApi.mainToggles::pingApi,
                     )
                     return@PartyChatCommand
                 }
@@ -83,10 +83,10 @@ object PartyChatCommands {
             { config.tpsCommand },
             requiresPartyLead = false,
             executable = {
-                TpsCounter.tps?.let {
-                    HypixelCommands.partyChat("Current TPS: $it", prefix = true)
+                TpsCounter.tps?.let { tps ->
+                    HypixelCommands.partyChat("Current TPS: %.2f".format(tps), prefix = true)
                 } ?: run {
-                    ChatUtils.chat("TPS Command Sent too early to calculate TPS")
+                    ChatUtils.chat("Command sent too early to calculate TPS")
                 }
             },
         ),
@@ -119,10 +119,10 @@ object PartyChatCommands {
 
     @HandleEvent
     fun onPartyCommand(event: PartyChatEvent.Allow) {
-        if (event.message.firstOrNull() !in commandPrefixes) return
-        val commandLabel = event.message.substring(1).substringBefore(' ')
+        if (event.cleanMessage.firstOrNull() !in commandPrefixes) return
+        val commandLabel = event.cleanMessage.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
-        val name = event.cleanedAuthor
+        val name = event.authorName
         if (name == PlayerUtils.getName() && (!command.triggerableBySelf || !config.selfTriggerCommands)) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return

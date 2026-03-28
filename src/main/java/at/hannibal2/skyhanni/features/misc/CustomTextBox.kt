@@ -29,7 +29,7 @@ object CustomTextBox {
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGui) return
         if (!isEnabled()) return
 
@@ -37,7 +37,7 @@ object CustomTextBox {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.onlyInGui) return
         if (!isEnabled()) return
 
