@@ -18,7 +18,7 @@ data class Achievement(
     fun getName(): Component? {
         name_ ?: return null
         val tier = getCurrentTier() ?: return name_
-        if (tier == 0) return name_
+        if (tier == 0 || tiers.size == 1) return name_
         return name_.copy().append(" $tier")
     }
 
