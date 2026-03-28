@@ -81,7 +81,7 @@ object DungeonDeathCounter {
     fun onWorldChange() = clear()
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.deathCounterDisplay) return
         val display = display ?: return
         config.deathCounterPos.renderRenderable(display, posLabel = "Dungeon Death Counter")

@@ -75,7 +75,7 @@ object SkyBlockKickDuration {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled || !SkyBlockUtils.onHypixel || !showTime) return
 
         if (SkyBlockUtils.inSkyBlock || lastKickTime.passedSince() > 5.minutes) notKicked()

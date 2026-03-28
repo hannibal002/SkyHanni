@@ -14,7 +14,7 @@ object InWaterDisplay {
     private val config get() = SkyHanniMod.feature.misc.stranded
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         val text = "§7In Water: " + if (MinecraftCompat.localPlayer.isInWater) "§aTrue" else "§cFalse"

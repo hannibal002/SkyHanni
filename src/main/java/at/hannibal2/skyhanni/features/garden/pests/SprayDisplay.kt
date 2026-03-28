@@ -54,7 +54,7 @@ object SprayDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.displayEnabled) return
         val display = display ?: return
         config.displayPosition.renderRenderable(display, posLabel = "Active Plot Spray Display")

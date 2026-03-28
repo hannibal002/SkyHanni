@@ -78,7 +78,7 @@ object InGameDateDisplay {
     private fun String.removeOrdinal() = replace("nd", "").replace("rd", "").replace("st", "").replace("th", "")
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
 
         val display = display ?: return

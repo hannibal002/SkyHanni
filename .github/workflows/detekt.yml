@@ -26,7 +26,7 @@ jobs:
             detekt_failed: ${{ steps.run_detekt.outcome == 'failure' }}
         steps:
             -   name: Checkout PR code
-                uses: actions/checkout@v4
+                uses: actions/checkout@v6
                 with:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
@@ -94,7 +94,7 @@ jobs:
             pull-requests: write
         steps:
             -   name: Checkout base repo code
-                uses: actions/checkout@v4
+                uses: actions/checkout@v6
                 with:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}

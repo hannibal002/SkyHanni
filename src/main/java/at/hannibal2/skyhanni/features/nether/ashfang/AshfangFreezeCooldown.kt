@@ -33,7 +33,7 @@ object AshfangFreezeCooldown {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !isCurrentlyFrozen()) return
 
         val format = unfrozenTime.timeUntil().format(showMilliSeconds = true)

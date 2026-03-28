@@ -35,7 +35,7 @@ object ArmorStackDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Armor Stack Display")

@@ -81,7 +81,7 @@ object DungeonMilestonesDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.showMilestonesDisplay) return
 
         val display = display ?: return
