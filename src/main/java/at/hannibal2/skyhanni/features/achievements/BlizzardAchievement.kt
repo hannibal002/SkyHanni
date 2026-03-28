@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -33,10 +34,10 @@ object BlizzardAchievement {
         event.register(achievement, BLIZZARD_ACHIEVEMENT)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         blizzardPattern.matchMatcher(event.cleanMessage) {
-            if (group("name").contains(PlayerUtils.getName())) {
+            if (group("name").cleanPlayerName() == PlayerUtils.getName()) {
                 AchievementManager.completeAchievement(BLIZZARD_ACHIEVEMENT)
             }
         }
