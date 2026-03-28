@@ -118,7 +118,7 @@ object LimboTimeTracker {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return
         if (SkyBlockUtils.inSkyBlock) {

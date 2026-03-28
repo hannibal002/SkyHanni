@@ -84,7 +84,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
 

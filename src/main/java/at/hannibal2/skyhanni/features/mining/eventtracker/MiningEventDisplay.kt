@@ -33,7 +33,7 @@ object MiningEventDisplay {
     }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         val isOnValidMiningLocation = (config.outsideMining || MiningEventTracker.isMiningIsland())
         if (!config.enabled || !isOnValidMiningLocation) return
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")

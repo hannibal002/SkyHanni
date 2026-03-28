@@ -85,7 +85,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         }
 
         @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MAYOR_OVERLAY])
-        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!config.enabled) return
             display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
