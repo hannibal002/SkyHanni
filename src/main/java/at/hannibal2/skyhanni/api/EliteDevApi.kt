@@ -57,7 +57,7 @@ object EliteDevApi {
             description = "Fetches the specified Elite resource from $ELITE_DOMAIN"
             category = CommandCategory.DEVELOPER_DEBUG
             argCallback("resource", EnumArgumentType.lowercase<EliteResourceType>()) { resource ->
-                SkyHanniMod.launchIOCoroutine("fetch elite resource command") {
+                SkyHanniMod.launchIOCoroutine("shfetcheliteresource command") {
                     fetchResourceCommand(resource)
                 }
             }
