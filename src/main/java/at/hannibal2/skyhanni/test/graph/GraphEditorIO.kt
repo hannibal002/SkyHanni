@@ -52,7 +52,7 @@ object GraphEditorIO {
             val compiledNode = compiledNodeMap[node.id] ?: continue
             val nodeEdges = edgesByNode[node].orEmpty()
 
-            compiledNode.neighbours = nodeEdges.map { edge ->
+            compiledNode.neighbors = nodeEdges.map { edge ->
                 val otherNode = edge.getOther(node)
                 val compiledOther = compiledNodeMap[otherNode.id]
                     ?: error("Invalid node ID ${otherNode.id} referenced in edge")
@@ -176,7 +176,7 @@ object GraphEditorIO {
         }
         val translation = graph.zip(importedNodes).toMap()
         val rawEdges = graph.flatMap { node ->
-            node.neighbours.mapNotNull { (neighbor, _) ->
+            node.neighbors.mapNotNull { (neighbor, _) ->
                 val node1 = translation[node] ?: error("Invalid node in translation: ${node.id}")
                 val node2 = translation[neighbor] ?: error("Invalid neighbor in translation: ${neighbor.id}")
                 GraphingEdge(node1, node2, EdgeDirection.ONE_TO_TWO)

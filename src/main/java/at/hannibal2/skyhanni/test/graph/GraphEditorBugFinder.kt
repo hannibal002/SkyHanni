@@ -66,11 +66,11 @@ object GraphEditorBugFinder {
         }
         for (node in graph) {
             val areaNode = nearestArea[node]?.name ?: continue
-            for (neighbour in node.neighbours.keys) {
-                val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
-                if (neighbouringAreaNode == areaNode) continue
+            for (neighbor in node.neighbors.keys) {
+                val neighboringAreaNode = nearestArea[neighbor]?.name ?: continue
+                if (neighboringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    errorsInWorld[node] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
+                    errorsInWorld[node] = "§cConflicting areas $areaNode and $neighboringAreaNode"
                 }
             }
         }
