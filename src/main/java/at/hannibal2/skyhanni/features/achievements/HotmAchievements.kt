@@ -13,14 +13,14 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 object HotmAchievements {
 
     private const val PICKAXE_ABILITY_ACHIEVEMENT = "ability master"
-    val hotmDetector = InventoryDetector(checkInventoryName = { it == "Heart Of The Mountain" })
+    val hotmDetector = InventoryDetector(checkInventoryName = { it == "Heart of the Mountain" })
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Have 4 Pickaxe Abilities unlocked".asComponent(),
             "Jack of all Abilities, master of none".asComponent(),
-            10f,
+            4f,
             true,
         )
         event.register(achievement, PICKAXE_ABILITY_ACHIEVEMENT)
