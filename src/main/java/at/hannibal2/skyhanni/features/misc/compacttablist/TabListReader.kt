@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,6 +29,8 @@ object TabListReader {
     private var lastTabComponents: List<Component>? = null
     private var lastFooterComponent: Component? = null
 
+    private var inUpgrades = false
+
     /**
      * REGEX-TEST: [164] CalMWolfs ᛝ♲
      * REGEX-TEST: [328] vayness ☠
@@ -56,6 +57,15 @@ object TabListReader {
     )
 
     /**
+     * REGEX-TEST: No effects active. Drink Potions or splash them on the
+     * REGEX-TEST: ground to buff yourself!
+     */
+    private val noActiveEffectsPattern by patternGroup.pattern(
+        "effects.active.none",
+        "No effects active\\. Drink Potions or splash them on the|ground to buff yourself!",
+    )
+
+    /**
      * REGEX-TEST: You have 1 active effect. Use "/effects" to see it!
      * REGEX-TEST: You have 1 non-god effects.
      */
@@ -70,6 +80,15 @@ object TabListReader {
     private val cookiePattern by patternGroup.pattern(
         "cookie.colorless",
         "Cookie Buff",
+    )
+
+    /**
+     * REGEX-TEST: Not active! Obtain booster cookies from the community
+     * REGEX-TEST: shop in the hub.
+     */
+    private val noCookiePattern by patternGroup.pattern(
+        "cookie.inactive",
+        "Not active! Obtain booster cookies from the community|shop in the hub\\.",
     )
 
     /**
@@ -88,20 +107,26 @@ object TabListReader {
         "Use \"/effects\".*",
     )
 
+    private val upgradesHeaderPattern by patternGroup.pattern(
+        "upgrades-header",
+        "Upgrades",
+    )
+
     /**
      * REGEX-TEST: Wardrobe Slots IV 5 Days
      */
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
-        "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)"
+        "(?<firstPart>[A-Za-z ]+)(?<secondPart> [\\w ]+)",
     )
+
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups.colorless",
         "Active Power Ups",
     )
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.enabled) {
             rebuildRenderColumns()
         }
@@ -109,13 +134,13 @@ object TabListReader {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        this.lastTabComponents = event.tabList
+        lastTabComponents = event.tabList
         rebuildRenderColumns()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
-        this.lastFooterComponent = event.footer
+        lastFooterComponent = event.footer
         rebuildRenderColumns()
     }
 
@@ -156,15 +181,16 @@ object TabListReader {
         return columns
     }
 
+    // TODO refactor
+    @Suppress("CyclomaticComplexMethod")
     private fun TabColumn.matchFooterTabComponent(
         component: Component,
         previousComponent: Component?,
         godPotTimer: String?,
-        effectCount: String?,
-    ): TabColumn = this.apply {
-        val lastIsCookieBuff = previousComponent?.string == "Cookie Buff"
-        val lastIsDungeons = previousComponent?.string == "Dungeon Buffs"
-        val lastIsWinterPowerUps = previousComponent?.string == "Active Power Ups"
+        effectCount: Int,
+    ): TabColumn = apply {
+        val lastIsDungeons = dungeonBuffPattern.matches(previousComponent?.string)
+        val lastIsWinterPowerUps = winterPowerUpsPattern.matches(previousComponent?.string)
 
         if (component.contains(hypixelAdvertisingString)) return@apply
 
@@ -172,16 +198,17 @@ object TabListReader {
         if (godPotTimer != null && godPotPattern.matches(component)) return@apply
         if (effectCountPattern.matches(component)) return@apply
         if (effectsUseCommandPattern.matches(component)) return@apply
-
         activeEffectPattern.matchMatcher(component) {
-            when {
-                godPotTimer != null -> {
-                    addComponent(Component.literal("§a§lActive Effects:"))
-                    addComponent(Component.literal(" §cGod Potion§r: $godPotTimer"))
-                }
-                effectCount != null -> addComponent(Component.literal("§a§lActive Effects: §e$effectCount"))
-                else -> addComponent(Component.literal("§a§lActive Effects: §e0"))
+            if (godPotTimer != null) {
+                addComponent(Component.literal("§a§lActive Effects:"))
+                addComponent(Component.literal(" §cGod Potion§r: $godPotTimer"))
+            } else {
+                addComponent(Component.literal("§a§lActive Effects: §e$effectCount"))
             }
+            return@apply
+        }
+        if (noActiveEffectsPattern.matches(component)) {
+            // No need to add this, it's already implied by the 0 count
             return@apply
         }
 
@@ -189,30 +216,35 @@ object TabListReader {
         cookiePattern.matchMatcher(component) {
             return@apply addComponent(component)
         }
-        if (component.startsWith("Not active!") && lastIsCookieBuff) {
+        if (noCookiePattern.matches(component)) {
+            if (noCookiePattern.matches(previousComponent)) return@apply
             return@apply addComponent(Component.literal("§7 Not Active"))
         }
 
         dungeonBuffPattern.matchMatcher(component) {
             return@apply addComponent(component)
         }
-        if (component.startsWith("No Buffs active.") && lastIsDungeons) {
+        if (lastIsDungeons && component.startsWith("No Buffs active.")) {
             return@apply addComponent(Component.literal("§7 None Found"))
         }
 
         winterPowerUpsPattern.matchMatcher(component) {
             return@apply addComponent(component)
         }
-        if (component.startsWith("No Power Ups active.") && lastIsWinterPowerUps) {
+        if (lastIsWinterPowerUps && component.startsWith("No Power Ups active.")) {
             return@apply addComponent(Component.literal("§7 None"))
         }
 
-        upgradesPattern.matchMatcher(component.string) {
+        if (upgradesHeaderPattern.matches(component)) {
+            inUpgrades = true
+        }
+        upgradesPattern.matchMatcher(component) {
+            if (!inUpgrades) return@matchMatcher
             if (!component.formattedTextCompat().startsWith("§e")) return@matchMatcher
 
             val firstComponent = TextHelper.matcher(component, group("firstPart")) ?: return@apply
             val secondComponent = TextHelper.matcher(component, group("secondPart")) ?: return@apply
-            val displayFirst = if (!firstComponent.string.startsWith(" ") && !firstComponent.style.isBold) {
+            val displayFirst = if (!firstComponent.startsWith(" ") && !firstComponent.style.isBold) {
                 TextHelper.join(" ", firstComponent)
             } else firstComponent
 
@@ -224,22 +256,29 @@ object TabListReader {
         val formatted = component.formattedTextCompat()
         when {
             // Separators are truly emptied
-            formatted.removeColor().trim().isEmpty() -> addComponent(Component.empty())
-            !formatted.contains("§l") -> addComponent(Component.literal(" ").append(component))
+            formatted.removeColor().trim().isEmpty() -> {
+                addComponent(Component.empty())
+                inUpgrades = false
+            }
+
+            "§l" !in formatted -> addComponent(Component.literal(" ").append(component))
             else -> addComponent(component)
         }
     }
 
+    // TODO refactor
     @Suppress("CyclomaticComplexMethod")
     private fun parseFooterAsColumn(component: Component): TabColumn? {
+        inUpgrades = false
+
         val lines = TextHelper.split(component, "\n") ?: listOf(component)
 
         val godPotTimer = lines.firstNotNullOfOrNull {
             godPotPattern.matchMatcher(it.string) { group("timer") }
         }
         val effectCount = lines.firstNotNullOfOrNull {
-            effectCountPattern.matchMatcher(it.string) { group("effectCount") }
-        }
+            effectCountPattern.matchMatcher(it.string) { group("effectCount").toInt() }
+        } ?: 0
 
         val titleColumn = Component.literal("§2§lOther")
         return TabColumn(titleColumn).apply {
