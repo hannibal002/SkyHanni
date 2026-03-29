@@ -30,7 +30,8 @@ import java.util.UUID
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
+// TODO refactor
+@Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions")
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -39,9 +40,13 @@ object StringUtils {
     private val asciiWithColorCodePattern = "[^\\x00-\\x7F§]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
+    private val formattingChars = "kmolnrKMOLNR".toSet()
+    private val colorChars = "abcdefABCDEF0123456789zZ".toSet()
+    private val colorMap = ChatFormatting.entries.associateBy { it.toString()[1] }
+
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
-    fun String.takeIfNotEmpty(): String? = this.ifEmpty { null }
+    fun String.takeIfNotEmpty(): String? = ifEmpty { null }
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -49,13 +54,9 @@ object StringUtils {
     fun String.removeSFormattingCode(): String = sFormattingPattern.matcher(this).replaceAll("")
     fun String.removeNonAsciiNonColorCode(): String = asciiWithColorCodePattern.matcher(this).replaceAll("")
 
-    fun String.firstLetterUppercase(): String {
-        return this.lowercase(Locale.getDefault())
+    fun String.firstLetterUppercase(): String =
+        lowercase(Locale.getDefault())
             .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-    }
-
-    private val formattingChars = "kmolnrKMOLNR".toSet()
-    private val colorChars = "abcdefABCDEF0123456789zZ".toSet()
 
     /**
      * Removes color and optionally formatting codes from the given string, leaving plain text.
@@ -76,10 +77,10 @@ object StringUtils {
         var nextFormattingSequence = indexOf('§')
 
         // If this string does not contain any formatting indicators, just return this string directly
-        if (nextFormattingSequence < 0) return this.toString()
+        if (nextFormattingSequence < 0) return toString()
 
         // Let's create a new string, and pre-allocate enough space to store this entire string
-        val cleanedString = StringBuilder(this.length)
+        val cleanedString = StringBuilder(length)
 
         // Read index stores the position in `this` which we have written up until now
         // a/k/a where we need to start reading from
@@ -87,12 +88,11 @@ object StringUtils {
 
         // As long as there still is a formatting indicator left in our string
         while (nextFormattingSequence >= 0) {
-
             // Write everything from the read index up to the next formatting indicator into our clean string
             cleanedString.append(this, readIndex, nextFormattingSequence)
 
             // Get the formatting code (note: this may not be a valid formatting code)
-            val formattingCode = this.getOrNull(nextFormattingSequence + 1)
+            val formattingCode = getOrNull(nextFormattingSequence + 1)
 
             // If the next formatting sequence's code indicates a non-color format and we should keep those
             if (keepFormatting && formattingCode in formattingChars) {
@@ -118,11 +118,11 @@ object StringUtils {
                 nextFormattingSequence = indexOf('§', startIndex = readIndex)
 
                 // If the next read would be out of bound, reset the readIndex to the very end of the string, resulting in a "" string to be appended
-                readIndex = readIndex.coerceAtMost(this.length)
+                readIndex = readIndex.coerceAtMost(length)
             }
         }
         // Finally, after the last formatting sequence was processed, copy over the last sequence of the string
-        cleanedString.append(this, readIndex, this.length)
+        cleanedString.append(this, readIndex, length)
 
         // And turn the string builder into a string
         return cleanedString.toString()
@@ -132,13 +132,13 @@ object StringUtils {
      * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
      */
     fun <T> subMapOfStringsStartingWith(prefix: String, map: NavigableMap<String, T>): NavigableMap<String, T> {
-        if ("" == prefix) return map
+        if (prefix == "") return map
         val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
     }
 
     fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
-        if ("" == prefix) return map
+        if (prefix == "") return map
         val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subSet(prefix, true, lastKey, false)
     }
@@ -188,9 +188,9 @@ object StringUtils {
     fun String.isPlayerName() = UtilsPatterns.playerNamePattern.matches(this)
 
     fun String.substringBeforeLastOrNull(needle: String): String? {
-        val index = this.lastIndexOf(needle)
+        val index = lastIndexOf(needle)
         if (index < 0) return null
-        return this.substring(0, index)
+        return substring(0, index)
     }
 
     fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
@@ -198,7 +198,7 @@ object StringUtils {
     fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
-    fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
+    fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) toInt().toString() else toString()
 
     fun String.splitLines(width: Int): String = splitText(
         this,
@@ -212,7 +212,7 @@ object StringUtils {
             var newLine = ""
             var lastColor: TextColor? = null
             var lastFormatting = ""
-            line.accept { index, style, codePoint ->
+            line.accept { _, style, codePoint ->
                 val color = style.color
                 if (color != lastColor) {
                     lastColor = color
@@ -248,11 +248,11 @@ object StringUtils {
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
     fun List<String>.createCommaSeparatedList(delimiterColor: String = ""): String {
-        if (this.isEmpty()) return ""
-        if (this.size == 1) return this[0]
-        if (this.size == 2) return "${this[0]}$delimiterColor and ${this[1]}"
-        val lastIndex = this.size - 1
-        val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
+        if (isEmpty()) return ""
+        if (size == 1) return this[0]
+        if (size == 2) return "${this[0]}$delimiterColor and ${this[1]}"
+        val lastIndex = size - 1
+        val allButLast = subList(0, lastIndex).joinToString("$delimiterColor, ")
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
@@ -327,34 +327,32 @@ object StringUtils {
         return if (matcher.matches()) matcher else null
     }
 
-    fun String.convertToFormatted(): String = this.replace("&&", "§")
-    fun String.convertToUnformatted(): String = this.replace("§", "&")
+    fun String.convertToFormatted(): String = replace("&&", "§")
+    fun String.convertToUnformatted(): String = replace("§", "&")
 
-    fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
+    fun String.allLettersFirstUppercase() =
+        split("_").joinToString(" ") { it.firstLetterUppercase() }
 
-    fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
+    fun String?.equalsIgnoreColor(string: String?) =
+        this?.let { it.removeColor() == string?.removeColor() } ?: false
 
     fun String.isRoman(): Boolean = UtilsPatterns.isRomanPattern.matches(this)
 
-    fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
+    fun isEmpty(message: String): Boolean =
+        message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
-    fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
+    fun String.insert(pos: Int, chars: CharSequence): String =
+        substring(0, pos) + chars + substring(pos)
 
-    fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
+    fun String.insert(pos: Int, char: Char): String =
+        substring(0, pos) + char + substring(pos)
 
-    fun replaceIfNeeded(
-        original: Component,
-        newText: String,
-    ): Component? {
-        return replaceIfNeeded(original, newText.asComponent())
-    }
+    fun replaceIfNeeded(original: Component, newText: String): Component? =
+        replaceIfNeeded(original, newText.asComponent())
 
-    private val colorMap = ChatFormatting.entries.associateBy { it.toString()[1] }
-    fun enumChatFormattingByCode(char: Char): ChatFormatting? {
-        return colorMap[char]
-    }
+    fun enumChatFormattingByCode(char: Char): ChatFormatting? = colorMap[char]
 
     fun doLookTheSame(left: Component, right: Component): Boolean {
         class ChatIterator(var component: Component) {
@@ -504,21 +502,17 @@ object StringUtils {
         return message
     }
 
-    fun String.applyFormattingFrom(original: ComponentSpan): Component {
-        return asComponent { style = original.sampleStyleAtStart() }
-    }
+    fun String.applyFormattingFrom(original: ComponentSpan): Component =
+        asComponent { style = original.sampleStyleAtStart() }
 
-    fun String.applyFormattingFrom(original: Component): Component {
-        return asComponent { style = original.style }
-    }
+    fun String.applyFormattingFrom(original: Component): Component =
+        asComponent { style = original.style }
 
-    fun Component.contains(string: String): Boolean = formattedTextCompat().contains(string)
+    fun Component.contains(other: String): Boolean = string.contains(other)
 
-    fun Component.startsWith(string: String): Boolean = formattedTextCompat().startsWith(string)
+    fun Component.startsWith(other: String): Boolean = string.startsWith(other)
 
-    fun String.width(): Int {
-        return Minecraft.getInstance().font.width(this)
-    }
+    fun String.width(): Int = Minecraft.getInstance().font.width(this)
 
     private val vowels = "aeiouAEIOU".toSet()
 
@@ -526,16 +520,9 @@ object StringUtils {
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
 
-    fun String.splitCamelCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
+    fun String.splitCamelCase() = replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
-    fun String.isValidUuid(): Boolean {
-        return try {
-            UUID.fromString(this)
-            true
-        } catch (e: IllegalArgumentException) {
-            false
-        }
-    }
+    fun String.isValidUuid(): Boolean = runCatching { UUID.fromString(this) }.isSuccess
 
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
@@ -599,7 +586,7 @@ object StringUtils {
         val matcher = prefixPattern.matcher(this)
         // Only remove the prefix if it matches at the start of the string
         return if (matcher.find() && matcher.start() == 0) {
-            this.substring(matcher.end())
+            substring(matcher.end())
         } else this
     }
 

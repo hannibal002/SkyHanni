@@ -69,7 +69,7 @@ object EnoughUpdatesManager {
     fun getInternalNames() = internalNameSet
     fun getItemInformation() = itemMap
 
-    fun inLoadingState() = loadingMutex.isLocked || EnoughUpdatesRepoManager.repoMutex.isLocked
+    fun inLoadingState() = loadingMutex.isLocked
 
     /**
      * Called by the Neu Repo Manager when the NEU repo is reloaded.
