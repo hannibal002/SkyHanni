@@ -84,7 +84,7 @@ object ProfitPerDragon {
         enchantedEnderPearlAmount += getStandardEnchantedEnderPearlAmount(DragonProfitTracker.lastDragonPlacement ?: 0)
 
         ChatUtils.debug(
-            "Weight: $weight after enchanted ender pearls (${enchantedEnderPearlAmount.toInt()} epearls)",
+            "Weight: $weight after enchanted ender pearls (${enchantedEnderPearlAmount.toInt()} ender pearls)",
         )
 
         dragonLoot.addOrPut(ENCHANTED_ENDER_PEARL, enchantedEnderPearlAmount.toInt())
