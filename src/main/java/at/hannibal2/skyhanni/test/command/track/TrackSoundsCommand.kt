@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.core.registries.BuiltInRegistries
@@ -51,10 +52,10 @@ object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(commonName
     override fun PlaySoundEvent.shouldAcceptTrackableEvent(): Boolean = when {
         soundName == "game.player.hurt" && pitch == 0f && volume == 0f -> false // remove random useless sound
         soundName.isEmpty() -> false // sound with empty name aren't useful
-        else -> runCatching {
+        else -> if (MinecraftCompat.localPlayerExists) {
             distanceToPlayer // Need to call to initialize Lazy
             true
-        }.getOrDefault(false)
+        } else false
     }
 
     // PlaySoundEvent.soundName strips the namespace prefix, so suggestions mirror that
