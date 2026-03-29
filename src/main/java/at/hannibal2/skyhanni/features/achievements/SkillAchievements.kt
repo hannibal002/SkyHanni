@@ -21,7 +21,7 @@ object SkillAchievements {
     private const val ROCK_ACHIEVEMENT = "Mythic Rock"
     private const val DOLPHIN_ACHIEVEMENT = "Mythic Dolphin"
     val skillDetector = InventoryDetector(checkInventoryName = { it == "Your Skills" })
-    val petSkillDetector = InventoryDetector(pattern = "Fishing|Mining Skill".toPattern())
+    val petSkillDetector = InventoryDetector(pattern = "(Fishing|Mining) Skill".toPattern())
 
     /**
      * REGEX-TEST: Ores mined: 2,449,790
