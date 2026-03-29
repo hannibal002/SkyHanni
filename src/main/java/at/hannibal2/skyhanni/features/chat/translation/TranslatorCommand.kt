@@ -27,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 object TranslatorCommand {
     private val config get() = SkyHanniMod.feature.chat.translator
     private var lastUserChange = SimpleTimeMark.farPast()
-    fun getNativeLanguage(): String = config.languageCode.get().ifEmpty { "en" }
+    private fun getNativeLanguage(): String = config.languageCode.get().ifEmpty { "en" }
 
     fun isEnabled() = config.translateOnClick
 
@@ -45,9 +45,9 @@ object TranslatorCommand {
             legacyCallbackArgs { GoogleTranslator.fromNativeLanguage(it) }
         }
         event.registerBrigadier("shtranslate") {
-            description = "Translate a message in another language your language."
+            description = "Translates a message in another language to your language."
             category = CommandCategory.USERS_ACTIVE
-            legacyCallbackArgs { GoogleTranslator.toNativeLanguage(it) }
+            legacyCallbackArgs { GoogleTranslator.toNativeLanguage(it, getNativeLanguage()) }
         }
     }
 

@@ -38,11 +38,11 @@ object GoogleTranslator {
         return@withContext arrayOf(messageToSend.toString(), language)
     }
 
-    fun toNativeLanguage(args: Array<String>) {
+    fun toNativeLanguage(args: Array<String>, nativeLanguage: String) {
         val message = args.joinToString(" ").removeColor()
 
         CoroutineConfig("translator toNativeLanguage", 10.seconds).launchCoroutine {
-            val translation = getTranslation(message, TranslatorCommand.getNativeLanguage())
+            val translation = getTranslation(message, nativeLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
 
@@ -71,7 +71,7 @@ object GoogleTranslator {
         val message = args.drop(1).joinToString(" ")
 
         CoroutineConfig("translator fromNativeLanguage").launchCoroutine {
-            val translation = getTranslation(message, language, TranslatorCommand.getNativeLanguage())?.get(0) ?: "Error!"
+            val translation = getTranslation(message, language, "auto")?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
                 onClick = {
