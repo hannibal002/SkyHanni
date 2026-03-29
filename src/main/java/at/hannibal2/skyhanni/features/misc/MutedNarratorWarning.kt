@@ -18,6 +18,9 @@ object MutedNarratorWarning {
     private val reminderInterval = 1.minutes
     private val lastReminded: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    private const val WARNING_MESSAGE = "You currently have the Minecraft narrator turn on, but it is muted.\n" +
+        "§cThis is likely negatively impacting your game's performance."
+
     private val narratorActive get(): Boolean = runCatching {
         Minecraft.getInstance().narrator.isActive
     }.getOrDefault(false)
@@ -33,7 +36,7 @@ object MutedNarratorWarning {
         if (lastReminded.passedSince() < reminderInterval) return
 
         ChatUtils.clickToActionOrDisable(
-            "You currently have the Minecraft narrator turn on, but it is muted.",
+            WARNING_MESSAGE,
             config::mutedNarratorWarning,
             "turn off narrator",
             { Minecraft.getInstance().options.narrator().set(NarratorStatus.OFF) },
