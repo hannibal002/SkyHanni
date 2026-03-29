@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundSource
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
-object NarratorReminder {
+object MutedNarratorWarning {
 
     private val config get() = SkyHanniMod.feature.misc
     private val warningEnabled get() = config.mutedNarratorWarning.get()
