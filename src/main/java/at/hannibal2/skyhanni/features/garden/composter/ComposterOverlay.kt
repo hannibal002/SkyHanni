@@ -547,7 +547,7 @@ object ComposterOverlay {
 
         val havingInSacks: Int
         if (internalName.isMissingSackItem()) {
-            // sunflower oil doesnt go into sacks so have to do this
+            // sunflower oil doesn't go into sacks so have to do this
             havingInSacks = 0
         } else {
             havingInSacks = internalName.getAmountInSacksOrNull() ?: run {

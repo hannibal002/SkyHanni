@@ -99,7 +99,7 @@ object CustomScoreboardUtils {
 
     internal fun getHeat() = MiningApi.heatDisplay
 
-    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSBLines(), "northStars") ?: "0"
+    internal fun getNorthStars() = getGroup(ScoreboardPattern.northStarsPattern, getSBLines(), "northStars") ?: "0"
 
     internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSBLines(), "symbol").orEmpty()
 
