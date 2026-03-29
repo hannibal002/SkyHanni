@@ -57,7 +57,7 @@ object SpiderDenRelicPathfinder {
      */
     private val duplicatePattern by patternGroup.pattern(
         key = "chat.duplicate",
-        fallback = "You've already found this relic!",
+        fallback = "You've already found this relic!|You've already found all the relics!",
     )
 
     private class Data(
