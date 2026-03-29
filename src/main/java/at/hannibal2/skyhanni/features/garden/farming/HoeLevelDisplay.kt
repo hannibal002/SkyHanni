@@ -208,7 +208,8 @@ object HoeLevelDisplay {
                 append("XP!") {
                     withColor(ChatFormatting.GREEN)
                 }
-            }
+            },
+            30f,
         )
         event.register(achievement, HOE_ACHIEVEMENT)
     }
