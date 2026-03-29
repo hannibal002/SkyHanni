@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.BowItem
 import java.util.regex.Matcher
@@ -230,9 +234,23 @@ object QuiverApi {
         }
     }
 
+    private const val ARROW_ACHIEVEMENT = "100 grand arrows"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Arrowslinger".asComponent(),
+            "Shoot 100,000 Arrows".asComponent(),
+            50f,
+            false,
+            listOf(100_000)
+        )
+        event.register(achievement, ARROW_ACHIEVEMENT)
+    }
+
     @HandleEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!isEnabled() && event.slot != 44) return
+        if (!isEnabled() || event.slot != 44) return
         val stack = event.itemStack
         if (stack.getExtraAttributes()?.contains("quiver_arrow") == true) {
             for (line in stack.getLore()) {
@@ -250,6 +268,13 @@ object QuiverApi {
                             "line" to line,
                         )
                         return
+                    }
+                    if (currentArrow == currentArrowType && amount != currentAmount) {
+                        val diff = currentAmount - amount
+                        if (diff > 0) {
+                            val achievement = AchievementManager.getAchievement(ARROW_ACHIEVEMENT)
+                            AchievementManager.updateTieredAchievement(ARROW_ACHIEVEMENT, achievement.data.progress + diff)
+                        }
                     }
                     if (currentArrowType != currentArrow || amount != currentAmount) {
                         currentArrow = currentArrowType

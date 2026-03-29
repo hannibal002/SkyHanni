@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -14,8 +15,10 @@ import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
@@ -31,6 +34,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
@@ -124,6 +128,18 @@ object MineshaftPityDisplay {
         update()
     }
 
+    private const val SHAFT_ACHIEVEMENT = "100 shaft"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Quick Shafter".asComponent(),
+            "Spawn a Mineshaft in under 100 Pity".asComponent(),
+            10f,
+        )
+        event.register(achievement, SHAFT_ACHIEVEMENT)
+    }
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!MiningApi.inGlacialTunnels()) return
@@ -132,6 +148,10 @@ object MineshaftPityDisplay {
             val chance = calculateChance(pityCounter)
             val counterUntilPity = MAX_COUNTER - pityCounter
             val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.spreadBlocksBroken }
+
+            if (counterUntilPity < 100 && counterUntilPity != 0) {
+                AchievementManager.completeAchievement(SHAFT_ACHIEVEMENT)
+            }
 
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++

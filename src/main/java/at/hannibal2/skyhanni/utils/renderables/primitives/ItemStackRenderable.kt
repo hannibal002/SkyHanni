@@ -64,4 +64,5 @@ open class ItemRenderableConfig {
     open var rescaleSkulls: Boolean by PropertyVar(true)
     open var horizontalAlign: HorizontalAlignment by PropertyVar(HorizontalAlignment.LEFT)
     open var verticalAlign: VerticalAlignment by PropertyVar { Property.of(VerticalAlignment.CENTER) }
+    open var alpha: Float by PropertyVar(1f)
 }

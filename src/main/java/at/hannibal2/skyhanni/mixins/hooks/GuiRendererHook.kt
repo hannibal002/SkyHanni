@@ -16,6 +16,7 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
+import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GlyphRenderState
 import net.minecraft.client.gui.render.state.GuiElementRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
@@ -57,6 +58,11 @@ object GuiRendererHook {
     }
 
     fun replacePipeline(state: GuiElementRenderState, original: Operation<RenderPipeline>): RenderPipeline {
+        if (state is BlitRenderState) {
+            val alpha = (state.color() ushr 24) and 0xFF
+            if (alpha in 1..254) return SkyHanniRenderPipeline.GUI_TEXTURED_TRANSLUCENT.invoke()
+        }
+
         if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return original.call(state)
 
         if (state is GlyphRenderState) {

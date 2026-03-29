@@ -146,7 +146,7 @@ object GardenOptimalSpeed {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
 
         val speed = optimalSpeed ?: return
 
@@ -192,7 +192,7 @@ object GardenOptimalSpeed {
                 action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
             )
         } else {
-            ChatUtils.notifyOrDisable(text, config::onlyWarnRanchers,)
+            ChatUtils.notifyOrDisable(text, config::onlyWarnRanchers)
         }
     }
 
