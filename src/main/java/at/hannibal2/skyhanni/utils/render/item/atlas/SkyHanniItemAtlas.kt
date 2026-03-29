@@ -59,10 +59,8 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHa
 
     fun SkyHanniItemRenderContext.setupAtlasRendering(
         frameNumber: Int,
-        //? if < 26.1 {
+        //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
-        //? } else
-        //projectionBuffer: ProjectionMatrixBuffer,
     ) {
         pruneFrames(frameNumber)
         if (atlasStates.isEmpty()) return

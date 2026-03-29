@@ -185,6 +185,15 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "radial_gradient_circle_deferred",
         depthWrite = false,
     ),
+    GUI_TEXTURED_TRANSLUCENT(
+        snippet = RenderPipelines.GUI_SNIPPET,
+        vFormat = DefaultVertexFormat.POSITION_TEX_COLOR,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "gui_textured_translucent",
+        sampler = "Sampler0",
+        depthWrite = false,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+    ),
     ;
 
     private val _pipe: RenderPipeline = RenderPipelines.register(

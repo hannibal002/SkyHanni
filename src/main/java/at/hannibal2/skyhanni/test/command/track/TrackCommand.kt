@@ -176,7 +176,7 @@ abstract class TrackCommand<T : CancellableWorldEvent, K>(
         }
     }
 
-    open fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    open fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (cutOffTime.isInPast()) return
         config.position.renderRenderables(display, posLabel = "Track $commonName log")
     }

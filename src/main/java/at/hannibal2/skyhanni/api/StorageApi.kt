@@ -229,7 +229,7 @@ object StorageApi {
         if (storage.isEmpty()) {
             event.addIrrelevant("Empty")
         } else {
-            event.addIrrelevant(storage.values.sortedBy { it.internalName }.map { it.getDebug() + listOf("") }.flatten())
+            event.addIrrelevant(storage.values.sortedBy { it.internalName }.flatMap { it.getDebug() + listOf("") })
         }
     }
 

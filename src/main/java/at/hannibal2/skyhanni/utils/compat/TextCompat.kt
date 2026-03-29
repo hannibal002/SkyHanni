@@ -71,7 +71,7 @@ private fun Component.computeUnformattedTextCompat(): String {
 }
 
 fun Component.unformattedTextCompat(): String =
-    iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
+    iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
 // has to be a separate function for pattern mappings
 fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
@@ -505,6 +505,5 @@ fun componentBuilder(init: MutableComponent.() -> Unit): Component {
 }
 
 fun Component.copyIfNeeded(): MutableComponent {
-    if (this is MutableComponent) return this
-    else return this.copy()
+    return this as? MutableComponent ?: this.copy()
 }

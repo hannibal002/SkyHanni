@@ -160,7 +160,7 @@ enum class PestType(
         }
 
         fun getByNameOrNull(name: String): PestType? {
-            return filterableEntries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
+            return filterableEntries.firstOrNull { it.displayName.equals(name, ignoreCase = true) }
         }
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")

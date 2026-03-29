@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import com.mojang.blaze3d.textures.FilterMode
+import kotlin.math.roundToInt
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -28,10 +29,8 @@ internal class SkyHanniItemAtlasRenderer(
 ) {
 
     fun render(
-        //? if < 26.1 {
+        //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
         projectionBuffer: CachedOrthoProjectionMatrixBuffer,
-        //? } else
-        //projectionBuffer: ProjectionMatrixBuffer,
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
@@ -92,7 +91,7 @@ internal class SkyHanniItemAtlasRenderer(
                 shState.pose(),
                 shState.x0(), shState.y0(), shState.x1(), shState.y1(),
                 u, u1, v, v1,
-                -1,
+                ((shState.alpha * 255).roundToInt() shl 24) or 0x00FFFFFF,
                 shState.scissorArea(),
             )
         )

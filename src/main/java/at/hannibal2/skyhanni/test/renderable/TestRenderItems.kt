@@ -82,6 +82,7 @@ object TestRenderItems : RenderableTestSuite.TestRenderableFor<GameOverlayRender
                 rotationStorage = AnimatedRotationLocalStorage(65.0)
                 bounceStorage = multiBounceDef
                 scale = 4.0
+                alpha = 0.5f
             },
         )
     }

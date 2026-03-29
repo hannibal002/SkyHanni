@@ -12,7 +12,6 @@ private typealias VFEType = VertexFormatElement.Type
 //? if < 26.1 {
 private typealias VFEUsage = VertexFormatElement.Usage
 //? }
-internal typealias SHVFE = SkyHanniVertexFormats.SkyHanniVertexFormatElement
 
 object SkyHanniVertexFormats {
 
@@ -21,7 +20,7 @@ object SkyHanniVertexFormats {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
 
-    internal enum class SkyHanniVertexFormatElement(
+    internal enum class VertexElement(
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         //? if < 26.1 {
@@ -33,6 +32,7 @@ object SkyHanniVertexFormats {
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
         ROUNDED_PARAMS_0,
+
         // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/angle1/0, angle2/0}
         ROUNDED_PARAMS_1,
         // {angle, progress, phaseOffset, reverse(float)}
@@ -87,8 +87,8 @@ object SkyHanniVertexFormats {
         VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("Color", VertexFormatElement.COLOR)
-            .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
-            .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
+            .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
             .build()
     }
 
@@ -117,7 +117,7 @@ object SkyHanniVertexFormats {
         y: Float,
         z: Float,
         w: Float,
-        format: SkyHanniVertexFormatElement,
+        format: VertexElement,
     ) {
         val element = format.element
         val ptr = (this@writeParams as MixinBufferBuilderAccessor).invokeBeginElement(element).takeIf {

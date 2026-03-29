@@ -389,7 +389,7 @@ object SkyBlockItemModifierUtils {
 
         companion object {
 
-            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.lowercase() == name.lowercase() }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
         }
     }
 

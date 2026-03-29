@@ -626,7 +626,7 @@ object WorldRenderUtils {
          */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
+        smallestViewDistance: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
@@ -646,7 +646,7 @@ object WorldRenderUtils {
         val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
         // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+        distToPlayer = distToPlayer.coerceAtLeast(smallestViewDistance)
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {
@@ -678,7 +678,7 @@ object WorldRenderUtils {
          */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
+        smallestViewDistance: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
@@ -698,7 +698,7 @@ object WorldRenderUtils {
         val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
         // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+        distToPlayer = distToPlayer.coerceAtLeast(smallestViewDistance)
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {

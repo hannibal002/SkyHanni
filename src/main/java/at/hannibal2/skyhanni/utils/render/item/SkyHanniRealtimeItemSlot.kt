@@ -14,6 +14,7 @@ import org.joml.Matrix4f*/
 //?}
 import net.minecraft.client.renderer.RenderPipelines
 import com.mojang.blaze3d.textures.FilterMode
+import kotlin.math.roundToInt
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -82,7 +83,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
                 1f,
                 1f,
                 0f,
-                -1,
+                ((state.alpha * 255).roundToInt() shl 24) or 0x00FFFFFF,
                 state.scissorArea(),
             )
         )
