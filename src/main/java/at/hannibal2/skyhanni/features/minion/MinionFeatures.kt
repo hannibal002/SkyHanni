@@ -281,7 +281,7 @@ object MinionFeatures {
     //  Use a "dirty" flag or something similar, and handle state management.
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTick() {
-        if (coinsPerDay != "") return
+        if (display != null) return
 
         if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
             display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
@@ -348,10 +348,13 @@ object MinionFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
-        if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
-            minions?.get(lastMinion)?.let {
-                it.lastClicked = SimpleTimeMark.now()
+        // TODO use repo patterns
+        val message = event.cleanMessage
+        minionCoinPattern.matchMatcher(message) {
+            if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
+                minions?.get(lastMinion)?.let {
+                    it.lastClicked = SimpleTimeMark.now()
+                }
             }
             val coins = group("coins").formatInt()
             val achievement = AchievementManager.getAchievement(MINION_COIN_ACHIEVEMENT)
