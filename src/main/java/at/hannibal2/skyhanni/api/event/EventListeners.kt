@@ -115,7 +115,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     add { _ -> SkyBlockUtils.inAnyIsland(set) }
                 }
             }
-            // These predicates cant be cached since they depend on info about the actual event
+            // These predicates can't be cached since they depend on info about the actual event
             predicates = buildList {
                 if (!receiveCancelled) add { event -> !event.isCancelled }
 

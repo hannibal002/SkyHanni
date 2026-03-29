@@ -425,8 +425,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
         } ?: NeuInternalName.fromItemNameOrNull(item) ?: return
 
         /**
-         * this is a failsafe in the event of runes lackin' sufficient NEU repo data to automagically
-         * fetch their correct internal names, and thus translatin' their in-game names into internal
+         * this is a failsafe in the event of runes lacking sufficient NEU repo data to automagically
+         * fetch their correct internal names, and thus translating their in-game names into internal
          * names literally
          */
         if (itemInternalName.startsWith(("◆_")))

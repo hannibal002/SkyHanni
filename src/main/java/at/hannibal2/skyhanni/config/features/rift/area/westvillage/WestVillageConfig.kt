@@ -15,10 +15,11 @@ class WestVillageConfig {
     @Expose
     val verminHighlight: VerminHighlightConfig = VerminHighlightConfig()
 
+    // TODO rename to guntherRace
     @ConfigOption(name = "Gunther's Race", desc = "")
     @Accordion
     @Expose
-    val gunthersRace: GunthersRaceConfig = GunthersRaceConfig()
+    val gunthersRace: GuntherRaceConfig = GuntherRaceConfig()
 
     @ConfigOption(name = "Kloon Hacking", desc = "")
     @Accordion

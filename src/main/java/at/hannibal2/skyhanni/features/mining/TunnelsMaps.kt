@@ -413,7 +413,7 @@ object TunnelsMaps {
         val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
         if (first != null && second != null) {
             val direct = playerPosition.distance(second.position)
-            val firstPath = first.neighbours[second] ?: 0.0
+            val firstPath = first.neighbors[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
                 this.path = Graph(path.drop(1)) to (distance - firstPath + direct)

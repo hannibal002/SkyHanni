@@ -13,7 +13,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
 /**
  * RenderDisplayHelper determines when to render displays based on
  * conditions and context, such as whether the player is in their inventory or
- * outside an inventory GUI, or in a inventory defined by InventoryDetector.
+ * outside an inventory GUI, or in an inventory defined by InventoryDetector.
  *
  * @property inventoryDetector set a InventoryDetector the display should be rendered in.
  * @property outsideInventory Specifies if the display should render when not inside any inventory.
