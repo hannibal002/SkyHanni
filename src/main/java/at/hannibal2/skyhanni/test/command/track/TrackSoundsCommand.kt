@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,9 +20,8 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.core.registries.BuiltInRegistries
 
 @SkyHanniModule
-object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(
-    commonName = "sound",
-) {
+object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(commonName = "sound") {
+
     override val config get() = DevApi.config.debug.trackSound
 
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
@@ -67,6 +67,8 @@ object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(
     @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
     fun onPlaySound(event: PlaySoundEvent) = super.onTrackableEvent(event)
 
+    // TODO for myself, this whole structure seems unnecessary.
+    //  We're defining event handlers that defer to inherits, in the same shape
     @HandleEvent
     override fun onKeyPress(event: KeyPressEvent) = super.onKeyPress(event)
 
@@ -81,6 +83,9 @@ object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(
 
     @HandleEvent
     override fun onCommandRegistration(event: CommandRegistrationEvent) = super.onCommandRegistration(event)
+
+    @HandleEvent
+    override fun onDisconnect(event: ClientDisconnectEvent) = super.onDisconnect(event)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

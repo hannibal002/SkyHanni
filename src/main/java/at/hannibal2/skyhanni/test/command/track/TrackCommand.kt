@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.config.features.dev.TrackCommandConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -33,6 +34,7 @@ abstract class TrackCommand<T : CancellableSkyHanniEvent, K>(
     protected val commonName: String,
     protected val commonNamePlural: String = commonName + "s",
 ) {
+
     private data class Tracked<T>(
         val event: T,
         private val manualTime: SimpleTimeMark? = null,
@@ -43,9 +45,9 @@ abstract class TrackCommand<T : CancellableSkyHanniEvent, K>(
     protected abstract val config: TrackCommandConfig
     protected abstract val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit
 
-    abstract fun T.formatForDisplay(): Renderable
-    abstract fun T.shouldAcceptTrackableEvent(): Boolean
-    abstract fun T.getTypeIdentifier(): K
+    internal abstract fun T.formatForDisplay(): Renderable
+    internal abstract fun T.shouldAcceptTrackableEvent(): Boolean
+    internal abstract fun T.getTypeIdentifier(): K
 
     private var lastKeyToggle: SimpleTimeMark = SimpleTimeMark.farPast()
     private var isRecording = false
@@ -129,6 +131,10 @@ abstract class TrackCommand<T : CancellableSkyHanniEvent, K>(
         if (event.shouldAcceptTrackableEvent()) {
             tracked.addFirst(Tracked(event))
         }
+    }
+
+    open fun onDisconnect(event: ClientDisconnectEvent) {
+        isRecording = false
     }
 
     open fun onKeyPress(event: KeyPressEvent) {
