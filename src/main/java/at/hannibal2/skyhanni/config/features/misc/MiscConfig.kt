@@ -498,4 +498,12 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var achievementMessages: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Muted Narrator Warning",
+        desc = "Send a warning reminder in chat when the narrator is enabled, but in a muted state",
+    )
+    @ConfigEditorBoolean
+    val mutedNarratorWarning: Property<Boolean> = Property.of(true)
 }
