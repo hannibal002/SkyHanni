@@ -42,8 +42,10 @@ data class Achievement(
                     append("${getProgressFormatted()}/${getAmountForNextTier()} for the next tier.")
                     append("\n${getProgressFormatted()}/${tiers.last().addSeparators()} to fully unlock!")
                 } else {
-                    append("Current Progress: ${getProgressFormatted()} " +
-                            "(you only needed ${tiers.last().addSeparators()} to fully unlock it)")
+                    append(
+                        "Current Progress: ${getProgressFormatted()} " +
+                            "(you only needed ${tiers.last().addSeparators()} to fully unlock it)"
+                    )
                 }
                 withColor(ChatFormatting.YELLOW)
             }
