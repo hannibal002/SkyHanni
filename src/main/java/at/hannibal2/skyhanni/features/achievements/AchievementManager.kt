@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -95,7 +96,7 @@ object AchievementManager {
                             withColor(ChatFormatting.GREEN)
                         }
                         if (!achievement.data.achieved) {
-                            append(" $newProgress/${achievement.getAmountForNextTier()} to unlock the next tier")
+                            append(" ${newProgress.addSeparators()}/${achievement.getAmountForNextTier()} to unlock the next tier")
                         }
                         append("!")
                         hover = achievement.getDescription()
