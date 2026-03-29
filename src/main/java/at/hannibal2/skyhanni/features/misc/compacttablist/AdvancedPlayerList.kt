@@ -204,7 +204,7 @@ object AdvancedPlayerList {
             add(nameSuffix)
         }
 
-        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
             add(faction.icon)
         }
 
