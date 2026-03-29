@@ -95,6 +95,17 @@ object RareMobWaypointShare {
         val mobName: String
     )
 
+    private fun isMobEnabled(name: String): Boolean {
+        val t = config.mobToggles
+        return when {
+            name.contains("Minos Inquisitor") -> t.minosInquisitor
+            name.contains("Sphinx") -> t.sphinx
+            name.contains("Manticore") -> t.manticore
+            name.contains("King Minos") -> t.kingMinos
+            else -> true
+        }
+    }
+
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
@@ -230,6 +241,7 @@ object RareMobWaypointShare {
             return
         }
         val location = rareMob.getLorenzVec().toChatFormat()
+        if (!isMobEnabled(rareMob.name.string.orEmpty())) return
         val mobName = rareMob.name.string.orEmpty()
         val name = if (mobName.isEmpty()) "" else "| $mobName"
         HypixelCommands.partyChat("$location $name")
