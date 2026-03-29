@@ -16,7 +16,7 @@ object MutedNarratorWarning {
     private val config get() = SkyHanniMod.feature.misc
     private val warningEnabled get() = config.mutedNarratorWarning.get()
     private val reminderInterval = 1.minutes
-    private val lastReminded: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastReminded: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private const val WARNING_MESSAGE = "You currently have the Minecraft narrator turn on, but it is muted.\n" +
         "§cThis is likely negatively impacting your game's performance."
@@ -41,5 +41,6 @@ object MutedNarratorWarning {
             "turn off narrator",
             { Minecraft.getInstance().options.narrator().set(NarratorStatus.OFF) },
         )
+        lastReminded = SimpleTimeMark.now()
     }
 }
