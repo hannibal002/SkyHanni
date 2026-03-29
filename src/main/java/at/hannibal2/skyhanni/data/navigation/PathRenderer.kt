@@ -26,7 +26,7 @@ import java.awt.Color
  * node structure around the 5 blocks in front of you
  *
  * if the closest node and the path to it is not visible, move further down the line of currently moves paths to
- *  find the spot where to start the curve from. and if that also doesnt work, find a new edge on the actual graph to start the path on.
+ *  find the spot where to start the curve from. and if that also doesn't work, find a new edge on the actual graph to start the path on.
  *
  *  do not jump forward if the path is higher than the user location
  *

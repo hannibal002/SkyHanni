@@ -201,7 +201,7 @@ object EntityUtils {
     @AllEntitiesGetter
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.entitiesForRendering()?.let {
         if (Minecraft.getInstance().isSameThread) it
-        // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
+        // TODO: while I am here, I want to point out that copying the entity list does not constitute proper synchronization,
         //  but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()

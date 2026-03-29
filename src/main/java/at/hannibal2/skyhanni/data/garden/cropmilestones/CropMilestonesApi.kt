@@ -169,7 +169,7 @@ object CropMilestonesApi {
         return this.milestoneTierAmount(tier + 1)
     }
 
-    fun CropType.milestoneTierAmount(tier: Int): Long { // get the amount of crops for only that tier, eg ms. 46 is 3m
+    fun CropType.milestoneTierAmount(tier: Int): Long { // get the amount of crops for only that tier, e.g. ms. 46 is 3m
         if (tier <= 0) return 0
         val overflowTier = minOf(tier - 1, getMaxTier() - 1)
         val data = this.getMilestoneTiersList()

@@ -65,7 +65,7 @@ interface Renderable {
 
     /**
      * Render the renderable. Enough said?
-     * Pos x and pos y are relative to the mouse position.
+     * Pos X and pos Y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
      *
      * @param mouseOffsetX The X offset of the mouse at this pass of rendering.

@@ -144,8 +144,8 @@ object GraphEditorNetworks {
             val nodeB = bestNodeB ?: break
             val distance = nodeA.position.distance(nodeB.position)
 
-            nodeA.neighbours += (nodeB to distance)
-            nodeB.neighbours += (nodeA to distance)
+            nodeA.neighbors += (nodeB to distance)
+            nodeB.neighbors += (nodeA to distance)
 
             clusters[bestIndexA].addAll(clusters[bestIndexB])
             clusters.removeAt(bestIndexB)
