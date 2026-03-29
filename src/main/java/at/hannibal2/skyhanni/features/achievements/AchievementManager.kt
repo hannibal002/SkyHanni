@@ -232,6 +232,9 @@ object AchievementManager {
                                 withColor(ChatFormatting.RED)
                             }
                         } else {
+                            if (achievement.getCurrentTier() == 0) {
+                                append(" 0")
+                            }
                             append("/${achievement.tiers.size}")
                         }
                         val luck = achievement.userLuckAmount
