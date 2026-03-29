@@ -4,11 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.OSUtils.getOperatingSystem
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.NarratorStatus
+import net.minecraft.client.input.InputQuirks
 import net.minecraft.sounds.SoundSource
 import kotlin.time.Duration.Companion.minutes
 
@@ -21,12 +20,9 @@ object MutedNarratorWarning {
     private var lastReminded: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private val toggleNarratorKeybind: String? get() = runCatching {
-        val enabled = Minecraft.getInstance().options.narratorHotkey().get()
-        if (!enabled) null else when (getOperatingSystem()) {
-            OSUtils.OperatingSystem.WINDOWS, OSUtils.OperatingSystem.LINUX -> "Ctrl + B"
-            OSUtils.OperatingSystem.MACOS -> "Cmd + B"
-            else -> "Ctrl/Cmd + B"
-        }
+        if (!Minecraft.getInstance().options.narratorHotkey().get()) null
+        else if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY) "Cmd + B"
+        else "Ctrl + B"
     }.getOrNull()
 
     private val warningMessage get() = "You currently have the Minecraft narrator turned on, " +
