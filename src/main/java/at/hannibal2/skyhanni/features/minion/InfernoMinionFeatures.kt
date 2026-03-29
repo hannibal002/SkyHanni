@@ -24,17 +24,18 @@ object InfernoMinionFeatures {
      * REGEX-TEST: Inferno Minion II
      * REGEX-TEST: Inferno Minion IX
      */
-    private val infernoMinionTitlePattern by RepoPattern.pattern(
+    val infernoMinionTitlePattern by RepoPattern.pattern(
         "minion.infernominiontitle",
         "Inferno Minion .*",
     )
-    private var fuelItemIds = listOf<NeuInternalName>()
+    var fuelItemIds = setOf<NeuInternalName>()
+        private set
     private var inInventory = false
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<InfernoMinionFuelsJson>("InfernoMinionFuels")
-        fuelItemIds = data.minionFuels
+        fuelItemIds = data.minionFuels.toSet()
     }
 
     @HandleEvent

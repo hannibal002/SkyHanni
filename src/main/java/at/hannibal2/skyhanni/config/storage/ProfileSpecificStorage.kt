@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
+import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
@@ -829,6 +830,9 @@ class ProfileSpecificStorage(
                 "}"
         }
     }
+
+    @Expose
+    var infernoMinionProfitTracker: InfernoMinionProfitTracker.Data = InfernoMinionProfitTracker.Data()
 
     // - misc
     @Expose
