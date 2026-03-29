@@ -187,7 +187,7 @@ object ShardTrackerDisplay {
                 SkyHanniMod.feature.hunting.shardTracker::enabled,
             )
         }
-        SkyHanniMod.launchCoroutine("reading skyshards data from clipboard") {
+        SkyHanniMod.launchCoroutine("reading SkyShards data from clipboard") {
             val clipboard = OSUtils.readFromClipboard()
             if (clipboard == null) {
                 ChatUtils.chat("Import from SkyShards failed, make sure you have a valid recipe copied.")

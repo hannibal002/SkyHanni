@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
-// Shows the price of iems in sacks while being in the sacks
+// Shows the price of items in sacks while being in the sacks
 @SkyHanniModule
 object SackDisplay {
 
