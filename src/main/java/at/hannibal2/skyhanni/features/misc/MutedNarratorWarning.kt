@@ -20,18 +20,22 @@ object MutedNarratorWarning {
     private val reminderInterval = 1.minutes
     private var lastReminded: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    private val toggleNarratorKeybind = when (getOperatingSystem()) {
-        OSUtils.OperatingSystem.WINDOWS, OSUtils.OperatingSystem.LINUX -> "Ctrl + B"
-        OSUtils.OperatingSystem.MACOS -> "Cmd + B"
-        else -> "Ctrl/Cmd + B"
-    }
+    private val toggleNarratorKeybind: String? get() = runCatching {
+        val enabled = Minecraft.getInstance().options.narratorHotkey().get()
+        if (!enabled) null else when (getOperatingSystem()) {
+            OSUtils.OperatingSystem.WINDOWS, OSUtils.OperatingSystem.LINUX -> "Ctrl + B"
+            OSUtils.OperatingSystem.MACOS -> "Cmd + B"
+            else -> "Ctrl/Cmd + B"
+        }
+    }.getOrNull()
 
-    private val warningMessage by lazy {
-        "You currently have the Minecraft narrator turned on, " +
-            "but the Voice or Master Volume sliders are muting it.\n" +
-            "§cThis is likely negatively impacting your game's performance.\n" +
-            "§eYou can use §b${toggleNarratorKeybind} §eto disable it, or:"
-    }
+    private val warningMessage get() = "You currently have the Minecraft narrator turned on, " +
+        "but the Voice or Master Volume sliders are muting it.\n" +
+        "§cThis is likely negatively impacting your game's performance." +
+        toggleNarratorKeybind?.let {
+            "\n§eYou can use §b${toggleNarratorKeybind} §eto toggle the narrator to OFF,"
+        }.orEmpty()
+
 
     private val narratorActive get(): Boolean = runCatching {
         Minecraft.getInstance().narrator.isActive
