@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -87,7 +87,7 @@ object TranslatorCommand {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        CoroutineConfig("shtranslateadvanced", 10.seconds).launchCoroutine {
+        CoroutineSettings("shtranslateadvanced", 10.seconds).launchCoroutine {
             val translation = GoogleTranslator.getTranslation(message, targetLanguage, sourceLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
@@ -95,7 +95,7 @@ object TranslatorCommand {
             ChatUtils.clickableChat(
                 "Found translation from sl: $sourceLanguage: §f$translatedMessage §7(tl: $targetLanguage)",
                 onClick = {
-                    CoroutineConfig("shtranslateadvanced clickableChat", 10.seconds).launchCoroutine {
+                    CoroutineSettings("shtranslateadvanced clickableChat", 10.seconds).launchCoroutine {
                         OSUtils.copyToClipboardAsync(translatedMessage)
                     }
                 },
