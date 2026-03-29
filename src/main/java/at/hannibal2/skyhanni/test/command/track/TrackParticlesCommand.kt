@@ -49,7 +49,7 @@ object TrackParticlesCommand : TrackWorldCommand<ReceiveParticleEvent, Identifie
     @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
     fun onParticleReceive(event: ReceiveParticleEvent) = super.onTrackableEvent(event)
 
-    // TODO for myself, this whole structure seems unnecessary.
+    // TODO for DavidArthurCole, this whole structure seems unnecessary.
     //  We're defining event handlers that defer to inherits, in the same shape
     @HandleEvent
     override fun onKeyPress(event: KeyPressEvent) = super.onKeyPress(event)
