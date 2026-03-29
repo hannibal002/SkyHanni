@@ -39,7 +39,7 @@ object SpiderDenRelicPathfinder {
 
     private val config get() = SkyHanniMod.feature.misc
 
-    private var data: Data? = null
+    private var data: Data = createEmptyData(Data.DebugState.NOT_INITIALIZED)
 
     private val relicPathFindConfig = CoroutineConfig("spider relic pathfind")
     private val patternGroup = RepoPattern.group("misc.spider-relic")
@@ -67,22 +67,23 @@ object SpiderDenRelicPathfinder {
         val allRelics: Set<LorenzVec>,
         var foundButNotClickedRelic: LorenzVec? = null,
     ) {
-        var disabled = total > 0 && found == total
-        var debugState: String? = null
+        val disabled get() = total > 0 && found == total
+
+        enum class DebugState {
+            NOT_INITIALIZED, ISLAND_GRAPH_EMPTY,
+            NO_RELICS_IN_GRAPH, ALL_FOUND, ACTIVE
+        }
+        var debugState: DebugState = DebugState.ACTIVE
 
         fun foundNearby() {
             if (disabled) return
             foundButNotClickedRelic = null
-            val nearest = getNearestRelic() ?: return
+            val playerLocation = LocationUtils.playerLocation()
+            val nearest = allRelics
+                .filter { it.distanceToPlayer() < 10 }
+                .minByOrNull { it.distanceSq(playerLocation) } ?: return
             markFound(nearest)
             pathToNext()
-        }
-
-        private fun getNearestRelic(): LorenzVec? {
-            val playerLocation = LocationUtils.playerLocation()
-            val nearest = allRelics.minByOrNull { it.distanceSq(playerLocation) } ?: return null
-            if (nearest.distanceToPlayer() < 10) return nearest
-            return null
         }
 
         private fun markFound(relic: LorenzVec) {
@@ -95,7 +96,7 @@ object SpiderDenRelicPathfinder {
             if (route.isEmpty()) {
                 val message = "§e[SkyHanni] Found all §5$found Relics §ein Spider's Den!"
                 NavigationFeedback.sendPathFindMessage(message)
-                allFound("found last relic in Spider's Den")
+                allFound()
             } else {
                 pathTo(route.first())
             }
@@ -122,29 +123,29 @@ object SpiderDenRelicPathfinder {
             )
         }
 
-        fun allFound(state: String) {
-            disabled = true
+        fun allFound() {
             foundRelicsStore().addAll(route)
             found = foundRelicsStore().size
-            debugState = state
+            debugState = DebugState.ALL_FOUND
         }
 
+        private val haveAll get() = total > 0 && foundRelicsStore().size == total
+
         fun checkHaveAll(): Boolean {
-            val haveAll = total > 0 && foundRelicsStore().size == total
-            if (haveAll) allFound("already found all relics in Spider's Den")
+            if (haveAll) allFound()
             return haveAll
         }
     }
 
-    @HandleEvent(WorldChangeEvent::class)
+    @HandleEvent(WorldChangeEvent::class, onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
     fun onWorldChange() {
-        data = null
+        data = createEmptyData(Data.DebugState.NOT_INITIALIZED)
     }
 
-    @HandleEvent(IslandGraphReloadEvent::class)
+    @HandleEvent(IslandGraphReloadEvent::class, onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
     fun onIslandGraphReload() {
         if (isEnabled()) reload()
-        else data = null
+        else data = createEmptyData(Data.DebugState.NOT_INITIALIZED)
     }
 
     @HandleEvent
@@ -156,21 +157,21 @@ object SpiderDenRelicPathfinder {
         }
     }
 
-    @HandleEvent(SecondPassedEvent::class)
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
     fun onSecondPassed() {
         if (!isEnabled()) return
-        data?.let {
-            it.checkNextRelic()
+        if (data.disabled) {
+            reload()
             return
         }
-        reload()
+        data.checkNextRelic()
     }
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
         if (foundPattern.matches(event.chatComponent) || duplicatePattern.matches(event.chatComponent)) {
-            data?.foundNearby()
+            data.foundNearby()
         }
     }
 
@@ -201,16 +202,14 @@ object SpiderDenRelicPathfinder {
             return
         }
         event.addData {
-            data?.apply {
-                debugState?.let {
-                    add(it)
-                    add("")
-                }
+            data.apply {
+                add(debugState.name)
+                add("")
                 add("found: $found")
                 add("total: $total")
                 add("route remaining: ${route.size}")
                 add("foundButNotClickedRelic: $foundButNotClickedRelic")
-            } ?: add("data is null")
+            }
         }
     }
 
@@ -219,10 +218,9 @@ object SpiderDenRelicPathfinder {
     private var calculatingStart = SimpleTimeMark.farPast()
 
     private fun reload() {
-        if (!isOnSpiderDen()) return
 
         val graph = IslandGraphs.currentIslandGraph ?: run {
-            data = createEmptyData("island graph is empty")
+            data = createEmptyData(Data.DebugState.ISLAND_GRAPH_EMPTY)
             return
         }
 
@@ -232,18 +230,18 @@ object SpiderDenRelicPathfinder {
 
         if (missingRelics.isEmpty()) {
             data = if (foundRelics.isEmpty()) {
-                createEmptyData("No relics found in Spider's Den graph")
+                createEmptyData(Data.DebugState.NO_RELICS_IN_GRAPH)
             } else {
                 val size = foundRelics.size
                 Data(size, size, mutableListOf(), foundRelics).also {
-                    it.debugState = "found all relics in Spider's Den"
+                    it.debugState = Data.DebugState.ALL_FOUND
                 }
             }
             return
         }
 
         data = Data(0, allRelics.size, mutableListOf(), emptySet())
-        if (data?.checkHaveAll() == true) return
+        if (data.checkHaveAll()) return
 
         calculating = true
         calculatingStart = SimpleTimeMark.now()
@@ -272,10 +270,9 @@ object SpiderDenRelicPathfinder {
         }
     }
 
-    private fun createEmptyData(reason: String) =
+    private fun createEmptyData(state: Data.DebugState) =
         Data(0, 0, mutableListOf(), emptySet()).apply {
-            disabled = true
-            debugState = reason
+            debugState = state
         }
 
     private fun getRelicNodes(nodes: List<GraphNode>): List<GraphNode> =
@@ -284,11 +281,7 @@ object SpiderDenRelicPathfinder {
     private fun foundRelicsStore(): MutableSet<LorenzVec> =
         ProfileStorageData.profileSpecific?.spider?.relics?.found ?: mutableSetOf()
 
-    private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && isOnSpiderDen() && config.spiderRelicPathfinder
-
-    private fun isOnSpiderDen() =
-        SkyBlockUtils.currentIsland == IslandType.SPIDER_DEN
+    private fun isEnabled() = config.spiderRelicPathfinder
 
     private fun isDisabledCommand(): Boolean {
         if (isEnabled()) return false
@@ -302,21 +295,21 @@ object SpiderDenRelicPathfinder {
     private fun onResetCommand() {
         if (isDisabledCommand()) return
         foundRelicsStore().clear()
-        data = null
+        data = createEmptyData(Data.DebugState.NOT_INITIALIZED)
         reload()
         ChatUtils.chat("Reset found Relics in Spider's Den.")
     }
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
-        data?.allFound("manually marked all relics as found via command")
+        data.allFound()
         reload()
         ChatUtils.chat("Marked all Relics as found in Spider's Den.")
     }
 
     private fun onReloadCommand() {
         if (isDisabledCommand()) return
-        data = null
+        data = createEmptyData(Data.DebugState.NOT_INITIALIZED)
         reload()
         ChatUtils.chat("Reloaded Relic pathfinder.")
     }
