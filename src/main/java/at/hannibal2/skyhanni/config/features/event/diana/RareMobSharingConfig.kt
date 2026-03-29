@@ -51,4 +51,32 @@ class RareMobSharingConfig {
     )
     @ConfigEditorBoolean
     var globalChat: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mob Toggles", desc = "Choose which rare mobs trigger waypoint sharing.")
+    @Accordion
+    val mobToggles: MobTogglesConfig = MobTogglesConfig()
+
+    class MobTogglesConfig {
+
+        @Expose
+        @ConfigOption(name = "Sphinx", desc = "Share waypoints for §6Sphinx§7.")
+        @ConfigEditorBoolean
+        var sphinx: Boolean = true
+
+        @Expose
+        @ConfigOption(name = "Minos Inquisitor", desc = "Share waypoints for §6Minos Inquisitor§7.")
+        @ConfigEditorBoolean
+        var minosInquisitor: Boolean = true
+
+        @Expose
+        @ConfigOption(name = "Manticore", desc = "Share waypoints for §6Manticore§7.")
+        @ConfigEditorBoolean
+        var manticore: Boolean = true
+
+        @Expose
+        @ConfigOption(name = "King Minos", desc = "Share waypoints for §6King Minos§7.")
+        @ConfigEditorBoolean
+        var kingMinos: Boolean = true
+    }
 }
