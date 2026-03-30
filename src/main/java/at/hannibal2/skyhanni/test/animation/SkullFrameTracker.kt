@@ -57,10 +57,10 @@ class SkullFrameTracker : Resettable {
     private var frameStartServerTick: Long = 0L
     private var frameStartClientTick: Int = 0
 
-    private val _accumulators = mutableListOf<FrameAccumulator>()
+    private val accumulators = mutableListOf<FrameAccumulator>()
 
     /** Learned frame sequence with averaged tick durations. Empty until the first loop completes. */
-    val frames: List<FrameRecord> get() = _accumulators.map { it.toFrameRecord() }
+    val frames: List<FrameRecord> get() = accumulators.map { it.toFrameRecord() }
 
     /** Number of completed animation loops (≥ 1 once learning finishes). */
     var loopCount = 0
@@ -75,10 +75,10 @@ class SkullFrameTracker : Resettable {
         private set
 
     val isLearning get() = phase == Phase.LEARNING
-    val hasData get() = _accumulators.isNotEmpty()
+    val hasData get() = accumulators.isNotEmpty()
 
     /** Minimum number of samples collected across all frames — the weakest link in accuracy. */
-    val minSampleCount: Int get() = _accumulators.minOfOrNull { it.serverSamples.size } ?: 0
+    val minSampleCount: Int get() = accumulators.minOfOrNull { it.serverSamples.size } ?: 0
 
     /**
      * Record the current skull texture for this tick.
@@ -114,9 +114,9 @@ class SkullFrameTracker : Resettable {
 
     private fun onFrameEnd(frame: FrameRecord, serverTicks: Int, clientTicks: Int): Boolean = when (phase) {
         Phase.LEARNING -> {
-            if (_accumulators.isNotEmpty() && frame.fullTexture == firstTexture) {
+            if (accumulators.isNotEmpty() && frame.fullTexture == firstTexture) {
                 // We've seen the first texture again, loop complete.
-                _accumulators.first().also {
+                accumulators.first().also {
                     it.serverSamples.add(serverTicks)
                     it.clientSamples.add(clientTicks)
                 }
@@ -128,7 +128,7 @@ class SkullFrameTracker : Resettable {
                 true
             } else {
                 FrameAccumulator(frame).also {
-                    _accumulators.add(it)
+                    accumulators.add(it)
                     it.serverSamples.add(serverTicks)
                     it.clientSamples.add(clientTicks)
                 }
@@ -137,14 +137,14 @@ class SkullFrameTracker : Resettable {
         }
 
         Phase.VERIFYING -> {
-            val accumulator = _accumulators.getOrNull(verifyIndex)
+            val accumulator = accumulators.getOrNull(verifyIndex)
             if (accumulator == null || accumulator.prototype.fullTexture != frame.fullTexture) {
                 verificationErrors++
             } else {
                 accumulator.serverSamples.add(serverTicks)
                 accumulator.clientSamples.add(clientTicks)
             }
-            verifyIndex = (verifyIndex + 1) % _accumulators.size
+            verifyIndex = (verifyIndex + 1) % accumulators.size
             if (verifyIndex == 0) {
                 loopCount++
                 true

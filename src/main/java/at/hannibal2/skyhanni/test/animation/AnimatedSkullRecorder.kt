@@ -26,7 +26,7 @@ object AnimatedSkullRecorder {
         NONE,
         HEAD,
         PET,
-        PLAYER
+        PLAYER,
     }
 
     class ArmorStandRecording(
