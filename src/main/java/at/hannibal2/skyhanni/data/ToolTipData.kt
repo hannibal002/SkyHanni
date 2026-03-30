@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
@@ -35,7 +36,7 @@ object ToolTipData {
     ): MutableList<Component> {
         val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
         val tooltipCopy = tooltip.toMutableList()
-        getTooltip(stack, tooltip)
+        getTooltip(tooltip)
         RenderItemTooltipEvent(context, stack).post()
         if (tooltip.isEmpty()) {
             return mutableListOf()
@@ -56,10 +57,11 @@ object ToolTipData {
     }
 
     @JvmStatic
-    fun getTooltip(stack: SafeItemStack, toolTip: MutableList<String>) {
+    fun getTooltip(toolTip: MutableList<String>) {
         val slot = lastSlot ?: return
-        val itemStack = slot.item ?: return
+        val itemStack = slot.item.orNull() ?: return
         try {
+            @Suppress("DEPRECATION")
             if (ToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
             }

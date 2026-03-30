@@ -345,10 +345,13 @@ detekt {
     buildUponDefaultConfig = true
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
     baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
-    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+    source.setFrom(project.sourceSets.named("main").map {
+        it.allSource.matching { exclude("**/build/generated/**") }
+    })
 }
 
 tasks.withType<Detekt>().configureEach {
+    exclude("**/build/generated/**")
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val isCi = System.getenv("CI") == "true"
     val skipDetekt = project.findProperty("skipDetekt") == "true"

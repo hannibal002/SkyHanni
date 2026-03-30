@@ -59,27 +59,24 @@ public class MixinGuiRenderer {
 
     @WrapOperation(
         method = "addElementToMesh",
-        //? if < 26.1 {
+        //~ if > 1.21.11 'gui/render/state/' -> 'gui/'
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
-        //? } else
-        //at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    //? if < 26.1 {
+    //~ if > 1.21.11 'Shadow' -> 'Unique'
     @Shadow
-    private int frameNumber;
-    //? } else {
-    /*@Unique
+    //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
     private int frameNumber;
 
-    @Inject(method = "render", at = @At("HEAD"))
+    //? if > 1.21.11 {
+    /*@Inject(method = "render", at = @At("HEAD"))
     private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
-        frameNumber++;
-    }
-    *///? }
+        skyhanni$frameNumber++;
+    }*/
+    //? }
 
     @Shadow
     @Final
@@ -111,6 +108,7 @@ public class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
+            //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
             frameNumber
         );
     }
@@ -128,6 +126,7 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
+            //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
             frameNumber
         );
     }

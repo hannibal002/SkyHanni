@@ -143,8 +143,6 @@ stonecutter parameters {
             replace("EndWorldTick", "EndLevelTick")
             replace("AFTER_CLIENT_WORLD_CHANGE", "AFTER_CLIENT_LEVEL_CHANGE")
             replace("AfterClientWorldChange", "AfterClientLevelChange")
-            replace("net.fabricmc.fabric.api.client.rendering.v1.world", "net.fabricmc.fabric.api.client.rendering.v1.level")
-            replace("WorldRenderEvents", "LevelRenderEvents")
             replace("ClickType", "ContainerInput")
             replace("GuiGraphics", "GuiGraphicsExtractor")
             replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")

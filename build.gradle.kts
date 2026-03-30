@@ -342,7 +342,9 @@ detekt {
     buildUponDefaultConfig = true
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
     baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
-    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+    source.setFrom(project.sourceSets.named("main").map {
+        it.allSource.matching { exclude("**/build/generated/**") }
+    })
 }
 
 // Detekt is handled by a dedicated CI workflow; exclude it from the check/build lifecycle
@@ -360,7 +362,6 @@ afterEvaluate {
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val skipDetekt = project.findProperty("skipDetekt") == "true"
-    val jvmVersion = JavaVersion.current().majorVersion.toInt()
     onlyIf { isTargetVersion && !skipDetekt }
 
     val isDetektMain = name == "detektMain"
