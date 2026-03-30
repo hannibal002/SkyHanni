@@ -19,8 +19,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.world.inventory.Slot
 import java.awt.Color
 import java.util.concurrent.CompletableFuture
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
@@ -114,10 +112,8 @@ object RenderUtils {
         highlight(color, x, y)
     }
 
-    private fun highlight(color: Color, x: Int, y: Int) {
-        DrawContextUtils.pushMatrix()
+    private fun highlight(color: Color, x: Int, y: Int) = DrawContextUtils.pushPop {
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
-        DrawContextUtils.popMatrix()
     }
 
     fun Slot.drawBorder(color: LorenzColor) {
@@ -136,13 +132,11 @@ object RenderUtils {
         drawBorder(color, x, y)
     }
 
-    fun drawBorder(color: Color, x: Int, y: Int) {
-        DrawContextUtils.pushMatrix()
+    fun drawBorder(color: Color, x: Int, y: Int) = DrawContextUtils.pushPop {
         GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
         GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
-        DrawContextUtils.popMatrix()
     }
 
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
@@ -166,8 +160,7 @@ object RenderUtils {
         if (renderables.isEmpty()) return
         var longestY = 0
         val longestX = renderables.maxOf { it.width }
-        for (line in renderables) {
-            DrawContextUtils.pushMatrix()
+        for (line in renderables) DrawContextUtils.pushPop {
             val (x, y) = transform()
             DrawContextUtils.translate(0f, longestY.toFloat())
             Renderable.withMousePosition(x, y) {
@@ -175,8 +168,6 @@ object RenderUtils {
             }
 
             longestY += line.height + extraSpace + 2
-
-            DrawContextUtils.popMatrix()
         }
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
@@ -190,30 +181,13 @@ object RenderUtils {
     ) {
         // cause crashes and errors on purpose
         DrawContextUtils.drawContext
-        DrawContextUtils.pushMatrix()
-        val (x, y) = transform()
-        Renderable.withMousePosition(x, y) {
-            renderable.render(0, 0)
+        DrawContextUtils.pushPop {
+            val (x, y) = transform()
+            Renderable.withMousePosition(x, y) {
+                renderable.render(0, 0)
+            }
         }
-        DrawContextUtils.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
-    }
-
-    @Deprecated("Use ChromaColor instead")
-    fun chromaColor(
-        timeTillRepeat: Duration,
-        offset: Float = 0f,
-        saturation: Float = 1F,
-        brightness: Float = 0.8F,
-        timeOverride: Long = System.currentTimeMillis(),
-    ): Color {
-        return Color(
-            Color.HSBtoRGB(
-                ((offset + timeOverride / timeTillRepeat.toDouble(DurationUnit.MILLISECONDS)) % 1).toFloat(),
-                saturation,
-                brightness,
-            ),
-        )
     }
 
     // todo move to GuiRenderUtils?

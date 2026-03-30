@@ -204,7 +204,7 @@ object OutsideSackValue {
             totalPrice += price
         }
 
-        val datas = mutableListOf<SackData>()
+        val sacks = mutableListOf<SackData>()
         for ((sack, sackPrice) in pricePerSack.entries.sortedByDescending { it.value.min }) {
             val itemPrices = itemPricesPerSack[sack] ?: continue
             val lore = mutableListOf<String>()
@@ -219,9 +219,9 @@ object OutsideSackValue {
                 lore.add("${item.getNumberedName(amount)}§8: $price")
                 itemNames.add(item.repoItemName.removeColor())
             }
-            datas.add(SackData(name, sackPrice, itemNames, lore))
+            sacks.add(SackData(name, sackPrice, itemNames, lore))
         }
 
-        return "$totalPrice §ein sacks ${totalAmount.formatItemAmount()}" to datas
+        return "$totalPrice §ein sacks ${totalAmount.formatItemAmount()}" to sacks
     }
 }

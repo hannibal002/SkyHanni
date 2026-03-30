@@ -57,9 +57,15 @@ class ModuleProcessor(
         logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion ($dirtyCount revalidated, $cachedCount from cache)")
 
         if (dirtyFilePaths.isEmpty()) {
-            logger.warn("No @SkyHanniModule files changed, skipping LoadedModules regeneration")
-            writeStateFile(newStates)
-            return emptyList()
+            val outputFile = stateFile?.parentFile?.let {
+                File(it, "generated/ksp/main/kotlin/at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt")
+            }
+            if (outputFile?.exists() != false) {
+                logger.warn("No @SkyHanniModule files changed, skipping LoadedModules regeneration")
+                writeStateFile(newStates)
+                return emptyList()
+            }
+            logger.warn("No @SkyHanniModule files changed but LoadedModules.kt is missing, regenerating")
         }
 
         val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths) }
