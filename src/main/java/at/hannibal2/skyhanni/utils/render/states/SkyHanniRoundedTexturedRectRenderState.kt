@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render.states
 
-import at.hannibal2.skyhanni.utils.render.SHVFE
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
+import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats
 import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats.writeParams
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexConsumer
@@ -28,7 +28,7 @@ class SkyHanniRoundedTexturedRectRenderState(
     override fun textureSetup(): TextureSetup {
         val fetchTexture = Minecraft.getInstance().textureManager.getTexture(texture)
         val view = fetchTexture.textureView
-        return TextureSetup.singleTexture(view, fetchTexture.sampler)
+        return TextureSetup.singleTexture(view)
     }
 
     override fun buildVertices(consumer: VertexConsumer) {
@@ -43,7 +43,7 @@ class SkyHanniRoundedTexturedRectRenderState(
         val buf = consumer as BufferBuilder
         buf.addVertex(matXScale * vx + matXTranslation, matYScale * vy + matYTranslation, 0f)
         buf.setUv(u, v)
-        buf.writeParams(radius, smoothness, adjustedHalfSizeX, adjustedHalfSizeY, SHVFE.ROUNDED_PARAMS_0)
-        buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, alpha, 0f, SHVFE.ROUNDED_PARAMS_1)
+        buf.writeParams(radius, smoothness, adjustedHalfSizeX, adjustedHalfSizeY, SkyHanniVertexFormats.VertexElement.ROUNDED_PARAMS_0)
+        buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, alpha, 0f, SkyHanniVertexFormats.VertexElement.ROUNDED_PARAMS_1)
     }
 }

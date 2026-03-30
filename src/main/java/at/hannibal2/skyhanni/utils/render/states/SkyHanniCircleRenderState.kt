@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render.states
 
-import at.hannibal2.skyhanni.utils.render.SHVFE
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
+import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats
 import at.hannibal2.skyhanni.utils.render.SkyHanniVertexFormats.writeParams
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexConsumer
@@ -27,7 +27,7 @@ class SkyHanniCircleRenderState(
         val buf = consumer as BufferBuilder
         buf.addVertex(matXScale * vx + matXTranslation, matYScale * vy + matYTranslation, 0f)
         buf.setColor(color)
-        buf.writeParams(radius, smoothness, adjustedHalfSizeX, adjustedHalfSizeY, SHVFE.ROUNDED_PARAMS_0)
-        buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, angle1, angle2, SHVFE.ROUNDED_PARAMS_1)
+        buf.writeParams(radius, smoothness, adjustedHalfSizeX, adjustedHalfSizeY, SkyHanniVertexFormats.VertexElement.ROUNDED_PARAMS_0)
+        buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, angle1, angle2, SkyHanniVertexFormats.VertexElement.ROUNDED_PARAMS_1)
     }
 }

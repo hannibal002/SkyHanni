@@ -206,8 +206,8 @@ object TextHelper {
         var currentString = ""
         var done = false
 
-        fun String.newText() = asComponent().withStyle(style)
         component.forEachNonEmpty { style, string ->
+            fun String.newText() = asComponent().withStyle(style)
             if (done) return@forEachNonEmpty
             for (c in string) {
                 if (index >= match.length) {
@@ -239,8 +239,8 @@ object TextHelper {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
-        fun String.toStyledComponent() = this.asComponent().withStyle(style)
         component.forEachNonEmpty { style, string ->
+            fun String.toStyledComponent() = this.asComponent().withStyle(style)
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
                 currentComponent.append(string.toStyledComponent())
@@ -248,7 +248,7 @@ object TextHelper {
                 currentComponent.append(string.toStyledComponent())
                 if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                 currentComponent = Component.empty()
-                for ((index, str) in split.withIndex()) {
+                for ((index, _) in split.withIndex()) {
                     if (index == 0) continue
                     currentComponent.append(string.toStyledComponent())
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)

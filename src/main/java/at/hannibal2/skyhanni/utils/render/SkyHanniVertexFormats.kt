@@ -96,19 +96,19 @@ object SkyHanniVertexFormats {
         VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("UV0", VertexFormatElement.UV0)
-            .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
-            .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
+            .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
             .build()
     }
 
     val POSITION_ROUNDED_GRADIENT: VertexFormat by lazy {
         VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
-            .add("RoundedParams0", SkyHanniVertexFormatElement.ROUNDED_PARAMS_0.element)
-            .add("RoundedParams1", SkyHanniVertexFormatElement.ROUNDED_PARAMS_1.element)
-            .add("GradientParams0", SkyHanniVertexFormatElement.GRADIENT_PARAMS_0.element)
-            .add("GradientParams1", SkyHanniVertexFormatElement.GRADIENT_PARAMS_1.element)
-            .add("GradientParams2", SkyHanniVertexFormatElement.GRADIENT_PARAMS_2.element)
+            .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
+            .add("GradientParams0", VertexElement.GRADIENT_PARAMS_0.element)
+            .add("GradientParams1", VertexElement.GRADIENT_PARAMS_1.element)
+            .add("GradientParams2", VertexElement.GRADIENT_PARAMS_2.element)
             .build()
     }
 
