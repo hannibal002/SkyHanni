@@ -2,8 +2,11 @@
 
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdgesOld
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
+import at.hannibal2.skyhanni.utils.VectorUtils.edges
 import com.google.gson.annotations.Expose
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Rotations
@@ -31,7 +34,11 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
-    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).inflate(0.0001, 0.0001, 0.0001).calculateEdgesOld() }
+    val edges by lazy {
+        toVec3().edges.mapTo(mutableSetOf()) { (a, b) ->
+            a.toLorenzVec() to b.toLorenzVec()
+        }
+    }
 
     constructor() : this(0.0, 0.0, 0.0)
 
