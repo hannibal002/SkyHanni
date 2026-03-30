@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
@@ -27,8 +27,7 @@ object SlayerMiniBossFeatures {
         val mob = event.mob
         if (!SlayerMiniBossType.isMiniboss(mob.name)) return
         miniBosses += mob
-        // TODO config option for color
-        if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
+        if (config.slayerMinibossHighlight) mob.highlight(config.minibossLine.color)
     }
 
     @HandleEvent
@@ -41,8 +40,8 @@ object SlayerMiniBossFeatures {
         val cocoon = event.cocoonMob
         if (!SlayerMiniBossType.isMiniboss(cocoon.mob.name)) return
         cocoons += cocoon.cocoonEntity
-        RenderLivingEntityHelper.setEntityColor(cocoon.cocoonEntity, LorenzColor.AQUA.toColor()) {
-            config.slayerMinibossHighlight
+        RenderLivingEntityHelper.setEntityColor(cocoon.cocoonEntity, config.cocoonLine.color.toColor()) {
+            config.cocoonHighlight
         }
     }
 

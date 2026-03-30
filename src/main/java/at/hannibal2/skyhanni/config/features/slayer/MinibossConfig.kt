@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class MinibossConfig {
 
     @Expose
-    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Minibosses in line color below (even when line is disabled).")
     @ConfigEditorBoolean
     @FeatureToggle
     var slayerMinibossHighlight: Boolean = false
@@ -20,6 +20,12 @@ class MinibossConfig {
     @ConfigOption(name = "Line to Miniboss Mob", desc = "")
     @Accordion
     val minibossLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
+
+    @Expose
+    @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Miniboss cocoons in line color below (even when line is disabled).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var cocoonHighlight: Boolean = false
 
     @Expose
     @ConfigOption(name = "Line To Cocoon with Miniboss", desc = "")
