@@ -21,8 +21,11 @@ class DeployableConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Only Show Highest Tier", desc = "Only show highest tier of deployable.\n" +
-            "e.g. Only show Overflux if a Radiant and Overflux are placed")
+    @ConfigOption(
+        name = "Only Show Highest Tier",
+        desc = "Only show highest tier of deployable.\n" +
+            "e.g. Only show Overflux if a Radiant and Overflux are placed"
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var highestTierOnly: Boolean = true
@@ -30,7 +33,7 @@ class DeployableConfig {
     @Expose
     @ConfigOption(name = "Deployable Types", desc = "Which types of Deployables to display")
     @ConfigEditorDraggableList
-    var displayTypes: MutableList<DeployableDisplay.DeployableType> = mutableListOf(
+    val displayTypes: MutableList<DeployableDisplay.DeployableType> = mutableListOf(
         DeployableDisplay.DeployableType.FLUX,
         DeployableDisplay.DeployableType.LANTERN,
         DeployableDisplay.DeployableType.UMBERELLA,
