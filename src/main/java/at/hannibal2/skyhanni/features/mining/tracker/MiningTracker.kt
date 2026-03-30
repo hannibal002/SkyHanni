@@ -75,7 +75,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     ::BucketData,
     { it.mining.miningTracker },
     { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.mining.miningTracker.perTrackerConfig }
+    trackerConfig = { SkyHanniMod.feature.mining.miningTracker.perTrackerConfig },
 ) {
     // region Tracker init and data population
 
@@ -97,7 +97,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
      */
     private val gemstonePatternMeta = group.pattern(
         "gemstoneidregex",
-        "^internalName:(ROUGH|FLAWED|FINE|FLAWLESS)_(.+)_GEM$"
+        "^internalName:(ROUGH|FLAWED|FINE|FLAWLESS)_(.+)_GEM$",
     )
     private val gemstonePattern by gemstonePatternMeta
     private var lastClickedPos: LorenzVec? = null
@@ -109,7 +109,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() && MiningApi.isHoldingMiningTool()},
+            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() && MiningApi.isHoldingMiningTool() },
             onRender = {
                 renderDisplay(config.position)
             },
@@ -117,7 +117,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     }
 
     data class BucketData(
-        @Expose var blocksMined: MutableMap<MiningCategory, Long>? = null
+        @Expose var blocksMined: MutableMap<MiningCategory, Long>? = null,
     ) : BucketedItemTrackerData<MiningCategory, SessionUptime.Normal>(MiningCategory::class, SessionUptime.Normal::class) {
 
         val safeBlocksMined: MutableMap<MiningCategory, Long>
@@ -144,9 +144,10 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
             /* times gained here is only every time the sack updates, so the best calculable
                 quantity is how often we gain it from sack- need to find a way to get individual item quantity */
             return listOf(
-                "§7Gained §e${timesGained.addSeparators()} §7times from sack/inventory updates."
+                "§7Gained §e${timesGained.addSeparators()} §7times from sack/inventory updates.",
             )
         }
+
         // Add tracker line if coins are picked up. Maybe glacite creature mob kill coins?
         override fun getCoinName(bucket: MiningCategory?, item: TrackedItem) = "§6Coins gained while mining"
 
@@ -154,7 +155,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         override fun getCoinDescription(bucket: MiningCategory?, item: TrackedItem): List<String> {
             val miningCoinsGained = item.totalAmount.shortFormat()
             return listOf(
-                "§7You have gained §6$miningCoinsGained coins §7from mining associated tasks."
+                "§7You have gained §6$miningCoinsGained coins §7from mining associated tasks.",
             )
         }
 
@@ -201,7 +202,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         add(
             Renderable.hoverTips(
                 content = "§7Times mined: §e${totalBlocksMined.addSeparators()}",
-                tips = listOf("§7You've mined §e${totalBlocksMined.addSeparators()} §7blocks not including spread.")
+                tips = listOf("§7You've mined §e${totalBlocksMined.addSeparators()} §7blocks not including spread."),
             ).toSearchable(),
         )
         val duration = data.getTotalUptime()
@@ -211,8 +212,8 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
                 totalBlocksMined,
                 "block",
                 duration,
-                "Blocks"
-            )
+                "Blocks",
+            ),
         )
         if (isInventoryOpen()) {
             addButton(
@@ -246,6 +247,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
             blockUpdateControl = true
         }
     }
+
     //Adding to the number of blocks mined
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {

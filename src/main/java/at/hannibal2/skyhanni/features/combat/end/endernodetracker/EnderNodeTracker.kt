@@ -69,7 +69,7 @@ object EnderNodeTracker {
         ::Data,
         { it.enderNodeTracker },
         drawDisplay = { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
+        trackerConfig = { config.perTrackerConfig },
     )
 
     data class Data(
