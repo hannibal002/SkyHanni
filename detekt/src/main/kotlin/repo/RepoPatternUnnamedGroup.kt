@@ -1,20 +1,11 @@
-package at.hannibal2.skyhanni.detektrules.repo
+package repo
 
-import at.hannibal2.skyhanni.detektrules.RepoPatternElement.Companion.asRepoPatternElement
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import RepoPatternElement.Companion.asRepoPatternElement
+import SkyHanniRule
+import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternUnnamedGroup(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "RepoPatternUnnamedGroup",
-        Severity.Style,
-        "All repo patterns must not contain unnamed groups.",
-        Debt.FIVE_MINS,
-    )
+class RepoPatternUnnamedGroup(config: Config) : SkyHanniRule(config, "All repo patterns must not contain unnamed groups.") {
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
