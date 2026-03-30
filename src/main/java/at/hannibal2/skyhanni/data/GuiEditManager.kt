@@ -99,10 +99,7 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    //? if < 26.1 {
     fun renderLast(context: GuiGraphics) {
-    //? } else
-    //fun renderLast(context: GuiGraphics) {
         if (GlobalRender.renderDisabled) return
         if (!isInGui()) return
 

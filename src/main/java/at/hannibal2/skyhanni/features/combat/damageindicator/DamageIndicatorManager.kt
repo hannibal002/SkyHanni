@@ -974,11 +974,11 @@ object DamageIndicatorManager {
     }
 
     private fun setMaxHealth(entity: LivingEntity, currentMaxHealth: Long) {
-        maxHealth[entity.uuid!!] = currentMaxHealth
+        maxHealth[entity.uuid] = currentMaxHealth
     }
 
     private fun getMaxHealthFor(entity: LivingEntity): Long {
-        return maxHealth.getOrDefault(entity.uuid!!, 0L)
+        return maxHealth.getOrDefault(entity.uuid, 0L)
     }
 
     @HandleEvent

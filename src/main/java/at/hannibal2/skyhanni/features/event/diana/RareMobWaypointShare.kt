@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -230,9 +231,10 @@ object RareMobWaypointShare {
             return
         }
         val location = rareMob.getLorenzVec().toChatFormat()
-        val mobName = rareMob.name.string.orEmpty()
-        val name = if (mobName.isEmpty()) "" else "| $mobName"
-        HypixelCommands.partyChat("$location $name")
+        val mobName = rareMob.name.string.takeIfNotEmpty()?.let {
+            "| $it"
+        }.orEmpty()
+        HypixelCommands.partyChat("$location $mobName")
     }
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
