@@ -257,6 +257,6 @@ object SlayerProfitTracker : SkyHanniItemTracker<SlayerProfitTracker.Data>("Slay
             old
         }
         val base = "slayer.itemProfitTracker"
-        event.move(128, "$base.pos", "$base.position")
+        event.move(130, "$base.pos", "$base.position")
     }
 }

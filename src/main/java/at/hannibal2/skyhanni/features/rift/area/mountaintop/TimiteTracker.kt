@@ -114,10 +114,10 @@ object TimiteTracker : SkyHanniItemTracker<TimiteTracker.Data>("Timite Tracker")
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "rift.area.mountaintop.timite"
-        event.move(128, "$base.tracker", "$base.tracker.enabled")
-        event.move(128, "$base.trackerPosition", "$base.tracker.position")
-        event.move(128, "$base.perTrackerConfig", "$base.tracker.perTrackerConfig")
-        event.move(128, "$base.onlyShowWhileHolding", "$base.tracker.onlyShowWhileHolding")
+        event.move(130, "$base.tracker", "$base.tracker.enabled")
+        event.move(130, "$base.trackerPosition", "$base.tracker.position")
+        event.move(130, "$base.perTrackerConfig", "$base.tracker.perTrackerConfig")
+        event.move(130, "$base.onlyShowWhileHolding", "$base.tracker.onlyShowWhileHolding")
     }
 
     private fun isEnabled() = RiftApi.inMountainTop() && config.enabled &&

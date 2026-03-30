@@ -336,9 +336,9 @@ object CFStrayTracker : SkyHanniTracker<CFStrayTracker.Data>("Stray Tracker") {
             migrateJsonStringKeyToRarityKey(element, LorenzRarity::class.java)
         }
         val base = "inventory.chocolateFactory"
-        event.move(128, "$base.strayRabbitTracker", "$base.strayTracker.enabled")
-        event.move(128, "$base.strayTrackerConfig", "$base.strayTracker.perTrackerConfig")
-        event.move(128, "$base.strayRabbitTrackerPosition", "$base.strayTracker.position")
+        event.move(130, "$base.strayRabbitTracker", "$base.strayTracker.enabled")
+        event.move(130, "$base.strayTrackerConfig", "$base.strayTracker.perTrackerConfig")
+        event.move(130, "$base.strayRabbitTrackerPosition", "$base.strayTracker.position")
     }
 
     @HandleEvent(ConfigLoadEvent::class)

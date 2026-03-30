@@ -197,9 +197,9 @@ object DarkMonolithFeatures : SkyHanniItemTracker<DarkMonolithFeatures.Data>("Da
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val base = "mining.darkMonolith"
-        event.move(128, "$base.tracker", "$base.tracker.enabled")
-        event.move(128, "$base.trackerPosition", "$base.tracker.position")
-        event.move(128, "$base.perTrackerConfig", "$base.perTrackerConfig.perTrackerConfig")
+        event.move(130, "$base.tracker", "$base.tracker.enabled")
+        event.move(130, "$base.trackerPosition", "$base.tracker.position")
+        event.move(130, "$base.perTrackerConfig", "$base.perTrackerConfig.perTrackerConfig")
     }
 
     @HandleEvent

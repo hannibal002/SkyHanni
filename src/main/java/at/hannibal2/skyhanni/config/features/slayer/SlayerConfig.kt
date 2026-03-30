@@ -209,12 +209,12 @@ class SlayerConfig {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
 
             // Renames beforehand
-            event.move(128, "slayer.endermen", "slayer.enderman")
-            event.move(128, "slayer.blazes", "slayer.blaze")
+            event.move(130, "slayer.endermen", "slayer.enderman")
+            event.move(130, "slayer.blazes", "slayer.blaze")
             val oldBase = "slayer.itemProfitTracker"
-            event.move(128, "$oldBase.voidgloomInNest", "slayer.enderman.showInNest")
-            event.move(128, "$oldBase.voidgloomInNoArea", "slayer.enderman.showInNoArea")
-            event.move(128, "$oldBase.revenantInGraveyard", "slayer.zombie.showInGraveyard")
+            event.move(130, "$oldBase.voidgloomInNest", "slayer.enderman.showInNest")
+            event.move(130, "$oldBase.voidgloomInNoArea", "slayer.enderman.showInNoArea")
+            event.move(130, "$oldBase.revenantInGraveyard", "slayer.zombie.showInGraveyard")
         }
     }
 }
