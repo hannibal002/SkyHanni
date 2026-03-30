@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.awt.Color
 
-object GenericRecipeLayout : RecipeLayout() {
+object GenericRecipeLayout : RecipeLayout {
 
     override fun build(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
         val outputsPanel = panel("Outputs", recipe.outputs, screen)
@@ -75,7 +75,9 @@ object GenericRecipeLayout : RecipeLayout() {
             horizontalAlign = HA.CENTER,
         )
         val centeredArrow = Renderable.fixedSizeColumn(
-            object : Renderable by arrowRenderable() { override val verticalAlign = VA.CENTER },
+            object : Renderable by arrowRenderable() {
+                override val verticalAlign = VA.CENTER
+            },
             outputsPanel.height,
         )
         return Renderable.horizontal(listOf(inputColumn, centeredArrow, outputsPanel), spacing = 8, verticalAlign = VA.TOP)

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import java.awt.Color
 
-object CraftingRecipeLayout : RecipeLayout() {
+object CraftingRecipeLayout : RecipeLayout {
 
     override fun build(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable {
         val ingredients = recipe.ingredients.toList()
@@ -29,7 +29,9 @@ object CraftingRecipeLayout : RecipeLayout() {
             }
         } else rawOutput
         val output = Renderable.fixedSizeColumn(
-            object : Renderable by outputColumn { override val verticalAlign = VA.CENTER },
+            object : Renderable by outputColumn {
+                override val verticalAlign = VA.CENTER
+            },
             gridRenderable.height.coerceAtLeast(outputColumn.height),
         )
         val craftingRow = Renderable.horizontal(listOf(gridRenderable, arrowRenderable(), output), spacing = 6, verticalAlign = VA.CENTER)

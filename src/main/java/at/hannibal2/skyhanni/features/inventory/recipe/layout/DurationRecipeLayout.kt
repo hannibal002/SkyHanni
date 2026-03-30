@@ -16,7 +16,7 @@ import java.awt.Color
  * Shared layout for recipes with a single timed operation (forge, kat upgrade).
  * Subclasses declare [timeLabel] and whether [alwaysShowOutput].
  */
-abstract class DurationRecipeLayout : RecipeLayout() {
+abstract class DurationRecipeLayout : RecipeLayout {
 
     abstract val timeLabel: String
     open val alwaysShowOutput: Boolean get() = false
@@ -38,7 +38,9 @@ abstract class DurationRecipeLayout : RecipeLayout() {
         }
 
         val centeredArrow = Renderable.fixedSizeColumn(
-            object : Renderable by arrowRenderable() { override val verticalAlign = VA.CENTER },
+            object : Renderable by arrowRenderable() {
+                override val verticalAlign = VA.CENTER
+            },
             inputsPanel.height,
         )
         val mainRow = Renderable.horizontal(

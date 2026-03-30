@@ -142,7 +142,7 @@ internal fun buildItemSlot(
 internal fun buildIngredientRowOrNull(
     ingredient: PrimitiveIngredient,
     screen: RecipeViewerScreen,
-    scale: Double = ITEM_SCALE
+    scale: Double = ITEM_SCALE,
 ): Renderable? = buildIngredientTextOrNull(ingredient)?.let {
     Renderable.horizontal(spacing = 4, verticalAlign = VA.CENTER) {
         add(buildItemSlot(ingredient, screen, scale = scale))
@@ -176,9 +176,9 @@ internal fun arrowRenderable() =
     Renderable.text(" ──► ", scale = 1.3, color = COLOR_ARROW.toColor(), horizontalAlign = HA.CENTER)
 
 /**
- * Base class for recipe-type-specific layout renderers.
+ * Base for recipe-type-specific layout renderers.
  * All shared rendering utilities are top-level internal functions in this file.
  */
-abstract class RecipeLayout {
-    abstract fun build(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable
+interface RecipeLayout {
+    fun build(recipe: PrimitiveRecipe, screen: RecipeViewerScreen): Renderable
 }

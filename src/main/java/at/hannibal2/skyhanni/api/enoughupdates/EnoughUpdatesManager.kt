@@ -143,11 +143,16 @@ object EnoughUpdatesManager {
             ErrorManager.logErrorWithData(e, "Failed to parse recipe for ${itemJson.internalName}", "type" to neuRecipe.type)
             return
         }
-        for (output in recipe.outputs)
-            recipesMap.getOrPut(output.internalName) { mutableSetOf() }.add(recipe)
-        for (ingredient in recipe.ingredients)
-            ingredientToOutputs.getOrPut(ingredient.internalName) { mutableSetOf() }
-                .addAll(recipe.outputs.map { it.internalName })
+        recipe.outputs.forEach { output ->
+            recipesMap.getOrPut(output.internalName) {
+                mutableSetOf()
+            }.add(recipe)
+        }
+        recipe.ingredients.forEach { ingredient ->
+            ingredientToOutputs.getOrPut(ingredient.internalName) {
+                mutableSetOf()
+            }.addAll(recipe.outputs.map { it.internalName })
+        }
     }
 
     private fun parseItem(json: JsonObject): NeuItemJson? = runCatching {
