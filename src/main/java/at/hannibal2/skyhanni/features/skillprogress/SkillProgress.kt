@@ -412,7 +412,7 @@ object SkillProgress {
         val lvl = skill.level
         val cap = activeSkill.maxLevel
         // This code is probably still wrong for hunting
-        // But i can not understand why we are doing this in the first place
+        // But I can not understand why we are doing this in the first place
         val add = if (lvl >= 50) {
             SkillUtil.xpRequiredForLevel(cap)
         } else {

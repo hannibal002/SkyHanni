@@ -23,7 +23,7 @@ jobs:
             pull-requests: write
         outputs:
             sarif_exists: ${{ steps.check_sarif.outputs.exists }}
-            detekt_failed: ${{ steps.run_detekt.outcome == 'failure' }}
+            detekt_failed: ${{ steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure' }}
         steps:
             -   name: Checkout PR code
                 uses: actions/checkout@v6
@@ -32,13 +32,24 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
             -   name: Disable preprocessor
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
+                if: github.repository == 'hannibal002/SkyHanni'
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                continue-on-error: true
+                with:
+                    gradle-command: detektMain --stacktrace
+            -   name: Run detekt main (w/ typing analysis) w/gradle retry
+                id: run_detekt_fork
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace
@@ -54,13 +65,14 @@ jobs:
                     fi
 
             -   name: Add label if detekt fails
-                if: ${{ steps.run_detekt.outcome == 'failure' && steps.check_sarif.outputs.exists == 'true' }}
+                if: ${{ (steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure') && steps.check_sarif.outputs.exists == 'true' }}
                 uses: actions-ecosystem/action-add-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Detekt'
             -   name: Remove label if detekt passes
-                if: ${{ steps.run_detekt.outcome != 'failure' }}
+                if: ${{ steps.run_detekt.outcome != 'failure' && steps.run_detekt_fork.outcome != 'failure' }}
+                continue-on-error: true
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +85,7 @@ jobs:
                     ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif | tee detekt_output.txt
             -   name: Upload detekt output as artifact
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 with:
                     name: detekt-output
                     path: detekt_output.txt
@@ -86,9 +98,9 @@ jobs:
             cancel-in-progress: true
         needs: detekt
         if: ${{
-                needs.detekt.outputs.sarif_exists == 'true' &&
-                needs.detekt.outputs.detekt_failed == 'true' &&
-                github.event.pull_request.draft == false
+            needs.detekt.outputs.sarif_exists == 'true' &&
+            needs.detekt.outputs.detekt_failed == 'true' &&
+            github.event.pull_request.draft == false
             }}
         permissions:
             pull-requests: write
@@ -99,7 +111,7 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
             -   name: Download detekt output
-                uses: actions/download-artifact@v4
+                uses: actions/download-artifact@v8
                 with:
                     name: detekt-output
                     path: .
