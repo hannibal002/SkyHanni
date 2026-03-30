@@ -26,7 +26,7 @@ object AtmosphericFilterDisplay {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenApi.inGarden()) {
             config.position.renderString(display, posLabel = "Atmospheric Filter Perk Display")

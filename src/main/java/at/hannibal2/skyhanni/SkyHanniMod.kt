@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.SkyHanniConfig
 import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
@@ -51,7 +52,7 @@ import org.apache.logging.log4j.Logger
 
 @SkyHanniModule
 object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
-    CoroutineScope(CoroutineName("SkyHanni") + SupervisorJob(Job(null)))
+    CoroutineScope(CoroutineName("SkyHanni") + SupervisorJob(Job(null))),
 ) {
     fun preInit() {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
@@ -120,8 +121,9 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
 
+    // TODO rename to config. whoever does this, have fun with 644 lines changed
     @JvmField
-    var feature: Features = Features()
+    var feature: SkyHanniConfig = SkyHanniConfig()
     lateinit var sackData: SackData
     lateinit var storageData: StorageData
     lateinit var friendsData: FriendsJson
@@ -132,6 +134,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
     lateinit var customTodos: CustomTodosStorage
     lateinit var seaCreatureStorage: SpecificSeaCreatureStorage
+    lateinit var achievementStorage: AchievementStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

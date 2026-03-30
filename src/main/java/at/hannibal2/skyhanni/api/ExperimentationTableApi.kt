@@ -294,7 +294,7 @@ object ExperimentationTableApi {
         }
     }
 
-    data class ExperimentationDataSet(
+    private data class ExperimentationDataSet(
         var type: ExperimentationTaskType? = null,
         var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
@@ -430,7 +430,7 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
         event.tryFireRareBookUncovered()

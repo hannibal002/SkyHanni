@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -29,7 +30,7 @@ object SlayerSpiderFeatures {
         }
     }
 
-    private fun Mob.isRightTier() = mobType == Mob.Type.SLAYER && (levelOrTier in 3..5) && name == "Tarantula Broodfather"
+    private fun Mob.isRightTier() = category == MobCategory.SLAYER && (levelOrTier in 3..5) && name == "Tarantula Broodfather"
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {

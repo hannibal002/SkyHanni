@@ -62,13 +62,13 @@ object GuiRenderUtils {
     }
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
-        DrawContextUtils.pushMatrix()
-        val strLength = fr.width(text)
-        val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        DrawContextUtils.translate(x, y)
-        DrawContextUtils.scale(factor, factor)
-        drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            val strLength = fr.width(text)
+            val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
+            DrawContextUtils.translate(x, y)
+            DrawContextUtils.scale(factor, factor)
+            drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
+        }
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
@@ -336,6 +336,7 @@ object GuiRenderUtils {
         y,
         scale = config.scale,
         rescaleSkulls = config.rescaleSkulls,
+        alpha = config.alpha,
         rotationVec = if (config is AnimatedItemRenderableConfig<*>) config.rotationStorage.currentRotation else Vec3.ZERO,
         translationVec = if (config is AnimatedItemRenderableConfig<*>) config.bounceStorage.currentBounce else Vec3.ZERO,
         stableRenderId = stableRenderId,
@@ -355,6 +356,7 @@ object GuiRenderUtils {
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
         frameNumber: Int? = null,
+        alpha: Float = 1f,
     ): Int? {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
@@ -411,6 +413,7 @@ object GuiRenderUtils {
             adjustedScale = (finalItemScale * guiScaleX).toFloat(),
             stableRenderId,
             frameNumber = frameNumber,
+            alpha = alpha,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId

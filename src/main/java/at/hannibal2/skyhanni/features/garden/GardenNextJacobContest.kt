@@ -445,14 +445,14 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -479,7 +479,7 @@ object GardenNextJacobContest {
 
     private fun handleFetchedContests() {
         if (haveAllContests) {
-            ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
+            ChatUtils.chat("Successfully loaded this year's contests from ${EliteDevApi.ELITE_DOMAIN} automatically!")
             fetchedFromElite = true
             nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
             loadedContestsYear = SkyBlockTime.now().year

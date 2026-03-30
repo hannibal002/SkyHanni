@@ -19,7 +19,7 @@ object MobFactories {
         MobFilter.slayerNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
-                mobType = Mob.Type.SLAYER,
+                category = MobCategory.SLAYER,
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
@@ -37,7 +37,7 @@ object MobFactories {
         MobFilter.bossMobNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
-                mobType = Mob.Type.BOSS,
+                category = MobCategory.BOSS,
                 armorStand = armorStand,
                 name = overriddenName ?: this.group("name"),
                 levelOrTier = group("level")?.takeIf { it.isNotEmpty() }?.toInt() ?: -1,
@@ -54,7 +54,7 @@ object MobFactories {
         MobFilter.dungeonNameFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
-                mobType = Mob.Type.DUNGEON,
+                category = MobCategory.DUNGEON,
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
@@ -75,7 +75,7 @@ object MobFactories {
         MobFilter.mobNameFilter.findMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
-                mobType = Mob.Type.BASIC,
+                category = MobCategory.BASIC,
                 armorStand = armorStand,
                 name = this.group("name").removeCorruptedSuffix(
                     this.group("corrupted")?.isNotEmpty() ?: false,
@@ -88,7 +88,7 @@ object MobFactories {
         }
 
     fun basic(baseEntity: LivingEntity, name: String) =
-        Mob(baseEntity = baseEntity, mobType = Mob.Type.BASIC, name = name)
+        Mob(baseEntity = baseEntity, category = MobCategory.BASIC, name = name)
 
     fun summon(
         baseEntity: LivingEntity,
@@ -98,7 +98,7 @@ object MobFactories {
         MobFilter.summonFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
-                mobType = Mob.Type.SUMMON,
+                category = MobCategory.SUMMON,
                 armorStand = armorStand,
                 name = this.group("name"),
                 additionalEntities = extraEntityList,
@@ -109,25 +109,25 @@ object MobFactories {
     fun displayNpc(baseEntity: LivingEntity, armorStand: ArmorStand, clickArmorStand: ArmorStand): Mob =
         Mob(
             baseEntity = baseEntity,
-            mobType = Mob.Type.DISPLAY_NPC,
+            category = MobCategory.DISPLAY_NPC,
             armorStand = armorStand,
             name = armorStand.cleanName(),
             additionalEntities = listOf(clickArmorStand),
         )
 
-    fun player(baseEntity: LivingEntity): Mob = Mob(baseEntity, Mob.Type.PLAYER, name = baseEntity.name.formattedTextCompatLessResets())
+    fun player(baseEntity: LivingEntity): Mob = Mob(baseEntity, MobCategory.PLAYER, name = baseEntity.name.formattedTextCompatLessResets())
     fun projectile(baseEntity: LivingEntity, name: String): Mob =
-        Mob(baseEntity = baseEntity, mobType = Mob.Type.PROJECTILE, name = name)
+        Mob(baseEntity = baseEntity, category = MobCategory.PROJECTILE, name = name)
 
     fun special(baseEntity: LivingEntity, name: String, armorStand: ArmorStand? = null) =
-        Mob(baseEntity = baseEntity, mobType = Mob.Type.SPECIAL, armorStand = armorStand, name = name)
+        Mob(baseEntity = baseEntity, category = MobCategory.SPECIAL, armorStand = armorStand, name = name)
 
     private fun String.removeCorruptedSuffix(case: Boolean) = if (case) this.dropLast(1) else this
     fun dojo(baseEntity: LivingEntity, armorStand: ArmorStand): Mob? =
         MobFilter.dojoFilter.matchMatcher(armorStand.cleanName()) {
             Mob(
                 baseEntity = baseEntity,
-                mobType = Mob.Type.SPECIAL,
+                category = MobCategory.SPECIAL,
                 armorStand = armorStand,
                 name = if (this.group("points")
                         ?.isNotEmpty() == true
@@ -136,6 +136,6 @@ object MobFactories {
         }
 
     fun minionMob(baseEntity: LivingEntity) =
-        Mob(baseEntity, Mob.Type.SPECIAL, name = MobFilter.MINION_MOB_PREFIX + baseEntity.cleanName())
+        Mob(baseEntity, MobCategory.SPECIAL, name = MobFilter.MINION_MOB_PREFIX + baseEntity.cleanName())
 
 }

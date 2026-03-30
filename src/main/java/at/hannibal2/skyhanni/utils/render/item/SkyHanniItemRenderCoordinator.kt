@@ -18,7 +18,7 @@ internal object SkyHanniItemRenderCoordinator {
     )
     private var frameResources: FrameRenderResources? = null
 
-    // items actively spinning re-render every frame, same as mojang's isAnimated path.
+    // items actively spinning re-render every frame, same as Mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
@@ -98,8 +98,8 @@ internal object SkyHanniItemRenderCoordinator {
         } ?: false
 
         if (isSettled) {
-            val blitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
-            if (blitted) return
+            val blitSubmitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
+            if (blitSubmitted) return
             // Atlas miss (overflow or not yet allocated) — fall through to realtime
         }
 

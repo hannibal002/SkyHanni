@@ -28,7 +28,7 @@ object TitleManager {
     private val titleLocationQueues: MutableMap<TitleLocation, CollectionUtils.OrderedQueue<TitleContext>> = enumMapOf()
     private val currentTitles: MutableMap<TitleLocation, TitleContext?> = enumMapOf()
     val guiConfig get() = SkyHanniMod.feature.gui
-    val existingIntentions = guiConfig.titleIntentionPositions.values.map { it.keys }.flatten().toSet()
+    val existingIntentions = guiConfig.titleIntentionPositions.values.flatMap { it.keys }.toSet()
     val intentionMapper: MutableMap<String, TitleIntention> = mutableMapOf()
 
     inline fun<reified E : Enum<E>> registerIntentions(
@@ -94,6 +94,9 @@ object TitleManager {
         override fun toString() = displayName
     }
 
+    /**
+     * always combine this with notifyOrDisable!
+     */
     fun <E : Enum<E>> sendTitle(
         titleText: String,
         subtitleText: String? = null,
@@ -336,14 +339,14 @@ object TitleManager {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (InventoryUtils.inInventory()) return
         val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
         globalTitle.tryRenderGlobalTitle()
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
         inventoryTitle.tryRenderInventoryTitle()

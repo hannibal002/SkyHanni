@@ -50,13 +50,13 @@ object MobDebug {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
-            lastRayHit = MobUtils.rayTraceForMobs(MinecraftCompat.localPlayer, event.partialTicks)
+            lastRayHit = MobUtils.raycastForMobs(MinecraftCompat.localPlayer, event.partialTicks)
                 ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }
         }
 
         if (config.skyblockMob.isHighlight()) {
             MobData.skyblockMobs.highlight(event) {
-                (if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN).toChromaColor()
+                (if (it.category == MobCategory.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN).toChromaColor()
             }
         }
         if (config.displayNPC.isHighlight()) {

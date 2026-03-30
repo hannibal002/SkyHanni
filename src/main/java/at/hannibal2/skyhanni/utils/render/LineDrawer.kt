@@ -80,7 +80,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     }
 
     fun drawEdges(axisAlignedBB: AABB, color: Color) {
-        // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+        // TODO add cache. maybe on the caller site, since we can't add a lazy member in AxisAlignedBB
         for ((p1, p2) in axisAlignedBB.calculateEdges()) {
             draw3DLine(p1, p2, color)
         }
