@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -45,7 +44,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import java.io.File
 import java.util.TreeMap
-import kotlin.collections.emptySet
 import kotlin.math.floor
 
 // Most functions are taken from NotEnoughUpdates
