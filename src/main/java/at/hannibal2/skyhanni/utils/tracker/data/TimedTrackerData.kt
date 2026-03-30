@@ -10,6 +10,7 @@ import com.google.gson.annotations.Expose
  * used by [at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.createNewSession].
  * All storage and navigation lives in [sessionContainer].
  */
+@Suppress("AbstractClassCanBeConcreteClass")
 abstract class TimedTrackerData<T : SessionUptime> : TrackerData<T>() {
 
     @Expose

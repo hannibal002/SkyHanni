@@ -62,7 +62,7 @@ enum class DisplayMode(
         type = LocalDate::class,
         toValue = { it.yearToLocalDate() },
         fromValue = { (it as LocalDate).format(TimeUtils.yearFormatter) }
-    )
+    ),
     ;
 
     override fun toString() = displayName

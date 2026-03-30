@@ -58,7 +58,7 @@ object DarkMonolithFeatures : SkyHanniItemTracker<DarkMonolithFeatures.Data>("Da
     )
 
     class Data(
-        @Expose var monolithsLooted: Long = 0
+        @Expose var monolithsLooted: Long = 0,
     ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long) = emptyList<String>()
         override fun getCoinName(item: TrackedItem) = "§6Monolith Coins"

@@ -65,7 +65,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
     fun coroutineSimpleCallback(
         config: CoroutineConfig,
-        block: suspend ArgContext.() -> Unit
+        block: suspend ArgContext.() -> Unit,
     ) {
         this.builder.executes {
             config.launch {
