@@ -289,13 +289,11 @@ fun HoverEvent.value(): Component {
     }
 }
 
-fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? {
-    if (action == null) return null
-    return when (action) {
-        HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
-        // I really don't think anyone is using the other 2 lol
-        else -> null
-    }
+fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? = when (action) {
+    null -> null
+    HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
+    // I really don't think anyone is using the other 2 lol
+    else -> null
 }
 
 fun Component.changeColor(color: LorenzColor): Component =
@@ -401,22 +399,26 @@ private fun replace(
     val newComp = Component.empty()
     var hasEdited = false
 
-    component.visit({ style: Style?, string: String? ->
-        var edit = string
-        if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
-            if (oldValue is String) {
-                edit = string?.replace(oldValue, newValue)
-            } else if (oldValue is Regex) {
-                edit = string?.replace(oldValue, newValue)
-            } else {
-                ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+    component.visit(
+        { style: Style?, string: String? ->
+            var edit = string
+            if ((!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+                edit = when (oldValue) {
+                    is String -> string?.replace(oldValue, newValue)
+                    is Regex -> string?.replace(oldValue, newValue)
+                    else -> {
+                        ErrorManager.skyHanniError("replace oldValue is not Regex or String")
+                    }
+                }
             }
-        }
-        if (edit != string) hasEdited = true
+            if (edit != string) hasEdited = true
 
-        newComp.append(Component.literal(edit).withStyle(style))
-        Optional.empty<Component>()
-    }, Style.EMPTY)
+            val safeStyle = style ?: Style.EMPTY
+            newComp.append(Component.literal(edit.orEmpty()).withStyle(safeStyle))
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
 
     if (!hasEdited) return null
     return newComp
@@ -433,19 +435,20 @@ fun Component.replace(
 
     this.visit(
         { currentStyle: Style?, string: String? ->
+            val safeCurrentStyle = currentStyle ?: Style.EMPTY
             if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
                 val split = string.split(oldValue)
                 newComp.append(
                     componentBuilder {
                         for ((index, str) in split.withIndex()) {
-                            append(Component.literal(str).withStyle(currentStyle))
+                            append(Component.literal(str).withStyle(safeCurrentStyle))
                             if (index < split.size - 1) {
                                 if (!onlyReplaceFirst || !hasEdited) {
                                     append(newValue)
                                     hasEdited = true
                                 } else {
                                     append(oldValue) {
-                                        style = currentStyle
+                                        style = safeCurrentStyle
                                     }
                                 }
                             }
@@ -453,7 +456,7 @@ fun Component.replace(
                     },
                 )
             } else {
-                newComp.append(Component.literal(string).withStyle(currentStyle))
+                newComp.append(Component.literal(string.orEmpty()).withStyle(safeCurrentStyle))
             }
             Optional.empty<Component>()
         },
@@ -472,6 +475,4 @@ fun componentBuilder(init: MutableComponent.() -> Unit): Component {
     return Component.empty().also(init)
 }
 
-fun Component.copyIfNeeded(): MutableComponent {
-    return this as? MutableComponent ?: this.copy()
-}
+fun Component.copyIfNeeded(): MutableComponent = this as? MutableComponent ?: this.copy()
