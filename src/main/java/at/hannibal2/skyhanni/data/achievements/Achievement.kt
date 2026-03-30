@@ -16,8 +16,8 @@ data class Achievement(
     @Expose
     var data: AchievementUserData = AchievementUserData(),
 ) {
-    fun getName(): Component? {
-        name_ ?: return null
+    fun getName(): Component {
+        name_ ?: return Component.empty()
         val tier = getCurrentTier() ?: return name_
         if (tier == 0 || tiers.size == 1) return name_
         return name_.copy().append(" $tier")
