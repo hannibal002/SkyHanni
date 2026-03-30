@@ -34,7 +34,7 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
-    val edges by lazy {
+    val edges: Set<Pair<LorenzVec, LorenzVec>> by lazy {
         toVec3().edges.mapTo(mutableSetOf()) { (a, b) ->
             a.toLorenzVec() to b.toLorenzVec()
         }
