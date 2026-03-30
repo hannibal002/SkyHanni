@@ -200,16 +200,14 @@ object RenderUtils {
         if (renderables.isEmpty()) return
         var longestY = 0
         val longestX = renderables.maxOf { it.width }
-        renderables.forEach { line ->
-            DrawContextUtils.pushPop {
-                val (x, y) = transform()
-                DrawContextUtils.translate(0f, longestY.toFloat())
-                Renderable.withMousePosition(x, y) {
-                    line.renderXAligned(0, longestY, longestX)
-                }
-
-                longestY += line.height + extraSpace + 2
+        for (line in renderables) DrawContextUtils.pushPop {
+            val (x, y) = transform()
+            DrawContextUtils.translate(0f, longestY.toFloat())
+            Renderable.withMousePosition(x, y) {
+                line.renderXAligned(0, longestY, longestX)
             }
+
+            longestY += line.height + extraSpace + 2
         }
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
