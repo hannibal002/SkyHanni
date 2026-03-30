@@ -43,7 +43,7 @@ object CruxTalismanDisplay {
     private var percentValue = 0.0
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(
             display,

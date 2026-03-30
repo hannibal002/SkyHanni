@@ -41,10 +41,10 @@ value class Graph(
         queue.add(node)
         while (queue.isNotEmpty()) {
             val current = queue.removeFirst()
-            for (neighbour in current.neighbours.keys) {
-                if (!condition(neighbour) || neighbour in visited) continue
-                visited.add(neighbour)
-                queue.add(neighbour)
+            for (neighbor in current.neighbors.keys) {
+                if (!condition(neighbor) || neighbor in visited) continue
+                visited.add(neighbor)
+                queue.add(neighbor)
             }
         }
         return visited
@@ -98,9 +98,10 @@ value class Graph(
                     out.endArray()
                 }
                 if (node.extraWeight != 0) out.name("ExtraWeight").value(node.extraWeight)
+                // JSON key intentionally kept as "Neighbours" for backward compatibility
                 out.name("Neighbours").beginObject()
-                for ((neighbour, weight) in node.neighbours) {
-                    out.name(neighbour.id.toString()).value(weight.roundTo(2))
+                for ((neighbor, weight) in node.neighbors) {
+                    out.name(neighbor.id.toString()).value(weight.roundTo(2))
                 }
                 out.endObject()
                 out.endObject()
@@ -110,15 +111,15 @@ value class Graph(
 
         private fun deserializeGraph(reader: JsonReader): Graph {
             reader.beginObject()
-            val (nodes, neighbourMap) = parseNodes(reader)
+            val (nodes, neighborMap) = parseNodes(reader)
             reader.endObject()
-            linkNeighbours(nodes, neighbourMap)
+            linkNeighbors(nodes, neighborMap)
             return Graph(nodes)
         }
 
         private fun parseNodes(reader: JsonReader): Pair<List<GraphNode>, Map<GraphNode, List<Pair<Int, Double>>>> {
             val list = mutableListOf<GraphNode>()
-            val neighbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
+            val neighborMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
 
             while (reader.hasNext()) {
                 if (reader.peek() != JsonToken.NAME) {
@@ -135,10 +136,10 @@ value class Graph(
                 nodeData.position?.let { pos ->
                     val node = GraphNode(id, pos, nodeData.name, nodeData.tags, nodeData.extraWeight)
                     list.add(node)
-                    neighbourMap[node] = nodeData.neighbors
+                    neighborMap[node] = nodeData.neighbors
                 }
             }
-            return list to neighbourMap
+            return list to neighborMap
         }
 
         private data class NodeData(
@@ -161,7 +162,8 @@ value class Graph(
                         LorenzVec(it[0].toDouble(), it[1].toDouble(), it[2].toDouble())
                     }
                     "ExtraWeight" -> data.extraWeight = reader.nextInt()
-                    "Neighbours" -> parseNeighbours(reader, data.neighbors)
+                    // JSON key intentionally kept as "Neighbours" for backward compatibility
+                    "Neighbours" -> parseNeighbors(reader, data.neighbors)
                     "Name" -> data.name = reader.nextString()
                     "Tags" -> data.tags = parseTags(reader)
                 }
@@ -169,7 +171,7 @@ value class Graph(
             return data
         }
 
-        private fun parseNeighbours(reader: JsonReader, neighbors: MutableList<Pair<Int, Double>>) {
+        private fun parseNeighbors(reader: JsonReader, neighbors: MutableList<Pair<Int, Double>>) {
             reader.beginObject()
             while (reader.hasNext()) neighbors.add(reader.nextName().toInt() to reader.nextDouble())
             reader.endObject()
@@ -183,10 +185,10 @@ value class Graph(
             return tags
         }
 
-        private fun linkNeighbours(nodes: List<GraphNode>, neighbourMap: Map<GraphNode, List<Pair<Int, Double>>>) {
+        private fun linkNeighbors(nodes: List<GraphNode>, neighborMap: Map<GraphNode, List<Pair<Int, Double>>>) {
             val lookup = nodes.associateBy { it.id }
-            for ((node, edges) in neighbourMap) {
-                node.neighbours = edges.associate { (id, distance) ->
+            for ((node, edges) in neighborMap) {
+                node.neighbors = edges.associate { (id, distance) ->
                     (lookup[id] ?: error("Node ${node.id} references non-existent neighbor $id")) to distance
                 }
             }

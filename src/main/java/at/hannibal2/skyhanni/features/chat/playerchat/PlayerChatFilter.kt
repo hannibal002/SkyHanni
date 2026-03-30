@@ -27,7 +27,6 @@ object PlayerChatFilter {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         filters.clear()
-        var countCategories = 0
         var countFilters = 0
 
         val playerChatFilter = event.getConstant<PlayerChatFilterJson>("PlayerChatFilter")
@@ -37,7 +36,6 @@ object PlayerChatFilter {
             filter.load(category)
             filters[description] = filter
 
-            countCategories++
             countFilters += filter.count()
         }
     }

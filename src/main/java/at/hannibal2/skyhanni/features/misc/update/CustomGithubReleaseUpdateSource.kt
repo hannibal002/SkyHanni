@@ -36,7 +36,7 @@ class CustomGithubReleaseUpdateSource(owner: String, repository: String) : Githu
 
     private fun GithubRelease.Download.createReleaseData(release: GithubRelease): GithubReleaseUpdateData {
         return GithubReleaseUpdateData(
-            if (release.name == null) release.tagName else release.name,
+            release.name ?: release.tagName,
             JsonPrimitive(release.tagName),
             null,
             browserDownloadUrl,

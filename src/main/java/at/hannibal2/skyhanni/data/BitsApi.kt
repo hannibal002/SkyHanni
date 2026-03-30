@@ -313,7 +313,7 @@ object BitsApi {
                 bitsAvailable = amount
                 sendBitsAvailableGainedEvent()
                 /**
-                 * We cant increase [BitsApi.bits] here since that difference is alr accounted for,
+                 * We can't increase [BitsApi.bits] here since that difference is alr accounted for,
                  * if we do, it will be counted twice
                  */
             }

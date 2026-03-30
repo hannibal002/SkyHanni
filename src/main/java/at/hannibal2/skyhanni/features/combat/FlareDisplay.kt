@@ -60,7 +60,7 @@ object FlareDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!enabled) return
 
         if (config.flashScreen && activeWarning) {
