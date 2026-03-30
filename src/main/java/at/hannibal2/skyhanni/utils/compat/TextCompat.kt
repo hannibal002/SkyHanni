@@ -131,7 +131,8 @@ fun TextColor.toChatFormatting(): ChatFormatting? {
 }
 
 fun Component.iterator(): Sequence<Component> {
-    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
+    // TODO: in theory we want to properly inherit styles here
+    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() }
 }
 
 fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
@@ -170,9 +171,17 @@ var Component.hover: Component?
 var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
-    }?.let { (it as HoverEvent.ShowItem).item /*? if >= 26.1 {*/ /*.create() *//*?}*/ }
+    }?.let {
+        //~ if > 1.21.11 '.item' -> '.item.create()'
+        (it as HoverEvent.ShowItem).item
+    }
     set(value) {
-        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(/*? if < 26.1 {*/ new /*?} else {*/ /*ItemStackTemplate.fromNonEmptyStack(new) *//*?}*/)) } }
+        value?.let { new ->
+            this.copyIfNeeded().withStyle {
+                //~ if > 1.21.11 'new' -> 'ItemStackTemplate.fromNonEmptyStack(new)'
+                it.withHoverEvent(HoverEvent.ShowItem(new))
+            }
+        }
     }
 
 var Component.command: String?
@@ -244,10 +253,9 @@ fun Style.setHoverShowText(text: Component): Style {
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        //? if < 26.1 {
+        //~ if > 1.21.11 'displayClientMessage' -> 'sendSystemMessage'
+        //~ if > 1.21.11 'message, false' -> 'message'
         Minecraft.getInstance().player?.displayClientMessage(message, false)
-        //? } else
-        //Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }
 
@@ -256,10 +264,8 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
     DelayedRun.runOrNextTick {
         val chat = Minecraft.getInstance().gui.chat
         chat.deleteMessage(idToMessageSignature(id))
-        //? if < 26.1 {
+        //~ if > 1.21.11 ' GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
         chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
-        //? } else
-        //chat.addMessage(component, idToMessageSignature(id), GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
     }
 }
 
@@ -299,10 +305,8 @@ fun ClickEvent.value(): String {
 
 fun HoverEvent.value(): Component = when (action()) {
     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-    //? if < 26.1 {
-        HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
-        //? } else
-        //HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
+    //~ if > 1.21.11 '.item.hoverName' -> '.item.create().hoverName'
+    HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }
 

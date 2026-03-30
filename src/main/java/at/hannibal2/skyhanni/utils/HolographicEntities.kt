@@ -178,14 +178,13 @@ object HolographicEntities {
 
         val client = Minecraft.getInstance()
         @Suppress("UNCHECKED_CAST")
-        val renderer = client.entityRenderDispatcher?.getRenderer(entity) as? EntityRenderer<T, EntityRenderState> ?: return
-        val gameRenderer = client.gameRenderer ?: return
+        val renderer = client.entityRenderDispatcher.getRenderer(entity) as? EntityRenderer<T, EntityRenderState> ?: return
+        val gameRenderer = client.gameRenderer
         val entityRenderState = holographicEntity.cachedRenderState
-            ?: renderer.createRenderState()?.also { holographicEntity.cachedRenderState = it }
-            ?: return
-        val cameraRenderState = gameRenderer.levelRenderState.cameraRenderState ?: return
+            ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
+        val cameraRenderState = gameRenderer.levelRenderState.cameraRenderState
         val cameraPos = cameraRenderState.pos
-        val submitNodeCollector = gameRenderer.featureRenderDispatcher.submitNodeStorage ?: return
+        val submitNodeCollector = gameRenderer.featureRenderDispatcher.submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild

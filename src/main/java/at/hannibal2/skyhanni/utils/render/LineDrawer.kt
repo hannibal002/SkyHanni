@@ -15,7 +15,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     internal fun drawQueuedLines() {
         if (queuedLines.isEmpty()) return
 
-        val layer = SkyHanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
+        val layer = SkyHanniRenderLayers.getLines(!depth)
         val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.last()
 

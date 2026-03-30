@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
-import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult

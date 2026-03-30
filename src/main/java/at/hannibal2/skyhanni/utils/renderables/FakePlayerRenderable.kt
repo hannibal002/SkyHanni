@@ -8,11 +8,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import java.awt.Color
 import org.joml.Matrix3x2f
-import kotlin.math.atan
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.entity.LivingEntity
-import org.joml.Quaternionf
-import org.joml.Vector3f
 
 fun Renderable.Companion.fakePlayer(
     player: FakePlayer,

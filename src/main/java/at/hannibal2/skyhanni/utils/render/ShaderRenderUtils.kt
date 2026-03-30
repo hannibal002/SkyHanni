@@ -30,6 +30,7 @@ private typealias GuiRenderState = net.minecraft.client.gui.render.state.GuiRend
 //? } else
 //private typealias GuiRenderState = net.minecraft.client.renderer.state.gui.GuiRenderState
 
+@Suppress("TooManyFunctions")
 object ShaderRenderUtils {
 
     /**

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.item
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.textures.TextureFormat

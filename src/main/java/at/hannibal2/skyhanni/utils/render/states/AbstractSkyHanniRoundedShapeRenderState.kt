@@ -11,7 +11,7 @@ abstract class AbstractSkyHanniRoundedShapeRenderState(
     protected val height: Int,
     protected val params: RoundedRenderStateParams,
     private val scissor: ScreenRectangle?,
-) : SkyHanniRenderState() {
+) : SkyHanniRenderState {
 
     protected abstract val padding: Int
 

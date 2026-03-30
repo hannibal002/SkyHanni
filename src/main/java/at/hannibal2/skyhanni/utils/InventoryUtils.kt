@@ -72,7 +72,7 @@ object InventoryUtils {
     }
 
     fun getItemIdsInOpenChest(): Set<NeuInternalName> {
-        return getItemsInOpenChest().mapNotNull { it.item?.getInternalNameOrNull() }.toSet()
+        return getItemsInOpenChest().mapNotNull { it.item.orNull()?.getInternalNameOrNull() }.toSet()
     }
 
     // only works while not in an inventory
@@ -123,7 +123,7 @@ object InventoryUtils {
     fun getLeggings(): SafeItemStack? = getArmor()[1]
     fun getBoots(): SafeItemStack? = getArmor()[0]
 
-    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+    internal fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.index?.let { slotNumber ->
             clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ClickType.SHIFT)

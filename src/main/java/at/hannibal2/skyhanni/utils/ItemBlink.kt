@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.item.Item
 
 object ItemBlink {
@@ -19,14 +18,13 @@ object ItemBlink {
         val stack = blinkItem ?: return this
         if (System.currentTimeMillis() > endOfBlink) return this
 
-        val offset: Long = if (!offsets.containsKey(itemType)) {
+        val offset: Long = offsets.getOrPut(itemType) {
             lastOffset += 200
             val number = lastOffset % 1000
             offsets[itemType] = number
             number
-        } else {
-            offsets[itemType]!!
         }
+
         return if ((offset + System.currentTimeMillis()) % 1000 > 500) stack else this
     }
 }

@@ -77,7 +77,7 @@ object LimboPlaytime {
             limboItem = ItemUtils.createItemStack(
                 itemID.getItemStack().itemType,
                 ITEM_NAME,
-                *createItemLore()
+                createItemLore(),
             )
         }
         event.replace(limboItem)

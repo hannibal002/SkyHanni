@@ -163,16 +163,12 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
+                        //~ if > 1.21.11 '.id()' -> '.texturePath()'
                         val texture = playerInfo.skin.body().id()
-                        //? if < 26.1 {
+                        //~ if > 1.21.11 'PlayerFaceRenderer.draw' -> 'PlayerFaceExtractor.extractRenderState'
                         PlayerFaceRenderer.draw(
                             DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )
-                        //? } else {
-                        /*PlayerFaceExtractor.extractRenderState(
-                            DrawContextUtils.drawContext, playerInfo.skin.body().texturePath(), middleX, middleY, 8, playerInfo.showHat(), false, -1,
-                        )*/
-                        //? }
                     }
                     middleX += 8 + 2
                 }

@@ -182,6 +182,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
             slotX - PADDING, sizePixels - slotY - pixelSize - PADDING, pixelSize + PADDING * 2, pixelSize + PADDING * 2,
         )
 
+        @Suppress("UnsafeCallOnNullableType")
         RenderSystem.getDevice().createCommandEncoder().createRenderPass(
             { "SkyHanni Atlas Shape Render" },
             textureView!!,
@@ -246,6 +247,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
+                @Suppress("UnsafeCallOnNullableType")
                 TextureSetup.singleTexture(textureView!!, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 pose,
                 x0, y0, x1, y1,

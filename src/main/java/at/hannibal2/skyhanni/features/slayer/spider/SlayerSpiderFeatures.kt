@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import net.minecraft.world.entity.monster.spider.Spider

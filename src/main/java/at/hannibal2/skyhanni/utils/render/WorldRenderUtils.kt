@@ -25,7 +25,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -950,8 +949,7 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos() =
-        Minecraft.getInstance().gameRenderer.mainCamera?.let { exactLocation(it) } ?: LorenzVec()
+    fun getViewerPos() = Minecraft.getInstance().gameRenderer.mainCamera.let { exactLocation(it) }
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -973,13 +971,13 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+    internal fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.eyeHeight.toDouble()
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
+    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
         exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {

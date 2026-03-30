@@ -19,10 +19,6 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
 
 class ChromaRenderLayer(
     name: String,
-    size: Int,
-    hasCrumbling: Boolean,
-    translucent: Boolean,
-    pipeline: RenderPipeline,
     texture: Identifier? = null,
 ) : RenderType(
     name,

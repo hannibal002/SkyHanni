@@ -196,7 +196,7 @@ enum class SkyHanniRenderPipeline(
     ),
     ;
 
-    private val _pipe: RenderPipeline = RenderPipelines.register(
+    private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
@@ -223,7 +223,7 @@ enum class SkyHanniRenderPipeline(
             }.build(),
     )
 
-    operator fun invoke(): RenderPipeline = _pipe
+    operator fun invoke(): RenderPipeline = internalPipeline
 }
 
 private object SkyHanniRenderPipelineUtils {

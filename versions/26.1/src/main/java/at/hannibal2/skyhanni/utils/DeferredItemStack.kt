@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.mixins.transformers.IItemStackAccessor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraft.core.Holder
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -15,7 +15,7 @@ internal class DeferredItemStack private constructor(
     private val factory: () -> ItemStack,
     private val deferredComponents: DeferredPatchedDataComponentMap,
     count: Int,
-) : ItemStack(null, count, deferredComponents) {
+) : ItemStack(Holder.direct(sourceItem), count, deferredComponents) {
 
     private var isBuilt = false
 

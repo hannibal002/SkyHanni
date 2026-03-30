@@ -49,21 +49,9 @@ object SkyHanniRenderLayers {
         RenderSetup.builder(SkyHanniRenderPipeline.QUADS_XRAY()).createRenderSetup(),
     )
 
-    private val CHROMA_STANDARD: RenderType = ChromaRenderLayer(
-        "skyhanni_standard_chroma",
-        RenderType.SMALL_BUFFER_SIZE,
-        hasCrumbling = false,
-        translucent = false,
-        pipeline = SkyHanniRenderPipeline.CHROMA_STANDARD(),
-    )
-
     private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
         ChromaRenderLayer(
             "skyhanni_text_chroma",
-            RenderType.SMALL_BUFFER_SIZE,
-            hasCrumbling = false,
-            translucent = false,
-            pipeline = SkyHanniRenderPipeline.CHROMA_TEXT(),
             texture = texture,
         )
     }
@@ -96,7 +84,7 @@ object SkyHanniRenderLayers {
         return if (throughWalls) QUADS_XRAY else QUADS
     }
 
-    fun getLines(lineWidth: Double, throughWalls: Boolean): RenderType {
+    fun getLines(throughWalls: Boolean): RenderType {
         return if (throughWalls) LINES_XRAY else LINES
     }
 
