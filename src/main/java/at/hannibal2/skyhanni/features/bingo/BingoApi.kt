@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -30,9 +31,12 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -186,7 +190,7 @@ object BingoApi {
         alixerHidden = false
     }
 
-    fun updateBingoData() = CoroutineConfig("bingo api fetch").withIOContext().launchCoroutine {
+    suspend fun updateBingoData() {
         val (_, jsonResponse) = ApiUtils.getJsonResponse(bingoStatic).assertSuccessWithData()
             ?: error("Failed to fetch Bingo data from Hypixel API")
         val response = ConfigManager.gson.fromJson<BingoApiResponseJson>(jsonResponse)
@@ -205,7 +209,9 @@ object BingoApi {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || lastFetchTime.passedSince() < UPDATE_INTERVAL) return
-        updateBingoData()
+        CoroutineConfig("bingo api fetch background").withIOContext().launchCoroutine {
+            updateBingoData()
+        }
     }
 
     private fun checkBingoNpcs() {
@@ -237,7 +243,21 @@ object BingoApi {
         event.registerBrigadier("shupdatebingodata") {
             description = "Update Bingo event data from Hypixel API"
             category = CommandCategory.USERS_BUG_FIX
-            simpleCallback(::updateBingoData)
+            simpleCallback {
+                ChatUtils.chat("Updating Bingo event data...")
+                CoroutineConfig("bingo api fetch foreground").withIOContext().launchCoroutine {
+                    try {
+                        updateBingoData()
+                    } catch (e: Exception) {
+                        ErrorManager.logErrorWithData(e, "Failed to update Bingo event data")
+                        return@launchCoroutine
+                    }
+                    ChatUtils.chat(
+                        Component.literal("Updated Bingo event data successfully.")
+                            .withColor(ChatFormatting.GREEN)
+                    )
+                }
+            }
         }
     }
 }
