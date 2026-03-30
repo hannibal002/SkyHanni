@@ -61,6 +61,11 @@ class CombatConfig {
     val flare: FlareConfig = FlareConfig()
 
     @Expose
+    @ConfigOption(name = "Deployable", desc = "")
+    @Accordion
+    val deployable: DeployableConfig = DeployableConfig()
+
+    @Expose
     @ConfigOption(name = "Broodmother", desc = "")
     @Accordion
     val broodmother: BroodmotherConfig = BroodmotherConfig()
