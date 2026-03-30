@@ -93,7 +93,7 @@
 
 + Added the ability to block refusing Seymour's Special Armor visitor reward. - Luna (https://github.com/hannibal002/SkyHanni/pull/5311)
   + This includes Velvet Top Hat, Cashmere Jacket, Satin Trousers, and Oxford Shoes.
-+ Tool Levels Display now warns you if your tool is not gaining XP because you're farming the wrong crop. - Luna (https://github.com/hannibal002/SkyHanni/pull/5415)
++ Hoe Levels Display now warns you if your tool is not gaining XP because you're farming the wrong crop. - Luna (https://github.com/hannibal002/SkyHanni/pull/5415)
 
 #### Misc
 
