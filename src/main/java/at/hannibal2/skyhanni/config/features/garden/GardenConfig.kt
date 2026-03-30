@@ -168,9 +168,9 @@ class GardenConfig {
     val trackerUptimeSettings: GardenTrackerUptimeConfig = GardenTrackerUptimeConfig()
 
     @Expose
-    @ConfigOption(name = "Hoe Levels Display", desc = "")
+    @ConfigOption(name = "Tool Levels Display", desc = "")
     @Accordion
-    val hoeLevelDisplay: HoeLevelsDisplayConfig = HoeLevelsDisplayConfig()
+    val toolLevelDisplay: ToolLevelsDisplayConfig = ToolLevelsDisplayConfig()
 
     @Expose
     @ConfigOption(name = "DNA Analyzer Solver", desc = "")

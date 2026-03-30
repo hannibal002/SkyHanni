@@ -7,14 +7,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class HoeLevelsDisplayConfig {
+class ToolLevelsDisplayConfig {
 
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Displays an overlay for hoe leveling progress."
+        desc = "Displays an overlay for farming tools leveling progress."
     )
     @ConfigEditorBoolean
+    @SearchTag("hoe, axe")
     @FeatureToggle
     var enabled: Boolean = true
 
@@ -36,6 +37,6 @@ class HoeLevelsDisplayConfig {
     var muteHoeSounds: Boolean = true
 
     @Expose
-    @ConfigLink(owner = HoeLevelsDisplayConfig::class, field = "enabled")
+    @ConfigLink(owner = ToolLevelsDisplayConfig::class, field = "enabled")
     val position: Position = Position(100, 100, true)
 }
