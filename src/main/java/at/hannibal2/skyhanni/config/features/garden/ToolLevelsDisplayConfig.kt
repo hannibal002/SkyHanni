@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class ToolLevelsDisplayConfig {
 
@@ -22,7 +23,7 @@ class ToolLevelsDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Show Overflow",
-        desc = "Displays overflow levels for level 50 hoes."
+        desc = "Displays overflow levels for level 50 tools."
     )
     @ConfigEditorBoolean
     var overflow: Boolean = true
@@ -30,7 +31,7 @@ class ToolLevelsDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Mute Hoe Sounds",
-        desc = "Mutes the sound that plays when you level up the hoe."
+        desc = "Mutes the sound that plays when you level up the tool."
     )
     @ConfigEditorBoolean
     @FeatureToggle
