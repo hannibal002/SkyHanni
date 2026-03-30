@@ -139,7 +139,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Date in Lobby Code",
-        desc = "Show the current date infront of the server name, like Hypixel does.",
+        desc = "Show the current date in front of the server name, like Hypixel does.",
     )
     @ConfigEditorBoolean
     var dateInLobbyCode: Boolean = true

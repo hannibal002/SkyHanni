@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack
 
 // Todo: Merge this with SuperpairDataDisplay
 //  Store slots over there
-//  Have the rendered text of superpairdatadisplay highlight the slots the items are in
+//  Have the rendered text of SuperpairDataDisplay highlight the slots the items are in
 @SkyHanniModule
 object SuperPairsItemVisibility {
 

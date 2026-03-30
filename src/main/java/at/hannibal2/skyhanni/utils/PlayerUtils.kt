@@ -24,7 +24,7 @@ object PlayerUtils {
 
     fun isThirdPersonView(): Boolean {
         val perspective = Minecraft.getInstance().options.cameraType
-        // for some reason they make you check the other 2 bools instead of giving you a third one
+        // for some reason they make you check the other 2 booleans instead of giving you a third one
         return !perspective.isMirrored && !perspective.isFirstPerson
     }
 

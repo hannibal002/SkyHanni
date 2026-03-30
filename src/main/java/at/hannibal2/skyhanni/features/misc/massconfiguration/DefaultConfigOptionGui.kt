@@ -42,147 +42,149 @@ class DefaultConfigOptionGui(
         orderedOptions.keys.associateWith { ResetSuggestionState.LEAVE_DEFAULTS }.toMutableMap()
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
-    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
         GuiRenderUtils.drawFloatingRectDark((width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
         var hoveringTextToDraw: List<String>? = null
-        val x = originalMouseX - ((width - xSize) / 2) - padding
+        val x = mouseX - ((width - xSize) / 2) - padding
         val isMouseDown = MouseCompat.isButtonDown(0)
         val shouldClick = isMouseDown && !wasMouseDown
         wasMouseDown = isMouseDown
         val isMouseInScrollArea =
-            x in 0..xSize && originalMouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
-        var y = originalMouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
+            x in 0..xSize && mouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
+        var y = mouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(width / 2F, (height - ySize) / 2F)
-        DrawContextUtils.scale(2f, 2f)
-        GuiRenderUtils.drawStringCenteredScaledMaxWidth(
-            guiTitle,
-            0F,
-            mc.font.lineHeight.toFloat(),
-            false,
-            xSize / 2 - padding,
-            -1,
-        )
-        DrawContextUtils.popMatrix()
-
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(
-            (width - xSize) / 2F + padding,
-            (height + ySize) / 2F - mc.font.lineHeight * 2,
-        )
-        var i = 0
-        fun button(title: String, tooltip: List<String>, func: () -> Unit) {
-            val width = mc.font.width(title)
-            var overMouse = false
-            if (originalMouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
-                originalMouseY - (height + ySize) / 2 in -barSize..0
-            ) {
-                overMouse = true
-                hoveringTextToDraw = tooltip
-                if (shouldClick) {
-                    func()
-                }
-            }
-            GuiRenderUtils.drawFloatingRectDark(i - 1, -3, width + 4, 14)
-            GuiRenderUtils.drawString(
-                title,
-                2 + i.toFloat(),
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(width / 2F, (height - ySize) / 2F)
+            DrawContextUtils.scale(2f, 2f)
+            // Todo, this is the only usage of this function.
+            //  If this is reusable, make it a renderable, if not, re-implement.
+            GuiRenderUtils.drawStringCenteredScaledMaxWidth(
+                guiTitle,
                 0F,
-                if (overMouse) 0xFF00FF00.toInt() else -1,
-                overMouse,
+                mc.font.lineHeight.toFloat(),
+                false,
+                xSize / 2 - padding,
+                -1,
             )
-            i += width + 12
         }
-        button("Apply choices", listOf()) {
-            DefaultConfigFeatures.applyCategorySelections(resetSuggestionState, orderedOptions)
-            mc.setScreen(null)
-        }
-        button("Turn all on", listOf()) {
-            for (entry in resetSuggestionState.entries) {
-                entry.setValue(ResetSuggestionState.TURN_ALL_ON)
-                orderedOptions[entry.key]?.let { opts ->
-                    opts.forEach { it.toggleOverride = null }
+
+        DrawContextUtils.translatedPushPopResult(
+            x = (width - xSize) / 2F + padding,
+            y = (height + ySize) / 2F - mc.font.lineHeight * 2,
+        ) {
+            var i = 0
+            fun button(title: String, tooltip: List<String>, func: () -> Unit) {
+                val width = mc.font.width(title)
+                var overMouse = false
+                if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
+                    mouseY - (height + ySize) / 2 in -barSize..0
+                ) {
+                    overMouse = true
+                    hoveringTextToDraw = tooltip
+                    if (shouldClick) {
+                        func()
+                    }
                 }
-            }
-        }
-        button("Turn all off", listOf()) {
-            for (entry in resetSuggestionState.entries) {
-                entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
-                orderedOptions[entry.key]?.let { opts ->
-                    opts.forEach { it.toggleOverride = null }
-                }
-            }
-        }
-        button("Leave all untouched", listOf()) {
-            for (entry in resetSuggestionState.entries) {
-                entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
-                orderedOptions[entry.key]?.let { opts ->
-                    opts.forEach { it.toggleOverride = null }
-                }
-            }
-        }
-        button("Cancel", listOf()) {
-            mc.setScreen(null)
-        }
-        DrawContextUtils.popMatrix()
-
-        DrawContextUtils.pushMatrix()
-        GuiRenderUtils.enableScissor(
-            (width - xSize) / 2,
-            (height - ySize) / 2 + barSize,
-            (width + xSize) / 2,
-            (height + ySize) / 2 - barSize,
-        )
-        DrawContextUtils.translate(
-            (width - xSize) / 2F + padding,
-            (height - ySize) / 2F + barSize - currentScrollOffset,
-        )
-
-        for ((cat) in orderedOptions.entries) {
-            val suggestionState = resetSuggestionState[cat]!!
-
-            GuiRenderUtils.drawRect(0, 0, xSize - padding * 2, 1, 0xFF808080.toInt())
-            GuiRenderUtils.drawRect(0, 30, xSize - padding * 2, cardHeight + 1, 0xFF808080.toInt())
-            GuiRenderUtils.drawRect(0, 0, 1, cardHeight, 0xFF808080.toInt())
-            GuiRenderUtils.drawRect(xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
-
-            GuiRenderUtils.drawString("§e${cat.name} ${suggestionState.label}", 4, 4)
-            GuiRenderUtils.drawStrings("§7${cat.description}".splitLines(xSize - padding * 2 - 8), 4, 14, -1)
-
-            if (isMouseInScrollArea && y in 0..cardHeight) {
-                hoveringTextToDraw = listOf(
-                    "§e${cat.name}",
-                    "§7${cat.description}",
-                    "§7Current plan: ${suggestionState.label}",
-                    "§aClick to toggle!",
-                    "§7Hold shift to show all options",
+                GuiRenderUtils.drawFloatingRectDark(i - 1, -3, width + 4, 14)
+                GuiRenderUtils.drawString(
+                    title,
+                    2 + i.toFloat(),
+                    0F,
+                    if (overMouse) 0xFF00FF00.toInt() else -1,
+                    overMouse,
                 )
-
-                if (KeyboardManager.isShiftKeyDown()) {
-                    hoveringTextToDraw = listOf(
-                        "§e${cat.name}",
-                        "§7${cat.description}",
-                    ) + orderedOptions[cat]?.let { opts ->
-                        opts.map { "§7 - §a" + it.name }
-                    }.orEmpty()
-                }
-
-                if (shouldClick) {
-                    resetSuggestionState[cat] = suggestionState.next
-                    orderedOptions[cat]?.let { opts ->
+                i += width + 12
+            }
+            button("Apply choices", listOf()) {
+                DefaultConfigFeatures.applyCategorySelections(resetSuggestionState, orderedOptions)
+                mc.setScreen(null)
+            }
+            button("Turn all on", listOf()) {
+                for (entry in resetSuggestionState.entries) {
+                    entry.setValue(ResetSuggestionState.TURN_ALL_ON)
+                    orderedOptions[entry.key]?.let { opts ->
                         opts.forEach { it.toggleOverride = null }
                     }
                 }
             }
-
-            y -= cardHeight
-            DrawContextUtils.translate(0F, cardHeight.toFloat())
+            button("Turn all off", listOf()) {
+                for (entry in resetSuggestionState.entries) {
+                    entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
+                    orderedOptions[entry.key]?.let { opts ->
+                        opts.forEach { it.toggleOverride = null }
+                    }
+                }
+            }
+            button("Leave all untouched", listOf()) {
+                for (entry in resetSuggestionState.entries) {
+                    entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
+                    orderedOptions[entry.key]?.let { opts ->
+                        opts.forEach { it.toggleOverride = null }
+                    }
+                }
+            }
+            button("Cancel", listOf()) {
+                mc.setScreen(null)
+            }
         }
 
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            GuiRenderUtils.enableScissor(
+                (width - xSize) / 2,
+                (height - ySize) / 2 + barSize,
+                (width + xSize) / 2,
+                (height + ySize) / 2 - barSize,
+            )
+            DrawContextUtils.translate(
+                (width - xSize) / 2F + padding,
+                (height - ySize) / 2F + barSize - currentScrollOffset,
+            )
+
+            for ((cat) in orderedOptions.entries) {
+                val suggestionState = resetSuggestionState[cat]!!
+
+                GuiRenderUtils.drawRect(0, 0, xSize - padding * 2, 1, 0xFF808080.toInt())
+                GuiRenderUtils.drawRect(0, 30, xSize - padding * 2, cardHeight + 1, 0xFF808080.toInt())
+                GuiRenderUtils.drawRect(0, 0, 1, cardHeight, 0xFF808080.toInt())
+                GuiRenderUtils.drawRect(xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
+
+                GuiRenderUtils.drawString("§e${cat.name} ${suggestionState.label}", 4, 4)
+                GuiRenderUtils.drawStrings("§7${cat.description}".splitLines(xSize - padding * 2 - 8), 4, 14, -1)
+
+                if (isMouseInScrollArea && y in 0..cardHeight) {
+                    hoveringTextToDraw = listOf(
+                        "§e${cat.name}",
+                        "§7${cat.description}",
+                        "§7Current plan: ${suggestionState.label}",
+                        "§aClick to toggle!",
+                        "§7Hold shift to show all options",
+                    )
+
+                    if (KeyboardManager.isShiftKeyDown()) {
+                        hoveringTextToDraw = listOf(
+                            "§e${cat.name}",
+                            "§7${cat.description}",
+                        ) + orderedOptions[cat]?.let { opts ->
+                            opts.map { "§7 - §a" + it.name }
+                        }.orEmpty()
+                    }
+
+                    if (shouldClick) {
+                        resetSuggestionState[cat] = suggestionState.next
+                        orderedOptions[cat]?.let { opts ->
+                            opts.forEach { it.toggleOverride = null }
+                        }
+                    }
+                }
+
+                y -= cardHeight
+                DrawContextUtils.translate(0F, cardHeight.toFloat())
+            }
+
+        }
         GuiRenderUtils.disableScissor()
+
         hoveringTextToDraw?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map(StringRenderable::from))
         }

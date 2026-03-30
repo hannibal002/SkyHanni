@@ -85,10 +85,15 @@ object DrawContextUtils {
      * Push and pop the matrix stack, running the action in between, and returning the result of the action.
      */
     @Suppress("DEPRECATION")
-    inline fun <T> pushPopResult(action: () -> T): T {
+    inline fun <T> pushPopResult(
+        onError: (Exception) -> T = { throw it },
+        action: () -> T,
+    ): T {
         pushMatrix()
-        try {
-            return action()
+        return try {
+            action()
+        } catch (e: Exception) {
+            onError(e)
         } finally {
             popMatrix()
         }
@@ -111,8 +116,9 @@ object DrawContextUtils {
         x: Number = 0,
         y: Number = 0,
         postTranslateScale: Float? = null,
+        onError: (Exception) -> T = { throw it },
         action: () -> T,
-    ): T = pushPopResult {
+    ): T = pushPopResult(onError) {
         translate(x.toFloat(), y.toFloat())
         postTranslateScale?.let { scale(it, it) }
         return action()
