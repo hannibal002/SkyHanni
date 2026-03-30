@@ -220,15 +220,17 @@ object CurrentPetDisplay {
         enabled: Boolean,
         petData: PetData,
         petItemConfig: PetItemConfig,
-    ): Renderable {
-        if (!enabled) return this
-        val petItemRenderable = Renderable.item(petData.heldItemInternalName?.getItemStackOrNull() ?: return this) {
-            scale = petItemConfig.scale.get()
-            horizontalAlign = petItemConfig.placement.get().horizontal
-            verticalAlign = petItemConfig.placement.get().vertical
-        }
-        return Renderable.doubleLayered(this, petItemRenderable, forceBottomRenderFirst = true)
-    }
+    ): Renderable = if (!enabled) this else petData.heldItemInternalName?.getItemStackOrNull()?.let {
+        Renderable.doubleLayered(
+            this,
+            Renderable.item(it) {
+                scale = petItemConfig.scale.get()
+                horizontalAlign = petItemConfig.placement.get().horizontal
+                verticalAlign = petItemConfig.placement.get().vertical
+            },
+            forceBottomRenderFirst = true,
+        )
+    } ?: this
 
     private fun PetData.buildBaseItemRenderable(
         rotationConfig: IconRotationConfig,
@@ -343,14 +345,12 @@ object CurrentPetDisplay {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
-        ConditionalUtils.onAnyToggled(config) {
-            lastPetHash = 0
-        }
+    fun onConfigLoad() = ConditionalUtils.onAnyToggled(config) {
+        lastPetHash = 0
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGameOverlayRenderPost(event: GameOverlayRenderPostEvent) {
+    fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.enabled.get()) return
         val currentPet = CurrentPetApi.currentPet ?: return run { lastPetHash = 0 }
