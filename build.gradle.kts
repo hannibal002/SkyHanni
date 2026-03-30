@@ -356,6 +356,7 @@ afterEvaluate {
     )
 }
 
+
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val skipDetekt = project.findProperty("skipDetekt") == "true"

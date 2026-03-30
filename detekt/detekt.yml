@@ -119,6 +119,23 @@ ktlint:
         active: false
     CommentWrapping:
         active: false
+    # Todo maybe re-evaluate in the future
+    BinaryExpressionWrapping:
+        active: false
+    BlankLineBetweenWhenConditions:
+        active: false
+    ClassSignature:
+        active: false
+    FunctionExpressionBody:
+        active: false
+    FunctionLiteral:
+        active: false
+    FunctionSignature:
+        active: false
+    MixedConditionOperators:
+        active: false
+    TrailingCommaOnCallSite:
+        active: false
 
 complexity:
     CyclomaticComplexMethod: # default allowedComplexity of 14, caught almost every complex method
@@ -171,4 +188,3 @@ potential-bugs:
         active: true
     UnreachableCode:
         active: false
-
