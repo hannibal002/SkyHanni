@@ -314,6 +314,9 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<ProcessResources> {
         onlyIf { false }
     }
+    tasks.matching { it.name.startsWith("ksp") }.configureEach {
+        onlyIf { false }
+    }
 }
 
 val sourcesJar by tasks.registering(Jar::class) {

@@ -25,6 +25,11 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.jar {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+}
+
 tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
     enabled = false
 }

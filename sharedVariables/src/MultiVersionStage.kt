@@ -32,7 +32,7 @@ enum class MultiVersionStage(val label: String) {
                 file.inputStream().use(prop::load)
             }
             val multiVersion = prop["skyhanni.multi-version"]
-            activeState = MultiVersionStage.values().find { it.label == multiVersion } ?: FULL
+            activeState = entries.find { it.label == multiVersion } ?: FULL
             println("SkyHanni multi version stage loaded: $activeState")
         }
     }
