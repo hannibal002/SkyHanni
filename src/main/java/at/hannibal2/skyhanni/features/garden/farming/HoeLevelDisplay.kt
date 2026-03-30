@@ -69,21 +69,35 @@ object HoeLevelDisplay {
         display = getDisplay()?.map(Renderable::text)
     }
 
-    private fun getDisplay(): List<String>? = buildList {
-        add("§6Hoe Levels")
-        val heldItem = InventoryUtils.getItemInHand()
-        val hoeExp = heldItem?.getHoeExp() ?: return null
-        var hoeLevel = heldItem.getHoeLevel() ?: return null
-        val hoeLevels = hoeLevels ?: return null
-        val next = if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1] else hoeOverflow
+   private fun getDisplay(): List<String>? = buildList {
+    val heldItem = InventoryUtils.getItemInHand() ?: return null
+    val hoeExp = heldItem.getHoeExp() ?: return null
+    var hoeLevel = heldItem.getHoeLevel() ?: return null
+    val hoeLevels = hoeLevels ?: return null
 
-        if (hoeLevel > hoeLevels.size && config.overflow) {
-            val uuid = heldItem.getItemUuid()
-            val overflowLevel = getOverflowHoeLevel(uuid)
-            if (overflowLevel != null) {
-                hoeLevel += overflowLevel
-            }
+    val cleanName = heldItem.hoverName.string.removeColor()
+    val title = when {
+        cleanName.contains("Sword", ignoreCase = true) -> "§6Knife Level"
+        cleanName.contains("Axe", ignoreCase = true) || cleanName.contains("Dicer", ignoreCase = true) -> "§6Dicer Level"
+        cleanName.contains("Hoe", ignoreCase = true) -> "§6Hoe Level"
+        else -> "§6Tool Levels"
+    }
+
+    add(title)
+
+    val next = if (hoeLevel <= hoeLevels.size) {
+        hoeLevels[hoeLevel - 1]
+    } else {
+        hoeOverflow
+    }
+
+    if (hoeLevel > hoeLevels.size && config.overflow) {
+        val uuid = heldItem.getItemUuid()
+        val overflowLevel = getOverflowHoeLevel(uuid)
+        if (overflowLevel != null) {
+            hoeLevel += overflowLevel
         }
+    }
         add("§7Level §8$hoeLevel➜§3${hoeLevel + 1}")
 
         var colorPrefix = "§e"
