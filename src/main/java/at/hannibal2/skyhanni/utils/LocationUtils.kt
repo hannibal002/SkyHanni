@@ -367,11 +367,6 @@ object LocationUtils {
         )
     }
 
-    @Deprecated("Use calculateEdges instead.", ReplaceWith("this.calculateEdges()"))
-    @Suppress("Deprecation")
-    fun AABB.calculateEdgesOld(): Set<Pair<LorenzVec, LorenzVec>> =
-        calculateEdges().mapTo(mutableSetOf()) { (a, b) -> a.toLorenzVec() to b.toLorenzVec() }
-
     fun computePitchWeight(derivative: LorenzVec) = sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
 
     private fun getPitchFromDerivative(derivative: LorenzVec): Double {

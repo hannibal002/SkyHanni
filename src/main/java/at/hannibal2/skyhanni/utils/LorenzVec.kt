@@ -2,10 +2,7 @@
 
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdgesOld
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.VectorUtils.boundingToOffset
 import at.hannibal2.skyhanni.utils.VectorUtils.edges
 import com.google.gson.annotations.Expose
 import net.minecraft.core.BlockPos
@@ -34,11 +31,7 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
-    val edges: Set<Pair<LorenzVec, LorenzVec>> by lazy {
-        toVec3().edges.mapTo(mutableSetOf()) { (a, b) ->
-            a.toLorenzVec() to b.toLorenzVec()
-        }
-    }
+    val edges: Set<Pair<LorenzVec, LorenzVec>> by lazy { toVec3().edges.toLorenzVecPairs() }
 
     constructor() : this(0.0, 0.0, 0.0)
 
@@ -289,14 +282,14 @@ data class LorenzVec(
             return LorenzVec(x, y, z)
         }
 
-        fun List<Double>.toLorenzVec(): LorenzVec {
-            if (size != 3) error("Can not transform a list of size $size to LorenzVec")
-
-            return LorenzVec(this[0], this[1], this[2])
-        }
-
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
+}
+
+fun List<Double>.toLorenzVec(): LorenzVec {
+    if (size != 3) error("Can not transform a list of size $size to LorenzVec")
+
+    return LorenzVec(this[0], this[1], this[2])
 }
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
@@ -340,3 +333,6 @@ fun Array<Double>.toLorenzVec(): LorenzVec {
 fun AABB.expand(vec: LorenzVec): AABB = inflate(vec.x, vec.y, vec.z)
 
 fun AABB.expand(amount: Double): AABB = inflate(amount, amount, amount)
+
+fun Set<Pair<Vec3, Vec3>>.toLorenzVecPairs(): Set<Pair<LorenzVec, LorenzVec>> =
+    mapTo(mutableSetOf()) { (a, b) -> a.toLorenzVec() to b.toLorenzVec() }
