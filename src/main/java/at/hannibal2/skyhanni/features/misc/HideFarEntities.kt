@@ -57,7 +57,7 @@ object HideFarEntities {
 
     /**
      * TODO mobs to add to never hide list
-     * golden/diamond golbins (mining islands)
+     * Golden/Diamond Goblins (mining islands)
      * beach ball (great and normal, from year of the seal)
      * worms/scatha in dwarven mines
      * dungeon wither+blood key

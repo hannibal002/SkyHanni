@@ -326,7 +326,7 @@ object DailyQuestHelper {
         DelayedRun.runDelayed(5.seconds) {
             if (oldQuest.state == QuestState.ACCEPTED) {
                 ChatUtils.debug(
-                    "Daily Minibosss Quest is still not ready to accept even though we have one miniboss kill," +
+                    "Daily Miniboss Quest is still not ready to accept even though we have one miniboss kill," +
                         "we now assume there are two to kill.",
                 )
                 val newQuest = MiniBossQuest(oldQuest.miniBoss, oldQuest.state, 2)

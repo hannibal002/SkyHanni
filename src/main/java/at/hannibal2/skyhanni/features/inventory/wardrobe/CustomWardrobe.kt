@@ -110,16 +110,13 @@ object CustomWardrobe {
                 .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f)
-
-        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-
-        if (EstimatedItemValue.config.enabled) {
-            DrawContextUtils.translate(0f, 0f)
-            EstimatedItemValue.tryRendering()
+        DrawContextUtils.translatedPushPopResult(0f, 0f) {
+            position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+            if (EstimatedItemValue.config.enabled) {
+                DrawContextUtils.translate(0f, 0f)
+                EstimatedItemValue.tryRendering()
+            }
         }
-        DrawContextUtils.popMatrix()
         event.cancel()
     }
 

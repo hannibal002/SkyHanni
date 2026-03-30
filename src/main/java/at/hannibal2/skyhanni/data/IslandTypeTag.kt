@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.google.gson.reflect.TypeToken
 import java.util.EnumSet
 
-// A group of islands that have someting in common.
+// A group of islands that have something in common.
 class IslandTypeTag internal constructor(name: String, private val types: EnumSet<IslandType>) {
 
     internal constructor(name: String, vararg types: Any) : this(
