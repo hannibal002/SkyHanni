@@ -1,6 +1,8 @@
+@file:Suppress("Deprecation")
+
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdgesOld
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import com.google.gson.annotations.Expose
 import net.minecraft.core.BlockPos
@@ -22,13 +24,14 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
+@Deprecated("Use Vec3 and VectorUtils instead.", ReplaceWith("Vec3(this)"))
+@Suppress("TooManyFunctions")
 data class LorenzVec(
     val x: Double,
     val y: Double,
     val z: Double,
 ) {
-    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).inflate(0.0001, 0.0001, 0.0001).calculateEdges() }
+    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).inflate(0.0001, 0.0001, 0.0001).calculateEdgesOld() }
 
     constructor() : this(0.0, 0.0, 0.0)
 

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdgesOld
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import net.minecraft.world.phys.AABB
@@ -81,7 +81,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 
     fun drawEdges(axisAlignedBB: AABB, color: Color) {
         // TODO add cache. maybe on the caller site, since we can't add a lazy member in AxisAlignedBB
-        for ((p1, p2) in axisAlignedBB.calculateEdges()) {
+        for ((p1, p2) in axisAlignedBB.calculateEdgesOld()) {
             draw3DLine(p1, p2, color)
         }
     }

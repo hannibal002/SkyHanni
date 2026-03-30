@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -337,15 +338,15 @@ object LocationUtils {
         return location
     }
 
-    fun AABB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
-        val bottomLeftFront = LorenzVec(minX, minY, minZ)
-        val bottomLeftBack = LorenzVec(minX, minY, maxZ)
-        val topLeftFront = LorenzVec(minX, maxY, minZ)
-        val topLeftBack = LorenzVec(minX, maxY, maxZ)
-        val bottomRightFront = LorenzVec(maxX, minY, minZ)
-        val bottomRightBack = LorenzVec(maxX, minY, maxZ)
-        val topRightFront = LorenzVec(maxX, maxY, minZ)
-        val topRightBack = LorenzVec(maxX, maxY, maxZ)
+    fun AABB.calculateEdges(): Set<Pair<Vec3, Vec3>> {
+        val bottomLeftFront = Vec3(minX, minY, minZ)
+        val bottomLeftBack = Vec3(minX, minY, maxZ)
+        val topLeftFront = Vec3(minX, maxY, minZ)
+        val topLeftBack = Vec3(minX, maxY, maxZ)
+        val bottomRightFront = Vec3(maxX, minY, minZ)
+        val bottomRightBack = Vec3(maxX, minY, maxZ)
+        val topRightFront = Vec3(maxX, maxY, minZ)
+        val topRightBack = Vec3(maxX, maxY, maxZ)
 
         return setOf(
             // Bottom face
@@ -365,6 +366,11 @@ object LocationUtils {
             bottomRightFront to topRightFront,
         )
     }
+
+    @Deprecated("Use calculateEdges instead.", ReplaceWith("this.calculateEdges()"))
+    @Suppress("Deprecation")
+    fun AABB.calculateEdgesOld(): Set<Pair<LorenzVec, LorenzVec>> =
+        calculateEdges().mapTo(mutableSetOf()) { (a, b) -> a.toLorenzVec() to b.toLorenzVec() }
 
     fun computePitchWeight(derivative: LorenzVec) = sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
 
