@@ -29,7 +29,7 @@ object MutedNarratorWarning {
         "but the Voice or Master Volume sliders are muting it.\n" +
         "§cThis is likely negatively impacting your game's performance." +
         toggleNarratorKeybind?.let {
-            "\n§eYou can use §b${toggleNarratorKeybind} §eto toggle the narrator to OFF,"
+            "\n§eYou can use §b$it §eto toggle the narrator to OFF,"
         }.orEmpty()
 
 
