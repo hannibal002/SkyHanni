@@ -1,5 +1,3 @@
-package at.hannibal2.skyhanni.detektrules
-
 enum class PreprocessingPattern(val text: String) {
     IF("#if"),
     ELSE("#else"),
