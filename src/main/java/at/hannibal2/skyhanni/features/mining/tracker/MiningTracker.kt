@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.config.features.mining.MiningProfitTrackerConfig.Ge
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.MiningApi.isHoldingMiningTool
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -109,7 +109,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() && isHoldingMiningTool()},
+            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() && MiningApi.isHoldingMiningTool()},
             onRender = {
                 renderDisplay(config.position)
             },
@@ -190,7 +190,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     // What should be displayed on the tracker
     fun drawDisplay(data: BucketData): List<Searchable> = buildList {
         addSearchString("§e§lMining Profit Tracker")
-        
+
         addBucketSelector(this, data, "Category")
 
         // Populates values into the tracker

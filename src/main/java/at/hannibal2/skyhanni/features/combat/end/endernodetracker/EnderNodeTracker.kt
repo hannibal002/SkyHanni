@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningApi.isHoldingMiningTool
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -203,7 +203,7 @@ object EnderNodeTracker {
 
     private fun isEnabled() = IslandType.THE_END.isCurrent() && (!config.onlyPickaxe || hasItemInHand())
 
-    private fun hasItemInHand() = isHoldingMiningTool()
+    private fun hasItemInHand() = MiningApi.isHoldingMiningTool()
 
     private fun EnderNode.isEnderArmor() = this in EnderNode.armorEntries
 
