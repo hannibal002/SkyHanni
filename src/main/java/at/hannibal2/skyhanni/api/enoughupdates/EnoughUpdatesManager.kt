@@ -311,7 +311,7 @@ object EnoughUpdatesManager {
         // Intentionally toString() instead of asString() to indicate failure
         val itemInfo = getItemById(internalName) ?: return@getOrPut internalName.toString()
         itemInfo.displayName ?: run {
-            ErrorManager.skyHanniError("No displayname for $internalName")
+            ErrorManager.skyHanniError("No display name for $internalName")
         }
     }
 

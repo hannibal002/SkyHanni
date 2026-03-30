@@ -152,7 +152,7 @@ data class LorenzVec(
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
-    // TODO better name. dont confuse with roundTo()
+    // TODO better name. don't confuse with roundTo()
     fun roundLocation(): LorenzVec {
         val x = if (x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1
