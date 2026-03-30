@@ -9,5 +9,5 @@ import net.minecraft.world.entity.Entity
 @PrimaryFunction("onEntityNameTagRender")
 class EntityNameTagRenderEvent<T : Entity>(
     override val entity: T,
-    var chatComponent: Component
+    var chatComponent: Component,
 ) : GenericSkyHanniEvent<T>(entity.javaClass), SkyHanniEntityEvent<T>
