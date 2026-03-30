@@ -110,6 +110,7 @@
 + Renamed feature Patcher Coords Waypoints to Coords Waypoints. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5424)
 + Significantly improved accuracy of server TPS measurement. - Luna (https://github.com/hannibal002/SkyHanni/pull/5437)
 + TPS counter will now climb back up to 20 more gradually when the server was completely unresponsive for over a second. - Luna (https://github.com/hannibal002/SkyHanni/pull/5467)
++ Added 21 more /shachievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5489)
 
 #### Garden
 
@@ -130,6 +131,10 @@
 + Fixed Discord Rich Presence not connecting. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5448)
 + Fixed not switching to backup repo when files on disk are corrupt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5446)
 + Fixed rare error loading recipes from NEU. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5385)
++ Fixed crash with Discord RPC enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5495)
++ Fixed Dice Achievement. - nopo (https://github.com/hannibal002/SkyHanni/pull/5489)
++ Fixed some overlays rendering at the wrong size with separate inventory GUI scales, and fixed Diana's nearest warp helper rendering twice over inventory. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/5482)
++ Fixed Translate on Click feature. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/5483)
 
 #### Garden
 
@@ -161,6 +166,7 @@
   + Removed the dungeon key counting as profit.
   + Removed empty items from display.
 + Fixed occasional performance issues with Mob Detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5456)
++ Fixed Slayer Kill Time not counting the first phase for Tarantula Broodfather 5. - Luna (https://github.com/hannibal002/SkyHanni/pull/5466)
 
 #### GUI
 
@@ -236,6 +242,7 @@
 #### Commands
 
 + Fixed colored item names in `/viewrecipe` autocomplete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5434)
++ Fixed issues with GFS auto-complete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5494)
 
 ### Technical Details
 
@@ -374,6 +381,12 @@
   + Prep for June 2026 deprecation of Node 20.
 + Upgraded gradle from 9.3 to 9.4.1. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5449)
   + New version fixed some caching issues.
++ Added alpha param for item stack rendering. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5341)
++ Renamed `BlockUtils.rayTrace` to `BlockUtils.raycast`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5488)
++ Renamed `MobUtils.OwnerShip` to `MobUtils.Ownership`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5488)
++ Renamed `MobUtils.rayTraceForMob` to `MobUtils.raycastForMob`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5488)
++ Renamed `MobUtils.rayTraceForMobs` to `MobUtils.raycastForMobs`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5488)
++ Renamed `SlayerChangeEvent` file to `SlayerEvents` and moved `SlayerQuestCompleteEvent` to it. - Luna (https://github.com/hannibal002/SkyHanni/pull/5466)
 
 ### Removed Features
 

@@ -415,9 +415,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param silentError If true, will not log errors to the console.
      * @param forceReset If true, will always download the latest commit zip file, even if the repo is up to date.
      * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
-     * @return FetchUnpackResult.SUCCESS if the repo was successfully fetched and unpacked,
-     *         FetchUnpackResult.SWITCHED_TO_BACKUP if the backup repo was used,
-     *         FetchUnpackResult.FAILED if the repo could not be fetched or unpacked and no backup repo is available.
+     * @return [FetchUnpackResult.SUCCESS] if the repo was successfully fetched and unpacked,
+     *         [FetchUnpackResult.SWITCHED_TO_BACKUP] if the backup repo was used,
+     *         [FetchUnpackResult.FAILED] if the repo could not be fetched or unpacked and no backup repo is available.
      */
     private suspend fun fetchAndUnpackRepo(
         progress: ChatProgressUpdates,

@@ -17,11 +17,11 @@ public class MixinLivingEntity {
 
     @Inject(method = "die", at = @At("HEAD"))
     public void onDeath(DamageSource damageSource, CallbackInfo ci) {
-        new EntityDeathEvent((LivingEntity) (Object) this).post();
+        new EntityDeathEvent<>((LivingEntity) (Object) this).post();
     }
 
     @Inject(method = "setItemSlot", at = @At("TAIL"))
     public void setItemStack(EquipmentSlot equipment, ItemStack itemStack, CallbackInfo ci) {
-        new EntityEquipmentChangeEvent((Entity) (Object) this, equipment.getId(), itemStack).post();
+        new EntityEquipmentChangeEvent<>((Entity) (Object) this, equipment.getId(), itemStack).post();
     }
 }

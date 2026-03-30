@@ -19,7 +19,7 @@ object KeyboardManager {
 
     private var lastClickedMouseButton = -1
 
-    // A mac-only key, represents Windows key on windows (but different key code)
+    // A mac-only key, represents Windows key on Windows (but different key code)
     private fun isCommandKeyDown() = GLFW.GLFW_KEY_LEFT_SUPER.isKeyHeld() || GLFW.GLFW_KEY_RIGHT_SUPER.isKeyHeld()
 
     // Windows: Alt key Mac: Option key
