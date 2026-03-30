@@ -15,7 +15,9 @@ class Shimmy private constructor(val source: Any, val reflectField: Field) {
         set(v) = reflectField.set(source, v)
 
     fun getJson(): JsonElement = ConfigManager.gson.toJsonTree(value)
-    fun setJson(element: JsonElement) { value = ConfigManager.gson.fromJson(element, clazz) }
+    fun setJson(element: JsonElement) {
+        value = ConfigManager.gson.fromJson(element, clazz)
+    }
 
     companion object {
         private fun traverse(source: Any?, fieldName: String): Any? =
