@@ -65,7 +65,7 @@ fun CompoundTag.getStringOrDefault(key: String): String {
     return this.getString(key).getOrNull().orEmpty()
 }
 
-fun CompoundTag.getIntOrDefault(key: String?): Int {
+fun CompoundTag.getIntOrDefault(key: String): Int {
     return this.getInt(key).getOrNull() ?: 0
 }
 
