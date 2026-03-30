@@ -1,35 +1,58 @@
 name: Detekt
 
 on:
-    pull_request_target:
-        types: [opened, synchronize, reopened]
-        branches:
-            - "*"
-    workflow_dispatch:
+    workflow_run:
+        workflows: ["Build"]
+        types: [completed]
 
 permissions:
     contents: read
     pull-requests: write
+    actions: read
 
 jobs:
     detekt:
         name: Run detekt
         runs-on: ubuntu-latest
+        if: |
+            github.event.workflow_run.event == 'pull_request_target' &&
+            github.event.workflow_run.conclusion == 'success'
         concurrency:
-            group: detekt-${{ github.event.pull_request.number }}
+            group: detekt-${{ github.event.workflow_run.id }}
             cancel-in-progress: true
         permissions:
             contents: read
             pull-requests: write
+            actions: read
         outputs:
             sarif_exists: ${{ steps.check_sarif.outputs.exists }}
             detekt_failed: ${{ steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure' }}
+            pr_number: ${{ steps.pr_meta.outputs.number }}
+            pr_sha: ${{ steps.pr_meta.outputs.sha }}
+            pr_repo: ${{ steps.pr_meta.outputs.repo }}
+            pr_draft: ${{ steps.pr_meta.outputs.draft }}
         steps:
+            -   name: Download PR metadata
+                uses: actions/download-artifact@v8
+                with:
+                    name: pr-metadata
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Read PR metadata
+                id: pr_meta
+                run: |
+                    echo "number=$(jq -r '.number' pr-metadata.json)" >> $GITHUB_OUTPUT
+                    echo "sha=$(jq -r '.sha' pr-metadata.json)" >> $GITHUB_OUTPUT
+                    echo "ref=$(jq -r '.ref' pr-metadata.json)" >> $GITHUB_OUTPUT
+                    echo "repo=$(jq -r '.repo' pr-metadata.json)" >> $GITHUB_OUTPUT
+                    echo "draft=$(jq -r '.draft' pr-metadata.json)" >> $GITHUB_OUTPUT
+
             -   name: Checkout PR code
                 uses: actions/checkout@v6
                 with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+                    ref: ${{ steps.pr_meta.outputs.ref }}
+                    repository: ${{ steps.pr_meta.outputs.repo }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
                 if: github.repository == 'hannibal002/SkyHanni'
@@ -66,17 +89,29 @@ jobs:
 
             -   name: Add label if detekt fails
                 if: ${{ (steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure') && steps.check_sarif.outputs.exists == 'true' }}
-                uses: actions-ecosystem/action-add-labels@v1
+                uses: actions/github-script@v7
                 with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Detekt'
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        await github.rest.issues.addLabels({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: ${{ steps.pr_meta.outputs.number }},
+                            labels: ['Detekt']
+                        });
             -   name: Remove label if detekt passes
                 if: ${{ steps.run_detekt.outcome != 'failure' && steps.run_detekt_fork.outcome != 'failure' }}
                 continue-on-error: true
-                uses: actions-ecosystem/action-remove-labels@v1
+                uses: actions/github-script@v7
                 with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Detekt'
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        await github.rest.issues.removeLabel({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: ${{ steps.pr_meta.outputs.number }},
+                            name: 'Detekt'
+                        }).catch(() => {});
 
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
@@ -94,13 +129,13 @@ jobs:
         name: Comment detekt failures on PR
         runs-on: ubuntu-latest
         concurrency:
-            group: detekt-comment-${{ github.event.pull_request.number }}
+            group: detekt-comment-${{ needs.detekt.outputs.pr_number }}
             cancel-in-progress: true
         needs: detekt
         if: ${{
             needs.detekt.outputs.sarif_exists == 'true' &&
             needs.detekt.outputs.detekt_failed == 'true' &&
-            github.event.pull_request.draft == false
+            needs.detekt.outputs.pr_draft == 'false'
             }}
         permissions:
             pull-requests: write
@@ -108,8 +143,8 @@ jobs:
             -   name: Checkout base repo code
                 uses: actions/checkout@v6
                 with:
-                    ref: ${{ github.event.pull_request.head.sha }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+                    ref: ${{ needs.detekt.outputs.pr_sha }}
+                    repository: ${{ needs.detekt.outputs.pr_repo }}
             -   name: Download detekt output
                 uses: actions/download-artifact@v8
                 with:
@@ -117,7 +152,7 @@ jobs:
                     path: .
             -   name: Process detekt output and create comment
                 env:
-                    PR_SHA: ${{ github.event.pull_request.head.sha }}
+                    PR_SHA: ${{ needs.detekt.outputs.pr_sha }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
                     kotlinc -script .github/scripts/process-detekt-output.kts
@@ -134,7 +169,7 @@ jobs:
                         const { data: comments } = await github.rest.issues.listComments({
                             owner: context.repo.owner,
                             repo:  context.repo.repo,
-                            issue_number: context.issue.number
+                            issue_number: ${{ needs.detekt.outputs.pr_number }}
                         });
                         return comments.some(c => c.body.includes(hash));
             -   name: Skip comment if duplicate
@@ -150,7 +185,7 @@ jobs:
                         const fs = require('fs');
                         const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
                         github.rest.issues.createComment({
-                            issue_number: context.issue.number,
+                            issue_number: ${{ needs.detekt.outputs.pr_number }},
                             owner: context.repo.owner,
                             repo: context.repo.repo,
                             body: commentBody

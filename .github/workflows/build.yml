@@ -42,6 +42,27 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: assemble -x test --stacktrace -PskipDetekt=true
+            -   name: Save PR metadata
+                if: github.event_name == 'pull_request_target'
+                uses: actions/github-script@v7
+                with:
+                    script: |
+                        const fs = require('fs');
+                        const pr = context.payload.pull_request;
+                        fs.writeFileSync('pr-metadata.json', JSON.stringify({
+                            number: pr.number,
+                            sha: pr.head.sha,
+                            ref: pr.head.ref,
+                            repo: pr.head.repo.full_name,
+                            draft: pr.draft
+                        }));
+            -   uses: actions/upload-artifact@v7
+                if: github.event_name == 'pull_request_target'
+                name: Upload PR metadata
+                with:
+                    name: pr-metadata
+                    path: pr-metadata.json
+                    retention-days: 1
             -   uses: actions/upload-artifact@v7
                 name: Upload development build
                 with:

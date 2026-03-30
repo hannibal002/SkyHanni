@@ -1,20 +1,25 @@
 name: Run detekt on push
 
 on:
-    push:
+    workflow_run:
+        workflows: ["Build"]
+        types: [completed]
         branches:
             - "beta"
-        paths-ignore:
-            - ".gitignore"
 jobs:
     detekt:
         name: Run detekt
         runs-on: ubuntu-latest
+        if: |
+            github.event.workflow_run.event == 'push' &&
+            github.event.workflow_run.conclusion == 'success'
         permissions:
             contents: read
         steps:
-            -   name: Checkout PR code
+            -   name: Checkout code
                 uses: actions/checkout@v6
+                with:
+                    ref: ${{ github.event.workflow_run.head_sha }}
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 uses: ./.github/actions/gradle-retry
