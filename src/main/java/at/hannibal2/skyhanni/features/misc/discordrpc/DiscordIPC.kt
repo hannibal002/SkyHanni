@@ -68,16 +68,24 @@ class DiscordIPC(
     }
 
     /**
-     * Sends a CLOSE frame to Discord and releases all pipe resources.
-     * Safe to call when not connected; errors during the close frame are silently swallowed.
+     * Releases all pipe resources and marks the client as disconnected.
+     *
+     * Closes the underlying pipe directly rather than sending a CLOSE frame first.
+     * This prevents a deadlock where [sendFrame] holds the lock while blocked
+     * on a native I/O write (e.g. [java.io.RandomAccessFile.write] on a Windows named pipe),
+     * and a shutdown or disconnect handler on another thread tries to acquire the same lock.
+     *
+     * Closing the pipe from outside the lock causes the blocked write to fail with an
+     * [java.io.IOException], which releases the lock without needing to acquire it here.
+     * The CLOSE frame itself is optional. Discord handles disconnects gracefully without it.
      */
     override fun close() {
         shutdownHook?.let { runCatching { Runtime.getRuntime().removeShutdownHook(it) } }
         shutdownHook = null
-        if (_connected) runCatching { sendFrame(Opcode.CLOSE, clientPayload) }
         _connected = false
-        runCatching { pipe?.close() }
+        val oldPipe = pipe
         pipe = null
+        runCatching { oldPipe?.close() }
     }
 
     private enum class Opcode(val id: Int) {

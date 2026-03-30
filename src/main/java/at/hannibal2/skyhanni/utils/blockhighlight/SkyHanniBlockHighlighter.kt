@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState
  * A [SkyHanniBlockHighlighter] is used to highlight blocks based on a certain condition
  *
  * @property highlightCondition A condition for when the highlighter should be running its code such as an isEnabled function.
- * @property blockCondition A condition that the blockstate at a location must fulfill to be highlighted.
+ * @property blockCondition A condition that the BlockState at a location must fulfill to be highlighted.
  * @property colorProvider Provides the color that the highlighter will use when rendering the highlighted block.
  */
 class SkyHanniBlockHighlighter<T : AbstractHighlightedBlock>(

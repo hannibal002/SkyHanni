@@ -5,14 +5,18 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.achievements.Achievement
+import at.hannibal2.skyhanni.data.achievements.AchievementUserData
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -28,6 +32,10 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 
+/**
+ * If you came here to find out what all the achievements are,
+ * I curse you with -100000 SkyHanni User Luck for life
+ */
 @SkyHanniModule
 object AchievementManager {
 
@@ -67,11 +75,20 @@ object AchievementManager {
         val currentTier = achievement.getCurrentTier() ?: 0
         achievement.data.progress = newProgress
         val newTier = achievement.getCurrentTier() ?: 0
-        if (newTier > currentTier) {
-            if (newTier == achievement.tiers.size) achievement.data.achieved = true
+        val isMaxed = newTier == achievement.tiers.size
+        if (newTier < currentTier) {
+            achievement.data.achieved = false
+        }
+        if (newTier > currentTier || (isMaxed && !achievement.data.achieved)) {
+            if (isMaxed) achievement.data.achieved = true
             if (shouldShowMessages) {
                 ChatUtils.chat(
                     componentBuilder {
+                        if (achievement.secret) {
+                            append("Secret ") {
+                                withColor(ChatFormatting.GRAY)
+                            }
+                        }
                         append("Achievement Get! ") {
                             withColor(ChatFormatting.GOLD)
                         }
@@ -79,7 +96,7 @@ object AchievementManager {
                             withColor(ChatFormatting.GREEN)
                         }
                         if (!achievement.data.achieved) {
-                            append(" $newProgress/${achievement.getAmountForNextTier()} to unlock the next tier")
+                            append(" ${newProgress.addSeparators()}/${achievement.getAmountForNextTier()} to unlock the next tier")
                         }
                         append("!")
                         hover = achievement.getDescription()
@@ -103,6 +120,11 @@ object AchievementManager {
         if (shouldShowMessages) {
             ChatUtils.chat(
                 componentBuilder {
+                    if (achievement.secret) {
+                        append("Secret ") {
+                            withColor(ChatFormatting.GRAY)
+                        }
+                    }
                     append("Achievement Get! ") {
                         withColor(ChatFormatting.GOLD)
                     }
@@ -144,6 +166,30 @@ object AchievementManager {
             literalCallback("unlockall") {
                 ChatUtils.chat("you didn't think this would really work? did you...")
             }
+            literal("lock") {
+                argCallback(
+                    "id",
+                    BrigadierArguments.greedyString(),
+                    BrigadierUtils.dynamicSuggestionProvider {
+                        config.filter { it.value.getName() != null }.map { it.key }
+                    }
+                ) { id ->
+                    val achievement = config[id]
+                    if (achievement == null) {
+                        ChatUtils.chat("Unknown Achievement")
+                    } else {
+                        achievement.data = AchievementUserData()
+                        setAchievement(id, achievement)
+                        ChatUtils.chat(
+                            componentBuilder {
+                                append(achievement.getName())
+                                append(" is now locked!")
+                            }
+
+                        )
+                    }
+                }
+            }
             simpleCallback {
                 val achievement = getAchievement(TEST_ACHIEVEMENT)
                 if (achievement.data.achieved) {
@@ -160,8 +206,10 @@ object AchievementManager {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.getName() != null }
+                val totalCount = achievementList.size
+                val unlocked = achievementList.count { it.data.achieved }
                 TextHelper.displayPaginatedList(
-                    "SkyHanni Achievements!",
+                    "SkyHanni Achievements! ($unlocked/$totalCount)",
                     achievementList,
                     ChatUtils.getUniqueMessageId(),
                     "No Achievements Found"
@@ -185,7 +233,15 @@ object AchievementManager {
                                 withColor(ChatFormatting.RED)
                             }
                         } else {
+                            if (achievement.getCurrentTier() == 0) {
+                                append(" 0")
+                            }
                             append("/${achievement.tiers.size}")
+                        }
+                        val luck = achievement.userLuckAmount
+                        append(" $luck✴") {
+                            withColor(ChatFormatting.GREEN)
+                            hover = "Gain §a$luck✴ SkyHanni User Luck§r for completing this achievement".asComponent()
                         }
                         hover = achievement.getDescription()
                     }
@@ -202,7 +258,7 @@ object AchievementManager {
             if (!achievement.data.achieved) hasDoneAllAchievements = false
             else luck += achievement.userLuckAmount
         }
-        if (hasDoneAllAchievements) luck += 100
+        if (hasDoneAllAchievements) luck += 1000
         if (luck == 0f) return
         event.addLuck(luck)
 
