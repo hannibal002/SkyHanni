@@ -46,7 +46,7 @@ object PowderTracker : SkyHanniTracker<PowderTracker.Data>("Powder Tracker") {
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
 
     /**
-     * REGEX-TEST:  §r§6§lCHEST LOCKPICKED
+     * WRAPPED-REGEX-TEST: "  §r§6§lCHEST LOCKPICKED "
      */
     private val pickedPattern by patternGroup.pattern(
         "picked",
