@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -71,34 +72,34 @@ object ToolLevelDisplay {
         display = getDisplay()?.map(Renderable::text)
     }
 
-   private fun getDisplay(): List<String>? = buildList {
-    val heldItem = InventoryUtils.getItemInHand() ?: return null
-    val toolExp = heldItem.getToolExp() ?: return null
-    var toolLevel = heldItem.getToolLevel() ?: return null
-    val toolLevels = toolLevels ?: return null
+    private fun getDisplay(): List<String>? = buildList {
+        val heldItem = InventoryUtils.getItemInHand() ?: return null
+        val toolExp = heldItem.getToolExp() ?: return null
+        var toolLevel = heldItem.getToolLevel() ?: return null
+        val toolLevels = toolLevels ?: return null
 
-       val type = when (heldItem.getItemCategoryOrNull()) {
-           ItemCategory.HOE -> "Hoe"
-           ItemCategory.AXE -> "Axe"
-           else -> "Tool"
-       }
-       val title = "§6$type Levels"
-
-    add(title)
-
-    val next = if (toolLevel <= toolLevels.size) {
-        toolLevels[toolLevel - 1]
-    } else {
-        toolOverflow
-    }
-
-    if (toolLevel > toolLevels.size && config.overflow) {
-        val uuid = heldItem.getItemUuid()
-        val overflowLevel = getOverflowToolLevel(uuid)
-        if (overflowLevel != null) {
-            toolLevel += overflowLevel
+        val type = when (heldItem.getItemCategoryOrNull()) {
+            ItemCategory.HOE -> "Hoe"
+            ItemCategory.AXE -> "Axe"
+            else -> "Tool"
         }
-    }
+        val title = "§6$type Levels"
+
+        add(title)
+
+        val next = if (toolLevel <= toolLevels.size) {
+            toolLevels[toolLevel - 1]
+        } else {
+            toolOverflow
+        }
+
+        if (toolLevel > toolLevels.size && config.overflow) {
+            val uuid = heldItem.getItemUuid()
+            val overflowLevel = getOverflowToolLevel(uuid)
+            if (overflowLevel != null) {
+            toolLevel += overflowLevel
+            }
+        }
         add("§7Level §8$toolLevel➜§3${toolLevel + 1}")
 
         var colorPrefix = "§e"
@@ -279,4 +280,9 @@ object ToolLevelDisplay {
     }
 
     fun isEnabled() = config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(130, "features.garden.hoeLevelDisplay", "features.garden.toolLevelDisplay")
+    }
 }
