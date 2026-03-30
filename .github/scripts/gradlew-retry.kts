@@ -28,7 +28,7 @@ val cmd = listOf("./gradlew") + gradleArgs
  */
 val retryableErrorRegex = Regex(
     // language=RegExp
-    "(?: *> )?(?:Could not (?:resolve|get|determine).+|(?:Caused by: )?[\\w.]+Exception.+)",
+    "(?: *> )?(?:Could not (?:resolve|get|determine).+|(?:Caused by: )?(?<!at)[\\w.]+(?<!TaskExecution|Verification)Exception:.+)",
     option = RegexOption.IGNORE_CASE,
 )
 

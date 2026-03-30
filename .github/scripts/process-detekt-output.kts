@@ -94,23 +94,18 @@ val sb = StringBuilder().apply {
             else -> " (+ ${violatingFiles.size - ceilingedFiles.size} more)"
         }
         val fileViolationsFormat = ceilingedFiles.joinToString(", ") { (cleanedFilePath, _) ->
-            val url = flaggedFileUrls[cleanedFilePath]
             val fileName = pathToNameCache[cleanedFilePath] ?: cleanedFilePath.substringAfter("src/")
-            when (url) {
-                null -> "`$fileName`"
-                else -> "[$fileName]($url)"
-            }
+            flaggedFileUrls[cleanedFilePath]?.let { url ->
+                "[$fileName]($url)"
+            } ?: "`$fileName`"
         }
         append("**<ins>Files flagged</ins>** (${violatingFiles.size}): $fileViolationsFormat$xMoreFormat\n")
     }
 
     appendLine()
-    if (shouldCollapseComment) {
-        appendLine(buildCollapsedComment())
-    } else {
-        formatLines.forEach { (_, line) ->
-            appendLine(line)
-        }
+    if (shouldCollapseComment) appendLine(buildCollapsedComment())
+    else formatLines.forEach { (_, line) ->
+        appendLine(line)
     }
 
     appendLine()
