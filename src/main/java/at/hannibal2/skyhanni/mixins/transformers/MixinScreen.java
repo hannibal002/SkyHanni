@@ -20,8 +20,8 @@ public class MixinScreen {
     private void wrapRenderBackground(Screen instance, GuiGraphics context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {
         //? } else {
     /*@WrapOperation(method = "extractRenderStateWithTooltipAndSubtitles", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractBackground(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"))
-    private void wrapRenderBackground(Screen instance, GuiGraphics context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {*/
-        //?}
+    private void wrapRenderBackground(Screen instance, GuiGraphics context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {
+        *///?}
         original.call(instance, context, mouseX, mouseY, deltaTicks);
         new ScreenDrawnEvent(context, Minecraft.getInstance().screen).post();
     }

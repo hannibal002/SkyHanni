@@ -12,10 +12,8 @@ import net.minecraft.client.Camera
 @PrimaryFunction("onRenderWorld")
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
-    //? if < 26.1 {
+    //~ if > 1.21.11 'Camera' -> 'CameraRenderState'
     val camera: Camera,
-    //? } else
-    //val camera: CameraRenderState,
     val vertexConsumers: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,

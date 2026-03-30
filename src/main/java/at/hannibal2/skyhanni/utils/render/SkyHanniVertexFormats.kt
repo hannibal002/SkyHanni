@@ -26,8 +26,8 @@ object SkyHanniVertexFormats {
         //? if < 26.1 {
         private val usage: VFEUsage = VFEUsage.GENERIC,
         //? } else {
-        /*private val normalized: Boolean = false,*/
-        //? }
+        /*private val normalized: Boolean = false,
+        *///? }
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}

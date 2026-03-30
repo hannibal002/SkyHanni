@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
@@ -39,18 +40,18 @@ object RenderEvents {
         }
 
         // makes the lines render weird idk
-        WorldRenderEvents.END_MAIN.register { event ->
-            //~ if > 1.21.11 '.consumers()' -> '.bufferSource()'
+        //~ if > 1.21.11 'WorldRenderContext' -> 'LevelRenderContext'
+        WorldRenderEvents.END_MAIN.register { event: WorldRenderContext ->
+            //~ if > 1.21.11 '.consumers() as? MultiBufferSource.BufferSource ?: return@register' -> '.bufferSource()'
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
-            //? if < 26.1 {
+            //~ if > 1.21.11 '.matrices()' -> '.poseStack()'
             val stack = event.matrices()
-            //? } else
-            //val stack = event.poseStack()
             SkyHanniRenderWorldEvent(
                 stack,
+                //~ if > 1.21.11 'mainCamera' -> 'mainCamera.getRenderState()'
                 event.gameRenderer().mainCamera,
                 immediateVertexConsumers,
-                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
+                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks,
             ).post()
         }
     }

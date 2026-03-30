@@ -7,8 +7,8 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 //? } else {
 /*import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.platform.CompareOp;*/
-//?}
+import com.mojang.blaze3d.platform.CompareOp;
+*///?}
 import net.minecraft.client.renderer.RenderPipelines;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,6 +32,6 @@ public class RenderPipelineMixin {
         return original != null
             ? new DepthStencilState(DepthTestFunction.LEQUAL_DEPTH_TEST, original.writeDepth(), original.depthBiasScaleFactor(), original.depthBiasConstant())
             : new DepthStencilState(DepthTestFunction.LEQUAL_DEPTH_TEST, true);
-    }*/
-    //?}
+    }
+    *///?}
 }

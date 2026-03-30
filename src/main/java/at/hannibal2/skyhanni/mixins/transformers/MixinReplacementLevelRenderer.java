@@ -26,8 +26,8 @@ import net.minecraft.client.Camera;
 import org.joml.Matrix4f;
 //? } else {
 /*import net.minecraft.client.renderer.state.level.CameraRenderState;
-import org.joml.Matrix4fc;*/
-//?}
+import org.joml.Matrix4fc;
+*///?}
 import com.mojang.blaze3d.textures.GpuSampler;
 
 // Adapted from Fabric API implementation
@@ -43,8 +43,8 @@ public class MixinReplacementLevelRenderer {
     Camera currentCamera;
     //? } else {
     /*@Unique
-    CameraRenderState currentCameraState;*/
-    //?}
+    CameraRenderState currentCameraState;
+    *///?}
 
     @Unique
     DeltaTracker currentTickCounter;
@@ -64,8 +64,8 @@ public class MixinReplacementLevelRenderer {
     private void beginRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci) {
         currentCameraState = cameraState;
         currentTickCounter = deltaTracker;
-    }*/
-    //?}
+    }
+    *///?}
 
     @WrapOperation(
         //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'

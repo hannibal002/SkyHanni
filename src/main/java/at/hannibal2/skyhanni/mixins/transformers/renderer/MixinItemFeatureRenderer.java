@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 //? if > 1.21.11 {
 /*import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.rendertype.RenderType;*/
-//? }
+import net.minecraft.client.renderer.rendertype.RenderType;
+*///? }
 
 @Mixin(ItemFeatureRenderer.class)
 public class MixinItemFeatureRenderer {
@@ -54,6 +54,6 @@ public class MixinItemFeatureRenderer {
             return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().getBuffer(renderType);
         }
         return original.call(outlineConsumer, renderType);
-    }*/
-    //? }
+    }
+    *///? }
 }

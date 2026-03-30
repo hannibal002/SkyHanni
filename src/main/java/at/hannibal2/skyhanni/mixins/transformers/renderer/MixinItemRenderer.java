@@ -10,8 +10,8 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 /*import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.ARGB;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;*/
-//?}
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+*///?}
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -67,5 +67,5 @@ public class MixinItemRenderer {
         }
         return layer;
     }
-}*/
-//? }
+}
+*///? }

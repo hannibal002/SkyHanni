@@ -18,8 +18,8 @@ import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import at.hannibal2.skyhanni.data.EntityData;
-import at.hannibal2.skyhanni.utils.SkyBlockUtils;*/
-//? }
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
+*///? }
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -88,6 +88,6 @@ public class MixinEntityRenderer {
             return EntityData.getHealthDisplay(text);
         }
         return text;
-    }*/
-    //? }
+    }
+    *///? }
 }

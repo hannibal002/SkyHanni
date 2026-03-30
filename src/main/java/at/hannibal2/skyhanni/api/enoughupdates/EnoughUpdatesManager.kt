@@ -44,8 +44,8 @@ import net.minecraft.nbt.StringTag
 //? if > 1.21.11 {
 /*import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack*/
-//? }
+import net.minecraft.world.item.ItemStack
+*///? }
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
@@ -248,8 +248,8 @@ object EnoughUpdatesManager {
             freshStack
         }
         return DeferredItemStack(baseItem, factory, countVal)
-    }*/
-    //? }
+    }
+    *///? }
 
     private fun SafeItemStack?.getPetLoreReplacements(): Map<String, String> {
         val petInfo = this?.getPetInfo() ?: return emptyMap()

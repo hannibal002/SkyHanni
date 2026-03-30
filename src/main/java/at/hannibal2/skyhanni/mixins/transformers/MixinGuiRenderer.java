@@ -78,8 +78,8 @@ public class MixinGuiRenderer {
     @Inject(method = "render", at = @At("HEAD"))
     private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
         frameNumber++;
-    }*/
-    //? }
+    }
+    *///? }
 
     @Shadow
     @Final

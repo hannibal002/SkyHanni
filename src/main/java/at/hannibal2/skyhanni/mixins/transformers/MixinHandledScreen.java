@@ -46,8 +46,8 @@ public abstract class MixinHandledScreen {
     private void renderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         //? } else {
     /*@Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
-    private void renderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
-        //?}
+    private void renderHead(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        *///?}
         if (GlobalRender.INSTANCE.getRenderDisabled()) return;
         AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) (Object) this;
         if (new GuiContainerEvent.PreDraw(context, gui, gui.getMenu(), mouseX, mouseY, deltaTicks).post()) {
@@ -66,8 +66,8 @@ public abstract class MixinHandledScreen {
     private void renderTail(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         //? } else {
     /*@Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
-    private void renderTail(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
-        //?}
+    private void renderTail(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        *///?}
         if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
     }
 
@@ -76,8 +76,8 @@ public abstract class MixinHandledScreen {
     private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         //? } else {
     /*@Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
-    private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {*/
-        //?}
+    private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        *///?}
         if (MinecraftCompat.INSTANCE.getLocalWorldExists() && MinecraftCompat.INSTANCE.getLocalPlayerExists()) {
             new DrawBackgroundEvent(context).post();
         }
@@ -88,8 +88,8 @@ public abstract class MixinHandledScreen {
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphics drawContext) {
         //? } else {
     /*@ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
-    private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphics drawContext) {*/
-        //?}
+    private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphics drawContext) {
+        *///?}
         if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
         }

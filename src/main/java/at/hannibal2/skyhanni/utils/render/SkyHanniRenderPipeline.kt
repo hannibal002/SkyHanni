@@ -12,8 +12,8 @@ import com.mojang.blaze3d.platform.DepthTestFunction
 //? } else {
 /*import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.DepthStencilState
-import com.mojang.blaze3d.platform.CompareOp*/
-//? }
+import com.mojang.blaze3d.platform.CompareOp
+*///? }
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat

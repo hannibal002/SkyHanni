@@ -20,8 +20,8 @@ public class MixinGuiNewChat {
     private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageTag indicator, CallbackInfo ci) {
     //? } else {
     /*@Inject(method = "addMessage", at = @At("HEAD"))
-    private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci) {*/
-    //? }
+    private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci) {
+    *///? }
         GuiChatHook.setCurrentComponent(chatComponent);
     }
 }

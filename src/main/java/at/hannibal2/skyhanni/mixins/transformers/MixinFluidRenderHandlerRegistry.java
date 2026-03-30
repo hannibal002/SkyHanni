@@ -44,5 +44,5 @@ public class MixinFluidRenderHandlerRegistry {
             else if (fluid == Fluids.FLOWING_LAVA) cir.setReturnValue(FluidRenderingRegistryImpl.get(Fluids.FLOWING_WATER));
         }
     }
-}*/
-//?}
+}
+*///?}

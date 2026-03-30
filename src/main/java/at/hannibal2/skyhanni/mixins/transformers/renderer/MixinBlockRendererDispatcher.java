@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.state.BlockState;
 //? if < 26.1 {
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 //? } else
-// import net.minecraft.client.renderer.block.BlockStateModelSet;
+ //import net.minecraft.client.renderer.block.BlockStateModelSet;
 //~ if > 1.21.11 'model.BlockStateModel' -> 'dispatch.BlockStateModel'
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,5 +29,5 @@ public class MixinBlockRendererDispatcher {
     public void getModel(BlockState state, CallbackInfoReturnable<BlockStateModel> cir) {
         BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockStateModelSet) (Object) this, state, cir);
     }
-}*/
-//?}
+}
+*///?}

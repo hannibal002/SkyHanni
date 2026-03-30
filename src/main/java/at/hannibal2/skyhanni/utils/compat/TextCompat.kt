@@ -29,8 +29,8 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
 //? > 1.21.11 {
 /*import net.minecraft.world.item.ItemStackTemplate
-import net.minecraft.client.GuiMessageSource*/
-//? }
+import net.minecraft.client.GuiMessageSource
+*///? }
 
 
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)

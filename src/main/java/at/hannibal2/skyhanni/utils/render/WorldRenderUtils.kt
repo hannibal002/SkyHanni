@@ -38,8 +38,8 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 //? if > 1.21.11 {
 /*import at.hannibal2.skyhanni.utils.compat.position
-import at.hannibal2.skyhanni.utils.compat.rotation*/
-//? }
+import at.hannibal2.skyhanni.utils.compat.rotation
+*///? }
 
 @Suppress("LargeClass")
 object WorldRenderUtils {

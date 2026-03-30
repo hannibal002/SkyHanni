@@ -45,7 +45,7 @@ public class MixinChatLine implements ChatLineData {
     private void onInit(int addedTime, Component content, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci) {
         Component hookComponent = GuiChatHook.getCurrentComponent();
         skyhanni$fullComponent = hookComponent == null ? content : hookComponent;
-    }*/
-    //? }
+    }
+    *///? }
 
 }
