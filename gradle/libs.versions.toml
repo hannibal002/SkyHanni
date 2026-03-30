@@ -15,9 +15,9 @@ methanol = "1.8.3"
 
 shadow = "9.3.1"
 loom = "1.15-SNAPSHOT"
-kotlin = "2.2.21"
-ksp = "2.3.4"
-detekt = "1.23.7"
+kotlin = "2.3.20"
+ksp = "2.3.6"
+detekt = "1.23.8"
 
 junixsocket = "2.6.2"
 devauth = "1.2.1"
@@ -44,8 +44,6 @@ changelog-builder = { module = "com.github.SkyHanniStudios:SkyHanniChangelogBuil
 methanol = { module = "com.github.mizosoft.methanol:methanol", version.ref = "methanol" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
-junixsocket-common = { module = "com.kohlschutter.junixsocket:junixsocket-common", version.ref = "junixsocket" }
-junixsocket-native = { module = "com.kohlschutter.junixsocket:junixsocket-native-common", version.ref = "junixsocket" }
 devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
