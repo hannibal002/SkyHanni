@@ -133,7 +133,7 @@ object DeployableDisplay {
         if (display.isEmpty()) return
         config.position.renderRenderables(display, 0, "Deployable Overlay")
     }
-    
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
