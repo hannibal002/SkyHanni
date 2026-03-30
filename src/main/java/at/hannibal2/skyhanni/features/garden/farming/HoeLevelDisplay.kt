@@ -77,10 +77,10 @@ object HoeLevelDisplay {
 
     val cleanName = heldItem.hoverName.string.removeColor()
     val title = when {
-        cleanName.contains("Knife", ignoreCase = true) -> "§6Knife Level"
-        cleanName.contains("Axe", ignoreCase = true) || cleanName.contains("Dicer", ignoreCase = true) -> "§6Dicer Level"
-        cleanName.contains("Hoe", ignoreCase = true) -> "§6Hoe Level"
-        else -> "§6Tool Levels"
+        cleanName.contains("Knife") -> "§6Knife Level"
+        cleanName.contains("Chopper") || cleanName.contains("Dicer") -> "§6Axe Level"
+        cleanName.contains("Hoe") || cleanName.contains("Cutter") -> "§6Hoe Level"
+        else -> "§6Farming Tool Level"
     }
 
     add(title)
