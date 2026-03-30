@@ -284,7 +284,7 @@ enum class HotmData(
     ),
 
     ANOMALOUS_DESIRE(
-        "Anomalous Desire",
+        "Tunnel Vision",
         3,
         { null },
         { level ->

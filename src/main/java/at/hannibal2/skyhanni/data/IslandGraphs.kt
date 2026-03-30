@@ -56,7 +56,7 @@ import kotlin.time.Duration.Companion.seconds
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
  * 	death location
- * 	% of island discvovered (every node was most closest node at least once)
+ * 	% of island discovered (every node was most closest node at least once)
  * hub:
  * 	diana
  * farming:
@@ -69,7 +69,7 @@ import kotlin.time.Duration.Companion.seconds
  * 	relicts + throw spot
  * dwarven mines:
  * 	emissary
- * 	commssion areas
+ * 	commission areas
  * 	events: raffle, goblin slayer, donpieresso
  * deep
  * 	path to the bottom (Rhys NPC) (replace in DeepCavernsGuide.kt)
@@ -92,9 +92,9 @@ import kotlin.time.Duration.Companion.seconds
  *  support cross island paths (have a list of all node names in all islands)
  *
  * Changes in graph editor:
- * 	toggle distance to node by node path lengh, instead of eye of sight lenght
+ * 	toggle distance to node by node path length, instead of eye of sight length
  * 	press test button again to enable "true test mode", with hiding other stuff
- * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
+ * 	option to compare two graphs, and store multiple graphs in the edit mode in parallel
  */
 
 @SkyHanniModule
@@ -392,7 +392,7 @@ object IslandGraphs {
         val nodeDistance = first?.distanceToPlayer() ?: 0.0
         if (first != null && second != null) {
             val direct = second.distanceToPlayer()
-            val firstPath = first.neighbours[second] ?: 0.0
+            val firstPath = first.neighbors[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
                 applyPath(Graph(path.drop(1)) to (distance - firstPath + direct))

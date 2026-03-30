@@ -126,11 +126,11 @@ class SkyhanniTimedTracker<Data : TrackerData<*>, Type : TimedGenericIndividualC
         this.getData().getOrPutNewestData(displayMode)
 
     override fun getDisplay(): List<Renderable> {
-        val searchables = getOrPutCurrentData()?.let { drawDisplay(it) } ?: return emptyList()
+        val displayLines = getOrPutCurrentData()?.let { drawDisplay(it) } ?: return emptyList()
         return if (config.trackerSearchEnabled.get()) {
-            buildFinalDisplay(searchables.buildSearchBox(textInput))
+            buildFinalDisplay(displayLines.buildSearchBox(textInput))
         } else {
-            buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
+            buildFinalDisplay(Renderable.vertical(displayLines.toRenderable()))
         }
     }
 

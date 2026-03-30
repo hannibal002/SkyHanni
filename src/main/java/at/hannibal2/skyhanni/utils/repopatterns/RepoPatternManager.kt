@@ -58,7 +58,7 @@ object RepoPatternManager {
     private var wasPreInitialized = false
 
     // idk what this is for
-    private val insideTest = false
+    private const val insideTest = false
 
     var inTestDuplicateUsage = true
 
@@ -314,7 +314,7 @@ object RepoPatternManager {
         val holders = StringUtils.subMapOfStringsStartingWith(prefixWithDot, usedKeys)
 
         val noShareHolder = holders.filter { !it.value.shares }.map { it.key.removePrefix(prefixWithDot) }
-            .groupBy { it.count { it == '.' } }
+            .groupBy { string -> string.count { it == '.' } }
 
         return patterns.filter { it.key !in holders.keys }.filter { unused ->
             val dot = unused.key.count { it == '.' }

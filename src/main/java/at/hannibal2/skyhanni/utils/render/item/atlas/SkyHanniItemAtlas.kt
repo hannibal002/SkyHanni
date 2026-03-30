@@ -20,10 +20,6 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
         private val identifier = Identifier.fromNamespaceAndPath("skyhanni", "item_atlas")
     }
 
-    init {
-        Minecraft.getInstance().textureManager.register(identifier, this)
-    }
-
     private var sizePixels = 0
     private var packer: SkyHanniAtlasBinPacker? = null
     private var renderer: SkyHanniItemAtlasRenderer? = null
@@ -50,6 +46,7 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractItemTexture(), Dumpable {
 
     private fun ensureAllocated() {
         if (texture != null) return
+        Minecraft.getInstance().textureManager.register(identifier, this)
         allocate(512.coerceAtMost(RenderSystem.getDevice().maxTextureSize))
     }
 
