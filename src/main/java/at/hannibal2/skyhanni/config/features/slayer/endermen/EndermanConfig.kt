@@ -1,6 +1,11 @@
 package at.hannibal2.skyhanni.config.features.slayer.endermen
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -19,10 +24,10 @@ class EndermanConfig {
     var highlightNukekebi: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Line to Nukekubi Skulls", desc = "Draw a line to the Enderman Slayer Nukekubi Skulls.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var drawLineToNukekebi: Boolean = false
+    @ConfigOption(name = "Line To Nukekubi Skulls", desc = "")
+    @Accordion
+    val lineToNukekebi: LineToConfig = LineToConfig(defaultColor = LorenzColor.GOLD.toChromaColor())
+
 
     @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer.")
@@ -34,4 +39,13 @@ class EndermanConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideParticles: Boolean = false
+
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
+            event.move(130, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.drawLineToNukekebi")
+        }
+    }
 }

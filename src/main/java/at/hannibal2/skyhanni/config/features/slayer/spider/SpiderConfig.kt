@@ -20,7 +20,7 @@ class SpiderConfig {
     @Expose
     @ConfigOption(name = "Line To Tarantula Boss", desc = "")
     @Accordion
-    var lineToBoss: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor())
+    val lineToBoss: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor())
 
     @Expose
     @ConfigOption(name = "Mark When Invincible", desc = "Highlight the Tarantula Slayer tier 5 when the hatchlings are alive.")
