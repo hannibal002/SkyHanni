@@ -17,7 +17,7 @@ public class MixinClientLevel {
 
     @Inject(method = "addEntity", at = @At("HEAD"))
     private void onAddEntity(Entity entity, CallbackInfo ci) {
-        new EntityEnterWorldEvent(entity).post();
+        new EntityEnterWorldEvent<>(entity).post();
     }
 
     @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)

@@ -108,257 +108,258 @@ open class VisualWordGui : SkyHanniBaseScreen() {
         }
     }
 
-    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
+    // There is an open PR to change this entire file anyway, and I want these off my list
+    @Suppress("DEPRECATION", "LongMethod", "CyclomaticComplexMethod")
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
         screenHeight = height
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
 
-        mouseX = GuiScreenUtils.mouseX
-        mouseY = GuiScreenUtils.mouseY
+        this@VisualWordGui.mouseX = GuiScreenUtils.mouseX
+        this@VisualWordGui.mouseY = GuiScreenUtils.mouseY
 
-        DrawContextUtils.pushMatrix()
-        GuiRenderUtils.drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
-        val scale = 0.75f
-        val inverseScale = 1 / scale
+        DrawContextUtils.pushPop {
+            GuiRenderUtils.drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
+            val scale = 0.75f
+            val inverseScale = 1 / scale
 
-        val colorA = 0x50828282
-        val colorB = 0x50303030
-        if (!currentlyEditing) {
-            val adjustedY = guiTop + 30 + pageScroll
-            var toRemove: VisualWord? = null
+            val colorA = 0x50828282
+            val colorB = 0x50303030
+            if (!currentlyEditing) {
+                val adjustedY = guiTop + 30 + pageScroll
+                var toRemove: VisualWord? = null
 
-            val x = guiLeft + 180
-            val y = guiTop + 170
+                val x = guiLeft + 180
+                val y = guiTop + 170
 
-            drawUnmodifiedStringCentered("§aAdd New", x, y)
-            val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                drawUnmodifiedStringCentered("§aAdd New", x, y)
+                val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
-            if (shouldDrawImport) {
-                val importX = guiLeft + sizeX - 45
-                val importY = guiTop + sizeY - 10
-                GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
-                val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
-                GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
-            }
-
-            DrawContextUtils.scale(scale, scale)
-
-            drawUnmodifiedStringCentered(
-                "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
-            )
-            drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
-            drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
-
-            for ((index, phrase) in modifiedWords.withIndex()) {
-                if (adjustedY + 30 * index < guiTop + 20) continue
-                if (adjustedY + 30 * index > guiTop + 125) continue
-
-                if (phrase.phrase == "" && phrase.replacement == "") {
-                    toRemove = phrase
+                if (shouldDrawImport) {
+                    val importX = guiLeft + sizeX - 45
+                    val importY = guiTop + sizeY - 10
+                    GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
+                    val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
+                    GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
                 }
 
-                var inBox = false
-                if (isPointInMousePos(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
-                    inBox = true
-                }
+                DrawContextUtils.scale(scale, scale)
 
-                drawUnmodifiedString(
-                    "${index + 1}.",
-                    (guiLeft + 5) * inverseScale,
-                    (adjustedY + 10 + 30 * index) * inverseScale,
+                drawUnmodifiedStringCentered(
+                    "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
                 )
+                drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
+                drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
 
-                val top = adjustedY + 30 * index + 7
-                if (isPointInLastClicked(guiLeft + 335, top, 16, 16)) {
-                    lastClickedWidth = 0
-                    lastClickedHeight = 0
-                    phrase.enabled = !phrase.enabled
-                    saveChanges()
-                    SoundUtils.playClickSound()
-                } else if (isPointInLastClicked(guiLeft + 295, top, 16, 16) && index != 0) {
-                    lastClickedWidth = 0
-                    lastClickedHeight = 0
-                    SoundUtils.playClickSound()
-                    changedIndex = index
-                    changedAction = ActionType.UP
-                } else if (isPointInLastClicked(guiLeft + 315, top, 16, 16) && index != modifiedWords.size - 1) {
-                    lastClickedWidth = 0
-                    lastClickedHeight = 0
-                    SoundUtils.playClickSound()
-                    changedIndex = index
-                    changedAction = ActionType.DOWN
-                } else if (isPointInLastClicked(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
-                    lastClickedWidth = 0
-                    lastClickedHeight = 0
-                    SoundUtils.playClickSound()
-                    currentlyEditing = true
-                    currentIndex = index
-                }
+                for ((index, phrase) in modifiedWords.withIndex()) {
+                    if (adjustedY + 30 * index < guiTop + 20) continue
+                    if (adjustedY + 30 * index > guiTop + 125) continue
 
-                if (inBox) {
-                    GuiRenderUtils.drawScaledRec(
-                        guiLeft,
-                        adjustedY + 30 * index,
-                        guiLeft + sizeX,
-                        adjustedY + 30 * index + 30,
-                        colorB,
-                        inverseScale,
+                    if (phrase.phrase == "" && phrase.replacement == "") {
+                        toRemove = phrase
+                    }
+
+                    var inBox = false
+                    if (isPointInMousePos(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
+                        inBox = true
+                    }
+
+                    drawUnmodifiedString(
+                        "${index + 1}.",
+                        (guiLeft + 5) * inverseScale,
+                        (adjustedY + 10 + 30 * index) * inverseScale,
                     )
+
+                    val top = adjustedY + 30 * index + 7
+                    if (isPointInLastClicked(guiLeft + 335, top, 16, 16)) {
+                        lastClickedWidth = 0
+                        lastClickedHeight = 0
+                        phrase.enabled = !phrase.enabled
+                        saveChanges()
+                        SoundUtils.playClickSound()
+                    } else if (isPointInLastClicked(guiLeft + 295, top, 16, 16) && index != 0) {
+                        lastClickedWidth = 0
+                        lastClickedHeight = 0
+                        SoundUtils.playClickSound()
+                        changedIndex = index
+                        changedAction = ActionType.UP
+                    } else if (isPointInLastClicked(guiLeft + 315, top, 16, 16) && index != modifiedWords.size - 1) {
+                        lastClickedWidth = 0
+                        lastClickedHeight = 0
+                        SoundUtils.playClickSound()
+                        changedIndex = index
+                        changedAction = ActionType.DOWN
+                    } else if (isPointInLastClicked(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
+                        lastClickedWidth = 0
+                        lastClickedHeight = 0
+                        SoundUtils.playClickSound()
+                        currentlyEditing = true
+                        currentIndex = index
+                    }
+
+                    if (inBox) {
+                        GuiRenderUtils.drawScaledRec(
+                            guiLeft,
+                            adjustedY + 30 * index,
+                            guiLeft + sizeX,
+                            adjustedY + 30 * index + 30,
+                            colorB,
+                            inverseScale,
+                        )
+                    }
+
+                    val statusBlock = if (phrase.enabled) {
+                        ColoredBlockCompat.GREEN.createStainedClay()
+                    } else {
+                        ColoredBlockCompat.RED.createStainedClay()
+                    }
+
+                    DrawContextUtils.scale(inverseScale, inverseScale)
+
+                    if (index != 0) {
+                        GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
+                    }
+                    if (index != modifiedWords.size - 1) {
+                        GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, top, colorA)
+                    }
+
+                    GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
+
+                    DrawContextUtils.scale(scale, scale)
+
+                    if (inBox) {
+                        drawUnmodifiedString(
+                            phrase.phrase,
+                            (guiLeft + 15) * inverseScale,
+                            (adjustedY + 5 + 30 * index) * inverseScale,
+                        )
+                        drawUnmodifiedString(
+                            phrase.replacement,
+                            (guiLeft + 15) * inverseScale,
+                            (adjustedY + 15 + 30 * index) * inverseScale,
+                        )
+                    } else {
+                        drawUnmodifiedString(
+                            phrase.phrase.convertToFormatted(),
+                            (guiLeft + 15) * inverseScale,
+                            (adjustedY + 5 + 30 * index) * inverseScale,
+                        )
+                        drawUnmodifiedString(
+                            phrase.replacement.convertToFormatted(),
+                            (guiLeft + 15) * inverseScale,
+                            (adjustedY + 15 + 30 * index) * inverseScale,
+                        )
+                    }
                 }
 
-                val statusBlock = if (phrase.enabled) {
-                    ColoredBlockCompat.GREEN.createStainedClay()
-                } else {
-                    ColoredBlockCompat.RED.createStainedClay()
+                if (modifiedWords.isEmpty()) {
+                    modifiedWords = ModifyVisualWords.userModifiedWords
+                        .map { it.toVisualWord() }.toMutableList()
+                }
+
+                if (toRemove != null) {
+                    modifiedWords.remove(toRemove)
+                    saveChanges()
                 }
 
                 DrawContextUtils.scale(inverseScale, inverseScale)
 
-                if (index != 0) {
-                    GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
-                }
-                if (index != modifiedWords.size - 1) {
-                    GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, top, colorA)
-                }
+                scrollScreen()
+            } else {
+                var x = guiLeft + 180
+                var y = guiTop + 140
+                drawUnmodifiedStringCentered("§cDelete", x, y)
+                var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                y += 30
+                drawUnmodifiedStringCentered("§eBack", x, y)
+                color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
-                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
+                if (currentIndex < modifiedWords.size && currentIndex != -1) {
+                    val currentPhrase = modifiedWords[currentIndex]
 
-                DrawContextUtils.scale(scale, scale)
+                    x -= 100
+                    drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
+                    var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
+                    drawUnmodifiedStringCentered(status, x, y)
+                    color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                    GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
-                if (inBox) {
-                    drawUnmodifiedString(
-                        phrase.phrase,
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 5 + 30 * index) * inverseScale,
-                    )
-                    drawUnmodifiedString(
-                        phrase.replacement,
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 15 + 30 * index) * inverseScale,
-                    )
-                } else {
-                    drawUnmodifiedString(
-                        phrase.phrase.convertToFormatted(),
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 5 + 30 * index) * inverseScale,
-                    )
-                    drawUnmodifiedString(
-                        phrase.replacement.convertToFormatted(),
-                        (guiLeft + 15) * inverseScale,
-                        (adjustedY + 15 + 30 * index) * inverseScale,
-                    )
+                    x += 200
+                    drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
+                    status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
+                    drawUnmodifiedStringCentered(status, x, y)
+                    color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                    GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
+
+                    drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
+
+                    if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
+                        GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
+                    }
+                    if (currentTextBox == SelectedTextBox.PHRASE) {
+                        GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
+                    }
+
+                    if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
+                        GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
+                    }
+                    if (currentTextBox == SelectedTextBox.REPLACEMENT) {
+                        GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
+                    }
+
+                    DrawContextUtils.scaled(scale, scale) {
+                        // TODO remove more code duplication
+                        drawUnmodifiedString(
+                            "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
+                        )
+                        drawUnmodifiedString(
+                            "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
+                        )
+
+                        drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
+                        drawUnmodifiedString(
+                            "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
+                        )
+
+                        drawUnmodifiedString(
+                            currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
+                        )
+                        drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
+
+                        drawUnmodifiedString(
+                            currentPhrase.replacement.convertToFormatted(),
+                            (guiLeft + 30) * inverseScale,
+                            (guiTop + 95) * inverseScale,
+                        )
+                        drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
+                    }
                 }
             }
 
-            if (modifiedWords.isEmpty()) {
-                modifiedWords = ModifyVisualWords.userModifiedWords
-                    .map { it.toVisualWord() }.toMutableList()
-            }
+            if (changedIndex != -1) {
+                if (changedAction == ActionType.UP) {
+                    if (changedIndex > 0) {
+                        val temp = modifiedWords[changedIndex]
+                        modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
+                        modifiedWords[changedIndex - 1] = temp
+                    }
+                } else if (changedAction == ActionType.DOWN) {
+                    if (changedIndex < modifiedWords.size - 1) {
+                        val temp = modifiedWords[changedIndex]
+                        modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
+                        modifiedWords[changedIndex + 1] = temp
+                    }
+                }
 
-            if (toRemove != null) {
-                modifiedWords.remove(toRemove)
+                changedIndex = -1
+                changedAction = ActionType.NONE
                 saveChanges()
             }
-
-            DrawContextUtils.scale(inverseScale, inverseScale)
-
-            scrollScreen()
-        } else {
-            var x = guiLeft + 180
-            var y = guiTop + 140
-            drawUnmodifiedStringCentered("§cDelete", x, y)
-            var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-            y += 30
-            drawUnmodifiedStringCentered("§eBack", x, y)
-            color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-
-            if (currentIndex < modifiedWords.size && currentIndex != -1) {
-                val currentPhrase = modifiedWords[currentIndex]
-
-                x -= 100
-                drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
-                var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
-                drawUnmodifiedStringCentered(status, x, y)
-                color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-
-                x += 200
-                drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
-                status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
-                drawUnmodifiedStringCentered(status, x, y)
-                color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-
-                drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
-
-                if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                    GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
-                }
-                if (currentTextBox == SelectedTextBox.PHRASE) {
-                    GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
-                }
-
-                if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                    GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
-                }
-                if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-                    GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
-                }
-
-                DrawContextUtils.scaled(scale, scale) {
-                    // TODO remove more code duplication
-                    drawUnmodifiedString(
-                        "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
-                    )
-                    drawUnmodifiedString(
-                        "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
-                    )
-
-                    drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
-                    drawUnmodifiedString(
-                        "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
-                    )
-
-                    drawUnmodifiedString(
-                        currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
-                    )
-                    drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
-
-                    drawUnmodifiedString(
-                        currentPhrase.replacement.convertToFormatted(),
-                        (guiLeft + 30) * inverseScale,
-                        (guiTop + 95) * inverseScale,
-                    )
-                    drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
-                }
-            }
         }
-
-        if (changedIndex != -1) {
-            if (changedAction == ActionType.UP) {
-                if (changedIndex > 0) {
-                    val temp = modifiedWords[changedIndex]
-                    modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
-                    modifiedWords[changedIndex - 1] = temp
-                }
-            } else if (changedAction == ActionType.DOWN) {
-                if (changedIndex < modifiedWords.size - 1) {
-                    val temp = modifiedWords[changedIndex]
-                    modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
-                    modifiedWords[changedIndex + 1] = temp
-                }
-            }
-
-            changedIndex = -1
-            changedAction = ActionType.NONE
-            saveChanges()
-        }
-
-        DrawContextUtils.popMatrix()
     }
 
     private fun isPointInMousePos(left: Int, top: Int, width: Int, height: Int) =
@@ -458,6 +459,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
         if (!currentlyEditing) {
             if (keyCode == GLFW.GLFW_KEY_DOWN || keyCode == GLFW.GLFW_KEY_S) {
@@ -599,6 +601,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
         ModifyVisualWords.changeWords = true
     }
 
+    @Suppress("SameParameterValue")
     private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
         drawUnmodifiedString(str, x.toFloat(), y.toFloat())
     }
@@ -609,6 +612,7 @@ open class VisualWordGui : SkyHanniBaseScreen() {
         ModifyVisualWords.changeWords = true
     }
 
+    @Suppress("SameParameterValue")
     private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {
         drawUnmodifiedStringCentered(str, x.toInt(), y.toInt())
     }
