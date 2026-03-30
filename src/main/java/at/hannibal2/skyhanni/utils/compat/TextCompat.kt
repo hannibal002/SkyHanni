@@ -274,7 +274,7 @@ fun ClickEvent.value(): String {
         ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
         ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
         ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
-        // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
+        // todo use error manager here probably, not doing it now because it doesn't compile on 1.21
         else -> ""
     }
 

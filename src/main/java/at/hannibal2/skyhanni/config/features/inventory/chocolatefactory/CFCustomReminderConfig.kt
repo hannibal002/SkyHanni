@@ -12,7 +12,7 @@ class CFCustomReminderConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show a custom reminder until you can purchase the next upgrade.\n" +
-            "Click on one item you cant buy to select/deselect it."
+            "Click on one item you can't buy to select/deselect it."
     )
     @ConfigEditorBoolean
     @FeatureToggle

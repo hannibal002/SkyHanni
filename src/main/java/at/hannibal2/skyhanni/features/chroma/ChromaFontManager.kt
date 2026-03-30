@@ -59,7 +59,7 @@ fun isNotActuallyEqualBecauseOfChroma(
     (textColor.name == "chroma" || testObject.name == "chroma") &&
     textColor.getTextColorName() != testObject.getTextColorName()
 
-// the get name inside of text colour does a string format and is very bad for performance
+// the get name inside of text color does a string format and is very bad for performance
 private fun TextColor.getTextColorName(): String? {
     return if (name != null) name else value.toString()
 }
