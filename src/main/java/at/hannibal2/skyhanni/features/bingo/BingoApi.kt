@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -189,6 +190,7 @@ object BingoApi {
         val (_, jsonResponse) = ApiUtils.getJsonResponse(bingoStatic).assertSuccessWithData()
             ?: error("Failed to fetch Bingo data from Hypixel API")
         val response = ConfigManager.gson.fromJson<BingoApiResponseJson>(jsonResponse)
+        lastFetchTime = SimpleTimeMark.now()
 
         if (response.start != bingoEventStart || response.end != bingoEventEnd) {
             bingoEventStart = response.start
@@ -201,8 +203,8 @@ object BingoApi {
     }
 
     @HandleEvent
-    fun onSecondPassed() {
-        if (lastFetchTime.passedSince() < UPDATE_INTERVAL) return
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!event.repeatSeconds(60) || lastFetchTime.passedSince() < UPDATE_INTERVAL) return
         updateBingoData()
     }
 
