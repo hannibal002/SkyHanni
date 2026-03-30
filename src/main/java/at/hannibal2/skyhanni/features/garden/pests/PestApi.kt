@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.iterator
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 import org.lwjgl.glfw.GLFW
@@ -73,6 +74,9 @@ object PestApi {
     var lastPestSpawnTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHeld = SimpleTimeMark.farPast()
     var lastTimeLassoHeld = SimpleTimeMark.farPast()
+
+    var isBpcEnabled = false
+    var latestBpc = 0
 
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
@@ -176,6 +180,17 @@ object PestApi {
         "PLAYING",
     )
 
+    private val bpcPatternGroup = RepoPattern.group("garden.bonuspestchance")
+
+    /**
+     * REGEX-TEST:  Bonus Pest Chance: ൠ70
+     * REGEX-TEST:  Bonus Pest Chance: ൠ70
+     */
+    val bonusPestChancePattern by bpcPatternGroup.pattern(
+        "widget-no-color",
+        "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
+    )
+
     private var gardenJoinTime = SimpleTimeMark.farPast()
     private var firstScoreboardCheck = false
 
@@ -253,25 +268,43 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
+        if (event.isWidget(TabWidget.PESTS)) {
+            infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
+                val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
+                val apiPlots = getInfestedPlots().map { it.id }.toSet()
 
-        infestedPlotsTabListPattern.firstMatcher(event.widget.lines.map { it.string }) {
-            val tabListPlots = group("plots").removeColor().split(", ").map { it.toInt() }.toSet()
-            val apiPlots = getInfestedPlots().map { it.id }.toSet()
+                if (tabListPlots == apiPlots) return
 
-            if (tabListPlots == apiPlots) return
-
-            for (plot in GardenPlotApi.plots) {
-                if (plot.id in tabListPlots) {
-                    if (!plot.isPestCountInaccurate && plot.pests == 0) {
-                        plot.isPestCountInaccurate = true
+                for (plot in GardenPlotApi.plots) {
+                    if (plot.id in tabListPlots) {
+                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                            plot.isPestCountInaccurate = true
+                        }
+                    } else {
+                        plot.pests = 0
+                        plot.isPestCountInaccurate = false
                     }
-                } else {
-                    plot.pests = 0
-                    plot.isPestCountInaccurate = false
                 }
+                updatePests()
             }
-            updatePests()
+        } else if(event.isWidget(TabWidget.STATS)) {
+            updateBpc(event)
+        }
+    }
+
+    fun updateBpc(event: WidgetUpdateEvent) {
+        event.widget.lines.forEach { line ->
+            PestApi.bonusPestChancePattern.matchMatcher(line) {
+                latestBpc = group("amount").toInt()
+                for (component in line.iterator()) {
+                    if (component.style.isStrikethrough) {
+                        isBpcEnabled = false
+                        return
+                    }
+                }
+                isBpcEnabled = true
+                return
+            }
         }
     }
 

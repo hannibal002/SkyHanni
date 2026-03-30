@@ -166,7 +166,6 @@ object FarmingFortuneDisplay {
                 pestBonusExpireTime = time
 
             }
-            update()
         }
     }
 
@@ -174,10 +173,7 @@ object FarmingFortuneDisplay {
         universalTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val fortune = group("fortune").toDouble()
             foundTabUniversalFortune = true
-            if (fortune != tabFortuneUniversal) {
-                tabFortuneUniversal = fortune
-                update()
-            }
+            tabFortuneUniversal = fortune
         }
         cropSpecificTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val crop = CropType.getByName(group("crop"))
@@ -185,10 +181,7 @@ object FarmingFortuneDisplay {
 
             currentCrop = crop
             foundTabCropFortune = true
-            if (cropFortune != tabFortuneCrop) {
-                tabFortuneCrop = cropFortune
-                update()
-            }
+            tabFortuneCrop = cropFortune
             if (GardenApi.cropInHand == crop) {
                 latestFF?.put(crop, getCurrentFarmingFortune())
             }
@@ -363,7 +356,8 @@ object FarmingFortuneDisplay {
     private fun isEnabled(): Boolean = GardenApi.inGarden() && config.display
 
     private fun getPestFFReduction(): Int {
-        val bpc = SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue ?: 0.0
+        val bpcEnabled = PestApi.isBpcEnabled
+        val bpc = if (bpcEnabled) SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue ?: 0.0 else 0.0
         val pests = (PestApi.scoreboardPests - floor(bpc / 100).toInt()).coerceAtLeast(0)
 
         return when (pests) {

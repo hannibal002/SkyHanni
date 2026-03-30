@@ -9,27 +9,13 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.compat.iterator
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object BonusPestChanceDisplay {
 
     private val config get() = PestApi.config
 
-    private val patternGroup = RepoPattern.group("garden.bonuspestchance")
-
-    /**
-     * REGEX-TEST:  Bonus Pest Chance: ൠ70
-     * REGEX-TEST:  Bonus Pest Chance: ൠ70
-     */
-    private val bonusPestChancePattern by patternGroup.pattern(
-        "widget-no-color",
-        "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
-    )
     private var display: String? = null
 
     @HandleEvent
@@ -40,26 +26,17 @@ object BonusPestChanceDisplay {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.STATS)) return
-        val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
-        event.widget.lines.forEach { line ->
-            bonusPestChancePattern.matchMatcher(line) {
-                var disabled = false
-                for (component in line.iterator()) {
-                    if (component.style.isStrikethrough) {
-                        disabled = true
-                        break
-                    }
-                }
-                val amount = group("amount").formatInt()
+        PestApi.updateBpc(event)
 
-                display = buildString {
-                    if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
-                    if (disabled) append("§c§m") else append("§f")
-                    append("$amount%")
-                    if (disabled && !compact) append("§r §cDISABLED")
-                }
-                return
-            }
+        val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
+        val disabled = !PestApi.isBpcEnabled
+        val amount = PestApi.latestBpc
+
+        display = buildString {
+            if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
+            if (disabled) append("§c§m") else append("§f")
+            append("$amount%")
+            if (disabled && !compact) append("§r §cDISABLED")
         }
     }
 
