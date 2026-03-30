@@ -46,25 +46,25 @@ object ItemTipHelper {
 
         val fontRenderer = Minecraft.getInstance().font
 
-        DrawContextUtils.pushMatrix()
-        for (slot in gui.container.slots) {
-            val stack = slot.item.orNull() ?: continue
+        DrawContextUtils.pushPop {
+            for (slot in gui.container.slots) {
+                val stack = slot.item.orNull() ?: continue
 
-            val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
-            itemTipEvent.post()
-            val stackTip = itemTipEvent.stackTip
-            if (stackTip.isEmpty()) continue
+                val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
+                itemTipEvent.post()
+                val stackTip = itemTipEvent.stackTip
+                if (stackTip.isEmpty()) continue
 
-            val xDisplayPosition = slot.x
-            val yDisplayPosition = slot.y
+                val xDisplayPosition = slot.x
+                val yDisplayPosition = slot.y
 
-            val x = gui.leftPos + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
-                fontRenderer.width(stackTip)
-            } else 0
-            val y = gui.topPos + yDisplayPosition + 9 + itemTipEvent.offsetY
+                val x = gui.leftPos + xDisplayPosition + 17 + itemTipEvent.offsetX - if (itemTipEvent.alignLeft) {
+                    fontRenderer.width(stackTip)
+                } else 0
+                val y = gui.topPos + yDisplayPosition + 9 + itemTipEvent.offsetY
 
-            GuiRenderUtils.drawString(stackTip, x, y, -1)
+                GuiRenderUtils.drawString(stackTip, x, y, -1)
+            }
         }
-        DrawContextUtils.popMatrix()
     }
 }

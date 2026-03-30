@@ -165,12 +165,12 @@ interface CommandContextAwareObject {
 /**
  * An Argument that is used by a [ComplexCommand].
  * [T] is the [CommandContextAwareObject] that should be mutated by the [ComplexCommand].
- * @param documentation User facing descriptor of the argument.
+ * @param documentation User-facing descriptor of the argument.
  *
  * It should start with a listing of the parameters it takes in followed by a " - " and the description of what it does.
  *
  * A needed parameter should be specified with: "&lt;>", inside the brackets there should be short name of what type it is
- * eg: "&lt;item>", "&lt;number>", "&lt;number/calculation>".
+ * e.g.: "&lt;item>", "&lt;number>", "&lt;number/calculation>".
  * If no argument is present prefix it with: "- " and then add the rest.
  * @param prefix A prefix that can be used to directly access that argument. Eg: "-i", "-p", "-cc".
  * @param defaultPosition The position where it is expected to be called if no prefix was specified by the user.
@@ -178,7 +178,7 @@ interface CommandContextAwareObject {
  * 0>= Index where it is expected to be used , -1 = can only be called with a prefix, -2 = expected position as last element.
  * @param validity Check the [CommandContextAwareObject] if this argument can be called with the current state
  * @param tabComplete This is called if the [ComplexCommand.tabParse] thinks this is valid
- * eg: The prefix is present before that. Or the [defaultPosition] matches
+ * e.g.: The prefix is present before that. Or the [defaultPosition] matches
  * The input is the partial written input the user gave.
  * The return value should be all possible completions of that.
  * All return values need to start with partial input that start with the last space (exclusive) till the end of the input.

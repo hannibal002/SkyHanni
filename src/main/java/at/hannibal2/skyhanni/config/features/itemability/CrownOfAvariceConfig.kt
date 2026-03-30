@@ -50,6 +50,7 @@ class CrownOfAvariceConfig {
     @ConfigEditorBoolean
     var resetOnWorldChange = false
 
+    // TODO rename enum names with _ and use config migration
     @Expose
     @ConfigOption(name = "Tracker Text", desc = "Drag the text to change the appearance of the overlay.")
     @ConfigEditorDraggableList

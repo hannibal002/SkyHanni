@@ -18,13 +18,13 @@ object BlobbercystsHighlight {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private val entityList = mutableSetOf<RemotePlayer>()
-    private const val BLOBBER_NAME = "Blobbercyst "
+    private const val ENTITY_NAME = "Blobbercyst "
 
     @HandleEvent
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.name.string != BLOBBER_NAME) return
+        if (entity.name.string != ENTITY_NAME) return
         RenderLivingEntityHelper.setEntityColor(entity, Color.RED.addAlpha(80)) { isEnabled() }
         entityList.add(entity)
     }

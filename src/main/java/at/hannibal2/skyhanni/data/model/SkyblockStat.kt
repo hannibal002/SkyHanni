@@ -28,7 +28,7 @@ enum class SkyblockStat(
     val hypixelIcon: String,
     @Language("RegExp") tabListPatternS: String,
     @Language("RegExp") menuPatternS: String,
-    private val hypxelId: String? = null,
+    private val hypixelId: String? = null,
 ) {
     DAMAGE("§c❁", "", ""), // Weapon only
     HEALTH("§c❤", " *Health: ❤$VALUE_PATTERN", " *§c❤ Health §f$VALUE_PATTERN"), // TODO get from action bar
@@ -41,22 +41,22 @@ enum class SkyblockStat(
     ), // TODO get from action bar
     CRIT_DAMAGE(
         "§9☠", " *Crit Damage: ☠$VALUE_PATTERN", " *§9☠ Crit Damage §f$VALUE_PATTERN",
-        hypxelId = "CRITICAL_DAMAGE",
+        hypixelId = "CRITICAL_DAMAGE",
     ),
     CRIT_CHANCE(
         "§9☣", " *Crit Chance: ☣$VALUE_PATTERN", " *§9☣ Crit Chance §f$VALUE_PATTERN",
-        hypxelId = "CRITICAL_CHANCE",
+        hypixelId = "CRITICAL_CHANCE",
     ),
     FEROCITY("§c⫽", " *Ferocity: ⫽$VALUE_PATTERN", " *§c⫽ Ferocity §f$VALUE_PATTERN"),
     BONUS_ATTACK_SPEED(
         "§e⚔",
         " *Attack Speed: ⚔$VALUE_PATTERN",
         " *§e⚔ Bonus Attack Speed §f$VALUE_PATTERN",
-        hypxelId = "ATTACK_SPEED",
+        hypixelId = "ATTACK_SPEED",
     ),
     ABILITY_DAMAGE(
         "§c๑", " *Ability Damage: ๑$VALUE_PATTERN", " *§c๑ Ability Damage §f$VALUE_PATTERN",
-        hypxelId = "ABILITY_DAMAGE_PERCENT",
+        hypixelId = "ABILITY_DAMAGE_PERCENT",
     ),
     HEALTH_REGEN(
         "§c❣",
@@ -72,7 +72,7 @@ enum class SkyblockStat(
     // TODO add the way sba did get it (be careful with 500+ Speed)
     SPEED(
         "§f✦", " *Speed: ✦$VALUE_PATTERN", " *§f✦ Speed §f$VALUE_PATTERN",
-        hypxelId = "WALK_SPEED",
+        hypixelId = "WALK_SPEED",
     ),
     SEA_CREATURE_CHANCE("§3α", " *Sea Creature Chance: α$VALUE_PATTERN", " *§3α Sea Creature Chance §f$VALUE_PATTERN"),
     MAGIC_FIND("§b✯", " *Magic Find: ✯$VALUE_PATTERN", " *§b✯ Magic Find §f$VALUE_PATTERN"),
@@ -202,7 +202,7 @@ enum class SkyblockStat(
             entries.maxOf { Minecraft.getInstance().font.width(it.icon) } + 1
         }
 
-        fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypxelId == string }
+        fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypixelId == string }
 
         fun getValue(string: String): SkyblockStat = getValueOrNull(string) ?: UNKNOWN
 
