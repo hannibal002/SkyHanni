@@ -42,6 +42,11 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: assemble -x test --stacktrace -PskipDetekt=true
+            -   name: Save Gradle build cache
+                uses: actions/cache/save@v4
+                with:
+                    path: ~/.gradle/caches/build-cache-1
+                    key: gradle-build-cache-${{ github.run_id }}-${{ github.run_attempt }}
             -   uses: actions/upload-artifact@v7
                 name: Upload development build
                 with:
@@ -144,6 +149,11 @@ jobs:
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
+            -   name: Restore Gradle build cache from build job
+                uses: actions/cache/restore@v4
+                with:
+                    path: ~/.gradle/caches/build-cache-1
+                    key: gradle-build-cache-${{ github.run_id }}-${{ github.run_attempt }}
             -   name: Disable preprocessor
                 run: |
                     mkdir -p .gradle
