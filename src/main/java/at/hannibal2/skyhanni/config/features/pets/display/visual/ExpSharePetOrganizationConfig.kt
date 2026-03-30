@@ -24,7 +24,7 @@ class ExpSharePetOrganizationConfig : Resettable {
         BOTTOM("Bottom"),
         LEFT("Left"),
         RIGHT("Right"),
-        ORBIT("Orbit")
+        ORBIT("Orbit"),
         ;
 
         override fun toString() = displayName

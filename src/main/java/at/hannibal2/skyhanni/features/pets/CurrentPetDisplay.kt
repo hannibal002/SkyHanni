@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.decorators.CircularContainerRenderable.Companion.circularContainer
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec3
@@ -63,20 +62,6 @@ object CurrentPetDisplay {
     private var petOverlay: Renderable? = null
     private val currentRotation: Property<Vec3> = Property.of(Vec3.ZERO)
     private val EXP_SHARE = "PET_ITEM_EXP_SHARE".toInternalName()
-
-    private fun LorenzRarity.getRarityBackgroundColor(
-        backgroundConfig: RarityBackgroundConfig
-    ): ChromaColour = with(backgroundConfig) {
-        when (this@getRarityBackgroundColor) {
-            LorenzRarity.COMMON -> commonColor.get()
-            LorenzRarity.UNCOMMON -> uncommonColor.get()
-            LorenzRarity.RARE -> rareColor.get()
-            LorenzRarity.EPIC -> epicColor.get()
-            LorenzRarity.LEGENDARY -> legendaryColor.get()
-            LorenzRarity.MYTHIC -> mythicColor.get()
-            else -> this@getRarityBackgroundColor.color.toChromaColor()
-        }
-    }
 
     private fun PetData.buildMainIconRenderableOrNull(): Renderable? = with(config.visual) {
         if (!icon.enabled.get()) return null
@@ -203,7 +188,7 @@ object CurrentPetDisplay {
         rarity: LorenzRarity,
     ): Renderable = if (!enabled) this else Renderable.circularContainer(
         this,
-        rarity.getRarityBackgroundColor(backgroundConfig),
+        backgroundConfig.getRarityBackgroundColor(rarity),
         padding = backgroundConfig.padding.get(),
     )
 

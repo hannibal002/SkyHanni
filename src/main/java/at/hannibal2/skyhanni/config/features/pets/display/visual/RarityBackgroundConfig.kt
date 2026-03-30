@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
 import at.hannibal2.skyhanni.config.features.pets.display.ResettableScalableConfig
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -14,6 +15,16 @@ class RarityBackgroundConfig(
 ) : ResettableScalableConfig {
     companion object {
         private const val DEFAULT_PADDING = 4
+    }
+
+    fun getRarityBackgroundColor(rarity: LorenzRarity): ChromaColour = when (rarity) {
+        LorenzRarity.COMMON -> commonColor.get()
+        LorenzRarity.UNCOMMON -> uncommonColor.get()
+        LorenzRarity.RARE -> rareColor.get()
+        LorenzRarity.EPIC -> epicColor.get()
+        LorenzRarity.LEGENDARY -> legendaryColor.get()
+        LorenzRarity.MYTHIC -> mythicColor.get()
+        else -> rarity.color.toChromaColor()
     }
 
     @Expose
