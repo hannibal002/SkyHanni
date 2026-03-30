@@ -9,13 +9,12 @@ import java.awt.Color
 
 class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent) {
 
-    @PublishedApi
     internal fun VertexConsumer.addColoredVertex(point: Vec3, color: Color) {
         addVertex(point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
             .setColor(color.red, color.green, color.blue, color.alpha)
     }
 
-    inline fun draw(
+    fun draw(
         middlePoint: Vec3,
         sidePoint1: Vec3,
         sidePoint2: Vec3,

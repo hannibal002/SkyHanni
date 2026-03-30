@@ -47,7 +47,7 @@ object StorageApi {
      * REGEX-TEST: Ender Chest
      * REGEX-TEST: Ender Chest (1/9)
      */
-    private val enderchestPattern by RepoPattern.pattern(
+    private val enderChestPattern by RepoPattern.pattern(
         "storage.enderchest",
         "Ender Chest(?: \\((?<page>\\d+)/\\d+\\))?",
     )
@@ -70,7 +70,7 @@ object StorageApi {
     )
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
-    val enderchest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
+    val enderChest: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Ender Chest", storage)
     val backpack: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Backpack", storage)
     val riftStorage: Map<String, SkyHanniInventoryContainer> get() = subMapOfStringsStartingWith("Rift Storage", storage)
     private val mutableIslandChest: MutableMap<String, SkyHanniInventoryContainer>
@@ -85,7 +85,7 @@ object StorageApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        enderchestPattern.matchMatcher(event.inventoryName) {
+        enderChestPattern.matchMatcher(event.inventoryName) {
             val page = groupOrNull("page")?.toInt() ?: 1
             handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return
@@ -153,7 +153,7 @@ object StorageApi {
             when {
                 chest.primaryCords.distanceSqToPlayer() > 30 * 30 -> false
                 chest.primaryCords.getBlockAt() !is ChestBlock -> true
-                chest.secondaryCords == null -> getNeighbourBlocks(chest.primaryCords).any { it.second is ChestBlock }
+                chest.secondaryCords == null -> getNeighborBlocks(chest.primaryCords).any { it.second is ChestBlock }
                 else -> chest.secondaryCords.getBlockAt() !is ChestBlock
             }.also {
                 if (it) ChatUtils.debug("Removed Private Island Chest at: ${chest.primaryCords}")
@@ -202,7 +202,7 @@ object StorageApi {
     private var lastChestClicked: Vec3? = null
     private var doubleChestCord: Vec3? = null
 
-    private fun getNeighbourBlocks(position: Vec3): List<Pair<Vec3, Block>> = listOf(
+    private fun getNeighborBlocks(position: Vec3): List<Pair<Vec3, Block>> = listOf(
         position.add(x = 1.0),
         position.subtract(x = 1.0),
         position.add(z = 1.0),
@@ -215,7 +215,7 @@ object StorageApi {
         if (!isPrivateIslandStorageEnabled()) return
         val chest = event.getBlockState.block as? ChestBlock ?: return
         // Double Chest Check
-        val otherChest = getNeighbourBlocks(event.position).firstOrNull { it.second == chest }?.first
+        val otherChest = getNeighborBlocks(event.position).firstOrNull { it.second == chest }?.first
         if (otherChest == null) {
             lastChestClicked = event.position
             doubleChestCord = null

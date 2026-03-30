@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.VectorUtils.roundTo
 import net.minecraft.world.phys.Vec3
 
+@PrimaryFunction("onPlaySound")
 class PlaySoundEvent(
     val soundName: String,
     override val location: Vec3,

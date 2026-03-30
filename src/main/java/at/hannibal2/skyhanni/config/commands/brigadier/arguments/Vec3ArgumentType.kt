@@ -71,7 +71,7 @@ sealed class Vec3ArgumentType : ArgumentType<Vec3> {
          * REGEX-TEST: Vec3(0.0, 0.0, 0.0)
          * REGEX-TEST: Vec3(-78.8, 68.0, -28.7)
          */
-        private val lorenzVecPattern by patternGroup.pattern(
+        private val vec3Pattern by patternGroup.pattern(
             "vec3",
             """Vec3\((?<x>-?\d+(?:\.\d+)?),\s*(?<y>-?\d+(?:\.\d+)?),\s*(?<z>-?\d+(?:\.\d+)?)\)""",
         )
@@ -100,7 +100,7 @@ sealed class Vec3ArgumentType : ArgumentType<Vec3> {
             """(?<x>~|-?\d+(?:\.\d+)?)\s+(?<y>~|-?\d+(?:\.\d+)?)\s+(?<z>~|-?\d+(?:\.\d+)?)""",
         )
 
-        private val patterns = listOf(lorenzVecPattern, colonPattern, spacePattern)
+        private val patterns = listOf(vec3Pattern, colonPattern, spacePattern)
 
         private val invalidCoordinates =
             SimpleCommandExceptionType(LiteralMessage("Invalid coordinates"))

@@ -132,7 +132,8 @@ object GriffinBurrowHelper {
         }
     }
 
-    // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
+    // Used because instant-breaking a block makes it invalid
+    // (would be better to store valid blocks in repo)
     private val recentClickedBlocks = TimeLimitedSet<Vec3>(1.seconds)
 
     private var shouldFocusOnRareMob = false
