@@ -64,18 +64,22 @@ object DeployableDisplay {
         )
 
         fun isInRange(entity: LivingEntity): Boolean {
-            val shaftBuff = fullShaft && IslandType.MINESHAFT.isCurrent()
-            return shaftBuff || range > entity.getLorenzVec().distanceToPlayer()
+            return hasShaftBuff() || range > entity.getLorenzVec().distanceToPlayer()
         }
 
         fun isInRange(): Boolean {
-            val shaftBuff = fullShaft && IslandType.MINESHAFT.isCurrent()
+            if (hasShaftBuff()) return true
             val entity = entity ?: return false
-            return shaftBuff || range > entity.getLorenzVec().distanceToPlayer()
+            return range > entity.getLorenzVec().distanceToPlayer()
+        }
+
+        fun hasShaftBuff(): Boolean {
+            return fullShaft && IslandType.MINESHAFT.isCurrent()
         }
 
         fun isActive(): Boolean {
-            return !expiryTime.isInPast() && isInRange() && entity?.deceased == false
+            // A mineshaft is bigger than entity render distance
+            return !expiryTime.isInPast() && isInRange() && (entity?.deceased == false || hasShaftBuff())
         }
 
         fun reset() {
@@ -105,6 +109,7 @@ object DeployableDisplay {
         }
     }
 
+    // todo should this be a set?
     private val activeDeployables = mutableListOf<Deployable>()
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -139,6 +144,12 @@ object DeployableDisplay {
         if (!config.enabled) return
         if (!event.isMod(10)) return
         buildDisplay()
+    }
+
+    @HandleEvent
+    fun onWorldChange() {
+        activeDeployables.clear()
+        Deployable.entries.forEach { it.reset() }
     }
 
     fun buildDisplay() {
