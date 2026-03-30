@@ -1,9 +1,9 @@
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
+import dev.detekt.gradle.Detekt
+import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -21,7 +21,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
     `maven-publish`
-    id("io.gitlab.arturbosch.detekt")
+    id("dev.detekt")
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
@@ -97,11 +97,7 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
-    this.javaLauncher.set(
-        javaToolchains.launcherFor {
-            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-        },
-    )
+    this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
@@ -169,7 +165,7 @@ dependencies {
 
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
-    detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.detektrules.ktlint)
 
     if (target != ProjectTarget.MODERN_12110) shadowImpl(libs.httpclient)
 }
@@ -364,6 +360,7 @@ afterEvaluate {
     )
 }
 
+
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12110
     val skipDetekt = project.findProperty("skipDetekt") == "true"
@@ -375,14 +372,8 @@ tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
         html.outputLocation.set(file("$detektDir/$outputFileName.html"))
-        xml.required.set(true)
-        xml.outputLocation.set(file("$detektDir/$outputFileName.xml"))
         sarif.required.set(true)
         sarif.outputLocation.set(file("$detektDir/$outputFileName.sarif"))
-        md.required.set(true)
-        md.outputLocation.set(file("$detektDir/$outputFileName.md"))
-        txt.required.set(true)
-        txt.outputLocation.set(file("$detektDir/$outputFileName.txt"))
     }
 }
 

@@ -62,13 +62,13 @@ object GuiRenderUtils {
     }
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
-        DrawContextUtils.pushMatrix()
-        val strLength = fr.width(text)
-        val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        DrawContextUtils.translate(x, y)
-        DrawContextUtils.scale(factor, factor)
-        drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            val strLength = fr.width(text)
+            val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
+            DrawContextUtils.translate(x, y)
+            DrawContextUtils.scale(factor, factor)
+            drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
+        }
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
