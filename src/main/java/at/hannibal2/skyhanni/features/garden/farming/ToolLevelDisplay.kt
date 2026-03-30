@@ -97,7 +97,7 @@ object ToolLevelDisplay {
             val uuid = heldItem.getItemUuid()
             val overflowLevel = getOverflowToolLevel(uuid)
             if (overflowLevel != null) {
-            toolLevel += overflowLevel
+	              toolLevel += overflowLevel
             }
         }
         add("§7Level §8$toolLevel➜§3${toolLevel + 1}")
