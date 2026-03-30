@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 
-data class NeuRecipeComponent(val internalName: NeuInternalName?, val count: Int = 1) {
+data class NeuRecipeComponent(val internalName: NeuInternalName? = null, val count: Int = 1) {
     fun toJsonString() = internalName?.let { "$it:$count" }.orEmpty()
 
     companion object {
@@ -19,7 +19,7 @@ data class NeuRecipeComponent(val internalName: NeuInternalName?, val count: Int
         }
     }
 
-    fun toPrimitiveIngredientOrNull() = internalName?.let { PrimitiveIngredient(it, count) }
+    fun toPrimitiveIngredientOrEmpty() = internalName?.let { PrimitiveIngredient(it, count) } ?: PrimitiveIngredient.EMPTY
     fun toPrimitiveIngredient(countOverride: Int? = null) = PrimitiveIngredient(
         internalName ?: error("Internal name cannot be null"),
         countOverride ?: count

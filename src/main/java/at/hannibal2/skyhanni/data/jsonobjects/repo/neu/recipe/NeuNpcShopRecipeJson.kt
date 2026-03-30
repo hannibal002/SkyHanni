@@ -10,7 +10,7 @@ data class NeuNpcShopRecipeJson(
     @Expose val result: NeuRecipeComponent,
 ) : NeuAbstractRecipe {
     // These cannot be by lazy since this class cannot be KSerializable.
-    override val primitiveIngredients get() = cost.mapNotNull { it.toPrimitiveIngredientOrNull() }
+    override val primitiveIngredients get() = cost.mapNotNull { it.toPrimitiveIngredientOrEmpty() }
     private val primitiveOutputs get() = listOf(result.toPrimitiveIngredient())
     override fun getPrimitiveOutputs(itemJson: NeuItemJson) = primitiveOutputs
     override fun getPrimitiveRecipe(itemJson: NeuItemJson): MerchantPrimitiveRecipe =

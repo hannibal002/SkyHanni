@@ -35,15 +35,24 @@ object GenericRecipeLayout : RecipeLayout() {
         buildList {
             add(sectionLabel(title))
             if (ingredients.isEmpty()) add(Renderable.text("§7(none)", scale = 0.85))
-            else addAll(ingredients.map { buildIngredientRow(it, screen) })
+            else addAll(ingredients.mapNotNull { buildIngredientRowOrNull(it, screen) })
         },
         spacing = 3,
+    )
+
+    private fun PrimitiveIngredient.buildWrappedText() = Renderable.wrappedText(
+        internalName.repoItemName,
+        setWidth = 80,
+        scale = 0.8,
+        color = Color.WHITE,
+        horizontalAlign = HA.CENTER,
+        internalAlign = HA.CENTER,
     )
 
     private fun buildSingleIngredientNoOutput(ingredient: PrimitiveIngredient, screen: RecipeViewerScreen) = Renderable.vertical(
         listOf(
             buildItemSlot(ingredient, screen),
-            Renderable.wrappedText(ingredient.internalName.repoItemName, setWidth = 80, scale = 0.8, color = Color.WHITE),
+            ingredient.buildWrappedText(),
         ),
         spacing = 2,
         horizontalAlign = HA.CENTER,
@@ -55,14 +64,12 @@ object GenericRecipeLayout : RecipeLayout() {
         screen: RecipeViewerScreen,
     ): Renderable {
         val slot = buildItemSlot(ingredient, screen)
-        val text = Renderable.wrappedText(ingredient.internalName.repoItemName, setWidth = 80, scale = 0.8, color = Color.WHITE)
-
         val topPad = ((outputsPanel.height - slot.height) / 2).coerceAtLeast(0)
         val inputColumn = Renderable.vertical(
             buildList {
                 if (topPad > 0) add(Renderable.placeholder(0, topPad))
                 add(slot)
-                add(text)
+                add(ingredient.buildWrappedText())
             },
             spacing = 2,
             horizontalAlign = HA.CENTER,

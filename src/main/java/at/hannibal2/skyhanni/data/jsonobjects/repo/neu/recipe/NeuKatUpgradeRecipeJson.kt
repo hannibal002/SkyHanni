@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
 import at.hannibal2.skyhanni.utils.DurationPrimitiveRecipe
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -22,7 +21,7 @@ data class NeuKatUpgradeRecipeJson(
     val duration by lazy { time.seconds }
     override val primitiveIngredients by lazy {
         buildList {
-            items.mapNotNull { it.toPrimitiveIngredientOrNull() }.forEach { add(it) }
+            items.mapNotNull { it.toPrimitiveIngredientOrEmpty() }.forEach { add(it) }
             add(PrimitiveIngredient(input))
             add(PrimitiveIngredient(SKYBLOCK_COIN, coins))
         }

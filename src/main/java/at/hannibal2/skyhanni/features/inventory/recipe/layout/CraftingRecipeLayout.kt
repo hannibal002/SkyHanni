@@ -40,7 +40,7 @@ object CraftingRecipeLayout : RecipeLayout() {
 
         val ingredientList = Renderable.vertical(spacing = 3) {
             add(sectionLabel("Ingredients"))
-            addAll(aggregated.map { buildIngredientText(it) })
+            addAll(aggregated.mapNotNull { buildIngredientTextOrNull(it) })
         }
         return Renderable.vertical(listOf(craftingRow, ingredientList), spacing = 8, horizontalAlign = HA.CENTER)
     }

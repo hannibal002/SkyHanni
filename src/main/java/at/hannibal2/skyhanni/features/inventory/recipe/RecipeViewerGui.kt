@@ -104,7 +104,9 @@ object RecipeViewerGui {
     }
 
     private fun NeuInternalName.buildHeaderRow() = Renderable.vertical(spacing = 4, horizontalAlign = HA.CENTER) {
-        add(scaledItem())
+        Renderable.horizontal(horizontalAlign = HA.CENTER, verticalAlign = VA.CENTER) {
+            add(scaledItem())
+        }.let { add(it) }
         Renderable.vertical(spacing = 2, horizontalAlign = HA.CENTER) {
             add(Renderable.text(repoItemName, scale = 1.4, color = COLOR_HEADER.toColor(), horizontalAlign = HA.CENTER))
             add(Renderable.text("§7${asString()}", scale = 0.8, color = COLOR_SUBHEADER.toColor(), horizontalAlign = HA.CENTER))

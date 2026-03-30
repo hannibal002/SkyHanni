@@ -26,14 +26,14 @@ abstract class DurationRecipeLayout : RecipeLayout() {
 
         val inputsPanel = Renderable.vertical(spacing = 3) {
             add(sectionLabel("Ingredients"))
-            addAll(recipe.ingredients.map { buildIngredientRow(it, screen) })
+            addAll(recipe.ingredients.mapNotNull { buildIngredientRowOrNull(it, screen) })
         }
         val timeRenderable = Renderable.vertical(spacing = 2, horizontalAlign = HA.CENTER) {
             add(sectionLabel(timeLabel))
             add(Renderable.text("§e${recipe.duration.format()}", scale = 0.85, color = Color.WHITE, horizontalAlign = HA.CENTER))
         }
 
-        if (!alwaysShowOutput && recipe.outputs.size <= 1) {
+        if (!alwaysShowOutput && recipe.outputs.size <= 1 && screen.viewMode != RecipeViewerScreen.RecipeViewMode.RECIPES_USING) {
             return Renderable.vertical(listOf(inputsPanel, timeRenderable), spacing = 8, horizontalAlign = HA.CENTER)
         }
 
@@ -53,7 +53,6 @@ abstract class DurationRecipeLayout : RecipeLayout() {
      * For a single output, the item is vertically centred within [containerHeight].
      */
     private fun buildOutputPanel(recipe: PrimitiveRecipe, screen: RecipeViewerScreen, containerHeight: Int): Renderable {
-        val label = sectionLabel("Output")
         return if (recipe.outputs.size == 1) {
             val rawOutput = buildItemSlot(recipe.outputs.first(), screen, isOutput = true)
             val repoItemName = recipe.outputs.first().internalName.repoItemName
@@ -63,12 +62,11 @@ abstract class DurationRecipeLayout : RecipeLayout() {
                 object : Renderable by itemWithName {
                     override val verticalAlign = VA.CENTER
                 },
-                (containerHeight - label.height - 3).coerceAtLeast(itemWithName.height),
+                containerHeight.coerceAtLeast(itemWithName.height),
             )
-            Renderable.vertical(listOf(label, centeredContent), spacing = 3, horizontalAlign = HA.CENTER)
+            Renderable.vertical(listOf(centeredContent), spacing = 3, horizontalAlign = HA.CENTER)
         } else Renderable.vertical(spacing = 3, horizontalAlign = HA.CENTER) {
-            add(label)
-            addAll(recipe.outputs.map { buildIngredientRow(it, screen) })
+            addAll(recipe.outputs.mapNotNull { buildIngredientRowOrNull(it, screen) })
         }
     }
 }

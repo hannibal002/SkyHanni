@@ -16,6 +16,8 @@ class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double =
     companion object {
         fun Collection<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> =
             map { it.toPrimitiveItemStack() }
+
+        val EMPTY by lazy { PrimitiveIngredient(NeuInternalName.NONE, 0.0) }
     }
 
     override fun toString() = "$internalName x$count"

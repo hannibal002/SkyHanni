@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderabl
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import java.awt.Color
 
 internal typealias HA = RenderUtils.HorizontalAlignment
@@ -63,6 +62,7 @@ internal fun NeuInternalName.scaledItem(withTip: Boolean = true, scale: Double =
             this.scale = scale
             this.xSpacing = 0
             this.ySpacing = 0
+            this.horizontalAlign = HA.CENTER
         }.let {
             if (withTip) it.withTip() else it
         }
@@ -77,7 +77,7 @@ internal fun Renderable.drawInSlot(filled: Boolean = true, radiusScalar: Double 
         if (filled) COLOR_SLOT_FILLED.toColor() else COLOR_SLOT_EMPTY.toColor(),
         padding = 1,
         radius = (4 * radiusScalar).toInt(),
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        horizontalAlign = HA.CENTER,
     )
 
 internal fun Renderable.withCountOverlay(count: Int): Renderable = if (count <= 1) this else Renderable.doubleLayered(
@@ -101,7 +101,7 @@ internal fun buildItemSlot(
 ): Renderable {
     val pixelSize = itemPixelSize(scale)
     return when {
-        ingredient == null ->
+        ingredient == null || ingredient == PrimitiveIngredient.EMPTY || ingredient.internalName == NeuInternalName.NONE ->
             Renderable.placeholder(pixelSize, pixelSize).drawInSlot(filled = false, radiusScalar = scale)
 
         ingredient.internalName == COIN_ITEM ->
@@ -139,22 +139,34 @@ internal fun buildItemSlot(
     }
 }
 
-internal fun buildIngredientRow(
+internal fun buildIngredientRowOrNull(
     ingredient: PrimitiveIngredient,
     screen: RecipeViewerScreen,
     scale: Double = ITEM_SCALE
-): Renderable = Renderable.horizontal(spacing = 4, verticalAlign = VA.CENTER) {
-    add(buildItemSlot(ingredient, screen, scale = scale))
-    add(buildIngredientText(ingredient))
+): Renderable? = buildIngredientTextOrNull(ingredient)?.let {
+    Renderable.horizontal(spacing = 4, verticalAlign = VA.CENTER) {
+        add(buildItemSlot(ingredient, screen, scale = scale))
+        add(it)
+    }
 }
 
 /** Text-only ingredient label (no slot icon), used in the crafting ingredient summary. */
-internal fun buildIngredientText(ingredient: PrimitiveIngredient): Renderable {
+internal fun buildIngredientTextOrNull(ingredient: PrimitiveIngredient): Renderable? {
+    if (ingredient == PrimitiveIngredient.EMPTY || ingredient.internalName == NeuInternalName.NONE) return null
     val count = ingredient.count.toInt()
     val countSuffix = if (count > 1) " §7×${count.addSeparators()}" else ""
-    return if (ingredient.internalName == COIN_ITEM) {
-        Renderable.wrappedText("§6${count.shortFormat(true)} Coins", scale = 0.9, setWidth = 175, color = Color.WHITE)
-    } else Renderable.wrappedText("${ingredient.internalName.repoItemName}$countSuffix", scale = 0.9, setWidth = 175, color = Color.WHITE)
+    fun String.buildIngredientText() = Renderable.wrappedText(
+        this,
+        scale = 0.9,
+        setWidth = 175,
+        color = Color.WHITE,
+        horizontalAlign = HA.CENTER,
+        internalAlign = HA.CENTER,
+    )
+
+    val format = if (ingredient.internalName == COIN_ITEM) "§6${count.shortFormat(true)} Coins"
+    else "${ingredient.internalName.repoItemName}$countSuffix"
+    return format.buildIngredientText()
 }
 
 internal fun sectionLabel(text: String) =
