@@ -84,6 +84,7 @@ object AchievementManager {
             if (shouldShowMessages) {
                 ChatUtils.chat(
                     componentBuilder {
+                        // Todo de-dupe with lower frag
                         if (achievement.secret) {
                             append("Secret ") {
                                 withColor(ChatFormatting.GRAY)
@@ -92,7 +93,7 @@ object AchievementManager {
                         append("Achievement Get! ") {
                             withColor(ChatFormatting.GOLD)
                         }
-                        append(achievement.getName() ?: "?".asComponent()) {
+                        append(achievement.getName().takeIf { it.string.isNotEmpty() } ?: "?".asComponent()) {
                             withColor(ChatFormatting.GREEN)
                         }
                         if (!achievement.data.achieved) {
@@ -128,7 +129,7 @@ object AchievementManager {
                     append("Achievement Get! ") {
                         withColor(ChatFormatting.GOLD)
                     }
-                    append(achievement.getName() ?: "?".asComponent()) {
+                    append(achievement.getName().takeIf { it.string.isNotEmpty() } ?: "?".asComponent()) {
                         withColor(ChatFormatting.GREEN)
                     }
                     append("!")
@@ -171,7 +172,7 @@ object AchievementManager {
                     "id",
                     BrigadierArguments.greedyString(),
                     BrigadierUtils.dynamicSuggestionProvider {
-                        config.filter { it.value.getName() != null }.map { it.key }
+                        config.filter { it.value.getName().string.isNotEmpty() }.map { it.key }
                     }
                 ) { id ->
                     val achievement = config[id]
@@ -205,7 +206,7 @@ object AchievementManager {
             description = "Shows your current achievement progress"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.getName() != null }
+                val achievementList = config.map { it.value }.sortedBy { it.data.achieved }.filter { it.getName().string.isNotEmpty() }
                 val totalCount = achievementList.size
                 val unlocked = achievementList.count { it.data.achieved }
                 TextHelper.displayPaginatedList(
@@ -220,7 +221,7 @@ object AchievementManager {
                                 withColor(ChatFormatting.DARK_GRAY)
                             }
                         } else {
-                            append(achievement.getName() ?: "?".asComponent()) {
+                            append(achievement.getName().takeIf { it.string.isNotEmpty() } ?: "?".asComponent()) {
                                 withColor(ChatFormatting.WHITE)
                             }
                         }
