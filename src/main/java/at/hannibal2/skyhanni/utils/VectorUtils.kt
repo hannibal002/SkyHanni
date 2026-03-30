@@ -23,8 +23,9 @@ import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.sin
 
-// TODO refactor
-@Suppress("TooManyFunctions")
+// TODO refactor instead of suppressing TooManyFunctions
+// TODO remove unused suppress once LorenzVec is gone
+@Suppress("TooManyFunctions", "unused")
 object VectorUtils {
     private val edgeCache = mutableMapOf<Vec3, Set<Pair<Vec3, Vec3>>>()
 
