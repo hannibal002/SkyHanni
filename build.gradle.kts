@@ -317,6 +317,12 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.matching { it.name.startsWith("ksp") }.configureEach {
         onlyIf { false }
     }
+    tasks.withType<DownloadBackupRepo> {
+        onlyIf { false }
+    }
+    tasks.matching { it.name.startsWith("stonecutter") }.configureEach {
+        onlyIf { false }
+    }
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
