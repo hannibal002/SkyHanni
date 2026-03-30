@@ -80,7 +80,6 @@ object SignUtils {
 
     fun SignEditScreen.isRancherSign(): Boolean {
         val signText = getSignLines() ?: return false
-        // one of the signs say "Set your Garden's" but because its too long (on 1.8) the word garden doesnt get rendered
         return signText[1] == "^^^^^^" && signText[2].startsWith("Set your") && signText[3].endsWith("speed cap!")
     }
 

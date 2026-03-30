@@ -430,7 +430,7 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
         event.tryFireRareBookUncovered()

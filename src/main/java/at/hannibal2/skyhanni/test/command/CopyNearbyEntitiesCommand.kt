@@ -208,9 +208,9 @@ object CopyNearbyEntitiesCommand {
 
     private fun MutableList<String>.addWither(entity: WitherBoss) {
         add("EntityWither:")
-        val invulTime = entity.invulnerableTicks
+        val invulnerableTime = entity.invulnerableTicks
         val isArmored = entity.isPowered
-        add("-  invulTime: '$invulTime'")
+        add("-  invulnerableTime: '$invulnerableTime'")
         add("-  armored: '$isArmored'")
     }
 
