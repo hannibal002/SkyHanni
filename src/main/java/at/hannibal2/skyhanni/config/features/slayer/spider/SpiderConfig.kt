@@ -1,8 +1,14 @@
 package at.hannibal2.skyhanni.config.features.slayer.spider
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.generic.LineToConfig
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -10,6 +16,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class SpiderConfig {
+
+    @Expose
+    @ConfigOption(name = "Line To Tarantula Boss", desc = "")
+    @Accordion
+    var lineToBoss: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor())
 
     @Expose
     @ConfigOption(name = "Mark When Invincible", desc = "Highlight the Tarantula Slayer tier 5 when the hatchlings are alive.")
@@ -27,17 +38,12 @@ class SpiderConfig {
     @ConfigEditorBoolean
     var phaseDisplay: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Line to Tarantula Boss", desc = "Adds a line to your Tarantula Broodfather Boss.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var lineToBoss: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Line to Tarantula Width",
-        desc = "The width of the line pointing to your Tarantula Broodfather.",
-    )
-    @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
-    var slayerLineWidth: Int = 3
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(130, "slayer.spider.lineToBoss", "slayer.spider.lineToBoss.showLine")
+            event.move(130, "slayer.spider.slayerLineWidth", "slayer.spider.lineToBoss.slayerLineWidth")
+        }
+    }
 }
