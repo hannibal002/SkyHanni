@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.test.utils
 
 import at.hannibal2.skyhanni.utils.ReflectionUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.createConsumerFromMethod
-import at.hannibal2.skyhanni.utils.ReflectionUtils.createRunnableFromMethod
 import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateField
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
@@ -51,41 +49,64 @@ class ReflectUtilsTest {
         private val nullableField: String? = null
     }
 
-    @Test fun `getPrivateField by name returns accessible field`() {
+    @Test
+    fun `getPrivateField by name returns accessible field`() {
         val field = WithFields().getPrivateField("secret")
         assertNotNull(field)
         assertEquals("secret", field.name)
     }
 
-    @Test fun `getPrivateField by index returns accessible field`() {
+    @Test
+    fun `getPrivateField by index returns accessible field`() {
         assertNotNull(WithFields().getPrivateField(0))
     }
 
-    @Test fun `getPrivateField by name throws for missing field`() {
+    @Test
+    fun `getPrivateField by name throws for missing field`() {
         assertThrows(NoSuchFieldException::class.java) {
             WithFields().getPrivateField("doesNotExist")
         }
     }
 
-    @Test fun `getPrivateFieldValue by name returns correct value`() {
+    @Test
+    fun `getPrivateFieldValue by name returns correct value`() {
         assertEquals("hidden", WithFields().getPrivateFieldValue("secret"))
     }
 
-    @Test fun `getPrivateFieldValue by index returns correct value`() {
+    @Test
+    fun `getPrivateFieldValue by index returns correct value`() {
         assertEquals("hidden", WithFields().getPrivateFieldValue(0))
     }
 
-    @Test fun `getPrivateFieldValue by name returns correct int value`() {
+    @Test
+    fun `getPrivateFieldValue by name returns correct int value`() {
         assertEquals(7, WithFields().getPrivateFieldValue("number"))
     }
 
-    @Test fun `getPrivateFieldValue throws for null field`() {
+    @Test
+    fun `getPrivateFieldValue throws for null field`() {
         assertThrows(IllegalArgumentException::class.java) {
             WithFields().getPrivateFieldValue("nullableField")
         }
     }
 
-    @Test fun `getPrivateFieldValue throws NoSuchFieldException for missing field`() {
+    @Test
+    fun `Class getPrivateFieldValue error message wrong name`() {
+        class Holder {
+            @Suppress("unused")
+            private val field: String? = null
+        }
+
+        val exception = assertThrows(IllegalArgumentException::class.java) {
+            Holder::class.java.getPrivateFieldValue("field", Holder())
+        }
+        assert(exception.message?.contains("Holder") == true) {
+            "Expected class name in message, was: ${exception.message}"
+        }
+    }
+
+    @Test
+    fun `getPrivateFieldValue throws NoSuchFieldException for missing field`() {
         assertThrows(NoSuchFieldException::class.java) {
             WithFields().getPrivateFieldValue("doesNotExist")
         }
@@ -93,33 +114,40 @@ class ReflectUtilsTest {
 
     class ConsumerTarget {
         var received: String? = null
-        fun accept(value: String) { received = value }
+        fun accept(value: String) {
+            received = value
+        }
     }
 
     class RunnableTarget {
         var ran = false
-        fun run() { ran = true }
-    }
-
-    @Test fun `createConsumerFromMethod invokes method with argument`() {
-        val target = ConsumerTarget()
-        val method = ConsumerTarget::class.java.getMethod("accept", String::class.java)
-        createConsumerFromMethod(target, method).accept("hello")
-        assertEquals("hello", target.received)
-    }
-
-    @Test fun `createConsumerFromMethod throws for non-consumer method`() {
-        val target = RunnableTarget()
-        val method = RunnableTarget::class.java.getMethod("run")
-        assertThrows(IllegalArgumentException::class.java) {
-            createConsumerFromMethod(target, method)
+        fun run() {
+            ran = true
         }
     }
 
-    @Test fun `createRunnableFromMethod invokes method`() {
+    @Test
+    fun `createConsumerFromMethod invokes method with argument`() {
+        val target = ConsumerTarget()
+        val method = ConsumerTarget::class.java.getMethod("accept", String::class.java)
+        ReflectionUtils.createConsumerFromMethod(target, method).accept("hello")
+        assertEquals("hello", target.received)
+    }
+
+    @Test
+    fun `createConsumerFromMethod throws for non-consumer method`() {
         val target = RunnableTarget()
         val method = RunnableTarget::class.java.getMethod("run")
-        createRunnableFromMethod(target, method).run()
+        assertThrows(IllegalArgumentException::class.java) {
+            ReflectionUtils.createConsumerFromMethod(target, method)
+        }
+    }
+
+    @Test
+    fun `createRunnableFromMethod invokes method`() {
+        val target = RunnableTarget()
+        val method = RunnableTarget::class.java.getMethod("run")
+        ReflectionUtils.createRunnableFromMethod(target, method).run()
         assertEquals(true, target.ran)
     }
 
@@ -128,20 +156,24 @@ class ReflectUtilsTest {
     class StringHolder : SingleParam<String>()
     class IntStringHolder : TwoParam<Int, String>()
 
-    @Test fun `findGenericSuperclassTypeArgument resolves single type parameter`() {
+    @Test
+    fun `findGenericSuperclassTypeArgument resolves single type parameter`() {
         assertEquals(String::class.java, StringHolder().findGenericSuperclassTypeArgument<SingleParam<*>, String>())
     }
 
     @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
-    @Test fun `findGenericSuperclassTypeArgument resolves first of two parameters`() {
+    @Test
+    fun `findGenericSuperclassTypeArgument resolves first of two parameters`() {
         assertEquals(Integer::class.java, IntStringHolder().findGenericSuperclassTypeArgument<TwoParam<*, *>, Int>(0))
     }
 
-    @Test fun `findGenericSuperclassTypeArgument resolves second of two parameters`() {
+    @Test
+    fun `findGenericSuperclassTypeArgument resolves second of two parameters`() {
         assertEquals(String::class.java, IntStringHolder().findGenericSuperclassTypeArgument<TwoParam<*, *>, String>(1))
     }
 
-    @Test fun `findGenericSuperclassTypeArgument throws when Stop class not in hierarchy`() {
+    @Test
+    fun `findGenericSuperclassTypeArgument throws when Stop class not in hierarchy`() {
         assertThrows(IllegalStateException::class.java) {
             StringHolder().findGenericSuperclassTypeArgument<TwoParam<*, *>, String>()
         }

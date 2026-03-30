@@ -85,26 +85,12 @@ abstract class ShimmyTestBase {
 
 // Tests against our kotlin version
 class ShimmyNewTest : ShimmyTestBase() {
-    override fun shimmy(source: Any?, path: List<String>) =
-        Shimmy(source, path)?.let {
-            object : ShimmyCompat {
-                override var value get() = it.value; set(v) { it.value = v }
-                override val clazz get() = it.clazz
-                override fun getJson() = it.getJson()
-                override fun setJson(element: com.google.gson.JsonElement) = it.setJson(element)
-            }
+    override fun shimmy(source: Any?, path: List<String>) = Shimmy(source, path)?.let {
+        object : ShimmyCompat {
+            override var value get() = it.value; set(v) { it.value = v }
+            override val clazz get() = it.clazz
+            override fun getJson() = it.getJson()
+            override fun setJson(element: com.google.gson.JsonElement) = it.setJson(element)
         }
+    }
 }
-
-// Tests against the version that came from NEU
-/*class ShimmyOldTest : ShimmyTestBase() {
-    override fun shimmy(source: Any?, path: List<String>) =
-        Shimmy.makeShimmy(source, path)?.let {
-            object : ShimmyCompat {
-                override var value get() = it.get(); set(v) { it.set(v) }
-                override val clazz get() = it.clazz
-                override fun getJson() = it.getJson()
-                override fun setJson(element: com.google.gson.JsonElement) = it.setJson(element)
-            }
-        }
-}*/
