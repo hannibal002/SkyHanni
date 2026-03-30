@@ -18,18 +18,18 @@ object ReindrakeWarpHelper {
     private val patternGroup = RepoPattern.group("event.winter.reindrakewarphelper")
 
     /**
-     * REGEX-TEST: §c§lWOAH! §cA §4Reindrake §cwas summoned from the depths!
-     * REGEX-TEST: §c§lWOAH! §r§cA §r§4Reindrake §r§cwas summoned from the depths!
+     * REGEX-TEST: WOAH! A Reindrake was summoned from the depths!
+     * REGEX-TEST: WOAH! [VIP] Georeek summoned a Reindrake from the depths!
      */
     private val spawnPattern by patternGroup.pattern(
-        "spawn.message",
-        "§c§lWOAH! (?:§r)?§cA (?:§r)?§4Reindrake (?:§r)?§cwas summoned from the depths!",
+        "spawn.message.colorless",
+        "WOAH! (?:A Reindrake was summoned|.+ summoned a Reindrake) from the depths!",
     )
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (!spawnPattern.matches(event.message)) return
+        if (!spawnPattern.matches(event.cleanMessage)) return
         ChatUtils.clickToActionOrDisable(
             "A Reindrake was detected. Click to warp to the Winter Island spawn!",
             config::reindrakeWarpHelper,
