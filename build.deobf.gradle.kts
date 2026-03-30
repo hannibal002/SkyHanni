@@ -351,7 +351,7 @@ detekt {
 }
 
 tasks.withType<Detekt>().configureEach {
-    exclude("**/build/generated/**")
+    source = source.matching { exclude("**/build/generated/**") }
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val isCi = System.getenv("CI") == "true"
     val skipDetekt = project.findProperty("skipDetekt") == "true"

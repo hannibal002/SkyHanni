@@ -343,7 +343,9 @@ detekt {
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
     baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
     source.setFrom(project.sourceSets.named("main").map {
-        it.allSource.matching { exclude("**/build/generated/**") }
+        it.allSource.matching {
+            exclude { elem -> elem.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
+        }
     })
 }
 
@@ -360,6 +362,9 @@ afterEvaluate {
 
 
 tasks.withType<Detekt>().configureEach {
+    source = source.matching {
+        exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
+    }
     val isTargetVersion = target == ProjectTarget.MODERN_12111
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
