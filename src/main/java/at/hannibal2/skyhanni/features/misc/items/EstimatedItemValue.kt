@@ -74,6 +74,7 @@ object EstimatedItemValue {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
+    // TODO test if this can go now since NEU pv is gone (SB-PV mod support?)
     /**
      * Workaround for NEU Profile Viewer bug where the ItemTooltipEvent gets called for two items when hovering
      * over the border between two items.
@@ -83,7 +84,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
 
