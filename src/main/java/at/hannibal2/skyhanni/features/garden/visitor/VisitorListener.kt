@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -45,7 +45,7 @@ object VisitorListener {
 
     private val config get() = VisitorApi.config
 
-    private val logger = LorenzLogger("garden/visitors/listener")
+    private val logger = SkyHanniLogger("garden/visitors/listener")
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {

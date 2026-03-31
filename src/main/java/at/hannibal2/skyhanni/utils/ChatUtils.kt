@@ -41,7 +41,7 @@ import kotlin.time.times
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
-    private val log = LorenzLogger("chat/mod_sent")
+    private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
