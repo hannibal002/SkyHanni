@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.TimeUtils.formatCurrentTime
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.logging.FileHandler
 import java.util.logging.Formatter
@@ -13,30 +12,24 @@ import kotlin.time.Duration.Companion.days
 
 open class SkyHanniLogger(filePath: String) {
 
-    internal open val relativeStorage by lazy { PREFIX_PATH }
     private val format = SimpleDateFormat("HH:mm:ss")
-    private val fileName by lazy { "$relativeStorage$filePath.log" }
+    private val fullFormat by lazy {
+        SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
+    }
+    internal open val logsDir = File("config/skyhanni/logs")
+    internal open val timedFormattedDir by lazy { "$logsDir/$fullFormat" }
+    private val logFileName by lazy { "$timedFormattedDir/$filePath.log" }
 
     companion object {
-
-        private val LOG_DIRECTORY = File("config/skyhanni/logs")
-        // I'm ab to change this in another PR I CBA - daveed
-        @Suppress("PropertyName")
-        private var PREFIX_PATH: String
-        var hasDone = false
-
-        init {
-            val format = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-            PREFIX_PATH = "config/skyhanni/logs/$format/"
-        }
+        private var deletedExpired = false
     }
 
     @Suppress("PrintStackTrace")
     private val logger: Logger by lazy {
         Logger.getLogger("SkyHanni-Logger-" + System.nanoTime()).apply {
             try {
-                File(fileName).parentFile?.takeIf { !it.isDirectory }?.mkdirs()
-                FileHandler(fileName).apply {
+                File(logFileName).parentFile?.takeIf { !it.isDirectory }?.mkdirs()
+                FileHandler(logFileName).apply {
                     encoding = Charsets.UTF_8.name()
                     formatter = object : Formatter() {
                         override fun format(logRecord: LogRecord) = "${format.formatCurrentTime()} ${logRecord.message}\n"
@@ -47,9 +40,9 @@ open class SkyHanniLogger(filePath: String) {
                 e.printStackTrace()
             }
 
-            if (!hasDone && SkyBlockUtils.onHypixel) {
-                hasDone = true
-                OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
+            if (!deletedExpired && SkyBlockUtils.onHypixel) {
+                deletedExpired = true
+                OSUtils.deleteExpiredFiles(logsDir, SkyHanniMod.feature.dev.logExpiryTime.days)
             }
         }
     }

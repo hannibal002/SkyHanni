@@ -67,11 +67,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val config: AbstractRepoConfig
     abstract val configDirectory: File
 
-    val logger by lazy { RepoLogger("repo/$commonShortNameCased", "[Repo - $commonName]") }
     val repoDirectory by lazy {
         // ~/.minecraft/config/[...]/repo
         File(configDirectory, "repo")
     }
+    val logger by lazy { RepoLogger(this) }
     private val repoZipFile by lazy {
         // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].zip
         // e.g., 'sh-repo-main' or 'neu-repo-master'
