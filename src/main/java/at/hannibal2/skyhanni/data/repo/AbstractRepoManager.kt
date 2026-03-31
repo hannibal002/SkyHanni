@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -84,8 +83,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
-    private val githubRepoLocation: GitHubUtils.RepoLocation
-        get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
+    private val githubRepoLocation: RepoLocation by lazy {
+        RepoLocation(config.location, debugConfig.logRepoErrors)
+    }
     val repoMutex = Mutex()
 
     abstract val updateCommand: String
@@ -426,6 +426,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult {
+        progress.update("try loading repo from jgit")
+        with(githubRepoLocation) {
+            if (repoFileSystem.loadFromJGit()) {
+                progress.update("loaded from jgit")
+                return FetchUnpackResult.SUCCESS
+            } else progress.update("failed to load repo from jgit")
+        }
+
         progress.update("fetchAndUnpackRepo")
         val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
@@ -460,17 +468,17 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
+        return if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to unpack the downloaded zip file.")
             logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
-            return if (switchToBackupOnFail) switchToBackupRepo(progress)
+            if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
+        } else {
+            progress.update("writeToFile: fetchAndUnpackRepo")
+            commitStorage.writeToFile(comparison.latest)
+            isUsingBackup = false
+            FetchUnpackResult.SUCCESS
         }
-
-        progress.update("writeToFile: fetchAndUnpackRepo")
-        commitStorage.writeToFile(comparison.latest)
-        isUsingBackup = false
-        return FetchUnpackResult.SUCCESS
     }
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
