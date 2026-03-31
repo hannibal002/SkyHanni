@@ -461,14 +461,18 @@ object GardenNextJacobContest {
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
     }
 
-    private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
-    private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
+    private fun sbEnabled() = SkyBlockUtils.inSkyBlock &&
+        (GardenApi.inGarden() || config.showOutsideGarden || config.warnOutsideGarden)
+    private fun outsideSbEnabled() =
+        OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun inCorrectArea() = sbEnabled() || outsideSbEnabled()
     private fun isDisplayEnabled() = inCorrectArea() && config.display
-    private fun isWarningEnabled() = inCorrectArea() && config.warn && (GardenApi.inGarden() || config.warnOutsideGarden)
+    private fun isWarningEnabled() =
+        inCorrectArea() && config.warn && (GardenApi.inGarden() || config.warnOutsideGarden)
     private fun isEnabled() = isDisplayEnabled() || isWarningEnabled()
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
-    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
+    private fun isSendEnabled() =
+        isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
 
     private fun fetchContestsIfAble() {
         if (haveAllContests || !isFetchEnabled()) return
