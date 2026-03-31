@@ -109,6 +109,8 @@ private val textColorLUT = ChatFormatting.entries
     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
     .toMap()
 
+fun Style?.orEmpty(): Style = this ?: Style.EMPTY
+
 fun Style.chatStyle() = buildString {
     color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
     if (isBold) append("§l")
