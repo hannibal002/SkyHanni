@@ -20,6 +20,8 @@ open class SkyHanniLogger(filePath: String) {
     companion object {
 
         private val LOG_DIRECTORY = File("config/skyhanni/logs")
+        // I'm ab to change this in another PR I CBA - daveed
+        @Suppress("PropertyName")
         private var PREFIX_PATH: String
         var hasDone = false
 
