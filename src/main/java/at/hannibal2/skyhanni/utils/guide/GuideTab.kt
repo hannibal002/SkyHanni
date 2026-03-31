@@ -14,7 +14,7 @@ class GuideTab(
     val tip: Renderable,
     val isVertical: Boolean = false,
     var lastTab: GuideGui.TabWrapper,
-    val onClick: (GuideTab) -> Unit
+    val onClick: (GuideTab) -> Unit,
 ) {
 
     fun fakeClick() = click()
