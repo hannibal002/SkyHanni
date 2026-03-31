@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -41,7 +41,7 @@ import kotlin.time.Duration
 @SkyHanniModule
 object UpdateManager {
 
-    private val logger = LorenzLogger("update_manager")
+    private val logger = SkyHanniLogger("update_manager")
     private var _activePromise: CompletableFuture<*>? = null
     private var activePromise: CompletableFuture<*>?
         get() = _activePromise
