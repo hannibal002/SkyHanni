@@ -66,7 +66,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
