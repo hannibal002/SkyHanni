@@ -21,7 +21,7 @@ object ReindrakeWarpHelper {
      * REGEX-TEST: WOAH! [VIP] Georeek summoned a Reindrake from the depths!
      */
     private val spawnPattern by patternGroup.pattern(
-        "spawn.message.colorless",
+        "spawn.message",
         "WOAH! .+ summoned a Reindrake from the depths!",
     )
 
