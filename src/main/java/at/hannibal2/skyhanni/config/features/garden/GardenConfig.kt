@@ -96,6 +96,11 @@ class GardenConfig {
     val armorDropTracker: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Warty Crop Tracker", desc = "")
+    @Accordion
+    val wartyCropTracker: WartyCropTrackerConfig = WartyCropTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Crop Break Tracker", desc = "")
     @Accordion
     val gardenBpsTracker: GardenBpsTrackerConfig = GardenBpsTrackerConfig()

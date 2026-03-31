@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboard
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.WartyCropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
@@ -485,6 +486,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var armorDropTracker: ArmorDropTracker.Data = ArmorDropTracker.Data()
+
+        @Expose
+        var wartyCropTracker: WartyCropTracker.Data = WartyCropTracker.Data()
 
         @Expose
         var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
