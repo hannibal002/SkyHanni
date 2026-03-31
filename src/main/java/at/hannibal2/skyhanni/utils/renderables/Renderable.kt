@@ -874,8 +874,8 @@ interface Renderable {
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            private val virtualHeight = list.sumOf { it.height }
-            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width) +
+            private val virtualHeight get() = list.sumOf { it.height }
+            override val width get() = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width) +
                 if (showScrollbar && virtualHeight > height) 7 else 0
 
             private var scroll = createScroll()
