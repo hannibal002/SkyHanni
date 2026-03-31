@@ -205,6 +205,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         repoUpdateCoroutineConfig.launch {
             if (!fetchAndUnpackRepo(progress, command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                dumpDiagnosticsToLog("operation" to "fetchAndUnpack", "forceReset" to forceReset)
                 return@launch
             }
             reloadRepository(progress, "$commonName repo updated successfully.")
@@ -256,7 +257,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             //  i.e. before any internal return path could call progress.end()
             // In all normal return paths above, progress is ended explicitly
             // We only need to guard here against the coroutine being torn down prematurely
-            if (cause != null) progress.end("init ended abnormally: ${cause.message}")
+            if (cause != null) {
+                progress.end("init ended abnormally: ${cause.message}")
+                dumpDiagnosticsToLog("exceptionType" to cause::class.simpleName, "exception" to cause.message)
+            }
         }
     }
 
@@ -301,6 +305,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         return FetchUnpackResult.SWITCHED_TO_BACKUP
     }.onFailure { e ->
         logger.error("Failed to switch to backup repo: ${e.message}")
+        dumpDiagnosticsToLog("operation" to "switchToBackupRepo", "exceptionType" to e::class.simpleName, "exception" to e.message)
         progress.update("reason: ${e.message ?: "no reason"}")
         progress.end("Failed to switch to backup repo")
     }.getOrDefault(FetchUnpackResult.FAILED)
@@ -348,6 +353,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         if (!command && isRepeatErrorOrFixed(progress)) return
         logger.chatError("$commonName repo has errors! Commit hash: §b$currentDownloadedCommit§r")
+        dumpDiagnosticsToLog()
 
         if (successfulConstants.isNotEmpty()) logger.chat("Successful Constants §7(${successfulConstants.size}):")
         for (constant in successfulConstants) logger.chat("   - §7$constant")
@@ -376,6 +382,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             }
         }.map { it.asComponent() }
         TextHelper.multiline(text).send()
+        dumpDiagnosticsToLog()
     }
 
     private enum class FetchUnpackResult(val canContinue: Boolean = true) {
@@ -431,7 +438,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             if (repoFileSystem.loadFromJGit()) {
                 progress.update("loaded from jgit")
                 return FetchUnpackResult.SUCCESS
-            } else progress.update("failed to load repo from jgit")
+            } else {
+                progress.update("failed to load repo from jgit")
+                dumpDiagnosticsToLog("operation" to "jgit load")
+            }
         }
 
         progress.update("fetchAndUnpackRepo")
@@ -459,6 +469,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (!gitRepo.downloadCommitZipToFile(repoZipFile)) {
             progress.update("Failed to download the repo zip file from GitHub.")
             logger.error("Failed to download the repo zip file from GitHub.")
+            dumpDiagnosticsToLog("operation" to "download zip", "destination" to repoZipFile.name)
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else {
                 progress.update("FetchUnpackResult.FAILED")
@@ -471,6 +482,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         return if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to unpack the downloaded zip file.")
             logger.error("Failed to unpack the downloaded zip file.")
+            dumpDiagnosticsToLog("operation" to "unpack zip", "zipFile" to repoZipFile.name, "zipSize" to repoZipFile.length())
             if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
         } else {
@@ -483,7 +495,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
         progress.update("deleteRecursively")
-        repoDirectory.deleteRecursively()
+        repoDirectory.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
@@ -545,6 +557,27 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
         } else {
             progress.end("done reloading $commonShortName repo")
+        }
+    }
+
+    internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
+        val loc = config.location
+        val fileCount = repoDirectory.walkTopDown().count { it.isFile }
+        debug("Diagnostic dump for $commonName:")
+        debug("  config: autoUpdate=${config.repoAutoUpdate}, unzipToMemory=${config.unzipToMemory}")
+        debug("  location: ${loc.user}/${loc.repoName}@${loc.branch} (default=${loc.hasDefaultSettings()})")
+        debug("  localCommit: sha=${localRepoCommit.sha ?: "none"}, time=${localRepoCommit.time ?: "none"}")
+        debug("  usingBackup: $isUsingBackup")
+        debug("  repoDir: exists=${repoDirectory.exists()}, files=$fileCount, path=${repoDirectory.absolutePath}")
+        debug("  gitPresent: ${repoDirectory.resolve(".git").exists()}")
+        debug("  fileSystem: ${repoFileSystem::class.simpleName}")
+        debug("  successful: ${successfulConstants.size}, failed: ${unsuccessfulConstants.size}")
+        if (unsuccessfulConstants.isNotEmpty()) {
+            debug("  failedConstants: ${unsuccessfulConstants.joinToString()}")
+        }
+        if (extraData.isNotEmpty()) {
+            debug("  extra:")
+            for ((key, value) in extraData) debug("    $key: $value")
         }
     }
 }

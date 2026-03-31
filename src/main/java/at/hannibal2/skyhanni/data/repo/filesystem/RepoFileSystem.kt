@@ -44,14 +44,13 @@ sealed interface RepoFileSystem {
     fun readJson(path: String): JsonElement {
         val bytes = readAllBytes(path)
         check(bytes.isNotEmpty()) {
-            "Repo file '$path' is empty (0 bytes) — ${pathDiagnostics(path)}"
+            "Repo file '$path' is empty (0 bytes)\n${pathDiagnostics(path)}"
         }
         val content = String(bytes, Charsets.UTF_8)
-        return ConfigManager.gson.fromJson(content, JsonElement::class.java)
-            ?: throw IllegalStateException(
-                "Repo file '$path' parsed as JSON null — file may contain only the literal 'null' or be malformed " +
-                    "(${content.length} chars) — ${pathDiagnostics(path)}",
-            )
+        return ConfigManager.gson.fromJson(content, JsonElement::class.java) ?: throw IllegalStateException(
+            "Repo file '$path' parsed as JSON null. File may contain only the literal 'null' or be malformed " +
+                "(${content.length} chars)\n${pathDiagnostics(path)}",
+        )
     }
 
     /**
@@ -61,8 +60,8 @@ sealed interface RepoFileSystem {
      * as this strongly suggests the zip is corrupt and continuing would silently produce
      * an unusable repo on disk.
      *
-     * This is a plain suspend function — callers are responsible for ensuring they are already
-     * running in an appropriate dispatcher (e.g. IO). No extra coroutine is launched here.
+     * This is a plain suspend function.
+     * Callers are responsible for ensuring they are already running in an appropriate dispatcher (e.g. IO).
      */
     suspend fun loadFromZip(progress: ChatProgressUpdates, zipFile: File): Boolean = runCatching {
         progress.update("loadFromZip")
@@ -105,7 +104,7 @@ sealed interface RepoFileSystem {
             val incrementedCount = emptyDataCount + 1
             logger.error("Empty zip entry: $relativePath ($incrementedCount/$MAX_EMPTY_ZIP_ENTRIES)")
             check(incrementedCount <= MAX_EMPTY_ZIP_ENTRIES) {
-                "Aborting: $incrementedCount empty zip entries in '${zipFile.name}' — zip is likely corrupt"
+                "Aborting: $incrementedCount empty zip entries in '${zipFile.name}'. Zip is likely corrupt"
             }
             incrementedCount
         } else {

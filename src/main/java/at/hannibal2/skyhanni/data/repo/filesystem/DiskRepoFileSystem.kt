@@ -16,7 +16,8 @@ class DiskRepoFileSystem(
     }
 
     override fun deleteRecursively(path: String) {
-        File(root, path).deleteRecursively()
+        if (path.isEmpty()) root.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
+        else File(root, path).deleteRecursively()
     }
 
     override fun list(path: String) = root.resolve(path).listFiles { file ->
