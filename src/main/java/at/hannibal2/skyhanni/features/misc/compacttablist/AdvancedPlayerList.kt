@@ -18,9 +18,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlinx.coroutines.flow.merge
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -49,7 +53,7 @@ object AdvancedPlayerList {
     private var playerData = mutableMapOf<Component, PlayerData>()
 
     fun createTabLine(component: Component, type: TabStringType) = playerData[component]?.let {
-        TabLine(component, type, createCustomName(it))
+        TabLine(component, type, it.createCustomName())
     } ?: TabLine(component, type)
 
     // Todo split up into smaller functions
@@ -167,48 +171,56 @@ object AdvancedPlayerList {
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 
-    private fun createCustomName(data: PlayerData): Component {
-        val playerName = if (config.useLevelColorForName) {
-            data.levelText.getOrNull(3)?.let { "§$it" + data.name } ?: data.coloredName
-        } else if (config.hideRankColor) {
-            "§b" + data.name
-        } else {
-            data.coloredName
+    private fun PlayerData.createCustomName(): Component = buildList<Component> {
+        fun MutableList<Component>.add(string: String?) {
+            string?.takeIfNotEmpty()?.let {
+                add(it.asComponent())
+            }
         }
 
-        val level = if (!config.hideLevel) {
-            if (config.hideLevelBrackets) data.levelText else "§8[${data.levelText}§8]"
-        } else ""
+        if (!config.hideLevel) {
+            val level = if (config.hideLevelBrackets) levelText else "§8[$levelText§8]"
+            add(level)
+        }
 
-        val suffix = if (config.hideEmblem) {
-            if (data.ironman) Component.literal("§7♲") else data.bingoLevel?.let {
-                Component.literal(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
-            } ?: Component.empty()
-        } else Component.literal(data.nameSuffix)
+        val playerName = if (config.useLevelColorForName) {
+            levelText.getOrNull(3)?.let { "§$it" + name } ?: coloredName
+        } else if (config.hideRankColor) {
+            "§b" + name
+        } else {
+            coloredName
+        }
+        add(playerName)
+
+        if (config.hideEmblem) {
+            if (ironman) {
+                add("§7♲")
+            } else {
+                bingoLevel?.let {
+                    add(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
+                }
+            }
+        } else {
+            add(nameSuffix)
+        }
+
+        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
+            add(faction.icon)
+        }
 
         if (config.markSpecialPersons) {
-            val icon = getSocialIcon(data.name).icon()
-            if (icon.isNotEmpty()) suffix.append(" $icon")
+            add(getSocialIcon(name).icon())
         }
 
         if (SkyHanniMod.feature.dev.fancyContributors) {
-            Minecraft.getInstance().connection?.getPlayerInfo(data.name)?.let { playerInfo ->
+            Minecraft.getInstance().connection?.getPlayerInfo(name)?.let { playerInfo ->
                 ContributorManager.getSuffix(playerInfo.profile.id)?.let {
-                    suffix.append(" ").append(it)
+                    add(it)
                 }
             }
         }
 
-        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
-            data.faction.icon?.let {
-                if (suffix.formattedTextCompat().removeColor().isNotBlank()) suffix.append(" ")
-                suffix.append(it)
-            }
-        }
-
-        // todo: level and player name should also really be components
-        return Component.literal("$level $playerName ").append(suffix)
-    }
+    }.merge()
 
     private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 

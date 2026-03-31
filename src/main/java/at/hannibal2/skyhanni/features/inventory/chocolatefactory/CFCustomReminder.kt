@@ -141,7 +141,7 @@ object CFCustomReminder {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
         if (Minecraft.getInstance().screen is ContainerScreen) return

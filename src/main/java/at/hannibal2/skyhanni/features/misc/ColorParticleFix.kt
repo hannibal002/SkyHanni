@@ -18,16 +18,16 @@ object ColorParticleFix {
         if (!isEnabled()) return
         if (particleOptions is ColorParticleOption) {
             particleOptions.color = ARGB.colorFromFloat(
-                particleOptions.getAlpha(),
-                (1 - event.packet.getXDist()),
-                (1 - event.packet.getZDist()),
-                (1 - event.packet.getYDist())
+                particleOptions.alpha,
+                (1 - event.packet.xDist),
+                (1 - event.packet.zDist),
+                (1 - event.packet.yDist)
             )
         }
         event.particleOptions = particleOptions
     }
     /*
-    1.8 has, some, questionable, ways of working out colour for particles where it uses the offset to calculate the Colouring,
+    1.8 has, some, questionable, ways of working out color for particles where it uses the offset to calculate the Coloring,
     this is done as RBG with XYZ, so in modern since it uses ARGB we go to XZY.
      */
 

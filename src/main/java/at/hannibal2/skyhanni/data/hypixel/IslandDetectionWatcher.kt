@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -34,7 +34,7 @@ object IslandDetectionWatcher {
     private var lastWorldChange = SimpleTimeMark.farFuture()
     private var showedError = false
 
-    private val logger = LorenzLogger("debug/island_change")
+    private val logger = SkyHanniLogger("debug/island_change")
 
     @HandleEvent
     fun onIslandJoin(event: IslandJoinEvent) {

@@ -70,13 +70,13 @@ object GraphParkour {
         }
 
         val start = starts.first()
-        val neighbours = start.neighbours.entries
-        if (neighbours.isEmpty()) {
-            ChatUtils.userError("Start has no neighbours!")
+        val neighbors = start.neighbors.entries
+        if (neighbors.isEmpty()) {
+            ChatUtils.userError("Start has no neighbors!")
             return null
         }
-        if (neighbours.size != 1) {
-            ChatUtils.userError("Start has more than one neighbours!")
+        if (neighbors.size != 1) {
+            ChatUtils.userError("Start has more than one neighbors!")
             return null
         }
 
@@ -97,33 +97,33 @@ object GraphParkour {
     }
 
     fun validatePath(graph: Graph, start: GraphNode): List<LorenzVec>? {
-        val startNeighbours = start.neighbours.entries.first()
+        val startNeighbors = start.neighbors.entries.first()
         val list = mutableListOf<GraphNode>()
         list.add(start)
 
-        var current = startNeighbours.key
+        var current = startNeighbors.key
 
         while (list.size != graph.size - 1) {
-            val neighbours = current.neighbours.filter { it.key !in list }.keys
+            val neighbors = current.neighbors.filter { it.key !in list }.keys
 
-            if (neighbours.size > 1) {
-                ChatUtils.userError("One node has more than two neighbours!")
+            if (neighbors.size > 1) {
+                ChatUtils.userError("One node has more than two neighbors!")
                 showErrorAt(current.position)
                 return null
             }
-            if (neighbours.isEmpty()) {
-                ChatUtils.userError("One node has only one neighbour!")
+            if (neighbors.isEmpty()) {
+                ChatUtils.userError("One node has only one neighbor!")
                 showErrorAt(current.position)
                 return null
             }
             if (current.name == "end") {
-                ChatUtils.userError("End node has two neighbours!")
+                ChatUtils.userError("End node has two neighbors!")
                 showErrorAt(current.position)
                 return null
             }
 
             list.add(current)
-            current = neighbours.first()
+            current = neighbors.first()
         }
 
         if (current.name != "end") {
@@ -170,29 +170,29 @@ object GraphParkour {
                 else -> null
             }
             GraphNode(index, location, name = name).also {
-                it.neighbours = emptyMap()
+                it.neighbors = emptyMap()
             }
         }
 
         for (node in nodes) {
             nodes.getOrNull(node.id - 1)?.let { previous ->
                 val distance = previous.position.distance(node.position)
-                addNeighbour(node, previous, distance)
-                addNeighbour(previous, node, distance)
+                addNeighbor(node, previous, distance)
+                addNeighbor(previous, node, distance)
             }
             nodes.getOrNull(node.id + 1)?.let { next ->
                 val distance = next.position.distance(node.position)
-                addNeighbour(node, next, distance)
-                addNeighbour(next, node, distance)
+                addNeighbor(node, next, distance)
+                addNeighbor(next, node, distance)
             }
         }
 
         return Graph(nodes)
     }
 
-    private fun addNeighbour(a: GraphNode, b: GraphNode, distance: Double) {
-        val neighbours = a.neighbours.toMutableMap()
-        neighbours[b] = distance
-        a.neighbours = neighbours
+    private fun addNeighbor(a: GraphNode, b: GraphNode, distance: Double) {
+        val neighbors = a.neighbors.toMutableMap()
+        neighbors[b] = distance
+        a.neighbors = neighbors
     }
 }

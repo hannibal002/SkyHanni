@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
@@ -14,7 +15,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -47,7 +48,7 @@ class ConfigManager {
         val configDirectory = File("config/skyhanni")
     }
 
-    private val logger = LorenzLogger("config_manager")
+    private val logger = SkyHanniLogger("config_manager")
 
     private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
@@ -268,6 +269,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
     SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
+    ACHIEVEMENTS("achievements", AchievementStorage::class.java, SkyHanniMod::achievementStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

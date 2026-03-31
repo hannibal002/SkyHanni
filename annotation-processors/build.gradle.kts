@@ -12,18 +12,19 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation(libs.ksp.api)
 }
 
 tasks.withType<JavaCompile> {
-    if (JavaVersion.current().isJava9Compatible) {
-        options.release.set(8)
-    }
+    options.release.set(21)
 }
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_1_8)
+        jvmTarget.set(JvmTarget.JVM_21)
     }
+}
+
+tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
+    enabled = false
 }

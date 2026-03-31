@@ -164,12 +164,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
 
     @PublishedApi
-    internal fun readJsonElement(path: String): JsonElement? =
-        if (repoFileSystem.exists(path)) repoFileSystem.readJson(path)
-        else repoDirectory.resolve(path).takeIf { it.isFile }?.getJson() ?: run {
-            logger.logNonDestructiveError("Repo file not found: $path")
-            null
+    internal fun readJsonElement(path: String): JsonElement? {
+        if (repoFileSystem.exists(path)) return repoFileSystem.readJson(path)
+        val fallback = repoDirectory.resolve(path)
+        if (fallback.isFile) return fallback.getJson()
+        val repoDiagnostic = when {
+            !repoDirectory.exists() -> "repo directory does not exist at '${repoDirectory.absolutePath}'"
+            !repoDirectory.isDirectory -> "repo path exists but is not a directory: '${repoDirectory.absolutePath}'"
+            else -> repoDirectory.list()?.size?.let { "$it top-level entries in repo directory" }
+                ?: "repo directory exists but could not be listed"
         }
+        logger.logNonDestructiveError("Repo file not found: $path ($repoDiagnostic)")
+        return null
+    }
 
     @PublishedApi
     internal inline fun <reified T : Any> getRepoData(
@@ -408,9 +415,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * @param silentError If true, will not log errors to the console.
      * @param forceReset If true, will always download the latest commit zip file, even if the repo is up to date.
      * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
-     * @return FetchUnpackResult.SUCCESS if the repo was successfully fetched and unpacked,
-     *         FetchUnpackResult.SWITCHED_TO_BACKUP if the backup repo was used,
-     *         FetchUnpackResult.FAILED if the repo could not be fetched or unpacked and no backup repo is available.
+     * @return [FetchUnpackResult.SUCCESS] if the repo was successfully fetched and unpacked,
+     *         [FetchUnpackResult.SWITCHED_TO_BACKUP] if the backup repo was used,
+     *         [FetchUnpackResult.FAILED] if the repo could not be fetched or unpacked and no backup repo is available.
      */
     private suspend fun fetchAndUnpackRepo(
         progress: ChatProgressUpdates,

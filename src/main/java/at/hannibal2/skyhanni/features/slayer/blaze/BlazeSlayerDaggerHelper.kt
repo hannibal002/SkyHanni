@@ -241,7 +241,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         if (textTop == "") return
