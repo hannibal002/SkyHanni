@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceSqIgnoreY
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceSqOnlyY
@@ -36,7 +36,7 @@ object CocoonAPI {
      Might require some sort of ping based tweaking?
      */
     val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
-    val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
+    val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
 
     data class CocoonMob(
         val mob: Mob,

@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.VectorUtils.blockCenter
 import at.hannibal2.skyhanni.utils.VectorUtils.distanceIgnoreY
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -27,7 +27,7 @@ object SendCoordinates {
 
     private val config get() = SkyHanniMod.feature.misc.patcherCoordsWaypoint
     private val waypoints = mutableListOf<SharedWaypoint>()
-    private val logger = LorenzLogger("misc/send_coords")
+    private val logger = SkyHanniLogger("misc/send_coords")
 
     /**
      * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4

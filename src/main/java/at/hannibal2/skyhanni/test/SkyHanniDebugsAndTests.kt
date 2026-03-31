@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer
 import net.minecraft.client.gui.components.debug.DebugScreenEntries
 import net.minecraft.client.gui.components.debug.DebugScreenEntry
@@ -570,9 +571,9 @@ object SkyHanniDebugsAndTests {
             category = CommandCategory.DEVELOPER_TEST
             arg("waypoint", Vec3ArgumentType.double()) { vec ->
                 literalCallback("pathfind") {
-                    waypoint(getArg(vec), true)
+                    waypoint(getArg(vec).toLorenzVec(), true)
                 }
-                callback { waypoint(getArg(vec)) }
+                callback { waypoint(getArg(vec).toLorenzVec()) }
 
             }
             simpleCallback { waypoint() }

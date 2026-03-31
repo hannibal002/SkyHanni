@@ -230,7 +230,7 @@ object VectorUtils {
     fun readListFromClipboard(): List<Vec3> =
         OSUtils.readFromClipboard()?.split("\n")?.map { line ->
             fromStoredString(line.replace("\"", "").replace(",", ""))
-        } ?: emptyList()
+        }.orEmpty()
 
     fun List<Vec3>.copyLocations() {
         OSUtils.copyToClipboard(joinToString(",\n") { it.asStoredString() })

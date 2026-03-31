@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.VectorUtils.up
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -49,7 +49,7 @@ object EndermanSlayerFeatures {
     private val flyingBeacons = mutableSetOf<ArmorStand>()
     private val nukekubiSkulls = mutableSetOf<ArmorStand>()
     private var sittingBeacon = emptyMap<Vec3, SimpleTimeMark>()
-    private val logger = LorenzLogger("slayer/enderman")
+    private val logger = SkyHanniLogger("slayer/enderman")
 
     private val NUKEKUBI_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_NUKEKUBI") }
 
