@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 
-class RepoLogger(filePath: String, private val loggingPrefix: String) : LorenzLogger(filePath) {
+class RepoLogger(filePath: String, private val loggingPrefix: String) : SkyHanniLogger(filePath) {
     fun debug(message: String) = log("[DEBUG] $loggingPrefix $message")
     fun warn(message: String) = log("[WARN] $loggingPrefix $message")
     fun error(message: String) = log("[ERROR] $loggingPrefix $message")

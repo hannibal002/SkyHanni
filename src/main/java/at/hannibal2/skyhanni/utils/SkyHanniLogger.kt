@@ -29,55 +29,28 @@ open class SkyHanniLogger(filePath: String) {
         }
     }
 
-    private lateinit var logger: Logger
-
-    private fun getLogger(): Logger {
-        if (::logger.isInitialized) {
-            return logger
-        }
-
-        val initLogger = initLogger()
-        this.logger = initLogger
-        return initLogger
-    }
-
     @Suppress("PrintStackTrace")
-    private fun initLogger(): Logger {
-        val logger = Logger.getLogger("Lorenz-Logger-" + System.nanoTime())
-        try {
-            createParent(File(fileName))
-            val handler = FileHandler(fileName)
-            handler.encoding = "utf-8"
-            logger.addHandler(handler)
-            logger.useParentHandlers = false
-            handler.formatter = object : Formatter() {
-                override fun format(logRecord: LogRecord): String {
-                    val message = logRecord.message
-                    return format.formatCurrentTime() + " $message\n"
-                }
+    private val logger: Logger by lazy {
+        Logger.getLogger("SkyHanni-Logger-" + System.nanoTime()).apply {
+            try {
+                File(fileName).parentFile?.takeIf { !it.isDirectory }?.mkdirs()
+                FileHandler(fileName).apply {
+                    encoding = Charsets.UTF_8.name()
+                    formatter = object : Formatter() {
+                        override fun format(logRecord: LogRecord) = "${format.formatCurrentTime()} ${logRecord.message}\n"
+                    }
+                }.let(::addHandler)
+                useParentHandlers = false
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
 
-        if (!hasDone && SkyBlockUtils.onHypixel) {
-            hasDone = true
-            OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
-        }
-
-        return logger
-    }
-
-    private fun createParent(file: File) {
-        val parent = file.parentFile
-        if (parent != null && !parent.isDirectory) {
-            parent.mkdirs()
+            if (!hasDone && SkyBlockUtils.onHypixel) {
+                hasDone = true
+                OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
+            }
         }
     }
 
-    fun log(text: String?) {
-        getLogger().info(text)
-    }
+    fun log(text: String?) = logger.info(text)
 }
