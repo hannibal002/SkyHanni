@@ -1,10 +1,10 @@
 [versions]
 libautoupdate = "1.3.1"
-moulconfig = "4.4.0-beta"
+moulconfig = "4.5.0"
 jbAnnotations = "24.1.0"
-hypixelmodapi = "1.0.1"
+hypixelmodapi = "1.0.2"
 hypixelmodapi-fabric = "1.0.1+build.1+mc1.21"
-fabricLanguageKotlin = "1.13.7+kotlin.2.2.21"
+fabricLanguageKotlin = "1.13.9+kotlin.2.3.10"
 roughlyenoughitems = "19.0.806"
 autoservice-ksp = "1.1.0"
 autoservice-annotations = "1.1.1"
@@ -17,9 +17,8 @@ shadow = "9.3.1"
 loom = "1.15-SNAPSHOT"
 kotlin = "2.3.20"
 ksp = "2.3.6"
-detekt = "1.23.8"
+detekt = "2.0.0-alpha.2"
 
-junixsocket = "2.6.2"
 devauth = "1.2.1"
 junit = "5.11.0"
 mockk = "1.12.5"
@@ -52,11 +51,11 @@ commons-net = { module = "commons-net:commons-net", version.ref = "commons-net" 
 keval = { module = "com.notkamui.libs:keval", version.ref = "keval" }
 httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
 
-detekt-api = { module = "io.gitlab.arturbosch.detekt:detekt-api", version.ref = "detekt" }
-detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
-detekt-test = { module = "io.gitlab.arturbosch.detekt:detekt-test", version.ref = "detekt" }
+detekt-api = { module = "dev.detekt:detekt-api", version.ref = "detekt" }
+detektrules-ktlint = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
+detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
 detektrules-neu = { module = "org.notenoughupdates:detektrules", version.ref = "detektrules-neu" }
-detektrules-authors = { module = "io.gitlab.arturbosch.detekt:detekt-rules-ruleauthors", version.ref = "detekt" }
+detektrules-authors = { module = "dev.detekt:detekt-rules-ruleauthors", version.ref = "detekt" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
@@ -66,4 +65,4 @@ loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
