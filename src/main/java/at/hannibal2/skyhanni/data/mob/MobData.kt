@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.LivingEntity
@@ -40,7 +40,7 @@ object MobData {
 
     var externRemoveOfRetryAmount = 0
 
-    val logger = LorenzLogger("mob/detection")
+    val logger = SkyHanniLogger("mob/detection")
 
     internal enum class Result {
         Found,
