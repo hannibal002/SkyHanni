@@ -314,33 +314,40 @@ object VisualWordGui {
         InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8).use { reader ->
             try {
                 val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-                var importedWords = 0
-                var skippedWords = 0
-                val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
-
-                for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
-                    pattern.matchMatcher(line.asString) {
-                        val from = group("from").replace("&", "&&")
-                        val to = group("to").replace("&", "&&")
-                        val state = group("state").toBoolean()
-                        if (screen.modifiedWords.any { it.phrase == from }) {
-                            skippedWords++
-                            return@matchMatcher
-                        }
-                        screen.modifiedWords.add(VisualWord(from, to, state, caseSensitive = false))
-                        importedWords++
-                    }
-                }
-
-                if (importedWords > 0 || skippedWords > 0) {
-                    chat("§aSuccessfully imported §e$importedWords §awords and skipped §e$skippedWords §afrom SkyBlockExtras!")
-                    SkyHanniMod.feature.storage.visualWordsImported = true
-                    screen.saveChanges()
-                    screen.rebuildDisplay()
-                }
+                importFromSbeJson(json, screen)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
             }
+        }
+    }
+
+    private fun importFromSbeJson(
+        json: JsonObject,
+        screen: VisualWordScreen,
+    ) {
+        var importedWords = 0
+        var skippedWords = 0
+        val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
+
+        for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
+            pattern.matchMatcher(line.asString) {
+                val from = group("from").replace("&", "&&")
+                val to = group("to").replace("&", "&&")
+                val state = group("state").toBoolean()
+                if (screen.modifiedWords.any { it.phrase == from }) {
+                    skippedWords++
+                    return@matchMatcher
+                }
+                screen.modifiedWords.add(VisualWord(from, to, state, caseSensitive = false))
+                importedWords++
+            }
+        }
+
+        if (importedWords > 0 || skippedWords > 0) {
+            chat("§aSuccessfully imported §e$importedWords §awords and skipped §e$skippedWords §afrom SkyBlockExtras!")
+            SkyHanniMod.feature.storage.visualWordsImported = true
+            screen.saveChanges()
+            screen.rebuildDisplay()
         }
     }
 }
