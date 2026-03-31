@@ -7,14 +7,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.render.state.GuiItemRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
@@ -26,6 +29,7 @@ import kotlin.math.min
 import kotlin.math.sqrt
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.world.item.ItemDisplayContext
+import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -58,13 +62,13 @@ object GuiRenderUtils {
     }
 
     fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
-        DrawContextUtils.pushMatrix()
-        val strLength = fr.width(text)
-        val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        DrawContextUtils.translate(x, y)
-        DrawContextUtils.scale(factor, factor)
-        drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            val strLength = fr.width(text)
+            val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
+            DrawContextUtils.translate(x, y)
+            DrawContextUtils.scale(factor, factor)
+            drawString(text, -strLength / 2, -fr.lineHeight / 2, color, shadow)
+        }
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
@@ -320,6 +324,25 @@ object GuiRenderUtils {
     private const val SKULL_SCALE = (5f / 4f)
 
     /**
+     * Wrapper for rendering an item on screen, with the config pre-built.
+     */
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        config: ItemRenderableConfig,
+        stableRenderId: Int? = null,
+    ) = renderOnScreen(
+        x,
+        y,
+        scale = config.scale,
+        rescaleSkulls = config.rescaleSkulls,
+        alpha = config.alpha,
+        rotationVec = if (config is AnimatedItemRenderableConfig<*>) config.rotationStorage.currentRotation else Vec3.ZERO,
+        translationVec = if (config is AnimatedItemRenderableConfig<*>) config.bounceStorage.currentBounce else Vec3.ZERO,
+        stableRenderId = stableRenderId,
+    )
+
+    /**
      * Returns either the stable ID of the custom render (if used) or -1 if the item was
      * rendered using the normal method (either is static, or 'small')
      */
@@ -332,7 +355,9 @@ object GuiRenderUtils {
         rotationVec: Vec3 = Vec3.ZERO,
         translationVec: Vec3 = Vec3.ZERO,
         stableRenderId: Int? = null,
-    ): Int {
+        frameNumber: Int? = null,
+        alpha: Float = 1f,
+    ): Int? {
         val item = checkBlinkItem()
         val isItemSkull = rescaleSkulls && item.isSkull()
 
@@ -355,11 +380,9 @@ object GuiRenderUtils {
         val trackingState = TrackingItemStackRenderState()
         Minecraft.getInstance().itemModelResolver.updateForTopItem(trackingState, item, ItemDisplayContext.GUI, null, null, 0)
 
-        // Todo, uncomment when modern item rendering is fixed
-        /* if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight())) */
-        return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
+        if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
+            return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
-        /*
         /**
          * This is used to render items that fit these criteria:
          *  - Uses block light (mostly skulls)
@@ -369,10 +392,10 @@ object GuiRenderUtils {
          *
          *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
          *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
-         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config,
-         *  and will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config.
+         *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
-        val guiRenderState = GuiItemRenderState(
+        val guiItemRenderState = GuiItemRenderState(
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
@@ -381,30 +404,29 @@ object GuiRenderUtils {
             DrawContextUtils.drawContext.scissorStack.peek()
         )
         val newRenderState = SkyHanniGuiItemRenderState(
-            guiRenderState, x, y,
+            itemStack = this,
+            guiItemRenderState,
+            translateX,
+            translateY,
             rotationVec, translationVec,
-            scale = scale.toFloat(),
-            adjustedScale = (scale * guiScaleX).toFloat(),
+            scale = finalItemScale.toFloat(),
+            adjustedScale = (finalItemScale * guiScaleX).toFloat(),
             stableRenderId,
+            frameNumber = frameNumber,
+            alpha = alpha,
         )
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         return newRenderState.stableId
-        */
     }
 
     private fun ItemStack.normalRenderOnScreen(
         translateX: Float,
         translateY: Float,
         scale: Float
-    ): Int = DrawContextUtils.pushPopResult {
-        DrawContextUtils.translate(translateX, translateY)
-        DrawContextUtils.scale(scale, scale)
-
-        RenderSystem.assertOnRenderThread()
-
-        Minecraft.getInstance().gameRenderer.lighting.setupFor(Lighting.Entry.ITEMS_3D)
-
-        DrawContextUtils.drawItem(this, 0, 0)
-        return@pushPopResult -1
-    }
+    ): Int? = RenderUtils.scheduleOnRenderThread(setupFor = Lighting.Entry.ITEMS_3D) {
+        DrawContextUtils.translatedPushPopResult(translateX, translateY, postTranslateScale = scale) {
+            DrawContextUtils.drawItem(this, 0, 0)
+        }
+        return@scheduleOnRenderThread null
+    }.get()
 }

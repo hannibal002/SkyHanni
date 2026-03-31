@@ -143,16 +143,15 @@ object EntityUtils {
             .firstOrNull { it.name == "textures" }?.value
     }
 
-    inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
-        getEntitiesNearby<T>(LocationUtils.playerLocation(), radius, predicate)
+    inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
+        LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
 
     // First filters for a bounding box because it's faster, and then filters based on distance
-    inline fun <reified T : Entity> getEntitiesNearby(
-        location: LorenzVec,
+    inline fun <reified T : Entity> LorenzVec.getEntitiesNearby(
         radius: Double,
         noinline predicate: (T) -> Boolean = ALWAYS,
     ): List<T> {
-        return getEntitiesInBox<T>(location, radius) { it.distanceTo(location) < radius && predicate(it) }
+        return getEntitiesInBox<T>(this, radius) { it.distanceTo(this) < radius && predicate(it) }
     }
 
     @AllEntitiesGetter
@@ -202,7 +201,7 @@ object EntityUtils {
     @AllEntitiesGetter
     fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.entitiesForRendering()?.let {
         if (Minecraft.getInstance().isSameThread) it
-        // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
+        // TODO: while I am here, I want to point out that copying the entity list does not constitute proper synchronization,
         //  but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()

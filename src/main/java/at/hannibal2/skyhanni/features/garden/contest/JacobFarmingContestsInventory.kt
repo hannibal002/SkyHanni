@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -115,29 +117,33 @@ object JacobFarmingContestsInventory {
 
     private fun openContest(year: String, month: String, day: String) {
         val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
-        OSUtils.openBrowser("https://elitebot.dev/contests/$date")
-        ChatUtils.chat("Opening contest in elitebot.dev")
+        openElite("contests/$date".addSkyHanniUtm())
+        ChatUtils.chat("Opening contest in ${EliteDevApi.ELITE_DOMAIN}")
     }
 
     private fun openFromJacobMenu(itemName: String) {
         when (itemName) {
             "§6Upcoming Contests" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming")
-                ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+                openElite("contests/upcoming".addSkyHanniUtm())
+                ChatUtils.chat("Opening upcoming contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             "§bClaim your rewards!" -> {
-                OSUtils.openBrowser("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}/contests")
-                ChatUtils.chat("Opening your contests in elitebot.dev")
+                openElite("@${PlayerUtils.getName()}/${HypixelData.profileName}/contests".addSkyHanniUtm())
+                ChatUtils.chat("Opening your contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             "§aWhat is this?" -> {
-                OSUtils.openBrowser("https://elitebot.dev/contests")
-                ChatUtils.chat("Opening contest page in elitebot.dev")
+                openElite("contests".addSkyHanniUtm())
+                ChatUtils.chat("Opening contest page in ${EliteDevApi.ELITE_DOMAIN}")
             }
 
             else -> return
         }
+    }
+
+    private fun openElite(url: String) {
+        OSUtils.openBrowser("${EliteDevApi.ELITE_URL}/$url")
     }
 
     private fun openFromCalendar(
@@ -157,8 +163,8 @@ object JacobFarmingContestsInventory {
                 openContest(year, month, day)
             } else {
                 val timestamp = time / 1000
-                OSUtils.openBrowser("https://elitebot.dev/contests/upcoming#$timestamp")
-                ChatUtils.chat("Opening upcoming contests in elitebot.dev")
+                openElite("contests/upcoming".addSkyHanniUtm() + "#$timestamp")
+                ChatUtils.chat("Opening upcoming contests in ${EliteDevApi.ELITE_DOMAIN}")
             }
             event.cancel()
         }

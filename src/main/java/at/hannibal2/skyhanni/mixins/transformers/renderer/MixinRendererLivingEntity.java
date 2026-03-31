@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.data.entity.EntityOpacityManager;
+import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -48,7 +48,7 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
     @ModifyArg(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"), index = 6)
     private int modifyRenderAlpha(int argb) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            Integer entityAlpha = EntityOpacityManager.getEntityOpacity(livingEntity);
+            Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return argb;
 
             int oldAlpha = (argb >> 24) & 0xFF;
@@ -63,7 +63,7 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
         if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
-            if (EntityOpacityManager.getEntityOpacity(livingEntity) == null) return;
+            if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return;
             //? if < 1.21.11 {
             cir.setReturnValue(RenderType.itemEntityTranslucentCull(this.getTextureLocation(state)));
             //?} else

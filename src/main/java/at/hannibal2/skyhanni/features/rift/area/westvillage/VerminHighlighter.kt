@@ -41,7 +41,7 @@ object VerminHighlighter {
     fun tryAdd(entity: LivingEntity) {
         if (!isVermin(entity)) return
         val color = config.color.get().toColor().addAlpha(60)
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color) { isEnabled() }
+        RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
     }
 
     // This only gets called on config change, so the performance impact is minimal

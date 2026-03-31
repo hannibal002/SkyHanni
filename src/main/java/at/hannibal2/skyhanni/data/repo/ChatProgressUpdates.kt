@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darkRectButton
@@ -110,10 +111,9 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         }
         innerProgress = ""
 
-        val time = SimpleTimeMark.now().toLocalDateTime()
         currentStep = nextStep
         startOfCurrent = SimpleTimeMark.now()
-        println("$time: $nextStep")
+        category.log(nextStep)
 
         if (phase == Phase.END) {
             if (!currentlyRunning) {
@@ -188,6 +188,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     class ChatProgressCategory(val categoryName: String) {
         val updates = mutableListOf<ChatProgressUpdates>()
         var enabled = false
+        private val logger = SkyHanniLogger("debug/chat_progress_updates/$categoryName")
 
         fun start(label: String): ChatProgressUpdates {
             val progress = ChatProgressUpdates(this)
@@ -196,9 +197,23 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             return progress
         }
 
+        fun startBlock(
+            label: String,
+            block: (ChatProgressUpdates) -> Unit
+        ): ChatProgressUpdates = start(label).apply { block(this) }
+
+        suspend fun startSuspendBlock(
+            label: String,
+            block: suspend (ChatProgressUpdates) -> Unit
+        ): ChatProgressUpdates = start(label).apply { block(this) }
+
         fun toggle() {
             enabled = !enabled
             dirty = true
+        }
+
+        fun log(string: String) {
+            logger.log(string)
         }
     }
 

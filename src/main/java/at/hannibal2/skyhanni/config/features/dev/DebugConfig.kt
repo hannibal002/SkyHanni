@@ -172,16 +172,6 @@ class DebugConfig {
     var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area and graph area in SkyBlock while F3 is open.")
-    @ConfigEditorBoolean
-    var currentAreaDebug: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at while F3 is open.")
-    @ConfigEditorBoolean
-    var rayTracedOreBlock: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
     @ConfigEditorBoolean
     var oreEventMessages: Boolean = false

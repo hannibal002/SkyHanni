@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.outlineTopFace
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
-import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
     private val locations: List<LorenzVec>,
@@ -62,7 +60,7 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        val onGround = MinecraftCompat.localPlayer.onGround()
+                        val onGround = PlayerUtils.onGround()
                         val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
                         if (!(closeEnough && onGround)) continue
                         if (goInOrder && (index < current - 1 || index > current + 1)) continue
@@ -166,6 +164,7 @@ class ParkourHelper(
     private fun axisAlignedBB(loc: LorenzVec) = loc.boundingToOffset(platformSize, 1.0, platformSize).expandBlock()
 
     private fun colorForIndex(index: Int) = if (rainbowColor) {
-        RenderUtils.chromaColor(4.seconds, offset = -index / 12f, brightness = 0.7f).toChromaColor()
+        val hueOffset = (-index / 12f).mod(1f)
+        Color(Color.HSBtoRGB(hueOffset, 1f, 0.7f)).toChromaColor(chromaSpeedMillis = 4000)
     } else monochromeColor
 }

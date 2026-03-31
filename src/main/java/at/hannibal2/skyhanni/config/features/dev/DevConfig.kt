@@ -11,11 +11,18 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class DevConfig {
+
+    // new config values
+
+    @Expose
+    @Category(name = "Main Toggles", desc = "Main Toggles")
+    val mainToggles: MainTogglesConfig = MainTogglesConfig()
+
+    // old config entries: all below options will get moved soon
 
     @Expose
     @ConfigOption(name = "Repository", desc = "")
@@ -79,18 +86,6 @@ class DevConfig {
     @NoConfigLink
     val debugPos: Position = Position(10, 10)
 
-    @Expose
-    @NoConfigLink
-    val debugLocationPos: Position = Position(1, 160)
-
-    @Expose
-    @NoConfigLink
-    val debugItemPos: Position = Position(90, 70)
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "rayTracedOreBlock")
-    val debugOrePos: Position = Position(1, 200)
-
     // TODO move [these] to a ContributorAppearanceConfig, or something similar
     @Expose
     @ConfigOption(
@@ -128,27 +123,11 @@ class DevConfig {
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false
 
-    // TODO reenable the setting once the hypixel mod api works fine
+    // TODO re-enable the setting once the hypixel mod api works fine
     // @Expose
     // @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
     // @ConfigEditorBoolean
     // var hypixelModApi: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Ping API",
-        desc = "Make the client always send ping packets to the server as if the debug HUD was open so that we can calculate your ping.",
-    )
-    @ConfigEditorBoolean
-    var pingApi: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Damage Indicator",
-        desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!",
-    )
-    @ConfigEditorBoolean
-    var damageIndicatorBackend: Boolean = true
 
     @Expose
     @ConfigOption(

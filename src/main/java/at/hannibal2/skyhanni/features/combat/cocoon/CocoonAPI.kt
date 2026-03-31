@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -34,7 +34,7 @@ object CocoonAPI {
      Might require some sort of ping based tweaking?
      */
     val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
-    val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
+    val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
 
     data class CocoonMob(
         val mob: Mob,
@@ -81,7 +81,7 @@ object CocoonAPI {
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         val cocoonMob = cocoon.mob
         val timeSince = cocoon.spawnTime.passedSince()
-        logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.mobType}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
+        logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.category}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 

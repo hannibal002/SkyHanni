@@ -107,6 +107,8 @@ data class LorenzVec(
     fun min() = min(x, min(y, z))
     fun max() = max(x, max(y, z))
 
+    fun addHalf() = add(0.5, 0.5, 0.5)
+
     fun minOfEachElement(other: LorenzVec) = LorenzVec(min(x, other.x), min(y, other.y), min(z, other.z))
     fun maxOfEachElement(other: LorenzVec) = LorenzVec(max(x, other.x), max(y, other.y), max(z, other.z))
 
@@ -150,7 +152,7 @@ data class LorenzVec(
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
-    // TODO better name. dont confuse with roundTo()
+    // TODO better name. don't confuse with roundTo()
     fun roundLocation(): LorenzVec {
         val x = if (x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1
@@ -225,6 +227,12 @@ data class LorenzVec(
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
+    // format we use to send to all/party chat
+    fun toChatFormat(): String = "x: ${x.toInt()}, y: ${y.toInt()}, z: ${z.toInt()}"
+
+    // format we show in local chat or for local commands
+    fun toLocalFormat(): String = "${x.toInt()} ${y.toInt()} ${z.toInt()}"
+
     /**
      * Kotlin compiles the default equals method of data classes for doubles by comparing them, like
      * ```kt
@@ -283,7 +291,7 @@ data class LorenzVec(
 
 fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
-fun Entity.getLorenzVec(): LorenzVec = LorenzVec(position().x, position().y, position().z)
+fun Entity.getLorenzVec(): LorenzVec = position().toLorenzVec()
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(xOld, yOld, zOld)
 fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(positionCodec.base.x, positionCodec.base.y, positionCodec.base.z)
 

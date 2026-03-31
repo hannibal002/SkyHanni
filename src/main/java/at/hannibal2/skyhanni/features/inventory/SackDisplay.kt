@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -33,7 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
-// Shows the price of iems in sacks while being in the sacks
+// Shows the price of items in sacks while being in the sacks
 @SkyHanniModule
 object SackDisplay {
 
@@ -69,7 +70,10 @@ object SackDisplay {
     }
 
     fun update(savingSacks: Boolean) {
-        display = drawDisplay(savingSacks)
+        // Ensure we're running on the render thread - this gets called from the network thread in SackApi
+        DelayedRun.runOrNextTick {
+            display = drawDisplay(savingSacks)
+        }
     }
 
     private fun drawDisplay(savingSacks: Boolean) = buildList {
@@ -137,12 +141,6 @@ object SackDisplay {
                             addString("§7/")
                             addAlignedNumber("§b${total.addSeparators()}")
                         }
-
-                        else -> {
-                            addAlignedNumber("$colorCode${stored.addSeparators()}")
-                            addString("§7/")
-                            addAlignedNumber("§b${total.addSeparators()}")
-                        }
                     }
 
                     // TODO change color of amount if full
@@ -184,7 +182,6 @@ object SackDisplay {
             SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored }
             SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
             SortingTypeEntry.ASC_PRICE -> sackItems.sortedBy { it.second.price }
-            else -> sackItems.sortedByDescending { it.second.stored }
         }.toMap().toMutableMap()
 
         for ((k, v) in sortedPairs.toList()) {

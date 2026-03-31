@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -408,7 +407,9 @@ object GardenNextJacobContest {
             val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest").apply {
                 if (isBoosted) addEnchantGlint()
             }
-            val stack = Renderable.item(cropStack, 1.0)
+            val stack = Renderable.item(cropStack) {
+                scale = 1.0
+            }
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toColor()))
             } else add(stack)
@@ -446,15 +447,15 @@ object GardenNextJacobContest {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderOverlay() {
         if (!isDisplayEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
+    @HandleEvent
+    fun onChestGuiRender() {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -484,7 +485,7 @@ object GardenNextJacobContest {
 
     private fun handleFetchedContests() {
         if (haveAllContests) {
-            ChatUtils.chat("Successfully loaded this year's contests from elitebot.dev automatically!")
+            ChatUtils.chat("Successfully loaded this year's contests from ${EliteDevApi.ELITE_DOMAIN} automatically!")
             fetchedFromElite = true
             nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
             loadedContestsYear = SkyBlockTime.now().year

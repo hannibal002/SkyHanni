@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -25,12 +25,13 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.toLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 
@@ -40,6 +41,27 @@ object SlayerApi {
 
     val config get() = SkyHanniMod.feature.slayer
     private val trackerConfig get() = config.itemProfitTracker
+
+    private val patternGroup = RepoPattern.group("slayer.api")
+
+    // <editor-fold desc="Patterns">
+    /**
+     * WRAPPED-REGEX-TEST: "  SLAYER QUEST STARTED!"
+     */
+    private val questStartPattern by patternGroup.pattern(
+        "quest.start",
+        "\\s*SLAYER QUEST STARTED!",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: "  SLAYER QUEST COMPLETE!"
+     */
+    private val questCompletePattern by patternGroup.pattern(
+        "quest.complete",
+        "\\s*SLAYER QUEST COMPLETE!",
+    )
+    // </editor-fold>
+
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
@@ -126,9 +148,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" graph area: ${SkyBlockUtils.graphArea}")
-                with(MinecraftCompat.localPlayer.blockPosition().toLorenzVec().roundTo(1)) {
-                    add(" /shtestwaypoint $x $y $z pathfind")
-                }
+                add(" /shtestwaypoint ${PlayerUtils.blockPosition().toLocalFormat()} pathfind")
             }
             add("isInAnyArea: $isInAnyArea")
             add("latestProgress: '${latestProgress.removeColor()}'")
@@ -143,11 +163,13 @@ object SlayerApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
+        val message = event.cleanMessage
+
+        if (questStartPattern.matches(message)) {
             questStartTime = SimpleTimeMark.now()
         }
 
-        if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
+        if (questCompletePattern.matches(message)) {
             SlayerQuestCompleteEvent.post()
         }
     }
@@ -235,7 +257,7 @@ object SlayerApi {
         BOSS_FIGHT,
         FAILED,
         SLAIN,
-        NO_ACTIVE_QUEST
+        NO_ACTIVE_QUEST,
     }
 
     private fun detectState(old: String, new: String): ActiveQuestState = when {

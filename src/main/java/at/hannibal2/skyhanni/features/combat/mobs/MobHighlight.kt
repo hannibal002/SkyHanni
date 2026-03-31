@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.level.block.Blocks
@@ -52,7 +52,7 @@ object MobHighlight {
             else -> return
         }
 
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+        RenderLivingEntityHelper.setEntityColor(
             mob.baseEntity,
             color.toColor().addAlpha(127),
         ) { isEnabled() }
@@ -72,7 +72,7 @@ object MobHighlight {
         val entity = event.entity
         if (!entity.isCorrupted()) return
 
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+        RenderLivingEntityHelper.setEntityColor(
             entity,
             LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
         ) { config.corruptedMobHighlight }
@@ -99,7 +99,7 @@ object MobHighlight {
             else -> return
         }
 
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+        RenderLivingEntityHelper.setEntityColor(
             entity,
             color.toColor().addAlpha(alpha),
         ) { isEnabled() }
@@ -113,7 +113,7 @@ object MobHighlight {
 
         if (!arachne.canBeSeen(10)) return
 
-        event.drawLineToEye(
+        event.drawLineToCrosshair(
             arachne.centerCords,
             LorenzColor.RED.toChromaColor(),
             config.lineToArachneWidth,

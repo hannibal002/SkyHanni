@@ -32,4 +32,4 @@ object ScoreboardElementObjective : ScoreboardElement() {
     )
 }
 
-// click: open the objective page (i think a command should exist)
+// click: open the objective page (I think a command should exist)

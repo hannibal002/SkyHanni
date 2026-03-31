@@ -138,7 +138,9 @@ object DungeonSpiritLeapOverlay {
 
         val backgroundColor = if (player.playerDead) deadTeammateColor else getClassColor(player.dungeonClass)
         val itemRenderable = Renderable.drawInsideRoundedRect(
-            Renderable.item(playerStackInfo.stack, scale = scaleFactor * 0.9 + 2.7),
+            Renderable.item(playerStackInfo.stack) {
+                scale = scaleFactor * 0.9 + 2.7
+            },
             color = Color(255, 255, 255, 100),
             radius = 5,
         )

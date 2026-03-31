@@ -58,7 +58,7 @@ object FireFreezeFeatures {
         }
 
         fun hasFinished(): Boolean = frozen || startTime.passedSince() > 0.5.seconds
-        // 0.5s passed since is for times where the fire freeze misses and hypixel plays no noise.
+        // 0.5s passed since is for times when the fire freeze misses and hypixel plays no noise.
 
         fun freezeMobs() {
             if (frozen) return
@@ -90,8 +90,8 @@ object FireFreezeFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         when (event.soundName) {
-            "mob.guardian.elder.idle" -> handleActiveSound(event)
-            "random.anvil_land" -> handleAnvilSound(event)
+            "entity.elder_guardian.ambient" -> handleActiveSound(event)
+            "block.anvil.land" -> handleAnvilSound(event)
         }
     }
 

@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -548,7 +547,7 @@ object ComposterOverlay {
 
         val havingInSacks: Int
         if (internalName.isMissingSackItem()) {
-            // sunflower oil doesnt go into sacks so have to do this
+            // sunflower oil doesn't go into sacks so have to do this
             havingInSacks = 0
         } else {
             havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
@@ -633,6 +632,7 @@ object ComposterOverlay {
     private fun updateOrganicMatterFactors() {
         try {
             organicMatterFactors = updateOrganicMatterFactors(organicMatter)
+            displayDirty = true
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Failed to calculate composter overlay data",
@@ -641,41 +641,38 @@ object ComposterOverlay {
         }
     }
 
+    // todo repo
     private val blockedItems = listOf(
         "POTION_AFFINITY_TALISMAN",
         "CROPIE_TALISMAN",
         "SPEED_TALISMAN",
         "SIMPLE_CARROT_CANDY",
-    )
+    ).map { it.toInternalName() }
 
-    private fun isBlockedArmor(internalName: String): Boolean {
-        return internalName.endsWith("_BOOTS") ||
-            internalName.endsWith("_HELMET") ||
-            internalName.endsWith("_CHESTPLATE") ||
-            internalName.endsWith("_LEGGINGS")
-    }
+    private val HUGE_MUSHROOM_1 = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
+    private val HUGE_MUSHROOM_2 = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
 
     private fun updateOrganicMatterFactors(baseValues: Map<NeuInternalName, Double>): Map<NeuInternalName, Double> {
         val map = mutableMapOf<NeuInternalName, Double>()
-        for ((internalName, _) in NeuItems.allNeuRepoItems()) {
-            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
+        for (internalName in NeuItems.allNeuRepoInternalNames()) {
+            if (blockedItems.contains(internalName) || internalName.isArmor()) continue
 
-            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName.toInternalName())
-            if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
+            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
+            if (internalName == HUGE_MUSHROOM_1 || internalName == HUGE_MUSHROOM_2) {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
             baseValues[newId]?.let {
                 val totalOrganicMatter = it * amount
                 if (totalOrganicMatter <= config.minimumOrganicMatter.get()) continue
-                map[internalName.toInternalName()] = totalOrganicMatter
+                map[internalName] = totalOrganicMatter
             }
         }
         return map
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
+    @HandleEvent
+    fun onChestGuiRender() {
         if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
         if (displayDirty) {
@@ -683,14 +680,12 @@ object ComposterOverlay {
             displayDirty = false
         }
 
-        config.overlayOrganicMatterPos.renderRenderable(
-            organicMatterDisplay,
-            posLabel = "Composter Overlay Organic Matter",
-        )
-        config.overlayFuelExtrasPos.renderRenderable(
-            fuelExtraDisplay,
-            posLabel = "Composter Overlay Fuel Extras",
-        )
+        organicMatterDisplay?.let {
+            config.overlayOrganicMatterPos.renderRenderable(it, posLabel = "Composter Overlay Organic Matter")
+        }
+        fuelExtraDisplay?.let {
+            config.overlayFuelExtrasPos.renderRenderable(it, posLabel = "Composter Overlay Fuel Extras")
+        }
     }
 
     enum class TimeType(val display: String, val multiplier: Int) {

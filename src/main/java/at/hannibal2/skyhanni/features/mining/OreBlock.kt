@@ -130,7 +130,7 @@ enum class OreBlock(
     }
 
     /**
-     * Assume below softcap
+     * Assume below soft cap
      */
     fun speedNeededForNextTick(currentSpeed: Double): Double =
         (strength * 30) / (miningTicks(currentSpeed) - 0.5) - currentSpeed

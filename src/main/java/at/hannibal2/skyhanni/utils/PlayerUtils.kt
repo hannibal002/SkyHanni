@@ -3,12 +3,16 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.StringUtils.toUnDashedUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.Minecraft
+import net.minecraft.world.entity.Avatar
+import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.ai.attributes.Attributes
 import java.util.UUID
 
 object PlayerUtils {
+
+    val STANDING_EYE_HEIGHT = Avatar.POSES.getValue(Pose.STANDING).eyeHeight
+    val SNEAKING_EYE_HEIGHT = Avatar.POSES.getValue(Pose.CROUCHING).eyeHeight
 
     // thirdPersonView on 1.8.9
     // 0 == normal
@@ -20,7 +24,7 @@ object PlayerUtils {
 
     fun isThirdPersonView(): Boolean {
         val perspective = Minecraft.getInstance().options.cameraType
-        // for some reason they make you check the other 2 bools instead of giving you a third one
+        // for some reason they make you check the other 2 booleans instead of giving you a third one
         return !perspective.isMirrored && !perspective.isFirstPerson
     }
 
@@ -41,7 +45,12 @@ object PlayerUtils {
 
     fun getName(): String = MinecraftCompat.localPlayer.plainTextName
 
-    fun inAir(): Boolean = !MinecraftCompat.localPlayer.onGround()
+    fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
+    fun inAir(): Boolean = !onGround()
+
+    fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
+
+    fun getLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
     fun isSneaking(): Boolean = MinecraftCompat.localPlayer.isShiftKeyDown
 }

@@ -53,6 +53,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 + Added Rainbow Action Bar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
 + Added an option to show the item that was bid on in the winning bid message in the Dark Auction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5126)
++ Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
+  + Do /shachievements to see them all.
 
 #### Chat Filter
 
@@ -311,6 +313,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Coins in excess of the integer limit on an individual order do not count towards the daily limit.
     + Resets at midnight UTC.
 + Added a keybind to fill your inventory with the hovered item from Sacks. - nopo (https://github.com/hannibal002/SkyHanni/pull/4697)
++ Added Supercrafting menu quantity preset overlay. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5296)
++ Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
+  + Highlights completed categories in green.
 
 </details>
 <details open><summary>
@@ -482,6 +487,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Sea Creature Health Overlay. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Kill Time. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Lootshare Sphere. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
++ Added Party Chat and Title Warning when an owned Sea Creature gets Cocooned. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5110)
 
 </details>
 <details open><summary>
@@ -591,6 +597,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to hide Damage Splashes near Slayer Bosses. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
 + Added option to hide Slayer Spawn particles. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4721)
 + Cocoon Timer & Mob Name Overlay. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5113)
++ Added line to Tarantula Boss. - SillyGirlMarina (https://github.com/hannibal002/SkyHanni/pull/5392)
 
 </details>
 <details open><summary>
@@ -807,8 +814,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Default: #10k
 + Sync Jacob Contests - Kaeso + CalMWolfs
     + No need to open the calendar every SkyBlock year again.
-    + Grab Jacob Contest data from the elitebot.dev website.
-    + Option to send local contest data to elitebot.dev at the start of the new SkyBlock year.
+    + Grab Jacob Contest data from the eliteskyblock.com website.
+    + Option to send local contest data to eliteskyblock.com at the start of the new SkyBlock year.
 + **Visual garden plot borders** - VixidDev
     + Press F3 + G to enable/disable the view.
 + /shmouselock command to lock mouse rotation for farming. - Cad
@@ -843,13 +850,20 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added crop collection leaderboard display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4665)
   + For each crop, show your all-time and monthly collection, leaderboard position, and players ahead/behind you.
   + Swap between crops and leaderboard modes by clicking on the display switcher button while in an inventory.
-  + Data sourced from the Elitebot.dev API.
+  + Data sourced from the eliteskyblock.com API.
 + Added pest kills leaderboard display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4665)
   + For each pest, show your all-time kills, leaderboard position, and players ahead/behind you.
   + Swap between pests by clicking on the display switcher button while in an inventory.
-  + Data sourced from the Elitebot.dev API.
+  + Data sourced from the eliteskyblock.com API.
 + Highlight Harvestability status in the Greenhouse. - nopo (https://github.com/hannibal002/SkyHanni/pull/5136)
 + Highlight Water Status green if the crop doesn't need more water. - nopo (https://github.com/hannibal002/SkyHanni/pull/5168)
++ Added command `/shgardenuptime`. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4703)
+    + Shows garden uptime history for the past x days, defaults to 7 days.
++ Added Crop Break Tracker. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4703)
+    + Shows the number of crops you have broken on the Garden and blocks per second (supports pest farming/visitors).
+    + Can choose to display data from the following modes: Total, Session, Day, Week, Month, or Year.
++ Added an option to prevent breaking crops on the Garden while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5455)
++ Added option to reduce sensitivity while holding Squeaky Mousemat. - Nick-NCSU (https://github.com/hannibal002/SkyHanni/pull/5391)
 
 ### Garden Pests
 
@@ -897,7 +911,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to change the number of seconds until the waypoint will disappear.
 + Pest Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1321)
 + Open On Elite. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1185)
-    + Allow opening farming contest stats on elitebot.dev by pressing a keybind + mouse click onto a contest item.
+    + Allow opening farming contest stats on eliteskyblock.com by pressing a keybind + mouse click onto a contest item.
     + Works inside the menus Jacob's Farming Contest, Your Contests, and SkyBlock Calendar.
 + Visitor's Logbook Stats. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1287)
     + Show all your visited/accepted/denied visitors stats in a display.
@@ -1166,6 +1180,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to mute final Tree Breaking Sound. - Siv (https://github.com/hannibal002/SkyHanni/pull/4459)
 + Added some whisper cost and spent info to HOTF perk tooltips. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4754)
 + Added Mute Fusion Machine. - Luna (https://github.com/hannibal002/SkyHanni/pull/5196)
++ Added tracker, titles, and block highlighting for Dark Monoliths. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4062)
 
 </details>
 <details open><summary>
@@ -1372,7 +1387,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + `/pt <player>` as alias for `/party transfer <player>`
     + SkyBlock Command `/tp` to check the play time still works
 + **/shfarmingprofile [player name]**
-    + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
+    + Opens the eliteskyblock.com website in your web browser to show your Farming Weight profile.
 + Tab Complete support to sacks command /gfs and /getfromsacks. - J10a1n15
 + /shcalccrop. - CalMWolfs
     + Calculate how many crops need to be farmed between different crop milestones.
@@ -1440,6 +1455,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Sirih NPC Helper. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3525)
     + Shows a clickable message that grabs sulphur from your sacks when talking to Sirih while he is a pig.
 + Show Exes, Wais and Zees hitbox. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2665)
++ Added Avorius Helper for the Crimson Isle. - Destiny (https://github.com/hannibal002/SkyHanni/pull/5441)
 
 </details>
 <details open><summary>

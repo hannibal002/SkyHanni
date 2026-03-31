@@ -23,10 +23,15 @@ val cmd = listOf("./gradlew") + gradleArgs
  * REGEX-TEST: > Could not resolve all files for configuration ':1.8.9:compileClasspath'.
  * REGEX-TEST:          > Could not GET 'https://maven.shedaniel.me/dev/architectury/architectury-naming-service/2.0.9/architectury-naming-service-2.0.9.jar'.
  * REGEX-TEST: Caused by: net.fabricmc.loom.util.download.DownloadException: Failed to download file
+ * REGEX-TEST: > java.io.IOException: Server returned HTTP response code: 502 for URL: https://github.com/NotEnoughUpdates/NotEnoughUpdates-Repo/archive/refs/heads/master.zip
+ * REGEX-TEST: Caused by: java.io.IOException: Server returned HTTP response code: 502 for URL: https://github.com/NotEnoughUpdates/NotEnoughUpdates-Repo/archive/refs/heads/master.zip
+ * REGEX-FAIL: org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':1.21.10:detektMain'.
+ * REGEX-FAIL: at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
  */
 val retryableErrorRegex = Regex(
     // language=RegExp
-    "(?:(?: +)?\\> +)?(?:Could not |Caused by: )(?:GET '?(?<url>https?:\\/\\/[^']+)(?:'\\.?)?(?: (?<error>.*))?|determine|resolve|net\\.fabricmc.*DownloadException:.*)(?: (?:all files for configuration|the dependencies of task) '(?<task>:[^']+)')?",
+    "(?: *> )?(?:Could not (?:resolve|get|determine).+|(?:Caused by: )?(?<!at)[\\w.]+(?<!TaskExecution|Verification)Exception:.+)",
+    option = RegexOption.IGNORE_CASE,
 )
 
 for (i in 1..maxAttempts) {

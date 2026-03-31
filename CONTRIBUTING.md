@@ -41,7 +41,7 @@ downloaded. If not, you might need to link the Gradle project in the Gradle tab 
 </details>
 
 Make sure the Gradle JVM (found in the settings wheel in the Gradle tab, or by searching <kbd>Ctrl + Shift + A</kbd>
-for "Gradle JVM") is set to a Java 21 JDK.
+for "Gradle JVM") is set to a Java 25 JDK.
 
 <details>
 <summary>🖼️Show Gradle JVM image</summary>
@@ -61,7 +61,7 @@ To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Proje
 
 </details>
 
-We want to set the project structure to use Java 21.
+We want to set the project structure to use Java 25.
 
 <details>
 <summary>🖼️ What you should set the project structure to be</summary>
@@ -90,7 +90,7 @@ configuration. If not, you can restart intellij and reload the gradle project ag
 
 </details>
 
-Select an appropriate Java 21 JDK (preferably [DCEVM](#hot-swap), but any Java 21 JDK will do).
+Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 25 JDK will do).
 
 <details>
 <summary>🖼️Show run configuration image</summary>
@@ -108,7 +108,10 @@ the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pu
 
 ### Creating a Pull Request
 
-If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
+If you are not very familiar with Git, you might want to check out some of these resources:
+- [GitHub docs](https://docs.github.com/en/get-started/learning-to-code/getting-started-with-git)
+- [Git tutorial video](https://www.youtube.com/watch?v=Ala6PHlYjmw)
+- [Learn Git Branching](https://learngitbranching.js.org)
 
 Proposed changes are best made in their own branch, as this makes development easier for both you and the maintainers of this repository.
 You can do this by following the instructions within the IntelliJ window in the open SkyHanni project:
@@ -333,7 +336,7 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 
 ### Elite Farmers API
 
-SkyHanni utilizes the [Elite API](https://api.elitebot.dev/) (view the [public site here](https://elitebot.dev)) for
+SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for
 some farming features.
 
 This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience.
