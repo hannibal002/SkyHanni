@@ -27,6 +27,5 @@ object MinecraftCompat {
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isF3Visible
 
     val isWindowActive get(): Boolean =
-        !SkyHanniMod.feature.dev.debug.alwaysUnfocused &&
-            Minecraft.getInstance().isWindowActive
+        !SkyHanniMod.feature.dev.debug.alwaysUnfocused && Minecraft.getInstance().isWindowActive
 }
