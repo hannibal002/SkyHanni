@@ -53,7 +53,7 @@ object DeployableDisplay {
         TITANIUM_LANTERN("Titanium Lantern", "§9Titanium Lantern", 30, DeployableType.LANTERN, 3),
         GLACITE_LANTERN("Glacite Lantern", "§5Glacite Lantern", 30, DeployableType.LANTERN, 4, true),
         WILL_O_WISP("Will-o'-wisp", "§6§lWill-o'-wisp", 30, DeployableType.LANTERN, 5, true),
-        BLACK_HOLE("Black Hole", "§5Black Hole", 10, DeployableType.BLACK_HOLE),
+        BLACK_HOLE("Black Hole", "§5Black Hole", 20, DeployableType.BLACK_HOLE),
         UMBERELLA("Umberella", "§9Umberella", 30, DeployableType.UMBERELLA),
         ;
 
