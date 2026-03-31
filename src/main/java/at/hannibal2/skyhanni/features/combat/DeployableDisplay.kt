@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -55,8 +54,8 @@ object DeployableDisplay {
         GLACITE_LANTERN("Glacite Lantern", "§5Glacite Lantern", 30, DeployableType.LANTERN, 4, true),
         WILL_O_WISP("Will-o'-wisp", "§6§lWill-o'-wisp", 30, DeployableType.LANTERN, 5, true),
         BLACK_HOLE("Black Hole", "§5Black Hole", 10, DeployableType.BLACK_HOLE),
-        UMBERELLA("Umberella", "§9Umberella", 30, DeployableType.UMBERELLA);
-
+        UMBERELLA("Umberella", "§9Umberella", 30, DeployableType.UMBERELLA),
+        ;
 
         val pattern by group.pattern(
             name.lowercase().replace("_", "-"),
@@ -96,7 +95,8 @@ object DeployableDisplay {
         FLUX,
         LANTERN,
         UMBERELLA,
-        BLACK_HOLE;
+        BLACK_HOLE,
+        ;
 
         override fun toString(): String {
             return when {
