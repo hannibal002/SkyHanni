@@ -68,10 +68,11 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
      * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§aBubbles§r§a!
      */
     val eggBoughtPattern by CFApi.patternGroup.pattern(
         "egg.bought",
-        "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6(?<cost>[\\d,]*) Coins§r§a!",
+        "§aYou bought §r(?<rabbitname>.*?)(?: §r§afor §r§6(?<cost>[\\d,]*) Coins)?§r§a!",
     )
 
     /**
@@ -297,6 +298,7 @@ object HoppityEggsManager {
 
     private fun warn() {
         if (!unclaimedEggsConfig.warningsEnabled) return
+        if (SkyBlockUtils.isStrandedProfile) return
         if (ReminderUtils.isBusy() && !unclaimedEggsConfig.warnWhileBusy) return
         if (lastWarnTime.passedSince() < 1.minutes) return
 

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarTransactionEvent.TransactionType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -132,7 +131,7 @@ object BazaarApi {
 
     fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
-    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int = -1) {
+    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int? = null) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
@@ -143,6 +142,15 @@ object BazaarApi {
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
+    }
+
+    fun searchForBazaarItemOrRecipe(internalName: NeuInternalName, amount: Int? = null) {
+        searchForBazaarItemOrRecipe(internalName.itemNameWithoutColor, amount)
+    }
+
+    fun searchForBazaarItemOrRecipe(displayName: String, amount: Int? = null) {
+        if (!SkyBlockUtils.noTradeMode) searchForBazaarItem(displayName, amount)
+        else HypixelCommands.recipe(displayName)
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -206,7 +214,7 @@ object BazaarApi {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {

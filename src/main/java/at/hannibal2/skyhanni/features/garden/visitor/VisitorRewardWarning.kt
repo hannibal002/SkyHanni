@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -47,7 +47,7 @@ object VisitorRewardWarning {
 
     private fun renderColor(backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
         if (!config.bypassKey.isKeyHeld() && backgroundSlot != null) {
-            backgroundSlot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
+            backgroundSlot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.transparency))
         }
         if (config.optionOutline && outlineSlot != null) {
             outlineSlot.drawBorder(outlineColor.addOpacity(200))
@@ -71,7 +71,6 @@ object VisitorRewardWarning {
             return
         }
 
-        // all but shift click types work for accepting visitor
         if (event.clickType == ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.REFUSED, "refused")
@@ -81,7 +80,7 @@ object VisitorRewardWarning {
             }
             return
         }
-        if (isAcceptSlot && stack.getLore().contains("§eClick to give!")) {
+        if (isAcceptSlot && stack.getLoreComponent().any { it.string.contains("Click to give!") }) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.ACCEPTED, "accepted")
             return
         }
@@ -126,7 +125,7 @@ object VisitorRewardWarning {
         }
 
         blockedToolTip.add("")
-        val pricePerCopper = visitor.pricePerCopper?.let { it.shortFormat() }
+        val pricePerCopper = visitor.pricePerCopper?.shortFormat()
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
         val formattedLoss = loss.absoluteValue.shortFormat()

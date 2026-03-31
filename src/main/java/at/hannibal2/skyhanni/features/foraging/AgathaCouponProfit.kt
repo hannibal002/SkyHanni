@@ -118,7 +118,7 @@ object AgathaCouponProfit {
         )
     }
 
-    // TODO merge logic into core item utils logic, i think
+    // TODO merge logic into core item utils logic, I think
     private fun workOutInternalNameOrNull(item: ItemStack): Pair<NeuInternalName, Component>? {
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
@@ -158,13 +158,13 @@ object AgathaCouponProfit {
     }
 
     private fun isValidSlotNumber(slot: Int): Boolean {
-        if (slot < 9 || slot > 44) return false
+        if (slot !in 9..44) return false
         val modNine = slot % 9
         return modNine != 0 && modNine != 8
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
         config.agathaCouponProfitPos.renderRenderables(
             display,

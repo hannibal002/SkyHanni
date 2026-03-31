@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
+import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -53,6 +54,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getOverclockerCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
@@ -76,6 +78,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -193,7 +196,9 @@ object EstimatedItemValueCalculator {
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
         val reforgeStoneName = internalName.repoItemName
-        val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
+        val applyCost = reforge.costs.takeIfNotEmpty()?.let {
+            getReforgeStoneApplyCost(stack, it, internalName)
+        } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
         list.add(" §7Stone: $reforgeStoneName ${reforgeStonePrice.formatCoinWithBrackets()}")
@@ -626,15 +631,13 @@ object EstimatedItemValueCalculator {
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (names.isEmpty()) return 0.0
         list.add("§7Enchantments: " + totalPrice.formatCoin())
-        var i = 0
-        for (name in names) {
+        for ((i, name) in names.withIndex()) {
             if (i == enchantmentsCap) {
                 val missing = names.size - enchantmentsCap
                 list.add(" §7§o$missing more enchantments..")
                 break
             }
             list.add(name)
-            i++
         }
         return totalPrice
     }
@@ -758,10 +761,10 @@ object EstimatedItemValueCalculator {
                 items.addOrPut(ingredient.internalName, amount)
             }
 
-            val splitSlot = key.split("_") // eg. SAPPHIRE_1
+            val splitSlot = key.split("_") // e.g. SAPPHIRE_1
             val colorCode = SkyBlockItemModifierUtils.GemstoneSlotType.getColorCode(splitSlot[0])
 
-            // eg. SAPPHIRE_1 -> Sapphire Slot 2
+            // e.g. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
                 // If the slot index is 0, we don't need to specify
                 if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
@@ -854,11 +857,12 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
+        val petLevelInclusiveInternalName = stack.getPetInternalNameWithLevel().removeKuudraTier()
 
         // ignore cases where players put bugged items in ah/trade/chest to break mods
         if (internalName == NeuInternalName.NONE) return 0.0
 
-        var price = internalName.getPrice()
+        var price = petLevelInclusiveInternalName.getPrice()
         if (price == -1.0) {
             price = 0.0
         }
@@ -873,8 +877,9 @@ object EstimatedItemValueCalculator {
                 }
             }
         }
+        val level = if (stack.getPetInternalNameWithLevel() != stack.getInternalName()) " LVL ${stack.getPetLevel()}" else ""
 
-        val name = internalName.repoItemName
+        val name = "${internalName.repoItemName}$level"
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0

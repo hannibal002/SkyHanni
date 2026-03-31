@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -34,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -45,8 +48,10 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -56,19 +61,23 @@ import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
+import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import com.google.gson.reflect.TypeToken
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
+import com.mojang.authlib.properties.PropertyMap
 import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -83,8 +92,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import com.google.common.collect.ImmutableMultimap
-import com.mojang.authlib.properties.PropertyMap
 
 @SkyHanniModule
 @Suppress("LargeClass")
@@ -274,6 +281,29 @@ object ItemUtils {
         return internalName
     }
 
+    /*
+    This will cause errors if used with basically anything EXCEPT getPrice
+    since PENGUIN;4+100 or GOLDEN_DRAGON;4+200 aren't real internal names.
+     */
+    fun ItemStack.getPetInternalNameWithLevel(): NeuInternalName = getPetInternalNameWithLevelOrNull() ?: NeuInternalName.NONE
+
+    fun ItemStack.getPetInternalNameWithLevelOrNull(): NeuInternalName? {
+        var internalName = getInternalNameOrNull()
+        if (internalName != null) {
+            val maxLevel = getMaxLevel(internalName)
+
+            if (this.getPetLevel() == 100) {
+                internalName = "${internalName.asString()}+100".toInternalName()
+            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
+                // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
+                internalName = "${internalName.asString()}+200".toInternalName()
+            } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
+                internalName = "${internalName.asString()}+100".toInternalName()
+            }
+        }
+        return internalName
+    }
+
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
         if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
@@ -282,8 +312,11 @@ object ItemUtils {
         if (getLore().getOrNull(0) == "§7Lump-sum amount") {
             return NeuInternalName.SKYBLOCK_COIN
         }
-        val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
-        return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
+        val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
+            "ULTIMATE_ULTIMATE_",
+            "ULTIMATE_"
+        )
+        return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
     fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
@@ -509,7 +542,7 @@ object ItemUtils {
      */
     private val enchantedBookPattern by RepoPattern.pattern(
         "item.enchantedbook",
-        "(?:§f)?Enchanted Book \\((?<item>.+)\\)"
+        "(?:§f)?Enchanted Book \\((?<item>.+)\\)",
     )
 
     fun readBookTypeStrippedColor(input: String): String? = readBookType(input)?.removeColor()
@@ -590,7 +623,7 @@ object ItemUtils {
     var bazaarOverrides = mapOf<String, String>()
         private set
 
-    private data class BazaarOverride(
+    internal data class BazaarOverride(
         @Expose @SerializedName("stock") val bazaarInternalName: String,
         @Expose @SerializedName("id") val neuInternalName: String,
     )
@@ -605,9 +638,9 @@ object ItemUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val bazaarOverridesTypeToken = object : TypeToken<List<BazaarOverride>>() {}.type
-        val overrides = event.getConstant<List<BazaarOverride>>("bazaarstocks", bazaarOverridesTypeToken)
-        bazaarOverrides = overrides.associate { it.bazaarInternalName to it.neuInternalName }
+        bazaarOverrides = event.getConstant<List<BazaarOverride>>("bazaarstocks").associate {
+            it.bazaarInternalName to it.neuInternalName
+        }
 
         // clear the item name cache so any potential missing items are reloaded
         itemNameCache.clear()
@@ -717,11 +750,11 @@ object ItemUtils {
         }
     }
 
+    private val testItemCoroutineConfig = CoroutineConfig("shtestitem").withIOContext()
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
-
         // running .getPrice() on thousands of items may take ~500ms
-        SkyHanniMod.launchIOCoroutine("shtestitem") {
+        testItemCoroutineConfig.launch {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
@@ -871,35 +904,37 @@ object ItemUtils {
         return "$prefix§r$repoItemName"
     }
 
+    private val COIN_TEXTURE_1 by lazy { SkullTextureHolder.getTexture("COIN_ITEM_STACK_1") }
+    private val COIN_TEXTURE_2 by lazy { SkullTextureHolder.getTexture("COIN_ITEM_STACK_2") }
+    private val COIN_TEXTURE_3 by lazy { SkullTextureHolder.getTexture("COIN_ITEM_STACK_3") }
+    private val COIN_TEXTURE_UUIDS = listOf(
+        "2070f6cb-f5db-367a-acd0-64d39a7e5d1b",
+        "94fa2455-2881-31fe-bb4e-e3e24d58dbe3",
+        "0af8df1f-098c-3b72-ac6b-65d65fd0b668",
+    )
+
+    private val coinSkulls by lazy {
+        listOf(COIN_TEXTURE_1, COIN_TEXTURE_2, COIN_TEXTURE_3).mapIndexed { index, texture ->
+            texture to createSkull("<placeholder>", COIN_TEXTURE_UUIDS[index], texture)
+        }.toMap()
+    }
+
+    private val coinSkullCache = TimeLimitedCache<Number, ItemStack>(2.minutes)
+
     // Taken from NEU
-    // TODO add cache
-    fun getCoinItemStack(coinAmount: Number): ItemStack {
+    fun getCoinItemStack(coinAmount: Number): ItemStack = coinSkullCache.getOrPut(coinAmount) {
+        ChatUtils.debug("Generating coin skull for amount ${coinAmount.addSeparators()}")
         val amount = coinAmount.toDouble()
-        var uuid = "2070f6cb-f5db-367a-acd0-64d39a7e5d1b"
-        var texture =
-            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0="
+        val skull = when {
+            amount >= 10000000 -> coinSkulls[COIN_TEXTURE_3]
+            amount >= 100000 -> coinSkulls[COIN_TEXTURE_2]
+            else -> coinSkulls[COIN_TEXTURE_1]
+        } ?: coinSkulls.entries.first().value
 
-        if (amount >= 100000) {
-            uuid = "94fa2455-2881-31fe-bb4e-e3e24d58dbe3"
-            texture =
-                "eyJ0aW1lc3RhbXAiOjE2MzU5NTczOTM4MDMsInByb2ZpbGVJZCI6ImJiN2NjYTcxMDQzNDQ0MTI4ZDMwODllMTNiZGZhYjU5IiwicHJvZmlsZU5hbWUiOiJsYXVyZW5jaW8zMDMiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2M5Yjc3OTk5ZmVkM2EyNzU4YmZlYWYwNzkzZTUyMjgzODE3YmVhNjQwNDRiZjQzZWYyOTQzM2Y5NTRiYjUyZjYiLCJtZXRhZGF0YSI6eyJtb2RlbCI6InNsaW0ifX19fQo="
+        skull.copy().apply {
+            setCustomItemName(amount.formatCoin() + " Coins")
+            extraAttributes = extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
         }
-
-        if (amount >= 10000000) {
-            uuid = "0af8df1f-098c-3b72-ac6b-65d65fd0b668"
-            texture =
-                "ewogICJ0aW1lc3RhbXAiIDogMTYzNTk1NzQ4ODQxNywKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-        }
-
-        val skull = createSkull(
-            amount.formatCoin() + " Coins",
-            uuid,
-            texture,
-        )
-
-        skull.extraAttributes = skull.extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
-
-        return skull
     }
 
     fun ItemStack.isSkull(): Boolean {
@@ -911,5 +946,17 @@ object ItemUtils {
         val identifier = this.get(DataComponents.ITEM_MODEL)
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
         return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
+    }
+
+    fun ItemStack.asTextComponent(): Component? {
+        val stack = this
+        if (this.item == Items.PLAYER_HEAD) {
+            return componentBuilder {
+                append(Component.`object`(PlayerSprite(stack.get(DataComponents.PROFILE), true))) {
+                    withColor(ChatFormatting.WHITE)
+                }
+            }
+        }
+        return null
     }
 }

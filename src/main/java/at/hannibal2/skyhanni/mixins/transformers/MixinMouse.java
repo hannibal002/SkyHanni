@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
@@ -41,18 +39,7 @@ public class MixinMouse {
 
     @Inject(method = "onButton", at = @At("HEAD"))
     private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
-        int button = input.button();
-        if (action == 1) {
-            MouseCompat.INSTANCE.setLastEventButton(button);
-            new KeyDownEvent(button).post();
-            new KeyPressEvent(button).post();
-        } else {
-            new KeyPressEvent(button).post();
-            DelayedRun.INSTANCE.runNextTickOld(() -> {
-                MouseCompat.INSTANCE.setLastEventButton(-1);
-                return null;
-            });
-        }
+        MouseCompat.INSTANCE.handleMouseButton(input, action);
     }
 
     @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isWindowActive()Z"))

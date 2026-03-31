@@ -9,21 +9,26 @@ import net.minecraft.network.chat.Component
 // A SkyHanniChatEvent after filtering all player send events, leaving messages from the game/system.
 object SystemMessageEvent {
 
+    // TODO docs missing
     @PrimaryFunction("onSystemMessage")
     open class Allow(
         open val message: String,
         open val chatComponent: Component,
         open var blockedReason: String? = null,
-        open val cleanMessage: String = chatComponent.string.removeColor(),
-    ) : SkyHanniEvent()
+    ) : SkyHanniEvent() {
+        open val cleanMessage: String = chatComponent.string.removeColor()
+    }
 
+    // TODO docs missing
     open class Modify(
         open val message: String,
         @set:Deprecated("Use replaceComponent() instead")
         open var chatComponent: Component,
         open val blockedReason: String? = null,
-        open val cleanMessage: String = chatComponent.string.removeColor(),
     ) : SkyHanniEvent() {
+        open val cleanMessage: String
+            get() = chatComponent.string.removeColor()
+
         fun replaceComponent(newComponent: Component, reason: String) {
             ChatManager.addReplacementContext(chatComponent, reason)
             @Suppress("DEPRECATION")

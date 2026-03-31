@@ -294,7 +294,7 @@ object ExperimentationTableApi {
         }
     }
 
-    data class ExperimentationDataSet(
+    private data class ExperimentationDataSet(
         var type: ExperimentationTaskType? = null,
         var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
@@ -430,7 +430,7 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
         event.tryFireRareBookUncovered()
@@ -458,7 +458,7 @@ object ExperimentationTableApi {
 
     private fun updateTablePosition() {
         val storage = storage ?: return
-        val tableEntity = EntityUtils.getEntitiesNextToPlayer<ArmorStand>(20.0) {
+        val tableEntity = EntityUtils.getEntitiesNearby<ArmorStand>(20.0) {
             it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
         }.firstOrNull() ?: return
         storage.tablePos = tableEntity.getLorenzVec()

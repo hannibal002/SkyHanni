@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -17,13 +16,16 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.ItemUtils.isAnySoulbound
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -48,8 +50,8 @@ object ChestValue {
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
+    @HandleEvent
+    fun onChestGuiRender() {
         if (!isEnabled()) return
         if (DungeonApi.inDungeon() && !config.enableInDungeons) return
         if (!inOwnInventory) {
@@ -121,7 +123,8 @@ object ChestValue {
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getInstance().font.width(textAmount)
-            val displayName = stack.repoItemNameCompact
+            val level = if (stack.getPetInternalNameWithLevel() != stack.getInternalName()) " ${stack.getPetLevel()}" else ""
+            val displayName = "${stack.repoItemNameCompact}$level"
             val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"
@@ -146,7 +149,6 @@ object ChestValue {
     private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
         SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
         SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
-        else -> values.sortedByDescending { it.total }
     }
 
     private fun MutableList<Renderable>.addButton() {
@@ -221,11 +223,8 @@ object ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) this.shortFormat(true) else this
-                .shortFormat()
-
+            NumberFormatEntry.SHORT -> this.shortFormat(preciseBillions = this > 1_000_000_000)
             NumberFormatEntry.LONG -> this.addSeparators()
-            else -> "0"
         }
     }
 

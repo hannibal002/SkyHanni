@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 
 @SkyHanniModule
 object ScoreboardPattern {
@@ -12,10 +13,13 @@ object ScoreboardPattern {
     // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
 
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        UnknownLinesHandler.remoteOnlyPatterns = scoreboardGroup.getUnusedPatterns().toTypedArray()
+    @HandleEvent(RepositoryReloadEvent::class)
+    fun onRepoReload() {
+        UnknownLinesHandler.invalidateRemoteOnlyPatterns()
     }
+
+    internal fun computeRemoteOnlyPatterns(): Array<Pattern> =
+        scoreboardGroup.getUnusedPatterns().toTypedArray()
 
     // Main scoreboard
     private val mainSB = scoreboardGroup.group("main")
@@ -136,7 +140,7 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: North Stars: §d1,539
      */
-    val northstarsPattern by mainSB.pattern(
+    val northStarsPattern by mainSB.pattern(
         "northstars",
         "North Stars: §d(?<northstars>[\\w,]+).*",
     )
@@ -586,6 +590,7 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Flight Duration: §a202:46:12
+     * REGEX-TEST: Flight Duration: §a2:09:29
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
@@ -792,7 +797,7 @@ object ScoreboardPattern {
         "dimension",
         "\\s*(?:§f)?Rift Dimension",
     )
-    val riftHotdogTitlePattern by riftSB.pattern(
+    val riftHotDogTitlePattern by riftSB.pattern(
         "hotdogtitle",
         "§6Hot Dog Contest",
     )
@@ -800,7 +805,7 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: Eaten: §c2/50
      */
-    val riftHotdogEatenPattern by riftSB.pattern(
+    val riftHotDogEatenPattern by riftSB.pattern(
         "hotdogeaten",
         "Eaten: §.\\d+/\\d+",
     )
@@ -864,10 +869,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §eCarnival§f 85:33:57
+     * REGEX-TEST: §eCarnival§f 118:41:05
      */
     val carnivalPattern by carnivalSB.pattern(
         "carnival",
-        "§eCarnival§f (?:\\d+:?)*",
+        "§eCarnival§f \\d+(?::\\d+)*",
     )
 
     /**

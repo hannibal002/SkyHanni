@@ -18,8 +18,9 @@ object ReiCompat {
     @JvmStatic
     fun searchHasFocus(): Boolean {
         if (!isReiLoaded) return false
+        if (Minecraft.getInstance().screen == null) return false
         return try {
-            REIRuntime.getInstance().searchTextField?.isFocused == true
+            (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
         } catch (e: Throwable) {
             false
         }

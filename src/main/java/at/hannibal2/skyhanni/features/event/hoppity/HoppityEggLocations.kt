@@ -5,8 +5,9 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ProfileViewerDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
@@ -38,6 +39,18 @@ object HoppityEggLocations {
 
     fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
         return collectedEggStorage[islandType].orEmpty()
+    }
+
+    var foundAllOnThisIsland = false
+        private set
+
+    fun setFoundAll() {
+        foundAllOnThisIsland = true
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: IslandChangeEvent) {
+        foundAllOnThisIsland = false
     }
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
@@ -77,7 +90,7 @@ object HoppityEggLocations {
     }
 
     @HandleEvent
-    fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
+    fun onProfileViewerDataLoaded(event: ProfileViewerDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.waypoints.loadFromNeuPv) return
 
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return

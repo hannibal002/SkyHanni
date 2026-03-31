@@ -29,6 +29,11 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     VOTER_BADGE_VIP("VOTER_BADGE_VIP", "§aVIP Voter's Badge"),
     VOTER_BADGE_ELITE("VOTER_BADGE_ELITE", "§9Elite Voter's Badge"),
     VOTER_BADGE_SUPREME("VOTER_BADGE_SUPREME", "§5Supreme Voter's Badge"),
+    DYE_WILD_STRAWBERRY("DYE_WILD_STRAWBERRY", "§dWild Strawberry Dye"),
+    VELVET_TOP_HAT("VELVET_TOP_HAT", "§9Velvet Top Hat"),
+    CASHMERE_JACKET("CASHMERE_JACKET", "§9Cashmere Jacket"),
+    SATIN_TROUSERS("SATIN_TROUSERS", "§9Satin Trousers"),
+    OXFORD_SHOES("OXFORD_SHOES", "§9Oxford Shoes"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
@@ -41,6 +46,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     }
 
     // Todo: Remove this when enum names of this and DropsStatisticsTextEntry are in sync
+    // TODO never hide an error entirely
     fun toStatsTextEntryOrNull() = when (this) {
         DEDICATION -> StatsEntry.DEDICATION_IV
         MUSIC_RUNE -> StatsEntry.MUSIC_RUNE_I
@@ -49,7 +55,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
         else -> {
             try {
                 StatsEntry.valueOf(name)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 null
             }
         }

@@ -84,7 +84,7 @@ object ChatFilter {
         "§7Request join for Hub (.*)\\.\\.\\.".toPattern(),
         "§7Request join for Dungeon Hub #(.*)\\.\\.\\.".toPattern(),
         // warp portals on public islands
-        // (canvas room – flower house, election room – community center, void sepulchre – the end)
+        // (Canvas Room – Flower House, Election Room – Community Center, Void Sepulture – The End)
         "§dWarped to (.*)§r§d!".toPattern(),
     )
     private val warpingMessages = listOf(
@@ -112,10 +112,11 @@ object ChatFilter {
 
     // Kill Combo
     /**
+     * REGEX-TEST: §6§l+175 Kill Combo
      * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b✯ Magic Find
      */
     private val killComboPatterns = listOf(
-        "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
+        "§.§l\\+(.*) Kill Combo(.*)".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern(),
     )
     private val killComboMessages = listOf(
@@ -175,7 +176,7 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
-        // TODO merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
+        // TODO merge patterns together. Just because old ones are designed poorly doesn't mean new ones need to be poor as well
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),

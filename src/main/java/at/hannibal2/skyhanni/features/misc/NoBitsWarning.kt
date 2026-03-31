@@ -31,7 +31,7 @@ object NoBitsWarning {
             )
             // TODO use reminder utils
             TitleManager.sendTitle("§bNo Bits Available")
-            if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
+            if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("block.note_block.pling", 0.6f))
         }
 
         if (config.bitsGainChatMessage) {

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -56,11 +55,10 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Hide Vanilla Scoreboard",
-        desc = "Hide the vanilla scoreboard.\n" +
+        desc = "Hide the vanilla scoreboard while the custom scoreboard is visible.\n" +
             "§cMods that add their own scoreboard will not be affected by this setting!",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     val hideVanillaScoreboard: Property<Boolean> = Property.of(true)
 
     @Expose
@@ -141,7 +139,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Date in Lobby Code",
-        desc = "Show the current date infront of the server name, like Hypixel does.",
+        desc = "Show the current date in front of the server name, like Hypixel does.",
     )
     @ConfigEditorBoolean
     var dateInLobbyCode: Boolean = true

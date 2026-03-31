@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -45,10 +45,10 @@ object VisitorListener {
 
     private val config get() = VisitorApi.config
 
-    private val logger = LorenzLogger("garden/visitors/listener")
+    private val logger = SkyHanniLogger("garden/visitors/listener")
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         VisitorApi.reset()
     }
 
@@ -114,13 +114,13 @@ object VisitorListener {
         VisitorOpenEvent(visitor).post()
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         VisitorApi.inInventory = false
     }
 
-    @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onKeybind() {
         if (!VisitorApi.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
         InventoryUtils.mouseClickSlot(29)
@@ -131,7 +131,8 @@ object VisitorListener {
         if (!GardenApi.onBarnPlot) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
+
+        GardenVisitorTooltip.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

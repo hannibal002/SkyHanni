@@ -7,13 +7,16 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.waypoints.SkyHanniWaypoint
 import at.hannibal2.skyhanni.data.model.waypoints.WaypointFormat
 import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
@@ -23,10 +26,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
+import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import kotlinx.coroutines.Job
@@ -115,7 +120,7 @@ object OrderedWaypoints {
         else orderedWaypointsList[renderWaypoints[2]]
         val traceLineColor = config.traceLineColor
         if (config.traceLine && !config.showAll && !config.setupMode) {
-            event.drawLineToEye(
+            event.drawLineToCrosshair(
                 traceWP.location.add(0.5, 0.25, 0.5),
                 traceLineColor,
                 config.traceLineThickness.toInt(),
@@ -126,10 +131,9 @@ object OrderedWaypoints {
         val currentWP = orderedWaypointsList[renderWaypoints[1]]
         val setupModeLineColor = config.setupModeLineColor
         if (config.setupMode && !config.showAll) {
-            val eyePos = if (config.sneakingDuringRoute) 1.54
-            else 1.62
+            val eyeHeight = if (config.sneakingDuringRoute) SNEAKING_EYE_HEIGHT else STANDING_EYE_HEIGHT
             event.draw3DLine(
-                currentWP.location.add(0.5, 1.0 + eyePos, 0.5),
+                currentWP.location.add(0.5, 1.0 + eyeHeight, 0.5),
                 traceWP.location.add(0.5, 0.5, 0.5),
                 setupModeLineColor,
                 config.setupModeLineThickness.toInt(),
@@ -174,9 +178,9 @@ object OrderedWaypoints {
             literal("skipto") {
                 description = "Skips to the waypoint with the inputted number."
                 arg("number", BrigadierArguments.integer()) { number ->
-                    callback { skipto(getArg(number)) }
+                    callback { skipTo(getArg(number)) }
                 }
-                simpleCallback { skipto(1) }
+                simpleCallback { skipTo(1) }
             }
             literal("unskip") {
                 description = "Goes back by the number inputted many waypoints."
@@ -226,8 +230,26 @@ object OrderedWaypoints {
         }
     }
 
-    private fun shouldRenderName(waypointIndice: Int) =
-        config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
+    @HandleEvent
+    fun onGlaciteMineshaftDetectEvent(event: GlaciteMineshaftDetectEvent) {
+        val routeName = event.type.name
+        val hasRoute = storage?.routes?.get(routeName) != null
+        ChatUtils.debug("AutoLoad check: type=$routeName, autoLoad=${config.autoLoadMatchingShaftRoute}, hasRoute=$hasRoute")
+        if (!config.autoLoadMatchingShaftRoute) return
+        if (!hasRoute) return
+        SkyHanniMod.launchIOCoroutine("Shaft Auto Route Load") {
+            load(event.type.name)
+        }
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.oldIsland == IslandType.MINESHAFT && config.autoUnloadWhenLeavingMineshaft) unload()
+        if (config.autoUnload) unload()
+    }
+
+    private fun shouldRenderName(waypointIndex: Int) =
+        config.showName && (config.setupMode || config.showAll || waypointIndex in 0..(1 + config.nextCount.toInt()))
 
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
@@ -235,36 +257,44 @@ object OrderedWaypoints {
         if (loadJob?.isActive == true) {
             return ChatUtils.userError("A route is already being loaded. Please wait until it finishes.")
         }
-        loadJob = setupLoadJob(name)
+        loadJob = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
+            setupLoadJob(name)
+        }
         loadJob?.join()
     }
 
-    private fun setupLoadJob(name: String): Job = SkyHanniMod.launchIOCoroutine("ordered waypoints setupLoadJob") {
-        val loadedRoute = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-        else storage?.routes?.get(name) ?: return@launchIOCoroutine ChatUtils.userError(
+    private fun setupLoadJob(name: String) {
+        val result = if (name == "") loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+        else storage?.routes?.get(name)?.let { it to "saved" } ?: return ChatUtils.userError(
             "Route $name doesn't exist.\n" +
                 "§cSaved Routes: ${storage?.routes?.keys?.toList()?.joinToString(", ")}\n" +
                 "§cIf you would like to import a route from your clipboard, leave the route name blank.",
         )
 
-        if (loadedRoute == null) return@launchIOCoroutine ChatUtils.userError(
+        if (result == null) return ChatUtils.userError(
             "There was an error parsing waypoints. " +
                 "Please make sure they are properly formatted and in a supported format.\n" +
                 "§cSupported Formats: ${getWaypointFormats().joinToString(", ")}",
         )
 
+        val (loadedRoute, formatName) = result
         orderedWaypointsList = loadedRoute.deepCopy()
         currentOrderedWaypointIndex = orderedWaypointsList.minBy { waypoint -> waypoint.location.distanceSqToPlayer() }.number - 1
         renderWaypoints.clear()
-        ChatUtils.chat("Loaded ordered waypoints!")
+        ChatUtils.chat("Loaded ${orderedWaypointsList.size} ordered waypoints! (§e$formatName§r)")
+
+        if (!config.enabled) {
+            config.enabled = true
+            ChatUtils.chat("§eOrdered Waypoints was disabled, auto-enabled it.")
+        }
     }
 
     private fun unload() {
+        if (orderedWaypointsList.isNotEmpty()) ChatUtils.chat("Unloaded ordered waypoints.")
         orderedWaypointsList.clear()
         renderWaypoints.clear()
         currentOrderedWaypointIndex = 0
         lastCloser = 0
-        ChatUtils.chat("Unloaded ordered waypoints.")
     }
 
     private fun skip(amount: Int) {
@@ -276,7 +306,7 @@ object OrderedWaypoints {
         ChatUtils.chat("Skipped $amount ${StringUtils.pluralize(amount, "waypoint")}.")
     }
 
-    private fun skipto(number: Int) {
+    private fun skipTo(number: Int) {
         if (orderedWaypointsList.isEmpty()) {
             return ChatUtils.chat("There are no waypoints to skip to.")
         }
@@ -380,6 +410,18 @@ object OrderedWaypoints {
         renderWaypoints.clear()
         if (orderedWaypointsList.isEmpty()) return
 
+        if (config.autoSkipForward) {
+            val closestInRange = orderedWaypointsList
+                .filter { it.location.distanceToPlayer() < config.waypointRange }
+                .minByOrNull { it.location.distanceToPlayer() }
+
+            if (closestInRange != null && closestInRange.number - 1 > currentOrderedWaypointIndex) {
+                currentOrderedWaypointIndex = closestInRange.number - 1
+                lastCloser = currentOrderedWaypointIndex
+                return
+            }
+        }
+
         val beforeWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex - 1)
             ?: orderedWaypointsList.last()
         renderWaypoints.add(beforeWaypoint.number - 1)
@@ -432,11 +474,9 @@ object OrderedWaypoints {
         currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 
-    private fun loadWaypoints(data: String): Waypoints<SkyHanniWaypoint>? {
-        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull {
-            it.load(data)
-        }?.let {
-            Waypoints(it.toMutableList())
+    private fun loadWaypoints(data: String): Pair<Waypoints<SkyHanniWaypoint>, String>? {
+        return ServiceLoader.load(WaypointFormat::class.java).firstNotNullOfOrNull { format ->
+            format.load(data)?.let { it to format.name }
         }
     }
 

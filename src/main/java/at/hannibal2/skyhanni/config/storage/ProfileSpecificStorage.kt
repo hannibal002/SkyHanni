@@ -34,13 +34,13 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
+import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
@@ -569,9 +570,6 @@ class ProfileSpecificStorage(
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
-
-            @Expose
             var farmingLevel: Int = -1
 
             @Expose
@@ -597,9 +595,6 @@ class ProfileSpecificStorage(
 
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
-
-            @Expose
-            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
@@ -644,6 +639,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var gardenBpsTracker: GardenBpsTracker.TimedData = GardenBpsTracker.TimedData()
 
         @Expose
         var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
@@ -805,6 +803,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var flowstatePersonalBest = 0
+
+        @Expose
+        var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
     }
 
     @Expose
@@ -812,7 +813,7 @@ class ProfileSpecificStorage(
 
     // - minion
     @Expose
-    var minions: Map<LorenzVec, MinionConfig>? = mutableMapOf()
+    var minions: MutableMap<LorenzVec, MinionConfig>? = mutableMapOf()
 
     class MinionConfig {
         @Expose
@@ -876,6 +877,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+
+        @Expose
+        var reputation: MutableMap<FactionType, Int> = mutableMapOf()
     }
 
     // - rift

@@ -35,6 +35,7 @@ object OwnInventoryData {
 
     private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
+    private var lastWardrobeClose = SimpleTimeMark.farPast()
 
     /**
      * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
@@ -80,18 +81,33 @@ object OwnInventoryData {
         if (!dirty) return
         dirty = false
 
-        val map = getCurrentItems()
+
+        val armorInternalNames = InventoryUtils.getArmorInternalNames()
+
+        if (lastWardrobeClose.passedSince() < 2.seconds) {
+            lastWardrobeClose = SimpleTimeMark.farPast()
+            for (name in armorInternalNames) {
+                ignoreItem(1.seconds, name)
+            }
+        }
+
+        val map = getCurrentItems(armorInternalNames)
         for ((internalName, amount) in map) {
             calculateDifference(internalName, amount)
         }
         itemAmounts = map
     }
 
-    private fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
+    private fun getCurrentItems(
+        armorInternalNames: Set<NeuInternalName> = InventoryUtils.getArmorInternalNames(),
+    ): MutableMap<NeuInternalName, Int> {
         val map = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
             map.addOrPut(internalName, itemStack.count)
+        }
+        for (name in armorInternalNames) {
+            map.addOrPut(name, 1)
         }
         return map
     }
@@ -110,8 +126,11 @@ object OwnInventoryData {
         }
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
+        if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
+            lastWardrobeClose = SimpleTimeMark.now()
+        }
         val item = MinecraftCompat.localPlayer.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds, internalNameOrNull)

@@ -37,7 +37,7 @@ object ShowFishingItemName {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        for (entityItem in EntityUtils.getEntitiesNextToPlayer<ItemEntity>(15.0)) {
+        for (entityItem in EntityUtils.getEntitiesNearby<ItemEntity>(15.0)) {
             val itemStack = entityItem.item.orNull() ?: continue
             var text = ""
 

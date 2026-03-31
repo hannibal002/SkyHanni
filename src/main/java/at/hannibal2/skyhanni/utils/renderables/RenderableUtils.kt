@@ -35,7 +35,7 @@ internal object RenderableUtils {
         var index = 0
         return buildList {
             while (true) {
-                val x = content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                val x = content.map { it.getOrNull(index) }.takeIf { list -> list.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(x)
@@ -59,7 +59,7 @@ internal object RenderableUtils {
         buildList {
             add(0)
             while (true) {
-                buffer += rows.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                buffer += rows.map { it.getOrNull(index) }.takeIf { list -> list.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)
@@ -94,14 +94,14 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    private fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
+    fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
         HorizontalAlignment.LEFT -> 0
         HorizontalAlignment.CENTER -> (xSpace - renderable.width) / 2
         HorizontalAlignment.RIGHT -> xSpace - renderable.width
         else -> 0
     }
 
-    private fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
+    fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
         VerticalAlignment.TOP -> 0
         VerticalAlignment.CENTER -> (ySpace - renderable.height) / 2
         VerticalAlignment.BOTTOM -> ySpace - renderable.height
@@ -441,7 +441,7 @@ internal object RenderableUtils {
         val outerList = mutableListOf<List<Renderable>>()
         for (entry in sorted) {
             val item = entry.item.getItemStackOrNull()?.let {
-                Renderable.item(it, scale = itemScale)
+                Renderable.item(it) { scale = itemScale }
             } ?: continue
             val left = hoverTips(
                 entry.left,

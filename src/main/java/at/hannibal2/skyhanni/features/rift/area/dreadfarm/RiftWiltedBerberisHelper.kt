@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
@@ -32,7 +32,7 @@ object RiftWiltedBerberisHelper {
 
     private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
 
-    private val berberisSounds = setOf("mob.horse.donkey.death", "mob.horse.donkey.hit")
+    private val berberisSounds = setOf("entity.donkey.death", "entity.donkey.hurt")
 
     // NOTE: Do not make this a set, it breaks identity checks
     private val list = mutableListOf<WiltedBerberis>()
@@ -56,7 +56,7 @@ object RiftWiltedBerberisHelper {
 
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
-        if (MinecraftCompat.localPlayer.onGround()) {
+        if (PlayerUtils.onGround()) {
             isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
     }

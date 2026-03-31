@@ -23,8 +23,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
     private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
     private val filterConfig get() = config.consoleFilter
 
-    private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
-    private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
+    private val loggerFiltered = SkyHanniLogger("debug/mc_console/filtered")
+    private val loggerUnfiltered = SkyHanniLogger("debug/mc_console/unfiltered")
 
     private val patternBiomeIdBounds = "Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)".toPattern()
 
@@ -37,9 +37,11 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
                 val loggerName = loggerConfig.name
                 loggerConfig.addFilter(MinecraftConsoleFilter(loggerName))
             }
+            ctx.configuration.rootLogger.addFilter(MinecraftConsoleFilter("root"))
         }
     }
 
+    @Suppress("LongMethod", "CyclomaticComplexMethod", "ReturnCount")
     override fun filter(event: LogEvent?): Filter.Result {
         if (event == null) return Filter.Result.ACCEPT
 
@@ -122,6 +124,50 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
                 filterConsole("Biome ID bounds")
                 return Filter.Result.DENY
             }
+        }
+
+        if (filterConfig.filterInvalidSkinSignature && (
+                formattedMessage.startsWith("Failed to verify signature on property") ||
+                    formattedMessage.startsWith("Profile contained invalid signature for textures property") ||
+                    formattedMessage.startsWith("Malformed signature encoding on property")
+                )
+        ) {
+            filterConsole("invalid skin signature")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterDynamicTransformsUbo &&
+            formattedMessage.startsWith("Resizing Dynamic Transforms UBO")
+        ) {
+            filterConsole("dynamic transforms UBO resize")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterCommandAmbiguity &&
+            loggerName.endsWith("ClientCommandInternals") &&
+            formattedMessage.startsWith("Ambiguity between arguments [")
+        ) {
+            filterConsole("command ambiguity")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterNarratorError &&
+            formattedMessage.startsWith("Error while loading the narrator")
+        ) {
+            filterConsole("narrator load error")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterMixinMessages && loggerName == "FabricLoader/Mixin") {
+            filterConsole("mixin message")
+            return Filter.Result.DENY
+        }
+
+        if (filterConfig.filterUnknownTeam &&
+            formattedMessage.startsWith("Received packet for unknown team ")
+        ) {
+            filterConsole("unknown team packet")
+            return Filter.Result.DENY
         }
 
         if (filterScoreboardErrors(event)) return Filter.Result.DENY

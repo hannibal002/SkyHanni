@@ -1,20 +1,19 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.compat.SoundCompat
 
+@PrimaryFunction("onPlaySound")
 class PlaySoundEvent(
-    val rawSoundName: String,
+    val soundName: String,
     override val location: LorenzVec,
     val pitch: Float,
     val volume: Float,
 ) : CancellableWorldEvent() {
-
-    val soundName by lazy { getSoundName(rawSoundName) }
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
     override fun toString(): String {
@@ -26,13 +25,8 @@ class PlaySoundEvent(
     /**
      * Cancels the current event, and plays the replacement sound with the same pitch and volume.
      */
-    fun replaceWithOther(rawSoundName: String) {
+    fun replaceWithOther(soundName: String) {
         this.cancel()
-        SoundUtils.createSound(rawSoundName, pitch, volume).playSound()
-    }
-
-    companion object {
-        private fun getSoundName(rawSoundName: String): String =
-            SoundCompat.getLegacySoundName(rawSoundName)
+        SoundUtils.createSound(soundName, pitch, volume).playSound()
     }
 }

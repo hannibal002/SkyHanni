@@ -38,7 +38,7 @@ object TestChatCommand {
             val mutArgs = args.toMutableList()
             val multiLines = mutArgs.remove("-lines")
             val isComplex = mutArgs.remove("-complex")
-            // cant use multi lines without clipboard
+            // can't use multi lines without clipboard
             val isClipboard = mutArgs.remove("-clipboard") || multiLines
             val isSilent = mutArgs.remove("-s")
             val text = if (isClipboard) {

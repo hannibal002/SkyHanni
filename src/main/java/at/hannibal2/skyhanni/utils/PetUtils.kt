@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
@@ -15,16 +15,17 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import com.google.gson.JsonObject
 
 @SkyHanniModule
 object PetUtils {
@@ -36,7 +37,7 @@ object PetUtils {
     private var displayNameMap: Map<String, String> = mapOf()
     private var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
     private var petInternalNames: Set<NeuInternalName> = setOf()
-    private var petSkinNbtNames: List<String> = listOf()
+    private var petSkinNbtNames: Set<String> = setOf()
     private var petItemResolution: Map<String, NeuInternalName> = mapOf()
 
     // Late load from SH repo
@@ -57,7 +58,7 @@ object PetUtils {
     }
 
     private fun getCiFactionVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
-        val playerFaction = CrimsonIsleReputationHelper.factionType ?: FactionType.BARBARIAN
+        val playerFaction = CrimsonIsleReputationApi.factionType ?: FactionType.BARBARIAN
         val variantFauxInternalName = "${skinInternalName.asString()}_${playerFaction.name}"
         return animatedPetSkins[variantFauxInternalName]
     }
@@ -68,9 +69,9 @@ object PetUtils {
     ): AnimatedSkinJson? {
         val baseSkin = animatedPetSkins[skinInternalName.asString()]
         return when {
-            skinInternalName in seasonalVariants -> return getSeasonalVariantOrNull(skinInternalName) ?: baseSkin
-            skinInternalName in dayNightVariants -> return getDayNightVariantOrNull(skinInternalName) ?: baseSkin
-            skinInternalName in ciFactionVariants -> return getCiFactionVariantOrNull(skinInternalName) ?: baseSkin
+            skinInternalName in seasonalVariants -> getSeasonalVariantOrNull(skinInternalName) ?: baseSkin
+            skinInternalName in dayNightVariants -> getDayNightVariantOrNull(skinInternalName) ?: baseSkin
+            skinInternalName in ciFactionVariants -> getCiFactionVariantOrNull(skinInternalName) ?: baseSkin
             skinVariantIndex == null || skinVariantIndex == -1 -> baseSkin
             else -> {
                 val variantIdentifier = petSkinVariants[skinInternalName]?.get(skinVariantIndex)
@@ -79,11 +80,13 @@ object PetUtils {
         }
     }
 
-    fun getVariantIndexOrNull(properSkinInternalName: NeuInternalName): Int? =
-        petSkinVariants.entries.indexOfFirstOrNull { it.key == properSkinInternalName }
+    fun getVariantIndexOrNull(extraData: JsonObject): Int? = petSkinNbtNames.firstNotNullOfOrNull {
+        extraData.get(it)?.asInt
+    }
 
-    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName]
-        ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf { !it.isPet }
+    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName] ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf {
+        !it.isPet && it.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET_ITEM
+    }
 
     fun isKnownPetInternalName(internalName: NeuInternalName) = internalName in petInternalNames
 
@@ -135,23 +138,23 @@ object PetUtils {
         basePetLeveling + customPetLeveling[petInternalName.getProperName()]?.petLevels.orEmpty()
 
     /**
-     * @param refPetInternalName The pet to compare against
-     * @param opPetInternalName The pet that is being compared to the reference.
+     * @param referencePetInternalName The pet to compare against.
+     * @param otherPetInternalName The pet that is being compared to the reference.
      *
      * @return An int (or null) representing the relationship between the two pets.
-     *  null in the case that the pets do not share a family
-     *      OR if either internal name passed is not a pet or cannot be parsed
-     *  1 if opPet is a higher rarity than refPet
-     *  0 if opPet is the same rarity as refPet
-     *  -1 if opPet is a lesser rarity than refPet
+     *  null in the case that the pets do not share a family.
+     *      OR if either internal name passed is not a pet or cannot be parsed.
+     *  1 if otherPet is a higher rarity than referencePet.
+     *  0 if otherPet is the same rarity as referencePet.
+     *  -1 if otherPet is a lesser rarity than referencePet.
      */
-    fun comparePets(refPetInternalName: NeuInternalName, opPetInternalName: NeuInternalName): Int? {
-        val (refProperName, refRarity) = splitInternalName(refPetInternalName) ?: return null
-        val (opProperName, opRarity) = splitInternalName(opPetInternalName) ?: return null
-        if (refProperName != opProperName) return null
+    fun comparePets(referencePetInternalName: NeuInternalName, otherPetInternalName: NeuInternalName): Int? {
+        val (referenceProperName, referenceRarity) = splitInternalName(referencePetInternalName) ?: return null
+        val (otherProperName, otherRarity) = splitInternalName(otherPetInternalName) ?: return null
+        if (referenceProperName != otherProperName) return null
 
         // Comparable.compareTo returns <0, 0 or >0, compareTo(0) maps that to exactly -1,0 or +1
-        return opRarity.compareTo(refRarity).compareTo(0)
+        return otherRarity.compareTo(referenceRarity).compareTo(0)
     }
 
     fun getCleanPetName(petInternalName: NeuInternalName, colored: Boolean = true): String {
@@ -170,7 +173,7 @@ object PetUtils {
 
     fun findPetSkinOrNull(petInternalName: NeuInternalName, skinColorTag: String): NeuItemJson? =
         petSkins[petInternalName.getProperName()]?.singleOrNull {
-            it.displayName.startsWith(skinColorTag)
+            it.displayName?.startsWith(skinColorTag) == true
         }
 
     fun getMaxLevel(petInternalName: NeuInternalName): Int =
@@ -230,7 +233,7 @@ object PetUtils {
             it,
             "Failed to calculate level for total XP $totalXp with internal name $petInternalName",
         )
-        0
+        1
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
@@ -281,14 +284,13 @@ object PetUtils {
 
         val rawPetInternalNames = mutableSetOf<NeuInternalName>()
         val rawPetSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
-        NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
-            val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
-            petSkinNamePattern.matchMatcher(rawInternalName) {
+        NeuItems.allNeuRepoItems().forEach { (internalName, itemData) ->
+            petSkinNamePattern.matchMatcher(internalName.asString()) {
                 val properPetName = group("pet") ?: return@matchMatcher
-                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(petItemData)
+                rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(itemData)
             }
-            neuPetLorePattern.firstMatcher(petItemData.lore) {
-                rawPetInternalNames.add(rawInternalName.toInternalName())
+            neuPetLorePattern.firstMatcher(itemData.lore) {
+                rawPetInternalNames.add(internalName)
             }
         }
         petInternalNames = rawPetInternalNames

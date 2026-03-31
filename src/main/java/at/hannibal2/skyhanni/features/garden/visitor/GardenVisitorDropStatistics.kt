@@ -122,13 +122,13 @@ object GardenVisitorDropStatistics {
         gemstonePowderPattern to { storage, amount -> storage.gemstonePowder += amount },
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onVisitorAccepted(event: VisitorAcceptedEvent) {
+    @HandleEvent(VisitorAcceptedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onVisitorAccepted() {
         lastAccept = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
         display = emptyList()
     }
 
@@ -186,6 +186,7 @@ object GardenVisitorDropStatistics {
                             addString(countFormat)
                         }
                     }
+
                     false -> list.addString(format(count, reward.displayName, "§b"))
                 }
             }
@@ -275,21 +276,21 @@ object GardenVisitorDropStatistics {
         )
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         saveAndUpdate()
         ConditionalUtils.onToggle(
             config.enabled,
             config.textFormat,
             config.displayNumbersFirst,
-            config.displayIcons
+            config.displayIcons,
         ) {
             saveAndUpdate()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
         if (GardenApi.hideExtraGuis()) return
         if (config.onlyOnBarn.get() && !GardenApi.onBarnPlot) return

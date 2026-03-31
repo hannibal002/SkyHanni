@@ -13,8 +13,8 @@ class GuideTab(
     val item: ItemStack,
     val tip: Renderable,
     val isVertical: Boolean = false,
-    var lastTab: GuideGui.tabWrapper,
-    val onClick: (GuideTab) -> Unit
+    var lastTab: GuideGui.TabWrapper,
+    val onClick: (GuideTab) -> Unit,
 ) {
 
     fun fakeClick() = click()
@@ -50,9 +50,11 @@ class GuideTab(
             override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT
             override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP
 
-            val itemRender = Renderable.item(
-                item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
-            )
+            val itemRender = Renderable.item(item) {
+                scale = 1.0
+                horizontalAlign = HorizontalAlignment.CENTER
+                verticalAlign = VerticalAlignment.CENTER
+            }
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 GuiRenderUtils.drawRect(0, 0, width, height, selectColor)

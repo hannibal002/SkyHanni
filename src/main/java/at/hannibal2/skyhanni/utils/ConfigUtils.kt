@@ -13,8 +13,8 @@ import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty0
-import kotlin.reflect.jvm.javaField
 
 object ConfigUtils {
 
@@ -32,7 +32,16 @@ object ConfigUtils {
     }
 
     private fun KProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
-        return editor.getOptionFromField(this.javaField ?: return null)
+        // Java reflection is used because MoulConfig is relocated at build time, causing Kotlin reflection
+        // (this.javaField) to fail to resolve property descriptors in the production build.
+        val receiver = (this as? CallableReference)?.boundReceiver
+            ?.takeIf { it !== CallableReference.NO_RECEIVER }
+            ?: return null
+        val field = generateSequence(receiver.javaClass as Class<*>?) { it.superclass }
+            .firstNotNullOfOrNull { clazz ->
+                runCatching { clazz.getDeclaredField(name) }.getOrNull()
+            } ?: return null
+        return editor.getOptionFromField(field)
     }
 
     fun KProperty0<*>.jumpToEditor() {

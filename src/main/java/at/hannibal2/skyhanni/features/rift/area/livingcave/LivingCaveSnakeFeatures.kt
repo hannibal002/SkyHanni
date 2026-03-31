@@ -15,10 +15,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -112,7 +112,7 @@ object LivingCaveSnakeFeatures {
     fun onTick() {
         if (!isEnabled()) return
 
-        if (SkyBlockUtils.debug && MinecraftCompat.localPlayer.isShiftKeyDown && snakes.isNotEmpty()) {
+        if (SkyBlockUtils.debug && PlayerUtils.isSneaking() && snakes.isNotEmpty()) {
             snakes.clear()
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
             return

@@ -104,7 +104,7 @@ object DianaProfitTracker {
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows"))
+        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows", false))
 
         tracker.addPriceFromButton(this)
     }

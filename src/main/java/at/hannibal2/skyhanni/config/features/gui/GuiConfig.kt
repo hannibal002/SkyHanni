@@ -5,6 +5,10 @@ import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.ActionBarConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.HeldItemTooltipConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.HotbarConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.XPBarConfig
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
@@ -80,6 +84,16 @@ class GuiConfig {
     @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
     val xpBar: XPBarConfig = XPBarConfig()
+
+    @Expose
+    @ConfigOption(name = "Action Bar", desc = "Settings for adjusting the action bar.")
+    @Accordion
+    val actionBar: ActionBarConfig = ActionBarConfig()
+
+    @Expose
+    @ConfigOption(name = "Held Item Tooltip", desc = "Settings for adjusting the held item tooltip.")
+    @Accordion
+    val heldItemTooltip: HeldItemTooltipConfig = HeldItemTooltipConfig()
 
     @Expose
     @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.")

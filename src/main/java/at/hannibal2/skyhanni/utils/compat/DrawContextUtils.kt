@@ -74,8 +74,29 @@ object DrawContextUtils {
     @Suppress("DEPRECATION")
     inline fun pushPop(action: () -> Unit) {
         pushMatrix()
-        action()
-        popMatrix()
+        try {
+            action()
+        } finally {
+            popMatrix()
+        }
+    }
+
+    /**
+     * Push and pop the matrix stack, running the action in between, and returning the result of the action.
+     */
+    @Suppress("DEPRECATION")
+    inline fun <T> pushPopResult(
+        onError: (Exception) -> T = { throw it },
+        action: () -> T,
+    ): T {
+        pushMatrix()
+        return try {
+            action()
+        } catch (e: Exception) {
+            onError(e)
+        } finally {
+            popMatrix()
+        }
     }
 
     /**
@@ -86,6 +107,21 @@ object DrawContextUtils {
         translate(x.toFloat(), y.toFloat())
         action()
         translate(-x.toFloat(), -y.toFloat())
+    }
+
+    /**
+     * Performs a push-pop around the action, and runs the action inside a DrawContext translation, returning the result of the action.
+     */
+    inline fun <reified T> translatedPushPopResult(
+        x: Number = 0,
+        y: Number = 0,
+        postTranslateScale: Float? = null,
+        onError: (Exception) -> T = { throw it },
+        action: () -> T,
+    ): T = pushPopResult(onError) {
+        translate(x.toFloat(), y.toFloat())
+        postTranslateScale?.let { scale(it, it) }
+        return action()
     }
 
     /**

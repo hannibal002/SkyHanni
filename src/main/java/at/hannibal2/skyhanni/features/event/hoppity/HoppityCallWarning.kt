@@ -49,7 +49,7 @@ object HoppityCallWarning {
     // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
-    private var warningSound = SoundUtils.createSound("note.pling", 1f)
+    private var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
     private var activeWarning = false
     private var nextWarningTime: Instant? = null
     private var finalWarningTime: Instant? = null
@@ -87,7 +87,7 @@ object HoppityCallWarning {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
         // Calculate a fluctuating alpha value based on the sine of time, for a smooth oscillation
         val randomizationAlphaDouble = ((2 + sin(Instant.now().toEpochMilli().toDouble() / 1000)) * 255 / 4)
