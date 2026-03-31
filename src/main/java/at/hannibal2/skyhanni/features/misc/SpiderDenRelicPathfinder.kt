@@ -69,6 +69,7 @@ object SpiderDenRelicPathfinder {
     ) {
         var disabled = total > 0 && found == total
         var debugState: String? = null
+        private val playerLocation get() = LocationUtils.playerLocation()
 
         fun foundNearby() {
             if (disabled) return
@@ -79,10 +80,7 @@ object SpiderDenRelicPathfinder {
         }
 
         private fun getNearestRelic(): LorenzVec? {
-            val playerLocation = LocationUtils.playerLocation()
-            val nearest = allRelics.minByOrNull { it.distanceSq(playerLocation) } ?: return null
-            if (nearest.distanceToPlayer() < 10) return nearest
-            return null
+            return allRelics.filter { it.distanceToPlayer() < 10 }.minByOrNull { it.distanceSq(playerLocation) }
         }
 
         private fun markFound(relic: LorenzVec) {
@@ -118,7 +116,7 @@ object SpiderDenRelicPathfinder {
                 "§b$found/$total §5Relics $percentageLabel",
                 LorenzColor.DARK_PURPLE.toColor(),
                 onFound = { foundButNotClickedRelic = loc },
-                condition = { isEnabled() && !disabled },
+                condition = { config.spiderRelicPathfinder && !disabled },
             )
         }
 
@@ -141,24 +139,24 @@ object SpiderDenRelicPathfinder {
         data = null
     }
 
-    @HandleEvent(IslandGraphReloadEvent::class)
-    fun onIslandGraphReload() {
-        if (isEnabled()) reload()
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
+    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
+        if (config.spiderRelicPathfinder) reload()
         else data = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
+        if (!config.spiderRelicPathfinder) return
         if (event.isMod(5) && calculating) {
             val duration = calculatingStart.passedSince().format(showMilliSeconds = true)
             "§e[SkyHanni] Calculating Relic route §b$duration".asComponent().send(calculatingMessageId)
         }
     }
 
-    @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!config.spiderRelicPathfinder) return
         data?.let {
             it.checkNextRelic()
             return
@@ -166,9 +164,9 @@ object SpiderDenRelicPathfinder {
         reload()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (!isEnabled()) return
+        if (!config.spiderRelicPathfinder) return
         if (foundPattern.matches(event.chatComponent) || duplicatePattern.matches(event.chatComponent)) {
             data?.foundNearby()
         }
@@ -196,7 +194,7 @@ object SpiderDenRelicPathfinder {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Spider Den Relic Pathfinder")
-        if (!isEnabled()) {
+        if (!config.spiderRelicPathfinder) {
             event.addIrrelevant("disabled")
             return
         }
@@ -219,7 +217,6 @@ object SpiderDenRelicPathfinder {
     private var calculatingStart = SimpleTimeMark.farPast()
 
     private fun reload() {
-        if (!isOnSpiderDen()) return
 
         val graph = IslandGraphs.currentIslandGraph ?: run {
             data = createEmptyData("island graph is empty")
@@ -284,14 +281,8 @@ object SpiderDenRelicPathfinder {
     private fun foundRelicsStore(): MutableSet<LorenzVec> =
         ProfileStorageData.profileSpecific?.spider?.relics?.found ?: mutableSetOf()
 
-    private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && isOnSpiderDen() && config.spiderRelicPathfinder
-
-    private fun isOnSpiderDen() =
-        SkyBlockUtils.currentIsland == IslandType.SPIDER_DEN
-
     private fun isDisabledCommand(): Boolean {
-        if (isEnabled()) return false
+        if (config.spiderRelicPathfinder) return false
         ChatUtils.clickableChat(
             "§cSpider Relic Pathfinder disabled, or not in Spider's Den. Click to enable!",
             onClick = { config.spiderRelicPathfinder = true },
