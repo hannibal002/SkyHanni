@@ -200,7 +200,7 @@ object TrevorFeatures {
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
-        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
+        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and don't update
         event.tabList.forEach { line ->
             val formattedLine = line.string.drop(1)
             if (formattedLine.startsWith("Time Left: ")) {

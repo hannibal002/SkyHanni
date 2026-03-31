@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.client.player.RemotePlayer
@@ -148,7 +148,7 @@ object LivingCaveDefenseBlocks {
             if (time > System.currentTimeMillis()) {
                 val location = block.location
                 event.drawWaypointFilled(location, color)
-                event.drawLineToEye(
+                event.drawLineToCrosshair(
                     location.blockCenter(),
                     color,
                     1,

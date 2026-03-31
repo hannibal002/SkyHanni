@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
@@ -14,7 +15,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -23,8 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -43,23 +42,13 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.days
 
-private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
-    return if (SkyHanniMod.isBetaVersion) {
-        registerTypeAdapterFactory(create)
-    } else this
-}
-
 class ConfigManager {
     companion object {
-
-        val gson: Gson = BaseGsonBuilder.gson()
-//             .registerIfBeta(FeatureTogglesByDefaultAdapter)
-            .create()
-
+        val gson: Gson = BaseGsonBuilder.gson().create()
         val configDirectory = File("config/skyhanni")
     }
 
-    private val logger = LorenzLogger("config_manager")
+    private val logger = SkyHanniLogger("config_manager")
 
     private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
@@ -81,7 +70,8 @@ class ConfigManager {
 
 
         for (fileType in ConfigFileType.entries) {
-            setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance()))
+            val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
+            setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, clazzInstance))
         }
 
         // TODO use SecondPassedEvent
@@ -279,6 +269,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     ROUTES("routes", OrderedWaypointsRoutes::class.java, SkyHanniMod::orderedWaypointsRoutesData),
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
     SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
+    ACHIEVEMENTS("achievements", AchievementStorage::class.java, SkyHanniMod::achievementStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

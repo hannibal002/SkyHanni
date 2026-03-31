@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.level.block.Blocks
@@ -153,7 +153,7 @@ object PowderChestTimer {
     private fun SkyHanniRenderWorldEvent.drawFirstLine(list: List<Map.Entry<LorenzVec, SimpleTimeMark>>) {
         val (firstPos, firstTime) = list.first()
 
-        drawLineToEye(
+        drawLineToCrosshair(
             firstPos.blockCenter(),
             firstTime.timeUntil().getColorBasedOnTime(),
             lineWidth = 3,

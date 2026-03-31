@@ -83,13 +83,13 @@ object MiningApi {
         "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
     )
 
-    private val pickbobulusGroup = group.group("pickobulus")
+    private val pickobulusGroup = group.group("pickobulus")
 
     /**
      * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
      */
 
-    private val pickobulusUsePattern by pickbobulusGroup.pattern(
+    private val pickobulusUsePattern by pickobulusGroup.pattern(
         "use",
         "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
     )
@@ -97,7 +97,7 @@ object MiningApi {
     /**
      * REGEX-TEST: §7Your §r§aPickobulus §r§7destroyed §r§e140 §r§7blocks!
      */
-    private val pickobulusEndPattern by pickbobulusGroup.pattern(
+    private val pickobulusEndPattern by pickobulusGroup.pattern(
         "end",
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!",
     )
@@ -105,7 +105,7 @@ object MiningApi {
     /**
      * REGEX-TEST: §7Your §r§aPickobulus §r§7didn't destroy any blocks!
      */
-    private val pickobulusFailPattern by pickbobulusGroup.pattern(
+    private val pickobulusFailPattern by pickobulusGroup.pattern(
         "fail",
         "§7Your §r§aPickobulus §r§7didn't destroy any blocks!",
     )
@@ -141,7 +141,7 @@ object MiningApi {
     private var pickobulusWaitingForSound = false
     private var pickobulusWaitingForBlock = false
 
-    // oreblock data
+    // OreBlock data
     var inGlacite = false
         private set
     var inTunnels = false
@@ -430,7 +430,7 @@ object MiningApi {
         val extraBlocks = surroundingMinedBlocks.filter {
             // We can do this because all blocks that don't have an init sound also cannot be mined by
             // efficient miner when other blocks are mined.
-            // The more correct way of doing this would be making sure the oretype of the originally mined
+            // The more correct way of doing this would be making sure the OreType of the originally mined
             // block matches
             if (ignoreFilter) it.first.ore == originalBlock.ore else it.first.confirmed
         }.countBy { it.first.ore }

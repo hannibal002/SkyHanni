@@ -47,7 +47,7 @@ import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -128,7 +128,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
+    // used because instant-breaking a block makes it invalid would be better to store valid blocks in repo
     private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
 
     private var shouldFocusOnRareMob = false
@@ -469,7 +469,7 @@ object GriffinBurrowHelper {
                 3
             } else 2
             if (currentWarp == null) {
-                event.drawLineToEye(renderLocation, color, lineWidth, false)
+                event.drawLineToCrosshair(renderLocation, color, lineWidth, false)
             }
         }
 

@@ -90,6 +90,9 @@ object HoppityEggDisplayManager {
                 val percentage = collectedEggs.toDouble() / totalEggs.toDouble()
                 val collectedFormat = formatEggsCollected(percentage)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+                if (percentage >= 1) {
+                    HoppityEggLocations.setFoundAll()
+                }
             }
         }.map { CFApi.partyModeReplace(it) }
 

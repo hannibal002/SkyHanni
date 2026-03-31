@@ -30,6 +30,7 @@ data class SkyHanniGuiItemRenderState(
     val adjustedScale: Float = 1f,
     private val passedStableId: Int? = null,
     private val frameNumber: Int? = null,
+    val alpha: Float = 1f,
 ) : PictureInPictureRenderState {
     companion object {
         private var counter = 0

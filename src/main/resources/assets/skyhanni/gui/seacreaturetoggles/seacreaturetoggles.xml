@@ -10,7 +10,7 @@
             <Spacer height="5"/>
             <Center>
                 <Row>
-                    <Button onClick="@showLootshare">
+                    <Button onClick="@showLootshareSphere">
                         <Text text="Lootshare Sphere Settings"/>
                     </Button>
                 </Row>

@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.TreeMap
-import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
 @SkyHanniModule
 object MobData {
@@ -41,7 +40,7 @@ object MobData {
 
     var externRemoveOfRetryAmount = 0
 
-    val logger = LorenzLogger("mob/detection")
+    val logger = SkyHanniLogger("mob/detection")
 
     internal enum class Result {
         Found,
@@ -75,16 +74,16 @@ object MobData {
     internal class RetryEntityInstancing(
         var entity: LivingEntity,
         var times: Int,
-        val roughType: MobType,
+        val roughCategory: MobCategory,
     ) {
         override fun hashCode() = entity.id
         override fun equals(other: Any?) = (other as? RetryEntityInstancing).hashCode() == this.hashCode()
         fun toKeyValuePair() = entity.id to this
 
         fun outsideRange() =
-            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughType) {
-                MobType.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
-                MobType.PLAYER -> Double.POSITIVE_INFINITY
+            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughCategory) {
+                MobCategory.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
+                MobCategory.PLAYER -> Double.POSITIVE_INFINITY
                 else -> DETECTION_RANGE
             }
     }
