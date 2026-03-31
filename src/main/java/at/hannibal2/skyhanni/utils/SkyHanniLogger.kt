@@ -11,7 +11,7 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
-class LorenzLogger(filePath: String) {
+class SkyHanniLogger(filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
     private val fileName = "$PREFIX_PATH$filePath.log"
@@ -19,6 +19,8 @@ class LorenzLogger(filePath: String) {
     companion object {
 
         private val LOG_DIRECTORY = File("config/skyhanni/logs")
+        // I'm ab to change this in another PR I CBA - daveed
+        @Suppress("PropertyName")
         private var PREFIX_PATH: String
         var hasDone = false
 
