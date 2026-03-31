@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
@@ -32,7 +33,7 @@ data class CachedItemData(
 
     var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 
-    var lastLore: List<String> = listOf(),
+    var lastLore: List<Component> = emptyList(),
 
     var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 

@@ -164,32 +164,47 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    @Deprecated("Use getCleanLore or getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
-    fun ItemStack.getLore(): List<String> {
+    fun DataComponentMap.getLoreComponent(): List<Component> =
+        get(DataComponents.LORE)?.lines.orEmpty()
+
+    fun DataComponentMap.getCleanLore(): List<String> =
+        getLoreComponent().map { it.string.removeColor() }
+
+    @Deprecated("Use getCleanLore or getLoreComponent unless you really need color codes")
+    fun DataComponentMap.getLore(): List<String> =
+        getLoreComponent().map { it.formattedTextCompatLeadingWhiteLessResets() }
+
+    fun ItemStack.getLoreComponent(): List<Component> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
         }
-        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
+
+        val lore = components.getLoreComponent()
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
     }
 
-    fun ItemStack.getCleanLore(): List<String> =
-        getLoreComponent().map { it.string.removeColor() }
+    fun ItemStack.getCleanLore(): List<String> = components.getCleanLore()
 
-    fun ItemStack.getLoreComponent(): List<Component> {
-        val lore = this.get(DataComponents.LORE)?.lines
-        return lore ?: emptyList()
-    }
+    @Deprecated(
+        "Use getCleanLore or getLoreComponent unless you really need color codes",
+        ReplaceWith("this.getLoreComponent()"),
+    )
+    @Suppress("Deprecation")
+    fun ItemStack.getLore(): List<String> = components.getLore()
 
-    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
+    fun ItemStack.getSingleLineCleanLore(): String =
+        getCleanLore().filter { it.isNotEmpty() }.joinToString(" ")
 
-    fun DataComponentMap?.getLore(): List<String> {
-        this ?: return emptyList()
-        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
-    }
+    @Deprecated(
+        "Use getSingleLineCleanLore unless you really need color codes.",
+        ReplaceWith("this.getSingleLineCleanLore()"),
+    )
+    @Suppress("Deprecation")
+    fun ItemStack.getSingleLineLore(): String =
+        getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
         this ?: return emptyList()
@@ -309,7 +324,7 @@ object ItemUtils {
             return NeuInternalName.WISP_POTION
         }
         // This is to prevent an error message whenever coins are traded.
-        if (getLore().getOrNull(0) == "§7Lump-sum amount") {
+        if (getCleanLore().getOrNull(0) == "Lump-sum amount") {
             return NeuInternalName.SKYBLOCK_COIN
         }
         val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
@@ -413,7 +428,7 @@ object ItemUtils {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
-        for (line in this.getLore().reversed()) {
+        for (line in this.getCleanLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
@@ -429,7 +444,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
-                    "lore" to getLore(),
+                    "lore" to getCleanLore(),
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
@@ -442,7 +457,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
-                    "lore" to getLore(),
+                    "lore" to getCleanLore(),
                     betaOnly = true,
                     condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
@@ -684,7 +699,7 @@ object ItemUtils {
             return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
         }
         if (name.endsWith("Enchanted Book Bundle")) {
-            return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
+            return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getCleanLore()[0]))
         }
 
         // obfuscated trophy fish
@@ -703,16 +718,16 @@ object ItemUtils {
     fun ItemStack.loreCosts(): MutableList<NeuInternalName> {
         var found = false
         val list = mutableListOf<NeuInternalName>()
-        for (lines in getLore()) {
-            if (lines == "§7Cost") {
+        for (line in getLore()) {
+            if (line.removeColor() == "Cost") {
                 found = true
                 continue
             }
 
             if (!found) continue
-            if (lines.isEmpty()) return list
+            if (line.isEmpty()) return list
 
-            NeuInternalName.fromItemNameOrNull(lines)?.let {
+            NeuInternalName.fromItemNameOrNull(line)?.let {
                 list.add(it)
             }
         }
@@ -837,7 +852,7 @@ object ItemUtils {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Missing Repo Items")
 
         if (missingRepoItems.isNotEmpty()) {
