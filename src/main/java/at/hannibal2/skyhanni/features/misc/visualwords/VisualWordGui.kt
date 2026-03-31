@@ -327,10 +327,9 @@ object VisualWordGui {
     ) {
         var importedWords = 0
         var skippedWords = 0
-        val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
 
         for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
-            pattern.matchMatcher(line.asString) {
+            replacementLinePattern.matchMatcher(line.asString) {
                 val from = group("from").replace("&", "&&")
                 val to = group("to").replace("&", "&&")
                 val state = group("state").toBoolean()
