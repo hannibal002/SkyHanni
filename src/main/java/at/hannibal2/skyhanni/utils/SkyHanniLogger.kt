@@ -11,7 +11,7 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
-open class LorenzLogger(filePath: String) {
+open class SkyHanniLogger(filePath: String) {
 
     internal open val relativeStorage by lazy { PREFIX_PATH }
     private val format = SimpleDateFormat("HH:mm:ss")
