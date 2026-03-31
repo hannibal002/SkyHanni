@@ -38,7 +38,7 @@ object ModifyVisualWords {
 
     var changeWords = true
 
-    private fun isActive(): Boolean {
+    private fun modifyVisualWordsEnabled(): Boolean {
         if (!config.enabled || !changeWords) return false
         if (userModifiedWords.isEmpty() && SkyHanniMod.visualWordsData.modifiedWords.isNotEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords.map { VisualWordText.fromVisualWord(it) })
@@ -65,7 +65,7 @@ object ModifyVisualWords {
 
     fun transformText(orderedText: FormattedCharSequence?): FormattedCharSequence? {
         if (orderedText == null) return null
-        if (!isActive()) return null
+        if (!modifyVisualWordsEnabled()) return null
 
         return textCache.getOrPut(orderedText) {
             val rawCharacters = mutableListOf<StyledCharacter>()
@@ -91,13 +91,13 @@ object ModifyVisualWords {
     fun transformFormattedText(formattedText: FormattedText?): FormattedText? {
         if (formattedText == null) return null
         if (formattedText is Component) return transformComponent(formattedText)
-        if (!isActive()) return null
+        if (!modifyVisualWordsEnabled()) return null
         return visitAndReplace(formattedText)
     }
 
     fun transformComponent(component: Component?): Component? {
         if (component == null) return null
-        if (!isActive()) return null
+        if (!modifyVisualWordsEnabled()) return null
         return componentCache.getOrPut(component) { visitAndReplace(component) }
     }
 

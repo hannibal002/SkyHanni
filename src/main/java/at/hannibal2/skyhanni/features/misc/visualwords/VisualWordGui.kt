@@ -59,6 +59,9 @@ object VisualWordGui {
 
     val sbeConfigPath: File = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
 
+    // TODO regex tests (idk hanni asked for the todo)
+    private val replacementLinePattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
+
     private val upSkull by lazy {
         ItemUtils.createSkull(
             displayName = "§aMove Up",
@@ -85,7 +88,6 @@ object VisualWordGui {
 
     fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
 
-    @JvmStatic
     fun onCommand() {
         if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
             ChatUtils.userError("You need to join Hypixel to use this feature!")
@@ -162,22 +164,17 @@ object VisualWordGui {
             width = 230,
         )
 
-        val upBtn = if (index > 0)
-            Renderable.clickable(
-                upItem.withTip(),
-                onLeftClick = { screen.moveWord(index, up = true) },
-                bypassChecks = true,
-            )
-        else upItemDimmed.withTip()
+        val upBtn = if (index > 0) Renderable.clickable(
+            upItem.withTip(),
+            onLeftClick = { screen.moveWord(index, up = true) },
+            bypassChecks = true,
+        ) else upItemDimmed.withTip()
 
-
-        val downBtn = if (index < screen.modifiedWords.lastIndex)
-            Renderable.clickable(
-                downItem.withTip(),
-                onLeftClick = { screen.moveWord(index, up = false) },
-                bypassChecks = true,
-            )
-        else downItemDimmed.withTip()
+        val downBtn = if (index < screen.modifiedWords.lastIndex) Renderable.clickable(
+            downItem.withTip(),
+            onLeftClick = { screen.moveWord(index, up = false) },
+            bypassChecks = true,
+        ) else downItemDimmed.withTip()
 
         val statusItem = if (word.enabled) ColoredBlockCompat.GREEN.createStainedClay()
         else ColoredBlockCompat.RED.createStainedClay()
@@ -314,35 +311,36 @@ object VisualWordGui {
     }
 
     private fun tryImportFromSbe(screen: VisualWordScreen) {
-        try {
-            val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
-            val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-            var importedWords = 0
-            var skippedWords = 0
-            val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
+        InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8).use { reader ->
+            try {
+                val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
+                var importedWords = 0
+                var skippedWords = 0
+                val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
 
-            for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
-                pattern.matchMatcher(line.asString) {
-                    val from = group("from").replace("&", "&&")
-                    val to = group("to").replace("&", "&&")
-                    val state = group("state").toBoolean()
-                    if (screen.modifiedWords.any { it.phrase == from }) {
-                        skippedWords++
-                        return@matchMatcher
+                for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
+                    pattern.matchMatcher(line.asString) {
+                        val from = group("from").replace("&", "&&")
+                        val to = group("to").replace("&", "&&")
+                        val state = group("state").toBoolean()
+                        if (screen.modifiedWords.any { it.phrase == from }) {
+                            skippedWords++
+                            return@matchMatcher
+                        }
+                        screen.modifiedWords.add(VisualWord(from, to, state, caseSensitive = false))
+                        importedWords++
                     }
-                    screen.modifiedWords.add(VisualWord(from, to, state, caseSensitive = false))
-                    importedWords++
                 }
-            }
 
-            if (importedWords > 0 || skippedWords > 0) {
-                chat("§aSuccessfully imported §e$importedWords §awords and skipped §e$skippedWords §afrom SkyBlockExtras!")
-                SkyHanniMod.feature.storage.visualWordsImported = true
-                screen.saveChanges()
-                screen.rebuildDisplay()
+                if (importedWords > 0 || skippedWords > 0) {
+                    chat("§aSuccessfully imported §e$importedWords §awords and skipped §e$skippedWords §afrom SkyBlockExtras!")
+                    SkyHanniMod.feature.storage.visualWordsImported = true
+                    screen.saveChanges()
+                    screen.rebuildDisplay()
+                }
+            } catch (e: Throwable) {
+                ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
             }
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
         }
     }
 }
