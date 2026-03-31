@@ -207,7 +207,7 @@ object BingoApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || lastFetchTime.passedSince() < UPDATE_INTERVAL) return
         CoroutineConfig("bingo api fetch background").withIOContext().launchCoroutine {
