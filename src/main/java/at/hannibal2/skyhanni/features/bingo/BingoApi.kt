@@ -47,6 +47,7 @@ import kotlin.time.Duration.Companion.hours
 object BingoApi {
 
     private val BINGO_NPC_OFFSET = 3.days
+
     // This may need to be made shorter than 1 hour if we start using goal data in the future
     private val UPDATE_INTERVAL = 1.hours
 
@@ -254,7 +255,7 @@ object BingoApi {
                     }
                     ChatUtils.chat(
                         Component.literal("Updated Bingo event data successfully.")
-                            .withColor(ChatFormatting.GREEN)
+                            .withColor(ChatFormatting.GREEN),
                     )
                 }
             }
