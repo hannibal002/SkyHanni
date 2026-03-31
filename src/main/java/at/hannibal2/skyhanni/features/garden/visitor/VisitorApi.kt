@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -38,7 +38,7 @@ object VisitorApi {
     var inInventory = false
     var lastClickedNpc = 0
     val config get() = GardenApi.config.visitors
-    private val logger = LorenzLogger("garden/visitors/api")
+    private val logger = SkyHanniLogger("garden/visitors/api")
 
     const val INFO_SLOT = 13
     const val ACCEPT_SLOT = 29
