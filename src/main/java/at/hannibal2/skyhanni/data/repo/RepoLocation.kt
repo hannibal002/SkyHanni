@@ -34,10 +34,6 @@ data class RepoLocation(
     val branch: String = "main",
     private val shouldError: Boolean = false,
 ) {
-    companion object {
-        private const val DEF_REF_SPEC = "+refs/heads/*:refs/remotes/origin/*"
-    }
-
     constructor(config: AbstractRepoLocationConfig, shouldError: Boolean = false) : this(
         config.user,
         config.repoName,
@@ -48,6 +44,7 @@ data class RepoLocation(
     val location = "$user/$repo/$branch"
     private val apiName = "GitHub - $location"
     private val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
+    private val shallowRefSpec = "+refs/heads/$branch:refs/remotes/origin/$branch"
     private val sshConfigurer = TransportConfigCallback { transport ->
         if (transport is SshTransport) transport.sshSessionFactory = SshSessionFactory.getInstance()
     }
@@ -97,13 +94,13 @@ data class RepoLocation(
         Git.init().setDirectory(root).call().use { git ->
             git.repository.config.apply {
                 setString("remote", "origin", "url", "https://github.com/$user/$repo.git")
-                setString("remote", "origin", "fetch", DEF_REF_SPEC)
+                setString("remote", "origin", "fetch", shallowRefSpec)
             }.save()
 
             git.fetch().apply {
                 setRemote("origin")
                 setDepth(1)
-                setRefSpecs(RefSpec(DEF_REF_SPEC))
+                setRefSpecs(RefSpec(shallowRefSpec))
                 setProgressMonitor(RepoJGitMonitor(this@tryGitConvertLocalRepo))
             }.call()
 
