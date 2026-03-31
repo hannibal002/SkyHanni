@@ -19,10 +19,11 @@ object ReindrakeWarpHelper {
 
     /**
      * REGEX-TEST: WOAH! [VIP] Georeek summoned a Reindrake from the depths!
+     * REGEX-TEST: WOAH! [MVP+] DulceLyncis summoned TWO Reindrakes from the depths!
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn.message",
-        "WOAH! .+ summoned a Reindrake from the depths!",
+        "WOAH! .+ summoned (?:a Reindrake|TWO Reindrakes) from the depths!",
     )
 
     @HandleEvent
