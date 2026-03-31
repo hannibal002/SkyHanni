@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.Vec3ArgumentType
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -47,7 +47,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -64,6 +63,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer
 import net.minecraft.client.gui.components.debug.DebugScreenEntries
 import net.minecraft.client.gui.components.debug.DebugScreenEntry
@@ -565,11 +565,11 @@ object SkyHanniDebugsAndTests {
         event.registerBrigadier("shtestwaypoint") {
             description = "Set a waypoint on that location"
             category = CommandCategory.DEVELOPER_TEST
-            arg("waypoint", LorenzVecArgumentType.double()) { vec ->
+            arg("waypoint", Vec3ArgumentType.double()) { vec ->
                 literalCallback("pathfind") {
-                    waypoint(getArg(vec), true)
+                    waypoint(getArg(vec).toLorenzVec(), true)
                 }
-                callback { waypoint(getArg(vec)) }
+                callback { waypoint(getArg(vec).toLorenzVec()) }
 
             }
             simpleCallback { waypoint() }

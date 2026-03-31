@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
-import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.Vec3ArgumentType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
@@ -15,12 +15,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.VectorUtils.toLocalFormat
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.toLorenzVec
 
 @SkyHanniModule
 object NavigationHelper {
@@ -129,8 +131,8 @@ object NavigationHelper {
         event.registerBrigadier("shnavigate") {
             description = "Using path finder to go to locations"
             aliases = listOf("shnav")
-            argCallback("coords", LorenzVecArgumentType.double()) { location ->
-                pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
+            argCallback("coords", Vec3ArgumentType.double()) { location ->
+                pathFind(location.add(-1.0).toLorenzVec(), "Custom Goal", condition = { true })
                 ChatUtils.chat("Started Navigating to custom goal at §f${location.toLocalFormat()}", messageId = messageId)
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
