@@ -37,8 +37,8 @@ object SlayerTimeMessages {
 
         val messages = buildList {
             if (config.timeToKill) add(
-                if (compact) "$bossDisplayName §etook §b${timeToKill}"
-                else "It took §b${timeToKill}§e to kill $bossDisplayName",
+                if (compact) "$bossDisplayName §etook §b$timeToKill"
+                else "It took §b$timeToKill§e to kill $bossDisplayName",
             )
 
             if (config.timeToKillPersonalBests) {
