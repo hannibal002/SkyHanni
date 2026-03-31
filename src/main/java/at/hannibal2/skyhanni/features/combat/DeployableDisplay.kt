@@ -100,7 +100,7 @@ object DeployableDisplay {
 
         override fun toString(): String {
             return when {
-                this == FLUX -> "Flux §7(§d§lPlasmaflux§7)"
+                this == FLUX -> "Power Orb §7(§d§lPlasmaflux§7)"
                 this == LANTERN -> "Lantern §7(§5Glacite Lantern§7)"
                 this == UMBERELLA -> "§9Umberella"
                 this == BLACK_HOLE -> "§5Black Hole"
