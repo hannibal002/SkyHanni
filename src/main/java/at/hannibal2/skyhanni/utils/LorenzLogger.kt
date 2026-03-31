@@ -11,10 +11,11 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
-class LorenzLogger(filePath: String) {
+open class LorenzLogger(filePath: String) {
 
+    internal open val relativeStorage by lazy { PREFIX_PATH }
     private val format = SimpleDateFormat("HH:mm:ss")
-    private val fileName = "$PREFIX_PATH$filePath.log"
+    private val fileName by lazy { "$relativeStorage$filePath.log" }
 
     companion object {
 

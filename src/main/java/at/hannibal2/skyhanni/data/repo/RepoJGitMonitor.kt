@@ -12,7 +12,7 @@ class RepoJGitMonitor(private val repoFs: RepoFileSystem) : ProgressMonitor {
     }
 
     override fun beginTask(title: String, totalWork: Int) {
-        repoFs.logger.preDebug("Starting task: $title ($totalWork units)")
+        repoFs.logger.debug("Starting task: $title ($totalWork units)")
     }
 
     override fun update(completed: Int) {
@@ -22,7 +22,7 @@ class RepoJGitMonitor(private val repoFs: RepoFileSystem) : ProgressMonitor {
 
     override fun endTask() {
         completedTasks++
-        repoFs.logger.preDebug("Task completed ($completedTasks/$totalTasks)")
+        repoFs.logger.debug("Task completed ($completedTasks/$totalTasks)")
     }
 
     override fun isCancelled(): Boolean = false

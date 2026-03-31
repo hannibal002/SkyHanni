@@ -67,7 +67,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val config: AbstractRepoConfig
     abstract val configDirectory: File
 
-    val logger by lazy { RepoLogger("[Repo - $commonName]") }
+    val logger by lazy { RepoLogger("repo/$commonShortNameCased", "[Repo - $commonName]") }
     val repoDirectory by lazy {
         // ~/.minecraft/config/[...]/repo
         File(configDirectory, "repo")
@@ -174,7 +174,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             else -> repoDirectory.list()?.size?.let { "$it top-level entries in repo directory" }
                 ?: "repo directory exists but could not be listed"
         }
-        logger.logNonDestructiveError("Repo file not found: $path ($repoDiagnostic)")
+        logger.error("Repo file not found: $path ($repoDiagnostic)")
         return null
     }
 
@@ -198,7 +198,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("Remove and re-download, forceReset=$forceReset")
         shouldManuallyReload = true
         if (!config.location.valid) {
-            logger.errorToChat("Invalid $commonName repo settings detected, resetting default settings.")
+            logger.chatError("Invalid $commonName repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
 
@@ -209,20 +209,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             }
             reloadRepository(progress, "$commonName repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launch
-            val informed = logger.logErrorStateWithData(
+            val informed = logger.errorStateWithData(
                 "Error updating reading $commonName repo",
                 "no success",
                 "usingBackupRepo" to isUsingBackup,
                 "unsuccessfulConstants" to unsuccessfulConstants,
             )
             if (informed) return@launch
-            logger.logToChat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
+            logger.chat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
         }
     }
 
     private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
-            if (manual) logger.logToChat("$commonShortNameCased repo settings are already on default!")
+            if (manual) logger.chat("$commonShortNameCased repo settings are already on default!")
             return
         }
 
@@ -300,7 +300,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         logger.debug("Successfully switched to backup repo")
         return FetchUnpackResult.SWITCHED_TO_BACKUP
     }.onFailure { e ->
-        logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
+        logger.error("Failed to switch to backup repo: ${e.message}")
         progress.update("reason: ${e.message ?: "no reason"}")
         progress.end("Failed to switch to backup repo")
     }.getOrDefault(FetchUnpackResult.FAILED)
@@ -317,18 +317,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val comparison = getCommitComparison(silentError = false)
         val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
-            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+            logger.error("Failed to fetch latest commit for repo status check.")
             false
         }
         if (isOutdated) {
-            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+            logger.chat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
             val result = fetchAndUnpackRepo(progress, command = false)
             if (result == FetchUnpackResult.SUCCESS) {
-                logger.logToChat("§a$commonName repo updated successfully!")
+                logger.chat("§a$commonName repo updated successfully!")
                 progress.update("repo update successfully!")
                 return true
             } else {
-                logger.logToChat("§cFailed to update the $commonName repo.")
+                logger.chat("§cFailed to update the $commonName repo.")
                 progress.update("Failed to update the $commonName repo.")
             }
         }
@@ -341,19 +341,19 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            logger.logToChat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
+            logger.chat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
             return
         }
 
         if (!command && isRepeatErrorOrFixed(progress)) return
-        logger.errorToChat("$commonName repo has errors! Commit hash: §b$currentDownloadedCommit§r")
+        logger.chatError("$commonName repo has errors! Commit hash: §b$currentDownloadedCommit§r")
 
-        if (successfulConstants.isNotEmpty()) logger.logToChat("Successful Constants §7(${successfulConstants.size}):")
-        for (constant in successfulConstants) logger.logToChat("   - §7$constant")
+        if (successfulConstants.isNotEmpty()) logger.chat("Successful Constants §7(${successfulConstants.size}):")
+        for (constant in successfulConstants) logger.chat("   - §7$constant")
 
-        logger.logToChat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
-        for (constant in unsuccessfulConstants) logger.logToChat("   - §7$constant", color = "§e")
+        logger.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
+        for (constant in unsuccessfulConstants) logger.chat("   - §7$constant", color = "§e")
 
         progress.update("reportExtraStatusInfo")
         reportExtraStatusInfo()
@@ -458,7 +458,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("downloadCommitZipToFile")
         if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
             progress.update("Failed to download the repo zip file from GitHub.")
-            logger.logNonDestructiveError("Failed to download the repo zip file from GitHub.")
+            logger.error("Failed to download the repo zip file from GitHub.")
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else {
                 progress.update("FetchUnpackResult.FAILED")
@@ -470,7 +470,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         // Actually unpack the repo zip file into our local 'file system'
         return if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to unpack the downloaded zip file.")
-            logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
+            logger.error("Failed to unpack the downloaded zip file.")
             if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
         } else {
@@ -521,7 +521,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         event.post { error ->
             if (loadingError) return@post
             progress.update("Error while posting repo reload event: ${error.message}")
-            logger.logErrorWithData(error, "Error while posting repo reload event")
+            logger.errorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }
         progress.update("post done")
@@ -533,7 +533,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("transitionAfterReload done")
         if (answerMessage.isNotEmpty() && !loadingError) {
             progress.end("answerMessage: $answerMessage")
-            logger.logToChat("§a$answerMessage")
+            logger.chat("§a$answerMessage")
         } else if (loadingError) {
             progress.end("Error with the $commonShortName repo detected")
             ChatUtils.clickableChat(

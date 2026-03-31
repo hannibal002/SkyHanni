@@ -121,7 +121,7 @@ data class RepoLocation(
         }
         true
     }.getOrElse { e ->
-        logger.logNonDestructiveError("Failed to link existing directory to Git: $e")
+        logger.error("Failed to link existing directory to Git: $e")
         false
     }
 
@@ -141,7 +141,7 @@ data class RepoLocation(
             }
         }
     }.getOrElse { e ->
-        logger.logNonDestructiveError("Failed to pull latest changes for $location\n$e")
+        logger.error("Failed to pull latest changes for $location\n$e")
         null
     }
 
@@ -161,7 +161,7 @@ data class RepoLocation(
             }
             true
         }.getOrElse { e ->
-            logger.logNonDestructiveError("Failed to clone $location from $source\n$e")
+            logger.error("Failed to clone $location from $source\n$e")
             root.deleteRecursively()
             root.mkdirs()
             false

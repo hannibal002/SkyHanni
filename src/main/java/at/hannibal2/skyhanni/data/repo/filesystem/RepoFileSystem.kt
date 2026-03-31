@@ -80,7 +80,7 @@ sealed interface RepoFileSystem {
         true
     }.getOrElse { e ->
         progress.update("Failed to load repo from zip '${zipFile.name}': ${e.message}")
-        logger.logNonDestructiveError("Failed to load repo from zip '${zipFile.name}': ${e.message}")
+        logger.error("Failed to load repo from zip '${zipFile.name}': ${e.message}")
         false
     }
 
@@ -103,7 +103,7 @@ sealed interface RepoFileSystem {
         val data = zip.getInputStream(entry).use { it.readBytes() }
         if (data.isEmpty()) {
             val incrementedCount = emptyDataCount + 1
-            logger.logNonDestructiveError("Empty zip entry: $relativePath ($incrementedCount/$MAX_EMPTY_ZIP_ENTRIES)")
+            logger.error("Empty zip entry: $relativePath ($incrementedCount/$MAX_EMPTY_ZIP_ENTRIES)")
             check(incrementedCount <= MAX_EMPTY_ZIP_ENTRIES) {
                 "Aborting: $incrementedCount empty zip entries in '${zipFile.name}' — zip is likely corrupt"
             }
