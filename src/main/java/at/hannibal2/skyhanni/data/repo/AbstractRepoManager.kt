@@ -83,8 +83,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
-    private val githubRepoLocation: RepoLocation by lazy {
-        RepoLocation(config.location, debugConfig.logRepoErrors)
+    private val gitRepo: GitRepo by lazy {
+        GitRepo(config.location, debugConfig.logRepoErrors)
     }
     val repoMutex = Mutex()
 
@@ -121,7 +121,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val progressCategory: ChatProgressCategory
 
     fun getFailedConstants() = unsuccessfulConstants.toList()
-    fun getGitHubRepoPath(): String = githubRepoLocation.location
+    fun getGitHubRepoPath(): String = gitRepo.location
 
     // Will be invoked by the implementation of this class
     internal fun registerCommands(event: CommandRegistrationEvent) {
@@ -393,7 +393,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     private suspend fun getCommitComparison(silentError: Boolean): RepoComparison? {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: return null
+        val latestRepoCommit = gitRepo.getLatestCommit(silentError) ?: return null
         return RepoComparison(commonName, localRepoCommit, latestRepoCommit)
     }
 
@@ -427,7 +427,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult {
         progress.update("try loading repo from jgit")
-        with(githubRepoLocation) {
+        with(gitRepo) {
             if (repoFileSystem.loadFromJGit()) {
                 progress.update("loaded from jgit")
                 return FetchUnpackResult.SUCCESS
@@ -456,7 +456,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         prepCleanRepoFileSystem(progress)
 
         progress.update("downloadCommitZipToFile")
-        if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
+        if (!gitRepo.downloadCommitZipToFile(repoZipFile)) {
             progress.update("Failed to download the repo zip file from GitHub.")
             logger.error("Failed to download the repo zip file from GitHub.")
             return if (switchToBackupOnFail) switchToBackupRepo(progress)

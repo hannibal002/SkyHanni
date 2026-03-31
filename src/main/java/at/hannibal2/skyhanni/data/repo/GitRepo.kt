@@ -22,29 +22,22 @@ import org.eclipse.jgit.util.FS
 import java.io.File
 
 /**
- * Represents the location of a GitHub repository.
- * @param user The GitHub username or organization.
- * @param repo The repository name.
- * @param branch The branch name, defaults to "main".
+ * Represents the location of a Git repository.
+ * @param config the [AbstractRepoLocationConfig] containing the information for this repository.
  * @param shouldError If true, will throw an error if the latest commit SHA cannot be fetched, or if the download fails.
  */
-data class RepoLocation(
-    val user: String,
-    val repo: String,
-    val branch: String = "main",
+data class GitRepo(
+    val config: AbstractRepoLocationConfig,
     private val shouldError: Boolean = false,
 ) {
-    constructor(config: AbstractRepoLocationConfig, shouldError: Boolean = false) : this(
-        config.user,
-        config.repoName,
-        config.branch,
-        shouldError,
-    )
+    private val user get() = config.user
+    private val repo get() = config.repoName
+    private val branch get() = config.branch
 
-    val location = "$user/$repo/$branch"
-    private val apiName = "GitHub - $location"
-    private val commitApiUrl: String = "https://api.github.com/repos/$user/$repo/commits/$branch"
-    private val shallowRefSpec = "+refs/heads/$branch:refs/remotes/origin/$branch"
+    val location get() = "$user/$repo/$branch"
+
+    private val commitApiUrl: String get() = "https://api.github.com/repos/$user/$repo/commits/$branch"
+    private val shallowRefSpec get() = "+refs/heads/$branch:refs/remotes/origin/$branch"
     private val sshConfigurer = TransportConfigCallback { transport ->
         if (transport is SshTransport) transport.sshSessionFactory = SshSessionFactory.getInstance()
     }
@@ -52,15 +45,11 @@ data class RepoLocation(
     private fun String.isSshUri() = startsWith("git@") || startsWith("ssh://")
 
     private fun RepoFileSystem.getAvailableSources(): List<String> {
-        val sources = mutableListOf(
-            "https://github.com/$user/$repo.git",
-            "https://mirror.ghproxy.com/https://github.com/$user/$repo.git"
-        )
+        val sources = mutableListOf("https://github.com/$user/$repo.git")
 
         val userHome = FS.DETECTED.userHome() ?: return sources.also {
             logger.debug("Skipping SSH fallback: Unable to determine user home directory.")
         }
-        // Check if the directory exists and has any files that don't end in .pub
         val keyPresent = File(userHome, ".ssh").listFiles()?.any { file ->
             file.isFile && !file.name.endsWith(".pub") && file.name.startsWith("id_")
         } ?: false
@@ -72,7 +61,7 @@ data class RepoLocation(
     }
 
     suspend fun getLatestCommit(silentError: Boolean = true): RepoCommit? {
-        val (_, jsonResponse) = ApiUtils.getJsonResponse(commitApiUrl, apiName, silentError).assertSuccessWithData() ?: run {
+        val (_, jsonResponse) = ApiUtils.getJsonResponse(commitApiUrl, location, silentError).assertSuccessWithData() ?: run {
             SkyHanniMod.logger.error("Failed to fetch latest commits.")
             return null
         }
@@ -179,7 +168,7 @@ data class RepoLocation(
             if (shouldError) {
                 SkyHanniMod.logger.info("Downloading $shaToUse for $location\nUrl: $fullArchiveUrl")
             }
-            ApiUtils.getZipResponse(destinationZip, fullArchiveUrl, apiName, !shouldError)
+            ApiUtils.getZipResponse(destinationZip, fullArchiveUrl, location, !shouldError)
             true
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to download archive from $fullArchiveUrl")
