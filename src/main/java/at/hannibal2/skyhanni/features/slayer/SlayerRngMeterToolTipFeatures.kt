@@ -60,6 +60,8 @@ object SlayerRngMeterToolTipFeatures {
         "✔ LVL (?<level>\\d)",
     )
 
+    private const val SLAYER_COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
+    private const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
     private const val SLAYER_COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
 
     @HandleEvent
@@ -137,8 +139,8 @@ object SlayerRngMeterToolTipFeatures {
         val expectedCoins = SlayerApi.slayerJsonData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
         val changeNegation = event.coins * -1
 
-        val hasSlayerBonusRewards = changeNegation == expectedCoins * 0.96 // -4% from Slayer Bonus Rewards
-        val hasBartender = changeNegation * -1 == expectedCoins * 0.95 // -5% from Brewery city project
+        val hasSlayerBonusRewards = changeNegation == expectedCoins * SLAYER_COST_REDUCTION // -4% from Slayer Bonus Rewards
+        val hasBartender = changeNegation == expectedCoins * BREWERY_CONTRIBUTION_REDUCTION // -5% from Brewery city project
 
         if (hasSlayerBonusRewards) ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = 7
         ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction = hasBartender
@@ -172,9 +174,9 @@ object SlayerRngMeterToolTipFeatures {
         val line = buildString {
             append("§7Coins/Boss: ")
 
-            maxItemPrice?.let { append("${calculateCoinsPerBoss(bossesNeeded, spawnCost, it)} §7to ") }
+            append("${calculateCoinsPerBoss(bossesNeeded, spawnCost, minItemPrice)} §7 to")
 
-            append(calculateCoinsPerBoss(bossesNeeded, spawnCost, minItemPrice))
+            maxItemPrice?.let { append(calculateCoinsPerBoss(bossesNeeded, spawnCost, it)) }
         }.let { Component.literal(it) }
 
         addOrInsert(index + 1, line)
@@ -187,8 +189,8 @@ object SlayerRngMeterToolTipFeatures {
         val base = SlayerApi.slayerJsonData?.spawnCosts?.get(this)?.get(tier) ?: return null
 
         val reduction = when {
-            ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true -> 0.95
-            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == SLAYER_COST_REDUCTION_LEVEL -> 0.96
+            ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true -> SLAYER_COST_REDUCTION
+            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == SLAYER_COST_REDUCTION_LEVEL -> BREWERY_CONTRIBUTION_REDUCTION
             else -> 1.0
         }
 
