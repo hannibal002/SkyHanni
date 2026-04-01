@@ -6,5 +6,5 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 @PrimaryFunction("onRepositoryReload")
 class RepositoryReloadEvent(
-    override val manager: AbstractRepoManager<RepositoryReloadEvent>
+    override val manager: AbstractRepoManager<RepositoryReloadEvent>,
 ) : AbstractRepoReloadEvent(manager)

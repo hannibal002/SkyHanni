@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.bingo.BingoApiResponseJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
@@ -50,6 +51,8 @@ object BingoApi {
 
     // This may need to be made shorter than 1 hour if we start using goal data in the future
     private val UPDATE_INTERVAL = 1.hours
+
+    private val backgroundCoroutine = CoroutineConfig("bingo api fetch background").withIOContext()
 
     private val bingoStatic = ApiStaticGetPath(
         "https://api.hypixel.net/v2/resources/skyblock/bingo",
@@ -191,7 +194,7 @@ object BingoApi {
         alixerHidden = false
     }
 
-    suspend fun updateBingoData() {
+    private suspend fun updateBingoData() {
         val (_, jsonResponse) = ApiUtils.getJsonResponse(bingoStatic).assertSuccessWithData()
             ?: error("Failed to fetch Bingo data from Hypixel API")
         val response = ConfigManager.gson.fromJson<BingoApiResponseJson>(jsonResponse)
@@ -210,13 +213,13 @@ object BingoApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(60) || lastFetchTime.passedSince() < UPDATE_INTERVAL) return
-        CoroutineConfig("bingo api fetch background").withIOContext().launchCoroutine {
+        backgroundCoroutine.launchCoroutine {
             updateBingoData()
         }
     }
 
     private fun checkBingoNpcs() {
-        if (IslandGraphs.lastLoadedIslandType != "HUB") return
+        if (!IslandGraphs.lastLoadedIslandType.equals(IslandType.HUB.name, ignoreCase = true)) return
         if (IslandGraphs.currentIslandGraph == null) return
 
         val shouldHideAlixer = !SkyBlockUtils.isBingoProfile
