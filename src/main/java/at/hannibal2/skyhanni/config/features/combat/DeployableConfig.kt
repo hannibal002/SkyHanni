@@ -24,7 +24,7 @@ class DeployableConfig {
     @ConfigOption(
         name = "Only Show Highest Tier",
         desc = "Only show highest tier of deployable.\n" +
-            "e.g. Only show Overflux if a Radiant and Overflux are placed"
+            "e.g. Only show Overflux if a Radiant and Overflux are placed",
     )
     @ConfigEditorBoolean
     @FeatureToggle
