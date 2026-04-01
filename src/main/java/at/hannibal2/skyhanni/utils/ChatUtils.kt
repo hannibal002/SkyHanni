@@ -36,16 +36,16 @@ import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
+private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
+private const val CHAT_PREFIX = "[SkyHanni] "
+
 @SkyHanniModule
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
-
-    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
-    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private const val CHAT_PREFIX = "[SkyHanni] "
 
     /**
      * Sends a debug message to the chat and the console.
