@@ -68,6 +68,10 @@
 + Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
   + Do /shachievements to see them all.
 
+#### Misc
+
++ Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
+
 ### Improvements
 
 #### Fishing
@@ -94,6 +98,10 @@
 + Added the ability to block refusing Seymour's Special Armor visitor reward. - Luna (https://github.com/hannibal002/SkyHanni/pull/5311)
   + This includes Velvet Top Hat, Cashmere Jacket, Satin Trousers, and Oxford Shoes.
 + Hoe Levels Display now warns you if your tool is not gaining XP because you're farming the wrong crop. - Luna (https://github.com/hannibal002/SkyHanni/pull/5415)
+
+#### Mining
+
++ Added support for Littlefoot's Den Shaft. - nopo (https://github.com/hannibal002/SkyHanni/pull/5523)
 
 #### Misc
 
@@ -178,6 +186,8 @@
 + Fixed Advanced Player List issues with YouTubers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5427)
 + Fixed double XP lines in tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5427)
 + Fixed error when using level color for player name in tab. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5445)
++ Fixed Active Effects and Cookie Buff in Compact Tab List having really long text when inactive. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
++ Fixed Active Effects in Compact Tab List being split into two lines when they shouldn't. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
 
 #### Item Ability
 
@@ -193,12 +203,14 @@
 + Fixed showing more than 100% of found Hoppity locations on the island because of outdated config data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5394)
 + Fixed Stranded players being notified to collect Hoppity eggs. - Luna (https://github.com/hannibal002/SkyHanni/pull/5390)
 + Fixed Shiny Orb Tracker not working with revamped Year of the Pig event. - Luna (https://github.com/hannibal002/SkyHanni/pull/5421)
++ Updated Shiny Orb Tracker to work after Shiny Shard rename to Shiny Token. - Luna (https://github.com/hannibal002/SkyHanni/pull/5518)
 
 #### Fishing
 
 + Fixed some Sea Creature features not working before opening `/shseacreatures`. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5306)
 + Fixed Tiki Mask being added to the Fishing Profit Tracker every time it was taken off the head. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5294)
 + Fixed Thunder Sparks triggering Custom Circles from the Fire Freeze feature. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5319)
++ Added support for new Reindrake spawn message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5513)
 
 #### Item
 
@@ -226,6 +238,7 @@
 + Fixed sometimes getting an error in chat / disconnect when opening sacks. - Luna (https://github.com/hannibal002/SkyHanni/pull/5370)
 + Fixed multiple overclockers not being detected by Jacob bulk-claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5410)
 + Fixed error reading items in ItemPickupLog. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5444)
++ Fixed Ultrasequencer Helper missing first round. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5498)
 
 #### Misc
 
@@ -238,6 +251,8 @@
 + Fixed issues with backup repo not loading. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5343)
 + Fixed tracker uptime data not being saved between sessions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5412)
 + Fixed `!tps` party command not rounding TPS to 2 decimal points. - Luna (https://github.com/hannibal002/SkyHanni/pull/5467)
++ Fixed error when disconnecting while tracking sounds/particles. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5484)
++ Fixed small typos. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5473)
 
 #### Commands
 
@@ -387,6 +402,16 @@
 + Renamed `MobUtils.rayTraceForMob` to `MobUtils.raycastForMob`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5488)
 + Renamed `MobUtils.rayTraceForMobs` to `MobUtils.raycastForMobs`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5488)
 + Renamed `SlayerChangeEvent` file to `SlayerEvents` and moved `SlayerQuestCompleteEvent` to it. - Luna (https://github.com/hannibal002/SkyHanni/pull/5466)
++ Cleaned up `TabListReader`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5497)
++ Cleaned up components in player name formatting logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5435)
++ Cleaned up lots of deprecated usages of functions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5388)
++ Extracted `TrackCommand` into base, and world class. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5484)
++ Fixed `Component.contains` and `Component.startsWith` adding legacy formatting codes where the original component string doesn't include them. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
++ Migrated all detekt rules to 2.0 format. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5507)
++ Migrated Moveable HUD elements to new `moveablehud` package. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5388)
+    + Config + impl. classes were almost entirely duplicated code.
++ Removed every instance of `pushMatrix()` and `popMatrix()` that can be removed. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5388)
++ Updated GitHub CIs to use Java 25. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5491)
 
 ### Removed Features
 
