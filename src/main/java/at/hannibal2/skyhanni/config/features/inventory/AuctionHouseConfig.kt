@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.glfw.GLFW
 
 class AuctionHouseConfig {
@@ -84,7 +85,8 @@ class AuctionHouseConfig {
     var auctionOutbid: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Skeleton Master", desc = "Highlights Skeleton Master Chestplates that are Floor 10 & 50% Item Stat Boost.")
+    @SearchTag("Floor") // Technically it's Tier but, people (Probably because SBA Did it years ago) call it Floor.
+    @ConfigOption(name = "Skeleton Master", desc = "Highlights Skeleton Master Chestplates that are Tier 10 & 50% Item Stat Boost with Green & non 50/50 tier 10 with Red.")
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightSkeletonMasterChestplate: Boolean = true

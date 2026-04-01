@@ -152,9 +152,8 @@ object AuctionHousePriceComparison {
         return Color(newRed, newGreen, newBlue)
     }
 
-    private fun shouldIgnoreItem(internalName: NeuInternalName): Boolean {
-        return (internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate)
-    }
+    private fun shouldIgnoreItem(internalName: NeuInternalName): Boolean =
+        (internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate)
 
     private fun lerp(delta: Double, start: Int, end: Int) = start + delta * (end - start)
 

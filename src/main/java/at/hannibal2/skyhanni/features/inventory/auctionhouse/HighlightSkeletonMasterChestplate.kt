@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.auctionhouse
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -18,24 +18,19 @@ import net.minecraft.world.item.ItemStack
 object HighlightSkeletonMasterChestplate {
 
     private val isEnabled get() = SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate
-    private var isInAuctionMenu = false
-
-    @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName.startsWith("Auctions")) isInAuctionMenu = true
-    }
+    private var isInAuctionMenu = InventoryDetector(checkInventoryName = {it.startsWith("Auctions")})
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isInAuctionMenu) return
+        if (!isInAuctionMenu.isInside()) return
         if (!isEnabled) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.item.getInternalName() != "SKELETON_MASTER_CHESTPLATE".toInternalName()) continue
-            if (shouldHighlight(slot.item)) slot.highlight(LorenzColor.GREEN)
+            if (isGoodChestplate(slot.item)) slot.highlight(LorenzColor.GREEN)
             else slot.highlight(LorenzColor.DARK_RED)
         }
     }
 
-    private fun shouldHighlight(item: ItemStack): Boolean =
+    private fun isGoodChestplate(item: ItemStack): Boolean =
         (item.getDungeonTier() == 10 && item.getStatBoostPercentage() == 50)
 }
