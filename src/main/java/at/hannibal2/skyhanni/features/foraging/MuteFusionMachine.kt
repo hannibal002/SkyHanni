@@ -9,10 +9,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 @SkyHanniModule
 object MuteFusionMachine {
 
+    private val sounds = setOf(
+        "entity.firework_rocket.blast",
+        "entity.firework_rocket.blast_far",
+    )
+
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!SkyHanniMod.feature.foraging.muteFusionMachine) return
-        if (event.soundName == "entity.firework_rocket.blast" && event.volume == 20f) {
+        if (event.soundName in sounds && event.volume == 20f) {
             event.cancel()
         }
     }
