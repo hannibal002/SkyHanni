@@ -15,7 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class DeployableConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Show active deployables")
+    @ConfigOption(name = "Enable", desc = "Show active deployables.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
@@ -24,14 +24,13 @@ class DeployableConfig {
     @ConfigOption(
         name = "Only Show Highest Tier",
         desc = "Only show highest tier of deployable.\n" +
-            "e.g. Only show Overflux if a Radiant and Overflux are placed",
+            "e.g. Only show Overflux if a Radiant and Overflux are placed.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     var highestTierOnly: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Deployable Types", desc = "Which types of Deployables to display")
+    @ConfigOption(name = "Deployable Types", desc = "Which types of Deployables to display.")
     @ConfigEditorDraggableList
     val displayTypes: MutableList<DeployableDisplay.DeployableType> = mutableListOf(
         DeployableDisplay.DeployableType.FLUX,
@@ -41,14 +40,14 @@ class DeployableConfig {
 
     @ConfigOption(
         name = "Flare Display",
-        desc = "Flares have their own settings",
+        desc = "Flares have their own settings.",
     )
     @ConfigEditorButton(buttonText = "Go")
     val flareRunnable = Runnable { SkyHanniMod.feature.combat.flare::enabled.jumpToEditor() }
 
     @ConfigOption(
         name = "Totem of Corruption",
-        desc = "Totem of Corruption has its own settings",
+        desc = "Totem of Corruption has its own settings.",
     )
     @ConfigEditorButton(buttonText = "Go")
     val totemRunnable = Runnable { SkyHanniMod.feature.fishing.totemOfCorruption::showOverlay.jumpToEditor() }

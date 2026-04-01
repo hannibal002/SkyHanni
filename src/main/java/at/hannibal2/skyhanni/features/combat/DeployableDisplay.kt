@@ -28,7 +28,7 @@ object DeployableDisplay {
     private val group = RepoPattern.group("deployable")
     private val config get() = SkyHanniMod.feature.combat.deployable
 
-    val display = mutableListOf<Renderable>()
+    private val display = mutableListOf<Renderable>()
 
     init {
         Deployable.entries.forEach { it.pattern }
@@ -124,7 +124,7 @@ object DeployableDisplay {
                 deployable.entity = entity
                 deployable.expiryTime = time
                 for (entry in activeDeployables) {
-                    val entryEntity = entry.entity ?: break
+                    val entryEntity = entry.entity ?: continue
                     if (entryEntity.getLorenzVec().equalsIgnoreY(entity.getLorenzVec())) return@matchMatcher
                 }
                 activeDeployables.add(deployable)
@@ -152,7 +152,7 @@ object DeployableDisplay {
         Deployable.entries.forEach { it.reset() }
     }
 
-    fun buildDisplay() {
+    private fun buildDisplay() {
         activeDeployables.removeIf { !it.isActive() }
         Deployable.entries.forEach { if (!it.isActive()) it.reset() }
         display.clear()
