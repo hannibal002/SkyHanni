@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils.CHAT_PREFIX
+import at.hannibal2.skyhanni.utils.ChatUtils.DEBUG_PREFIX
+import at.hannibal2.skyhanni.utils.ChatUtils.USER_ERROR_PREFIX
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -30,7 +33,6 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import java.lang.UnsupportedOperationException
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KProperty0
@@ -359,14 +361,14 @@ object ChatUtils {
         }
     }
 
-    private var deleteNext: Pair<String, (String) -> Boolean>? = null
+    private var deleteNext: Pair<String, (Component) -> Boolean>? = null
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val (reason, predicate) = deleteNext ?: return
         this.deleteNext = null
 
-        if (predicate(event.message)) {
+        if (predicate(event.chatComponent)) {
             event.blockedReason = reason
         }
     }
@@ -379,7 +381,7 @@ object ChatUtils {
 
     fun deleteNextMessage(
         reason: String,
-        predicate: (String) -> Boolean,
+        predicate: (Component) -> Boolean,
     ) {
         deleteNext = reason to predicate
     }
@@ -441,6 +443,7 @@ object ChatUtils {
     ) {
         val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to $actionName or disable this feature]"
+        val modifier = KeyboardManager.getModifierKeyName()
         clickableChat(
             "$message$hint",
             onClick = {
@@ -450,7 +453,8 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n" +
+                "§eShift-Click or $modifier-Click to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )

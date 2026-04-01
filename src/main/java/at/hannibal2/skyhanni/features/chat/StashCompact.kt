@@ -130,7 +130,7 @@ object StashCompact {
 
         pickupStashPattern.matchMatcher(event.message) {
             event.blockedReason = REASON
-            ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it) }
+            ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it.string) }
             val currentType = currentType ?: return@matchMatcher
 
             val currentMessage = currentMessages[currentType] ?: return@matchMatcher
@@ -145,7 +145,7 @@ object StashCompact {
         if (!config.hideAddedMessages) return
         genericAddedToStashPattern.matchMatcher(event.message) {
             event.blockedReason = REASON
-            ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it) }
+            ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it.string) }
         }
     }
 

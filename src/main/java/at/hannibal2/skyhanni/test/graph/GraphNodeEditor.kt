@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.test.graph
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
@@ -38,8 +37,8 @@ object GraphNodeEditor {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
-    @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderTop() {
         doRender()
     }
 
@@ -246,7 +245,7 @@ object GraphNodeEditor {
             }
 
             add("§eClick to select/deselect this node!")
-            add("§eControl-Click to edit the tags for this node!")
+            add("§e${KeyboardManager.getModifierKeyName()}-Click to edit the tags for this node!")
 
         },
         onLeftClick = {
