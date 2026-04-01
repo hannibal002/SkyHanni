@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
+import at.hannibal2.skyhanni.features.inventory.auctionhouse.HighlightSkeletonMasterChestplate
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -153,7 +154,7 @@ object AuctionHousePriceComparison {
     }
 
     private fun shouldIgnoreItem(internalName: NeuInternalName): Boolean =
-        (internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate)
+        internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && HighlightSkeletonMasterChestplate.isEnabled
 
     private fun lerp(delta: Double, start: Int, end: Int) = start + delta * (end - start)
 

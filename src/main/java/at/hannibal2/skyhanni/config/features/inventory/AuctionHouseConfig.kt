@@ -85,9 +85,9 @@ class AuctionHouseConfig {
     var auctionOutbid: Boolean = false
 
     @Expose
-    @SearchTag("Floor") // Technically it's Tier but, people (Probably because SBA Did it years ago) call it Floor.
     @ConfigOption(name = "Skeleton Master", desc = "Highlights Skeleton Master Chestplates that are Tier 10 & 50% Item Stat Boost with Green & non 50/50 tier 10 with Red.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("Floor") // Technically it's Tier but, people (Probably because SBA Did it years ago) call it Floor.
     var highlightSkeletonMasterChestplate: Boolean = true
 }

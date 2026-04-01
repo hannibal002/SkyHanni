@@ -17,8 +17,8 @@ import net.minecraft.world.item.ItemStack
 @SkyHanniModule
 object HighlightSkeletonMasterChestplate {
 
-    private val isEnabled get() = SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate
-    private var isInAuctionMenu = InventoryDetector(checkInventoryName = {it.startsWith("Auctions")})
+    val isEnabled get() = SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate
+    private val isInAuctionMenu = InventoryDetector(checkInventoryName = { it.startsWith("Auctions") })
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
