@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public abstract class MixinAbstractDebugChart {
 
     @WrapMethod(method = "getValueForAggregation")
-    public long getValueForAggregation(final int sampleIndex, Operation<Long> original) {
+    private long getValueForAggregation(final int sampleIndex, Operation<Long> original) {
         long orig = original.call(sampleIndex);
         //noinspection ConstantConditions
         if (!((Object) (this) instanceof PingDebugChart)) return orig;

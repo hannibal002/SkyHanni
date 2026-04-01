@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinClientPacketListener {
 
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showNetworkCharts()Z"))
-    public boolean showNetworkCharts(boolean original) {
+    private boolean showNetworkCharts(boolean original) {
         if (!CurrentPing.INSTANCE.isEnabled()) return original;
         return true;
     }
@@ -33,7 +33,7 @@ public abstract class MixinClientPacketListener {
         ),
         cancellable = true
     )
-    public void postParticleEvent(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
+    private void postParticleEvent(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (
             new ReceiveParticleEvent(
                 packet.getParticle().getType(),
@@ -49,8 +49,14 @@ public abstract class MixinClientPacketListener {
         }
     }
 
-    @ModifyArg(method = "handleParticleEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V"))
-    public ParticleOptions postParticleChangeEvent(ParticleOptions particleOptions, @Local(argsOnly = true) ClientboundLevelParticlesPacket packet) {
+    @ModifyArg(
+        method = "handleParticleEvent",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/ClientLevel;addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V"
+        )
+    )
+    private ParticleOptions postParticleChangeEvent(ParticleOptions particleOptions, @Local(argsOnly = true) ClientboundLevelParticlesPacket packet) {
         ParticleChangeEvent particleChangeEvent = new ParticleChangeEvent(particleOptions, packet);
         particleChangeEvent.post();
         return particleChangeEvent.getParticleOptions();
