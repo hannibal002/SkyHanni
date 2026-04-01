@@ -32,12 +32,12 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
-import net.minecraft.network.chat.Component
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -257,7 +257,8 @@ object BingoApi {
                         return@launchCoroutine
                     }
                     ChatUtils.chat(
-                        Component.literal("Updated Bingo event data successfully.")
+                        "Updated Bingo event data successfully."
+                            .asComponent()
                             .withColor(ChatFormatting.GREEN),
                     )
                 }
