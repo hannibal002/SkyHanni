@@ -97,10 +97,11 @@ object KeyboardManager {
     }
 
     fun getModifierKeyName(short: Boolean = false): String =
-        if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY)
+        if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY) {
             if (short) "Cmd" else "Command"
-        else
+        } else {
             if (short) "Ctrl" else "Control"
+        }
 
     // The delay below is here to make sure the Text input features in graph editor
     // and in renderable calls have time to react first, and lock this key press event properly.
