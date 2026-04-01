@@ -82,4 +82,10 @@ class AuctionHouseConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var auctionOutbid: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Skeleton Master", desc = "Highlights Skeleton Master Chestplates that are Floor 10 & 50% Item Stat Boost.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var highlightSkeletonMasterChestplate: Boolean = true
 }
