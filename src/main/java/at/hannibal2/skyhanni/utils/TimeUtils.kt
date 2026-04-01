@@ -28,9 +28,11 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+// TODO refactor
 @Suppress("TooManyFunctions")
 object TimeUtils {
 
+    @JvmStatic
     val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
         val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
         val (always, never) = SkyHanniMod.feature.dev.debug.let { it.alwaysFunnyTime to it.neverFunnyTime }
