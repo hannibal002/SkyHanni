@@ -100,10 +100,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         if (repoMutex != null) it.withMutex(repoMutex) else it
     }
 
-    private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
-    private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
-    private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
-    private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
+    private val repoIOCoroutine = repoCoroutineConfig("IO")
+    private val repoInitCoroutine = repoCoroutineConfig("Init", repoMutex)
+    private val repoReloadCoroutine = repoCoroutineConfig("Reload", repoMutex)
+    private val repoUpdateCoroutine = repoCoroutineConfig("Update", repoMutex)
+    private val repoStatusCoroutine = repoCoroutineConfig("Status")
 
     var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
         private set
@@ -137,7 +138,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            coroutineSimpleCallback {
+            coroutineSimpleCallback(repoStatusCoroutine) {
                 val progress = progressCategory.start("showing status via /$statusCommand")
                 displayRepoStatus(progress, joinEvent = false, command = true)
                 progress.end("done showing status")
@@ -150,7 +151,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
                 val progress = progressCategory.start("reloading local repo via /$reloadCommand")
                 progress.update("reloadLocalRepo")
                 shouldManuallyReload = true
-                repoReloadCoroutineConfig.launch {
+                repoReloadCoroutine.launch {
                     reloadRepository(progress, "$commonName repo loaded from local files successfully.")
                 }
             }
@@ -202,7 +203,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             resetRepositoryLocation()
         }
 
-        repoUpdateCoroutineConfig.launch {
+        repoUpdateCoroutine.launch {
             if (!fetchAndUnpackRepo(progress, command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
                 return@launch
@@ -238,7 +239,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     fun initRepo() = progressCategory.startBlock("auto loading on init") { progress ->
         shouldManuallyReload = true
-        repoInitCoroutineConfig.launch {
+        repoInitCoroutine.launch {
             if (config.repoAutoUpdate) {
                 if (!fetchAndUnpackRepo(progress, command = false).canContinue) {
                     progress.end("Failed to fetch & unpack repo - aborting.")
@@ -479,7 +480,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
-            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory, logger, repoIOCoroutineConfig)
+            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory, logger, repoIOCoroutine)
             else DiskRepoFileSystem(repoDirectory, logger)
         }.apply { deleteRecursively("") }
 
