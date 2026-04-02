@@ -41,7 +41,7 @@ import kotlin.time.times
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
-    private val log = LorenzLogger("chat/mod_sent")
+    private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
@@ -103,6 +103,15 @@ object ChatUtils {
         }
         chat(message.asComponent(), prefix, color, replaceSameMessage, onlySendOnce, messageId)
     }
+
+    fun chat(
+        prefix: Boolean = true,
+        prefixColor: Int? = null,
+        replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
+        builder: MutableComponent.() -> Unit = { },
+    ) = chat(componentBuilder(builder), prefix, prefixColor, replaceSameMessage, onlySendOnce, messageId)
 
     fun chat(
         message: Component,
