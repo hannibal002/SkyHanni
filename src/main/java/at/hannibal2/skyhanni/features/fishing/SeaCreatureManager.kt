@@ -94,7 +94,12 @@ object SeaCreatureManager {
             }
 
             if (config.compactDoubleHook && doubleHook) {
-                edited = Component.literal("§e§lDOUBLE HOOK! ").append(edited)
+                edited = when (config.compactDoubleHookPosition) {
+                    CompactDoubleHookPosition.LEFT ->
+                        "§e§lDOUBLE HOOK! ".asComponent().append(edited)
+                    CompactDoubleHookPosition.RIGHT ->
+                        edited.append(" §e§lDOUBLE HOOK!".asComponent())
+                }
             }
 
             if (original == edited) return
@@ -142,5 +147,13 @@ object SeaCreatureManager {
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
+    }
+
+    enum class CompactDoubleHookPosition(private val displayName: String) {
+        LEFT("Left"),
+        RIGHT("Right"),
+        ;
+
+        override fun toString() = displayName
     }
 }
