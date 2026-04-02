@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandType.Companion.isInAnyIsland
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -114,7 +113,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     add { _ -> island.isInIsland() }
                 }
                 options.onlyOnIslands.takeIfNotEmpty()?.let { islands ->
-                    add { _ -> islands.toList().isInAnyIsland() }
+                    add { _ -> islands.any { it.isInIsland() } }
                 }
                 options.onlyOnIslandTypeTag.takeIfNotEmpty()?.let { tags ->
                     add { _ -> tags.any { it.isInIsland() } }
