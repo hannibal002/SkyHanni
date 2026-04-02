@@ -66,7 +66,7 @@ object PowderChestTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
@@ -121,7 +121,7 @@ object PowderChestTimer {
         if (!isEnabled()) return
 
         // TODO why in god's name is this calculating onTick 🥺
-        display = drawDisplay()?.let { Renderable.text(it) } ?: return
+        display = drawDisplay()?.let(Renderable::text)
 
         chests.keys.removeIf { pos ->
             ((MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f

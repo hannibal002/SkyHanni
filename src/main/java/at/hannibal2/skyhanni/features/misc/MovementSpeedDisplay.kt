@@ -28,7 +28,7 @@ object MovementSpeedDisplay {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !event.isMod(5)) return
+        if (!event.isMod(5)) return
 
         bpsMoveSpeed = with(MinecraftCompat.localPlayer) {
             val oldPos = LorenzVec(xOld, yOld, zOld)
@@ -37,6 +37,8 @@ object MovementSpeedDisplay {
             // Distance from previous tick, multiplied by TPS
             oldPos.distance(newPos) * 20
         }
+
+        if (!isEnabled()) return
         display = Renderable.text("Movement Speed: ${bpsMoveSpeed.roundTo(2)}")
     }
 
