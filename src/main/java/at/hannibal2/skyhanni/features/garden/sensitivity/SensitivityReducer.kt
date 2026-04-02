@@ -165,7 +165,7 @@ object SensitivityReducer {
     }
 
     @HandleEvent(eventType = GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isActive) return
         if (!config.showGui) return
         config.position.renderRenderable(

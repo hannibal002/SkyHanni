@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -126,7 +124,7 @@ object GemstoneMoneyPerHour {
         display = createDisplay()
     }
 
-    private fun createDisplay() = buildList<Renderable> {
+    private fun createDisplay() = buildList {
         if (start.isFarPast()) return@buildList
         if (lastGemstone.isEmpty()) return@buildList
         val moneyPerHour = coins / maxOf(uptime.inPartialSeconds, 1.0) * 3600
@@ -178,7 +176,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOnTopRenderEvent) {
+    fun onGuiRenderTop() {
         if (!isEnabled()) return
         display.ifEmpty { updateDisplay() }
         if (display.isNotEmpty()) {
@@ -191,7 +189,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled() || lastMined.isFarPast()) display = listOf()
         else if (lastMined.passedSince() > config.timeoutTime.toInt().seconds) {
             if (config.shouldPause) paused = true
@@ -201,8 +199,8 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onWorldChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.NONE || !paused) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (!paused) return
         if (!isEnabled() || !IslandTypeTags.MINING.inAny()) return reset()
         paused = true
     }

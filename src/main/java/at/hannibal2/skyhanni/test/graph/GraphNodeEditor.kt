@@ -39,7 +39,7 @@ object GraphNodeEditor {
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
     @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderTop() {
         doRender()
     }
 

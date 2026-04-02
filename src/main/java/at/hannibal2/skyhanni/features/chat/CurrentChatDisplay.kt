@@ -131,16 +131,11 @@ object CurrentChatDisplay {
     }
 
     @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRender() {
         if (!isEnabled()) return
         if (Minecraft.getInstance().screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
         val display = display ?: return
         config.currentChatDisplayPos.renderRenderable(display, posLabel = "Current Chat")
-    }
-
-    @JvmStatic
-    fun onCloseChat() {
-        lastClosedChatTime = SimpleTimeMark.now()
     }
 
     private fun isEnabled() = config.currentChatDisplay
