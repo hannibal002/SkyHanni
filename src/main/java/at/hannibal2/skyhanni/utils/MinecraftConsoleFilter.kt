@@ -23,8 +23,8 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
     private val config get() = SkyHanniMod.feature.dev.minecraftConsoles
     private val filterConfig get() = config.consoleFilter
 
-    private val loggerFiltered = LorenzLogger("debug/mc_console/filtered")
-    private val loggerUnfiltered = LorenzLogger("debug/mc_console/unfiltered")
+    private val loggerFiltered = SkyHanniLogger("debug/mc_console/filtered")
+    private val loggerUnfiltered = SkyHanniLogger("debug/mc_console/unfiltered")
 
     private val patternBiomeIdBounds = "Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)".toPattern()
 

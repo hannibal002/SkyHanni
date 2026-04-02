@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -18,13 +19,15 @@ object CurrentPing {
     val averagePing: Duration
         get() = previousPings.takeIf { it.isNotEmpty() }?.average()?.milliseconds ?: Duration.ZERO
 
-    val previousPings: List<Long>
+    internal val previousPings: List<Long>
         get() = Minecraft.getInstance().debugOverlay.pingLogger.let {
             List(it.size()) { i -> it[i] }
         }
 
-    fun getFormattedPing(): String =
-        "Current Ping: ${averagePing.inWholeMilliseconds.addSeparators()} ms"
+    fun getFormattedPing(): String {
+        val ping = averagePing.inWholeMilliseconds.let { if (TimeUtils.isAprilFoolsDay) it * 2 else it }
+        return "Current Ping: ${ping.addSeparators()} ms"
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

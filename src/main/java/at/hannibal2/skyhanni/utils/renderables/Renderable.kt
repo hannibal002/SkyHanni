@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toInt
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
@@ -18,7 +19,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -76,8 +77,11 @@ interface Renderable {
 
     companion object {
 
-        val logger = LorenzLogger("debug/renderable")
+        val logger = SkyHanniLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
+
+        private val scrollbarTrackColor: ChromaColour = ChromaColour.fromStaticRGB(40, 40, 60, 200)
+        private val scrollbarThumbColor: ChromaColour = ChromaColour.fromStaticRGB(100, 100, 200, 200)
 
         fun <T> withMousePosition(mousePositionX: Int, mousePositionY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
@@ -800,16 +804,19 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             showScrollableTipsInList: Boolean = false,
+            showScrollbar: Boolean = false,
+            scrollbarTrackColor: ChromaColour = Companion.scrollbarTrackColor,
+            scrollbarThumbColor: ChromaColour = Companion.scrollbarThumbColor,
         ) = object : Renderable {
             private val scrollUpTip = text("§7§oMore items above (scroll)")
             private val scrollDownTip = text("§7§oMore items below (scroll)")
 
-            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-
             private val virtualHeight = list.sumOf { it.height }
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width) +
+                if (showScrollbar && virtualHeight > height) 7 else 0
 
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
@@ -834,6 +841,10 @@ interface Renderable {
                     showScrollableTipsInList,
                     scrollUpTip,
                     scrollDownTip,
+                    showScrollbar,
+                    virtualHeight,
+                    scrollbarTrackColor,
+                    scrollbarThumbColor,
                 )
             }
         }
@@ -850,18 +861,22 @@ interface Renderable {
             showScrollableTipsInList: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            showScrollbar: Boolean = false,
+            scrollbarTrackColor: ChromaColour = Companion.scrollbarTrackColor,
+            scrollbarThumbColor: ChromaColour = Companion.scrollbarThumbColor,
         ) = object : Renderable {
             private var list: Set<Renderable> = filterList(content, textInput.textBox)
 
             private val scrollUpTip = text("§7§oMore items above (scroll)")
             private val scrollDownTip = text("§7§oMore items below (scroll)")
 
-            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollUpTip.width, scrollDownTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-
             private val virtualHeight get() = list.sumOf { it.height }
+            override val width get() = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width) +
+                if (showScrollbar && virtualHeight > height) 7 else 0
+
             private var scroll = createScroll()
 
             init {
@@ -895,6 +910,10 @@ interface Renderable {
                     showScrollableTipsInList,
                     scrollUpTip,
                     scrollDownTip,
+                    showScrollbar,
+                    virtualHeight,
+                    scrollbarTrackColor,
+                    scrollbarThumbColor,
                 )
             }
         }
@@ -909,6 +928,10 @@ interface Renderable {
             showScrollableTipsInList: Boolean,
             scrollUpTip: Renderable,
             scrollDownTip: Renderable,
+            showScrollbar: Boolean = false,
+            virtualHeight: Int = 0,
+            scrollbarTrackColor: ChromaColour = Companion.scrollbarTrackColor,
+            scrollbarThumbColor: ChromaColour = Companion.scrollbarThumbColor,
         ) {
             val end = scroll.asInt() + height + 1
 
@@ -959,6 +982,18 @@ interface Renderable {
             }
 
             DrawContextUtils.translate(0f, -renderY.toFloat())
+
+            if (showScrollbar && virtualHeight > height) {
+                val barX = width - 4
+                val maxScroll = (virtualHeight - height).coerceAtLeast(1).toFloat()
+                val thumbRatio = height.toFloat() / virtualHeight
+                val thumbHeight = (thumbRatio * height).toInt().coerceAtLeast(8)
+                val thumbY = ((scroll.asDouble() / maxScroll) * (height - thumbHeight)).toInt()
+                val trackRgb = scrollbarTrackColor.toColor().rgb
+                val thumbRgb = scrollbarThumbColor.toColor().rgb
+                ShaderRenderUtils.drawRoundRectDeferred(barX, 0, 4, height, trackRgb, 2, 1f)
+                ShaderRenderUtils.drawRoundRectDeferred(barX, thumbY, 4, thumbHeight, thumbRgb, 2, 1f)
+            }
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
