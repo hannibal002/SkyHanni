@@ -162,7 +162,8 @@ object MineshaftDetection {
         JASP_1(LorenzColor.LIGHT_PURPLE, "Jasper"),
         JASP_C(LorenzColor.LIGHT_PURPLE, "Jasper Crystal"),
         OPAL_1(LorenzColor.WHITE, "Opal"),
-        OPAL_C(LorenzColor.WHITE, "Opal Crystal")
+        OPAL_C(LorenzColor.WHITE, "Opal Crystal"),
+        LITT_L(LorenzColor.AQUA, "Littlefoot's Den"),
         ;
 
         val displayName: String = color.getChatColor() + rawName
