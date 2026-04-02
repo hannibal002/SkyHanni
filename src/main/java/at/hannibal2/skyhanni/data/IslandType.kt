@@ -14,7 +14,6 @@ import net.minecraft.world.phys.AABB
 
 internal interface SkyHanniIslandType {
     fun isInIsland(): Boolean
-    fun Collection<SkyHanniIslandType>.isInAnyIsland(): Boolean = any { it.isInIsland() }
 }
 
 enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
