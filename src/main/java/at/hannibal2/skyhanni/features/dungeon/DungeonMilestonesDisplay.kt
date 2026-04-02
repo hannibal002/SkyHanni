@@ -2,14 +2,18 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -19,32 +23,33 @@ object DungeonMilestonesDisplay {
     private val config get() = SkyHanniMod.feature.dungeon
 
     /**
-     * REGEX-TEST: §e§lMage Milestone §r§e❷§r§7: You have dealt §r§c300,000§r§7 Total Damage so far! §r§a07s
-     * REGEX-TEST: §e§lTank Milestone §r§e❷§r§7: You have tanked and dealt §r§c180,000§r§7 Total Damage so far! §r§a16s
+     * REGEX-TEST: Mage Milestone ❷: You have dealt 300,000 Total Damage so far! 07s
+     * REGEX-TEST: Tank Milestone ❷: You have tanked and dealt 180,000 Total Damage so far! 16s
      */
     private val milestonePattern by RepoPattern.pattern(
-        "dungeon.milestone",
-        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*",
+        "dungeon.milestone.colorless",
+        ".*Milestone .: You have (?:tanked and )?(?:dealt|healed) *.*so far! .*",
     )
 
-    private var display = ""
+    private var displayString: String = ""
+    private val display: Renderable? get() = displayString.takeIfNotEmpty()?.let { Renderable.text(color + it) }
     private var currentMilestone = 0
     private var timeReached = SimpleTimeMark.farPast()
-    var color = ""
+    private var color = ""
 
+    // Todo I like the ingenuity of the fade-out effect here, but this should probably be made
+    //  into a reusable decorator of TextRenderable/StringRenderable
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!event.isMod(5)) return
-        if (currentMilestone >= 3 && timeReached.passedSince() > 3.seconds && display.isNotEmpty()) {
-            display = display.substring(1)
-        }
+        if (!event.isMod(5) || displayString.isEmpty()) return
+        if (currentMilestone < 3 || timeReached.passedSince() < 3.seconds) return
+        displayString = displayString.substring(1)
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
-
-        if (milestonePattern.matches(event.message)) {
+        if (!config.showMilestonesDisplay) return
+        if (milestonePattern.matches(event.chatComponent)) {
             event.blockedReason = "dungeon_milestone"
             currentMilestone++
             update()
@@ -53,21 +58,19 @@ object DungeonMilestonesDisplay {
 
     private fun update() {
         if (currentMilestone > 3) return
-        if (currentMilestone == 3) {
-            timeReached = SimpleTimeMark.now()
-        }
+        else if (currentMilestone == 3) timeReached = SimpleTimeMark.now()
 
         color = when (currentMilestone) {
             0, 1 -> "§c"
             2 -> "§e"
             else -> "§a"
         }
-        display = "Current Milestone: $currentMilestone"
+        displayString = "Current Milestone: $currentMilestone"
     }
 
     @HandleEvent
     fun onWorldChange() {
-        display = ""
+        displayString = ""
         currentMilestone = 0
     }
 
@@ -77,15 +80,11 @@ object DungeonMilestonesDisplay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.showMilestonesDisplay) return
 
-        config.showMileStonesDisplayPos.renderString(
-            color + display,
-            posLabel = "Dungeon Milestone",
-        )
+        val display = display ?: return
+        config.showMileStonesDisplayPos.renderRenderable(display, posLabel = "Dungeon Milestone")
     }
-
-    private fun isEnabled() = DungeonApi.inDungeon() && config.showMilestonesDisplay
 }

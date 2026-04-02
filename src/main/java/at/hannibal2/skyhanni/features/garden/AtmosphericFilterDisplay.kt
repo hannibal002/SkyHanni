@@ -6,16 +6,17 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object AtmosphericFilterDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
-
-    private var display = ""
+    private var display: Renderable? = null
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ATMOSPHERIC_FILTER])
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -28,14 +29,12 @@ object AtmosphericFilterDisplay {
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ATMOSPHERIC_FILTER])
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenApi.inGarden()) {
-            config.position.renderString(display, posLabel = "Atmospheric Filter Perk Display")
-        } else {
-            config.positionOutside.renderString(display, posLabel = "Atmospheric Filter Perk Display")
-        }
+        val display = display ?: return
+        val position = if (GardenApi.inGarden()) config.position else config.positionOutside
+        position.renderRenderable(display, posLabel = "Atmospheric Filter Perk Display")
     }
 
-    private fun drawDisplay(season: SkyblockSeason): String = buildString {
+    private fun drawDisplay(season: SkyblockSeason) = Renderable.text {
         if (!config.onlyBuff) {
             append(season.getSeasonName(config.abbreviateSeason))
             append("§7: ")
