@@ -337,30 +337,24 @@ class ItemResolutionQuery {
                 }
             }
 
-            guiName == "Catacombs RNG Meter" ->
-                resolveItemInCatacombsRngMeter()
+            guiName == "Catacombs RNG Meter" -> resolveItemInCatacombsRngMeter()
 
-            guiName.startsWith("Choose Pet") ->
-                findInternalNameByDisplayName(displayName, false)
+            guiName.startsWith("Choose Pet") -> findInternalNameByDisplayName(displayName, false)
 
-            guiName.endsWith("Experimentation Table RNG") ->
-                resolveEnchantmentByName(displayName)
+            guiName.endsWith("Experimentation Table RNG") -> resolveEnchantmentByName(displayName)
 
-            guiName == "Attribute Menu" ->
-                resolveItemInAttributeMenu(compound.getLoreComponent())
+            guiName == "Attribute Menu" -> resolveItemInAttributeMenu(compound.getLoreComponent())
 
             guiName.equalsOneOf("Hunting Box", "Fusion Box", "Shard Fusion") ->
                 resolveItemInHuntingBoxMenu(displayName.removeColor())
 
-            guiName == "Confirm Fusion" ->
-                compound.getLoreComponent().firstOrNull()?.let {
-                    shardPattern.matchMatcher(it) {
-                        resolveItemInHuntingBoxMenu(group("name").removeColor())
-                    }
+            guiName == "Confirm Fusion" -> compound.getLoreComponent().firstOrNull()?.let {
+                shardPattern.matchMatcher(it) {
+                    resolveItemInHuntingBoxMenu(group("name").removeColor())
                 }
+            }
 
-            guiName == "Dye Compendium" ->
-                findInternalNameByDisplayName(displayName, false)
+            guiName == "Dye Compendium" -> findInternalNameByDisplayName(displayName, false)
 
             else -> null
         }
