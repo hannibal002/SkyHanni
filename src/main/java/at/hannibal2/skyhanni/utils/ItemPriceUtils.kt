@@ -172,7 +172,6 @@ object ItemPriceUtils {
     private val eliteLowBinStatic = ApiStaticGetPath(
         "https://api.eliteskyblock.com/resources/auctions",
         "Elite Lowest Bin",
-        tryForceGzip = true,
     )
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
