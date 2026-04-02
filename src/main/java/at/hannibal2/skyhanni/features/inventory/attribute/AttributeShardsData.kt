@@ -321,9 +321,11 @@ object AttributeShardsData {
                 val shardName = group("shardName")
                 val amount = groupOrNull("amount")?.toInt() ?: 1
 
-                val shardInternalName = ItemResolutionQuery.attributeNameToInternalName(shardName)?.toInternalName()
-                if (shardInternalName == null) {
-                    ItemUtils.addMissingRepoItem(shardName, "Could not find internal name for attribute shard: $shardName")
+                val shardInternalName = ItemResolutionQuery.attributeNameToInternalName(shardName) ?: run {
+                    ItemUtils.addMissingRepoItem(
+                        shardName,
+                        "Could not find internal name for attribute shard: $shardName",
+                    )
                     return
                 }
 
