@@ -1,23 +1,28 @@
 package at.hannibal2.skyhanni.features.bingo
 
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.bingo.BingoApiResponseJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoRanksJson
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -25,18 +30,39 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
+import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
 object BingoApi {
 
-    // TODO replace with dynamic detection once we have secret bingo detection (maybe via repo?)
-    private val BINGO_EVENT_DURATION = 7.days
     private val BINGO_NPC_OFFSET = 3.days
+
+    // This may need to be made shorter than 1 hour if we start using goal data in the future
+    private val UPDATE_INTERVAL = 1.hours
+
+    private val backgroundCoroutine = CoroutineConfig("bingo api fetch background").withIOContext()
+
+    private val bingoStatic = ApiStaticGetPath(
+        "https://api.hypixel.net/v2/resources/skyblock/bingo",
+        "SkyBlock Bingo",
+    )
+
+    private var lastFetchTime = SimpleTimeMark.farPast()
+
+    private var bingoEventStart = getStartOfMonth()
+    private var bingoEventEnd = bingoEventStart + 7.days
 
     private var ranks = mapOf<String, Int>()
     private var data: Map<String, BingoData> = emptyMap()
@@ -63,7 +89,7 @@ object BingoApi {
     )
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Bingo Card")
 
         if (!SkyBlockUtils.isBingoProfile) {
@@ -94,7 +120,7 @@ object BingoApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    fun onRepositoryReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
         data = event.getConstant<BingoJson>("Bingo").bingoTips
     }
@@ -153,30 +179,48 @@ object BingoApi {
         }
     }
 
-    @HandleEvent(IslandGraphReloadEvent::class)
+    @HandleEvent
     fun onIslandGraphReload() {
         bingoNpcHidden = false
         alixerHidden = false
         checkBingoNpcs()
     }
 
-    // Reset state on every island change in case IslandGraphReloadEvent does not fire for this island (private island, garden)
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
+    // Reset state on every world change in case IslandGraphReloadEvent does not fire for this
+    // island (Private Island, Garden)
+    @HandleEvent
+    fun onWorldChange() {
         bingoNpcHidden = false
         alixerHidden = false
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(10)) return
-        if (IslandGraphs.currentIslandGraph != null) {
+    private suspend fun updateBingoData() {
+        val (_, jsonResponse) = ApiUtils.getJsonResponse(bingoStatic).assertSuccessWithData()
+            ?: error("Failed to fetch Bingo data from Hypixel API")
+        val response = ConfigManager.gson.fromJson<BingoApiResponseJson>(jsonResponse)
+        lastFetchTime = SimpleTimeMark.now()
+
+        if (response.start != bingoEventStart || response.end != bingoEventEnd) {
+            bingoEventStart = response.start
+            bingoEventEnd = response.end
+            ChatUtils.debug(
+                "Updated Bingo event time from API (start=$bingoEventStart end=$bingoEventEnd)",
+            )
             checkBingoNpcs()
         }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!event.repeatSeconds(60) || lastFetchTime.passedSince() < UPDATE_INTERVAL) return
+        backgroundCoroutine.launchCoroutine {
+            updateBingoData()
+        }
+    }
+
     private fun checkBingoNpcs() {
-        if (!IslandType.HUB.isCurrent()) return
+        if (!IslandGraphs.lastLoadedIslandType.equals(IslandType.HUB.name, ignoreCase = true)) return
+        if (IslandGraphs.currentIslandGraph == null) return
 
         val shouldHideAlixer = !SkyBlockUtils.isBingoProfile
         if (shouldHideAlixer != alixerHidden) {
@@ -192,10 +236,33 @@ object BingoApi {
     }
 
     private fun isInBingoEventWindow(): Boolean {
-        val eventStart = getStartOfMonth()
         val now = OffsetDateTime.now(ZoneOffset.UTC).asTimeMark()
-        val windowStart = eventStart - BINGO_NPC_OFFSET
-        val windowEnd = eventStart + BINGO_EVENT_DURATION + BINGO_NPC_OFFSET
+        val windowStart = bingoEventStart - BINGO_NPC_OFFSET
+        val windowEnd = bingoEventEnd + BINGO_NPC_OFFSET
         return now in windowStart..windowEnd
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdatebingodata") {
+            description = "Update Bingo event data from Hypixel API"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback {
+                ChatUtils.chat("Updating Bingo event data...")
+                CoroutineConfig("bingo api fetch foreground").withIOContext().launchCoroutine {
+                    try {
+                        updateBingoData()
+                    } catch (e: Exception) {
+                        ErrorManager.logErrorWithData(e, "Failed to update Bingo event data")
+                        return@launchCoroutine
+                    }
+                    ChatUtils.chat(
+                        "Updated Bingo event data successfully."
+                            .asComponent()
+                            .withColor(ChatFormatting.GREEN),
+                    )
+                }
+            }
+        }
     }
 }
