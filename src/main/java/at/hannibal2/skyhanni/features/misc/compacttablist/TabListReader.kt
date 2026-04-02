@@ -22,12 +22,13 @@ object TabListReader {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList
     private val patternGroup = RepoPattern.group("misc.compacttablist")
+
     var hypixelAdvertisingString = "HYPIXEL.NET"
     var renderColumns = mutableListOf<RenderColumn>()
         private set
 
-    private var lastTabComponents: List<Component>? = null
-    private var lastFooterComponent: Component? = null
+    private var lastTab: List<Component>? = null
+    private var lastFooter: Component? = null
 
     private var inUpgrades = false
 
@@ -134,19 +135,19 @@ object TabListReader {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        lastTabComponents = event.tabList
+        lastTab = event.tabList
         rebuildRenderColumns()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
-        lastFooterComponent = event.footer
+        lastFooter = event.footer
         rebuildRenderColumns()
     }
 
     private fun rebuildRenderColumns() {
-        if (lastTabComponents == null) return
-        val columns = rebuildColumns()
+        val tabList = lastTab ?: return
+        val columns = rebuildColumns(tabList)
         parseSections(columns)
 
         val renderColumn = RenderColumn()
@@ -154,31 +155,28 @@ object TabListReader {
         combineColumnsToRender(columns, renderColumn)
     }
 
-    private fun rebuildColumns(): MutableList<TabColumn> = buildList {
-        val components = this@TabListReader.lastTabComponents ?: emptyList()
-        addAll(parseComponentColumns(components))
+    private fun rebuildColumns(tabList: List<Component>): List<TabColumn> = buildList {
+        if (tabList.isNotEmpty()) {
+            addAll(parseComponentColumns(tabList))
+        }
 
-        val footer = this@TabListReader.lastFooterComponent ?: return@buildList
-        parseFooterAsColumn(footer)?.let { add(it) }
-    }.toMutableList()
+        parseFooterAsColumn()?.let { add(it) }
+    }
 
-    private fun parseComponentColumns(components: List<Component>): MutableList<TabColumn> {
-        if (components.isEmpty()) return mutableListOf()
-        val columns = mutableListOf<TabColumn>()
-        val fullTabComponents = AdvancedPlayerList.newSorting(components)
+    private fun parseComponentColumns(tabList: List<Component>) = buildList {
+        val fullTabComponents = AdvancedPlayerList.newSorting(tabList)
 
         for (entry in fullTabComponents.indices step 20) {
             val titleComponent = fullTabComponents[entry]
             val trimmedTitle = Component.literal(titleComponent.formattedTextCompat().trim())
-            val column = getColumnFromComponent(columns, trimmedTitle) ?: TabColumn(trimmedTitle).also {
-                columns.add(it)
+            val column = getColumnFromComponent(this, trimmedTitle) ?: TabColumn(trimmedTitle).also {
+                add(it)
             }
 
             for (columnEntry in (entry + 1) until fullTabComponents.size.coerceAtMost(entry + 20)) {
                 column.addComponent(fullTabComponents[columnEntry])
             }
         }
-        return columns
     }
 
     // TODO refactor
@@ -268,7 +266,8 @@ object TabListReader {
 
     // TODO refactor
     @Suppress("CyclomaticComplexMethod")
-    private fun parseFooterAsColumn(component: Component): TabColumn? {
+    private fun parseFooterAsColumn(): TabColumn? {
+        val component = lastFooter ?: return null
         inUpgrades = false
 
         val lines = TextHelper.split(component, "\n") ?: listOf(component)
@@ -292,16 +291,10 @@ object TabListReader {
         }.takeIf { it.components.isNotEmpty() }
     }
 
-    private fun getColumnFromComponent(columns: List<TabColumn>, component: Component): TabColumn? {
-        for (tabColumn in columns) {
-            if (component == tabColumn.titleComponent) {
-                return tabColumn
-            }
-        }
-        return null
-    }
+    private fun getColumnFromComponent(columns: List<TabColumn>, component: Component): TabColumn? =
+        columns.find { component == it.titleComponent }
 
-    private fun parseSections(columns: MutableList<TabColumn>) {
+    private fun parseSections(columns: List<TabColumn>) {
         for (column in columns) {
             var currentTabSection: TabSection? = null
             for (line in column.components) {
@@ -319,7 +312,7 @@ object TabListReader {
         }
     }
 
-    private fun combineColumnsToRender(columns: MutableList<TabColumn>, firstColumn: RenderColumn) {
+    private fun combineColumnsToRender(columns: List<TabColumn>, firstColumn: RenderColumn) {
         var currentColumn = firstColumn
         var lastTitleComponent: Component? = null
 
