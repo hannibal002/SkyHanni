@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -57,6 +58,7 @@ class ItemResolutionQuery {
 
         private val patternGroup = RepoPattern.group("misc.itemresolution")
 
+        // <editor-fold desc="Patterns">
         /**
          * REGEX-TEST: §r§7[Lvl 100] §r§6Scatha
          * REGEX-TEST: §r§7[Lvl 200] §r§6Golden Dragon§5 ✦
@@ -75,6 +77,12 @@ class ItemResolutionQuery {
             "(?<name>§.[^§]+)(?: §d§lNEW SHARD)?",
         )
 
+        private val toBazaarPattern by patternGroup.pattern(
+            "to-bazaar",
+            "To Bazaar",
+        )
+        // </editor-fold>
+
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
@@ -83,7 +91,7 @@ class ItemResolutionQuery {
         private var shardNameOverrides = emptyMap<String, String>()
 
         @HandleEvent
-        fun onRepositoryReload(event: RepositoryReloadEvent) {
+        fun onRepoReload(event: RepositoryReloadEvent) {
             val data = event.getConstant<ItemsJson>("Items")
             renamedEnchantments = data.renamedEnchantments
             shardNameOverrides = data.shardNameOverrides
@@ -369,7 +377,7 @@ class ItemResolutionQuery {
         val stackInSlot = chest.getItem(bazaarSlot) ?: return false
         if (stackInSlot.count == 0) return false
 
-        return "To Bazaar" in stackInSlot.getCleanLore()
+        return toBazaarPattern.anyMatches(stackInSlot.getCleanLore())
     }
 
     private fun getExtraAttributes(): CompoundTag = compound?.extraAttributes ?: CompoundTag()
