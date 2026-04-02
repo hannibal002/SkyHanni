@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -34,8 +35,13 @@ object MiningEventDisplay {
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        val isOnValidMiningLocation = (config.outsideMining || MiningEventTracker.isMiningIsland())
-        if (!config.enabled || !isOnValidMiningLocation) return
+        // The `else true` comes from the fact that, if this handler is hit, the only case
+        // for the `else` will be that the outside sb feature is enabled, in which case it's always true.
+        val shouldDisplay = if (SkyBlockUtils.inSkyBlock) {
+            MiningEventTracker.isMiningIsland() || config.outsideMining
+        } else true
+        if (!config.enabled || !shouldDisplay) return
+
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
     }
 
