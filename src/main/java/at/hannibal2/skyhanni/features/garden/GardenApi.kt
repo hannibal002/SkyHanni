@@ -304,6 +304,7 @@ object GardenApi {
         }
         event.registerBrigadier("ff") {
             description = "Opens the Farming Fortune Guide"
+            category = CommandCategory.USERS_ACTIVE
             simpleCallback {
                 if (!SkyBlockUtils.inSkyBlock) {
                     ChatUtils.userError("Join SkyBlock to open the fortune guide!")
