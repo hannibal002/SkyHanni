@@ -73,7 +73,7 @@ object DeployableDisplay {
         }
 
         fun hasShaftBuff(): Boolean {
-            return fullShaft && IslandType.MINESHAFT.isCurrent()
+            return fullShaft && IslandType.MINESHAFT.isInIsland()
         }
 
         fun isActive(): Boolean {
