@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionItem
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteAuctionsResponse
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
@@ -23,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
 import kotlin.time.Duration.Companion.minutes
@@ -143,6 +146,7 @@ object ItemPriceUtils {
 
     private var lastLowestBinRefresh = SimpleTimeMark.farPast()
     private var lowestBins: Map<NeuInternalName, Long> = mutableMapOf()
+    private var eliteLowestBins: Map<NeuInternalName, List<EliteAuctionItem>> = mutableMapOf()
     private fun getShLowestBin(internalName: NeuInternalName): Long = lowestBins[internalName] ?: -1L
 
     @HandleEvent
@@ -151,16 +155,24 @@ object ItemPriceUtils {
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
-        SkyHanniMod.launchIOCoroutine("neu lowest bin item price fetch", timeout = 1.minutes) {
-            val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lowBinStatic).assertSuccessWithData() ?: return@launchIOCoroutine
+        lowBinCoroutine.launch {
+            val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lowBinStatic).assertSuccessWithData() ?: return@launch
             lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(data)
         }
     }
 
+    private val lowBinCoroutine = CoroutineConfig("neu lowest bin item price fetch", timeout = 1.minutes).withIOContext()
     private val lowBinStatic = ApiStaticGetPath(
         "https://moulberry.codes/lowestbin.json.gz",
         "NEU Lowest Bin",
-        tryForceGzip = true
+        tryForceGzip = true,
+    )
+
+    private val eliteLbinCoroutine = CoroutineConfig("elite lowest bin item price fetch", timeout = 1.minutes).withIOContext()
+    private val eliteLowBinStatic = ApiStaticGetPath(
+        "https://api.eliteskyblock.com/resources/auctions",
+        "Elite Lowest Bin",
+        tryForceGzip = true,
     )
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
@@ -200,8 +212,8 @@ object ItemPriceUtils {
         event.registerBrigadier("shfetchmoulblbins") {
             description = "Test fetching Moulberry's lowest bin data."
             category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback {
-                SkyHanniMod.launchIOCoroutine("shfetchmoulblbins command", timeout = 1.minutes) {
+            coroutineSimpleCallback {
+                lowBinCoroutine.launch {
                     val timeNow = SimpleTimeMark.now()
                     val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(lowBinStatic).assertSuccessWithData()
                         ?: ErrorManager.skyHanniError("Failed to fetch Moulberry's lowest bin data!")
@@ -209,6 +221,23 @@ object ItemPriceUtils {
                     val formatString = buildString {
                         appendLine("§aFetched Moulberry's lowest bin data in §b${timeNow.passedSince().format()}§a!")
                         appendLine("    §7Total Items: §6${lowestBins.size}")
+                    }
+                    ChatUtils.chat(formatString, prefixColor = "§a")
+                }
+            }
+        }
+        event.registerBrigadier("shfetchelitelbins") {
+            description = "Test fetching lowest bin data from Elite's API."
+            category = CommandCategory.DEVELOPER_DEBUG
+            coroutineSimpleCallback {
+                eliteLbinCoroutine.launch {
+                    val timeNow = SimpleTimeMark.now()
+                    val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(eliteLowBinStatic).assertSuccessWithData()
+                        ?: ErrorManager.skyHanniError("Failed to fetch Elite's lowest bin data!")
+                    eliteLowestBins = ConfigManager.gson.fromJson<EliteAuctionsResponse>(fetchedLowestBins).items
+                    val formatString = buildString {
+                        appendLine("§aFetched lowest bin data from Elite in §b${timeNow.passedSince().format()}§a!")
+                        appendLine("    §7Total Items: §6${eliteLowestBins.size}")
                     }
                     ChatUtils.chat(formatString, prefixColor = "§a")
                 }
