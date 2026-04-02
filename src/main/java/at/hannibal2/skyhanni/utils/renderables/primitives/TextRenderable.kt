@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.awt.Color
 
-// Extension Functions are not inside there Companion Object as it would be ambiguous on import.
+// Extension Functions are not inside their Companion Objects, as it would be ambiguous on import.
 // Therefore, they are in the top level and the constructors are just internal not private as they should be.
 
 fun Renderable.Companion.text(
@@ -18,6 +18,17 @@ fun Renderable.Companion.text(
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
 ) = StringRenderable(text, scale, color, horizontalAlign, verticalAlign)
+
+fun Renderable.Companion.text(
+    scale: Double = 1.0,
+    color: Color = Color.WHITE,
+    horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+    verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+    builder: StringBuilder.() -> Unit = {},
+) = StringBuilder().let {
+    builder.invoke(it)
+    StringRenderable(it.toString(), scale, color, horizontalAlign, verticalAlign)
+}
 
 fun Renderable.Companion.text(
     text: Component,

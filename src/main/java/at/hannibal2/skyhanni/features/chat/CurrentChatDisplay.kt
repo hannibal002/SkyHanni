@@ -13,11 +13,13 @@ import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
@@ -40,7 +42,7 @@ object CurrentChatDisplay {
         }
 
     private var lastClosedChatTime = SimpleTimeMark.farPast()
-    private var display: String? = null
+    private var display: Renderable? = null
     private val maxPrivateMessageTime = 5.minutes
 
     private val patternGroup = RepoPattern.group("chat.current-chat")
@@ -95,16 +97,16 @@ object CurrentChatDisplay {
         }
     }
 
-    private fun drawDisplay() = buildString {
-        val chat = currentChat ?: return@buildString
+    private fun drawDisplay() = Renderable.text {
+        val chat = currentChat ?: return@text
         append("§aChat: ")
         if (chat == ChatType.PRIVATE) {
             append(privateMessagePlayer?.let { "§6$it " } ?: "§cUnknown ")
             append(if (privateMessageEnd.isInPast()) "§c(EXPIRED)" else "§b${privateMessageEnd.timeUntil().format()}")
-            return@buildString
+            return@text
         }
         append(chat.displayName)
-        if (chat != ChatType.PARTY) return@buildString
+        if (chat != ChatType.PARTY) return@text
         val size = PartyApi.partyMembers.size
         append(
             if (size == 0) " §c(NOT IN PARTY)"
@@ -132,7 +134,8 @@ object CurrentChatDisplay {
     fun onRenderOverlay() {
         if (!isEnabled()) return
         if (Minecraft.getInstance().screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
-        config.currentChatDisplayPos.renderString(display, posLabel = "Current Chat")
+        val display = display ?: return
+        config.currentChatDisplayPos.renderRenderable(display, posLabel = "Current Chat")
     }
 
     @JvmStatic

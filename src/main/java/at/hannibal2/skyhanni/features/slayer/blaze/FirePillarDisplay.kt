@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -25,29 +27,27 @@ object FirePillarDisplay {
         "§6§l(?<seconds>.*)s §c§l8 hits",
     )
 
-    private var display = ""
-
+    private var display: Renderable? = null
     private var entityId: Int = 0
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
-        if (!isEnabled()) return
+        if (!config.firePillarDisplay) return
         val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
         entityId = event.entity.id
-        display = "§cFire Pillar: §b${seconds}s"
+        display = Renderable.text("§cFire Pillar: §b${seconds}s")
     }
 
     @HandleEvent
     fun onEntityRemoved(event: EntityRemovedEvent<ArmorStand>) {
-        if (event.entity.id == entityId) display = ""
+        if (event.entity.id == entityId) display = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.firePillarDisplay) return
 
-        config.firePillarDisplayPosition.renderString(display, posLabel = "Fire Pillar")
+        val display = display ?: return
+        config.firePillarDisplayPosition.renderRenderable(display, posLabel = "Fire Pillar")
     }
-
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.firePillarDisplay
 }
