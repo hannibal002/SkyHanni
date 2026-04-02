@@ -159,7 +159,7 @@ object ReflectionUtils {
         MethodType.methodType(Nothing::class.javaPrimitiveType),
     )
 
-    inline fun <reified Stop : Any, reified T> Any.findGenericSuperclassTypeArgument(index: Int = 0): Class<T> {
+    inline fun <reified Stop : Any, T> Any.findGenericSuperclassTypeArgument(index: Int = 0): Class<T> {
         var type = javaClass.genericSuperclass
         while (type !is ParameterizedType || (type.rawType as Class<*>) != Stop::class.java) {
             type = (type as? Class<*>)?.genericSuperclass
