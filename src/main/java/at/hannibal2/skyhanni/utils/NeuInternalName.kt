@@ -81,8 +81,7 @@ value class NeuInternalName private constructor(private val internalName: String
             return NeuInternalName(formatted)
         }
 
-        fun Set<String>.toInternalNames(): Set<NeuInternalName> = mapTo(mutableSetOf()) { it.toInternalName() }
-        fun List<String>.toInternalNames(): List<NeuInternalName> = mapTo(mutableListOf()) { it.toInternalName() }
+        fun Iterable<String>.toInternalNames(): List<NeuInternalName> = map { it.toInternalName() }
 
         private val itemNameCache = mutableMapOf<String, NeuInternalName?>()
 

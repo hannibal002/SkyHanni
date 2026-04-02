@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -9,8 +10,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyShardsExportData
 import at.hannibal2.skyhanni.data.jsonobjects.other.SkyShardsExportJson
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
@@ -33,6 +32,7 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
@@ -47,8 +47,12 @@ object ShardTrackerDisplay {
     val config get() = SkyHanniMod.feature.hunting.shardTracker
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
-    private var renderables: List<Renderable>? = null
-    private val trackedShards get() = ProfileStorageData.profileSpecific?.hunting?.trackedAttributeShards ?: mutableMapOf()
+    private var renderables = emptyList<Renderable>()
+    // TODO can this be changed to MutableMap<NeuInternalName, Int>
+    //  without breaking existing configs?
+    private val trackedShards: MutableMap<String, Int>
+        get() = ProfileStorageData.profileSpecific?.hunting?.trackedAttributeShards
+            ?: mutableMapOf()
 
     private fun toggleShard(neuId: NeuInternalName) {
         if (!AttributeShardsData.isAttributeShard(neuId)) {
@@ -69,7 +73,7 @@ object ShardTrackerDisplay {
     fun onTick() {
         if (!isEnabled()) return
         if (trackedShards.isEmpty()) {
-            renderables = null
+            renderables = emptyList()
             return
         }
         val invCurrentlyOpen = InventoryUtils.inAnyInventory()
@@ -131,11 +135,9 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
+    fun onGuiRenderTop() {
         if (!isEnabled()) return
-        renderables?.let {
-            config.position.renderRenderables(it, posLabel = "Shard Tracker")
-        }
+        config.position.renderRenderables(renderables, posLabel = "Shard Tracker")
     }
 
     private fun isInsideShardsMenu(): Boolean {
@@ -145,7 +147,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onKeyPress(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress() {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
         if (!isInsideShardsMenu()) return
@@ -187,7 +189,7 @@ object ShardTrackerDisplay {
                 SkyHanniMod.feature.hunting.shardTracker::enabled,
             )
         }
-        SkyHanniMod.launchCoroutine("reading SkyShards data from clipboard") {
+        CoroutineConfig("reading SkyShards data from clipboard").launchCoroutine {
             val clipboard = OSUtils.readFromClipboard()
             if (clipboard == null) {
                 ChatUtils.chat("Import from SkyShards failed, make sure you have a valid recipe copied.")
@@ -207,7 +209,7 @@ object ShardTrackerDisplay {
             for (shardData in skyShardsData) {
                 if (shardData.source != "Direct" && shardData.source != null) continue
                 val shardName = ItemResolutionQuery.attributeNameToInternalName(shardData.name) ?: continue
-                trackedShards[shardName] = shardData.needed
+                trackedShards[shardName.toString()] = shardData.needed
             }
         }
     }
