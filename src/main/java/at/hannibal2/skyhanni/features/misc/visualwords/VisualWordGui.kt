@@ -186,7 +186,7 @@ object VisualWordGui {
         )
 
         val clickableText = Renderable.clickable(
-            Renderable.fixedSizeLine(textFixed, width = 230),
+            textFixed,
             onLeftClick = { screen.enterEditMode(index) },
             bypassChecks = true,
         )

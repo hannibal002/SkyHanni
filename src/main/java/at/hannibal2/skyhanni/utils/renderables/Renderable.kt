@@ -918,8 +918,6 @@ interface Renderable {
             }
         }
 
-
-
         private fun scrollListRender(
             mouseOffsetX: Int,
             mouseOffsetY: Int,
