@@ -63,7 +63,7 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
 
         @HandleEvent
         fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-            event.getConstantAsync<Map<String, List<String>>>("IslandTypeTag").forEach { (name, values) ->
+            event.getConstantAsync<Map<String, List<String>>>("IslandTypeTags").forEach { (name, values) ->
                 EnumUtils.enumValueOfOrNull<IslandTypeTag>(name.uppercase())?.update(values)
             }
         }
