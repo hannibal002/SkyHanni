@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType

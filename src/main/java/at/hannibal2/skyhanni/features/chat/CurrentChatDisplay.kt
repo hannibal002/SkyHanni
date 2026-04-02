@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.mixins.transformers.MixinGuiChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -136,6 +138,12 @@ object CurrentChatDisplay {
         if (Minecraft.getInstance().screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
         val display = display ?: return
         config.currentChatDisplayPos.renderRenderable(display, posLabel = "Current Chat")
+    }
+
+    // TODO implement this logic again, this is currently never called
+    @JvmStatic
+    fun onCloseChat() {
+        lastClosedChatTime = SimpleTimeMark.now()
     }
 
     private fun isEnabled() = config.currentChatDisplay

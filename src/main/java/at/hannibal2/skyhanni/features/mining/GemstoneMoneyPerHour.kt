@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
