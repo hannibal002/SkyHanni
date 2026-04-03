@@ -55,6 +55,9 @@ class FrameTickRateProvider private constructor(
     companion object {
         fun <E : Number> of(value: E) = FrameTickRateProvider { value.toInt() }
         fun <E : Number> of(property: Property<E>) = FrameTickRateProvider { property.get().toInt() }
+
+        /** Uses each frame's own [AnimatedFrame.transitionTicks] as the tick rate. */
+        fun perFrame() = FrameTickRateProvider { it.transitionTicks }
     }
 
     fun getTransitionTicks(frame: AnimatedFrame): Int = provider(frame)

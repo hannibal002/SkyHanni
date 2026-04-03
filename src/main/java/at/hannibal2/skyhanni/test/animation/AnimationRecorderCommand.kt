@@ -3,73 +3,102 @@ package at.hannibal2.skyhanni.test.animation
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.Locale
 
-object AnimatedSkullRecorderCommand {
+object AnimationRecorderCommand {
 
-    private val stopRecordingCoroutine = CoroutineSettings("animated skull recorder stop recording")
+    private val stopRecordingCoroutine = CoroutineSettings("animation recorder stop recording")
     private val statusMessageId by lazy { ChatUtils.getUniqueMessageId() }
+    private val config get() = DevApi.config.devTool.recordAnimations
 
     @Suppress("HandleEventInspection")
     fun handleEvent(event: CommandRegistrationEvent) {
         event.registerBrigadier("shskull") {
-            description = "Records animated skull texture frames for animatedskulls.json"
+            description = "Records animated texture frames for animations.json"
             category = CommandCategory.DEVELOPER_DEBUG
             aliases = listOf("shrecordanmiation", "shanimation", "shrecani")
 
             literal("start") {
-                for (mode in listOf(AnimatedSkullRecorder.RecordingMode.HEAD, AnimatedSkullRecorder.RecordingMode.PET)) {
+                for (mode in listOf(AnimationState.RecordingMode.HEAD, AnimationState.RecordingMode.PET)) {
                     literal(mode.name.lowercase()) {
-                        callback { AnimatedSkullRecorder.startRecording(mode) }
+                        callback {
+                            if (!checkEnabled()) return@callback
+                            AnimationState.startRecording(mode)
+                            AnimationRecorder.clearDebugRenderables()
+                        }
                     }
                 }
 
                 literal("player") {
                     arg("name", BrigadierArguments.string()) { nameArg ->
                         callback {
-                            AnimatedSkullRecorder.startRecording(
-                                AnimatedSkullRecorder.RecordingMode.PLAYER,
+                            if (!checkEnabled()) return@callback
+                            AnimationState.startRecording(
+                                AnimationState.RecordingMode.PLAYER,
                                 trackedPlayer = getArg(nameArg),
                             )
+                            AnimationRecorder.clearDebugRenderables()
                         }
                     }
 
                     callback {
+                        if (!checkEnabled()) return@callback
                         ChatUtils.userError("Please specify a player name.")
-                        ChatUtils.chat("  §e/shskull start player <name> §7- Start recording a player's head frames.", prefix = false)
+                        ChatUtils.chat("  §e/shskull start player <name> §7- Start recording a player's animation frames.", prefix = false)
                     }
                 }
 
                 callback {
+                    if (!checkEnabled()) return@callback
                     ChatUtils.userError("Please specify a recording mode: head, pet, or player <name>")
-                    ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.", prefix = false)
+                    ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording animation frames.", prefix = false)
                 }
             }
 
-            coroutineLiteralCallback("stop", config = stopRecordingCoroutine) { AnimatedSkullRecorder.stopRecording() }
+            coroutineLiteralCallback("stop", config = stopRecordingCoroutine) {
+                if (!checkEnabled()) return@coroutineLiteralCallback
+                AnimationState.stopRecording()
+            }
 
-            literalCallback("status") { ChatUtils.chat(buildStatusMessage(), messageId = statusMessageId) }
+            literalCallback("status") {
+                if (!checkEnabled()) return@literalCallback
+                ChatUtils.chat(buildStatusMessage(), messageId = statusMessageId)
+            }
 
             callback {
+                if (!checkEnabled()) return@callback
                 ChatUtils.userError("Please specify a subcommand: start, stop, or status.")
-                ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording skull frames.", prefix = false)
+                ChatUtils.chat("  §e/shskull start <head|pet|player <name>> §7- Start recording animation frames.", prefix = false)
                 ChatUtils.chat("  §e/shskull stop §7- Stop recording and copy frames to clipboard.", prefix = false)
                 ChatUtils.chat("  §e/shskull status §7- Show current recording status.", prefix = false)
             }
         }
     }
 
+    private fun checkEnabled(): Boolean {
+        if (config.enabled.get()) return true
+        ChatUtils.clickableChat(
+            "The /shskull command is disabled. Click here to enable it in the dev tool config!",
+            onClick = { config::enabled.jumpToEditor() },
+            hover = "Click to open the dev tool config",
+            replaceSameMessage = true,
+        )
+        return false
+    }
+
     private fun buildStatusMessage(): String {
-        if (!AnimatedSkullRecorder.isRecording) return "§cNot recording."
-        val state = AnimatedSkullRecorder.state
-        return if (state.mode == AnimatedSkullRecorder.RecordingMode.PET) buildPetStatus(state)
+        if (!AnimationState.isRecording) return "§cNot recording."
+        val state = AnimationState.state
+        return if (state.mode == AnimationState.RecordingMode.PET) buildPetStatus(state)
         else buildTrackerStatus(state.tracker)
     }
 
-    private fun buildPetStatus(state: AnimatedSkullRecorder.RecordingState): String {
+    private fun buildPetStatus(state: AnimationState.RecordingState): String {
         val entityCount = state.petRecordings.size
         if (entityCount == 0) return "§aCurrently recording pets - no entities captured yet."
 
@@ -86,7 +115,7 @@ object AnimatedSkullRecorderCommand {
             "$loopFormat completed, §b$minSamples§a sample(s)/frame min."
     }
 
-    private fun buildTrackerStatus(tracker: SkullFrameTracker): String {
+    private fun buildTrackerStatus(tracker: AnimationFrameTracker): String {
         val frameCount = tracker.frames.size
         if (frameCount == 0) return "§aCurrently recording - no frames captured yet."
         return buildString {

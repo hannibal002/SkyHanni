@@ -15,12 +15,15 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-object AnimatedSkullRecorder {
+object AnimationState {
 
     private val gson = GsonBuilder().setPrettyPrinting().create()
 
-    private data class TrackerOutput(val serverTicks: Int, val clientTicks: Int, val textures: List<String>)
-    private data class PetEntryOutput(val displayName: String, val frames: List<SkullFrameTracker.FrameRecord>)
+    private data class AnimationOutput(
+        val textures: List<String>,
+        val ticksPerTexture: List<Int>,
+        private val ticks: Int = 0,
+    )
 
     enum class RecordingMode {
         NONE,
@@ -30,16 +33,15 @@ object AnimatedSkullRecorder {
     }
 
     class ArmorStandRecording(
-        val entityId: Int,
         val displayName: String,
-        val tracker: SkullFrameTracker = SkullFrameTracker(),
+        val tracker: AnimationFrameTracker = AnimationFrameTracker(),
     )
 
     data class RecordingState(
         var mode: RecordingMode = RecordingMode.NONE,
         var trackedPlayer: String = "",
-        val tracker: SkullFrameTracker = SkullFrameTracker(),
-        val petRecordings: LinkedHashMap<Pair<Int, String>, ArmorStandRecording> = linkedMapOf(),
+        val tracker: AnimationFrameTracker = AnimationFrameTracker(),
+        val petRecordings: LinkedHashMap<String, ArmorStandRecording> = linkedMapOf(),
     ) : Resettable
 
     var state: RecordingState = RecordingState()
@@ -60,8 +62,8 @@ object AnimatedSkullRecorder {
         return true
     }
 
-    fun ItemStack.getFrameTexture(): SkullFrameTracker.FrameRecord? = getSkullTexture()?.let { texture ->
-        SkullFrameTracker.FrameRecord(
+    fun ItemStack.getFrameTexture(): AnimationFrameTracker.FrameRecord? = getSkullTexture()?.let { texture ->
+        AnimationFrameTracker.FrameRecord(
             uuid = getSkullOwner(),
             texture = texture,
             signature = getSkullSignature(),
@@ -73,8 +75,8 @@ object AnimatedSkullRecorder {
     fun startRecording(mode: RecordingMode, trackedPlayer: String = "") {
         if (isRecording) ChatUtils.chat("Restarting...")
         state = RecordingState(mode, trackedPlayer)
-        val label = if (mode == RecordingMode.PLAYER) "§e$trackedPlayer§a's head" else "§e${mode.name.lowercase()}§a"
-        ChatUtils.chat("Started recording $label skull frames.")
+        val label = if (mode == RecordingMode.PLAYER) "§e$trackedPlayer§a's" else "§e${mode.name.lowercase()}§a"
+        ChatUtils.chat("Started recording $label animation frames.")
 
         if (mode == RecordingMode.PET) ChatUtils.chat("§eMake sure no other armor stands are nearby.")
         ChatUtils.chat("Use §e/shskull stop §ato stop.")
@@ -116,19 +118,16 @@ object AnimatedSkullRecorder {
 
     private fun buildOutput(state: RecordingState): String = when (state.mode) {
         RecordingMode.PET -> buildPetOutput(state)
-        else -> buildTrackerOutput(state.tracker)
+        else -> gson.toJson(state.tracker.orderedFrames.toAnimationOutput())
     }
 
-    private fun buildTrackerOutput(tracker: SkullFrameTracker): String = with(tracker) {
-        val uniformServer = uniformServerTicks
-        val uniformClient = uniformClientTicks
-        if (uniformServer != null && uniformClient != null) {
-            gson.toJson(TrackerOutput(uniformServer, uniformClient, frames.map { it.fullTexture }))
-        } else gson.toJson(frames)
-    }
+    private fun List<AnimationFrameTracker.FrameRecord>.toAnimationOutput() = AnimationOutput(
+        textures = map { it.fullTexture },
+        ticksPerTexture = map { it.serverTicks },
+    )
 
     private fun buildPetOutput(state: RecordingState): String = state.petRecordings.values
         .filter { it.tracker.frames.size > 1 }
-        .associate { it.entityId.toString() to PetEntryOutput(it.displayName, it.tracker.frames) }
+        .associate { it.displayName to it.tracker.orderedFrames.toAnimationOutput() }
         .let { gson.toJson(it) }
 }

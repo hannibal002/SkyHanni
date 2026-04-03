@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.test.animation
 
+import at.hannibal2.skyhanni.config.storage.NoReset
 import at.hannibal2.skyhanni.config.storage.Resettable
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.roundToInt
 
 /**
- * Tracks animated skull texture frames with server-tick and client-tick precision.
+ * Tracks animated texture frames with server-tick and client-tick precision.
  *
  * Call [record] on each [at.hannibal2.skyhanni.events.minecraft.ServerTickEvent] with the current
- * skull texture. The tracker detects animation loops and records how many ticks each frame
+ * frame texture. The tracker detects animation loops and records how many ticks each frame
  * persists before transitioning, for both server and client tick counters.
  *
  * LEARNING: Records frame textures and their tick durations for one full loop.
@@ -16,7 +18,7 @@ import kotlin.math.roundToInt
  * VERIFYING: On every subsequent loop the recorded frames are compared against
  * the learned sequence. Any texture or tick-count mismatch increments [verificationErrors].
  */
-class SkullFrameTracker : Resettable {
+class AnimationFrameTracker : Resettable {
 
     data class FrameRecord(
         val uuid: String? = null,
@@ -39,16 +41,6 @@ class SkullFrameTracker : Resettable {
         )
     }
 
-    /** If every learned frame shares the same server tick duration, returns that value; otherwise null. */
-    val uniformServerTicks: Int? get() = frames.firstOrNull()?.serverTicks?.takeIf { first ->
-        frames.all { it.serverTicks == first }
-    }
-
-    /** If every learned frame shares the same client tick duration, returns that value; otherwise null. */
-    val uniformClientTicks: Int? get() = frames.firstOrNull()?.clientTicks?.takeIf { first ->
-        frames.all { it.clientTicks == first }
-    }
-
     private enum class Phase { LEARNING, VERIFYING }
 
     private var phase = Phase.LEARNING
@@ -60,6 +52,7 @@ class SkullFrameTracker : Resettable {
     private val accumulators = mutableListOf<FrameAccumulator>()
 
     /** Learned frame sequence with averaged tick durations. Empty until the first loop completes. */
+    @NoReset
     val frames: List<FrameRecord> get() = accumulators.map { it.toFrameRecord() }
 
     /** Number of completed animation loops (≥ 1 once learning finishes). */
@@ -77,15 +70,51 @@ class SkullFrameTracker : Resettable {
     val isLearning get() = phase == Phase.LEARNING
     val hasData get() = accumulators.isNotEmpty()
 
-    /** Minimum number of samples collected across all frames — the weakest link in accuracy. */
+    /** Minimum number of samples collected across all frames - the weakest link in accuracy. */
     val minSampleCount: Int get() = accumulators.minOfOrNull { it.serverSamples.size } ?: 0
 
     /**
-     * Record the current skull texture for this tick.
+     * The learned frames reordered so the frame with the highest [FrameRecord.serverTicks]
+     * is last. This is the "base frame" that anchors the animation.
+     * The internal accumulator list is not modified; reordering is only applied here.
+     */
+    @NoReset
+    val orderedFrames: List<FrameRecord> get() {
+        if (accumulators.isEmpty()) return emptyList()
+        val f = frames
+        val maxTicks = f.maxOf { it.serverTicks }
+        val maxIndex = f.indexOfFirst { it.serverTicks == maxTicks }
+        return f.drop(maxIndex + 1) + f.take(maxIndex + 1)
+    }
+
+    /**
+     * A 0-100 score combining frame completeness (50%) and timing confidence (50%).
+     *
+     * Frame completeness is binary: 0 until the first loop completes, 100 after.
+     * Timing confidence is `min(1, minSampleCount / 5) * 100`.
+     */
+    val capturePercent: Double get() {
+        val frameComplete = if (loopCount > 0) 1.0 else 0.0
+        val timingConfidence = minSampleCount.coerceAtMost(5) / 5.0
+        return (frameComplete * 0.5 + timingConfidence * 0.5) * 100.0
+    }
+
+    /** Human-readable capture stats for debug overlays. */
+    val captureStatsString: String get() =
+        "§7Captured: §a${capturePercent.roundTo(1)}%§7 " +
+            "(${loopCount} loops, ${accumulators.size} frames, $minSampleCount samples min)"
+
+    /** Human-readable verification status for debug overlays. */
+    val verificationStatusString: String get() =
+        if (verificationErrors == 0) "§aNo errors"
+        else "§c$verificationErrors verification errors"
+
+    /**
+     * Record the current frame texture for this tick.
      *
      * @param serverTick The tick number from [at.hannibal2.skyhanni.events.minecraft.ServerTickEvent].
      * @param clientTick The tick number from [at.hannibal2.skyhanni.api.minecraftevents.ClientEvents.totalTicks].
-     * @param frame      The current skull frame, or null if no skull is present.
+     * @param frame The current animation frame, or null if no texture is present.
      * @return true if a loop was just completed.
      */
     fun record(serverTick: Long, clientTick: Int, frame: FrameRecord?): Boolean {
