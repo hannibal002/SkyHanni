@@ -43,8 +43,8 @@ internal fun buildActivityPayload(
     args = ActivityArgs(
         pid = pid,
         activity = Activity(
-            details = presence.details,
-            state = presence.state,
+            details = presence.details?.ifEmpty { null },
+            state = presence.state?.ifEmpty { null },
             timestamps = presence.startTimestamp?.let { ActivityTimestamps(it) },
             assets = if (presence.largeImageKey != null || presence.largeImageText != null) {
                 ActivityAssets(largeImage = presence.largeImageKey, largeText = presence.largeImageText)

@@ -44,7 +44,6 @@ object DiscordRPCManager {
     private var started = false
     private var nextUpdate = SimpleTimeMark.farPast()
     private var presenceJob: Job? = null
-    private var readerJob: Job? = null
 
     private var debugError = false
     private var debugStatusMessage = "nothing"
@@ -56,7 +55,6 @@ object DiscordRPCManager {
 
     private val startConfig = CoroutineConfig("discord RPC start", timeout = Duration.INFINITE).withIOContext()
     private val presenceConfig = CoroutineConfig("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
-    private val readerConfig = CoroutineConfig("discord RPC reader", timeout = Duration.INFINITE).withIOContext()
     private val stopConfig = CoroutineConfig("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
     private val manualStartConfig = CoroutineConfig("discord RPC manual start", timeout = Duration.INFINITE).withIOContext()
 
@@ -100,11 +98,7 @@ object DiscordRPCManager {
     }
 
     @HandleEvent
-    fun onDisconnect() {
-        retryJob?.cancel()
-        retryHelper.reset()
-        stop()
-    }
+    fun onDisconnect() = stop()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress() {
@@ -160,12 +154,12 @@ object DiscordRPCManager {
     private fun cancelJobs() {
         presenceJob?.cancel()
         presenceJob = null
-        readerJob?.cancel()
-        readerJob = null
     }
 
     private fun stop() {
-        if (!isConnected()) return
+        retryJob?.cancel()
+        retryJob = null
+        retryHelper.reset()
         updateDebugStatus("Stopped")
         cancelJobs()
         client?.close()
@@ -242,12 +236,6 @@ object DiscordRPCManager {
                     updatePresenceProgress = null
                     delay(5.seconds)
                 }
-            }
-        }
-        val activeClient = client
-        readerJob = with(SkyHanniMod) {
-            readerConfig.launchUnScopedCoroutine {
-                activeClient?.readerLoop()
             }
         }
     }
