@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterValuesNotNul
 import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
-import java.util.Base64
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import java.util.Base64
 
 object AnimationState {
 
@@ -35,9 +35,12 @@ object AnimationState {
     }
 
     class ArmorStandRecording(
-        val displayName: String,
+        private val displayName: String,
+        val skinName: String? = null,
         val tracker: AnimationFrameTracker = AnimationFrameTracker(),
-    )
+    ) {
+        val outputName: String get() = skinName ?: displayName
+    }
 
     data class RecordingState(
         var mode: RecordingMode = RecordingMode.NONE,
@@ -48,8 +51,11 @@ object AnimationState {
         var skinColor: String? = null,
     ) : Resettable {
         val skinName: String? get() = skinId?.let { id ->
-            if (skinColor != null) "${id}_${skinColor!!.replace(" ", "_").uppercase()}" else id
+            skinColor?.let { color ->
+                "${id}_${color.replace(" ", "_").uppercase()}"
+            } ?: id
         }
+        val frameCount get() = tracker.frames.size
     }
 
     var state: RecordingState = RecordingState()
@@ -142,7 +148,13 @@ object AnimationState {
     }
 
     private fun buildOutput(state: RecordingState): String = when (state.mode) {
-        RecordingMode.PET -> buildPetOutput(state)
+        RecordingMode.PET -> gson.toJson(
+            state.petRecordings.values.filter {
+                it.tracker.frames.size > 1
+            }.associate { recording ->
+                recording.outputName to recording.tracker.orderedFrames.toAnimationOutput()
+            },
+        )
         else -> gson.toJson(state.tracker.orderedFrames.toAnimationOutput())
     }
 
@@ -150,16 +162,4 @@ object AnimationState {
         textures = map { it.fullTexture },
         ticksPerTexture = map { it.serverTicks },
     )
-
-    private fun buildPetOutput(state: RecordingState): String {
-        val recordings = state.petRecordings.values.filter { it.tracker.frames.size > 1 }
-        val skinName = state.skinName
-        return if (skinName != null) {
-            val animation = recordings.firstOrNull()?.tracker?.orderedFrames?.toAnimationOutput()
-                ?: return gson.toJson(emptyMap<String, Any>())
-            gson.toJson(mapOf(skinName to animation))
-        } else {
-            gson.toJson(recordings.associate { it.displayName to it.tracker.orderedFrames.toAnimationOutput() })
-        }
-    }
 }

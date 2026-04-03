@@ -24,33 +24,27 @@ class RotatableDragRenderable private constructor(
     private val sensitivity: Double,
 ) : RenderableDecoratorOnlyRender {
 
-    private var isDragging = false
-    private var dragStartX = 0
-    private var dragStartY = 0
-    private var dragStartRotX = 0.0
-    private var dragStartRotY = 0.0
-
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         val isHovered = mouseOffsetX in 0..<width && mouseOffsetY in 0..<height
         val isMouseHeld = KeyboardManager.LEFT_MOUSE.isKeyHeld()
 
         when {
-            isHovered && isMouseHeld && !isDragging -> {
-                isDragging = true
-                dragStartX = mouseOffsetX
-                dragStartY = mouseOffsetY
-                dragStartRotX = rotationStorage.currentRotation[Axis.X]
-                dragStartRotY = rotationStorage.currentRotation[Axis.Y]
+            isHovered && isMouseHeld && !rotationStorage.isDragging -> {
+                rotationStorage.isDragging = true
+                rotationStorage.dragStartX = mouseOffsetX
+                rotationStorage.dragStartY = mouseOffsetY
+                rotationStorage.dragStartRotX = rotationStorage.currentRotation[Axis.X]
+                rotationStorage.dragStartRotY = rotationStorage.currentRotation[Axis.Y]
             }
-            !isMouseHeld -> isDragging = false
+            !isMouseHeld -> rotationStorage.isDragging = false
         }
 
-        if (isDragging) {
-            val deltaX = (mouseOffsetX - dragStartX) * sensitivity
-            val deltaY = (mouseOffsetY - dragStartY) * sensitivity
+        if (rotationStorage.isDragging) {
+            val deltaX = (mouseOffsetX - rotationStorage.dragStartX) * sensitivity
+            val deltaY = (mouseOffsetY - rotationStorage.dragStartY) * sensitivity
             rotationStorage.currentRotation = rotationStorage.currentRotation
-                .applyAxisValue(Axis.Y, dragStartRotY + deltaX)
-                .applyAxisValue(Axis.X, dragStartRotX - deltaY)
+                .applyAxisValue(Axis.Y, rotationStorage.dragStartRotY + deltaX)
+                .applyAxisValue(Axis.X, rotationStorage.dragStartRotX - deltaY)
         }
 
         root.render(mouseOffsetX, mouseOffsetY)
