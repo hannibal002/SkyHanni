@@ -23,7 +23,7 @@ object CocoonOverlay {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for (cocoon in existingCocoons) {
-            if (cocoon.coordinates.distanceToPlayer() > 32 || cocoon.hasBeenSeen) continue
+            if (!cocoon.hasBeenSeen) if (cocoon.coordinates.distanceToPlayer() > 32) continue
             if (!playerCanCocoon() && config.onlyShowWhenPlayerIsAbleToCocoon) return
             if (config.showCocoonContainedMobName) event.drawDynamicText(
                 cocoon.coordinates,
