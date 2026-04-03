@@ -38,7 +38,7 @@ object TpsCounter {
             msPerTickList.isEmpty() || lastServerTick.passedSince() >= 1.seconds -> 0.0
             else -> (1000.0 / msPerTickList.values.average()).coerceIn(0.0..20.0).also {
                 if (!it.isFinite()) printError(it)
-            }
+            }.let { if (TimeUtils.isAprilFoolsDay) it / 2 else it }
         }
 
     private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
@@ -69,7 +69,7 @@ object TpsCounter {
 
     private fun getTpsString(compact: Boolean = false): String = buildString {
         append("§eTPS: ")
-        var currentTps = tps
+        val currentTps = tps
         when {
             LimboTimeTracker.inLimbo -> {
                 append("§4N/A §7(Limbo)")
@@ -80,7 +80,6 @@ object TpsCounter {
                 append("§7(${remaining}s)")
             }
             else -> {
-                if (TimeUtils.isAprilFoolsDay) currentTps /= 2
                 append("%s%.1f".format(getColor(currentTps), currentTps))
             }
         }
@@ -145,7 +144,7 @@ object TpsCounter {
             "TPS calculation got an error",
             "tps is $tps",
             "tps" to tps,
-            "msptList" to msPerTickList,
+            "msPerTickList" to msPerTickList,
             "timeSinceWorldSwitch" to timeSinceWorldSwitch,
         )
     }
