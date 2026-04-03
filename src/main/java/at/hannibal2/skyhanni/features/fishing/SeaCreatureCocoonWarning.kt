@@ -18,7 +18,7 @@ object SeaCreatureCocoonWarning {
     private val config get() = SkyHanniMod.feature.fishing.cocoonSettings
 
     @HandleEvent
-    fun onCocoon(event: CocoonSpawnEvent) {
+    fun onCocoonSpawn(event: CocoonSpawnEvent) {
         val mob = event.cocoonMob
         if (mob.seaCreature == null) return
         if (!mob.seaCreature.isOwn) return

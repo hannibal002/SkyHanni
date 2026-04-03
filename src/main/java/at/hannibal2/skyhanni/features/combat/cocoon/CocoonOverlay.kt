@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.expectedLifetime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialSeconds
@@ -21,6 +22,7 @@ object CocoonOverlay {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for (cocoon in existingCocoons) {
+            if (cocoon.coordinates.distanceToPlayer() > 32) continue
             if (config.showCocoonContainedMobName) event.drawDynamicText(
                 cocoon.coordinates,
                 cocoon.mob.name,
