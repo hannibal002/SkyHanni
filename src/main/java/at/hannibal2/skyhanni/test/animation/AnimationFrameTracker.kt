@@ -27,6 +27,12 @@ class AnimationFrameTracker : Resettable {
         val signature: String? = null,
         val clientTicks: Int,
         val serverTicks: Int,
+        /**
+         * Stable key used for animation sequence comparisons.
+         * Should be the decoded texture URL, which is invariant across different player profiles
+         * that may serve the same visual skin. Falls back to [texture] if URL extraction fails.
+         */
+        val textureKey: String = texture,
     ) {
         val fullTexture get() = if (uuid != null) "$uuid:$texture" else texture
     }
@@ -169,14 +175,14 @@ class AnimationFrameTracker : Resettable {
 
         if (currentFrame == null) {
             // First frame ever seen, begin tracking.
-            firstTexture = frame.fullTexture
+            firstTexture = frame.textureKey
             currentFrame = frame
             frameStartServerTick = serverTick
             frameStartClientTick = clientTick
             return false
         }
 
-        if (frame.fullTexture == currentFrame!!.fullTexture) return false
+        if (frame.textureKey == currentFrame!!.textureKey) return false
 
         // Texture changed, finalize the frame that just ended.
         val elapsedServer = (serverTick - frameStartServerTick).toInt().coerceAtLeast(1)
@@ -190,7 +196,7 @@ class AnimationFrameTracker : Resettable {
 
     private fun onFrameEnd(frame: FrameRecord, serverTicks: Int, clientTicks: Int): Boolean = when (phase) {
         Phase.LEARNING -> {
-            if (accumulators.isNotEmpty() && frame.fullTexture == firstTexture) {
+            if (accumulators.isNotEmpty() && frame.textureKey == firstTexture) {
                 // We've seen the first texture again, loop complete.
                 accumulators.first().also {
                     it.serverSamples.add(serverTicks)
@@ -214,7 +220,7 @@ class AnimationFrameTracker : Resettable {
 
         Phase.VERIFYING -> {
             val accumulator = accumulators.getOrNull(verifyIndex)
-            if (accumulator == null || accumulator.prototype.fullTexture != frame.fullTexture) {
+            if (accumulator == null || accumulator.prototype.textureKey != frame.textureKey) {
                 verificationErrors++
             } else {
                 accumulator.serverSamples.add(serverTicks)

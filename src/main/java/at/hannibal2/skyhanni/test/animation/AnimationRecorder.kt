@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationL
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.interactables.RotatableDragRenderable.Companion.rotatableDrag
 import com.google.common.collect.ImmutableMultimap
+import java.util.concurrent.ConcurrentHashMap
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import com.mojang.authlib.properties.PropertyMap
@@ -50,7 +51,16 @@ object AnimationRecorder {
     private val debugRenderables = mutableMapOf<String, Renderable>()
     private val rotationStorages = mutableMapOf<String, AnimatedRotationLocalStorage>()
 
+    private data class RebuildRequest(
+        val displayName: String,
+        val mode: AnimationState.RecordingMode,
+        val tracker: AnimationFrameTracker,
+    )
+
+    private val pendingRebuilds = ConcurrentHashMap<String, RebuildRequest>()
+
     fun clearDebugRenderables() {
+        pendingRebuilds.clear()
         debugRenderables.clear()
         rotationStorages.clear()
     }
@@ -153,6 +163,7 @@ object AnimationRecorder {
     @HandleEvent(GuiRenderEvent::class)
     fun onGuiRender() {
         if (!config.enabled.get() || !config.debugOverlay.get()) return
+        drainPendingRebuilds()
         if (debugRenderables.isEmpty()) return
         val combined = Renderable.vertical(spacing = 4) {
             addAll(debugRenderables.values)
@@ -160,14 +171,8 @@ object AnimationRecorder {
         config.debugPosition.renderRenderable(combined, "Record Animations Debug")
     }
 
-    /**
-     * Rebuilds the debug renderable for a single recording key when a new loop completes.
-     *
-     * @param key Unique key for this recording (display name for pets, player name, or "head").
-     * @param displayName Human-readable label shown in the overlay header.
-     * @param mode The current [AnimationState.RecordingMode].
-     * @param tracker The [AnimationFrameTracker] whose frames drive the animated item and stats.
-     */
+    // Enqueues a rebuild request from a non-render thread (e.g. server tick).
+    // No GL work is done here; building happens on the render thread in drainPendingRebuilds.
     private fun rebuildRenderable(
         key: String,
         displayName: String,
@@ -175,20 +180,44 @@ object AnimationRecorder {
         tracker: AnimationFrameTracker,
     ) {
         if (!config.debugOverlay.get()) return
+        if (tracker.orderedFrames.isEmpty()) return
+        pendingRebuilds[key] = RebuildRequest(displayName, mode, tracker)
+    }
+
+    // Must only be called from the render thread.
+    private fun drainPendingRebuilds() {
+        if (pendingRebuilds.isEmpty()) return
+        val snapshot = pendingRebuilds.entries.toList()
+        pendingRebuilds.clear()
+        for ((key, request) in snapshot) {
+            buildRenderable(key, request.displayName, request.mode, request.tracker)
+        }
+    }
+
+    /**
+     * Builds the debug renderable for a single recording key. Must be called on the render thread.
+     *
+     * @param key Unique key for this recording (display name for pets, player name, or "head").
+     * @param displayName Human-readable label shown in the overlay header.
+     * @param mode The current [AnimationState.RecordingMode].
+     * @param tracker The [AnimationFrameTracker] whose frames drive the animated item and stats.
+     */
+    private fun buildRenderable(
+        key: String,
+        displayName: String,
+        mode: AnimationState.RecordingMode,
+        tracker: AnimationFrameTracker,
+    ) {
         val frames = tracker.orderedFrames.takeIf { it.isNotEmpty() } ?: return
-
         val rotStorage = rotationStorages.getOrPut(key) { AnimatedRotationLocalStorage() }
-
         val animFrames = frames.map { record ->
             ItemStackAnimatedFrame(record.toItemStack(), record.serverTicks)
         }
-
         val animatedItem = Renderable.animatedItemStack {
             frameStorage = AnimatedFrameLocalStorage(animFrames, FrameTickRateProvider.perFrame())
             rotationStorage = rotStorage
             scale = NeuItems.ITEM_FONT_SIZE * config.previewScale.get()
         }
-
         debugRenderables[key] = Renderable.vertical(spacing = 2) {
             addString("§a$displayName §7(${mode.name})")
             addString(tracker.captureStatsString)

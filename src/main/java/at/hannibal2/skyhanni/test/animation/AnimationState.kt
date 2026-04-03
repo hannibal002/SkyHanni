@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterValuesNotNull
 import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
+import java.util.Base64
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
@@ -75,7 +77,24 @@ object AnimationState {
             signature = getSkullSignature(),
             clientTicks = 0,
             serverTicks = 0,
+            textureKey = extractTextureUrl(texture) ?: texture,
         )
+    }
+
+    /**
+     * Decodes a base64 skull texture property and extracts the Minecraft texture CDN URL.
+     * The URL is stable across different player profiles serving the same visual skin,
+     * unlike the full base64 value which embeds a per-profile timestamp and name.
+     * Returns null if decoding or parsing fails.
+     */
+    private fun extractTextureUrl(base64Texture: String): String? = try {
+        val decoded = Base64.getDecoder().decode(base64Texture).toString(Charsets.UTF_8)
+        JsonParser.parseString(decoded).asJsonObject
+            .getAsJsonObject("textures")
+            ?.getAsJsonObject("SKIN")
+            ?.get("url")?.asString
+    } catch (_: Exception) {
+        null
     }
 
     fun startRecording(mode: RecordingMode, trackedPlayer: String = "") {
