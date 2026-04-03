@@ -48,6 +48,7 @@ object TotemOfCorruption {
 
     private var display = emptyList<Renderable>()
     private var totems = emptyList<Totem>()
+    private var allTotems = emptyList<Totem>()
     private val warnedTotems = TimeLimitedSet<UUID>(2.minutes)
 
     private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
@@ -85,7 +86,8 @@ object TotemOfCorruption {
         if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return
 
-        totems = getTotems()
+        allTotems = getAllTotems()
+        totems = filterTotems(allTotems)
         display = createDisplay()
     }
 
@@ -93,7 +95,7 @@ object TotemOfCorruption {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!config.hideParticles) return
 
-        for (totem in totems) {
+        for (totem in allTotems) {
             if (event.type == ParticleTypes.WITCH && event.speed == 0f) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
@@ -129,6 +131,7 @@ object TotemOfCorruption {
         config.showOverlay.onToggle {
             display = emptyList()
             totems = emptyList()
+            allTotems = emptyList()
         }
     }
 
@@ -136,6 +139,7 @@ object TotemOfCorruption {
     fun onWorldChange() {
         display = emptyList()
         totems = emptyList()
+        allTotems = emptyList()
     }
 
     private fun getTimeRemaining(totem: ArmorStand): Duration? =
@@ -181,22 +185,31 @@ object TotemOfCorruption {
         return totems.minByOrNull { it.distance }
     }
 
-    private fun getTotems(): List<Totem> = getEntitiesNearby<ArmorStand>(100.0)
+    private fun getAllTotems(): List<Totem> = getEntitiesNearby<ArmorStand>(100.0)
         .filter { totemNamePattern.matches(it.cleanName()) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
             val owner = getOwner(totem) ?: return@mapNotNull null
-
-            if (config.ownTotemOnly && (owner != PlayerUtils.getName())) return@mapNotNull null
-
-            val timeToWarn = config.warnWhenAboutToExpire.seconds
-            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uuid !in warnedTotems) {
-                playBeepSound(0.5f)
-                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
-                warnedTotems.add(totem.uuid)
-            }
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
+
+    private fun filterTotems(all: List<Totem>): List<Totem> = all.mapNotNull { totem ->
+        if (config.ownTotemOnly && totem.ownerName != PlayerUtils.getName()) return@mapNotNull null
+
+        val timeToWarn = config.warnWhenAboutToExpire.seconds
+        if (timeToWarn > 0.seconds && totem.timeRemaining <= timeToWarn) {
+            // warnedTotems requires a UUID — look up the ArmorStand to get it.
+            val entity = getEntitiesNearby<ArmorStand>(100.0)
+                .firstOrNull { it.getLorenzVec() == totem.location } ?: return@mapNotNull totem
+            if (entity.uuid !in warnedTotems) {
+                playBeepSound(0.5f)
+                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
+                warnedTotems.add(entity.uuid)
+            }
+        }
+
+        totem
+    }
 
     private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
     private fun isEffectiveAreaEnabled() = SkyBlockUtils.inSkyBlock && config.outlineType != OutlineType.NONE
