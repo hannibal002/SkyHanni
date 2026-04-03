@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
+import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -56,10 +58,13 @@ object MobHealthDisplay {
 
     private fun formatShuriken(mob: Mob): Component {
         val hasShuriken = mob.name.contains("§b✯")
-        if (!hasShuriken || !config.shouldShowShuriken) return Component.empty()
-        return componentBuilder {
-            appendWithColor("✯", ChatFormatting.AQUA)
+        ChatUtils.debug("Shuriken = $hasShuriken, name = ${mob.name}")
+        if (hasShuriken && config.shouldShowShuriken) {
+            return componentBuilder {
+                appendWithColor("✯", ChatFormatting.AQUA)
+            }
         }
+        return Component.empty()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
