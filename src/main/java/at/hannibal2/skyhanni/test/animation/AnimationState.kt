@@ -42,7 +42,13 @@ object AnimationState {
         var trackedPlayer: String = "",
         val tracker: AnimationFrameTracker = AnimationFrameTracker(),
         val petRecordings: LinkedHashMap<String, ArmorStandRecording> = linkedMapOf(),
-    ) : Resettable
+        var skinId: String? = null,
+        var skinColor: String? = null,
+    ) : Resettable {
+        val skinName: String? get() = skinId?.let { id ->
+            if (skinColor != null) "${id}_${skinColor!!.replace(" ", "_").uppercase()}" else id
+        }
+    }
 
     var state: RecordingState = RecordingState()
         private set
@@ -126,8 +132,12 @@ object AnimationState {
         ticksPerTexture = map { it.serverTicks },
     )
 
-    private fun buildPetOutput(state: RecordingState): String = state.petRecordings.values
-        .filter { it.tracker.frames.size > 1 }
-        .associate { it.displayName to it.tracker.orderedFrames.toAnimationOutput() }
-        .let { gson.toJson(it) }
+    private fun buildPetOutput(state: RecordingState): String {
+        val recordings = state.petRecordings.values
+            .filter { it.tracker.frames.size > 1 }
+            .associate { it.displayName to it.tracker.orderedFrames.toAnimationOutput() }
+        val skinName = state.skinName
+        return if (skinName != null) gson.toJson(mapOf(skinName to recordings))
+        else gson.toJson(recordings)
+    }
 }

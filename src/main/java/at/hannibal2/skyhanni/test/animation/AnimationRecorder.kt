@@ -3,15 +3,20 @@ package at.hannibal2.skyhanni.test.animation
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DevApi
 import at.hannibal2.skyhanni.test.animation.AnimationState.getFrameTexture
 import at.hannibal2.skyhanni.test.animation.AnimationState.isPetTextureStand
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getPlayerEntities
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -74,6 +79,7 @@ object AnimationRecorder {
                 val displayName = MobUtils.getArmorStandByRangeAll(stand, 2.0)
                     .firstOrNull { it.cleanName().startsWith("[Lv") }
                     ?.name?.string ?: stand.name.string
+                if (displayName == "Armor Stand") return@forEach
                 val recording = current.petRecordings.getOrPut(displayName) {
                     AnimationState.ArmorStandRecording(displayName)
                 }
@@ -99,6 +105,26 @@ object AnimationRecorder {
                 }
             }
         }
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!config.enabled.get()) return
+        if (!AnimationState.isRecording) return
+        val item = event.item ?: return
+        val lastLore = item.getLoreComponent().lastOrNull()?.string ?: return
+        if (lastLore != "Right-click to preview!" && lastLore != "Click to preview!") return
+        val displayName = item.cleanName()
+        val internalName = item.getInternalNameOrNull()?.asString()
+        if (displayName == "FIRE SALE!") {
+            AnimationState.state.skinColor = null
+            AnimationState.state.skinId = internalName
+        } else {
+            AnimationState.state.skinId = internalName ?: AnimationState.state.skinId
+            AnimationState.state.skinColor = displayName
+        }
+        val skinName = AnimationState.state.skinName ?: return
+        ChatUtils.chat("Skin identified: §e$skinName§a.")
     }
 
     @HandleEvent

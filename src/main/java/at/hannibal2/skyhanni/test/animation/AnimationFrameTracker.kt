@@ -102,7 +102,7 @@ class AnimationFrameTracker : Resettable {
     /** Human-readable capture stats for debug overlays. */
     val captureStatsString: String get() =
         "§7Captured: §a${capturePercent.roundTo(1)}%§7 " +
-            "(${loopCount} loops, ${accumulators.size} frames, $minSampleCount samples min)"
+            "($loopCount loops, ${accumulators.size} frames, $minSampleCount samples min)"
 
     /** Human-readable verification status for debug overlays. */
     val verificationStatusString: String get() =
