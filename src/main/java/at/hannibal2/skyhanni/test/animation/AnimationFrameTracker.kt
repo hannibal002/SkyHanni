@@ -159,7 +159,7 @@ class AnimationFrameTracker : Resettable {
         val mean = worst.serverMean.roundTo(1)
         val stddev = worst.serverStddev.roundTo(1)
         val conf = (worst.confidenceScore * 100).roundTo(1)
-        return "§7Worst: #$idx (mean=${mean}t, \u00b1${stddev}t, ${n} samples, conf §c${conf}%§7)"
+        return "§7Worst: #$idx (mean=${mean}t, \u00b1${stddev}t, $n samples, conf §c$conf%§7)"
     }
 
     /**

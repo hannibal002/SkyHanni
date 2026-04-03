@@ -136,7 +136,7 @@ object AnimationRecorder {
 
         val isFire = displayName == "FIRE SALE!"
         val skinName = AnimationState.state.apply {
-            skinId =  if (isFire) internalName else internalName ?: skinId
+            skinId = if (isFire) internalName else internalName ?: skinId
             skinColor = if (isFire) null else displayName
         }.skinName ?: return
         ChatUtils.chat("Skin identified: §e$skinName§a.")
