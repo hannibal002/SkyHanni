@@ -86,8 +86,11 @@ object CocoonAPI {
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
-        val mob = skyblockMobs.minByOrNull { it.baseEntity.getLorenzVec().distanceIgnoreY(cocoonVector) } ?: return null
-        if (mob.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
+        val deadMobs = skyblockMobs.filter { !it.isAlive }
+        val mob = deadMobs.minByOrNull {
+            it.baseEntity.getLorenzVec().distance(cocoonVector)
+        } ?: return null
+        if (mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) > 4.0) return null
         return mob
     }
 
