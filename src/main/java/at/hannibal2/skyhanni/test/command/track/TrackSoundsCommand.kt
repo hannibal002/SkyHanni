@@ -26,7 +26,11 @@ object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(commonName
     override val config get() = DevApi.config.debug.trackSound
 
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
-        argCallback("sound_name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { allSoundIds }) {
+        argCallback(
+            "sound_name",
+            BrigadierArguments.string(),
+            BrigadierUtils.dynamicSuggestionProvider { allSoundIds },
+        ) {
             val soundName = it.trim()
             if (soundName.isEmpty()) {
                 ChatUtils.chat("§cSound name cannot be empty")
@@ -38,7 +42,8 @@ object TrackSoundsCommand : TrackWorldCommand<PlaySoundEvent, String>(commonName
 
     override fun PlaySoundEvent.getTypeIdentifier() = soundName
 
-    override fun PlaySoundEvent.formatForDisplay() = Renderable.text("§3$soundName §8p:$pitch §7v:$volume")
+    override fun PlaySoundEvent.formatForDisplay() =
+        Renderable.text("§3$soundName §8p:$pitch §7v:$volume")
 
     override fun PlaySoundEvent.formatForWorldRender(): String {
         val volumeColor = when (volume) {

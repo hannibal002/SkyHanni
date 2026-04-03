@@ -202,7 +202,7 @@ object TextHelper {
 
     fun matcher(component: Component, match: String): Component? {
         var index = 0
-        var newComponent = Component.empty()
+        var newComponent: Component = Component.empty()
         var currentString = ""
         var done = false
 
@@ -260,8 +260,6 @@ object TextHelper {
         if (currentComponent.isNotEmpty()) newComponents.add(currentComponent)
         return newComponents.takeIf { it.isNotEmpty() }
     }
-
-    private fun MutableComponent.isNotEmpty() = string.isNotEmpty()
 
     fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
         val atlasId = Identifier.withDefaultNamespace(atlas)
