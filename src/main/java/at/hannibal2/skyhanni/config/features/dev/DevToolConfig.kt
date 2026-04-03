@@ -20,4 +20,9 @@ class DevToolConfig {
     @ConfigOption(name = "LOS Face Test", desc = "")
     @Accordion
     val canSeeFace: TestCanSeeFaceConfig = TestCanSeeFaceConfig()
+
+    @Expose
+    @ConfigOption(name = "Record Animations", desc = "")
+    @Accordion
+    val recordAnimations: RecordAnimationsConfig = RecordAnimationsConfig()
 }
