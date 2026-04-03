@@ -49,7 +49,7 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
         existingCocoons.forEach { cocoon ->
-            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen()
+            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
         }
     }
 
