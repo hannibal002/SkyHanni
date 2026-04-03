@@ -257,7 +257,7 @@ object TextHelper {
             }
         }
 
-        if (currentComponent.isNotEmpty()) newComponents.add(currentComponent)
+        if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
         return newComponents.takeIf { it.isNotEmpty() }
     }
 

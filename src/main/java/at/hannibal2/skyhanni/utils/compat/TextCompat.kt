@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -311,6 +313,7 @@ fun HoverEvent.value(): Component = when (action()) {
 }
 
 fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? = when (action) {
+    null -> null
     HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
     // I really don't think anyone is using the other 2 lol
     else -> throw NotImplementedError("Action ${action.name} is not implemented")
