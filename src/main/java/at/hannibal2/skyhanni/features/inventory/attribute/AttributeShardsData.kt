@@ -212,7 +212,7 @@ object AttributeShardsData {
      */
     private val fusionShardPattern by patternGroup.pattern(
         "fusion.shard.colorless",
-        "FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: (?<amount>\\d+))?!(?: NEW!)?",
+        "FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!(?: NEW!)?",
     )
 
     /**

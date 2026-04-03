@@ -73,6 +73,10 @@ object ReforgeHelper {
         "You reforged your .+ into an? .+!|You applied an? .+ to your .+!",
     )
 
+    /**
+     * REGEX-TEST: Wait a moment before reforging again!
+     * REGEX-TEST: Whoa! Slow down there!
+     */
     private val reforgeChatFailPattern by patternGroup.pattern(
         "chat.fail.colorless",
         "Wait a moment before reforging again!|Whoa! Slow down there!",
