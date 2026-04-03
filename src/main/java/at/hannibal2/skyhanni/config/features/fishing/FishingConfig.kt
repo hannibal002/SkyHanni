@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager.CompactDoubleHookPosition
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -122,7 +121,7 @@ class FishingConfig {
     )
     @SearchTag("before after")
     @ConfigEditorDropdown
-    val compactDoubleHookPosition: CompactDoubleHookPosition = CompactDoubleHookPosition.LEFT
+    var compactDoubleHookPosition: CompactDoubleHookPosition = CompactDoubleHookPosition.LEFT
 
     @Expose
     @ConfigOption(name = "Hotspot Radar Guesser", desc = "Shows where the closest Fishing Hotspot is when using the §9Hotspot Radar§7.")
