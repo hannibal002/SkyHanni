@@ -60,6 +60,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
             DrawSlotEvent(gui, container, slot)
     }
 
+    @PrimaryFunction("onForegroundDrawn")
     data class ForegroundDrawnEvent(
         override val context: GuiGraphics,
         override val gui: SkyHanniGuiContainer,

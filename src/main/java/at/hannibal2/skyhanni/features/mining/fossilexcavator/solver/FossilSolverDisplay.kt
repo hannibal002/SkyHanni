@@ -1,25 +1,25 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -28,9 +28,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object FossilSolverDisplay {
 
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
-    private val patternGroup = RepoPattern.group("mining.fossilexcavator")
+
     private val labelRenderable by lazy { Renderable.text("§eExcavator solver GUI") }
 
+    private val patternGroup = RepoPattern.group("mining.fossilexcavator")
+
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Chisel Charges Remaining: 3
      */
@@ -46,6 +49,7 @@ object FossilSolverDisplay {
         "fossilprogress",
         "Fossil Excavation Progress: (?<progress>[\\d.]+%)",
     )
+    // </editor-fold desc="Patterns">
 
     private val inExcavatorMenu get() = FossilExcavatorApi.inExcavatorMenu
 
@@ -53,6 +57,7 @@ object FossilSolverDisplay {
     private var percentage: String? = null
 
     var maxCharges = 0
+        private set
     private var chargesRemaining = 0
     private var possibleFossilsRemaining = 0
 
@@ -69,13 +74,17 @@ object FossilSolverDisplay {
     private const val FOSSILS_REMAINING_STRING = "§ePossible fossils remaining: "
     private const val CHARGES_REMAINING_STRING = "§eCharges remaining: "
 
-    var possibleFossilTypes = setOf<FossilType>()
+    var possibleFossilTypes = emptySet<FossilType>()
 
     @HandleEvent
-    fun onWorldChange() = clearData()
+    fun onWorldChange() {
+        clearData()
+    }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) = clearData()
+    fun onInventoryClose() {
+        clearData()
+    }
 
     // Todo reshape to a data class, use Resettable
     private fun clearData() {
@@ -121,8 +130,8 @@ object FossilSolverDisplay {
             }
 
             if (!foundChargesRemaining) {
-                for (line in stack.getLore()) {
-                    chargesRemainingPattern.matchMatcher(line.removeColor()) {
+                for (line in stack.getCleanLore()) {
+                    chargesRemainingPattern.matchMatcher(line) {
                         chargesRemaining = group("charges").toInt()
                         if (maxCharges == 0) maxCharges = chargesRemaining
                         foundChargesRemaining = true
@@ -131,15 +140,15 @@ object FossilSolverDisplay {
             }
 
             if (!isFossil || foundPercentage) continue
-            for (line in stack.getLore()) {
-                fossilProgressPattern.matchMatcher(line.removeColor()) {
+            for (line in stack.getCleanLore()) {
+                fossilProgressPattern.matchMatcher(line) {
                     foundPercentage = true
                     percentage = group("progress")
                 }
             }
         }
 
-        SkyHanniMod.launchCoroutine("fossil solver findBestTile") {
+        CoroutineConfig("fossil solver findBestTile").launchCoroutine {
             FossilSolver.findBestTile(fossilLocations, dirtLocations, percentage)
         }
     }
@@ -159,16 +168,14 @@ object FossilSolverDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    fun onForegroundDrawn() {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return
 
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.containerSlot == slotToClick) {
-                slot.highlight(LorenzColor.GREEN.toColor().addAlpha(90))
-            }
-        }
+        InventoryUtils.getItemsInOpenChest()
+            .firstOrNull { it.containerSlot == slotToClick }
+            ?.highlight(LorenzColor.GREEN.toColor().addAlpha(90))
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
@@ -185,28 +192,29 @@ object FossilSolverDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!isEnabled()) return
 
         // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
         if (inExcavatorMenu) return config.position.renderRenderable(labelRenderable, posLabel = "Fossil Excavator Solver")
 
-        val displayList = mutableListOf<String>()
-        when {
-            isNotPossible -> displayList.add(NOT_POSSIBLE_STRING)
-            isCompleted -> displayList.add(SOLVED_STRING)
-            else -> displayList.add("${FOSSILS_REMAINING_STRING}§a$possibleFossilsRemaining")
-        }
-        displayList.add("${CHARGES_REMAINING_STRING}§a$chargesRemaining")
-
-        if (possibleFossilTypes.isNotEmpty()) {
-            displayList.add("§ePossible Fossil types:")
-            for (fossil in possibleFossilTypes) {
-                displayList.add("§7- ${fossil.displayName}")
+        val displayList = buildList {
+            when {
+                isNotPossible -> add(NOT_POSSIBLE_STRING)
+                isCompleted -> add(SOLVED_STRING)
+                else -> add("${FOSSILS_REMAINING_STRING}§a$possibleFossilsRemaining")
             }
-        }
+            add("${CHARGES_REMAINING_STRING}§a$chargesRemaining")
 
-        config.position.renderStrings(displayList, posLabel = "Fossil Excavator Solver")
+            if (possibleFossilTypes.isNotEmpty()) {
+                add("§ePossible Fossil types:")
+                for (fossil in possibleFossilTypes) {
+                    add("§7- ${fossil.displayName}")
+                }
+            }
+        }.map(Renderable::text)
+
+        config.position.renderRenderables(displayList, posLabel = "Fossil Excavator Solver")
     }
 
     @HandleEvent
