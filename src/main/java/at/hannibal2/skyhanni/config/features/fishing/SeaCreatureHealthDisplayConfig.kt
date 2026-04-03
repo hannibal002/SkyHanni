@@ -22,6 +22,11 @@ class SeaCreatureHealthDisplayConfig {
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var limit = 5
 
+    @Expose
+    @ConfigOption(name = "Show Shuriken", desc = "Show a §b✯ §fSymbol when the mob is Shurikened.")
+    @ConfigEditorBoolean
+    var shouldShowShuriken = false
+
     @ConfigOption(name = "Custom Health Display Mobs", desc = "This Feature's Mobs can be customized under /shseacreatures!")
     @ConfigEditorInfoText
     var notice: String = ""

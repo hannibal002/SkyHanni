@@ -54,8 +54,16 @@ object MobHealthDisplay {
         }
     }
 
+    private fun formatShuriken(mob: Mob): Component {
+        val hasShuriken = mob.name.contains("§b✯")
+        if (!hasShuriken || !config.shouldShowShuriken) return Component.empty()
+        return componentBuilder {
+            appendWithColor("✯", ChatFormatting.AQUA)
+        }
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (healthMap.isEmpty()) return
         val strings = buildList {
@@ -63,10 +71,13 @@ object MobHealthDisplay {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
                 val color = if (seaCreature.isOwn) ChatFormatting.GREEN else ChatFormatting.RED
+                val shuriken: String = if (mob.name.contains("§b✯")) "✯" else ""
                 val guiComponent = componentBuilder {
                     appendWithColor(seaCreature.name, color)
                     append(" ")
                     append(formatHealth(mob))
+                    append(" ")
+                    append(formatShuriken(mob))
                 }
                 add(Renderable.text(guiComponent))
                 if (size >= config.limit) break
