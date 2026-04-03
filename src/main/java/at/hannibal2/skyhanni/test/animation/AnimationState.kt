@@ -133,11 +133,14 @@ object AnimationState {
     )
 
     private fun buildPetOutput(state: RecordingState): String {
-        val recordings = state.petRecordings.values
-            .filter { it.tracker.frames.size > 1 }
-            .associate { it.displayName to it.tracker.orderedFrames.toAnimationOutput() }
+        val recordings = state.petRecordings.values.filter { it.tracker.frames.size > 1 }
         val skinName = state.skinName
-        return if (skinName != null) gson.toJson(mapOf(skinName to recordings))
-        else gson.toJson(recordings)
+        return if (skinName != null) {
+            val animation = recordings.firstOrNull()?.tracker?.orderedFrames?.toAnimationOutput()
+                ?: return gson.toJson(emptyMap<String, Any>())
+            gson.toJson(mapOf(skinName to animation))
+        } else {
+            gson.toJson(recordings.associate { it.displayName to it.tracker.orderedFrames.toAnimationOutput() })
+        }
     }
 }

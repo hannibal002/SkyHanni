@@ -63,6 +63,7 @@ object AnimationRecorderCommand {
             coroutineLiteralCallback("stop", config = stopRecordingCoroutine) {
                 if (!checkEnabled()) return@coroutineLiteralCallback
                 AnimationState.stopRecording()
+                AnimationRecorder.clearDebugRenderables()
             }
 
             literalCallback("status") {

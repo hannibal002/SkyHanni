@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DevApi
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -110,21 +112,32 @@ object AnimationRecorder {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.enabled.get()) return
-        if (!AnimationState.isRecording) return
         val item = event.item ?: return
         val lastLore = item.getLoreComponent().lastOrNull()?.string ?: return
         if (lastLore != "Right-click to preview!" && lastLore != "Click to preview!") return
         val displayName = item.cleanName()
         val internalName = item.getInternalNameOrNull()?.asString()
-        if (displayName == "FIRE SALE!") {
-            AnimationState.state.skinColor = null
-            AnimationState.state.skinId = internalName
-        } else {
-            AnimationState.state.skinId = internalName ?: AnimationState.state.skinId
-            AnimationState.state.skinColor = displayName
+        if (internalName == "UPCOMING_SALE") return
+
+        if (!AnimationState.isRecording) {
+            AnimationState.startRecording(AnimationState.RecordingMode.PET)
+            clearDebugRenderables()
         }
-        val skinName = AnimationState.state.skinName ?: return
+
+        val isFire = displayName == "FIRE SALE!"
+        val skinName = AnimationState.state.apply {
+            skinId =  if (isFire) internalName else internalName ?: skinId
+            skinColor = if (isFire) null else displayName
+        }.skinName ?: return
         ChatUtils.chat("Skin identified: §e$skinName§a.")
+    }
+
+    @HandleEvent
+    fun onIslandLeave(event: IslandLeaveEvent) {
+        if (!AnimationState.isRecording) return
+        ChatUtils.chat("§cRecording stopped: left island.")
+        AnimationState.state.reset()
+        clearDebugRenderables()
     }
 
     @HandleEvent
@@ -173,11 +186,13 @@ object AnimationRecorder {
         val animatedItem = Renderable.animatedItemStack {
             frameStorage = AnimatedFrameLocalStorage(animFrames, FrameTickRateProvider.perFrame())
             rotationStorage = rotStorage
+            scale = NeuItems.ITEM_FONT_SIZE * config.previewScale.get()
         }
 
         debugRenderables[key] = Renderable.vertical(spacing = 2) {
             addString("§a$displayName §7(${mode.name})")
             addString(tracker.captureStatsString)
+            addString(tracker.captureDetailString)
             add(Renderable.rotatableDrag(animatedItem, rotStorage))
             addString(tracker.verificationStatusString)
         }

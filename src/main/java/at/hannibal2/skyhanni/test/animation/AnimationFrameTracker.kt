@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.storage.NoReset
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 /**
  * Tracks animated texture frames with server-tick and client-tick precision.
@@ -39,6 +40,34 @@ class AnimationFrameTracker : Resettable {
             clientTicks = clientSamples.average().roundToInt(),
             serverTicks = serverSamples.average().roundToInt(),
         )
+
+        val serverMean: Double get() = serverSamples.average()
+
+        val serverStddev: Double get() {
+            val n = serverSamples.size
+            if (n < 2) return 0.0
+            val mean = serverMean
+            return sqrt(serverSamples.sumOf { s -> (s - mean) * (s - mean) } / n)
+        }
+
+        /**
+         * A 0-1 confidence score combining sample count (capping at 3) and tick consistency.
+         *
+         * For deterministic animations (all samples identical), three observations yield 1.0.
+         * Higher variance between samples reduces the score, requiring more loops to compensate.
+         * The coefficient of variation (stddev / mean) measures relative spread.
+         */
+        val confidenceScore: Double get() {
+            val n = serverSamples.size
+            if (n == 0) return 0.0
+            val sampleFactor = minOf(1.0, n / 3.0)
+            if (n < 2) return sampleFactor
+            val mean = serverMean
+            if (mean == 0.0) return sampleFactor
+            val cv = serverStddev / mean
+            val consistency = 1.0 / (1.0 + 4.0 * cv)
+            return sampleFactor * consistency
+        }
     }
 
     private enum class Phase { LEARNING, VERIFYING }
@@ -91,11 +120,12 @@ class AnimationFrameTracker : Resettable {
      * A 0-100 score combining frame completeness (50%) and timing confidence (50%).
      *
      * Frame completeness is binary: 0 until the first loop completes, 100 after.
-     * Timing confidence is `min(1, minSampleCount / 5) * 100`.
+     * Timing confidence is the minimum [FrameAccumulator.confidenceScore] across all frames.
+     * For deterministic animations, reaches 100% after 3 complete loops.
      */
     val capturePercent: Double get() {
         val frameComplete = if (loopCount > 0) 1.0 else 0.0
-        val timingConfidence = minSampleCount.coerceAtMost(5) / 5.0
+        val timingConfidence = accumulators.minOfOrNull { it.confidenceScore } ?: 0.0
         return (frameComplete * 0.5 + timingConfidence * 0.5) * 100.0
     }
 
@@ -108,6 +138,23 @@ class AnimationFrameTracker : Resettable {
     val verificationStatusString: String get() =
         if (verificationErrors == 0) "§aNo errors"
         else "§c$verificationErrors verification errors"
+
+    /**
+     * Human-readable detail string for the least-confident frame.
+     * Shows the frame index, mean tick duration, standard deviation, sample count, and confidence score.
+     * Empty string when no frames have been collected yet.
+     */
+    val captureDetailString: String get() {
+        if (accumulators.isEmpty()) return ""
+        val worst = accumulators.minByOrNull { it.confidenceScore } ?: return ""
+        val idx = accumulators.indexOf(worst) + 1
+        val n = worst.serverSamples.size
+        if (n == 0) return "§7Worst frame: #$idx (no samples)"
+        val mean = worst.serverMean.roundTo(1)
+        val stddev = worst.serverStddev.roundTo(1)
+        val conf = (worst.confidenceScore * 100).roundTo(1)
+        return "§7Worst: #$idx (mean=${mean}t, \u00b1${stddev}t, ${n} samples, conf §c${conf}%§7)"
+    }
 
     /**
      * Record the current frame texture for this tick.

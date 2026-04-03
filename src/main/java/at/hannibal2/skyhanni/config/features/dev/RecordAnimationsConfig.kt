@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dev
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -17,6 +18,11 @@ class RecordAnimationsConfig {
     @ConfigOption(name = "Debug Overlay", desc = "Show per-animation debug overlays while recording.")
     @ConfigEditorBoolean
     val debugOverlay: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(name = "Preview Scale", desc = "Scale multiplier for the animated item preview in the debug overlay.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 6f, minStep = 1f)
+    val previewScale: Property<Float> = Property.of(2f)
 
     @Expose
     @ConfigLink(owner = RecordAnimationsConfig::class, field = "debugOverlay")
