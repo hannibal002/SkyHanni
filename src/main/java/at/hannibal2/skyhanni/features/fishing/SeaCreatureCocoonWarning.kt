@@ -38,7 +38,7 @@ object SeaCreatureCocoonWarning {
         if (config.shareInPartyChat) {
             if (getSeaCreatureConfig(name)?.shouldShareCocoonInChat == true) {
                 if (PartyApi.isInParty()) {
-                    HypixelCommands.partyChat("I Cocooned ${StringUtils.optionalAn(name)} $name!")
+                    HypixelCommands.partyChat("My $name has been Cocooned!")
                 }
             }
         }
