@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -22,7 +24,9 @@ object TimeFeatures {
 
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter
-
+    private val alreadyClosingRenderable by lazy {
+        Renderable.text("§fJerry's Workshop §cis closing!")
+    }
     private val startOfNextYear by RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).toTimeMark()
     }
@@ -32,6 +36,7 @@ object TimeFeatures {
         @Suppress("InSkyBlockEarlyReturn")
         if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.REAL_TIME.isSelected()) return
         if (config.realTime) {
+            // TODO we should be using the standard formats, not remaking our own DTS
             val timeFormat = if (config.realTimeFormatToggle) {
                 // 12 h format
                 SimpleDateFormat("hh:mm${if (config.realTimeShowSeconds) ":ss" else ""} a")
@@ -39,20 +44,19 @@ object TimeFeatures {
                 // 24 h format
                 SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds) ":ss" else ""}")
             }
-            val currentTime = timeFormat.format(System.currentTimeMillis())
-            config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
+            val currentTime = Renderable.text(timeFormat.format(System.currentTimeMillis()))
+            config.realTimePosition.renderRenderable(currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isCurrent()) {
             if (WinterApi.isDecember()) return
             val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
-            val text = if (alreadyInNextYear) {
-                "§fJerry's Workshop §cis closing!"
-            } else {
-                "§fJerry's Workshop §ecloses in §b${timeTillNextYear.format()}"
-            }
-            winterConfig.islandCloseTimePosition.renderString(text, posLabel = "Winter Time")
+
+            val display = if (alreadyInNextYear) alreadyClosingRenderable
+            else Renderable.text("§fJerry's Workshop §ecloses in §b${timeTillNextYear.format()}")
+
+            winterConfig.islandCloseTimePosition.renderRenderable(display, posLabel = "Winter Time")
         }
     }
 
