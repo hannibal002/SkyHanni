@@ -134,6 +134,11 @@ object DiscordRPCManager {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback(::startCommand)
         }
+        event.registerBrigadier("shrpcrestart") {
+            description = "Manually restarts the Discord Rich Presence feature"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback(::restartCommand)
+        }
     }
 
     private fun onDisplayConfigChanged() {
@@ -274,6 +279,19 @@ object DiscordRPCManager {
             client = null
             scheduleRetry("Discord RPC disconnected")
         }
+    }
+
+    private fun restartCommand() {
+        if (!isEnabled()) return ChatUtils.userError("Discord Rich Presence is disabled. Enable it in the config §e/sh discord")
+        stop()
+        ChatUtils.chat("Restarting Discord Rich Presence...")
+        val progress = progressCategory.start("init /shrpcrestart")
+        with(SkyHanniMod) {
+            manualStartConfig.launchUnScopedCoroutine {
+                start(progressCategory.start("discord RPC manual restart"), fromCommand = true)
+            }
+        }
+        progress.end("end restart")
     }
 
     private fun startCommand() {
