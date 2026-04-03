@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.XmlUtils
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import io.github.notenoughupdates.moulconfig.common.IItemStack
 import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
@@ -117,7 +117,7 @@ class CommunityTodoViewer(
         fun viewOnDiscord() {
             OSUtils.openBrowser(communityInfo.discordThread)
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("Opened the Discord thread for the ${todo.label} community todo.") {
                         withColor("#7289da")
                     }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.achievements
 
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.annotations.Expose
 import net.minecraft.ChatFormatting
@@ -27,7 +27,7 @@ data class Achievement(
         if (tiers.isEmpty()) return description_
 
         if (tiers.size == 1) {
-            return componentBuilder {
+            return buildComponent {
                 append(description_)
                 append(" \n")
                 if (!data.achieved) append("${getProgressFormatted()}/${tiers.first().addSeparators()} to Unlock")
@@ -35,7 +35,7 @@ data class Achievement(
                 withColor(ChatFormatting.YELLOW)
             }
         } else {
-            return componentBuilder {
+            return buildComponent {
                 append(description_)
                 append("\n")
                 if (!data.achieved) {

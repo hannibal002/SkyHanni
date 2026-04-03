@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import net.minecraft.ChatFormatting
 
 @SkyHanniModule
@@ -37,7 +37,7 @@ object NoBitsWarning {
         if (config.bitsGainChatMessage) {
             if (event.bits < config.messageThreshold) return
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("You have gained ")
                     appendWithColor(event.difference.addSeparators(), ChatFormatting.AQUA)
                     append(" Bits.")

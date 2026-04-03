@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import net.minecraft.ChatFormatting
 import net.minecraft.client.player.RemotePlayer
 import kotlin.time.Duration.Companion.seconds
@@ -51,7 +51,7 @@ object PlayerDeathMessages {
             val reason = event.reason
             val color = MarkedPlayerManager.config.chatColor.toChatFormatting()
             event.chatEvent.replaceComponent(
-                componentBuilder {
+                buildComponent {
                     appendWithColor(" ☠ ", ChatFormatting.RED)
                     appendWithColor("$name ", color)
                     appendWithColor(reason, ChatFormatting.GRAY)

@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.plus
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -188,7 +188,7 @@ object MineshaftPityDisplay {
 
             resetCounter()
 
-            val newComponent = componentBuilder {
+            val newComponent = buildComponent {
                 append(message)
                 hover = TextHelper.multiline(hoverText)
             }

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 
@@ -36,7 +36,7 @@ object SlayerAchievements {
         )
         val achievement10m = Achievement(
             "Slayer Psycho".asComponent(),
-            componentBuilder {
+            buildComponent {
                 append("Get over 10m Stored RNG XP! ")
                 append("I hope you drop the dye soon!") {
                     withColor(ChatFormatting.DARK_PURPLE)

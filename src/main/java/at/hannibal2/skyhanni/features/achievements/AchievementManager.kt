@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -83,7 +83,7 @@ object AchievementManager {
             if (isMaxed) achievement.data.achieved = true
             if (shouldShowMessages) {
                 ChatUtils.chat(
-                    componentBuilder {
+                    buildComponent {
                         if (achievement.secret) {
                             append("Secret ") {
                                 withColor(ChatFormatting.GRAY)
@@ -119,7 +119,7 @@ object AchievementManager {
         config[id] = achievement
         if (shouldShowMessages) {
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     if (achievement.secret) {
                         append("Secret ") {
                             withColor(ChatFormatting.GRAY)
@@ -148,7 +148,7 @@ object AchievementManager {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Test Achievement".asComponent(),
-            componentBuilder {
+            buildComponent {
                 append("Run /shtestachievement to test the achievement system!") {
                     withColor(ChatFormatting.DARK_PURPLE)
                 }
@@ -181,7 +181,7 @@ object AchievementManager {
                         achievement.data = AchievementUserData()
                         setAchievement(id, achievement)
                         ChatUtils.chat(
-                            componentBuilder {
+                            buildComponent {
                                 append(achievement.getName())
                                 append(" is now locked!")
                             }
@@ -214,7 +214,7 @@ object AchievementManager {
                     ChatUtils.getUniqueMessageId(),
                     "No Achievements Found"
                 ) { achievement ->
-                    componentBuilder {
+                    buildComponent {
                         if (achievement.secret && !achievement.data.achieved) {
                             append("???") {
                                 withColor(ChatFormatting.DARK_GRAY)
@@ -268,7 +268,7 @@ object AchievementManager {
             listOf(
                 Component.literal("Innate").withColor(ChatFormatting.DARK_GRAY),
                 Component.empty(),
-                componentBuilder {
+                buildComponent {
                     appendWithColor("Value: ", ChatFormatting.GRAY)
                     appendWithColor("$luck✴", ChatFormatting.GREEN)
                 },

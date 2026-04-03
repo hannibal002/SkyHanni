@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -122,7 +122,7 @@ object UpdateManager {
                     updateState = UpdateState.AVAILABLE
                     if (config.fullAutoUpdates || forceDownload) {
                         ChatUtils.chat(
-                            componentBuilder {
+                            buildComponent {
                                 append("SkyHanni found a new update: ${it.update.versionName}, starting to download now.")
                                 withColor(ChatFormatting.GREEN)
                             }
@@ -143,7 +143,7 @@ object UpdateManager {
                     }
                 } else if (forceDownload) {
                     ChatUtils.chat(
-                        componentBuilder {
+                        buildComponent {
                             append("SkyHanni didn't find a new update.")
                             withColor(ChatFormatting.GREEN)
                         }

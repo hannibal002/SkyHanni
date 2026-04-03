@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,7 +29,7 @@ object MythicRabbitPetWarning {
 
     private fun warn() {
         ChatUtils.chat(
-            componentBuilder {
+            buildComponent {
                 append("Use a ")
                 appendWithColor("Mythic Rabbit Pet ", ChatFormatting.LIGHT_PURPLE)
                 append("for more chocolate!")

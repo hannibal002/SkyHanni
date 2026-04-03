@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
@@ -168,7 +168,7 @@ object GardenVisitorTooltip {
             if (wasEmpty && config.rewardWarning.notifyInChat) {
                 visitor.getRewardWarningAwards().forEach { reward ->
                     ChatUtils.chat(
-                        componentBuilder {
+                        buildComponent {
                             append("Found Visitor Reward ")
                             append(reward.displayName)
                             append("!")

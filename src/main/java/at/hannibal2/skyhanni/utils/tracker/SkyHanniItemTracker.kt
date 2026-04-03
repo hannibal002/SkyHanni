@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
@@ -361,7 +361,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
                     appendWithColor(": ", ChatFormatting.GRAY)
                     append("§r$itemName")

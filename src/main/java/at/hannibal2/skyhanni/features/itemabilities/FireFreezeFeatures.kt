@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -200,7 +200,7 @@ object FireFreezeFeatures {
 
             if (config.mobTimer) {
                 val format = timeUntil.formatTime()
-                val text = componentBuilder {
+                val text = buildComponent {
                     appendWithColor("❄ ", LorenzColor.AQUA.toColor().rgb)
                     appendWithColor(format, color.rgb)
                 }

@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -89,7 +89,7 @@ object MineshaftDetection {
         if (type in config.mineshaftsToTrack) {
             TitleManager.sendTitle(type.displayName)
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     withColor(ChatFormatting.GREEN)
                     append("It took ")
                     appendWithColor(formattedTime, ChatFormatting.YELLOW)

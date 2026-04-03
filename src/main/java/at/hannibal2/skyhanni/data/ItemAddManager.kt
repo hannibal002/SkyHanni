@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.evictOldestEntry
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
@@ -158,7 +158,7 @@ object ItemAddManager {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Professional Gambler".asComponent(),
-            componentBuilder {
+            buildComponent {
                 append("Spin 100 dice")
                 append(" I doubt you make money from this...") {
                     withColor(ChatFormatting.DARK_GRAY)

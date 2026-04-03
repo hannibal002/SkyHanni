@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.network.chat.Component
@@ -31,7 +31,7 @@ object VolcanoExplosivityDisplay {
         }
 
         TabWidget.VOLCANO.pattern.matchGroup(event.lines.first(), "status")?.let {
-            display = componentBuilder {
+            display = buildComponent {
                 append("§bVolcano Explosivity§7: ")
                 append(it)
             }

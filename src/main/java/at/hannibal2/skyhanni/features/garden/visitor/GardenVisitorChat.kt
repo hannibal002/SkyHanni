@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
@@ -147,7 +147,7 @@ object GardenVisitorChat {
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(visitor.visitorName)
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append(displayName)
                     append(" is visiting your garden!")
                 }

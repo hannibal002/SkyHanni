@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
@@ -66,7 +66,7 @@ object ContributorManager {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "EEEEKK!".asComponent(),
-            componentBuilder {
+            buildComponent {
                 append("Be in the same lobby as a")
                 append(" SkyHanni ") {
                     withColor(TextHelper.chromaStyle)

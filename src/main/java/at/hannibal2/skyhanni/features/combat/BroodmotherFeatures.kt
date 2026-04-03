@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
@@ -137,7 +137,7 @@ object BroodmotherFeatures {
     private fun playImminentWarning() {
         SoundUtils.repeatSound(100, 2, SoundUtils.createSound("block.note_block.pling", 0.5f))
         ChatUtils.chat(
-            componentBuilder {
+            buildComponent {
                 append("The Broodmother is ")
                 appendWithColor("Imminent", ChatFormatting.DARK_RED)
                 append("! It will spawn in ")

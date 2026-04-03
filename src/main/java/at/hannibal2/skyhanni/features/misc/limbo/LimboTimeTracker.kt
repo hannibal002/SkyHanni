@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -81,7 +81,7 @@ object LimboTimeTracker {
             shownPB = true
             oldPB = personalBest.seconds
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("PERSONAL BEST") {
                         bold = true
                         withColor(ChatFormatting.LIGHT_PURPLE)
@@ -93,7 +93,7 @@ object LimboTimeTracker {
                 },
             )
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("Keep it up!")
                     withColor(ChatFormatting.WHITE)
                 },
@@ -137,7 +137,7 @@ object LimboTimeTracker {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Forgot to turn off the PC".asComponent(),
-            componentBuilder {
+            buildComponent {
                 append("Spend 6 hours in limbo at once! ")
                 append("What a waste of electricity :(") {
                     withColor(ChatFormatting.DARK_GRAY)

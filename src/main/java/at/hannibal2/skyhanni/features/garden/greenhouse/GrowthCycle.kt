@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -74,7 +74,7 @@ object GrowthCycle {
         hasNotified = true
         SoundUtils.playPlingSound()
         ChatUtils.chat(
-            componentBuilder {
+            buildComponent {
                 append("Greenhouse Growth Stage is ready in the Garden") {
                     withColor(ChatFormatting.GREEN)
                 }

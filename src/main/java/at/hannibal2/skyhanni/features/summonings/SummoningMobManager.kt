@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -109,7 +109,7 @@ object SummoningMobManager {
         DelayedRun.runNextTick {
             if (lastChatTime.passedSince() > timeOut) {
                 ChatUtils.chat(
-                    componentBuilder {
+                    buildComponent {
                         append("Your Summoning Mob just ")
                         appendWithColor("died!", ChatFormatting.RED)
                     }

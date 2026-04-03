@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -171,7 +171,7 @@ object MetalDetectorSolver {
         if (config.showTimeTaken && !lastTreasureFound.isFarPast()) {
             DelayedRun.runNextTick {
                 ChatUtils.chat(
-                    componentBuilder {
+                    buildComponent {
                         withColor(ChatFormatting.GREEN)
                         append("You found the treasure in ")
                         appendWithColor("${timeTaken.inWholeSeconds}", ChatFormatting.YELLOW)

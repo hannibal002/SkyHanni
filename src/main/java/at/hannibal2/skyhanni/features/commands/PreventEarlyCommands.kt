@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
@@ -74,7 +74,7 @@ object PreventEarlyCommands {
             val formattedTime = "$seconds ${StringUtils.pluralize(seconds, "second")}"
 
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     withColor(ChatFormatting.RED)
                     append("Cannot execute ")
                     append("/$lastCommand ") {

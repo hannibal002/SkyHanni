@@ -439,7 +439,7 @@ fun Component.replace(
             if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
                 val split = string.split(oldValue)
                 newComp.append(
-                    componentBuilder {
+                    buildComponent {
                         for ((index, str) in split.withIndex()) {
                             append(Component.literal(str).withStyle(safeCurrentStyle))
                             if (index < split.size - 1) {
@@ -471,7 +471,7 @@ operator fun Component.plus(string: String): Component {
     return this.append(string)
 }
 
-fun componentBuilder(init: MutableComponent.() -> Unit): Component {
+fun buildComponent(init: MutableComponent.() -> Unit): Component {
     return Component.empty().also(init)
 }
 

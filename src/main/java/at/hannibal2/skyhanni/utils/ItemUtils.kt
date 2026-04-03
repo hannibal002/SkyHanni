@@ -53,7 +53,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -826,7 +826,7 @@ object ItemUtils {
                 "§eClick to copy internal name to clipboard!",
             ),
         )
-        val hoverComp = componentBuilder {
+        val hoverComp = buildComponent {
             appendWithColor(" (tooltip)", ChatFormatting.DARK_GRAY)
             stackHover = internalName.getItemStackOrNull()
         }
@@ -948,7 +948,7 @@ object ItemUtils {
     fun ItemStack.asTextComponent(): Component? {
         val stack = this
         if (this.item == Items.PLAYER_HEAD) {
-            return componentBuilder {
+            return buildComponent {
                 append(Component.`object`(PlayerSprite(stack.get(DataComponents.PROFILE), true))) {
                     withColor(ChatFormatting.WHITE)
                 }

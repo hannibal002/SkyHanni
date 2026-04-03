@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -94,7 +94,7 @@ object FlowstateHelper {
                 val newLuck = calculateFlowstateLuck(blockBreakStreak)
                 val oldLuck = calculateFlowstateLuck(personalBest)
                 ChatUtils.chat(
-                    componentBuilder {
+                    buildComponent {
                         appendWithColor("NEW FLOWSTATE PERSONAL BEST!", ChatFormatting.LIGHT_PURPLE) {
                             bold = true
                         }
@@ -298,7 +298,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
                 Renderable.text(
-                    componentBuilder {
+                    buildComponent {
                         append("§7Time Remaining: ")
                         append(timeRemaining.formatTime())
                     }
@@ -319,7 +319,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
                 val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
                 Renderable.text(
-                    componentBuilder {
+                    buildComponent {
                         append("§7x${getStreakColor()}$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ ")
                         append(timeRemaining.formatTime())
                     }
@@ -344,7 +344,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
         private val config get() = SkyHanniMod.feature.mining.flowstateHelper
 
         private fun Duration.formatTime(): Component {
-            return componentBuilder {
+            return buildComponent {
                 append(format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true))
                 withColor(getTimerColor(this@formatTime))
             }

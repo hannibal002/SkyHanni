@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 
@@ -47,7 +47,7 @@ object ExperimentsDryStreakDisplay {
         val attemptsFormat = "attempt".pluralize(storage.attemptsSince)
         val finallyFormat = if (storage.attemptsSince >= 10) "§o(finally)§r§e " else ""
         ChatUtils.chat(
-            componentBuilder {
+            buildComponent {
                 append("DRY-STREAK ENDED! ") {
                     withColor(ChatFormatting.GREEN)
                     bold = true

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.italic
 import at.hannibal2.skyhanni.utils.compat.stackHover
@@ -38,7 +38,7 @@ class ExtendedChatColor(
                 description = "Sends a rainbow in chat"
                 category = CommandCategory.DEVELOPER_TEST
                 callback {
-                    val comp = componentBuilder {
+                    val comp = buildComponent {
                         for (i in (0 until 100)) {
                             val color = Color.HSBtoRGB(i / 100F, 1f, 1f)
                             // its funny this doesn't even use extended chat color anymore...
@@ -56,7 +56,7 @@ class ExtendedChatColor(
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
                     ChatUtils.chat(
-                        componentBuilder {
+                        buildComponent {
                             withColor(1146986)
                             append("Hello this is the componentBuilder ")
                             append("example") {
@@ -73,7 +73,7 @@ class ExtendedChatColor(
                                 }
                                 append("Click Events!") {
                                     command = "/ac lol u clicked"
-                                    hover = componentBuilder {
+                                    hover = buildComponent {
                                         append("Click for epic chat message") {
                                             strikethrough = true
                                             withColor(ChatFormatting.RED)
@@ -104,7 +104,7 @@ class ExtendedChatColor(
                 description = "Test component matcher"
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
-                    val component = componentBuilder {
+                    val component = buildComponent {
                         append("hi guys ")
                         appendWithColor("watch me count ", ChatFormatting.AQUA)
                         append(

@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -157,7 +157,7 @@ object HoeLevelDisplay {
             listOf(
                 Component.literal("Items").withColor(ChatFormatting.DARK_GRAY),
                 Component.empty(),
-                componentBuilder {
+                buildComponent {
                     appendWithColor("Value: ", ChatFormatting.GRAY)
                     appendWithColor("$luck✴", ChatFormatting.GREEN)
                 },
@@ -194,7 +194,7 @@ object HoeLevelDisplay {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Hoe Expert".asComponent(),
-            componentBuilder {
+            buildComponent {
                 append("Get a hoe to level 1000. ") {
                     withColor(ChatFormatting.YELLOW)
                 }
@@ -240,7 +240,7 @@ object HoeLevelDisplay {
                     val storage = gardenStorage?.overflowHoeLevels ?: errorStorage(item)
                     storage[uuid] = newLevel - MAX_LEVEL
                     ChatUtils.chat(
-                        componentBuilder {
+                        buildComponent {
                             append("Updated overflow level for ")
                             append(item.hoverName)
                             append(" from ")

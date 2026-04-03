@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 
@@ -52,7 +52,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         if (errors > 3) {
             val hiddenErrors = errors - 3
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!")
                     withColor(ChatFormatting.RED)
                 }

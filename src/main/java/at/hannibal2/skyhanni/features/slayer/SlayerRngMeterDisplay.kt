@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -151,7 +151,7 @@ object SlayerRngMeterDisplay {
                     )
                 }
                 ChatUtils.chat(
-                    componentBuilder {
+                    buildComponent {
                         appendWithColor("RNG Meter ", ChatFormatting.LIGHT_PURPLE)
                         withColor(ChatFormatting.GRAY)
                         append("dropped at ")

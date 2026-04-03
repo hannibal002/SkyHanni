@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
@@ -114,7 +114,7 @@ object FarmingPersonalBestGain {
 
         if (oldFF < 100 && !config.overflow) {
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("This is ")
                     append("${ffDiff.roundTo(2)}☘ $crop Fortune ") {
                         withColor(ChatFormatting.GOLD)
@@ -124,7 +124,7 @@ object FarmingPersonalBestGain {
             )
         } else if (newOverflowFF > 100 && config.overflow) {
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("You have ")
                     append("${overflowFFDiff.roundTo(2)}☘ $crop Fortune ") {
                         withColor(ChatFormatting.GOLD)
@@ -133,7 +133,7 @@ object FarmingPersonalBestGain {
                 }
             )
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append("This is ")
                     append("${overflowFFDiff.roundTo(2)}☘ $crop Fortune ") {
                         withColor(ChatFormatting.GOLD)

@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
@@ -162,13 +162,13 @@ object TotemOfCorruption {
             Component.literal("Totem of Corruption").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD)
         )
         add(
-            componentBuilder {
+            buildComponent {
                 appendWithColor("Remaining: ", ChatFormatting.GRAY)
                 appendWithColor(totem.timeRemaining.format(TimeUnit.MINUTE), ChatFormatting.YELLOW)
             }
         )
         add(
-            componentBuilder {
+            buildComponent {
                 appendWithColor("Owner: ", ChatFormatting.GRAY)
                 appendWithColor(totem.ownerName, ChatFormatting.YELLOW)
             }

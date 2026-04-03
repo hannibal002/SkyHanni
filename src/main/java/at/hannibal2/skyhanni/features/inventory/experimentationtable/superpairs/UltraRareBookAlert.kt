@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.obfuscated
 import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.seconds
@@ -34,7 +34,7 @@ object UltraRareBookAlert {
         lastNotificationTime = SimpleTimeMark.now()
         dragonSound.playSound()
         ChatUtils.chat(
-            componentBuilder {
+            buildComponent {
                 append("You have uncovered a ")
                 appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
                     obfuscated = true

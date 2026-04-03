@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 
@@ -25,7 +25,7 @@ object SeaCreatureKillTime {
         val time = seaCreature.spawnTime.passedSince()
         if (event.seenDeath) {
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append(seaCreature.displayName)
                     append(" took ")
                     append(time.format(showMilliSeconds = true)) {
@@ -37,7 +37,7 @@ object SeaCreatureKillTime {
         } else {
             val minTime = seaCreature.lastUpdate.passedSince()
             ChatUtils.chat(
-                componentBuilder {
+                buildComponent {
                     append(seaCreature.displayName)
                     append(" took between ")
                     append(minTime.format(showMilliSeconds = true)) {

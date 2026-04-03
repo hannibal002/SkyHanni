@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
@@ -111,7 +111,7 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
         builder: MutableComponent.() -> Unit = { },
-    ) = chat(componentBuilder(builder), prefix, prefixColor, replaceSameMessage, onlySendOnce, messageId)
+    ) = chat(buildComponent(builder), prefix, prefixColor, replaceSameMessage, onlySendOnce, messageId)
 
     fun chat(
         message: Component,
@@ -200,7 +200,7 @@ object ChatUtils {
         }
         val msgPrefix = if (prefix) getFormattedChatPrefix(color) else Component.empty()
 
-        val text = componentBuilder {
+        val text = buildComponent {
             append(msgPrefix)
             append(message) {
                 if (color == null) withColor(ChatFormatting.YELLOW)
@@ -268,7 +268,7 @@ object ChatUtils {
         val msgPrefix = if (prefix) getFormattedChatPrefix(color) else Component.empty()
 
         logAndSendMessage(
-            componentBuilder {
+            buildComponent {
                 append(msgPrefix)
                 append(message) {
                     if (color == null) withColor(ChatFormatting.YELLOW)
@@ -307,7 +307,7 @@ object ChatUtils {
             color = prefixColor.replace("§", "")[0].toLorenzColor()?.toColor()?.rgb
         }
         val msgPrefix = if (prefix) getFormattedChatPrefix(color) else Component.empty()
-        val text = componentBuilder {
+        val text = buildComponent {
             append(msgPrefix)
             append(message) {
                 if (color == null) withColor(ChatFormatting.YELLOW)
@@ -507,7 +507,7 @@ object ChatUtils {
     }
 
     private fun getFormattedChatPrefix(prefixColor: Int?): Component {
-        return componentBuilder {
+        return buildComponent {
             if (prefixColor != null) {
                 append(CHAT_PREFIX)
                 withColor(prefixColor)

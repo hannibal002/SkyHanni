@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -85,7 +85,7 @@ object ShardTrackerDisplay {
 
             val color =
                 ColorUtils.blendRGB(LorenzColor.YELLOW, LorenzColor.GREEN, amountInHuntingBox, amountUntilMax).rgb
-            val text = componentBuilder {
+            val text = buildComponent {
                 withColor(ChatFormatting.GRAY)
                 append(" $shardDisplayName")
                 append(": ")
