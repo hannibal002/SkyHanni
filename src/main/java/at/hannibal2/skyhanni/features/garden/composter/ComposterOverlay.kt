@@ -597,7 +597,8 @@ object ComposterOverlay {
         return price
     }
 
-    fun onNeuRepositoryReload() {
+    @HandleEvent
+    fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
