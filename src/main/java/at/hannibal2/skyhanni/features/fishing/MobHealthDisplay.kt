@@ -71,7 +71,6 @@ object MobHealthDisplay {
                 if (health == -1) continue
                 val mob = seaCreature.mob ?: continue
                 val color = if (seaCreature.isOwn) ChatFormatting.GREEN else ChatFormatting.RED
-                val shuriken: String = if (mob.name.contains("§b✯")) "✯" else ""
                 val guiComponent = componentBuilder {
                     appendWithColor(seaCreature.name, color)
                     append(" ")
