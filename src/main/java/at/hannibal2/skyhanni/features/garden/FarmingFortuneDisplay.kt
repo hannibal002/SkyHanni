@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCur
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -112,7 +111,6 @@ object FarmingFortuneDisplay {
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
     private val latestFF: MutableMap<CropType, Double>? get() = GardenApi.storage?.latestTrueFarmingFortune
-    private val personalBest: MutableMap<CropType, Double>? get() = GardenApi.storage?.personalBestFF
 
     private var currentCrop: CropType? = null
 
@@ -195,13 +193,13 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @HandleEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
+    @HandleEvent(GardenToolChangeEvent::class)
+    fun onGardenToolChange() {
         lastToolSwitch = SimpleTimeMark.now()
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
@@ -346,8 +344,8 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @HandleEvent
-    fun onCropClick(event: CropClickEvent) {
+    @HandleEvent(CropClickEvent::class)
+    fun onCropClick() {
         if (firstBrokenCropTime == SimpleTimeMark.farPast()) firstBrokenCropTime = SimpleTimeMark.now()
     }
 
@@ -376,7 +374,6 @@ object FarmingFortuneDisplay {
         }
     }
 
-    fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
     fun getToolFortune(internalName: NeuInternalName?): Double {
         if (internalName == null) return 0.0
         val string = internalName.asString()
@@ -420,10 +417,6 @@ object FarmingFortuneDisplay {
     fun getHarvestingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("harvesting") ?: 0) * 12.5
     fun getCultivatingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("cultivating") ?: 0) * 2.0
     fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("pesterminator") ?: 0) * 2.0
-
-    fun getAbilityFortune(item: ItemStack?) = item?.let {
-        getAbilityFortune(it.getInternalName(), it.getLore())
-    } ?: 0.0
 
     fun getAbilityFortune(internalName: NeuInternalName, lore: List<String>): Double {
         var pieces = 0
@@ -497,9 +490,5 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
 
         event.move(87, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
-    }
-
-    fun getPersonalBest(crop: CropType): Double {
-        return personalBest?.get(crop) ?: 0.0
     }
 }

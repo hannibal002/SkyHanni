@@ -51,5 +51,5 @@ object CrystalHollowsNamesInCore {
         }
     }
 
-    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.crystalHollowsNamesInCore
+    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsNamesInCore
 }

@@ -19,10 +19,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percen
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -67,7 +64,7 @@ object GardenCropMilestoneDisplay {
     private var displayCrop: CropType? = null
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         onToggle(
             config.showMaxTier,
             config.highestTimeFormat,
@@ -79,7 +76,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 
@@ -107,22 +104,23 @@ object GardenCropMilestoneDisplay {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         update()
     }
 
+    // TODO make sure how we can replace this event without breaking logic
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onGardenJoin(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         update()
     }
 
-    @HandleEvent
-    fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
+    @HandleEvent(CropMilestoneUpdateEvent::class)
+    fun onCropMilestoneUpdate() {
         update()
     }
 
-    @HandleEvent
-    fun onToolChange(event: GardenToolChangeEvent) {
+    @HandleEvent(GardenToolChangeEvent::class)
+    fun onToolChange() {
         update()
     }
 
