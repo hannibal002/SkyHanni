@@ -92,7 +92,7 @@ object SulphurSkitterBox {
     }
 
     fun isEnabled() =
-        IslandType.CRIMSON_ISLE.isCurrent() && config.enabled && (!config.onlyWithRods || FishingApi.holdingLavaRod)
+        IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || FishingApi.holdingLavaRod)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

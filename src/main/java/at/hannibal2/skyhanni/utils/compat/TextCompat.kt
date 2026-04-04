@@ -22,6 +22,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import java.net.URI
 import java.util.Optional
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
@@ -107,6 +108,8 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
 private val textColorLUT = ChatFormatting.entries
     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
     .toMap()
+
+fun Style?.orEmpty(): Style = this ?: Style.EMPTY
 
 fun Style.chatStyle() = buildString {
     color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
@@ -293,7 +296,7 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): H
     null -> null
     HoverEvent.Action.SHOW_TEXT -> HoverEvent.ShowText(component)
     // I really don't think anyone is using the other 2 lol
-    else -> null
+    else -> throw NotImplementedError("Action ${action.name} is not implemented")
 }
 
 fun Component.changeColor(color: LorenzColor): Component =
@@ -431,21 +434,21 @@ fun Component.replace(
     predicate: (Style?) -> Boolean = ALWAYS,
 ): MutableComponent? {
     val newComp = Component.empty()
-    var hasEdited = false
+    val hasEdited = AtomicBoolean(false)
 
     this.visit(
         { currentStyle: Style?, string: String? ->
             val safeCurrentStyle = currentStyle ?: Style.EMPTY
-            if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited) && predicate(style)) {
+            if (string?.contains(oldValue) == true && (!onlyReplaceFirst || !hasEdited.load()) && predicate(style)) {
                 val split = string.split(oldValue)
                 newComp.append(
                     componentBuilder {
                         for ((index, str) in split.withIndex()) {
                             append(Component.literal(str).withStyle(safeCurrentStyle))
                             if (index < split.size - 1) {
-                                if (!onlyReplaceFirst || !hasEdited) {
+                                if (!onlyReplaceFirst || !hasEdited.load()) {
                                     append(newValue)
-                                    hasEdited = true
+                                    hasEdited.store(true)
                                 } else {
                                     append(oldValue) {
                                         style = safeCurrentStyle
@@ -463,7 +466,7 @@ fun Component.replace(
         Style.EMPTY,
     )
 
-    if (!hasEdited) return null
+    if (!hasEdited.load()) return null
     return newComp
 }
 
