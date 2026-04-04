@@ -296,5 +296,5 @@ object CrystalHollowsWalls {
         )
     }
 
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent()
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

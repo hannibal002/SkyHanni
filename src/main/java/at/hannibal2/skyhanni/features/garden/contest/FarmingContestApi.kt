@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -49,7 +49,7 @@ object FarmingContestApi {
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
     val inContest
-        get() = internalContest && IslandTypeTags.CONTESTS_SHOWN.inAny()
+        get() = internalContest && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false

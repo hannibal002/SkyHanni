@@ -14,11 +14,8 @@ import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -134,7 +131,7 @@ object ComposterOverlay {
         }
     }
 
-    @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened() {
         if (inInventory) displayDirty = true
     }
@@ -508,7 +505,7 @@ object ComposterOverlay {
 
             add("")
             if (selected) {
-                add(internalName.createBuyTipLine("Control + "))
+                add(internalName.createBuyTipLine("${KeyboardManager.getModifierKeyName()} + "))
             } else {
                 add("§eClick to select for profit calculations!")
             }
@@ -600,15 +597,15 @@ object ComposterOverlay {
         return price
     }
 
-    @HandleEvent(NeuRepositoryReloadEvent::class)
+    @HandleEvent
     fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
     // hopefully fix the display not working properly
     @HandleEvent
-    fun onIslandSwap(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GARDEN) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
         updateOrganicMatterFactors()
     }
 
@@ -620,7 +617,7 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(minimumOrganicMatter) {
@@ -708,7 +705,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {
