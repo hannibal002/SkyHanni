@@ -121,11 +121,11 @@ enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
         }
     }
 
-    override
+
     @Deprecated("old name", ReplaceWith("isInIsland()"))
     fun isCurrent() = isInIsland()
 
-    fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
+    override fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
 }
 
 data class IslandData(
