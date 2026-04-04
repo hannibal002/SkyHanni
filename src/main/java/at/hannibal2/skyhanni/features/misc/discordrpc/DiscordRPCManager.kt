@@ -68,7 +68,11 @@ object DiscordRPCManager {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
             onDisplayConfigChanged()
         }
-        config.enabled.whenChanged { _, new -> onEnabledChanged(new) }
+        config.enabled.whenChanged { _, new ->
+            with(SkyHanniMod) {
+                if (!new) stopConfig.launchUnScopedCoroutine(::stop)
+            }
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -151,11 +155,6 @@ object DiscordRPCManager {
         } else {
             cancelJobs()
         }
-    }
-
-    private fun onEnabledChanged(enabled: Boolean) = with(SkyHanniMod) {
-        if (enabled) return@with
-        else stopConfig.launchUnScopedCoroutine(::stop)
     }
 
     private fun cancelJobs() {
