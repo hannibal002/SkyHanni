@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
@@ -235,11 +236,11 @@ object VanquisherWaypointShare {
             waypoint.location,
             beaconColor.rgb,
         )
-        drawLineToEye(
+        drawLineToCrosshair(
             location = waypoint.location,
             color = beaconColor,
             lineWidth = 3,
-            depth = false,
+            depth = false
         )
     }
 
