@@ -5,15 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
-import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.IslandTypeTags.FORAGING_CUSTOM_TREES
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -64,7 +62,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
     override val config get() = SkyHanniMod.feature.foraging.tracker
     override val renderConfig = RenderDisplayConfig(
         condition = { heldItemEnabled() && config.enabled },
-        onlyOnIslandTag = FORAGING_CUSTOM_TREES,
+        onlyOnIslandTag = IslandTypeTag.FORAGING_CUSTOM_TREES,
     )
     private val patternGroup = RepoPattern.group("foraging.treegift")
 
@@ -260,15 +258,14 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
         addPriceFromButton(this)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onItemAdd(event: ItemAddEvent) {
-        if (!FORAGING_CUSTOM_TREES.inAny() || event.source != ItemAddManager.Source.COMMAND) return
+        if (event.source != ItemAddManager.Source.COMMAND) return
         event.addItemFromEvent()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onSackChange(event: SackChangeEvent) {
-        if (!FORAGING_CUSTOM_TREES.inAny()) return
         event.addLogs()
     }
 
@@ -315,9 +312,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
     private var lastTreeGiftAt: SimpleTimeMark = SimpleTimeMark.farPast()
     private val loot = mutableMapOf<NeuInternalName, Int>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!FORAGING_CUSTOM_TREES.inAny()) return
         event.tryReadLoot()
         event.tryBlock()
     }
@@ -325,9 +321,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
     private val STRETCHING_STICKS = "STRETCHING_STICKS".toInternalName()
     private var currentStretchingSticks = 0
 
-    @HandleEvent(OwnInventoryItemUpdateEvent::class)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onOwnInventoryItemUpdate() {
-        if (!FORAGING_CUSTOM_TREES.inAny()) return
         val treeType = treeType ?: return
 
         val stretchingSticksNow = InventoryUtils.getItemsInOwnInventory().filter {
@@ -500,9 +495,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
         lastHover = null
     }
 
-    @HandleEvent(IslandChangeEvent::class)
+    @HandleEvent(IslandChangeEvent::class, onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onIslandChange() {
-        if (!FORAGING_CUSTOM_TREES.inAny()) return
         firstUpdate()
     }
 
@@ -515,9 +509,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<TreeType, ForagingTracker.B
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onItemChange(event: ItemInHandChangeEvent) {
-        if (!FORAGING_CUSTOM_TREES.inAny()) return
         val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
         if (isAxe != hasHeldAxe) {
             if (!isAxe) {
