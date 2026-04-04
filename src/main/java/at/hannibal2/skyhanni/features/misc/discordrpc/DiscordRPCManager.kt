@@ -55,11 +55,10 @@ object DiscordRPCManager {
     private var retryJob: Job? = null
     private var lastDebugInfo: Map<String, String> = emptyMap()
 
-    private val startConfig = CoroutineSettings("discord RPC start", timeout = Duration.INFINITE).withIOContext()
-    private val presenceConfig = CoroutineSettings("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
-    private val readerConfig = CoroutineSettings("discord RPC reader", timeout = Duration.INFINITE).withIOContext()
-    private val stopConfig = CoroutineSettings("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
-    private val manualStartConfig = CoroutineSettings("discord RPC manual start", timeout = Duration.INFINITE).withIOContext()
+    private val startCoroutine = CoroutineSettings("discord RPC start", timeout = Duration.INFINITE).withIOContext()
+    private val presenceCoroutine = CoroutineSettings("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
+    private val stopCoroutine = CoroutineSettings("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
+    private val manualStartCoroutine = CoroutineSettings("discord RPC manual start", timeout = Duration.INFINITE).withIOContext()
 
     private fun isConnected() = client?.isConnected == true
     private fun isEnabled() = config.enabled.get()
@@ -71,7 +70,7 @@ object DiscordRPCManager {
         }
         config.enabled.whenChanged { _, new ->
             with(SkyHanniMod) {
-                if (!new) stopConfig.launchUnScopedCoroutine(::stop)
+                if (!new) stopCoroutine.launchUnScopedCoroutine(::stop)
             }
         }
     }
@@ -92,7 +91,7 @@ object DiscordRPCManager {
     fun onTick() {
         if (started || !isEnabled()) return
         val progress = progressCategory.start("auto start in onTick")
-        startConfig.launchUnScoped { start(progress) }
+        startCoroutine.launchUnScoped { start(progress) }
         started = true
     }
 
@@ -236,7 +235,7 @@ object DiscordRPCManager {
         progress.update("in setupPresenceJob")
         var updatePresenceProgress: ChatProgressUpdates? = progressCategory.start("discord RPC updatePresence")
         presenceJob = with(SkyHanniMod) {
-            presenceConfig.launchUnScopedCoroutine {
+            presenceCoroutine.launchUnScopedCoroutine {
                 updatePresenceProgress?.update("started update presence loop first run")
                 while (isConnected()) {
                     updatePresence(updatePresenceProgress)
@@ -291,7 +290,7 @@ object DiscordRPCManager {
         ChatUtils.chat("Restarting Discord Rich Presence...")
         val progress = progressCategory.start("init /shrpcrestart")
         with(SkyHanniMod) {
-            manualStartConfig.launchUnScopedCoroutine {
+            manualStartCoroutine.launchUnScopedCoroutine {
                 start(progressCategory.start("discord RPC manual restart"), fromCommand = true)
             }
         }
@@ -315,7 +314,7 @@ object DiscordRPCManager {
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         progress.end("launchCoroutine")
         with(SkyHanniMod) {
-            manualStartConfig.launchUnScopedCoroutine {
+            manualStartCoroutine.launchUnScopedCoroutine {
                 start(progressCategory.start("discord RPC manual start"), fromCommand = true)
             }
         }
