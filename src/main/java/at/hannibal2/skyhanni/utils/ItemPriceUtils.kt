@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
 import kotlin.time.Duration.Companion.minutes
@@ -161,14 +161,14 @@ object ItemPriceUtils {
         }
     }
 
-    private val lowBinCoroutine = CoroutineConfig("neu lowest bin item price fetch", timeout = 1.minutes).withIOContext()
+    private val lowBinCoroutine = CoroutineSettings("neu lowest bin item price fetch", timeout = 1.minutes).withIOContext()
     private val lowBinStatic = ApiStaticGetPath(
         "https://moulberry.codes/lowestbin.json.gz",
         "NEU Lowest Bin",
         tryForceGzip = true,
     )
 
-    private val eliteLbinCoroutine = CoroutineConfig("elite lowest bin item price fetch", timeout = 1.minutes).withIOContext()
+    private val eliteLbinCoroutine = CoroutineSettings("elite lowest bin item price fetch", timeout = 1.minutes).withIOContext()
     private val eliteLowBinStatic = ApiStaticGetPath(
         "https://api.eliteskyblock.com/resources/auctions",
         "Elite Lowest Bin",
