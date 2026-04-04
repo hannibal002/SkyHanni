@@ -14,7 +14,7 @@ fun modifyGetModelFromBlockState(
 ) {
     if (!SkyBlockUtils.inSkyBlock) return
 
-    val returnState = MiningCommissionsBlocksColor.processState(state)
+    val returnState = MiningCommissionsBlocksColor.processState(state) ?: return
 
     if (returnState != state) {
         cir.returnValue = blockRendererDispatcher.blockModelShaper.getBlockModel(returnState)

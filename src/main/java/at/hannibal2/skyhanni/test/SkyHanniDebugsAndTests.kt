@@ -47,7 +47,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -89,6 +88,7 @@ object SkyHanniDebugsAndTests {
             add("[SkyHanni] Graph Area: ${SkyBlockUtils.graphArea}")
         }
 
+        // TODO can we rename this to ore_block?
         registerDebugScreenEntry("targeted_oreblock", SkyBlockUtils::inSkyBlock) {
             BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                 OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
@@ -443,7 +443,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         // TODO: make this not tied to debug HUD
         if (!debugConfig.enabled || !MinecraftCompat.showDebugHud) return
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")

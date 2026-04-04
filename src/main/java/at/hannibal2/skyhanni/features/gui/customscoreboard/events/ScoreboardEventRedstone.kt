@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
@@ -14,5 +14,5 @@ object ScoreboardEventRedstone : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.redstonePattern)
 
-    override fun showIsland() = IslandTypeTags.PRIVATE_ISLAND.inAny()
+    override fun showIsland() = IslandTypeTag.PRIVATE_ISLAND.isInIsland()
 }

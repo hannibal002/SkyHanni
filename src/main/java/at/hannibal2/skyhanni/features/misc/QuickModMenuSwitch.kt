@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
@@ -14,9 +15,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPublicFieldValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -26,6 +27,8 @@ import net.minecraft.client.Minecraft
 object QuickModMenuSwitch {
 
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
+    private val reloadRepoCoroutine = CoroutineSettings("quick mod menu switch repo reload")
+
     private var display = emptyList<Renderable>()
     private var latestGuiPath = ""
 
@@ -35,18 +38,17 @@ object QuickModMenuSwitch {
     private var lastGuiOpen = 0L
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
-        mods = modsJar.mods.filter { mod ->
+    fun onRepoReload(event: RepositoryReloadEvent) = reloadRepoCoroutine.launch {
+        mods = event.getConstantAsync<ModGuiSwitcherJson>("ModGuiSwitcher").mods.filter { mod ->
             mod.value.guiPath.any { runCatching { Class.forName(it) }.isSuccess }
         }.map { (name, mod) ->
             Mod(name, mod.description, mod.command, mod.guiPath)
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.QUICK_MOD_MENU_SWITCH])
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !event.isMod(5)) return
+        if (!config.enabled || !event.isMod(5)) return
         update()
     }
 
@@ -140,16 +142,14 @@ object QuickModMenuSwitch {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.QUICK_MOD_MENU_SWITCH])
     fun onScreenDrawn(event: ScreenDrawnEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
         DrawContextUtils.pushPop {
             config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
         }
     }
-
-    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -10,9 +10,6 @@ import at.hannibal2.skyhanni.api.SkillApi.skillXPInfoMap
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
@@ -60,7 +57,7 @@ object SkillProgress {
     var hideInActionBar = listOf<String>()
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -78,7 +75,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -88,7 +85,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -146,7 +143,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         display = emptyList()
         allDisplay = emptyList()
         etaDisplay = emptyList()
@@ -205,7 +202,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         onToggle(
             config.enabled,
             config.alwaysShow,
