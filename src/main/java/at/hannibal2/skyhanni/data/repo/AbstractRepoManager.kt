@@ -56,7 +56,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val configDirectory: File
 
     @PublishedApi
-    internal val logger by lazy { RepoLogger("[Repo - $commonName]") }
+    internal val logger by lazy { RepoLogger(this) }
     val repoDirectory by lazy {
         // ~/.minecraft/config/[...]/repo
         File(configDirectory, "repo")

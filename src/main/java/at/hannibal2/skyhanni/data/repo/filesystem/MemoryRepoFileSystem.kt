@@ -75,7 +75,7 @@ class MemoryRepoFileSystem(
         root: File,
     ): CompletableDeferred<Unit> {
         val deferred = CompletableDeferred<Unit>()
-        coroutineConfig.withIOContext().launchUnScoped {
+        coroutineSettings.withIOContext().launchUnScoped {
             try {
                 saveToDisk(category, root)
                 deferred.complete(Unit)
