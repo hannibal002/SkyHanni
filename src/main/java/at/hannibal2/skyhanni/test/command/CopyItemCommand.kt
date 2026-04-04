@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CopyItemCommand {
 
-    private val copyItemConfig = CoroutineConfig("copy item command")
+    private val copyItemConfig = CoroutineSettings("copy item command")
     private val itemPropertyMap: Map<String, (ItemStack.() -> String)> = buildMap {
         fun String.quoteWrap(leadingSpace: Boolean = false) = "${if (leadingSpace) " " else ""}'$this'"
         put("internal name") { getInternalName().asString() }

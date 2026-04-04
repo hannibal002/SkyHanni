@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonElement
 import net.minecraft.world.item.ItemStack
@@ -22,7 +22,7 @@ import java.io.Reader
 @SkyHanniModule
 object TestExportTools {
     private val config get() = DevApi.config.debug
-    private val copyConfig = CoroutineConfig("copy item data")
+    private val copyConfig = CoroutineSettings("copy item data")
     internal val itemKey = Key<ItemStack>("Item")
     class Key<T> internal constructor(val name: String)
 

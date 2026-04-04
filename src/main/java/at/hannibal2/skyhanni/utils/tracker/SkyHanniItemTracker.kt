@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
@@ -253,7 +253,7 @@ abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : Sk
         }
     }
 
-    private val copyOnClickConfig by lazy { CoroutineConfig("$name copy on click") }
+    private val copyOnClickConfig by lazy { CoroutineSettings("$name copy on click") }
 
     private fun copyOnClick(line: String, fullTipsLine: String, type: String) = copyOnClickConfig.launch {
         val copied = ClipboardUtils.copyToClipboardAsync(
