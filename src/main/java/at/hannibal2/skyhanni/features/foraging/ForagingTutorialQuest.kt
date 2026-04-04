@@ -66,7 +66,7 @@ object ForagingTutorialQuest {
                 }
             }
         }
-        if (IslandType.HUB.isCurrent() || IslandType.THE_PARK.isCurrent()) {
+        if (IslandType.HUB.isInIsland() || IslandType.THE_PARK.isInIsland()) {
             "§cYou must complete the §r§6(?<quest>.*) Quest §r§cto use this!".toPattern().matchMatcher(event.message) {
                 stepByName(group("quest"))
             }

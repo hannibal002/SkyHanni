@@ -231,7 +231,7 @@ object TestCanSeeFace {
     }
 
     @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRender() {
         if (!enabled || !debugEnabled) return
         val renderable = faceCheckContext.debugRenderable ?: lastRenderable ?: return
         lastRenderable = renderable

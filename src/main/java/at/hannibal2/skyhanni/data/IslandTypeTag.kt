@@ -1,150 +1,71 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import com.google.gson.reflect.TypeToken
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.EnumSet
 
-// A group of islands that have something in common.
-class IslandTypeTag internal constructor(name: String, private val types: EnumSet<IslandType>) {
+/**
+ * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
+ */
+enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType {
 
-    internal constructor(name: String, vararg types: Any) : this(
-        name,
-        EnumSet.copyOf(
-            types.flatMap {
-                when (it) {
-                    is IslandTypeTag -> it.types
-                    is IslandType -> listOf(it)
-                    is String -> listOf(IslandType.getByName(it))
-                    else -> error("Invalid type: $it")
-                }
-            },
-        ),
-    )
+    PRIVATE_ISLAND(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST),
+    GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
+    PERSONAL_ISLAND(PRIVATE_ISLAND, GARDEN_ISLAND),
 
-    init {
-        tags[name] = this
+    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT),
+    NORMAL_MINING(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS),
+    ADVANCED_MINING(IS_COLD, IslandType.CRYSTAL_HOLLOWS),
+    MINING(NORMAL_MINING, ADVANCED_MINING),
+    CUSTOM_MINING(ADVANCED_MINING, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN),
+
+    FORAGING(IslandType.THE_PARK, IslandType.GALATEA),
+    FORAGING_CUSTOM_TREES(IslandType.GALATEA),
+
+    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT),
+    HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
+    CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
+
+    /** Busy islands are islands where a player is doing something considered 'important'. */
+    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+    ;
+
+    private val types: EnumSet<IslandType> = types.fold(
+        EnumSet.noneOf(IslandType::class.java),
+    ) { set, islandType ->
+        set.apply {
+            when (islandType) {
+                is IslandTypeTag -> addAll(islandType.types)
+                is IslandType -> add(islandType)
+                else -> error("Invalid type: $islandType")
+            }
+        }
     }
 
     private fun update(newValues: List<String>) {
         types.clear()
-        newValues.forEach { island ->
-            EnumUtils.enumValueOfOrNull<IslandType>(island.uppercase())?.let {
-                types.add(it)
-            }
-        }
+        newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    fun inAny() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland in types
+    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland in types
 
     @SkyHanniModule
     companion object {
 
-        private val type = object : TypeToken<Map<String, List<String>>>() {}.type
-        private val tags = mutableMapOf<String, IslandTypeTag>()
+        fun Collection<IslandTypeTag>.isInAnyIsland(): Boolean = any { it.isInIsland() }
+
+        private val repoReloadCoroutine = CoroutineSettings("island type tag repo reload")
 
         @HandleEvent
-        fun onRepoReload(event: RepositoryReloadEvent) {
-            IslandTypeTags // Make sure the object is initialized
-            event.getConstant<Map<String, List<String>>>("IslandTypeTags").forEach { (name, values) ->
-                tags[name]?.update(values)
+        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+            event.getConstantAsync<Map<String, List<String>>>("IslandTypeTags").forEach { (name, values) ->
+                EnumUtils.enumValueOfOrNull<IslandTypeTag>(name.uppercase())?.update(values)
             }
         }
     }
-}
-
-object IslandTypeTags {
-
-    val PRIVATE_ISLAND = IslandTypeTag(
-        "private_island",
-        IslandType.PRIVATE_ISLAND,
-        IslandType.PRIVATE_ISLAND_GUEST,
-    )
-
-    val GARDEN_ISLAND = IslandTypeTag(
-        "garden_island",
-        IslandType.GARDEN,
-        IslandType.GARDEN_GUEST,
-    )
-
-    val PERSONAL_ISLAND = IslandTypeTag(
-        "personal_island",
-        PRIVATE_ISLAND,
-        GARDEN_ISLAND,
-    )
-
-    // Mining
-    val IS_COLD = IslandTypeTag(
-        "is_cold",
-        IslandType.DWARVEN_MINES,
-        IslandType.MINESHAFT,
-    )
-    val NORMAL_MINING = IslandTypeTag(
-        "normal_mining",
-        IslandType.GOLD_MINES,
-        IslandType.DEEP_CAVERNS,
-    )
-    val ADVANCED_MINING = IslandTypeTag(
-        "advanced_mining",
-        IS_COLD,
-        IslandType.CRYSTAL_HOLLOWS,
-    )
-    val MINING = IslandTypeTag(
-        "mining",
-        NORMAL_MINING,
-        ADVANCED_MINING,
-    )
-    val CUSTOM_MINING = IslandTypeTag(
-        "custom_mining",
-        ADVANCED_MINING,
-        IslandType.THE_END,
-        IslandType.CRIMSON_ISLE,
-        IslandType.SPIDER_DEN,
-    )
-
-    // Foraging
-    val FORAGING = IslandTypeTag(
-        "foraging",
-        IslandType.THE_PARK,
-        IslandType.GALATEA,
-    )
-    val FORAGING_CUSTOM_TREES = IslandTypeTag(
-        "foraging_custom_trees",
-        IslandType.GALATEA,
-    )
-
-    // Misc
-    val HOPPITY_DISALLOWED = IslandTypeTag(
-        "hoppity_disallowed",
-        IslandType.THE_RIFT,
-        IslandType.KUUDRA_ARENA,
-        IslandType.CATACOMBS,
-        IslandType.MINESHAFT,
-    )
-    val HAS_SHOWCASES = IslandTypeTag(
-        "has_showcases",
-        PRIVATE_ISLAND,
-        IslandType.HUB,
-        IslandType.CRIMSON_ISLE,
-    )
-    val CONTESTS_SHOWN = IslandTypeTag(
-        "contests_shown",
-        IslandType.GARDEN,
-        IslandType.HUB,
-        IslandType.THE_FARMING_ISLANDS,
-    )
-
-    /** Busy islands are islands where a player is doing something considered 'important'. */
-    val BUSY = IslandTypeTag(
-        "busy",
-        IslandType.DARK_AUCTION,
-        IslandType.MINESHAFT,
-        IslandType.THE_RIFT,
-        IslandType.NONE,
-        IslandType.UNKNOWN,
-    )
-
 }

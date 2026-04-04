@@ -68,15 +68,19 @@ object RenderUtils {
     /**
      * Runs or schedules a block on the Render Thread.
      * - If already on the render thread, executes immediately and returns a completed future.
-     * - Otherwise, queues via [Minecraft.submit] and returns a pending future.
+     * - Otherwise, queues and returns a pending future.
      */
     fun <T> scheduleOnRenderThread(
         setupFor: Lighting.Entry? = null,
         block: () -> T,
     ): CompletableFuture<T> =
-        if (RenderSystem.isOnRenderThread()) CompletableFuture.completedFuture(runOnRenderThread(setupFor, block))
-        else Minecraft.getInstance().submit<T> {
-            runOnRenderThread(setupFor, block)
+        if (RenderSystem.isOnRenderThread()) {
+            CompletableFuture.completedFuture(runOnRenderThread(setupFor, block))
+        } else {
+            CompletableFuture.supplyAsync(
+                { runOnRenderThread(setupFor, block) },
+                Minecraft.getInstance(),
+            )
         }
 
     /**
@@ -152,13 +156,6 @@ object RenderUtils {
     }
 
     @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
-    fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
-        if (string.isNullOrBlank()) return
-        val x = renderString0(string, offsetX, offsetY, centerX)
-        GuiEditManager.add(this, posLabel, x, 10)
-    }
-
-    @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
     private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int =
         DrawContextUtils.pushPopResult {
             val display = "§f$string"
@@ -214,6 +211,8 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
+    // TODO clean up nullable calls - the function param should not take `Renderable?`,
+    //  the onus should be on the caller to check before calling this.
     fun Position.renderRenderable(
         renderable: Renderable,
         posLabel: String,
