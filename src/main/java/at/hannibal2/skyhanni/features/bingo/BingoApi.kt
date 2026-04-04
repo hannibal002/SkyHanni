@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
@@ -52,7 +52,7 @@ object BingoApi {
     // This may need to be made shorter than 1 hour if we start using goal data in the future
     private val UPDATE_INTERVAL = 1.hours
 
-    private val backgroundCoroutine = CoroutineConfig("bingo api fetch background").withIOContext()
+    private val backgroundCoroutine = CoroutineSettings("bingo api fetch background").withIOContext()
 
     private val bingoStatic = ApiStaticGetPath(
         "https://api.hypixel.net/v2/resources/skyblock/bingo",
@@ -249,7 +249,7 @@ object BingoApi {
             category = CommandCategory.USERS_BUG_FIX
             simpleCallback {
                 ChatUtils.chat("Updating Bingo event data...")
-                CoroutineConfig("bingo api fetch foreground").withIOContext().launchCoroutine {
+                CoroutineSettings("bingo api fetch foreground").withIOContext().launchCoroutine {
                     try {
                         updateBingoData()
                     } catch (e: Exception) {

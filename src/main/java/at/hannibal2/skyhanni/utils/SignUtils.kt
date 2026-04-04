@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
@@ -18,9 +18,9 @@ object SignUtils {
     private var copyLastClicked = false
     private var deleteLastClicked = false
 
-    private val deleteConfig = CoroutineConfig("sign utils check deleting")
-    private val copyConfig = CoroutineConfig("sign utils copy copying")
-    private val pasteConfig = CoroutineConfig("sign utils paste config")
+    private val deleteConfig = CoroutineSettings("sign utils check deleting")
+    private val copyConfig = CoroutineSettings("sign utils copy copying")
+    private val pasteConfig = CoroutineSettings("sign utils paste config")
 
     fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getInstance().screen
