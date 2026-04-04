@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class RareMobSharingConfig {
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Share your Rare Diana Mobs and receiving other Rare Diana Mobs via Party Chat.")
     @ConfigEditorBoolean
@@ -24,7 +25,7 @@ class RareMobSharingConfig {
     @Expose
     @ConfigOption(
         name = "Instant Share",
-        desc = "Share the waypoint as soon as you find a Rare Diana Mob. As an alternative, you can share it only via key press."
+        desc = "Share the waypoint as soon as you find a Rare Diana Mob. As an alternative, you can share it only via key press.",
     )
     @ConfigEditorBoolean
     var instantShare: Boolean = true
@@ -47,7 +48,7 @@ class RareMobSharingConfig {
     @Expose
     @ConfigOption(
         name = "Read Global Chat",
-        desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat."
+        desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat.",
     )
     @ConfigEditorBoolean
     var globalChat: Boolean = false
@@ -55,28 +56,5 @@ class RareMobSharingConfig {
     @Expose
     @ConfigOption(name = "Mob Toggles", desc = "Choose which rare mobs trigger waypoint sharing.")
     @Accordion
-    val mobToggles: MobTogglesConfig = MobTogglesConfig()
-
-    class MobTogglesConfig {
-
-        @Expose
-        @ConfigOption(name = "Sphinx", desc = "Share waypoints for §6Sphinx§7.")
-        @ConfigEditorBoolean
-        var sphinx: Boolean = true
-
-        @Expose
-        @ConfigOption(name = "Minos Inquisitor", desc = "Share waypoints for §6Minos Inquisitor§7.")
-        @ConfigEditorBoolean
-        var minosInquisitor: Boolean = true
-
-        @Expose
-        @ConfigOption(name = "Manticore", desc = "Share waypoints for §6Manticore§7.")
-        @ConfigEditorBoolean
-        var manticore: Boolean = true
-
-        @Expose
-        @ConfigOption(name = "King Minos", desc = "Share waypoints for §6King Minos§7.")
-        @ConfigEditorBoolean
-        var kingMinos: Boolean = true
-    }
+    val mobToggles: RareMobToggleConfig = RareMobToggleConfig()
 }

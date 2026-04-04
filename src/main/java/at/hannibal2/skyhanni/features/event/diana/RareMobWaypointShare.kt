@@ -76,7 +76,6 @@ object RareMobWaypointShare {
         ".* §r§eYou dug out a §.§.(?:Minos Inquisitor|Sphinx|King Minos|Manticore)§.§.!",
     )
 
-
     private var rareMob = -1
     private var lastRareMob = -1
     private var lastShareTime = SimpleTimeMark.farPast()
@@ -222,7 +221,6 @@ object RareMobWaypointShare {
     private fun sendRareMob() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
-        lastShareTime = SimpleTimeMark.now()
 
         if (rareMob == -1) {
             ChatUtils.debug("Trying to send Rare Diana Mob via chat, but no mob found nearby.")
@@ -242,6 +240,7 @@ object RareMobWaypointShare {
         val location = rareMob.getLorenzVec().toChatFormat()
         val mobName = rareMob.name.string.orEmpty()
         if (!isMobEnabled(mobName)) return
+        lastShareTime = SimpleTimeMark.now()
         val name = if (mobName.isEmpty()) "" else "| $mobName"
         HypixelCommands.partyChat("$location $name")
     }
@@ -260,6 +259,7 @@ object RareMobWaypointShare {
             if (rawMobName !in mob.mobAliases) continue
             mobName = mob.cleanName
         }
+        if (!isMobEnabled(mobName)) return false
 
         val optionalAn = StringUtils.optionalAn(mobName)
 
