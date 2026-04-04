@@ -194,22 +194,17 @@ object TotemOfCorruption {
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
             val owner = getOwner(totem) ?: return@mapNotNull null
-            Totem(totem.getLorenzVec(), timeRemaining, owner)
+            Totem(totem.uuid, totem.getLorenzVec(), timeRemaining, owner)
         }
 
     private fun filterTotems(): List<Totem> = allTotems.filter { !config.ownTotemOnly || it.isOwn() }
 
     private fun Totem.tryWarn(timeToWarn: Duration) {
         if (timeToWarn <= 0.seconds || timeRemaining > timeToWarn) return
-
-        // warnedTotems requires a UUID — look up the ArmorStand to get it.
-        val entity = getEntitiesNearby<ArmorStand>(100.0)
-            .firstOrNull { it.getLorenzVec() == location } ?: return
-        if (entity.uuid !in warnedTotems) {
-            playBeepSound(0.5f)
-            TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
-            warnedTotems.add(entity.uuid)
-        }
+        if (uuid in warnedTotems) return
+        playBeepSound(0.5f)
+        TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
+        warnedTotems.add(uuid)
     }
 
     private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
@@ -217,6 +212,7 @@ object TotemOfCorruption {
 }
 
 private class Totem(
+    val uuid: UUID,
     val location: LorenzVec,
     val timeRemaining: Duration,
     val ownerName: String,
