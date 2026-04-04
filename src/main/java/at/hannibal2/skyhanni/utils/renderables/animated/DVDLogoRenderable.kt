@@ -38,9 +38,10 @@ class DVDLogoRenderable private constructor(
     override val height: Int = renderable.height
 
     private val positionSync: Position? = syncPosition
+    private var position: DVDLogoPosition = syncPosition?.let {
+        DVDLogoPosition(it)
+    } ?: renderable.generateRandomStartingPosition()
 
-    var position: DVDLogoPosition = syncPosition?.let { DVDLogoPosition(it) } ?: renderable.generateRandomStartingPosition()
-        private set
     var trajectory: LogoTrajectory = initialTrajectory
         private set
 
@@ -171,6 +172,6 @@ private fun Renderable.generateRandomStartingPosition() = DVDLogoPosition(
     y = (0..(GuiScreenUtils.scaledWindowHeight - (height * 2)).coerceAtLeast(1)).random().toDouble(),
 )
 
-class DVDLogoPosition(val x: Double, val y: Double) {
+private class DVDLogoPosition(val x: Double, val y: Double) {
     constructor(position: Position) : this(position.x.toDouble(), position.y.toDouble())
 }
