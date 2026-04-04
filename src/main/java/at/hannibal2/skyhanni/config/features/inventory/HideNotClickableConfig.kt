@@ -8,6 +8,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class HideNotClickableConfig {
 
@@ -42,8 +43,10 @@ class HideNotClickableConfig {
     @Expose
     @ConfigOption(
         name = "Bypass With Key",
-        desc = "Add the ability to bypass not clickable items when holding the control/command key.",
+        desc = "Add the ability to bypass not clickable items when holding the Control key " +
+            "(Command on macOS)",
     )
+    @SearchTag("cmd ctrl")
     @ConfigEditorBoolean
     var itemsBypass: Boolean = true
 

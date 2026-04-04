@@ -215,5 +215,5 @@ object CrystalNucleusTracker : SkyHanniItemTracker<CrystalNucleusTracker.Data>("
     }
 
     private fun isAreaEnabled() = config.showOutsideNucleus || SkyBlockUtils.graphArea == "Crystal Nucleus"
-    private fun isEnabled() = config.enabled && isAreaEnabled()
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && isAreaEnabled()
 }

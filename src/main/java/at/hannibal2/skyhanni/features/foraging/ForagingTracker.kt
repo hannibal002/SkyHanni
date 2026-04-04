@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandTypeTags.FORAGING_CUSTOM_TREES
 import at.hannibal2.skyhanni.data.ItemAddManager

@@ -207,7 +207,7 @@ object ExcavatorProfitTracker : SkyHanniItemTracker<ExcavatorProfitTracker.Data>
         }
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && SkyBlockUtils.graphArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && SkyBlockUtils.graphArea == "Fossil Research Center"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

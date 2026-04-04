@@ -144,11 +144,11 @@ object ComposterDisplay {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
-        @Suppress("InSkyBlockEarlyReturn")
-        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
-
+    @HandleEvent(
+        GuiRenderEvent.GuiOverlayRenderEvent::class,
+        onlyOnSkyblockOrFeatures = [OutsideSBFeature.COMPOSTER_TIME],
+    )
+    fun onGuiRenderOverlay() {
         if (GardenApi.inGarden() && config.displayEnabled) {
             display?.let {
                 config.displayPos.renderRenderable(it, posLabel = "Composter Display")
@@ -174,15 +174,12 @@ object ComposterDisplay {
             } else "?"
         } ?: "§cJoin SkyBlock to show composter timer."
 
-        val inSB = SkyBlockUtils.inSkyBlock && config.displayOutsideGarden
-        val outsideSB = !SkyBlockUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
-        if (!GardenApi.inGarden() && (inSB || outsideSB)) {
-            val outsideGardenDisplay = Renderable.horizontal {
-                addItemStack(bucket)
-                addString("§b$format")
-            }
-            config.outsideGardenPos.renderRenderable(outsideGardenDisplay, posLabel = "Composter Outside Garden")
+        if (SkyBlockUtils.inSkyBlock && !GardenApi.inGarden() && !config.displayOutsideGarden) return
+        val outsideGardenDisplay = Renderable.horizontal {
+            addItemStack(bucket)
+            addString("§b$format")
         }
+        config.outsideGardenPos.renderRenderable(outsideGardenDisplay, posLabel = "Composter Outside Garden")
     }
 
     private fun warn(warningMessage: String) {
@@ -193,7 +190,7 @@ object ComposterDisplay {
 
         if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
-        if (IslandType.GARDEN.isCurrent()) {
+        if (IslandType.GARDEN.isInIsland()) {
             ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(

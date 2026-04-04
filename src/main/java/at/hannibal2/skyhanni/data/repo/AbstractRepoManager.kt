@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
@@ -90,7 +90,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
     private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
-    private val commandConfig = CoroutineConfig("$commonName command")
+    private val commandConfig = CoroutineSettings("$commonName command")
 
     abstract val updateCommand: String
     abstract val statusCommand: String
@@ -120,7 +120,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     fun getFailedConstants() = unsuccessfulConstants.toList()
     fun getGitHubRepoPath(): String = githubRepoLocation.location
 
-    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineConfig(
+    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineSettings(
         name = "$commonName Repo $repoAction Coroutine",
         timeout = 2.minutes,
         withIOContext = true,

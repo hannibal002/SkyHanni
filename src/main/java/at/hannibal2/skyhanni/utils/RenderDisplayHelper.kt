@@ -97,7 +97,7 @@ class RenderDisplayHelper(
         false
     }
 
-    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isCurrent()
+    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isInIsland()
     private fun checkIslandTagCondition(): Boolean = onlyOnIslandTag == null || onlyOnIslandTag.inAny()
 
     private fun render() {

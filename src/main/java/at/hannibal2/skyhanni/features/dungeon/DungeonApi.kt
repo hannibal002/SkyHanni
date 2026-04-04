@@ -142,7 +142,7 @@ object DungeonApi {
         }
     }
 
-    fun inDungeon(): Boolean = IslandType.CATACOMBS.isCurrent()
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
 
     fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
 

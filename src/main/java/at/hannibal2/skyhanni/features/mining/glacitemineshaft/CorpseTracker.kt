@@ -140,7 +140,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
     private fun isEnabled() =
         SkyBlockUtils.inSkyBlock && config.enabled && (
-            IslandType.MINESHAFT.isCurrent() ||
+            IslandType.MINESHAFT.isInIsland() ||
                 (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())
             )
 }

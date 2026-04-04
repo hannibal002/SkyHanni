@@ -391,7 +391,7 @@ object PowderTracker : SkyHanniTracker<PowderTracker.Data>("Powder Tracker") {
         @NoReset var lastEstimated: Long = 0L
     }
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.enabled
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
