@@ -270,7 +270,7 @@ object GardenVisitorShoppingList {
     }
 
     @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRender() {
         if (!config.enabled) return
         if (Minecraft.getInstance().screen is SignEditScreen) return
 

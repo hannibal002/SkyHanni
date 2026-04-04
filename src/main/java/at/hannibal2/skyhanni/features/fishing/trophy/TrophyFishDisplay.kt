@@ -8,10 +8,7 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDis
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.WhenToShow
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -53,12 +50,11 @@ object TrophyFishDisplay {
     private var display = emptyList<Renderable>()
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.CRIMSON_ISLE) {
-            DelayedRun.runDelayed(200.milliseconds) {
-                TrophyFishManager.loadMissingTrophyFish()
-                update()
-            }
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.CRIMSON_ISLE) return
+        DelayedRun.runDelayed(200.milliseconds) {
+            TrophyFishManager.loadMissingTrophyFish()
+            update()
         }
     }
 
@@ -73,14 +69,14 @@ object TrophyFishDisplay {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         display = emptyList()
         TrophyFishManager.loadMissingTrophyFish()
         update()
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(
                 enabled,
@@ -268,7 +264,7 @@ object TrophyFishDisplay {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
         if (FishingApi.hasTreasureHook || !matchesArmorRequirement()) return

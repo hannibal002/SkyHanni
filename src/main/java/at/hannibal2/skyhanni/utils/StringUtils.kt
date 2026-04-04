@@ -522,7 +522,7 @@ object StringUtils {
 
     fun String.splitCamelCase() = replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
-    fun String.isValidUuid(): Boolean = runCatching { UUID.fromString(this) }.isSuccess
+    fun String.isValidUuid(): Boolean = runCatching(UUID::fromString).isSuccess
 
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""

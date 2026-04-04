@@ -946,15 +946,13 @@ object ItemUtils {
     }
 
     fun ItemStack.asTextComponent(): Component? {
-        val stack = this
-        if (this.item == Items.PLAYER_HEAD) {
-            return componentBuilder {
-                append(Component.`object`(PlayerSprite(stack.get(DataComponents.PROFILE), true))) {
-                    withColor(ChatFormatting.WHITE)
-                }
+        if (item != Items.PLAYER_HEAD) return null
+        val profile = get(DataComponents.PROFILE) ?: return null
+        return componentBuilder {
+            append(Component.`object`(PlayerSprite(profile, true))) {
+                withColor(ChatFormatting.WHITE)
             }
         }
-        return null
     }
 
     fun ItemStack.getSkullSignature(): String? {

@@ -34,12 +34,13 @@ object MiningEventDisplay {
     }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MINING_EVENT_DISPLAY])
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        // The `else true` comes from the fact that, if this handler is hit, the only case
-        // for the `else` will be that the outside sb feature is enabled, in which case it's always true.
+    fun onGuiRenderOverlay() {
         val shouldDisplay = if (SkyBlockUtils.inSkyBlock) {
             MiningEventTracker.isMiningIsland() || config.outsideMining
-        } else true
+        } else {
+            // The @HandleEvent predicate already ensures the OutsideSBFeature is enabled, so always show.
+            true
+        }
         if (!config.enabled || !shouldDisplay) return
 
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
