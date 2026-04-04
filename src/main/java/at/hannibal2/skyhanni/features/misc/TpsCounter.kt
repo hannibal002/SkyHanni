@@ -32,7 +32,7 @@ object TpsCounter {
     private val config get() = SkyHanniMod.feature.gui
 
     private val msPerTickList = SizeLimitedCache<Long, Double>(100)
-    val tps: Double?
+    val rawTps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
             msPerTickList.isEmpty() || lastServerTick.passedSince() >= 1.seconds -> 0.0
@@ -40,6 +40,7 @@ object TpsCounter {
                 if (!it.isFinite()) printError(it)
             }
         }
+    val tps get() = rawTps?.let { if (TimeUtils.isAprilFoolsDay) it / 2 else it }
 
     private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
 
@@ -69,18 +70,19 @@ object TpsCounter {
 
     private fun getTpsString(compact: Boolean = false): String = buildString {
         append("§eTPS: ")
-        var currentTps = tps
+        val currentTps = tps
         when {
             LimboTimeTracker.inLimbo -> {
                 append("§4N/A §7(Limbo)")
             }
+
             currentTps == null -> {
                 val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
                 if (!compact) append("§fCalculating... ")
                 append("§7(${remaining}s)")
             }
+
             else -> {
-                if (TimeUtils.isAprilFoolsDay) currentTps /= 2
                 append("%s%.1f".format(getColor(currentTps), currentTps))
             }
         }
@@ -145,7 +147,7 @@ object TpsCounter {
             "TPS calculation got an error",
             "tps is $tps",
             "tps" to tps,
-            "msptList" to msPerTickList,
+            "msPerTickList" to msPerTickList,
             "timeSinceWorldSwitch" to timeSinceWorldSwitch,
         )
     }
@@ -154,7 +156,7 @@ object TpsCounter {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("TPS Counter")
         event.addIrrelevant {
-            add("TPS: %.1f".format(tps))
+            add("TPS: %.1f".format(rawTps))
             add("Milliseconds Per Tick: ${msPerTickList.values.joinToString(", ") { "%.1f".format(it) }}")
             add("Time Since World Switch: $timeSinceWorldSwitch")
         }
