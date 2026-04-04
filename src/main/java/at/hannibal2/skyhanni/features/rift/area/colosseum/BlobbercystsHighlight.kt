@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.player.RemotePlayer
 import java.awt.Color
 
@@ -19,13 +18,13 @@ object BlobbercystsHighlight {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private val entityList = mutableSetOf<RemotePlayer>()
-    private const val BLOBBER_NAME = "Blobbercyst "
+    private const val ENTITY_NAME = "Blobbercyst "
 
     @HandleEvent
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
         val entity = event.entity
-        if (entity.name.string != BLOBBER_NAME) return
+        if (entity.name.string != ENTITY_NAME) return
         RenderLivingEntityHelper.setEntityColor(entity, Color.RED.addAlpha(80)) { isEnabled() }
         entityList.add(entity)
     }

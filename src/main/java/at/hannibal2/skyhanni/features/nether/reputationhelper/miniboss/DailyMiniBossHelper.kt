@@ -104,7 +104,7 @@ object DailyMiniBossHelper {
             .forEach { storage.miniBossesDoneToday.add(it.displayName) }
     }
 
-    fun onRepoReload(data: Map<String, ReputationQuest>) {
+    fun processRepoData(data: Map<String, ReputationQuest>) {
         miniBosses.clear()
         for ((displayName, quest) in data) {
             val displayItem = quest.item

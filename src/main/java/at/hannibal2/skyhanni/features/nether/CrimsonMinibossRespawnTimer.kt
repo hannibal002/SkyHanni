@@ -82,7 +82,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val renderable = display ?: drawDisplay()
         config.minibossTimerPosition.renderRenderable(renderable, posLabel = "Miniboss Timer")
@@ -247,7 +247,7 @@ object CrimsonMinibossRespawnTimer {
 
         companion object {
             fun fromName(spawnName: String) = entries.firstOrNull {
-                it.displayName.removeColor().lowercase() == spawnName.lowercase()
+                it.displayName.removeColor().equals(spawnName, ignoreCase = true)
             }
 
             fun MiniBoss.isTimerKnown(): Boolean {

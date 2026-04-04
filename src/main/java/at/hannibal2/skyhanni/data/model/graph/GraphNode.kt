@@ -23,8 +23,8 @@ class GraphNode(
             field = value
         }
 
-    /** Keys are the neighbours and value the edge weight (e.g. distance) */
-    lateinit var neighbours: Map<GraphNode, Double>
+    /** Keys are the neighbors and value the edge weight (e.g. distance) */
+    lateinit var neighbors: Map<GraphNode, Double>
 
     fun hasTag(tag: GraphNodeTag): Boolean = tag in tags
 
@@ -33,7 +33,7 @@ class GraphNode(
     private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
 
     // Identity is by id alone — two GraphNode references with the same id are the same node regardless
-    // of mutable state (neighbours, enabled), which must not participate in equality.
+    // of mutable state (neighbors, enabled), which must not participate in equality.
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

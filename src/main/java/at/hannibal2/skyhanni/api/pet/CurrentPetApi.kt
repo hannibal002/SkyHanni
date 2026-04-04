@@ -41,8 +41,8 @@ object CurrentPetApi {
     fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
         val currentPet = currentPet ?: return false
         val comparisonResult = PetUtils.comparePets(
-            refPetInternalName = petInternalName,
-            opPetInternalName = currentPet.fauxInternalName,
+            referencePetInternalName = petInternalName,
+            otherPetInternalName = currentPet.fauxInternalName,
         ) ?: return false
         return comparisonResult >= 0
     }

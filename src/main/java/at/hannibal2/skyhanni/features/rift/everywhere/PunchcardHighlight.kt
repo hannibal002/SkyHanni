@@ -214,7 +214,7 @@ object PunchcardHighlight {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
 
         config.position.renderRenderable(display, "Punchcard Overlay")

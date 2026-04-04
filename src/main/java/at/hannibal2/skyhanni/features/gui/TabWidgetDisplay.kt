@@ -73,7 +73,7 @@ enum class TabWidgetDisplay(
         private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
         @HandleEvent
-        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
             config.display.get().forEach { widget ->

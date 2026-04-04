@@ -86,10 +86,10 @@ object ApiInternalUtils {
     internal suspend fun ApiStaticPath.internalGetZipResponse(file: File): ZipApiResponse = withZipHttpClient<HttpGet>(file)
 
     /**
-     * Driving logic for posting a Json body to the Api.
+     * Driving logic for posting a JSON body to the Api.
      * @param T The type of [JsonElement] expected in the response.
-     * @param this The [ApiStaticPostPath] to post the Json body to.
-     * @param jsonBody The Json body to post as a String.
+     * @param this The [ApiStaticPostPath] to post the JSON body to.
+     * @param jsonBody The JSON body to post as a String.
      * @return A [JsonApiResponse] containing the result of the request, with the response data as a [JsonElement].
      */
     internal suspend inline fun <reified T : JsonElement> ApiStaticPostPath.internalPostJson(
@@ -100,9 +100,9 @@ object ApiInternalUtils {
     )
 
     /**
-     * Driving logic for fetching a Json response from the Api.
+     * Driving logic for fetching a JSON response from the Api.
      * @param T The type of [JsonElement] expected in the response.
-     * @param this The [ApiStaticGetPath] to fetch the Json response from.
+     * @param this The [ApiStaticGetPath] to fetch the JSON response from.
      * @return A [JsonApiResponse] containing the result of the request.
      */
     @PublishedApi
@@ -118,7 +118,7 @@ object ApiInternalUtils {
      * Executes the given Api intention and returns an [Res] (ApiResponse subtype).
      * If the request fails, it will call the exceptionHandler with the error.
      * @param Res The type of ApiResponse expected (e.g., [ZipApiResponse] or [JsonApiResponse]).
-     * @param T The type of data expected in the ApiResponse (e.g., [Long] for Zip responses or [JsonElement] for Json responses).
+     * @param T The type of data expected in the ApiResponse (e.g., [Long] for Zip responses or [JsonElement] for JSON responses).
      * @param Req The type of HttpRequestBase to be used (e.g., [HttpGet] or [HttpPost]).
      * @param requestFactory Creates the HttpRequestBase for the Api request.
      * @param entityHandler Processes the HttpEntity from the response and returns data of type [T].
@@ -166,7 +166,7 @@ object ApiInternalUtils {
 
     /**
      * See [withHttpClient] for general field definitions.
-     * Specific to fetching a response expecting a Json body of some type [T].
+     * Specific to fetching a response expecting a JSON body of some type [T].
      * Executes the given Api intention and returns a JsonApiResponse of type [T].
      * @param T The type of JsonElement expected in the ApiResponse.
      * @param Req The type of HttpRequestBase to be used (e.g., [HttpPost] or [HttpGet]).

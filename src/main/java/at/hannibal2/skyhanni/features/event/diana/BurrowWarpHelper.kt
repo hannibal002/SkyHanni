@@ -55,8 +55,8 @@ object BurrowWarpHelper {
         }
     }
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.burrowNearestWarp) return
         if (!DianaApi.isDoingDiana()) return
         val warp = currentWarp ?: return
@@ -81,7 +81,7 @@ object BurrowWarpHelper {
         if (cannotWarpUntil.isInFuture()) {
             GriffinBurrowHelper.addDebug("delaying warp for ${cannotWarpUntil.timeUntil()}")
             warpQueued = true
-            DelayedRun.runDelayed(cannotWarpUntil.timeUntil(), { warp() })
+            DelayedRun.runDelayed(cannotWarpUntil.timeUntil()) { warp() }
         } else warp()
     }
 

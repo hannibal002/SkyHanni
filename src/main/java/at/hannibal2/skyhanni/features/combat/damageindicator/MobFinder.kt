@@ -72,7 +72,8 @@ class MobFinder {
     // F5
     private var floor5lividEntity: RemotePlayer? = null
     private var floor5lividEntitySpawnTime = SimpleTimeMark.farPast()
-    private val correctLividPattern = "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
+    // TODO use RepoPattern
+    private val correctLividPattern = "\\[BOSS] (.*) Livid: Impossible! How did you figure out which one I was\\?!".toPattern()
 
     // F6
     private var floor6Giants = false
@@ -490,92 +491,93 @@ class MobFinder {
 
     fun handleChat(message: String) {
         if (!DungeonApi.inDungeon()) return
+        // TODO use RepoPattern
         when (message) {
             // F1
-            "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
+            "[BOSS] Bonzo: Gratz for making it this far, but I'm basically unbeatable." -> {
                 floor1bonzo1 = true
                 floor1bonzo1SpawnTime = 11.25.seconds.fromNow()
             }
 
-            "§c[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!" -> {
+            "[BOSS] Bonzo: Oh noes, you got me.. what ever will I do?!" -> {
                 floor1bonzo1 = false
             }
 
-            "§c[BOSS] Bonzo§r§f: Oh I'm dead!" -> {
+            "[BOSS] Bonzo: Oh I'm dead!" -> {
                 floor1bonzo2 = true
                 floor1bonzo2SpawnTime = 4.2.seconds.fromNow()
             }
 
-            "§c[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.." -> {
+            "[BOSS] Bonzo: Alright, maybe I'm just weak after all.." -> {
                 floor1bonzo2 = false
             }
 
             // F2
-            "§c[BOSS] Scarf§r§f: ARISE, MY CREATIONS!" -> {
+            "[BOSS] Scarf: ARISE, MY CREATIONS!" -> {
                 floor2summons1 = true
                 floor2summons1SpawnTime = 3.5.seconds.fromNow()
             }
 
-            "§c[BOSS] Scarf§r§f: Those toys are not strong enough I see." -> {
+            "[BOSS] Scarf: Those toys are not strong enough I see." -> {
                 floor2summons1 = false
             }
 
-            "§c[BOSS] Scarf§r§f: Don't get too excited though." -> {
+            "[BOSS] Scarf: Don't get too excited though." -> {
                 floor2secondPhase = true
                 floor2secondPhaseSpawnTime = 6.3.seconds.fromNow()
             }
 
-            "§c[BOSS] Scarf§r§f: Whatever..." -> {
+            "[BOSS] Scarf: Whatever..." -> {
                 floor2secondPhase = false
             }
 
             // F3
-            "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
+            "[BOSS] The Professor: I was burdened with terrible news recently..." -> {
                 floor3GuardianShield = true
                 floor3GuardianShieldSpawnTime = 15.4.seconds.fromNow()
             }
 
-            "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
+            "[BOSS] The Professor: Oh? You found my Guardians' one weakness?" -> {
                 floor3GuardianShield = false
                 DamageIndicatorManager.removeDamageIndicator(BossType.DUNGEON_F3_GUARDIAN)
                 floor3Professor = true
                 floor3ProfessorSpawnTime = 10.3.seconds.fromNow()
             }
 
-            "§c[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique." -> {
+            "[BOSS] The Professor: I see. You have forced me to use my ultimate technique." -> {
                 floor3Professor = false
 
                 floor3ProfessorGuardianPrepare = true
                 floor3ProfessorGuardianPrepareSpawnTime = 10.5.seconds.fromNow()
             }
 
-            "§c[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!" -> {
+            "[BOSS] The Professor: The process is irreversible, but I'll be stronger than a Wither now!" -> {
                 floor3ProfessorGuardian = true
             }
 
-            "§c[BOSS] The Professor§r§f: What?! My Guardian power is unbeatable!" -> {
+            "[BOSS] The Professor: What?! My Guardian power is unbeatable!" -> {
                 floor3ProfessorGuardian = false
             }
 
             // F5
-            "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
+            "[BOSS] Livid: This Orb you see, is Thorn, or what is left of him." -> {
                 floor5lividEntity = DungeonLividFinder.livid
                 floor5lividEntitySpawnTime = 13.seconds.fromNow()
             }
 
             // F6
-            "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
+            "[BOSS] Sadan: ENOUGH!" -> {
                 floor6Giants = true
                 floor6GiantsSpawnTime = 2.8.seconds.fromNow()
             }
 
-            "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
+            "[BOSS] Sadan: You did it. I understand now, you have earned my respect." -> {
                 floor6Giants = false
                 floor6Sadan = true
                 floor6SadanSpawnTime = 11.5.seconds.fromNow()
             }
 
-            "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
+            "[BOSS] Sadan: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
                 floor6Sadan = false
             }
         }

@@ -1,24 +1,18 @@
-package at.hannibal2.skyhanni.detektrules.style
+package style
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.rules.hasAnnotation
+import SkyHanniRule
+import dev.detekt.api.Config
+import utils.DetektUtils.hasAnnotation
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
-class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "IsInIslandEarlyReturn",
-        Severity.Style,
-        "!isInIsland checks should be removed and replaced with onlyOnIsland = IslandType in the @HandleEvent annotation",
-        Debt.FIVE_MINS
-    )
+class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(
+    config,
+    "!isInIsland checks should be removed and replaced with onlyOnIsland = IslandType in the @HandleEvent annotation",
+) {
 
     private fun KtExpression.isEarlyReturn(): Boolean = this is KtIfExpression && then is KtReturnExpression
 

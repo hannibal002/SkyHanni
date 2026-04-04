@@ -10,9 +10,11 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.iterator
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -30,7 +32,7 @@ object BonusPestChanceDisplay {
         "widget-no-color",
         "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
     )
-    private var display: String? = null
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onWorldChange() {
@@ -41,32 +43,25 @@ object BonusPestChanceDisplay {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.STATS)) return
         val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
-        event.widget.lines.forEach { line ->
-            bonusPestChancePattern.matchMatcher(line) {
-                var disabled = false
-                for (component in line.iterator()) {
-                    if (component.style.isStrikethrough) {
-                        disabled = true
-                        break
-                    }
-                }
-                val amount = group("amount").formatInt()
+        bonusPestChancePattern.matchAllComponents(event.widget.lines) { line ->
+            val disabled = line.iterator().any { it.style.isStrikethrough }
+            val amount = group("amount").formatInt()
 
-                display = buildString {
-                    if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
-                    if (disabled) append("§c§m") else append("§f")
-                    append("$amount%")
-                    if (disabled && !compact) append("§r §cDISABLED")
-                }
-                return
+            display = Renderable.text {
+                if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
+                if (disabled) append("§c§m") else append("§f")
+                append("$amount%")
+                if (disabled && !compact) append("§r §cDISABLED")
             }
+            return
         }
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        config.pestChanceDisplayPosition.renderString(display, posLabel = "Bonus Pest Chance")
+        val display = display ?: return
+        config.pestChanceDisplayPosition.renderRenderable(display, posLabel = "Bonus Pest Chance")
     }
 
     @HandleEvent

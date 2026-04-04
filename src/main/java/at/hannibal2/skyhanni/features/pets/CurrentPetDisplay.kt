@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object CurrentPetDisplay {
@@ -19,7 +21,8 @@ object CurrentPetDisplay {
         if (RiftApi.inRift() || !config.display) return
 
         val displayName = CurrentPetApi.currentPet?.getUserFriendlyName(includeLevel = false) ?: return
-        config.displayPos.renderString(displayName, posLabel = "Current Pet")
+        val display = Renderable.text(displayName)
+        config.displayPos.renderRenderable(display, posLabel = "Current Pet")
     }
 
     @HandleEvent

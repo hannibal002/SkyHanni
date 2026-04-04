@@ -143,7 +143,7 @@ object InstanceChestProfit {
      * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
      * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
-    private val bookColorFixerold by patternGroup.pattern(
+    private val bookColorFixerOld by patternGroup.pattern(
         // Remove after 7.6.0 is pushed
         "bookcolorfix",
         "Enchanted Book \\((?<item>.+)(?:§.)+\\)",

@@ -53,6 +53,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 + Added Rainbow Action Bar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
 + Added an option to show the item that was bid on in the winning bid message in the Dark Auction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5126)
++ Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
+  + Do /shachievements to see them all.
 
 #### Chat Filter
 
@@ -1860,6 +1862,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Transparent Minecraft Farming feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/5178)
 + Added the ability to move and scale the Action Bar in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
 + Added the ability to move and scale the Held Item Tooltip in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
++ Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
 
 </details>
 <details open><summary>

@@ -197,7 +197,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         display?.let {
             config.position.renderRenderable(it, posLabel = "Golden Fish Timer")
