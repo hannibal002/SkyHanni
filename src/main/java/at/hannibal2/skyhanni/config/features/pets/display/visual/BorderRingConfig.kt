@@ -56,7 +56,7 @@ open class BorderRingConfig(
         @ConfigEditorColour
         @ConfigOverride
         @ConfigOrder(20)
-        override val color: Property<ChromaColour> = Property.of(RingConfig.DEFAULT_RING_COLOR)
+        override val color: Property<ChromaColour> = Property.of(DEFAULT_RING_COLOR)
     }
 
     @ConfigOption(name = "Reset Ring Settings", desc = "Reset border ring settings to the default values.")
