@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -148,7 +148,7 @@ object FossilSolverDisplay {
             }
         }
 
-        CoroutineConfig("fossil solver findBestTile").launchCoroutine {
+        CoroutineSettings("fossil solver findBestTile").launchCoroutine {
             FossilSolver.findBestTile(fossilLocations, dirtLocations, percentage)
         }
     }

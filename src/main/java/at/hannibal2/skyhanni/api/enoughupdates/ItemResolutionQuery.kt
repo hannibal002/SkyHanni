@@ -120,12 +120,9 @@ class ItemResolutionQuery {
             displayName: String,
             mayBeMangled: Boolean,
         ): NeuInternalName? {
-            var itemName = displayName
-            var petRarity: String? = null
-            petPattern.matchMatcher(itemName) {
-                itemName = group("name")
-                petRarity = group("rarity")
-            }
+            val (itemName, petRarity) = petPattern.matchMatcher(displayName) {
+                group("name") to group("rarity")
+            } ?: (displayName to null)
 
             val cleanItemName = itemName.removeColor()
             var bestMatch: NeuInternalName? = null

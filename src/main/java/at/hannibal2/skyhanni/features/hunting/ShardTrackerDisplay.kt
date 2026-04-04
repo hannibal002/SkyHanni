@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
@@ -48,6 +48,7 @@ object ShardTrackerDisplay {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     private var renderables = emptyList<Renderable>()
+
     // TODO can this be changed to MutableMap<NeuInternalName, Int>
     //  without breaking existing configs?
     private val trackedShards: MutableMap<String, Int>
@@ -58,7 +59,7 @@ object ShardTrackerDisplay {
         if (!AttributeShardsData.isAttributeShard(neuId)) {
             ErrorManager.logErrorStateWithData(
                 "Error Getting Attribute Shard",
-                "$neuId is not a valid attribute shard"
+                "$neuId is not a valid attribute shard",
             )
         }
         val id = neuId.asString()
@@ -108,7 +109,7 @@ object ShardTrackerDisplay {
             renderable += Renderable.clickable(
                 Renderable.text(text),
                 onLeftClick = { toggleShard(shardId) },
-                tips = listOf("§cClick to remove from tracker")
+                tips = listOf("§cClick to remove from tracker"),
             )
         }
 
@@ -121,14 +122,14 @@ object ShardTrackerDisplay {
                 tips = listOf(
                     "Imports shard recipe exported from SkyShards",
                     "This will reset the currently tracked shards",
-                    "You can also do §e/shimportskyshards§f to import shards"
-                )
+                    "You can also do §e/shimportskyshards§f to import shards",
+                ),
             )
 
             list += Renderable.clickable(
                 "§c[Reset Display]",
                 onLeftClick = ::clearTrackedShards,
-                tips = listOf("This will reset the currently tracked shards and hide the display")
+                tips = listOf("This will reset the currently tracked shards and hide the display"),
             )
         }
         renderables = list
@@ -189,7 +190,7 @@ object ShardTrackerDisplay {
                 SkyHanniMod.feature.hunting.shardTracker::enabled,
             )
         }
-        CoroutineConfig("reading SkyShards data from clipboard").launchCoroutine {
+        CoroutineSettings("reading SkyShards data from clipboard").launchCoroutine {
             val clipboard = OSUtils.readFromClipboard()
             if (clipboard == null) {
                 ChatUtils.chat("Import from SkyShards failed, make sure you have a valid recipe copied.")
