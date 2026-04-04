@@ -286,7 +286,7 @@ object SlayerApi {
 
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
-        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isCurrent()) Type.REVENANT else null
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
         "Revenant Cave" -> Type.REVENANT
 
         "Spider Mound",
@@ -305,8 +305,8 @@ object SlayerApi {
         "Zealot Bruiser Hideout",
         -> Type.VOID
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
-        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
+        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
         "Stronghold",
         "The Wasteland", // TODO check if we can remove this

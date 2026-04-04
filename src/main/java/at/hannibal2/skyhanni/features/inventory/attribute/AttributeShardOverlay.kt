@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -315,8 +314,8 @@ object AttributeShardOverlay {
         )
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    @HandleEvent(InventoryUpdatedEvent::class, onlyOnSkyblock = true)
+    fun onInventoryUpdated() {
         if (!AttributeShardsData.attributeMenuInventory.isInside()) return
         if (!config.onlyCurrentInventory) return
 
@@ -329,7 +328,7 @@ object AttributeShardOverlay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!config.enabled) return
         if (!AttributeShardsData.attributeMenuInventory.isInside() && !AttributeShardsData.bazaarShardsInventory.isInside()) return
 

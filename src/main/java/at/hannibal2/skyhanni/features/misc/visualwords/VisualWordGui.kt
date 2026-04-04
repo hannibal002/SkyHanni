@@ -2,630 +2,351 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import com.google.gson.JsonObject
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-import net.minecraft.util.Mth
-import org.lwjgl.glfw.GLFW
+import java.awt.Color
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-open class VisualWordGui : SkyHanniBaseScreen() {
+/**
+ * Constructs the full Renderable display for [VisualWordScreen].
+ *
+ * Stateless — all mutable state lives in [VisualWordScreen].
+ */
+@SkyHanniModule
+object VisualWordGui {
 
-    private var guiLeft = 0
-    private var guiTop = 0
-    private var screenHeight = 0
-    private val sizeX = 360
-    private val sizeY = 180
-    private val maxTextLength = 75
+    private val COLOR_BG = ChromaColour.fromStaticRGB(18, 18, 28, 235)
+    private val COLOR_OUTLINE_TOP = ChromaColour.fromStaticRGB(100, 100, 160, 255)
+    private val COLOR_OUTLINE_BOT = ChromaColour.fromStaticRGB(55, 55, 100, 255)
+    private val COLOR_ROW_NORMAL = ChromaColour.fromStaticRGB(30, 30, 50, 180)
+    private val COLOR_ROW_HOVER = ChromaColour.fromStaticRGB(55, 55, 85, 220)
+    private val COLOR_BTN_ADD = ChromaColour.fromStaticRGB(35, 90, 35, 215)
+    private val COLOR_BTN_DELETE = ChromaColour.fromStaticRGB(110, 30, 30, 215)
+    private val COLOR_BTN_BACK = ChromaColour.fromStaticRGB(75, 65, 25, 215)
+    private val COLOR_BTN_NEUTRAL = ChromaColour.fromStaticRGB(45, 45, 68, 215)
+    private val COLOR_BTN_ENABLED = ChromaColour.fromStaticRGB(35, 95, 35, 215)
+    private val COLOR_BTN_DISABLED = ChromaColour.fromStaticRGB(110, 35, 35, 215)
 
-    private var mouseX = 0
-    private var mouseY = 0
-    private var lastMouseScroll = 0
-    private var noMouseScrollFrames = 0
+    val sbeConfigPath: File = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
 
-    private var pageScroll = 0
-    private var scrollVelocity = 0.0
-    private val maxNoInputFrames = 100
+    // TODO regex tests (idk hanni asked for the todo)
+    private val replacementLinePattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
 
-    private var lastClickedHeight = 0
-    private var lastClickedWidth = 0
-    private var changedIndex = -1
-    private var changedAction = ActionType.NONE
+    private val upSkull by lazy {
+        ItemUtils.createSkull(
+            displayName = "§aMove Up",
+            uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
+            value = SkullTextureHolder.getTexture("UP_ARROW"),
+        )
+    }
+    private val downSkull by lazy {
+        ItemUtils.createSkull(
+            displayName = "§aMove Down",
+            uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
+            value = SkullTextureHolder.getTexture("DOWN_ARROW"),
+        )
+    }
+    private val defaultConfig = ItemRenderableConfig { scale = 1.0 }
+    private val dimmedConfig = ItemRenderableConfig {
+        scale = 1.0
+        alpha = 0.4f
+    }
+    private val upItem by lazy { Renderable.item(upSkull, defaultConfig) }
+    private val upItemDimmed by lazy { Renderable.item(upSkull, dimmedConfig) }
+    private val downItem by lazy { Renderable.item(downSkull, defaultConfig) }
+    private val downItemDimmed by lazy { Renderable.item(downSkull, dimmedConfig) }
 
-    private var currentlyEditing = false
-    private var currentIndex = -1
+    fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
 
-    private var currentTextBox = SelectedTextBox.NONE
-    private var currentText = ""
-
-    private var modifiedWords = mutableListOf<VisualWord>()
-
-    private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
-
-    @SkyHanniModule
-    companion object {
-
-        @JvmStatic
-        fun onCommand() {
-            if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
-                ChatUtils.userError("You need to join Hypixel to use this feature!")
-            } else {
-                if (sbeConfigPath.exists()) drawImport = true
-                SkyHanniMod.screenToOpen = VisualWordGui()
-            }
+    fun onCommand() {
+        if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
+            ChatUtils.userError("You need to join Hypixel to use this feature!")
+            return
         }
+        SkyHanniMod.screenToOpen = VisualWordScreen()
+    }
 
-        fun isInGui() = Minecraft.getInstance().screen is VisualWordGui
-        var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
-        var drawImport = false
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shwords") {
+            description = "Opens the config list for modifying visual words"
+            callback { onCommand() }
+        }
+    }
 
-        val itemUp by lazy {
-            ItemUtils.createSkull(
-                displayName = "§§Up",
-                uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
-                value = SkullTextureHolder.getTexture("UP_ARROW"),
+    /**
+     * Constructs the full display [Renderable] for the current state of [screen].
+     * Stateless — all mutable state lives in [VisualWordScreen].
+     */
+    fun buildDisplay(screen: VisualWordScreen): Renderable {
+        val body = if (screen.currentlyEditing) buildEditView(screen) else buildListView(screen)
+        return Renderable.drawInsideFloatingRectWithBorder(
+            body,
+            backgroundColor = COLOR_BG,
+            lightColor = COLOR_OUTLINE_TOP,
+            darkColor = COLOR_OUTLINE_BOT,
+            padding = 14,
+            radius = 12,
+            smoothness = 2,
+            borderThickness = 2,
+        )
+    }
+
+    private fun buildListView(screen: VisualWordScreen): Renderable {
+        val header = Renderable.text("§bVisual Word Replacements", scale = 1.2, horizontalAlign = HA.CENTER)
+        val subtitle = Renderable.text(
+            "§7Each entry replaces §bPhrase§7 with §aReplacement",
+            scale = 0.85,
+            horizontalAlign = HA.CENTER,
+        )
+
+        val listArea = if (screen.modifiedWords.isEmpty()) {
+            Renderable.text("§7No entries yet — click §aAdd New§7 to start.", horizontalAlign = HA.CENTER)
+        } else {
+            Renderable.scrollList(
+                screen.modifiedWords.mapIndexed { index, word -> buildWordRow(screen, index, word) },
+                height = 150,
+                scrollValue = screen.listScrollValue,
+                bypassChecks = true,
+                showScrollableTipsInList = false,
+                showScrollbar = true,
             )
         }
 
-        val itemDown by lazy {
-            ItemUtils.createSkull(
-                displayName = "§§Down",
-                uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
-                value = SkullTextureHolder.getTexture("DOWN_ARROW"),
-            )
-        }
-
-        @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
-            event.registerBrigadier("shwords") {
-                description = "Opens the config list for modifying visual words"
-                callback { onCommand() }
-            }
-        }
+        return Renderable.vertical(
+            listOf(header, subtitle, listArea, buildListBottomRow(screen)),
+            spacing = 6,
+            horizontalAlign = HA.CENTER,
+        )
     }
 
-    // There is an open PR to change this entire file anyway, and I want these off my list
-    @Suppress("DEPRECATION", "LongMethod", "CyclomaticComplexMethod")
-    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(mouseX, mouseY, partialTicks)
-        screenHeight = height
-        guiLeft = (width - sizeX) / 2
-        guiTop = (height - sizeY) / 2
+    private fun buildWordRow(screen: VisualWordScreen, index: Int, word: VisualWord): Renderable {
+        val indexLabel = Renderable.fixedSizeLine(Renderable.text("§7${index + 1}."), width = 20)
 
-        this@VisualWordGui.mouseX = GuiScreenUtils.mouseX
-        this@VisualWordGui.mouseY = GuiScreenUtils.mouseY
+        val textFixed = Renderable.fixedSizeLine(
+            Renderable.vertical(
+                listOf(
+                    Renderable.text(word.phrase.convertToFormatted()),
+                    Renderable.text(word.replacement.convertToFormatted()),
+                ),
+                spacing = 1,
+            ),
+            width = 230,
+        )
 
-        DrawContextUtils.pushPop {
-            GuiRenderUtils.drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
-            val scale = 0.75f
-            val inverseScale = 1 / scale
+        val upBtn = if (index > 0) Renderable.clickable(
+            upItem.withTip(),
+            onLeftClick = { screen.moveWord(index, up = true) },
+            bypassChecks = true,
+        ) else upItemDimmed.withTip()
 
-            val colorA = 0x50828282
-            val colorB = 0x50303030
-            if (!currentlyEditing) {
-                val adjustedY = guiTop + 30 + pageScroll
-                var toRemove: VisualWord? = null
+        val downBtn = if (index < screen.modifiedWords.lastIndex) Renderable.clickable(
+            downItem.withTip(),
+            onLeftClick = { screen.moveWord(index, up = false) },
+            bypassChecks = true,
+        ) else downItemDimmed.withTip()
 
-                val x = guiLeft + 180
-                val y = guiTop + 170
+        val statusItem = if (word.enabled) ColoredBlockCompat.GREEN.createStainedClay()
+        else ColoredBlockCompat.RED.createStainedClay()
 
-                drawUnmodifiedStringCentered("§aAdd New", x, y)
-                val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
+        val statusBtn = Renderable.clickable(
+            Renderable.item(statusItem) { scale = 0.9 },
+            onLeftClick = { screen.toggleEnabled(index) },
+            bypassChecks = true,
+        )
 
-                if (shouldDrawImport) {
-                    val importX = guiLeft + sizeX - 45
-                    val importY = guiTop + sizeY - 10
-                    GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
-                    val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
-                    GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
-                }
-
-                DrawContextUtils.scale(scale, scale)
-
-                drawUnmodifiedStringCentered(
-                    "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
-                )
-                drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
-                drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
-
-                for ((index, phrase) in modifiedWords.withIndex()) {
-                    if (adjustedY + 30 * index < guiTop + 20) continue
-                    if (adjustedY + 30 * index > guiTop + 125) continue
-
-                    if (phrase.phrase == "" && phrase.replacement == "") {
-                        toRemove = phrase
-                    }
-
-                    var inBox = false
-                    if (isPointInMousePos(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
-                        inBox = true
-                    }
-
-                    drawUnmodifiedString(
-                        "${index + 1}.",
-                        (guiLeft + 5) * inverseScale,
-                        (adjustedY + 10 + 30 * index) * inverseScale,
-                    )
-
-                    val top = adjustedY + 30 * index + 7
-                    if (isPointInLastClicked(guiLeft + 335, top, 16, 16)) {
-                        lastClickedWidth = 0
-                        lastClickedHeight = 0
-                        phrase.enabled = !phrase.enabled
-                        saveChanges()
-                        SoundUtils.playClickSound()
-                    } else if (isPointInLastClicked(guiLeft + 295, top, 16, 16) && index != 0) {
-                        lastClickedWidth = 0
-                        lastClickedHeight = 0
-                        SoundUtils.playClickSound()
-                        changedIndex = index
-                        changedAction = ActionType.UP
-                    } else if (isPointInLastClicked(guiLeft + 315, top, 16, 16) && index != modifiedWords.size - 1) {
-                        lastClickedWidth = 0
-                        lastClickedHeight = 0
-                        SoundUtils.playClickSound()
-                        changedIndex = index
-                        changedAction = ActionType.DOWN
-                    } else if (isPointInLastClicked(guiLeft, adjustedY + 30 * index, sizeX, 30)) {
-                        lastClickedWidth = 0
-                        lastClickedHeight = 0
-                        SoundUtils.playClickSound()
-                        currentlyEditing = true
-                        currentIndex = index
-                    }
-
-                    if (inBox) {
-                        GuiRenderUtils.drawScaledRec(
-                            guiLeft,
-                            adjustedY + 30 * index,
-                            guiLeft + sizeX,
-                            adjustedY + 30 * index + 30,
-                            colorB,
-                            inverseScale,
-                        )
-                    }
-
-                    val statusBlock = if (phrase.enabled) {
-                        ColoredBlockCompat.GREEN.createStainedClay()
-                    } else {
-                        ColoredBlockCompat.RED.createStainedClay()
-                    }
-
-                    DrawContextUtils.scale(inverseScale, inverseScale)
-
-                    if (index != 0) {
-                        GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
-                    }
-                    if (index != modifiedWords.size - 1) {
-                        GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, top, colorA)
-                    }
-
-                    GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
-
-                    DrawContextUtils.scale(scale, scale)
-
-                    if (inBox) {
-                        drawUnmodifiedString(
-                            phrase.phrase,
-                            (guiLeft + 15) * inverseScale,
-                            (adjustedY + 5 + 30 * index) * inverseScale,
-                        )
-                        drawUnmodifiedString(
-                            phrase.replacement,
-                            (guiLeft + 15) * inverseScale,
-                            (adjustedY + 15 + 30 * index) * inverseScale,
-                        )
-                    } else {
-                        drawUnmodifiedString(
-                            phrase.phrase.convertToFormatted(),
-                            (guiLeft + 15) * inverseScale,
-                            (adjustedY + 5 + 30 * index) * inverseScale,
-                        )
-                        drawUnmodifiedString(
-                            phrase.replacement.convertToFormatted(),
-                            (guiLeft + 15) * inverseScale,
-                            (adjustedY + 15 + 30 * index) * inverseScale,
-                        )
-                    }
-                }
-
-                if (modifiedWords.isEmpty()) {
-                    modifiedWords = ModifyVisualWords.userModifiedWords
-                        .map { it.toVisualWord() }.toMutableList()
-                }
-
-                if (toRemove != null) {
-                    modifiedWords.remove(toRemove)
-                    saveChanges()
-                }
-
-                DrawContextUtils.scale(inverseScale, inverseScale)
-
-                scrollScreen()
-            } else {
-                var x = guiLeft + 180
-                var y = guiTop + 140
-                drawUnmodifiedStringCentered("§cDelete", x, y)
-                var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-                y += 30
-                drawUnmodifiedStringCentered("§eBack", x, y)
-                color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-
-                if (currentIndex < modifiedWords.size && currentIndex != -1) {
-                    val currentPhrase = modifiedWords[currentIndex]
-
-                    x -= 100
-                    drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
-                    var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
-                    drawUnmodifiedStringCentered(status, x, y)
-                    color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                    GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-
-                    x += 200
-                    drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
-                    status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
-                    drawUnmodifiedStringCentered(status, x, y)
-                    color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                    GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
-
-                    drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
-
-                    if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                        GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
-                    }
-                    if (currentTextBox == SelectedTextBox.PHRASE) {
-                        GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
-                    }
-
-                    if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                        GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
-                    }
-                    if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-                        GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
-                    }
-
-                    DrawContextUtils.scaled(scale, scale) {
-                        // TODO remove more code duplication
-                        drawUnmodifiedString(
-                            "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
-                        )
-                        drawUnmodifiedString(
-                            "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
-                        )
-
-                        drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
-                        drawUnmodifiedString(
-                            "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
-                        )
-
-                        drawUnmodifiedString(
-                            currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
-                        )
-                        drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
-
-                        drawUnmodifiedString(
-                            currentPhrase.replacement.convertToFormatted(),
-                            (guiLeft + 30) * inverseScale,
-                            (guiTop + 95) * inverseScale,
-                        )
-                        drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
-                    }
-                }
-            }
-
-            if (changedIndex != -1) {
-                if (changedAction == ActionType.UP) {
-                    if (changedIndex > 0) {
-                        val temp = modifiedWords[changedIndex]
-                        modifiedWords[changedIndex] = modifiedWords[changedIndex - 1]
-                        modifiedWords[changedIndex - 1] = temp
-                    }
-                } else if (changedAction == ActionType.DOWN) {
-                    if (changedIndex < modifiedWords.size - 1) {
-                        val temp = modifiedWords[changedIndex]
-                        modifiedWords[changedIndex] = modifiedWords[changedIndex + 1]
-                        modifiedWords[changedIndex + 1] = temp
-                    }
-                }
-
-                changedIndex = -1
-                changedAction = ActionType.NONE
-                saveChanges()
-            }
-        }
+        val clickableText = Renderable.clickable(
+            textFixed,
+            onLeftClick = { screen.enterEditMode(index) },
+            bypassChecks = true,
+        )
+        val rowContent = Renderable.horizontal(
+            listOf(indexLabel, clickableText, upBtn, downBtn, statusBtn),
+            spacing = 4,
+            verticalAlign = VA.CENTER,
+        )
+        return Renderable.hoverable(
+            Renderable.drawInsideRoundedRect(rowContent, COLOR_ROW_HOVER.toColor(), padding = 3, radius = 5),
+            Renderable.drawInsideRoundedRect(rowContent, COLOR_ROW_NORMAL.toColor(), padding = 3, radius = 5),
+            bypassChecks = true,
+        )
     }
 
-    private fun isPointInMousePos(left: Int, top: Int, width: Int, height: Int) =
-        GuiRenderUtils.isPointInRect(mouseX, mouseY, left, top, width, height)
-
-    private fun isPointInLastClicked(left: Int, top: Int, width: Int, height: Int) =
-        GuiRenderUtils.isPointInRect(lastClickedWidth, lastClickedHeight, left, top, width, height)
-
-    override fun onHandleMouseInput() {
-        if (!MouseCompat.getEventButtonState()) {
-            if (MouseCompat.getScrollDelta() != 0) {
-                lastMouseScroll = MouseCompat.getScrollDelta()
-                noMouseScrollFrames = 0
-            }
-        }
+    private fun buildListBottomRow(screen: VisualWordScreen): Renderable {
+        val addBtn = buildButton("§a+ Add New", COLOR_BTN_ADD.toColor()) { screen.addNewWord() }
+        if (!sbeConfigPath.exists() || SkyHanniMod.feature.storage.visualWordsImported) return addBtn
+        val importBtn = buildButton("§eImport from SBE", COLOR_BTN_NEUTRAL.toColor()) { tryImportFromSbe(screen) }
+        return Renderable.horizontal(listOf(addBtn, importBtn), spacing = 8, verticalAlign = VA.CENTER)
     }
 
-    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
-        if (!currentlyEditing) {
-            if (isPointInMousePos(guiLeft, guiTop, sizeX, sizeY - 25)) {
-                lastClickedWidth = mouseX
-                lastClickedHeight = mouseY
-            }
-        }
-        var x = guiLeft + 180
-        var y = guiTop + 140
-        if (currentlyEditing) {
-            if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
-                SoundUtils.playClickSound()
-                currentlyEditing = false
-                modifiedWords.removeAt(currentIndex)
-                currentIndex = -1
-                saveChanges()
-                currentTextBox = SelectedTextBox.NONE
-            }
-            if (currentIndex < modifiedWords.size && currentIndex != -1) {
-                x -= 100
-                y += 30
-                if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
-                    SoundUtils.playClickSound()
-                    modifiedWords[currentIndex].enabled = !modifiedWords[currentIndex].enabled
-                    saveChanges()
-                }
-                x += 200
-                if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
-                    SoundUtils.playClickSound()
-                    modifiedWords[currentIndex].setCaseSensitive(!modifiedWords[currentIndex].isCaseSensitive())
-                    saveChanges()
-                } else if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                    SoundUtils.playClickSound()
-                    currentTextBox = SelectedTextBox.PHRASE
-                    currentText = modifiedWords[currentIndex].phrase
-                } else if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                    SoundUtils.playClickSound()
-                    currentTextBox = SelectedTextBox.REPLACEMENT
-                    currentText = modifiedWords[currentIndex].replacement
-                } else {
-                    if (currentTextBox != SelectedTextBox.NONE) {
-                        SoundUtils.playClickSound()
-                        currentTextBox = SelectedTextBox.NONE
-                    }
-                }
-            }
-        }
-        y = guiTop + 170
-        x = guiLeft + 180
-        if (isPointInMousePos(x - 30, y - 10, 60, 20)) {
-            SoundUtils.playClickSound()
-            if (currentlyEditing) {
-                val currentVisualWord = modifiedWords.elementAt(currentIndex)
+    private fun buildEditView(screen: VisualWordScreen): Renderable {
+        val word = screen.modifiedWords.getOrNull(screen.currentIndex) ?: return buildListView(screen)
 
-                if (currentVisualWord.phrase == "" && currentVisualWord.replacement == "") {
-                    modifiedWords.remove(currentVisualWord)
-                    saveChanges()
-                }
+        val header = Renderable.text("§bEdit Replacement", scale = 1.2, horizontalAlign = HA.CENTER)
+        val hint = Renderable.text(
+            "§8Tip: use \"&&\" to produce the §r§8Minecraft formatting character §r§8(e.g. &&aGreen)",
+            scale = 0.8,
+        )
 
-                currentIndex = -1
-                currentTextBox = SelectedTextBox.NONE
-            } else {
-                modifiedWords.add(VisualWord("", "", true, caseSensitive = false))
-                currentTextBox = SelectedTextBox.PHRASE
-                currentText = ""
-                currentIndex = modifiedWords.size - 1
-                saveChanges()
-                pageScroll = -(modifiedWords.size * 30 - 100)
-                scrollScreen()
-            }
-            currentlyEditing = !currentlyEditing
-        }
-        if (shouldDrawImport) {
-            val importX = guiLeft + sizeX - 45
-            val importY = guiTop + sizeY - 10
-            if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) {
-                SoundUtils.playClickSound()
-                tryImportFromSbe()
-            }
-        }
+        val toggleRow = Renderable.horizontal(
+            listOf(
+                buildButton(
+                    if (word.enabled) "§a● Enabled" else "§c● Disabled",
+                    if (word.enabled) COLOR_BTN_ENABLED.toColor() else COLOR_BTN_DISABLED.toColor(),
+                ) { screen.toggleEnabled(screen.currentIndex) },
+                buildButton(
+                    if (word.isCaseSensitive()) "§bCase Sensitive" else "§7Case Insensitive",
+                    COLOR_BTN_NEUTRAL.toColor(),
+                ) { screen.toggleCaseSensitive(screen.currentIndex) },
+            ),
+            spacing = 8,
+            verticalAlign = VA.CENTER,
+        )
+
+        val actionRow = Renderable.horizontal(
+            listOf(
+                buildButton("§c✗ Delete", COLOR_BTN_DELETE.toColor()) { screen.deleteWord(screen.currentIndex) },
+                buildButton("§e← Back", COLOR_BTN_BACK.toColor()) { screen.exitEditMode() },
+            ),
+            spacing = 8,
+            verticalAlign = VA.CENTER,
+        )
+
+        return Renderable.vertical(
+            listOf(
+                header,
+                buildFieldSection(screen, "§bPhrase §7(the text to be replaced):", screen.phraseInput),
+                buildFieldSection(screen, "§aReplacement §7(what to replace it with):", screen.replacementInput),
+                hint,
+                toggleRow,
+                actionRow,
+            ),
+            spacing = 8,
+            horizontalAlign = HA.CENTER,
+        )
     }
 
-    @Suppress("DEPRECATION")
-    override fun onKeyTyped(typedChar: Char?, keyCode: Int?) {
-        if (!currentlyEditing) {
-            if (keyCode == GLFW.GLFW_KEY_DOWN || keyCode == GLFW.GLFW_KEY_S) {
-                if (KeyboardManager.isModifierKeyDown()) {
-                    pageScroll = -(modifiedWords.size * 30 - 100)
-                } else {
-                    pageScroll -= 30
-                }
-                scrollScreen()
-            }
-            if (keyCode == GLFW.GLFW_KEY_UP || keyCode == GLFW.GLFW_KEY_W) {
-                if (KeyboardManager.isModifierKeyDown()) {
-                    pageScroll = 0
-                } else {
-                    pageScroll += 30
-                }
-                scrollScreen()
-            }
-            return
-        }
-        if (currentTextBox == SelectedTextBox.NONE) return
-        if (currentIndex >= modifiedWords.size || currentIndex == -1) return
+    private fun buildFieldSection(screen: VisualWordScreen, label: String, textInput: TextInput) =
+        Renderable.vertical(
+            listOf(Renderable.text(label), buildTextField(screen, textInput, fieldWidth = 310)),
+            spacing = 3,
+        )
 
-        if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-            if (currentText.isNotEmpty()) {
-                currentText = if (KeyboardManager.isDeleteLineDown()) ""
-                else if (KeyboardManager.isDeleteWordDown()) {
-                    val lastSpaceIndex = currentText.trimEnd().removeSuffix(" ").lastIndexOf(' ')
-                    if (lastSpaceIndex >= 0) currentText.substring(0, lastSpaceIndex + 1) else ""
-                } else {
-                    currentText.substring(0, currentText.length - 1)
-                }
-                saveTextChanges()
-            }
-
-            return
-        }
-
-        if (currentText.length < maxTextLength && (typedChar != null && !Character.isISOControl(typedChar))) {
-            currentText += typedChar
-            saveTextChanges()
-            return
-        }
-
-        if (KeyboardManager.isPastingKeysDown()) {
-            SkyHanniMod.launchCoroutine("visual word pasting") {
-                val clipboard = OSUtils.readFromClipboard().orEmpty()
-                for (char in clipboard) {
-                    if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
-                        currentText += char
-                    }
-                }
-                saveTextChanges()
-            }
-            return
-        }
-
-        if (KeyboardManager.isCopyingKeysDown()) {
-            OSUtils.copyToClipboard(currentText)
-            return
-        }
-    }
-
-    private fun saveTextChanges() {
-        if (currentTextBox == SelectedTextBox.PHRASE) {
-            modifiedWords[currentIndex].phrase = currentText
-        } else if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-            modifiedWords[currentIndex].replacement = currentText
-        }
-        saveChanges()
-    }
-
-    private fun scrollScreen() {
-        scrollVelocity += lastMouseScroll / 48.0
-        scrollVelocity *= 0.95
-        pageScroll += scrollVelocity.toInt() + lastMouseScroll / 24
-
-        noMouseScrollFrames++
-
-        if (noMouseScrollFrames >= maxNoInputFrames) {
-            scrollVelocity *= 0.75
-        }
-
-        if (pageScroll > 0) {
-            pageScroll = 0
-        }
-
-        pageScroll = Mth.clamp(pageScroll, -(modifiedWords.size * 30 - 100), 0)
-        lastMouseScroll = 0
-    }
-
-    private fun saveChanges() {
-
-        ModifyVisualWords.userModifiedWords = modifiedWords.map { VisualWordText.fromVisualWord(it) }.toMutableList()
-        ModifyVisualWords.update()
-
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
-    }
-
-    private fun tryImportFromSbe() {
-        if (!drawImport) return
-        try {
-            val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
-            val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
-            var importedWords = 0
-            var skippedWords = 0
-            val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
-            val pattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
-            loop@ for (line in lists) {
-                pattern.matchMatcher(line.asString) {
-                    val from = group("from").replace("&", "&&")
-                    val to = group("to").replace("&", "&&")
-                    val state = group("state").toBoolean()
-
-                    if (modifiedWords.any { it.phrase == from }) {
-                        skippedWords++
-                        continue@loop
-                    }
-
-                    modifiedWords.add(VisualWord(from, to, state, false))
-                    importedWords++
-                }
-            }
-            if (importedWords > 0 || skippedWords > 0) {
-                chat(
-                    "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !",
-                )
-                SkyHanniMod.feature.storage.visualWordsImported = true
-                drawImport = false
-            }
-        } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
-        }
-    }
-
-    private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
-        ModifyVisualWords.changeWords = false
-        GuiRenderUtils.drawString(str, x, y)
-        ModifyVisualWords.changeWords = true
-    }
-
+    /**
+     * An editable text-field Renderable. Reads live from [textInput] every frame.
+     * Becomes active when [VisualWordScreen.activeInput] points to it; click to focus.
+     */
     @Suppress("SameParameterValue")
-    private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
-        drawUnmodifiedString(str, x.toFloat(), y.toFloat())
+    private fun buildTextField(screen: VisualWordScreen, textInput: TextInput, fieldWidth: Int) = Renderable.clickable(
+        buildLiveField(screen, textInput, fieldWidth),
+        onLeftClick = { screen.activeInput = textInput },
+        bypassChecks = true,
+    )
+
+    private fun buildLiveField(screen: VisualWordScreen, textInput: TextInput, fieldWidth: Int): Renderable =
+        object : Renderable {
+            override val width = fieldWidth
+            override val height = 16
+            override val horizontalAlign = HA.LEFT
+            override val verticalAlign = VA.TOP
+
+            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                val isActive = screen.activeInput === textInput
+                if (isActive) {
+                    GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, false)
+                    textInput.makeActive()
+                    textInput.handle()
+                } else {
+                    GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
+                }
+                val displayText = if (isActive) textInput.editText() else textInput.textBox
+                DrawContextUtils.pushPop {
+                    DrawContextUtils.translate(3f, ((height - 8) / 2).toFloat())
+                    RenderableUtils.renderString(displayText, scale = 1.0, color = Color.WHITE)
+                }
+            }
+        }
+
+    private fun buildButton(label: String, color: Color, onClick: () -> Unit): Renderable {
+        val text = Renderable.text(label)
+        return Renderable.clickable(
+            Renderable.hoverable(
+                Renderable.drawInsideRoundedRect(text, color.brighter(), padding = 5, radius = 6),
+                Renderable.drawInsideRoundedRect(text, color, padding = 5, radius = 6),
+                bypassChecks = true,
+            ),
+            onLeftClick = onClick,
+            bypassChecks = true,
+        )
     }
 
-    private fun drawUnmodifiedStringCentered(str: String?, x: Int, y: Int) {
-        ModifyVisualWords.changeWords = false
-        GuiRenderUtils.drawStringCentered(str ?: "null", x, y)
-        ModifyVisualWords.changeWords = true
+    private fun tryImportFromSbe(screen: VisualWordScreen) {
+        InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8).use { reader ->
+            try {
+                val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
+                importFromSbeJson(json, screen)
+            } catch (e: Throwable) {
+                ErrorManager.logErrorWithData(e, "Failed to load visual words from SBE")
+            }
+        }
     }
 
-    @Suppress("SameParameterValue")
-    private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {
-        drawUnmodifiedStringCentered(str, x.toInt(), y.toInt())
+    private fun importFromSbeJson(
+        json: JsonObject,
+        screen: VisualWordScreen,
+    ) {
+        var importedWords = 0
+        var skippedWords = 0
+
+        for (line in json["custom"].asJsonObject["visualWords"].asJsonArray) {
+            replacementLinePattern.matchMatcher(line.asString) {
+                val from = group("from").replace("&", "&&")
+                val to = group("to").replace("&", "&&")
+                val state = group("state").toBoolean()
+                if (screen.modifiedWords.any { it.phrase == from }) {
+                    skippedWords++
+                    return@matchMatcher
+                }
+                screen.modifiedWords.add(VisualWord(from, to, state, caseSensitive = false))
+                importedWords++
+            }
+        }
+
+        if (importedWords > 0 || skippedWords > 0) {
+            chat("§aSuccessfully imported §e$importedWords §awords and skipped §e$skippedWords §afrom SkyBlockExtras!")
+            SkyHanniMod.feature.storage.visualWordsImported = true
+            screen.saveChanges()
+            screen.rebuildDisplay()
+        }
     }
-}
-
-private enum class ActionType {
-    UP,
-    DOWN,
-    NONE
-}
-
-private enum class SelectedTextBox {
-    PHRASE,
-    REPLACEMENT,
-    NONE
 }
