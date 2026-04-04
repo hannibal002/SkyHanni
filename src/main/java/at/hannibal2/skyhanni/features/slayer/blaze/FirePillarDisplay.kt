@@ -43,7 +43,7 @@ object FirePillarDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGuiRender(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!config.firePillarDisplay) return
 
         val display = display ?: return

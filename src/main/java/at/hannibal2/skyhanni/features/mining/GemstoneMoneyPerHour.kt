@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -198,7 +197,7 @@ object GemstoneMoneyPerHour {
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    fun onIslandJoin() {
         if (!paused) return
         if (!isEnabled() || !IslandTypeTag.MINING.isInIsland()) return reset()
         paused = true
