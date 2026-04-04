@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -62,6 +63,10 @@ object CurrentPetDisplay {
     private var petOverlay: Renderable? = null
     private val currentRotation: Property<Vec3> = Property.of(Vec3.ZERO)
     private val EXP_SHARE = "PET_ITEM_EXP_SHARE".toInternalName()
+    private val previewPet: PetData by lazy {
+        // Level 100 with overflow XP, used as a visual fallback when no pet is active during preview
+        PetData(petInternalName = "MITHRIL_GOLEM;4".toInternalName(), exp = 25_353_230.0)
+    }
 
     private fun PetData.buildMainIconRenderableOrNull(): Renderable? = with(config.visual) {
         if (!icon.enabled.get()) return null
@@ -249,48 +254,49 @@ object CurrentPetDisplay {
         verticalAlign = RenderUtils.VerticalAlignment.CENTER
     }
 
-    private fun PetData.buildTextRenderableOrNull(): Renderable? = Renderable.vertical(
-        buildList {
-            val enabledTexts = config.text.enabledTexts.get().takeIfNotEmpty() ?: return null
-            enabledTexts.mapNotNull {
-                it to when (it) {
-                    TElement.PET_NAME -> getUserFriendlyName(
-                        includeLevel = config.text.nameLevel.get(),
-                        includeSkinTag = config.text.nameSkinSymbol.get(),
-                    )
-                    TElement.HELD_ITEM -> heldItemInternalName?.repoItemName ?: return@mapNotNull null
-                    TElement.OVERFLOW_XP -> {
-                        // 1000.0 to account for double rounding errors between Hypixel's stored data, and our calculation
-                        val overflowXp = overflowXp.takeIf { overflow -> overflow > 1000.0 } ?: return@mapNotNull null
-                        "§7+§b${overflowXp.formatExpByConfigOption()}"
-                    }
-                    TElement.TOTAL_XP -> {
-                        val totalXp = exp?.takeIf { totalXp -> totalXp > 0.0 } ?: return@mapNotNull null
-                        "§b${totalXp.formatExpByConfigOption()}"
-                    }
-                    TElement.NEXT_LEVEL -> {
-                        if (level >= PetUtils.getMaxLevel(fauxInternalName)) return@mapNotNull null
-
-                        val currentExp = exp ?: 0.0
-                        val currentXpOverLevel = currentExp - currentLevelXp
-                        val neededXp = nextLevelXp - currentLevelXp
-                        val percentageFormat = if (config.text.nextLevelPercent.get()) {
-                            " §7- §e${levelProgressionPercentage.shortFormat()}%"
-                        } else ""
-                        formatExpPairByConfigOption(currentXpOverLevel, neededXp) + percentageFormat
-                    }
-                }
-            }.map { (textElement, textElementFormat) ->
-                val labelFormat = textElement.getFormattedLabel().takeIf { config.text.textLabels.get() }.orEmpty()
-                StringRenderable(
-                    "$labelFormat$textElementFormat",
-                    horizontalAlign = config.text.horizontalAlign.get()
+    private fun PetData.buildTextRenderableOrNull(): Renderable? {
+        val enabledTexts = config.text.enabledTexts.get().takeIfNotEmpty() ?: return null
+        val lines = enabledTexts.mapNotNull {
+            it to when (it) {
+                TElement.PET_NAME -> getUserFriendlyName(
+                    includeLevel = config.text.nameLevel.get(),
+                    includeSkinTag = config.text.nameSkinSymbol.get(),
                 )
-            }.forEach { add(it) }
-        },
-        horizontalAlign = config.text.horizontalAlign.get(),
-        verticalAlign = config.text.verticalAlign.get(),
-    )
+                TElement.HELD_ITEM -> heldItemInternalName?.repoItemName ?: return@mapNotNull null
+                TElement.OVERFLOW_XP -> {
+                    // 1000.0 to account for double rounding errors between Hypixel's stored data, and our calculation
+                    val overflowXp = overflowXp.takeIf { overflow -> overflow > 1000.0 } ?: return@mapNotNull null
+                    "§7+§b${overflowXp.formatExpByConfigOption()}"
+                }
+                TElement.TOTAL_XP -> {
+                    val totalXp = exp?.takeIf { totalXp -> totalXp > 0.0 } ?: return@mapNotNull null
+                    "§b${totalXp.formatExpByConfigOption()}"
+                }
+                TElement.NEXT_LEVEL -> {
+                    if (level >= PetUtils.getMaxLevel(fauxInternalName)) return@mapNotNull null
+
+                    val currentExp = exp ?: 0.0
+                    val currentXpOverLevel = currentExp - currentLevelXp
+                    val neededXp = nextLevelXp - currentLevelXp
+                    val percentageFormat = if (config.text.nextLevelPercent.get()) {
+                        " §7- §e${levelProgressionPercentage.shortFormat()}%"
+                    } else ""
+                    formatExpPairByConfigOption(currentXpOverLevel, neededXp) + percentageFormat
+                }
+            }
+        }.map { (textElement, textElementFormat) ->
+            val labelFormat = textElement.getFormattedLabel().takeIf { config.text.textLabels.get() }.orEmpty()
+            StringRenderable(
+                "$labelFormat$textElementFormat",
+                horizontalAlign = config.text.horizontalAlign.get()
+            )
+        }.takeIfNotEmpty() ?: return null
+        return Renderable.vertical(
+            lines,
+            horizontalAlign = config.text.horizontalAlign.get(),
+            verticalAlign = config.text.verticalAlign.get(),
+        )
+    }
 
     private fun Double.formatExpByConfigOption() = when (config.text.xpFormat.get()) {
         NFE.DEFAULT, NFE.UNFORMATTED -> toLong().addSeparators()
@@ -310,9 +316,10 @@ object CurrentPetDisplay {
 
     private fun PetData.buildRenderable(): Renderable? {
         lastPetHash = this.hashCode().takeIf { it != lastPetHash } ?: return petOverlay
-        val currentPetUuid = CurrentPetApi.currentPet?.uuid ?: return null
+        val currentPetUuid = CurrentPetApi.currentPet?.uuid
 
-        val itemRenderable = buildMainIconRenderableOrNull()?.wrapInExpShareIconsOrSelf(currentPetUuid)
+        val itemRenderable = buildMainIconRenderableOrNull()
+            ?.let { if (currentPetUuid != null) it.wrapInExpShareIconsOrSelf(currentPetUuid) else it }
         val textRenderable = buildTextRenderableOrNull()
 
         return if (itemRenderable != null && textRenderable != null) {
@@ -334,10 +341,19 @@ object CurrentPetDisplay {
         lastPetHash = 0
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
-        if (RiftApi.inRift() || !config.enabled.get()) return
+        if (!config.enabled.get()) return
+        if (PetDisplayConfigGuiManager.isOpen()) {
+            val pet = CurrentPetApi.currentPet ?: previewPet
+            val renderable = pet.buildRenderable() ?: return
+            config.position.renderRenderable(renderable, posLabel = "Current Pet")
+            lastPetHash = 0
+            return
+        }
+        @Suppress("InSkyBlockEarlyReturn")
+        if (!SkyBlockUtils.inSkyBlock || RiftApi.inRift()) return
         val currentPet = CurrentPetApi.currentPet ?: return run { lastPetHash = 0 }
         petOverlay = currentPet.buildRenderable()?.also {
             config.position.renderRenderable(it, posLabel = "Current Pet")
@@ -348,7 +364,7 @@ object CurrentPetDisplay {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
         event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
-        event.move(100, "misc.pets.display", "misc.pets.display.enabled")
-        event.move(100, "misc.pets.displayPos", "misc.pets.display.position")
+        event.move(130, "misc.pets.display", "misc.pets.display.enabled")
+        event.move(130, "misc.pets.displayPos", "misc.pets.display.position")
     }
 }

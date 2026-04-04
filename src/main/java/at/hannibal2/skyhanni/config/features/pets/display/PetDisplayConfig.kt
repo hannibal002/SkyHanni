@@ -6,13 +6,17 @@ import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayCon
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class PetDisplayConfig {
+class PetDisplayConfig : Config() {
+    override fun saveNow() = Unit
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a GUI element for the currently active pet.")
     @ConfigEditorBoolean
@@ -24,8 +28,7 @@ class PetDisplayConfig {
     val position: Position = Position(200, 200)
 
     @Expose
-    @ConfigOption(name = "Visual Elements", desc = "")
-    @Accordion
+    @Category(name = "Visual Elements", desc = "Visual element settings for the pet display.")
     val visual: MainVisualPetDisplayConfig = MainVisualPetDisplayConfig()
 
     class MainVisualPetDisplayConfig : VisualPetDisplayConfig() {
@@ -36,7 +39,6 @@ class PetDisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Text Elements", desc = "")
-    @Accordion
+    @Category(name = "Text Elements", desc = "Text element settings for the pet display.")
     val text: TextPetDisplayConfig = TextPetDisplayConfig()
 }

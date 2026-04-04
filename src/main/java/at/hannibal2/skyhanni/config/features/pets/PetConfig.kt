@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.config.features.pets
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.pets.display.PetDisplayConfig
+import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -15,9 +17,11 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class PetConfig {
     @Expose
-    @ConfigOption(name = "Pet Display", desc = "")
-    @Accordion
     val display: PetDisplayConfig = PetDisplayConfig()
+
+    @ConfigOption(name = "Pet Display", desc = "Configure the advanced pet display HUD.")
+    @ConfigEditorButton(buttonText = "Open")
+    val openPetDisplay: Runnable = Runnable { PetDisplayConfigGuiManager.open() }
 
     @Expose
     @ConfigOption(name = "Pet Experience Tooltip", desc = "")

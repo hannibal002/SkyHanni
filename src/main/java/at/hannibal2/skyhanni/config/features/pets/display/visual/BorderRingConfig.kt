@@ -44,7 +44,19 @@ open class BorderRingConfig(
         @Expose
         @ConfigOption(name = "Enabled", desc = "Display a separator ring between the background and the XP ring.")
         @ConfigEditorBoolean
+        @ConfigOrder(10)
         val enabled: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
+            name = "Ring Color",
+            desc = "The color of the ring.\n" +
+                "§7Default: §#§8§0§8§0§8§0§/#808080"
+        )
+        @ConfigEditorColour
+        @ConfigOverride
+        @ConfigOrder(20)
+        override val color: Property<ChromaColour> = Property.of(RingConfig.DEFAULT_RING_COLOR)
     }
 
     @ConfigOption(name = "Reset Ring Settings", desc = "Reset border ring settings to the default values.")
@@ -93,7 +105,8 @@ open class RingConfig(
     scalar: Float = 1.0f,
 ) : ResettableScalableConfig {
     companion object {
-        private val DEFAULT_RING_COLOR = ChromaColour.fromRGB(128, 128, 128, 0, 255)
+        @Transient
+        internal val DEFAULT_RING_COLOR = ChromaColour.fromRGB(128, 128, 128, 0, 255)
         private const val DEFAULT_PADDING = 3
     }
 
@@ -110,14 +123,7 @@ open class RingConfig(
     @ConfigOrder(10)
     val padding: Property<Int> = Property.of((DEFAULT_PADDING * scalar).toInt())
 
-    @Expose
-    @ConfigOption(
-        name = "Ring Color",
-        desc = "The color of the ring.\n" +
-            "§7Default: §#§8§0§8§0§8§0§/#808080"
-    )
-    @ConfigEditorColour
-    @ConfigOrder(20)
+    @Transient
     open val color: Property<ChromaColour> = Property.of(DEFAULT_RING_COLOR)
 
     @ConfigOption(name = "Reset Ring Settings", desc = "Reset the ring settings to the default values.")

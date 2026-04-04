@@ -14,6 +14,10 @@ class ExpSharePetDisplayConfig(
     override val scalar: Float = 0.6f,
 ) : VisualPetDisplayConfig(scalar) {
 
+    // Field @ConfigOrder values intentionally override parent orders from VisualPetDisplayConfig
+    // to produce the display sequence: enabled(10), organization(20), icon(30), petItem(40),
+    // rarityBackground(50), activeSlotsOnly(60). Do not remove or change without updating all six.
+
     @Expose
     @ConfigOption(
         name = "Exp-Share Pets",
@@ -70,11 +74,8 @@ class ExpSharePetDisplayConfig(
     open class ExpShareBackgroundColorConfig(
         scalar: Float = 1.0f,
     ) : BackgroundColorConfig(scalar) {
-        @Expose
-        @ConfigOption(name = "XP Ring", desc = "")
-        @Accordion
-        @ConfigOverride
-        override val borderRing = object : BorderRingConfig(scalar) {
+
+        class ExpShareBorderRingConfig(scalar: Float = 1.0f) : BorderRingConfig(scalar) {
             @Expose
             @ConfigOption(
                 name = "Enabled",
@@ -99,6 +100,12 @@ class ExpSharePetDisplayConfig(
             @ConfigOrder(35)
             val staticNote: Unit = Unit
         }
+
+        @Expose
+        @ConfigOption(name = "XP Ring", desc = "")
+        @Accordion
+        @ConfigOverride
+        override val borderRing = ExpShareBorderRingConfig(scalar)
     }
 
     @Expose
