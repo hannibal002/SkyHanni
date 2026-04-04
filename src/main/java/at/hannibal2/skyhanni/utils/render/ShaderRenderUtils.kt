@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
+import at.hannibal2.skyhanni.utils.render.states.SkyHanniCircleRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectOutlineRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectRenderState
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -18,6 +19,7 @@ import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
+import kotlin.math.min
 import org.joml.Matrix3x2f
 
 private typealias GuiRenderState = net.minecraft.client.gui.render.state.GuiRenderState
@@ -226,6 +228,59 @@ object ShaderRenderUtils {
         val bottom = y + (radius * 2) + 5
 
         RoundedShapeDrawer.drawCircle(left, top, right, bottom, color.rgb)
+    }
+
+    /**
+     * Deferred equivalent of [drawFilledCircle]. Submits a [SkyHanniCircleRenderState] to the
+     * [GuiRenderState] queue, ensuring the circle renders after any screen-level blur effects.
+     * All shader parameters are pre-computed from the current GUI pose matrix so the state is
+     * self-contained when processed by the deferred renderer.
+     *
+     * @param x The x-coordinate of the top-left of the circle's bounding box.
+     * @param y The y-coordinate of the top-left of the circle's bounding box.
+     * @param color The fill color.
+     * @param radius The circle's radius in GUI units.
+     * @param smoothness Edge smoothing amount in pixels.
+     * @param angle1 Start angle of arc clipping in radians (default makes a full circle).
+     * @param angle2 End angle of arc clipping in radians (default makes a full circle).
+     */
+    fun drawFilledCircleDeferred(
+        x: Int,
+        y: Int,
+        color: Color,
+        radius: Int = 10,
+        smoothness: Float = 1f,
+        angle1: Float = 7.0f,
+        angle2: Float = 7.0f,
+    ) {
+        val scaleFactor = GuiScreenUtils.scaleFactor
+        val radiusIn = (radius * scaleFactor).toFloat()
+        val diameter = radius * 2
+
+        val matrix = Matrix3x2f(DrawContextUtils.drawContext.pose())
+        val xScale = matrix.m00()
+        val yScale = matrix.m11()
+        val xTranslation = matrix.m20()
+        val yTranslation = matrix.m21()
+
+        val centerPosX = (x + radius) * scaleFactor.toFloat()
+        val centerPosY = GuiScreenUtils.displayHeight.toFloat() - (y + radius) * scaleFactor.toFloat()
+
+        val adjustedCenterPosX = centerPosX + radiusIn * (xScale - 1f) + xTranslation * scaleFactor
+        val adjustedCenterPosY = centerPosY - radiusIn * (yScale - 1f) - yTranslation * scaleFactor
+        val adjustedRadius = radiusIn * min(xScale, yScale)
+
+        val a1 = angle1 - Math.PI.toFloat()
+        val a2 = angle2 - Math.PI.toFloat()
+
+        val state = SkyHanniCircleRenderState(
+            x, y, diameter, color.rgb,
+            adjustedRadius, smoothness, a1, a2,
+            adjustedCenterPosX, adjustedCenterPosY,
+            xScale, yScale, xTranslation, yTranslation,
+            DrawContextUtils.drawContext.scissorStack.peek(),
+        )
+        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
     }
 
     /**

@@ -27,11 +27,11 @@ open class CircularRenderable protected constructor(
         filledPercentage < 100.0 -> {
             val baseAngle = Math.PI.toFloat() * 3f / 2f
             val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
-            ShaderRenderUtils.drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness, baseAngle, endAngle)
-            ShaderRenderUtils.drawFilledCircle(0, 0, unfilledColor.toColor(), radius, smoothness, endAngle, baseAngle)
+            ShaderRenderUtils.drawFilledCircleDeferred(0, 0, backgroundColor.toColor(), radius, smoothness, baseAngle, endAngle)
+            ShaderRenderUtils.drawFilledCircleDeferred(0, 0, unfilledColor.toColor(), radius, smoothness, endAngle, baseAngle)
         }
 
-        else -> ShaderRenderUtils.drawFilledCircle(0, 0, backgroundColor.toColor(), radius, smoothness = smoothness)
+        else -> ShaderRenderUtils.drawFilledCircleDeferred(0, 0, backgroundColor.toColor(), radius, smoothness = smoothness)
     }
 
     companion object {

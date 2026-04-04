@@ -141,6 +141,13 @@ enum class SkyHanniRenderPipeline(
         uniforms = commonChromaUniforms,
         irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
+    CIRCLE_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "circle_deferred",
+        depthWrite = false,
+    ),
     ROUNDED_RECT_DEFERRED(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
         vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,

@@ -42,8 +42,8 @@ object SubclassFieldDeduplicatingTypeAdapterFactory : TypeAdapterFactory {
 
     private fun findShadowedParentFields(rawType: Class<*>): Set<Pair<Class<*>, String>> = buildSet {
         val seenNames = mutableSetOf<String>()
-        generateSequence(rawType) {
-            clazz -> clazz.superclass?.takeIf { it != Any::class.java }
+        generateSequence(rawType) { clazz ->
+            clazz.superclass?.takeIf { it != Any::class.java }
         }.flatMap { clazz ->
             clazz.declaredFields.filter {
                 it.isAnnotationPresent(Expose::class.java)

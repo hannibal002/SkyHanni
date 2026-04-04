@@ -65,13 +65,12 @@ open class BorderRingConfig(
     open val reset: Runnable = Runnable(::reset)
 }
 
+private val DEFAULT_XP_FILLED_COLOR = ChromaColour.fromRGB(0, 255, 255, 0, 255)
+private val DEFAULT_XP_UNFILLED_COLOR = ChromaColour.fromRGB(192, 192, 192, 0, 255)
+
 class XPRingConfig(
     scalar: Float = 1.0f,
 ) : RingConfig(scalar) {
-    companion object {
-        private val DEFAULT_FILLED_COLOR = ChromaColour.fromRGB(0, 255, 255, 0, 255)
-        private val DEFAULT_UNFILLED_COLOR = ChromaColour.fromRGB(192, 192, 192, 0, 255)
-    }
 
     override val color: Property<ChromaColour> get() = filledColor
 
@@ -83,7 +82,7 @@ class XPRingConfig(
     )
     @ConfigEditorColour
     @ConfigOrder(21)
-    val filledColor: Property<ChromaColour> = Property.of(DEFAULT_FILLED_COLOR)
+    val filledColor: Property<ChromaColour> = Property.of(DEFAULT_XP_FILLED_COLOR)
 
     @Expose
     @ConfigOption(
@@ -93,7 +92,7 @@ class XPRingConfig(
     )
     @ConfigEditorColour
     @ConfigOrder(22)
-    val unfilledColor: Property<ChromaColour> = Property.of(DEFAULT_UNFILLED_COLOR)
+    val unfilledColor: Property<ChromaColour> = Property.of(DEFAULT_XP_UNFILLED_COLOR)
 
     @ConfigOption(name = "Reset", desc = "Reset XP ring settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")

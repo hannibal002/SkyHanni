@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.config.features.pets.display.visual.RingConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.renderables.animated.OrbitSystemRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrameLocalStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationDefinition
+import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationLocalStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationPropertyStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AxisRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -169,6 +170,7 @@ object CurrentPetDisplay {
             rotationConfig = expShareConfig.icon.rotation,
             iconScale = expShareConfig.icon.scale.get(),
             useSkinAnimations = expShareConfig.icon.skinAnimation.get(),
+            rotationPropGetter = null,
         )
 
         val backgroundEnabled = expShareConfig.rarityBackground.enabled.get()
@@ -222,10 +224,19 @@ object CurrentPetDisplay {
         )
     } ?: this
 
+    /**
+     * Builds a base animated item stack renderable for a pet icon.
+     *
+     * @param rotationConfig The rotation config to use for the icon.
+     * @param iconScale The scale to render the icon at.
+     * @param useSkinAnimations Whether to use animated frames from skin data.
+     * @param rotationPropGetter A getter for the shared rotation property, or null to use isolated local storage.
+     */
     private fun PetData.buildBaseItemRenderable(
         rotationConfig: IconRotationConfig,
         iconScale: Double,
         useSkinAnimations: Boolean,
+        rotationPropGetter: (() -> Property<Vec3>)? = { currentRotation },
     ): Renderable = Renderable.animatedItemStack {
         frameStorage = AnimatedFrameLocalStorage(
             getAnimatedItemStackSequence(firstFrameOnly = !useSkinAnimations) ?: listOf(
@@ -233,22 +244,25 @@ object CurrentPetDisplay {
                     ?: ErrorManager.skyHanniError("Could not generate an item stack for pet!")
             ),
         )
-        rotationStorage = AnimatedRotationPropertyStorage(
-            rotationDefinition = AnimatedRotationDefinition(
-                Direction.Axis.X to AxisRotationDefinition(
-                    staticRotation = rotationConfig.staticRotation.xRotation.get(),
-                    rotationSpeed = rotationConfig.spinRotation.speedX.get(),
-                ),
-                Direction.Axis.Y to AxisRotationDefinition(
-                    rotationSpeed = rotationConfig.spinRotation.speedY.get(),
-                    staticRotation = rotationConfig.staticRotation.yRotation.get(),
-                ),
-                Direction.Axis.Z to AxisRotationDefinition(
-                    rotationSpeed = rotationConfig.spinRotation.speedZ.get(),
-                    staticRotation = rotationConfig.staticRotation.zRotation.get(),
-                ),
+        val rotationDefinition = AnimatedRotationDefinition(
+            Direction.Axis.X to AxisRotationDefinition(
+                staticRotation = rotationConfig.staticRotation.xRotation.get(),
+                rotationSpeed = rotationConfig.spinRotation.speedX.get(),
             ),
-        ) { currentRotation }
+            Direction.Axis.Y to AxisRotationDefinition(
+                rotationSpeed = rotationConfig.spinRotation.speedY.get(),
+                staticRotation = rotationConfig.staticRotation.yRotation.get(),
+            ),
+            Direction.Axis.Z to AxisRotationDefinition(
+                rotationSpeed = rotationConfig.spinRotation.speedZ.get(),
+                staticRotation = rotationConfig.staticRotation.zRotation.get(),
+            ),
+        )
+        rotationStorage = if (rotationPropGetter != null) {
+            AnimatedRotationPropertyStorage(rotationDefinition, rotationPropGetter)
+        } else {
+            AnimatedRotationLocalStorage(rotationDefinition)
+        }
         scale = iconScale
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         verticalAlign = RenderUtils.VerticalAlignment.CENTER
@@ -341,23 +355,25 @@ object CurrentPetDisplay {
         lastPetHash = 0
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
-        if (!config.enabled.get()) return
-        if (PetDisplayConfigGuiManager.isOpen()) {
-            val pet = CurrentPetApi.currentPet ?: previewPet
-            val renderable = pet.buildRenderable() ?: return
-            config.position.renderRenderable(renderable, posLabel = "Current Pet")
-            lastPetHash = 0
-            return
-        }
-        @Suppress("InSkyBlockEarlyReturn")
-        if (!SkyBlockUtils.inSkyBlock || RiftApi.inRift()) return
+        if (RiftApi.inRift() || !config.general.enabled.get()) return
         val currentPet = CurrentPetApi.currentPet ?: return run { lastPetHash = 0 }
         petOverlay = currentPet.buildRenderable()?.also {
-            config.position.renderRenderable(it, posLabel = "Current Pet")
+            config.general.position.renderRenderable(it, posLabel = "Current Pet")
         }
+    }
+
+    @HandleEvent
+    fun onRenderingTick(event: RenderingTickEvent) {
+        if (event.startPhase) return
+        if (!PetDisplayConfigGuiManager.isOpen()) return
+        if (!config.general.enabled.get()) return
+        val pet = CurrentPetApi.currentPet ?: previewPet
+        val renderable = pet.buildRenderable() ?: return
+        petOverlay = renderable
+        PetDisplayConfigGuiManager.renderPreview(renderable)
     }
 
     @HandleEvent
@@ -366,5 +382,7 @@ object CurrentPetDisplay {
         event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
         event.move(130, "misc.pets.display", "misc.pets.display.enabled")
         event.move(130, "misc.pets.displayPos", "misc.pets.display.position")
+        event.move(131, "misc.pets.display.enabled", "misc.pets.display.general.enabled")
+        event.move(131, "misc.pets.display.position", "misc.pets.display.general.position")
     }
 }

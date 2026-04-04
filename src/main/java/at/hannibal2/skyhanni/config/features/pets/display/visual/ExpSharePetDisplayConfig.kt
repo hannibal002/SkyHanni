@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOverride
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExpSharePetDisplayConfig(
+    @field:ConfigOverride
     override val scalar: Float = 0.6f,
 ) : VisualPetDisplayConfig(scalar) {
 
@@ -42,10 +43,6 @@ class ExpSharePetDisplayConfig(
     override val icon: SpaceIconConfig = SpaceIconConfig(scalar)
 
     class SpaceIconConfig(scalar: Float = 1.0f) : IconConfig(scalar) {
-        companion object {
-            private const val DEFAULT_ICON_SPACING = 1
-        }
-
         @Expose
         @ConfigOption(
             name = "Icon Spacing",
@@ -54,7 +51,7 @@ class ExpSharePetDisplayConfig(
         )
         @ConfigEditorSlider(minValue = 1f, maxValue = 5f, minStep = 1f)
         @ConfigOrder(45)
-        val iconSpacing: Property<Int> = Property.of(DEFAULT_ICON_SPACING)
+        val iconSpacing: Property<Int> = Property.of(1)
     }
 
     @Expose
