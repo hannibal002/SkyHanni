@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
 import net.minecraft.client.Minecraft
@@ -25,7 +26,7 @@ object ModifyVisualWords {
 
     /** Replacements added automatically by the mod for features, april fools, etc. */
     private val modModifiedWords = mutableListOf<VisualWordText>()
-    private var finalWordsList = listOf<VisualWordText>()
+    private var finalWordsList = emptyList<VisualWordText>()
 
     fun update() {
         finalWordsList = modModifiedWords + userModifiedWords
@@ -33,7 +34,7 @@ object ModifyVisualWords {
         componentCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords =
             userModifiedWords.map { it.toVisualWord() }.toMutableList()
-        Minecraft.getInstance().gui?.chat?.refreshTrimmedMessages()
+        Minecraft.getInstance().gui.chat.refreshTrimmedMessages()
     }
 
     var changeWords = true
@@ -58,7 +59,7 @@ object ModifyVisualWords {
         )
         return Component.empty().also { result ->
             doReplacements(rawCharacters).toStyleRuns().forEach { (text, style) ->
-                result.append(Component.literal(text).withStyle(style))
+                result.append(text.asComponent().withStyle(style))
             }
         }
     }
@@ -160,16 +161,17 @@ object ModifyVisualWords {
 private fun List<StyledCharacter>.toStyleRuns(): List<Pair<String, Style>> {
     val runs = mutableListOf<Pair<String, Style>>()
     var lastStyle = Style.EMPTY
-    val sb = StringBuilder()
-    for (character in this) {
-        if (character.style != lastStyle) {
-            if (sb.isNotEmpty()) runs.add(sb.toString() to lastStyle)
-            lastStyle = character.style
-            sb.clear()
+    val str = buildString {
+        for (character in this@toStyleRuns) {
+            if (character.style != lastStyle) {
+                if (isNotEmpty()) runs.add(toString() to lastStyle)
+                lastStyle = character.style
+                clear()
+            }
+            appendCodePoint(character.codePoint)
         }
-        sb.appendCodePoint(character.codePoint)
     }
-    if (sb.isNotEmpty()) runs.add(sb.toString() to lastStyle)
+    if (str.isNotEmpty()) runs.add(str to lastStyle)
     return runs
 }
 
@@ -179,7 +181,8 @@ data class StyledCharacter(
     val first: Boolean = false,
 ) {
 
-    fun withParentStyle(parentStyle: Style) = StyledCharacter(codePoint, style.applyTo(parentStyle), first)
+    fun withParentStyle(parentStyle: Style) =
+        StyledCharacter(codePoint, style.applyTo(parentStyle), first)
 }
 
 data class VisualWordText(
@@ -207,26 +210,22 @@ data class VisualWordText(
     }
 }
 
-private fun List<StyledCharacter>.toLegacyString(): String {
-    val builder = StringBuilder()
+private fun List<StyledCharacter>.toLegacyString(): String = buildString {
     var lastStyle = Style.EMPTY
-    for (character in this) {
+    for (character in this@toLegacyString) {
         if (lastStyle != character.style) {
-            builder.append(requiredStyleChangeString(lastStyle, character.style, true))
+            append(requiredStyleChangeString(lastStyle, character.style, true))
             lastStyle = character.style
         }
-        builder.appendCodePoint(character.codePoint)
+        appendCodePoint(character.codePoint)
     }
-    return builder.toString()
 }
 
-private fun String.toStyledCharacterList(style: Style = Style.EMPTY, hasFirst: Boolean = true): List<StyledCharacter> {
-    val newList = mutableListOf<StyledCharacter>()
-
-    StringDecomposer.iterateFormatted(this, style) { index: Int, styleIter: Style, codePoint: Int ->
-        newList.add(StyledCharacter(codePoint, styleIter, index == 0 && hasFirst))
-        true
+private fun String.toStyledCharacterList(
+    style: Style = Style.EMPTY,
+    hasFirst: Boolean = true,
+): List<StyledCharacter> = buildList {
+    StringDecomposer.iterateFormatted(this@toStyledCharacterList, style) { index, iterStyle, codePoint ->
+        add(StyledCharacter(codePoint, iterStyle, index == 0 && hasFirst))
     }
-
-    return newList
 }

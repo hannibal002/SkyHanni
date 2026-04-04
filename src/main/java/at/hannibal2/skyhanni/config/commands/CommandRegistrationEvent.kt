@@ -8,9 +8,10 @@ import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import com.mojang.brigadier.CommandDispatcher
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 class CommandRegistrationEvent(
-    val dispatcher: CommandDispatcher<Any?>,
+    val dispatcher: CommandDispatcher<FabricClientCommandSource>,
 ) : SkyHanniEvent() {
     private val builders = mutableListOf<CommandData>()
 

@@ -198,8 +198,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.2"
         }
     }
 }
@@ -264,7 +263,12 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
-        freeCompilerArgs.addAll("-Xbackend-threads=0")
+        optIn.addAll(
+            "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+        )
+        freeCompilerArgs.addAll(
+            "-Xbackend-threads=0",
+        )
     }
 }
 
