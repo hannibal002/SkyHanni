@@ -69,6 +69,7 @@ class ChatConfig {
         desc = "Right click a chat message to copy it. Holding Shift will copy the message with " +
             "Shwords applied, and holding Ctrl will copy only one line."
     )
+    @SearchTag("control")
     @ConfigEditorBoolean
     @FeatureToggle
     var copyChat: Boolean = false

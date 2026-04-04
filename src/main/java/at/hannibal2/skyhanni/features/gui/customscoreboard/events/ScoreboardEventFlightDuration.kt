@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
@@ -14,5 +14,5 @@ object ScoreboardEventFlightDuration : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.flightDurationPattern)
 
-    override fun showIsland() = IslandTypeTags.PERSONAL_ISLAND.inAny()
+    override fun showIsland() = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
 }

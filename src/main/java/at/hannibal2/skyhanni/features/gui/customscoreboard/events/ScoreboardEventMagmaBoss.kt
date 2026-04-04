@@ -27,5 +27,5 @@ object ScoreboardEventMagmaBoss : ScoreboardEvent() {
         ScoreboardPattern.bossHealthBarPattern,
     )
 
-    override fun showIsland() = IslandType.CRIMSON_ISLE.isCurrent()
+    override fun showIsland() = IslandType.CRIMSON_ISLE.isInIsland()
 }

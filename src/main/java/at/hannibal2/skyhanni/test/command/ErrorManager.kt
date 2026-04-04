@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.CrashReport
 import net.minecraft.client.Minecraft
@@ -98,7 +98,7 @@ object ErrorManager {
     // where the error class name is the key and the first line contains one of the entries in the list of values
     private val skipErrorEntry = emptyMap<String, List<String>>()
 
-    private val copyErrorCoroutine = CoroutineConfig("error manager copy error")
+    private val copyErrorCoroutine = CoroutineSettings("error manager copy error")
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

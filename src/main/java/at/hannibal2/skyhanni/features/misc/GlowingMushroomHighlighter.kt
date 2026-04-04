@@ -25,7 +25,7 @@ object GlowingMushroomHighlighter {
     )
 
     private fun isEnabled(): Boolean {
-        return IslandType.THE_FARMING_ISLANDS.isCurrent() && config.enabled
+        return IslandType.THE_FARMING_ISLANDS.isInIsland() && config.enabled
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
