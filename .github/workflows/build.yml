@@ -25,29 +25,45 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
             -   name: Disable preprocessor
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Build with Gradle w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: assemble -x test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v4
+            -   name: Build with Gradle w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
+            -   uses: actions/upload-artifact@v7
                 name: Upload development build
                 with:
                     name: "Development Build"
                     path: build/libs/*.jar
             -   name: Test with Gradle w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
                 with:
                     gradle-command: test
-            -   uses: actions/upload-artifact@v4
+            -   name: Test with Gradle w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: test
+            -   uses: actions/upload-artifact@v7
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
                 with:
                     name: "Test Results"
-                    path: build/reports/tests/test/
+                    path: versions/*/build/reports/tests/test/
+                    if-no-files-found: warn
 
     preprocess:
         runs-on: ubuntu-latest
@@ -60,12 +76,21 @@ jobs:
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
             -   name: Enable preprocessor
                 run: |
                     mkdir -p .gradle
                     echo skyhanni.multi-version=compile > .gradle/private.properties
             -   name: Build with Gradle w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
                 uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                with:
+                    gradle-command: build --stacktrace -PskipDetekt=true
+            -   name: Build with Gradle w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: build --stacktrace -PskipDetekt=true
 
@@ -78,13 +103,14 @@ jobs:
 
             -   name: Remove label if build passes
                 if: ${{ success() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
+                continue-on-error: true
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Fails Multi-Version'
 
             -   name: Upload multi-version build
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 if: ${{ !cancelled() }}
                 with:
                     name: "Multi-version Development Build"

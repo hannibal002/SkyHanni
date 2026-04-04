@@ -9,30 +9,31 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object LockMouseLook {
     /**
-     * REGEX-TEST: §aTeleported you to §r§aPlot
+     * REGEX-TEST: Teleported you to Plot
      */
-    private val gardenTeleportPattern by RepoPattern.Companion.pattern(
-        "chat.garden.teleport",
-        "§aTeleported you to .*",
+    private val gardenTeleportPattern by RepoPattern.pattern(
+        "chat.garden.teleport.colorless",
+        "Teleported you to .*",
     )
 
     private val config get() = SkyHanniMod.feature.misc
     private val isActive get() = MouseSensitivityManager.SensitivityState.LOCKED.isActive()
+    private val lockedRenderable by lazy { Renderable.text("§eMouse Locked") }
 
     @HandleEvent
-    fun onWorldChange() {
-        unlockMouse()
-    }
+    fun onWorldChange() = unlockMouse()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!gardenTeleportPattern.matches(event.message)) return
+        if (!gardenTeleportPattern.matches(event.chatComponent)) return
         unlockMouse()
     }
 
@@ -54,18 +55,10 @@ object LockMouseLook {
         }
     }
 
-    private fun toggleLock() {
-        if (isActive) {
-            unlockMouse()
-        } else {
-            lockMouse()
-        }
-    }
-
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive) return
-        config.lockedMouseDisplay.renderString("§eMouse Locked", posLabel = "Mouse Locked")
+        config.lockedMouseDisplay.renderRenderable(lockedRenderable, posLabel = "Mouse Locked")
     }
 
     @HandleEvent
@@ -74,7 +67,9 @@ object LockMouseLook {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
-            simpleCallback { toggleLock() }
+            simpleCallback {
+                if (isActive) unlockMouse() else lockMouse()
+            }
         }
     }
 }

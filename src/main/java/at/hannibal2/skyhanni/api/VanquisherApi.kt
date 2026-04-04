@@ -117,7 +117,7 @@ object VanquisherApi {
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         if (mob.name != "Vanquisher") return
-        val isOwn = mob.isOwnVanq()
+        val isOwn = mob.isOwnVanquisher()
         val spawnTime = mob.baseEntity.spawnTime
         val data = VanquisherData(isOwn, mob, spawnTime)
         vanquishers[mob] = data
@@ -157,7 +157,7 @@ object VanquisherApi {
         spawnEntity = null
     }
 
-    private fun Mob.isOwnVanq(): Boolean {
+    private fun Mob.isOwnVanquisher(): Boolean {
         val spawnEntity = spawnEntity ?: return false
         if (baseEntity.distanceTo(spawnEntity) > 4) return false
         if (lastOwnTime.passedSince() > 7.seconds) return false // TODO: actually get good time
@@ -171,13 +171,13 @@ object VanquisherApi {
         event.addIrrelevant {
             addAll(
                 "vanquishers $vanquishers",
-                "lastOwnVanqTime $lastOwnTime",
-                "vanqSpawnEntity $spawnEntity",
-                "lastPossibleVanqSpawnEntity $lastPossibleSpawnEntity",
-                "lastVanqSpawnEntityPos $lastSpawnEntityPos",
-                "lastVanqSpawnEntityTime $lastSpawnEntityTime",
-                "lastVanqSoundPos $lastSoundPos",
-                "lastVanqSoundTime $lastSoundTime",
+                "lastOwnTime $lastOwnTime",
+                "spawnEntity $spawnEntity",
+                "lastPossibleSpawnEntity $lastPossibleSpawnEntity",
+                "lastSpawnEntityPos $lastSpawnEntityPos",
+                "lastSpawnEntityTime $lastSpawnEntityTime",
+                "lastSoundPos $lastSoundPos",
+                "lastSoundTime $lastSoundTime",
             )
         }
     }

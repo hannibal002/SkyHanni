@@ -149,7 +149,6 @@ object ChestValue {
     private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
         SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
         SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
-        else -> values.sortedByDescending { it.total }
     }
 
     private fun MutableList<Renderable>.addButton() {
@@ -224,11 +223,8 @@ object ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) this.shortFormat(true) else this
-                .shortFormat()
-
+            NumberFormatEntry.SHORT -> this.shortFormat(preciseBillions = this > 1_000_000_000)
             NumberFormatEntry.LONG -> this.addSeparators()
-            else -> "0"
         }
     }
 
@@ -246,7 +242,7 @@ object ChestValue {
             return true
         }
 
-        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isCurrent()
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         // TODO: Use repo for this
         return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }

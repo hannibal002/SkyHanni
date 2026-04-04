@@ -253,5 +253,5 @@ object ActualGemstonePowderDisplay {
         }
     }
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.showEffectivePowder
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.showEffectivePowder
 }

@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class GunthersRaceConfig {
+class GuntherRaceConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show the route for Gunther's rift race.")
     @ConfigEditorBoolean

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
@@ -33,9 +32,9 @@ object ArrowTrail {
 
     // TODO: This should probably be done using entity add events, and only iterating through the known arrows on tick
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ARROW_TRAIL])
     fun onTick() {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
         val deathTime = time.plus(secondsAlive)
@@ -45,17 +44,14 @@ object ArrowTrail {
 
         for (arrow in EntityUtils.getEntities<Arrow>()) {
             val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
-            if (arrow.owner.isLocalPlayer) {
-                listYourArrow.add(line)
-            } else {
-                listAllArrow.add(line)
-            }
+            val target = if (arrow.owner.isLocalPlayer) listYourArrow else listAllArrow
+            target.add(line)
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ARROW_TRAIL])
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
         listYourArrow.forEach {
             event.draw3DLine(it.start, it.end, color.toColor(), config.lineWidth, true)
@@ -67,8 +63,6 @@ object ArrowTrail {
             }
         }
     }
-
-    private fun isEnabled() = config.enabled && (SkyBlockUtils.inSkyBlock || OutsideSBFeature.ARROW_TRAIL.isSelected())
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {

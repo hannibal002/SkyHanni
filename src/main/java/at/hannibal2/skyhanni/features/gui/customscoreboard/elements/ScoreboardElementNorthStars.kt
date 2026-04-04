@@ -19,7 +19,7 @@ object ScoreboardElementNorthStars : ScoreboardElement() {
 
     override val configLine = "North Stars: §d756"
 
-    override val elementPatterns = listOf(ScoreboardPattern.northstarsPattern)
+    override val elementPatterns = listOf(ScoreboardPattern.northStarsPattern)
 
     override fun showIsland() = WinterApi.inWorkshop()
 }

@@ -27,6 +27,7 @@ object TextHelper {
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
+    val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
@@ -199,26 +200,22 @@ object TextHelper {
         return text
     }
 
-    private val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
-
-    fun getChromaColorStyle(): TextColor {
-        return chromaStyle
-    }
-
     fun matcher(component: Component, match: String): Component? {
         var index = 0
         var newComponent: Component = Component.empty()
         var currentString = ""
+        var done = false
 
-        component.visit({ style: Style?, string: String? ->
-            if (string.isNullOrEmpty()) return@visit Optional.empty()
+        component.forEachNonEmpty { style, string ->
+            if (done) return@forEachNonEmpty
             for (c in string) {
                 if (index >= match.length) {
-                    if (!currentString.isEmpty()) {
+                    if (currentString.isNotEmpty()) {
                         newComponent.append(Component.literal(currentString).withStyle(style))
                     }
                     currentString = ""
-                    return@visit Optional.of(newComponent)
+                    done = true
+                    return@forEachNonEmpty
                 }
                 if (c == match[index]) {
                     currentString += c
@@ -229,23 +226,19 @@ object TextHelper {
                     index = 0
                 }
             }
-            if (!currentString.isEmpty()) {
+            if (currentString.isNotEmpty()) {
                 newComponent.append(Component.literal(currentString).withStyle(style))
             }
             currentString = ""
-
-            Optional.empty()
-        }, Style.EMPTY)
-        if (newComponent.string.isEmpty()) return null
-        return newComponent
+        }
+        return newComponent.takeIf { it.string.isNotEmpty() }
     }
 
     fun split(component: Component, delimiter: String): List<Component>? {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
-        component.visit({ style: Style?, string: String? ->
-            if (string.isNullOrEmpty()) return@visit Optional.empty()
+        component.forEachNonEmpty { style, string ->
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
                 currentComponent.append(Component.literal(string).withStyle(style))
@@ -260,18 +253,39 @@ object TextHelper {
                     currentComponent = Component.empty()
                 }
             }
-
-            Optional.empty<Component>()
-        }, Style.EMPTY)
+        }
 
         if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
-        if (newComponents.isEmpty()) return null
-        return newComponents
+        return newComponents.takeIf { it.isNotEmpty() }
     }
 
     fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
         val atlasId = Identifier.withDefaultNamespace(atlas)
         val texture = Identifier.fromNamespaceAndPath(namespace, sprite)
         return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
+    }
+
+    private fun Component.forEachNonEmpty(visitor: (Style, String) -> Unit) {
+        visitNonEmpty { style, string ->
+            visitor(style, string)
+            Optional.empty()
+        }
+    }
+
+    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit<T>(
+        { style, string ->
+            if (string.isNullOrEmpty()) Optional.empty()
+            else visitor(style, string)
+        },
+        Style.EMPTY,
+    )
+
+    fun List<Component>.merge(): MutableComponent {
+        val component = "".asComponent()
+        for ((index, item) in withIndex()) {
+            component.append(item)
+            if (index < size - 1) component.append(" ")
+        }
+        return component
     }
 }

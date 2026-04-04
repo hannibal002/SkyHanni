@@ -26,7 +26,7 @@ object SkyBlockUtils {
     // almost always prefer this over scoreboardArea
     val graphArea get() = if (inSkyBlock) IslandAreaBackend.currentArea else null
 
-    // Only use scoreboardArea if graph data is not useable in this scenario.
+    // Only use scoreboardArea if graph data is not usable in this scenario.
     val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val noTradeMode get() = HypixelData.noTrade

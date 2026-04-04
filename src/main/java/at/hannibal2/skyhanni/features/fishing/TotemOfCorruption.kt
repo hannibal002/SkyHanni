@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -48,6 +48,7 @@ object TotemOfCorruption {
 
     private var display = emptyList<Renderable>()
     private var totems = emptyList<Totem>()
+    private var allTotems = emptyList<Totem>()
     private val warnedTotems = TimeLimitedSet<UUID>(2.minutes)
 
     private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
@@ -63,7 +64,7 @@ object TotemOfCorruption {
      */
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining-nocolor",
-        "Remaining: (?:(?<min>\\d+)m )?(?<sec>\\d+)s"
+        "Remaining: (?:(?<min>\\d+)m )?(?<sec>\\d+)s",
     )
 
     /**
@@ -71,11 +72,11 @@ object TotemOfCorruption {
      */
     private val ownerPattern by patternGroup.pattern(
         "owner-nocolor",
-        "Owner: (?<owner>.+)"
+        "Owner: (?<owner>.+)",
     )
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderOverlay() {
         if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Totem of Corruption")
     }
@@ -85,7 +86,14 @@ object TotemOfCorruption {
         if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return
 
-        totems = getTotems()
+        allTotems = getAllTotems()
+        totems = filterTotems()
+
+        val timeToWarn = config.warnWhenAboutToExpire.seconds
+        for (totem in totems) {
+            totem.tryWarn(timeToWarn)
+        }
+
         display = createDisplay()
     }
 
@@ -93,7 +101,7 @@ object TotemOfCorruption {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!config.hideParticles) return
 
-        for (totem in totems) {
+        for (totem in allTotems) {
             if (event.type == ParticleTypes.WITCH && event.speed == 0f) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
@@ -129,6 +137,7 @@ object TotemOfCorruption {
         config.showOverlay.onToggle {
             display = emptyList()
             totems = emptyList()
+            allTotems = emptyList()
         }
     }
 
@@ -136,6 +145,7 @@ object TotemOfCorruption {
     fun onWorldChange() {
         display = emptyList()
         totems = emptyList()
+        allTotems = emptyList()
     }
 
     private fun getTimeRemaining(totem: ArmorStand): Duration? =
@@ -158,20 +168,18 @@ object TotemOfCorruption {
 
     private fun createDisplay(): List<Renderable> = buildList {
         val totem = getTotemToShow() ?: return@buildList
-        add(
-            Component.literal("Totem of Corruption").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD)
-        )
+        add("Totem of Corruption".asComponent().withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
         add(
             componentBuilder {
                 appendWithColor("Remaining: ", ChatFormatting.GRAY)
                 appendWithColor(totem.timeRemaining.format(TimeUnit.MINUTE), ChatFormatting.YELLOW)
-            }
+            },
         )
         add(
             componentBuilder {
                 appendWithColor("Owner: ", ChatFormatting.GRAY)
                 appendWithColor(totem.ownerName, ChatFormatting.YELLOW)
-            }
+            },
         )
     }.map(Renderable::text)
 
@@ -181,30 +189,34 @@ object TotemOfCorruption {
         return totems.minByOrNull { it.distance }
     }
 
-    private fun getTotems(): List<Totem> = getEntitiesNearby<ArmorStand>(100.0)
+    private fun getAllTotems(): List<Totem> = getEntitiesNearby<ArmorStand>(100.0)
         .filter { totemNamePattern.matches(it.cleanName()) }.toList()
         .mapNotNull { totem ->
             val timeRemaining = getTimeRemaining(totem) ?: return@mapNotNull null
             val owner = getOwner(totem) ?: return@mapNotNull null
-
-            if (config.ownTotemOnly && (owner != PlayerUtils.getName())) return@mapNotNull null
-
-            val timeToWarn = config.warnWhenAboutToExpire.seconds
-            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uuid !in warnedTotems) {
-                playBeepSound(0.5f)
-                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
-                warnedTotems.add(totem.uuid)
-            }
-            Totem(totem.getLorenzVec(), timeRemaining, owner)
+            Totem(totem.uuid, totem.getLorenzVec(), timeRemaining, owner)
         }
+
+    private fun filterTotems(): List<Totem> = allTotems.filter { !config.ownTotemOnly || it.isOwn() }
+
+    private fun Totem.tryWarn(timeToWarn: Duration) {
+        if (timeToWarn <= 0.seconds || timeRemaining > timeToWarn) return
+        if (uuid in warnedTotems) return
+        playBeepSound(0.5f)
+        TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
+        warnedTotems.add(uuid)
+    }
 
     private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
     private fun isEffectiveAreaEnabled() = SkyBlockUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
 private class Totem(
+    val uuid: UUID,
     val location: LorenzVec,
     val timeRemaining: Duration,
     val ownerName: String,
     val distance: Double = location.distanceToPlayer(),
-)
+) {
+    fun isOwn() = ownerName == PlayerUtils.getName()
+}

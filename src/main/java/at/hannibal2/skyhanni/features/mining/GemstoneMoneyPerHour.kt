@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -203,7 +203,7 @@ object GemstoneMoneyPerHour {
     @HandleEvent
     fun onWorldChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.NONE || !paused) return
-        if (!isEnabled() || !IslandTypeTags.MINING.inAny()) return reset()
+        if (!isEnabled() || !IslandTypeTag.MINING.isInIsland()) return reset()
         paused = true
     }
 

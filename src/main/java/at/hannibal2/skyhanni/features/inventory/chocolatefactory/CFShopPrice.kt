@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
+import at.hannibal2.skyhanni.utils.StringUtils.addStrikethrough
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -159,7 +159,7 @@ object CFShopPrice {
             }
             table.add(
                 DisplayTableEntry(
-                    product.name.addStrikethorugh(!product.canBeBought).asComponent(),
+                    product.name.addStrikethrough(!product.canBeBought).asComponent(),
                     "§6§l$perFormat".asComponent(),
                     factor,
                     product.item,

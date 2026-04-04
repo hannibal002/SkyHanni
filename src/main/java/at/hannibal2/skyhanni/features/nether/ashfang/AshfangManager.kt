@@ -34,7 +34,7 @@ object AshfangManager {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
-        // TODO add config optioinhs for colors
+        // TODO add config options for colors
         val color = when (mob.name) {
             "Ashfang Follower" -> LorenzColor.DARK_GRAY
             "Ashfang Underling" -> LorenzColor.RED

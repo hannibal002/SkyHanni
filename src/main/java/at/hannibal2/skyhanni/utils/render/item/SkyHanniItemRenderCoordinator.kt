@@ -18,7 +18,7 @@ internal object SkyHanniItemRenderCoordinator {
     )
     private var frameResources: FrameRenderResources? = null
 
-    // items actively spinning re-render every frame, same as mojang's isAnimated path.
+    // items actively spinning re-render every frame, same as Mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
