@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -16,7 +15,7 @@ object FerocityDisplay {
     private val config get() = SkyHanniMod.feature.combat.ferocityDisplay
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isEnabled()) return
         SkyblockStat.FEROCITY.displayValue?.let {
             config.position.renderRenderable(Renderable.text(it), posLabel = "Ferocity Display")

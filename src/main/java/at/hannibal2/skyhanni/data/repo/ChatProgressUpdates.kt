@@ -293,7 +293,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
         }
 
         @HandleEvent(GuiRenderEvent::class)
-        fun onRenderOverlay() {
+        fun onGuiRender() {
             display?.let {
                 config.chatProgressPosition.renderRenderable(it, "Chat Progress Updates")
             }
