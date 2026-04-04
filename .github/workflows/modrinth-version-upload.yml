@@ -55,13 +55,17 @@ jobs:
                     echo "EOF" >> $GITHUB_OUTPUT
 
             -   name: Print environment variables
+                env:
+                    CHANGELOG: ${{ steps.get_changelog.outputs.changelog }}
                 run: |
                     echo "UPDATE_VERSION=${UPDATE_VERSION}"
                     echo "REPO=${REPO}"
-                    echo "CHANGELOG=${{ steps.get_changelog.outputs.changelog }}"
+                    echo "CHANGELOG=${CHANGELOG}"
 
             -   name: Build Shared Variables Submodule
                 run: ./gradlew :sharedVariables:build
 
             -   name: Publish to Modrinth
-                run: ./gradlew publishToModrinth -Pchangelog="${{ steps.get_changelog.outputs.changelog }}" -PmodVersion="${UPDATE_VERSION}" -PmodrinthToken="${MODRINTH_TOKEN}"
+                env:
+                    CHANGELOG: ${{ steps.get_changelog.outputs.changelog }}
+                run: ./gradlew publishToModrinth -Pchangelog="${CHANGELOG}" -PmodVersion="${UPDATE_VERSION}" -PmodrinthToken="${MODRINTH_TOKEN}"
