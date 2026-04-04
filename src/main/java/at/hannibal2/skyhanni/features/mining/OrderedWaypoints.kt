@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils.SNEAKING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -44,8 +44,8 @@ object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
     private val storage get() = ProfileStorageData.orderedWaypointsRoutes
 
-    private val waypointsExportCoroutine = CoroutineConfig("ordered waypoints export").withIOContext()
-    private val waypointsLoadCoroutine = CoroutineConfig("ordered waypoints load").withIOContext()
+    private val waypointsExportCoroutine = CoroutineSettings("ordered waypoints export").withIOContext()
+    private val waypointsLoadCoroutine = CoroutineSettings("ordered waypoints load").withIOContext()
     private var orderedWaypointsList = Waypoints<SkyHanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0

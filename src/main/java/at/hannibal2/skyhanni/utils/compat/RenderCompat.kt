@@ -29,9 +29,10 @@ object RenderCompat {
     private fun RenderTarget.findDepthAttachment() = if (this.useDepth) this.depthTextureView else null
 
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {
+        val colorAttachment = framebuffer.findColorAttachment() ?: error("color attachment is null")
         return this.createCommandEncoder().createRenderPass(
             { name },
-            framebuffer.findColorAttachment(),
+            colorAttachment,
             OptionalInt.empty(),
             framebuffer.findDepthAttachment(),
             OptionalDouble.empty(),

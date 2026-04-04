@@ -146,5 +146,5 @@ object DraconicSacrificeTracker {
         }
     }
 
-    private fun isEnabled() = IslandType.THE_END.isCurrent() && config.enabled
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled
 }

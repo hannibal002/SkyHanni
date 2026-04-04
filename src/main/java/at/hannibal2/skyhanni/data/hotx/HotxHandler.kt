@@ -52,7 +52,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     protected abstract val resetTokensPattern: Pattern
     protected abstract val readingLevelTransform: Matcher.() -> Int
 
-    val inApplicableIsland: Boolean get() = applicableIslandType.inAny()
+    val inApplicableIsland: Boolean get() = islandTypeTag.isInIsland()
     val inInventory: Boolean get() = treeInventoryDetector.isInside()
     var heartItem: Slot? = null
 
@@ -193,7 +193,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
     protected open val rotatingPerkPattern: Pattern by lazy { HotxPatterns.rotatingPerkPattern }
     protected abstract val rotatingPerks: List<RotPerkE>
-    protected abstract val applicableIslandType: IslandTypeTag
+    protected abstract val islandTypeTag: IslandTypeTag
     abstract var currentRotPerk: RotPerkE?
         protected set
 

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -69,7 +69,7 @@ object FlowstateHelper {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (flowstateCache == null) return
 
         displayHibernating = false
@@ -81,7 +81,7 @@ object FlowstateHelper {
 
     @HandleEvent
     fun onTick() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
 
         attemptClearDisplay()
     }
@@ -122,7 +122,7 @@ object FlowstateHelper {
 
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny() || !config.enabled) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland() || !config.enabled) return
         if (flowstateCache == null && !streakEndTimer.isInFuture()) return
 
         if (shouldAutoHide()) return
