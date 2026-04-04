@@ -44,7 +44,7 @@ object FirePillarDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender(event: GuiRenderEvent) {
         if (!config.firePillarDisplay) return
 
         val display = display ?: return

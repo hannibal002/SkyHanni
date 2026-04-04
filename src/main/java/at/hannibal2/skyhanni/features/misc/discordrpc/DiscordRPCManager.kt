@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
@@ -56,11 +56,11 @@ object DiscordRPCManager {
     private var retryJob: Job? = null
     private var lastDebugInfo: Map<String, String> = emptyMap()
 
-    private val startConfig = CoroutineConfig("discord RPC start", timeout = Duration.INFINITE).withIOContext()
-    private val presenceConfig = CoroutineConfig("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
-    private val readerConfig = CoroutineConfig("discord RPC reader", timeout = Duration.INFINITE).withIOContext()
-    private val stopConfig = CoroutineConfig("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
-    private val manualStartConfig = CoroutineConfig("discord RPC manual start", timeout = Duration.INFINITE).withIOContext()
+    private val startConfig = CoroutineSettings("discord RPC start", timeout = Duration.INFINITE).withIOContext()
+    private val presenceConfig = CoroutineSettings("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
+    private val readerConfig = CoroutineSettings("discord RPC reader", timeout = Duration.INFINITE).withIOContext()
+    private val stopConfig = CoroutineSettings("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
+    private val manualStartConfig = CoroutineSettings("discord RPC manual start", timeout = Duration.INFINITE).withIOContext()
 
     private fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
         progress.update("call start")
@@ -102,7 +102,7 @@ object DiscordRPCManager {
             updateDebugStatus("Retry ${retryHelper.retriesLabel} in ${retryDelay.inWholeSeconds}s: ${reason ?: "unknown"}")
             val retryCount = retryHelper.currentRetry
             retryJob = with(SkyHanniMod) {
-                CoroutineConfig("discord RPC auto-retry $retryCount", timeout = Duration.INFINITE).withIOContext()
+                CoroutineSettings("discord RPC auto-retry $retryCount", timeout = Duration.INFINITE).withIOContext()
                     .launchUnScopedCoroutine {
                         delay(retryDelay)
                         start(progressCategory.start("discord RPC auto-retry $retryCount"))
