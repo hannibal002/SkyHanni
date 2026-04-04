@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -54,7 +52,7 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onRenderOverlay(event: GuiRenderEvent) {
+        fun onGuiRender() {
             if (config.displayPositions.isEmpty()) return
             if (!config.enabled) return
             config.display.get().forEach { leaderboard ->
@@ -69,7 +67,7 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onConfigLoad(event: ConfigLoadEvent) {
+        fun onConfigLoad() {
             val weightConfigs = listOf(
                 weightConfig.rankGoals.useRankGoal,
                 weightConfig.rankGoals.monthlyRankGoal,

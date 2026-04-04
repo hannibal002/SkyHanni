@@ -89,7 +89,7 @@ object DailyKuudraBossHelper {
             .forEach { storage.kuudraTiersDone.add(it.name) }
     }
 
-    fun onRepoReload(data: Map<String, ReputationQuest>) {
+    fun processRepoData(data: Map<String, ReputationQuest>) {
         var tier = 1
         for ((displayName, kuudraTier) in data) {
             val displayItem = kuudraTier.item

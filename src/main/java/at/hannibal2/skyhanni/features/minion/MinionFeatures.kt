@@ -229,7 +229,7 @@ object MinionFeatures {
     }
 
     private fun removeBuggedMinions(isCommand: Boolean = false) {
-        if (!IslandType.PRIVATE_ISLAND.isCurrent()) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
         val removedEntities = mutableListOf<LorenzVec>()
@@ -268,7 +268,7 @@ object MinionFeatures {
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
-        if (IslandType.PRIVATE_ISLAND.isCurrent()) {
+        if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
             if (location !in minions) {
@@ -433,7 +433,7 @@ object MinionFeatures {
         }
     }
 
-    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isCurrent() || IslandType.HUB.isCurrent()
+    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.HUB.isInIsland()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
