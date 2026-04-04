@@ -107,6 +107,6 @@ class CrimsonIsleConfig {
     @Expose
     @ConfigOption(name = "Vanquisher Waypoint", desc = "")
     @Accordion
-    var vanquisherShare = VanquisherWaypointShareConfig()
+    val vanquisherShare = VanquisherWaypointShareConfig()
 
 }
