@@ -8,10 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
-/**
- * Attention developers:
- * If your feature can only be used on the foraging islands please mark it with @[OnlyModern]
- */
 class ForagingConfig {
 
     @Expose

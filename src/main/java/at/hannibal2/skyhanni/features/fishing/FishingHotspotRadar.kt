@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import net.minecraft.core.particles.ParticleTypes
 import kotlin.time.Duration.Companion.seconds
@@ -116,7 +116,7 @@ object FishingHotspotRadar {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (config.lineToHotspot) {
-            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toChromaColor(), lineWidth = 3, depth = false)
+            event.drawLineToCrosshair(location, LorenzColor.LIGHT_PURPLE.toChromaColor(), lineWidth = 3, depth = false)
         }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()

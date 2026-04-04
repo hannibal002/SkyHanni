@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import net.minecraft.world.entity.Entity
 
 @SkyHanniModule
@@ -58,7 +58,7 @@ object SlayerMiniBossFeatures {
         if (!config.slayerMinibossLine) return
         for (mob in miniBosses) {
             if (!mob.baseEntity.canBeSeen(10)) continue
-            event.drawLineToEye(
+            event.drawLineToCrosshair(
                 mob.baseEntity.getLorenzVec().up(),
                 LorenzColor.AQUA.toChromaColor(),
                 config.slayerMinibossLineWidth,
@@ -67,7 +67,7 @@ object SlayerMiniBossFeatures {
         }
         for (mob in cocoons) {
             if (!mob.canBeSeen(10)) continue
-            event.drawLineToEye(
+            event.drawLineToCrosshair(
                 mob.getLorenzVec().up(),
                 LorenzColor.AQUA.toChromaColor(),
                 config.slayerMinibossLineWidth,

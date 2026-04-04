@@ -182,7 +182,7 @@ object PetStorageApi {
             petTabWidgetNamePattern.matchMatcher(component.string) {
                 val petName = groupOrNull("pet") ?: return@matchMatcher false
                 val level = group("level").toInt()
-                // lets hope they dont add a multi colored pet
+                // let's hope they don't add a multicolored pet
                 val rarity: LorenzRarity =
                     LorenzRarity.getByComponent(component, group("pet")) ?: return@matchMatcher false
                 val petHeldItem = event.lines.firstNotNullOfOrNull { line ->

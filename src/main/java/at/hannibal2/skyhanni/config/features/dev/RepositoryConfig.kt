@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>() {
+class RepositoryConfig : AbstractRepoConfig {
     @Expose
     @ConfigOption(
         name = "Repo Auto Update",
@@ -29,7 +29,7 @@ class RepositoryConfig : AbstractRepoConfig<RepositoryConfig.RepositoryLocation>
     @Accordion
     override val location: RepositoryLocation = RepositoryLocation()
 
-    class RepositoryLocation : AbstractRepoLocationConfig() {
+    class RepositoryLocation : AbstractRepoLocationConfig {
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
         val resetRepoLocation: Runnable = Runnable { reset() }

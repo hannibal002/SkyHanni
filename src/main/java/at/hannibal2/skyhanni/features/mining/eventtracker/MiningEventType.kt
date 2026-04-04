@@ -22,6 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private fun createPlayerHead(): ItemStack = ItemStack(Items.PLAYER_HEAD)
 
+// Todo de-duplicate with MiningEventType in data
 enum class MiningEventType(
     val eventName: String,
     shortName: String,
@@ -155,7 +156,7 @@ enum class MiningEventType(
         CompressFormat.ICON_ONLY -> icon
         CompressFormat.TEXT_WITHOUT_ICON -> normalText
         CompressFormat.COMPACT_TEXT_WITHOUT_ICON -> compactText
-        CompressFormat.DEFAULT, null -> normalTextWithIcon
+        CompressFormat.DEFAULT -> normalTextWithIcon
     }
 
     // todo on 1.8 this used to make it darker, the shader we had for that is gone now so idk

@@ -176,7 +176,7 @@ object EnigmaSoulWaypoints {
         } else {
             trackedSouls[area]?.remove(name)
             ChatUtils.chat("§5No longer tracking the $name Enigma Soul!", prefixColor = "§5")
-            IslandGraphs.stop()
+            IslandGraphs.stopNavigation()
         }
     }
 

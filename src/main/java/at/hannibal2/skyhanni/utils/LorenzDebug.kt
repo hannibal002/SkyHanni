@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 object LorenzDebug {
 
-    private val logger = LorenzLogger("debug")
+    private val logger = SkyHanniLogger("debug")
 
     fun log(text: String) {
         logger.log(text)

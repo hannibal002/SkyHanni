@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
@@ -33,7 +34,7 @@ import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -74,16 +75,16 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         InitFinishedEvent.post()
     }
 
-    fun CoroutineConfig.launch(block: suspend CoroutineScope.() -> Unit): Job =
+    fun CoroutineSettings.launch(block: suspend CoroutineScope.() -> Unit): Job =
         with(SkyHanniMod) { launchCoroutine(block) }
 
-    fun CoroutineConfig.launchUnScoped(block: suspend () -> Unit): Job =
+    fun CoroutineSettings.launchUnScoped(block: suspend () -> Unit): Job =
         with(SkyHanniMod) { launchUnScopedCoroutine(block) }
 
-    fun <T> CoroutineConfig.async(block: suspend CoroutineScope.() -> T): Deferred<T?> =
+    fun <T> CoroutineSettings.async(block: suspend CoroutineScope.() -> T): Deferred<T?> =
         with(SkyHanniMod) { asyncCoroutine(block) }
 
-    fun <T> CoroutineConfig.asyncUnScoped(block: suspend () -> T): Deferred<T?> =
+    fun <T> CoroutineSettings.asyncUnScoped(block: suspend () -> T): Deferred<T?> =
         with(SkyHanniMod) { asyncUnScopedCoroutine(block) }
 
     @HandleEvent
@@ -133,6 +134,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var orderedWaypointsRoutesData: OrderedWaypointsRoutes
     lateinit var customTodos: CustomTodosStorage
     lateinit var seaCreatureStorage: SpecificSeaCreatureStorage
+    lateinit var achievementStorage: AchievementStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

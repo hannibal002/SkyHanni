@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
@@ -205,7 +205,7 @@ object GraphEditorInput {
 
         val json = OSUtils.readFromClipboard() ?: return true
 
-        CoroutineConfig("load graph json").launchCoroutine {
+        CoroutineSettings("load graph json").launchCoroutine {
             try {
                 val graph = Graph.fromJson(json)
                 val newState = GraphEditorIO.createStateFrom(graph)

@@ -132,7 +132,7 @@ object CFCustomReminder {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inChocolateMenu()) return
         if (ReminderUtils.isBusy()) return
@@ -141,7 +141,7 @@ object CFCustomReminder {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
         if (Minecraft.getInstance().screen is ContainerScreen) return

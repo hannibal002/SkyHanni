@@ -132,7 +132,7 @@ object PesthunterProfit {
     } ?: 0
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
         config.profitPosition.renderRenderables(
             display,

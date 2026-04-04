@@ -68,6 +68,15 @@ class CrimsonIsleConfig {
     var sirihHelper: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Avorius NPC Helper",
+        desc = "Show a clickable message that grabs a cup of blood from your sacks.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var avoriusHelper: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Volcano Explosivity", desc = "Show a HUD of the current volcano explosivity level.")
     @ConfigEditorBoolean
     var volcanoExplosivity: Boolean = false

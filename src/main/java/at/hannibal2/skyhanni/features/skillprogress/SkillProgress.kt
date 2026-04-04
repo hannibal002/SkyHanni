@@ -60,7 +60,7 @@ object SkillProgress {
     var hideInActionBar = listOf<String>()
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -78,7 +78,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -339,7 +339,7 @@ object SkillProgress {
         val useCustomGoalLevel =
             skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
         var targetLevel = if (useCustomGoalLevel) skillInfo.customGoalLevel else level + 1
-        if (targetLevel <= level || targetLevel > 400) targetLevel = (level + 1)
+        if (targetLevel !in (level + 1)..400) targetLevel = (level + 1)
 
         val need = skillInfo.overflowCurrentXpMax
         val have = skillInfo.overflowCurrentXp
@@ -412,7 +412,7 @@ object SkillProgress {
         val lvl = skill.level
         val cap = activeSkill.maxLevel
         // This code is probably still wrong for hunting
-        // But i can not understand why we are doing this in the first place
+        // But I can not understand why we are doing this in the first place
         val add = if (lvl >= 50) {
             SkillUtil.xpRequiredForLevel(cap)
         } else {

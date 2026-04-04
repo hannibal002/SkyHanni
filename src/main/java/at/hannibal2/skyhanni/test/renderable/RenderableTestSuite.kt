@@ -30,7 +30,9 @@ object RenderableTestSuite {
     @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
     fun onGuiRender() {
         for (test in active.filter { it.eventClass == GuiRenderEvent.GuiOnTopRenderEvent::class }) {
-            test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")
+            test.finalRenderable?.let {
+                test.position.renderRenderable(it, posLabel = "Renderable Test: $test")
+            }
         }
     }
 
@@ -38,7 +40,9 @@ object RenderableTestSuite {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         for (test in active.filter { it.eventClass == GameOverlayRenderPostEvent::class }) {
-            test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")
+            test.finalRenderable?.let {
+                test.position.renderRenderable(it, posLabel = "Renderable Test: $test")
+            }
         }
     }
 
@@ -92,23 +96,23 @@ object RenderableTestSuite {
      */
     abstract class TestRenderable(
         name: String,
-        shouldRenderBounds: Boolean = true
+        shouldRenderBounds: Boolean = true,
     ) : TestRenderableBase<GuiRenderEvent.GuiOnTopRenderEvent>(
         name,
         GuiRenderEvent.GuiOnTopRenderEvent::class,
-        shouldRenderBounds
+        shouldRenderBounds,
     )
 
     abstract class TestRenderableFor<T : RenderingSkyHanniEvent>(
         name: String,
         eventClass: KClass<T>,
-        shouldRenderBounds: Boolean = true
+        shouldRenderBounds: Boolean = true,
     ) : TestRenderableBase<T>(name, eventClass, shouldRenderBounds)
 
     abstract class TestRenderableBase<T : RenderingSkyHanniEvent>(
         val name: String,
         val eventClass: KClass<T>,
-        val shouldRenderBounds: Boolean = true
+        val shouldRenderBounds: Boolean = true,
     ) {
         abstract fun renderable(): Renderable?
 

@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -12,11 +12,15 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditorIO {
+
+    private val copyGraphCoroutine = CoroutineSettings("copy-graph").withIOContext()
+    private val bridgeGraphNetworksCoroutine = CoroutineSettings("bridge-graph-networks")
+    private val mergeJsonCoroutine = CoroutineSettings("merge-json").withIOContext()
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
@@ -48,7 +52,7 @@ object GraphEditorIO {
             val compiledNode = compiledNodeMap[node.id] ?: continue
             val nodeEdges = edgesByNode[node].orEmpty()
 
-            compiledNode.neighbours = nodeEdges.map { edge ->
+            compiledNode.neighbors = nodeEdges.map { edge ->
                 val otherNode = edge.getOther(node)
                 val compiledOther = compiledNodeMap[otherNode.id]
                     ?: error("Invalid node ID ${otherNode.id} referenced in edge")
@@ -70,14 +74,14 @@ object GraphEditorIO {
         return newState
     }
 
-    fun save() {
-        if (nodes.isEmpty()) {
-            ChatUtils.chat("Copied nothing since the graph is empty.")
-            return
-        }
+    fun save() = copyGraphCoroutine.launch {
+        if (nodes.isEmpty()) return@launch ChatUtils.chat("Copied nothing since the graph is empty.")
+
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
-        OSUtils.copyToClipboard(json)
+        val copied = OSUtils.copyToClipboardAsync(json) ?: false
+        if (!copied) return@launch ChatUtils.chat("Failed to copy graph to clipboard.")
+
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()
         useAsIslandArea(compileGraph)
@@ -86,7 +90,7 @@ object GraphEditorIO {
 
     private fun useAsIslandArea(compileGraph: Graph) {
         if (!GraphEditor.config.useAsIslandArea) return
-        CoroutineConfig("bridge graph networks").launchCoroutine {
+        bridgeGraphNetworksCoroutine.launchCoroutine {
             GraphEditorNetworks.bridgeNetworks(compileGraph)
             DelayedRun.runOrNextTick {
                 IslandGraphs.setNewGraph(compileGraph)
@@ -118,12 +122,7 @@ object GraphEditorIO {
     }
 
     fun loadThisIsland() {
-        val graph = IslandGraphs.currentIslandGraph
-        if (graph == null) {
-            ChatUtils.userError("This island does not have graph data!")
-            return
-        }
-
+        val graph = IslandGraphs.currentIslandGraph ?: return ChatUtils.userError("This island does not have graph data!")
         IslandGraphs.disabledNodesReason?.let {
             if (GraphEditor.bypassTempRemoveTimer.isInPast()) {
                 IslandGraphs.enableAllNodes()
@@ -142,22 +141,15 @@ object GraphEditorIO {
         ChatUtils.chat("Graph Editor loaded this island!")
     }
 
-    fun mergeFromClipboard() {
-        val json = OSUtils.readFromClipboard()
-        if (json == null) {
-            ChatUtils.userError("Clipboard is empty!")
-            return
-        }
-
-        CoroutineConfig("merge graph json").launchCoroutine {
-            try {
-                val graph = Graph.fromJson(json)
-                DelayedRun.runOrNextTick {
-                    merging(graph)
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
+    fun mergeFromClipboard() = mergeJsonCoroutine.launch {
+        val json = OSUtils.readFromClipboard() ?: return@launch ChatUtils.userError("Clipboard is empty!")
+        try {
+            val graph = Graph.fromJson(json)
+            DelayedRun.runOrNextTick {
+                merging(graph)
             }
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Merge failed", "json" to json, ignoreErrorCache = true)
         }
     }
 
@@ -180,18 +172,11 @@ object GraphEditorIO {
 
     private fun convertToGraphingData(graph: Graph, idProvider: (GraphNode) -> Int): Pair<List<GraphingNode>, List<GraphingEdge>> {
         val importedNodes = graph.map { graphNode ->
-            GraphingNode(
-                idProvider(graphNode),
-                graphNode.position,
-                graphNode.name,
-                graphNode.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
-                graphNode.extraWeight,
-            )
+            GraphingNode(graphNode, idProvider(graphNode))
         }
         val translation = graph.zip(importedNodes).toMap()
-
         val rawEdges = graph.flatMap { node ->
-            node.neighbours.mapNotNull { (neighbor, _) ->
+            node.neighbors.mapNotNull { (neighbor, _) ->
                 val node1 = translation[node] ?: error("Invalid node in translation: ${node.id}")
                 val node2 = translation[neighbor] ?: error("Invalid neighbor in translation: ${neighbor.id}")
                 GraphingEdge(node1, node2, EdgeDirection.ONE_TO_TWO)

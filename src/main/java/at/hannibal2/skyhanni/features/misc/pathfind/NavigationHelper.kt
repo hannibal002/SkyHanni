@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
-import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -47,7 +47,7 @@ object NavigationHelper {
 
         val goBack = {
             doCommandAsync(searchTerm)
-            IslandGraphs.stop()
+            IslandGraphs.stopNavigation()
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
@@ -131,9 +131,7 @@ object NavigationHelper {
             aliases = listOf("shnav")
             argCallback("coords", LorenzVecArgumentType.double()) { location ->
                 pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
-                with(location) {
-                    ChatUtils.chat("Started Navigating to custom goal at §f$x $y $z", messageId = messageId)
-                }
+                ChatUtils.chat("Started Navigating to custom goal at §f${location.toLocalFormat()}", messageId = messageId)
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
                 SkyHanniMod.launchCoroutine("shnavigate command") {

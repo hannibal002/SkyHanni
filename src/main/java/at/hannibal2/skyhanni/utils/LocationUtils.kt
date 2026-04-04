@@ -28,7 +28,7 @@ object LocationUtils {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.rayTrace(a, b)?.miss == true
+    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b)?.miss == true
 
     fun playerLocation() = PlayerUtils.getLocation()
 
@@ -237,9 +237,7 @@ object LocationUtils {
     fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
-        val noBlocks = canSee(a, b, offset)
-        val notTooFar = a.distance(b) < viewDistance.toDouble()
-        return noBlocks && notTooFar
+        return a.distance(b) < viewDistance.toDouble() && canSee(a, b, offset)
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =

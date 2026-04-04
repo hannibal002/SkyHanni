@@ -126,7 +126,7 @@ object GraphEditorRenderer {
                 text,
                 scaleMultiplier = 0.8,
                 seeThroughBlocks = showTextAlways,
-                smallestDistanceVew = 12.0,
+                smallestViewDistance = 12.0,
                 ignoreY = true,
                 yOff = yOff,
                 maxDistance = 80,

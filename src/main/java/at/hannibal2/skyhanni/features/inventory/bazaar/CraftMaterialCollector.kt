@@ -137,7 +137,7 @@ object CraftMaterialCollector {
             val nameColor = if (isThisMultiply) "§a" else "§e"
             val priceColor = if (isThisMultiply) "§6" else "§7"
             val price = priceColor + calculateTotalPrice(neededMaterials, m).shortFormat()
-            val text = "${nameColor}Mulitply x$m $price"
+            val text = "${nameColor}Multiply x$m $price"
             if (!isThisMultiply) {
                 add(
                     Renderable.clickable(
@@ -164,7 +164,7 @@ object CraftMaterialCollector {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRecipeInventory && !purchasing) return
 

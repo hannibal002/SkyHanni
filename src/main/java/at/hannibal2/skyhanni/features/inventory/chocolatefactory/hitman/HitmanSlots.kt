@@ -48,7 +48,7 @@ object HitmanSlots {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.hitmanCosts || slotPricesLeft.isEmpty()) return
         if (!inInventory) return
         config.hitmanCostsPosition.renderRenderable(

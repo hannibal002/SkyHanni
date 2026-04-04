@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.GraphUtils.getNearestNode
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -238,7 +237,7 @@ object TunnelsMaps {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS")
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -414,7 +413,7 @@ object TunnelsMaps {
         val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
         if (first != null && second != null) {
             val direct = playerPosition.distance(second.position)
-            val firstPath = first.neighbours[second] ?: 0.0
+            val firstPath = first.neighbors[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
                 this.path = Graph(path.drop(1)) to (distance - firstPath + direct)
@@ -539,6 +538,6 @@ object TunnelsMaps {
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isCurrent() && config.enable &&
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable &&
             (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
 }

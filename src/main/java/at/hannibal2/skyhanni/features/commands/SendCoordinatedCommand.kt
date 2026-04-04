@@ -25,11 +25,5 @@ object SendCoordinatedCommand {
         }
     }
 
-    private fun getCoordinates(): String {
-        val location = LocationUtils.playerLocation()
-        val x = location.x.toInt()
-        val y = location.y.toInt()
-        val z = location.z.toInt()
-        return "x: $x, y: $y, z: $z"
-    }
+    private fun getCoordinates(): String = LocationUtils.playerLocation().toChatFormat()
 }

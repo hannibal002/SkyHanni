@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.isGreedy
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
 import at.hannibal2.skyhanni.utils.StringUtils.splitLastWhitespace
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -62,9 +63,12 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     }
 
     /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
-    fun coroutineSimpleCallback(block: suspend ArgContext.() -> Unit) {
+    fun coroutineSimpleCallback(
+        config: CoroutineSettings = CoroutineSettings("$this command callback"),
+        block: suspend ArgContext.() -> Unit,
+    ) {
         this.builder.executes {
-            SkyHanniMod.launchIOCoroutine("brigadier builder coroutineSimpleCallback") {
+            config.launch {
                 block(ArgContext(it))
             }
             1

@@ -71,7 +71,7 @@ object GardenCropMilestoneDisplay {
         onToggle(
             config.showMaxTier,
             config.highestTimeFormat,
-            config.overflow.cropMilestoneDisplay
+            config.overflow.cropMilestoneDisplay,
         ) {
             GardenBestCropTime.updateTimeTillNextCrop()
             update()
@@ -100,7 +100,9 @@ object GardenCropMilestoneDisplay {
         }
 
         if (config.next.bestDisplay) {
-            config.next.displayPos.renderRenderable(GardenBestCropTime.display, posLabel = "Best Crop Time")
+            GardenBestCropTime.display?.let {
+                config.next.displayPos.renderRenderable(it, posLabel = "Best Crop Time")
+            }
         }
     }
 
@@ -157,7 +159,7 @@ object GardenCropMilestoneDisplay {
             overflowDisplay,
             currentTier,
             nextTier,
-            useCustomGoal
+            useCustomGoal,
         ) = getMilestoneInfo(crop) ?: run {
             return formatDisplay(lineMap)
         }
@@ -233,7 +235,7 @@ object GardenCropMilestoneDisplay {
             overflowDisplay,
             currentTier,
             nextTier,
-            useCustomGoal
+            useCustomGoal,
         )
     }
 
@@ -242,7 +244,7 @@ object GardenCropMilestoneDisplay {
         counter: Long,
         have: Long,
         need: Long,
-        overflowDisplay: Boolean
+        overflowDisplay: Boolean,
     ) = if (crop.isMaxMilestone() && !overflowDisplay) {
         val haveFormat = counter.addSeparators()
         Renderable.text("§7Counter: §e$haveFormat")
@@ -314,7 +316,7 @@ object GardenCropMilestoneDisplay {
                 MilestoneTextEntry.MILESTONE_TIER,
                 MilestoneTextEntry.PERCENTAGE,
                 MilestoneTextEntry.NUMBER_OUT_OF_TOTAL,
-                MilestoneTextEntry.TIME
+                MilestoneTextEntry.TIME,
             )
 
             for (key in inaccurateList) {
@@ -356,7 +358,7 @@ object GardenCropMilestoneDisplay {
             overflowDisplay,
             currentTier,
             nextTier,
-            useCustomGoal
+            useCustomGoal,
         ) = getMilestoneInfo(mushroom) ?: run {
             mushroomCowPerkDisplay = listOf(Renderable.text("§cOpen §e/cropmilestones §cto update!"))
             return
@@ -412,6 +414,6 @@ object GardenCropMilestoneDisplay {
         val overflowDisplay: Boolean,
         val currentTier: Int,
         val nextTier: Int,
-        val useCustomGoal: Boolean
+        val useCustomGoal: Boolean,
     )
 }

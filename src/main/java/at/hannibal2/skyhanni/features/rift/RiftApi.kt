@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack
 @SkyHanniModule
 object RiftApi {
 
-    fun inRift() = IslandType.THE_RIFT.isCurrent()
+    fun inRift() = IslandType.THE_RIFT.isInIsland()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift
 
@@ -87,7 +87,7 @@ object RiftApi {
         IslandGraphs.disabledNodesReason?.let {
             IslandGraphs.enableAllNodes()
             if (temporalPillars.isEmpty()) {
-                IslandGraphs.update(force = true)
+                IslandGraphs.refreshNavigation(force = true)
             }
         }
 
@@ -96,7 +96,7 @@ object RiftApi {
                 val location = mob.baseEntity.getLorenzVec()
                 IslandGraphs.disableNodes("Temporal Pillar", location, 7.0)
             }
-            IslandGraphs.update(force = true)
+            IslandGraphs.refreshNavigation(force = true)
         }
 
     }

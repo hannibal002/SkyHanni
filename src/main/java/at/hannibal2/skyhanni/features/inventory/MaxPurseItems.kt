@@ -65,7 +65,7 @@ object MaxPurseItems {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!BazaarApi.inBazaarInventory) return
         // I would use BazaarAPI for price info, but as soon as NEU's data goes out of date, it will be wrong

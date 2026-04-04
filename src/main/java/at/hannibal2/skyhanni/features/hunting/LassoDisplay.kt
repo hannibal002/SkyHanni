@@ -27,10 +27,11 @@ object LassoDisplay {
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.lassoDisplay) return
-        if (display == null) return
-        config.lassoDisplayPosition.renderRenderable(display, posLabel = "Lasso Display")
+        display?.let {
+            config.lassoDisplayPosition.renderRenderable(it, posLabel = "Lasso Display")
+        }
     }
 
     // TODO: use entity events

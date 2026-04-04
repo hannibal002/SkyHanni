@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.pets
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -134,8 +133,8 @@ object GeorgeHelper {
         var renderableInfo: HorizontalContainerRenderable,
     )
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onChestGuiRender() {
         if (!config.enabled) return
         if (display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Taming 60 Helper")

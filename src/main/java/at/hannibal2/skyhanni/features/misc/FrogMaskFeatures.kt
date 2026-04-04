@@ -63,7 +63,9 @@ object FrogMaskFeatures {
     fun onRenderOverlay() {
         if (!isEnabled()) return
 
-        config.position.renderRenderable(display, posLabel = "Frog Mask Display")
+        display?.let {
+            config.position.renderRenderable(it, posLabel = "Frog Mask Display")
+        }
     }
 
     @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
@@ -89,7 +91,7 @@ object FrogMaskFeatures {
     }
 
     private fun handleWarning(helmetRegion: String) {
-        if (!IslandType.THE_PARK.isCurrent()) return
+        if (!IslandType.THE_PARK.isInIsland()) return
         val inWrongArea = SkyBlockUtils.graphArea != helmetRegion.removeColor()
         val timeToWarn = lastWarning.passedSince() > config.warning.cooldown.seconds
 
@@ -162,7 +164,7 @@ object FrogMaskFeatures {
     private fun shouldShowDisplay(): Boolean = when (config.display) {
         FrogMaskFeaturesConfig.FrogMaskCondition.DISABLED -> false
         FrogMaskFeaturesConfig.FrogMaskCondition.ALWAYS -> true
-        FrogMaskFeaturesConfig.FrogMaskCondition.PARK -> IslandType.THE_PARK.isCurrent()
+        FrogMaskFeaturesConfig.FrogMaskCondition.PARK -> IslandType.THE_PARK.isInIsland()
         FrogMaskFeaturesConfig.FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == FROG_MASK
         FrogMaskFeaturesConfig.FrogMaskCondition.WORN_IN_PARK -> InventoryUtils.getHelmet()?.getInternalName() == FROG_MASK
     }

@@ -19,7 +19,7 @@ object SpidersDenApi {
         "§4Broodmother§7: §[e64](?:Slain|Dormant|Soon|Awakening|Imminent|Alive!)",
     )
 
-    fun inSpidersDen() = IslandType.SPIDER_DEN.isCurrent()
+    fun inSpidersDen() = IslandType.SPIDER_DEN.isInIsland()
 
     fun isAtTopOfNest() = inSpidersDen() && broodmotherPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 }

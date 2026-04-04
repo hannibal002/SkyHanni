@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -136,7 +137,7 @@ object LimboPlaytime {
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = hoursPattern.matcher(it.string)
                 if (matcher.find()) {
-                    matcher.group("hours").replace(",", "").toDoubleOrNull() ?: 0.0
+                    matcher.group("hours").formatDoubleOrNull() ?: 0.0
                 } else 0.0
             }.toMutableList()
             setMinutes = false

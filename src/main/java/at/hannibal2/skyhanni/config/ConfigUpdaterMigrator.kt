@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
 import com.google.gson.JsonElement
@@ -11,8 +12,8 @@ import com.google.gson.JsonPrimitive
 
 object ConfigUpdaterMigrator {
 
-    val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 126
+    val logger = SkyHanniLogger("ConfigMigration")
+    const val CONFIG_VERSION = 129
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -24,6 +25,7 @@ object ConfigUpdaterMigrator {
         return obj?.at(chain.drop(1), init)
     }
 
+    @PrimaryFunction("onConfigFix")
     data class ConfigFixEvent(
         val old: JsonObject,
         val new: JsonObject,

@@ -41,7 +41,7 @@ object CFTooltipCompact {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!CFApi.inChocolateFactory) return
         if (config.tooltipMove) {
             if (lastHover.passedSince() < 1.seconds) {

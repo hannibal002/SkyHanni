@@ -14,12 +14,8 @@ import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -135,7 +131,7 @@ object ComposterOverlay {
         }
     }
 
-    @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened() {
         if (inInventory) displayDirty = true
     }
@@ -509,7 +505,7 @@ object ComposterOverlay {
 
             add("")
             if (selected) {
-                add(internalName.createBuyTipLine("Control + "))
+                add(internalName.createBuyTipLine("${KeyboardManager.getModifierKeyName()} + "))
             } else {
                 add("§eClick to select for profit calculations!")
             }
@@ -548,7 +544,7 @@ object ComposterOverlay {
 
         val havingInSacks: Int
         if (internalName.isMissingSackItem()) {
-            // sunflower oil doesnt go into sacks so have to do this
+            // sunflower oil doesn't go into sacks so have to do this
             havingInSacks = 0
         } else {
             havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
@@ -601,15 +597,15 @@ object ComposterOverlay {
         return price
     }
 
-    @HandleEvent(NeuRepositoryReloadEvent::class)
+    @HandleEvent
     fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
     // hopefully fix the display not working properly
     @HandleEvent
-    fun onIslandSwap(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GARDEN) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
         updateOrganicMatterFactors()
     }
 
@@ -621,7 +617,7 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(minimumOrganicMatter) {
@@ -672,8 +668,8 @@ object ComposterOverlay {
         return map
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
+    @HandleEvent
+    fun onChestGuiRender() {
         if (!isEnabled() || !inInventory) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
         if (displayDirty) {
@@ -681,14 +677,12 @@ object ComposterOverlay {
             displayDirty = false
         }
 
-        config.overlayOrganicMatterPos.renderRenderable(
-            organicMatterDisplay,
-            posLabel = "Composter Overlay Organic Matter",
-        )
-        config.overlayFuelExtrasPos.renderRenderable(
-            fuelExtraDisplay,
-            posLabel = "Composter Overlay Fuel Extras",
-        )
+        organicMatterDisplay?.let {
+            config.overlayOrganicMatterPos.renderRenderable(it, posLabel = "Composter Overlay Organic Matter")
+        }
+        fuelExtraDisplay?.let {
+            config.overlayFuelExtrasPos.renderRenderable(it, posLabel = "Composter Overlay Fuel Extras")
+        }
     }
 
     enum class TimeType(val display: String, val multiplier: Int) {
@@ -711,7 +705,7 @@ object ComposterOverlay {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {

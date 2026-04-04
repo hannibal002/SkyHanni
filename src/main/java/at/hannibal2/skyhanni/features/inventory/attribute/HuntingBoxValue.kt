@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.attribute
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -113,13 +112,13 @@ object HuntingBoxValue {
     }
 
     private fun isValidSlotNumber(slot: Int): Boolean {
-        if (slot < 9 || slot > 44) return false
+        if (slot !in 9..44) return false
         val modNine = slot % 9
         return modNine != 0 && modNine != 8
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChestGuiRender() {
         if (!config.huntingBoxValue) return
         if (!AttributeShardsData.huntingBoxInventory.isInside()) return
 

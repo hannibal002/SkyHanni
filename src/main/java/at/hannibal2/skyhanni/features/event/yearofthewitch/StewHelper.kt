@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -118,8 +117,8 @@ object StewHelper {
         return container
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay() {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onChestGuiRender() {
         if (!config.stewHelper) return
         if (display.isEmpty()) return
         config.stewHelperPosition.renderRenderables(display, posLabel = "Witch Stew Helper")

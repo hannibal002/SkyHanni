@@ -143,9 +143,18 @@ object InstanceChestProfit {
      * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
      * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
      */
-    private val bookColorFixerold by patternGroup.pattern( // Remove after 7.6.0 is pushed
+    private val bookColorFixerOld by patternGroup.pattern(
+        // Remove after 7.6.0 is pushed
         "bookcolorfix",
-        "Enchanted Book \\((?<item>.+)(?:§.)+\\)"
+        "Enchanted Book \\((?<item>.+)(?:§.)+\\)",
+    )
+
+    /**
+     * REGEX-TEST: §eRequires a Dungeon Chest Key
+     */
+    private val requiresDungeonChestKeyPattern by patternGroup.pattern(
+        "requiresadungeonchestkey",
+        "§eRequires a Dungeon Chest Key",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -257,6 +266,9 @@ object InstanceChestProfit {
                     itemPrice = getPrice(internalName)
                     essencePattern.matchMatcher(loreLine) {
                         itemPrice = getEssence(group("name"), group("count").toInt())
+                    }
+                    if (requiresDungeonChestKeyPattern.matches(loreLine) || loreLine.isEmpty()) {
+                        itemPrice = -1.0
                     }
                     if (dungeonChestKey.matches(loreLine)) {
                         cost += getPrice(internalName).times(-1)
@@ -405,7 +417,7 @@ object InstanceChestProfit {
         add(Renderable.emptyText())
         add(Renderable.text("$color§lProfit $color${total.formatCoin()}"))
 
-        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
+        if (!IslandType.CATACOMBS.isInIsland() && !IslandType.KUUDRA_ARENA.isInIsland()) return@buildList
 
         add(Renderable.emptyText())
         add(Renderable.text("§d§lAll Chest Profits"))
@@ -433,17 +445,15 @@ object InstanceChestProfit {
     fun onRenderOverlay() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
-                config.position.renderRenderable(
-                    chestDisplay,
-                    posLabel = "Instance Chest Profit",
-                )
+                chestDisplay?.let {
+                    config.position.renderRenderable(it, posLabel = "Instance Chest Profit")
+                }
             }
         if (config.croesusAllChestsOverlay && InventoryUtils.inInventory())
             if (isInCroesusMenu()) {
-                config.croesusPosition.renderRenderable(
-                    croesusDisplay,
-                    posLabel = "Croesus Chest Profit",
-                )
+                croesusDisplay?.let {
+                    config.croesusPosition.renderRenderable(it, posLabel = "Croesus Chest Profit")
+                }
             }
     }
 

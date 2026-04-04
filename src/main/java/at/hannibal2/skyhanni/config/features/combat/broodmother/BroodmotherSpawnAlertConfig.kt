@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.config.features.combat.broodmother
 
-import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -21,7 +22,7 @@ class BroodmotherSpawnAlertConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    val testSound: Runnable = Runnable(BroodmotherFeatures::playTestSound)
+    val testSound: () -> Unit = { SoundUtils.createSound(alertSound, pitch).playSound() }
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")

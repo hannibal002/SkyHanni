@@ -142,7 +142,7 @@ object JacobContestFFNeededDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.ffForContest) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return

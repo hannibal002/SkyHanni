@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTra
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CakeData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -186,8 +185,8 @@ object CakeTracker {
         ) { invalidateCakeCache() }
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onBackgroundDraw() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChestGuiRender() {
         if (!config.enabled) return
 
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()

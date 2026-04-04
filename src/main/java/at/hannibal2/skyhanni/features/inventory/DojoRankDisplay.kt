@@ -37,7 +37,7 @@ object DojoRankDisplay {
     private var belts = mapOf<String, Int>()
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }
@@ -97,5 +97,5 @@ object DojoRankDisplay {
     }
 
     private fun isEnabled() =
-        IslandType.CRIMSON_ISLE.isCurrent() && SkyBlockUtils.graphArea == "Dojo" && config.showDojoRankDisplay
+        IslandType.CRIMSON_ISLE.isInIsland() && SkyBlockUtils.graphArea == "Dojo" && config.showDojoRankDisplay
 }

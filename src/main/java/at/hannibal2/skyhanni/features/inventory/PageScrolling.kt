@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -53,12 +52,12 @@ object PageScrolling {
 
     // these checks are to prevent cheat-like behaviour, where the player could scroll through the inventory without any delay
     // currentlyScrollable is the primary check, to see if the player is currently able to scroll,
-    // with cooldown beeing a fallback to still allow for scrolling if currentlyScrollable is stuck
+    // with cooldown being a fallback to still allow for scrolling if currentlyScrollable is stuck
     private var currentlyScrollable = false
     private var cooldown = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         if (!currentlyScrollable && cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return

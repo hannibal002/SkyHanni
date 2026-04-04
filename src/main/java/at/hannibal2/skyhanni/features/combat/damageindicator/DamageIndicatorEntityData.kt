@@ -12,9 +12,8 @@ class DamageIndicatorEntityData(
     var delayedStart: SimpleTimeMark?,
     val finalDungeonBoss: Boolean,
     val bossType: BossType,
+    var foundTime: SimpleTimeMark,
     val damageCounter: DamageCounter = DamageCounter(),
-    val foundTime: SimpleTimeMark,
-
     var lastHealth: Long = 0L,
     var healthText: String = "",
     var timeLastTick: SimpleTimeMark = SimpleTimeMark.now(),
@@ -22,12 +21,12 @@ class DamageIndicatorEntityData(
     var nameSuffix: String = "",
     var nameAbove: String = "",
     var dead: Boolean = false,
-    var firstDeath: Boolean = false, // TODO this defines if hp is very low, replace dead with this later
+    var firstDeath: Boolean = false, // TODO this defines if HP is very low, replace dead with this later
     var deathLocation: LorenzVec? = null,
-
     var serverTicksAlive: Long = 0L,
 ) {
+
     val entity get() = mob.baseEntity
 
-    val timeToKill by lazy { "§e" + foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true) }
+    val timeToKill by lazy { foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true) }
 }

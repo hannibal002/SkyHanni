@@ -69,7 +69,7 @@ object BazaarLimitTracker {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.dailyLimitTracker) return
         if (!BazaarApi.inBazaarInventory) return
 

@@ -115,7 +115,7 @@ object SuperpairDataDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.superpairs.display || !ExperimentationTableApi.inTable) return
 
         display = display.takeIfNotEmpty()

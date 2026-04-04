@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
@@ -144,8 +144,8 @@ object GraphEditorNetworks {
             val nodeB = bestNodeB ?: break
             val distance = nodeA.position.distance(nodeB.position)
 
-            nodeA.neighbours += (nodeB to distance)
-            nodeB.neighbours += (nodeA to distance)
+            nodeA.neighbors += (nodeB to distance)
+            nodeB.neighbors += (nodeA to distance)
 
             clusters[bestIndexA].addAll(clusters[bestIndexB])
             clusters.removeAt(bestIndexB)

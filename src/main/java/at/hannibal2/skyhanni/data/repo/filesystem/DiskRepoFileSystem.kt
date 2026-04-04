@@ -30,4 +30,31 @@ class DiskRepoFileSystem(
                 "please report this on the SkyHanni discord.",
         )
     }
+
+    /**
+     * Returns OS-level diagnostics for [path]: absolute path, existence, file vs directory,
+     * size, read permission, and parent directory state. Used to surface actionable context
+     * in exception messages without needing to inspect the stack trace.
+     */
+    override fun pathDiagnostics(path: String): String = with(File(root, path)) {
+        buildString {
+            append("absolutePath='$absolutePath'")
+            append(", exists=${exists()}")
+            append(", isFile=$isFile")
+            if (exists()) {
+                append(", size=${length()}B")
+                append(", canRead=${canRead()}")
+            }
+            parentFile?.let { parent ->
+                append(", parentExists=${parent.exists()}")
+                if (parent.exists()) append(", parentCanRead=${parent.canRead()}")
+            }
+            val rootDiag = when {
+                !root.exists() -> "missing"
+                !root.isDirectory -> "not a directory"
+                else -> "${root.list()?.size ?: "?"} top-level entries"
+            }
+            append(", repoRoot='${root.absolutePath}' ($rootDiag)")
+        }
+    }
 }

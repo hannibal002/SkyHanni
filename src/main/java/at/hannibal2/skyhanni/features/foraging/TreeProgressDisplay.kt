@@ -25,10 +25,11 @@ object TreeProgressDisplay {
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-        if (display == null) return
-        config.position.renderRenderable(display, posLabel = "Tree Progress")
+        display?.let {
+            config.position.renderRenderable(it, posLabel = "Tree Progress")
+        }
     }
 
     // TODO: optimize to not use getEntities
@@ -43,10 +44,10 @@ object TreeProgressDisplay {
         for (entity in EntityUtils.getEntities<ArmorStand>()) {
             val name = entity.displayName.formattedTextCompat()
             ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
-                if (config.compact) {
-                    display = Renderable.text("${group("treeType")} §b§l${group("percent")}%")
+                display = if (config.compact) {
+                    Renderable.text("${group("treeType")} §b§l${group("percent")}%")
                 } else {
-                    display = Renderable.text(name)
+                    Renderable.text(name)
                 }
                 return
 
