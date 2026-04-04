@@ -47,7 +47,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -89,6 +88,7 @@ object SkyHanniDebugsAndTests {
             add("[SkyHanni] Graph Area: ${SkyBlockUtils.graphArea}")
         }
 
+        // TODO can we rename this to ore_block?
         registerDebugScreenEntry("targeted_oreblock", SkyBlockUtils::inSkyBlock) {
             BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
                 OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
@@ -158,38 +158,20 @@ object SkyHanniDebugsAndTests {
         progress.end("c")
     }
 
+    private val FIND_NULL_BLOCKED_NAMES = setOf(
+        "TRUE", "FALSE", "SIZE", "MIN_VALUE", "MAX_VALUE", "BYTES",
+        "POSITIVE_INFINITY", "NEGATIVE_INFINITY", "NaN", "MIN_NORMAL",
+    )
+
     private fun findNull(obj: Any, path: String) {
-        val blockedNames = listOf(
-            "TRUE",
-            "FALSE",
-            "SIZE",
-            "MIN_VALUE",
-            "MAX_VALUE",
-            "BYTES",
-            "POSITIVE_INFINITY",
-            "NEGATIVE_INFINITY",
-            "NaN",
-            "MIN_NORMAL",
-        )
-
-        val javaClass = obj.javaClass
-        if (javaClass.isEnum) return
-        for (field in javaClass.fields) {
-            val name = field.name
-            if (name in blockedNames) continue
-
-            // funny thing
-            if (obj is Position) {
-                if (name == "internalName") continue
-            }
-
-            val other = field.makeAccessible().get(obj)
-            val newName = "$path.$name"
-            if (other == null) {
-                println("config null at $newName")
-            } else {
-                findNull(other, newName)
-            }
+        if (obj.javaClass.isEnum) return
+        for (field in obj.javaClass.fields) {
+            if (field.name in FIND_NULL_BLOCKED_NAMES) continue
+            if (obj is Position && field.name == "internalName") continue
+            val value = field.get(obj)
+            val newName = "$path.${field.name}"
+            if (value == null) println("config null at $newName")
+            else findNull(value, newName)
         }
     }
 
@@ -461,7 +443,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         // TODO: make this not tied to debug HUD
         if (!debugConfig.enabled || !MinecraftCompat.showDebugHud) return
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")

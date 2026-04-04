@@ -32,5 +32,5 @@ object ScoreboardEventCarnival : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.carnivalPattern) + patterns
 
-    override fun showIsland() = IslandType.HUB.isCurrent()
+    override fun showIsland() = IslandType.HUB.isInIsland()
 }

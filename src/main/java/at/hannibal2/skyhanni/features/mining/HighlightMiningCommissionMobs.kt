@@ -104,5 +104,5 @@ object HighlightMiningCommissionMobs {
         event.move(2, "misc.mining", "mining")
     }
 
-    fun isEnabled() = config.highlightCommissionMobs && (IslandType.DWARVEN_MINES.isCurrent() || IslandType.CRYSTAL_HOLLOWS.isCurrent())
+    fun isEnabled() = config.highlightCommissionMobs && (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
 }

@@ -21,5 +21,5 @@ object ScoreboardEventVoting : ScoreboardEvent() {
         ScoreboardPattern.waitingForVotePattern,
     )
 
-    override fun showIsland() = IslandType.HUB.isCurrent()
+    override fun showIsland() = IslandType.HUB.isInIsland()
 }

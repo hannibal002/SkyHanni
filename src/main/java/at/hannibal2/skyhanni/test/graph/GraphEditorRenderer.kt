@@ -52,7 +52,7 @@ object GraphEditorRenderer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         GraphEditor.config.infoDisplay.renderRenderables(buildDisplay(), posLabel = "Graph Info")
     }
