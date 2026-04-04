@@ -102,5 +102,5 @@ object DojoRankDisplay {
     }
 
     private fun isEnabled() =
-        IslandType.CRIMSON_ISLE.isCurrent() && SkyBlockUtils.graphArea == "Dojo" && config.showDojoRankDisplay
+        IslandType.CRIMSON_ISLE.isInIsland() && SkyBlockUtils.graphArea == "Dojo" && config.showDojoRankDisplay
 }

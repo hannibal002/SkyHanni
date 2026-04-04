@@ -68,15 +68,19 @@ object RenderUtils {
     /**
      * Runs or schedules a block on the Render Thread.
      * - If already on the render thread, executes immediately and returns a completed future.
-     * - Otherwise, queues via [Minecraft.submit] and returns a pending future.
+     * - Otherwise, queues and returns a pending future.
      */
     fun <T> scheduleOnRenderThread(
         setupFor: Lighting.Entry? = null,
         block: () -> T,
     ): CompletableFuture<T> =
-        if (RenderSystem.isOnRenderThread()) CompletableFuture.completedFuture(runOnRenderThread(setupFor, block))
-        else Minecraft.getInstance().submit<T> {
-            runOnRenderThread(setupFor, block)
+        if (RenderSystem.isOnRenderThread()) {
+            CompletableFuture.completedFuture(runOnRenderThread(setupFor, block))
+        } else {
+            CompletableFuture.supplyAsync(
+                { runOnRenderThread(setupFor, block) },
+                Minecraft.getInstance(),
+            )
         }
 
     /**

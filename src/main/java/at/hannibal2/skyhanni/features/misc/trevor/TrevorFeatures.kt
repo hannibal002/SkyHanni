@@ -237,7 +237,7 @@ object TrevorFeatures {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!config.cooldownGui) return
 
         val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"

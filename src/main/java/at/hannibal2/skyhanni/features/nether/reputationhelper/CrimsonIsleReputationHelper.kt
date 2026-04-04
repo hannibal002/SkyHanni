@@ -50,8 +50,8 @@ object CrimsonIsleReputationHelper {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
-        DailyMiniBossHelper.onRepoReload(data.MINIBOSS)
-        DailyKuudraBossHelper.onRepoReload(data.KUUDRA)
+        DailyMiniBossHelper.processRepoData(data.MINIBOSS)
+        DailyKuudraBossHelper.processRepoData(data.KUUDRA)
 
         QuestLoader.quests.clear()
         QuestLoader.loadQuests(data.FISHING, "FISHING")
