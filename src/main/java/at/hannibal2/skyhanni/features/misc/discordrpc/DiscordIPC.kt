@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import com.google.gson.JsonObject
 import java.io.Closeable
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -49,8 +50,32 @@ class DiscordIPC(
         val (opcode, body) = readFrame()
         ChatUtils.debug("Discord RPC: handshake response opcode=$opcode")
         if (opcode != Opcode.FRAME) throw DiscordIPCException("Expected FRAME after handshake, got $opcode. Body: $body")
+        validateReadyBody(body)
         _connected = true
         shutdownHook = Thread(::close, "discord-rpc-shutdown").also(Runtime.getRuntime()::addShutdownHook)
+    }
+
+    /**
+     * Parses the handshake response body and verifies it contains a READY event.
+     *
+     * @param body The raw JSON string received from Discord after the handshake frame.
+     * @throws DiscordIPCException If the body is not valid JSON, contains an ERROR event,
+     *   or contains an unexpected event type.
+     */
+    @Suppress("ThrowsCount")
+    private fun validateReadyBody(body: String) {
+        val obj = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
+            ?: throw DiscordIPCException("Handshake response was not valid JSON. Body: $body")
+        when (val evt = obj.get("evt")?.asString) {
+            "READY" -> return
+            "ERROR" -> {
+                val data = obj.getAsJsonObject("data")
+                val code = data?.get("code")?.asInt
+                val message = data?.get("message")?.asString ?: "unknown error"
+                throw DiscordIPCException("Handshake rejected by Discord (error $code): $message")
+            }
+            else -> throw DiscordIPCException("Expected READY event after handshake, got evt=$evt. Body: $body")
+        }
     }
 
     var lastActivityJson: String? = null

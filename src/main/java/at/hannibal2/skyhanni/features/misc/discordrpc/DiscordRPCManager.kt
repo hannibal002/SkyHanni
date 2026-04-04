@@ -45,6 +45,8 @@ object DiscordRPCManager {
     private var nextUpdate = SimpleTimeMark.farPast()
     private var presenceJob: Job? = null
 
+    internal var beenAfkFor = SimpleTimeMark.now()
+
     private var debugError = false
     private var debugStatusMessage = "nothing"
 
@@ -276,6 +278,7 @@ object DiscordRPCManager {
             client?.setActivity(presence)
         } catch (e: DiscordIPCException) {
             updateDebugStatus("Discord RPC disconnected: ${e.message}")
+            client?.close()
             client = null
             scheduleRetry("Discord RPC disconnected")
         }
