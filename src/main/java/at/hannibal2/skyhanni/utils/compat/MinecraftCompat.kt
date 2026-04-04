@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
@@ -8,7 +7,8 @@ import net.minecraft.world.entity.Entity
 
 object MinecraftCompat {
 
-    val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("player is null")
+    @Deprecated("Use localPlayerOrNull instead", ReplaceWith("localPlayerOrNull"))
+    val localPlayer get(): LocalPlayer = localPlayerOrNull ?: error("player is null")
 
     val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
 
@@ -16,7 +16,8 @@ object MinecraftCompat {
 
     val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
-    val localWorld get(): ClientLevel = localWorldOrNull ?: ErrorManager.skyHanniError("level is null")
+    @Deprecated("Use localWorldOrNull instead", ReplaceWith("localWorldOrNull"))
+    val localWorld get(): ClientLevel = localWorldOrNull ?: error("level is null")
 
     val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
 
