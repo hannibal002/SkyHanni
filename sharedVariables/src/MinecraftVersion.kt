@@ -31,4 +31,11 @@ enum class MinecraftVersion(
         require(parts.size == 3)
         parts[0] * 10000 + parts[1] * 100 + parts[2]
     }
+
+    /**
+     * The version string used in fabric.mod.json's minecraft dependency field.
+     * For versions using the new 26.x+ versioning scheme, a tilde is prepended to allow compatible patch versions.
+     */
+    val fabricModJsonVersion: String
+        get() = if (versionNumber >= 260100) "~$versionName" else versionName
 }

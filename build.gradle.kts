@@ -208,7 +208,7 @@ tasks.processResources {
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
     val props = buildMap {
         put("version", version)
-        put("minecraft", target.minecraftVersion.versionName)
+        put("minecraft", target.minecraftVersion.fabricModJsonVersion)
         put("fapi", fapiVersion)
     }
 
