@@ -7,10 +7,7 @@ import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -241,7 +238,7 @@ object BlockStrengthGuide {
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
-                        addString("§eHold control-key to show extra infos!")
+                        addString("§eHold ${KeyboardManager.getModifierKeyName()} key to show extra infos!")
                     }
                 },
             )
@@ -513,7 +510,7 @@ object BlockStrengthGuide {
         }
     }
 
-    @HandleEvent(SkyHanniTickEvent::class)
+    @HandleEvent
     fun onTick() {
         val now = KeyboardManager.isModifierKeyDown()
         if (showExtraInfos != now) {
@@ -522,14 +519,14 @@ object BlockStrengthGuide {
         }
     }
 
-    @HandleEvent(InventoryCloseEvent::class)
+    @HandleEvent
     fun onInventoryClose() {
         if (!statsOpened) return
         shouldBlockSHMenu = false
     }
 
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
+    @HandleEvent
+    fun onWorldChange() {
         shouldBlockSHMenu = false
     }
 

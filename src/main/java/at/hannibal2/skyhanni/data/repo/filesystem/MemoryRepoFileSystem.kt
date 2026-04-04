@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.repo.filesystem
 import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.RepoLogger
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.DisposableHandle
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 class MemoryRepoFileSystem(
     override val root: File,
     override val logger: RepoLogger,
-    private val coroutineConfig: CoroutineConfig,
+    private val coroutineSettings: CoroutineSettings,
 ) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
 
@@ -69,7 +69,7 @@ class MemoryRepoFileSystem(
         // awaited later in transitionAfterReload.
         // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
         // through runWithErrorHandling which would otherwise swallow exceptions silently.
-        coroutineConfig.withIOContext().launchUnScoped {
+        coroutineSettings.withIOContext().launchUnScoped {
             try {
                 saveToDisk(progressCategory, root)
                 deferred.complete(Unit)

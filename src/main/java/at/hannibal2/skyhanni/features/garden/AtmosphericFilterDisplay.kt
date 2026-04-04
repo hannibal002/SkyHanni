@@ -18,7 +18,7 @@ object AtmosphericFilterDisplay {
     private val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
     private var display: Renderable? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ATMOSPHERIC_FILTER])
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         @Suppress("IsInIslandEarlyReturn")
@@ -26,7 +26,7 @@ object AtmosphericFilterDisplay {
         display = drawDisplay(SkyblockSeason.currentSeason ?: return)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.ATMOSPHERIC_FILTER])
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val display = display ?: return
@@ -42,8 +42,5 @@ object AtmosphericFilterDisplay {
         append(season.getPerk(config.abbreviatePerk))
     }
 
-    private fun hypixelEnabled() = SkyBlockUtils.onHypixel && config.enabled
-    private fun outSkyblockEnabled() = OutsideSBFeature.ATMOSPHERIC_FILTER.isSelected() && !SkyBlockUtils.inSkyBlock
-    private fun inSkyblockEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden)
-    private fun isEnabled() = hypixelEnabled() && (outSkyblockEnabled() || inSkyblockEnabled())
+    private fun isEnabled() = SkyBlockUtils.onHypixel && config.enabled && (GardenApi.inGarden() || config.outsideGarden)
 }

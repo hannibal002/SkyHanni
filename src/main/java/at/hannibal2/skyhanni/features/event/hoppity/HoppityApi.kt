@@ -220,7 +220,7 @@ object HoppityApi {
 
     @HandleEvent(IslandChangeEvent::class)
     fun onIslandChange() {
-        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isCurrent() }
+        onHoppityIsland = SkyBlockUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
     }
 
     @HandleEvent
@@ -338,7 +338,7 @@ object HoppityApi {
             postApiEggFoundEvent(type, event, note)
         }
 
-        if (IslandType.GARDEN.isCurrent()) HoppityEggsManager.hoppityVisitorAccepted.matchMatcher(event.cleanMessage) {
+        if (IslandType.GARDEN.isInIsland()) HoppityEggsManager.hoppityVisitorAccepted.matchMatcher(event.cleanMessage) {
             hoppityDataSet.reset()
             postApiEggFoundEvent(VISITOR, event)
         }

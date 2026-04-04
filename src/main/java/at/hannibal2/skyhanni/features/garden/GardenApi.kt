@@ -172,7 +172,7 @@ object GardenApi {
     private fun isOtherTool(internalName: NeuInternalName): Boolean =
         internalName in extraFarmingTools
 
-    fun inGarden() = IslandType.GARDEN.isCurrent()
+    fun inGarden() = IslandType.GARDEN.isInIsland()
 
     fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
 

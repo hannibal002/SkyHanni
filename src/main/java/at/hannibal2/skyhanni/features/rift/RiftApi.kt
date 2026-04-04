@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 @SkyHanniModule
 object RiftApi {
 
-    fun inRift() = IslandType.THE_RIFT.isCurrent()
+    fun inRift() = IslandType.THE_RIFT.isInIsland()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift
 

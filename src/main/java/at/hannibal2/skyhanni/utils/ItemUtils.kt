@@ -63,7 +63,7 @@ import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.common.collect.ImmutableMultimap
@@ -750,11 +750,11 @@ object ItemUtils {
         }
     }
 
-    private val testItemCoroutineConfig = CoroutineConfig("shtestitem").withIOContext()
+    private val testItemCoroutineSettings = CoroutineSettings("shtestitem").withIOContext()
     private fun testItemCommand(args: String) {
         TextHelper.text("§eProcessing..").send(testItemMessageId)
         // running .getPrice() on thousands of items may take ~500ms
-        testItemCoroutineConfig.launch {
+        testItemCoroutineSettings.launch {
             buildTestItemMessage(args).send(testItemMessageId)
         }
     }
