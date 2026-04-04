@@ -73,5 +73,5 @@ class MinionsConfig {
     @Expose
     @ConfigOption(name = "Inferno Minion Profit Tracker", desc = "")
     @Accordion
-    val infernoMinionProfitTracker: InfernoMinionProfitTrackerConfig = InfernoMinionProfitTrackerConfig()
+    val infernoProfitTracker: InfernoProfitTrackerConfig = InfernoProfitTrackerConfig()
 }

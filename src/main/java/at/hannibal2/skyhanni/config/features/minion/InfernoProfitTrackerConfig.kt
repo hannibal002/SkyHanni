@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class InfernoMinionProfitTrackerConfig {
+class InfernoProfitTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track items collected from Inferno Minions.")
     @ConfigEditorBoolean
@@ -17,7 +17,7 @@ class InfernoMinionProfitTrackerConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigLink(owner = InfernoMinionProfitTrackerConfig::class, field = "enabled")
+    @ConfigLink(owner = InfernoProfitTrackerConfig::class, field = "enabled")
     val position: Position = Position(250, 250)
 
     @Expose

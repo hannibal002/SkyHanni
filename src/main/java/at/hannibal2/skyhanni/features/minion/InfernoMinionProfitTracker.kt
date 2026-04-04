@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
-import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.features.minion.MinionFeatures.MINION_FUEL_SLOT
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object InfernoMinionProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.misc.minions.infernoMinionProfitTracker
+    private val config get() = SkyHanniMod.feature.misc.minions.infernoProfitTracker
 
     private val infernoMinionInventory = InventoryDetector { name ->
         InfernoMinionFeatures.infernoMinionTitlePattern.matches(name)
@@ -43,7 +43,6 @@ object InfernoMinionProfitTracker {
     private var isInfernoMinion = false
     private var lastFuelItem: NeuInternalName? = null
     private var lastCollectionTime = SimpleTimeMark.farPast()
-    private var itemsCollected = false
 
     private val tracker = SkyHanniItemTracker(
         "Inferno Minion Profit Tracker",
@@ -58,17 +57,17 @@ object InfernoMinionProfitTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val totalItems = items.values.sumOf { it.timesGained }
-            val percentage = if (totalItems > 0) timesGained.toDouble() / totalItems else 0.0
-            val dropRate = "%.1f%%".format(percentage * 100)
+            val shareOfDrops = if (totalItems > 0) timesGained.toDouble() / totalItems else 0.0
+            val formattedShare = "%.1f%%".format(shareOfDrops * 100)
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Drop chance: §c$dropRate",
+                "§7Share of drops: §c$formattedShare",
             )
         }
 
         override fun getCoinName(item: TrackedItem) = ""
 
-        override fun getCoinDescription(item: TrackedItem) = listOf<String>()
+        override fun getCoinDescription(item: TrackedItem) = emptyList<String>()
     }
 
     init {
@@ -137,22 +136,10 @@ object InfernoMinionProfitTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemAddInInventory(event: ItemAddInInventoryEvent) {
+    fun onItemAddInInventory(event: ItemAddEvent) {
         if (!isInfernoMinion) return
         if (!config.enabled) return
         tracker.addItem(event.internalName, event.amount, command = false)
-        itemsCollected = true
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSackChange(event: SackChangeEvent) {
-        if (!config.enabled) return
-        if (lastCollectionTime.passedSince() > 5.seconds) return
-        for (sackChange in event.sackChanges) {
-            if (sackChange.delta > 0) {
-                tracker.addItem(sackChange.internalName, sackChange.delta, command = false)
-            }
-        }
     }
 
     @HandleEvent
@@ -162,11 +149,10 @@ object InfernoMinionProfitTracker {
         lastCollectionTime = SimpleTimeMark.now()
         lastFuelItem = null
         isInfernoMinion = false
-        itemsCollected = false
     }
 
     private fun getFuelFromInventory(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
-        val fuelStack = inventoryItems[19] ?: return null
+        val fuelStack = inventoryItems[MINION_FUEL_SLOT] ?: return null
         val name = fuelStack.getInternalNameOrNull() ?: return null
         return if (name in InfernoMinionFeatures.fuelItemIds) name else null
     }

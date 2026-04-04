@@ -68,6 +68,9 @@ import net.minecraft.world.level.block.Blocks
 @SkyHanniModule
 object MinionFeatures {
 
+    const val MINION_FUEL_SLOT = 19
+    const val MINION_PICKUP_SLOT = 53
+
     private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
     private var newMinion: LorenzVec? = null
