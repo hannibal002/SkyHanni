@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables.animated
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -15,7 +16,8 @@ import kotlin.time.Duration
  * Just like the old DVD logos on old monitors back in the old days. old.
  *
  * @param renderable The renderable to be bounced around the screen.
- * @param movementSpeed The speed in pixels per second at which the logo moves.
+ * @param movementSpeed The speed in pixels per frame at a 60Hz reference rate at which the logo moves.
+ * @param syncPosition A [Position] used as the initial position and kept in sync with the logo's current position each frame.
  * @param initialTrajectory The initial trajectory of the logo.
  * @param horizontalAlign The horizontal alignment of the logo on the screen.
  * @param verticalAlign The vertical alignment of the logo on the screen.
@@ -25,6 +27,7 @@ import kotlin.time.Duration
 class DVDLogoRenderable private constructor(
     private val renderable: Renderable,
     private val movementSpeed: Float = 4f,
+    syncPosition: Position? = null,
     initialTrajectory: LogoTrajectory = LogoTrajectory.entries.random(),
     override val horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
     override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
@@ -34,8 +37,12 @@ class DVDLogoRenderable private constructor(
     override val width: Int = renderable.width
     override val height: Int = renderable.height
 
-    private var position: Position = renderable.generateRandomStartingPosition()
-    private var trajectory: LogoTrajectory = initialTrajectory
+    private val positionSync: Position? = syncPosition
+
+    var position: DVDLogoPosition = syncPosition?.let { DVDLogoPosition(it) } ?: renderable.generateRandomStartingPosition()
+        private set
+    var trajectory: LogoTrajectory = initialTrajectory
+        private set
 
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
 
@@ -69,9 +76,9 @@ class DVDLogoRenderable private constructor(
         else -> trajectory
     }
 
-    private fun generateNextPosition(deltaTime: Double): Position = Position(
-        x = position.x + (trajectory.x * movementSpeed * deltaTime),
-        y = position.y + (trajectory.y * movementSpeed * deltaTime),
+    private fun generateNextPosition(deltaTime: Double): DVDLogoPosition = DVDLogoPosition(
+        x = position.x + (trajectory.x * movementSpeed * 60.0 * deltaTime),
+        y = position.y + (trajectory.y * movementSpeed * 60.0 * deltaTime),
     )
 
     override fun renderWithDelta(mouseOffsetX: Int, mouseOffsetY: Int, deltaTime: Duration) {
@@ -94,10 +101,12 @@ class DVDLogoRenderable private constructor(
         val posYAtEdge = posYAtTopEdge || posYAtBottomEdge
 
         trajectory = generateNextTrajectory(posXAtEdge, posXAtLeftEdge, posYAtEdge, posYAtTopEdge)
-        position = generateNextPosition(deltaTime.inPartialSeconds)
+        position = generateNextPosition(deltaTime.inPartialSeconds.coerceAtMost(0.1))
+        positionSync?.moveTo(position.x.roundToInt(), position.y.roundToInt())
 
         val (x, y) = position.x.roundToInt() to position.y.roundToInt()
         DrawContextUtils.pushPop {
+            DrawContextUtils.loadIdentity()
             DrawContextUtils.translate(x.toFloat(), y.toFloat())
             renderable.render(mouseOffsetX + x, mouseOffsetY + y)
         }
@@ -110,12 +119,16 @@ class DVDLogoRenderable private constructor(
         fun Renderable.Companion.dvdLogo(
             renderable: Renderable,
             movementSpeed: Float = 4f,
+            syncPosition: Position? = null,
             initialTrajectory: LogoTrajectory = LogoTrajectory.entries.random(),
             horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
             onBounce: (Renderable) -> Unit = {},
             onCornerHit: (Renderable) -> Unit = {},
-        ) = DVDLogoRenderable(renderable, movementSpeed, initialTrajectory, horizontalAlign, verticalAlign, onBounce, onCornerHit)
+        ) = DVDLogoRenderable(
+            renderable, movementSpeed, syncPosition, initialTrajectory,
+            horizontalAlign, verticalAlign, onBounce, onCornerHit,
+        )
     }
 }
 
@@ -153,9 +166,11 @@ enum class LogoTrajectory(var x: Int, val y: Int) {
     }
 }
 
-private fun Renderable.generateRandomStartingPosition() = Position(
+private fun Renderable.generateRandomStartingPosition() = DVDLogoPosition(
     x = (0..(GuiScreenUtils.scaledWindowWidth - (width * 2)).coerceAtLeast(1)).random().toDouble(),
     y = (0..(GuiScreenUtils.scaledWindowHeight - (height * 2)).coerceAtLeast(1)).random().toDouble(),
 )
 
-private class Position(val x: Double, val y: Double)
+class DVDLogoPosition(val x: Double, val y: Double) {
+    constructor(position: Position) : this(position.x.toDouble(), position.y.toDouble())
+}

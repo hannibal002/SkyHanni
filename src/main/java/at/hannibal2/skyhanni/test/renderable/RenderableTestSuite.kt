@@ -28,7 +28,7 @@ object RenderableTestSuite {
     private val active = mutableSetOf<TestRenderableBase<*>>()
 
     @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
-    fun onGuiRender() {
+    fun onGuiRenderTop() {
         for (test in active.filter { it.eventClass == GuiRenderEvent.GuiOnTopRenderEvent::class }) {
             test.finalRenderable?.let {
                 test.position.renderRenderable(it, posLabel = "Renderable Test: $test")
