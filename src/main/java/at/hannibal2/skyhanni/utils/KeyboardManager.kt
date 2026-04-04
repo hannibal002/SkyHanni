@@ -14,7 +14,6 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
 import net.minecraft.client.input.KeyEvent
-import net.minecraft.client.input.KeyEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 
@@ -26,8 +25,8 @@ object KeyboardManager {
     @HandleEvent
     fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) return
-        if (GLFW.GLFW_KEY_ENTER.isKeyHeld()) lockedKeys[GLFW.GLFW_KEY_ENTER] = true
-        if (GLFW.GLFW_KEY_KP_ENTER.isKeyHeld()) lockedKeys[GLFW.GLFW_KEY_KP_ENTER] = true
+        if (GLFW.GLFW_KEY_ENTER.isKeyHeld()) lockedKeys.add(GLFW.GLFW_KEY_ENTER)
+        if (GLFW.GLFW_KEY_KP_ENTER.isKeyHeld()) lockedKeys.add(GLFW.GLFW_KEY_KP_ENTER)
     }
 
     const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
@@ -137,6 +136,7 @@ object KeyboardManager {
         this < -1 -> ErrorManager.skyHanniError(
             "Error while checking if a key is pressed. Key code is invalid: $this",
         )
+
         this == -1 -> false
         this in 0..5 -> MouseCompat.isButtonDown(this)
         else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)
