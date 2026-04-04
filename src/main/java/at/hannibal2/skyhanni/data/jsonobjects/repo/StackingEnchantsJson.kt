@@ -7,6 +7,6 @@ data class StackingEnchantsJson(
 )
 
 data class StackingEnchantData(
-    @Expose val levels: List<Int>,
-    @Expose val statName: String,
+    @Expose val levels: List<Int> = listOf(0),
+    @Expose val statName: String = "",
 )
