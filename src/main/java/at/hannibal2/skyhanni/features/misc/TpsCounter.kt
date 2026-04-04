@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -156,7 +157,7 @@ object TpsCounter {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("TPS Counter")
         event.addIrrelevant {
-            add("TPS: %.1f".format(rawTps))
+            add("TPS: ${rawTps?.oneDecimal()}")
             add("Milliseconds Per Tick: ${msPerTickList.values.joinToString(", ") { "%.1f".format(it) }}")
             add("Time Since World Switch: $timeSinceWorldSwitch")
         }

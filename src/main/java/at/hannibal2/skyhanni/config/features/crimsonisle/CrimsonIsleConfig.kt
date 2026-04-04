@@ -103,4 +103,10 @@ class CrimsonIsleConfig {
     @ConfigOption(name = "Magma Boss Phase", desc = "Show the current phase of the Magma Boss.")
     @ConfigEditorBoolean
     var magmaBossDisplay: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Vanquisher Waypoint", desc = "")
+    @Accordion
+    var vanquisherShare = VanquisherWaypointShareConfig()
+
 }
