@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -77,21 +76,19 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     companion object {
         var display: Renderable? = null
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MAYOR_OVERLAY])
         fun onSecondPassed(event: SecondPassedEvent) {
-            if (!isEnabled()) return
+            if (!config.enabled) return
             with(config) {
                 display = Renderable.vertical(mayorOverlay.map { it.createLines() }, spacing = spacing)
             }
         }
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.MAYOR_OVERLAY])
         fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-            if (!isEnabled()) return
+            if (!config.enabled) return
             display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
-
-        private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
     }
 }
 

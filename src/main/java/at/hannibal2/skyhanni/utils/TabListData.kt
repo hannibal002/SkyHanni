@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.mixins.hooks.tabListGuarded
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.fabricmc.api.EnvType
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TabListData {
     private val playerOrdering = Ordering.from(TabPlayerComparator())
-    private val copyCoroutine = CoroutineConfig("copy tab list data")
+    private val copyCoroutine = CoroutineSettings("copy tab list data")
 
     @Environment(EnvType.CLIENT)
     internal class TabPlayerComparator : Comparator<PlayerInfo> {

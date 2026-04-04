@@ -30,12 +30,15 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import java.lang.UnsupportedOperationException
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
+
+private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
+private const val CHAT_PREFIX = "[SkyHanni] "
 
 @SkyHanniModule
 object ChatUtils {
@@ -43,10 +46,6 @@ object ChatUtils {
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
-
-    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
-    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private const val CHAT_PREFIX = "[SkyHanni] "
 
     /**
      * Sends a debug message to the chat and the console.
@@ -368,14 +367,14 @@ object ChatUtils {
         }
     }
 
-    private var deleteNext: Pair<String, (String) -> Boolean>? = null
+    private var deleteNext: Pair<String, (Component) -> Boolean>? = null
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val (reason, predicate) = deleteNext ?: return
         this.deleteNext = null
 
-        if (predicate(event.message)) {
+        if (predicate(event.chatComponent)) {
             event.blockedReason = reason
         }
     }
@@ -388,7 +387,7 @@ object ChatUtils {
 
     fun deleteNextMessage(
         reason: String,
-        predicate: (String) -> Boolean,
+        predicate: (Component) -> Boolean,
     ) {
         deleteNext = reason to predicate
     }
@@ -450,6 +449,7 @@ object ChatUtils {
     ) {
         val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to $actionName or disable this feature]"
+        val modifier = KeyboardManager.getModifierKeyName()
         clickableChat(
             "$message$hint",
             onClick = {
@@ -459,7 +459,8 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n" +
+                "§eShift-Click or $modifier-Click to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
