@@ -139,8 +139,8 @@ object SlayerRngMeterToolTipFeatures {
         val expectedCoins = SlayerApi.slayerJsonData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
         val changeNegation = event.coins * -1
 
-        val hasSlayerBonusRewards = changeNegation == expectedCoins * SLAYER_COST_REDUCTION // -4% from Slayer Bonus Rewards
-        val hasBartender = changeNegation == expectedCoins * BREWERY_CONTRIBUTION_REDUCTION // -5% from Brewery city project
+        val hasSlayerBonusRewards = changeNegation == expectedCoins * SLAYER_COST_REDUCTION
+        val hasBartender = changeNegation == expectedCoins * BREWERY_CONTRIBUTION_REDUCTION
 
         if (hasSlayerBonusRewards) ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = 7
         ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction = hasBartender
