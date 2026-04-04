@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -17,17 +19,14 @@ object AshfangNextResetCooldown {
 
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (AshfangManager.lastSpawnTime.isFarPast()) return
+        if (!isEnabled() || AshfangManager.lastSpawnTime.isFarPast()) return
         val nextSpawn = AshfangManager.lastSpawnTime + ashfangResetTime
 
         val format = if (nextSpawn.isInPast()) "§aNow!"
         else "§b${nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)}"
 
-        config.nextResetCooldownPos.renderString(
-            "§cAshfang next reset in: $format",
-            posLabel = "Ashfang Reset Cooldown",
-        )
+        val display = Renderable.text("§cAshfang next reset in: $format")
+        config.nextResetCooldownPos.renderRenderable(display, posLabel = "Ashfang Reset Cooldown")
     }
 
     @HandleEvent

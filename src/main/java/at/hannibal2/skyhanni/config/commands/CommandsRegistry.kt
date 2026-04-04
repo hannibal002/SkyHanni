@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 @SkyHanniModule
 object CommandsRegistry {
@@ -17,7 +18,7 @@ object CommandsRegistry {
     @HandleEvent(PreInitFinishedEvent::class)
     fun onPreInitFinished() {
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            CommandRegistrationEvent(dispatcher as CommandDispatcher<Any?>).post()
+            CommandRegistrationEvent(dispatcher).post()
         }
     }
 
@@ -32,17 +33,20 @@ object CommandsRegistry {
         aliases.forEach { it.isUnique(builders) }
     }
 
-    fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>, builders: MutableList<CommandData>) {
-        val original = dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
+    fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<FabricClientCommandSource>, builders: MutableList<CommandData>) {
+        val original = dispatcher.register(builder as LiteralArgumentBuilder<FabricClientCommandSource>)
         this.node = original
         aliases.forEach {
-            dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original).executes(original.command))
+            dispatcher.register(LiteralArgumentBuilder.literal<FabricClientCommandSource>(it).redirect(original).executes(original.command))
         }
         addBuilder(builders)
     }
 
-    fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>, builders: MutableList<CommandData>) {
-        if (this !is CommandBuilder) return // complex commands are not supported in 1.21.5 right now
+    fun <T : CommandBuilderBase> T.addToRegister(
+        dispatcher: CommandDispatcher<FabricClientCommandSource>,
+        builders: MutableList<CommandData>,
+    ) {
+        if (this !is CommandBuilder) return // complex commands are not supported in 1.21+ right now
         val builder = BaseBrigadierBuilder(name).apply {
             this.description = this@addToRegister.descriptor
             this.aliases = this@addToRegister.aliases
