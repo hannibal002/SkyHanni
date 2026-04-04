@@ -142,7 +142,7 @@ object HoppityLiveDisplay {
     private var inventoryOpen = false
 
     @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    fun onGuiRender() {
         if (!liveDisplayEnabled()) return
 
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
