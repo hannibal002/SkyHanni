@@ -9,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOverride
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class BorderRingConfig(
@@ -21,16 +23,19 @@ open class BorderRingConfig(
         desc = "Display a border ring around the background color, showing your pet's progress to leveling up.",
     )
     @ConfigEditorBoolean
+    @ConfigOrder(10)
     open val enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Customization", desc = "")
     @Accordion
+    @ConfigOrder(20)
     open val customization: XPRingConfig = XPRingConfig(scalar)
 
     @Expose
     @ConfigOption(name = "Separator Ring", desc = "")
     @Accordion
+    @ConfigOrder(30)
     open val separator: SeparatorRingConfig = SeparatorRingConfig(scalar)
 
     class SeparatorRingConfig(
@@ -44,6 +49,7 @@ open class BorderRingConfig(
 
     @ConfigOption(name = "Reset Ring Settings", desc = "Reset border ring settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")
+    @ConfigOrder(40)
     open val reset: Runnable = Runnable(::reset)
 }
 
@@ -64,7 +70,9 @@ class XPRingConfig(
             "§7Default: §#§0§0§f§f§f§f§/#00FFFF",
     )
     @ConfigEditorColour
+    @ConfigOrder(21)
     val filledColor: Property<ChromaColour> = Property.of(DEFAULT_FILLED_COLOR)
+
     @Expose
     @ConfigOption(
         name = "Unfilled Ring Color",
@@ -72,10 +80,12 @@ class XPRingConfig(
             "§7Default: §#§c§0§c§0§c§0§/#C0C0C0",
     )
     @ConfigEditorColour
+    @ConfigOrder(22)
     val unfilledColor: Property<ChromaColour> = Property.of(DEFAULT_UNFILLED_COLOR)
 
     @ConfigOption(name = "Reset", desc = "Reset XP ring settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")
+    @ConfigOverride
     override val reset: Runnable = Runnable(::reset)
 }
 
@@ -97,6 +107,7 @@ open class RingConfig(
         desc = "How wide the ring should be."
     )
     @ConfigEditorSlider(minValue = 2f, maxValue = 10f, minStep = 0.5f)
+    @ConfigOrder(10)
     val padding: Property<Int> = Property.of((DEFAULT_PADDING * scalar).toInt())
 
     @Expose
@@ -106,9 +117,11 @@ open class RingConfig(
             "§7Default: §#§8§0§8§0§8§0§/#808080"
     )
     @ConfigEditorColour
+    @ConfigOrder(20)
     open val color: Property<ChromaColour> = Property.of(DEFAULT_RING_COLOR)
 
     @ConfigOption(name = "Reset Ring Settings", desc = "Reset the ring settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")
+    @ConfigOrder(30)
     open val reset: Runnable = Runnable(::reset)
 }

@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 /**
@@ -20,11 +21,13 @@ open class VisualPetDisplayConfig(
     @Expose
     @ConfigOption(name = "Pet Icon", desc = "")
     @Accordion
+    @ConfigOrder(10)
     open val icon: IconConfig = IconConfig(scalar)
 
     @Expose
     @ConfigOption(name = "Background Color", desc = "")
     @Accordion
+    @ConfigOrder(20)
     open val rarityBackground: BackgroundColorConfig = BackgroundColorConfig(scalar)
 
     open class BackgroundColorConfig(
@@ -38,21 +41,25 @@ open class VisualPetDisplayConfig(
                 "Default is to display the rarity color of the pet."
         )
         @ConfigEditorBoolean
+        @ConfigOrder(10)
         open val enabled: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(name = "Customization", desc = "")
         @Accordion
+        @ConfigOrder(20)
         open val customization: RarityBackgroundConfig = RarityBackgroundConfig(scalar)
 
         @Expose
         @ConfigOption(name = "Border Ring", desc = "")
         @Accordion
+        @ConfigOrder(30)
         open val borderRing: BorderRingConfig = BorderRingConfig(scalar)
     }
 
     @Expose
     @ConfigOption(name = "Pet Item", desc = "")
     @Accordion
+    @ConfigOrder(30)
     open val petItem: PetItemConfig = PetItemConfig(scalar)
 }

@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 open class IconConfig(
@@ -25,11 +26,13 @@ open class IconConfig(
             "§cRequired for any options below to work§7.",
     )
     @ConfigEditorBoolean
+    @ConfigOrder(10)
     val enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Skin Animation", desc = "If your pet has an animated skin, the icon will also animate.")
     @ConfigEditorBoolean
+    @ConfigOrder(20)
     val skinAnimation: Property<Boolean> = Property.of(true)
 
     @Expose
@@ -38,11 +41,13 @@ open class IconConfig(
         desc = "How large the pet icon should be.",
     )
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 3.0f, minStep = 0.1f)
+    @ConfigOrder(30)
     open val scale: Property<Double> = Property.of(DEFAULT_ICON_SCALE * scalar)
 
     @Expose
     @ConfigOption(name = "Icon Rotation/Spin", desc = "")
     @Accordion
+    @ConfigOrder(40)
     val rotation: IconRotationConfig = IconRotationConfig()
 
     class IconRotationConfig : Resettable {
@@ -108,5 +113,6 @@ open class IconConfig(
 
     @ConfigOption(name = "Reset Icon Settings", desc = "Reset the icon settings to the default values.")
     @ConfigEditorButton(buttonText = "Reset")
+    @ConfigOrder(50)
     open val reset: Runnable = Runnable(::reset)
 }
