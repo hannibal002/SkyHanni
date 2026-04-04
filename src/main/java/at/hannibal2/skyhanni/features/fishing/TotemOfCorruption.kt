@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -64,7 +64,7 @@ object TotemOfCorruption {
      */
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining-nocolor",
-        "Remaining: (?:(?<min>\\d+)m )?(?<sec>\\d+)s"
+        "Remaining: (?:(?<min>\\d+)m )?(?<sec>\\d+)s",
     )
 
     /**
@@ -72,11 +72,11 @@ object TotemOfCorruption {
      */
     private val ownerPattern by patternGroup.pattern(
         "owner-nocolor",
-        "Owner: (?<owner>.+)"
+        "Owner: (?<owner>.+)",
     )
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderOverlay() {
         if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Totem of Corruption")
     }
@@ -87,7 +87,13 @@ object TotemOfCorruption {
         if (!isOverlayEnabled()) return
 
         allTotems = getAllTotems()
-        totems = filterTotems(allTotems)
+        totems = filterTotems()
+
+        val timeToWarn = config.warnWhenAboutToExpire.seconds
+        for (totem in totems) {
+            totem.tryWarn(timeToWarn)
+        }
+
         display = createDisplay()
     }
 
@@ -162,20 +168,18 @@ object TotemOfCorruption {
 
     private fun createDisplay(): List<Renderable> = buildList {
         val totem = getTotemToShow() ?: return@buildList
-        add(
-            Component.literal("Totem of Corruption").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD)
-        )
+        add("Totem of Corruption".asComponent().withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
         add(
             componentBuilder {
                 appendWithColor("Remaining: ", ChatFormatting.GRAY)
                 appendWithColor(totem.timeRemaining.format(TimeUnit.MINUTE), ChatFormatting.YELLOW)
-            }
+            },
         )
         add(
             componentBuilder {
                 appendWithColor("Owner: ", ChatFormatting.GRAY)
                 appendWithColor(totem.ownerName, ChatFormatting.YELLOW)
-            }
+            },
         )
     }.map(Renderable::text)
 
@@ -193,22 +197,19 @@ object TotemOfCorruption {
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
 
-    private fun filterTotems(all: List<Totem>): List<Totem> = all.mapNotNull { totem ->
-        if (config.ownTotemOnly && totem.ownerName != PlayerUtils.getName()) return@mapNotNull null
+    private fun filterTotems(): List<Totem> = allTotems.filter { !config.ownTotemOnly || it.isOwn() }
 
-        val timeToWarn = config.warnWhenAboutToExpire.seconds
-        if (timeToWarn > 0.seconds && totem.timeRemaining <= timeToWarn) {
-            // warnedTotems requires a UUID — look up the ArmorStand to get it.
-            val entity = getEntitiesNearby<ArmorStand>(100.0)
-                .firstOrNull { it.getLorenzVec() == totem.location } ?: return@mapNotNull totem
-            if (entity.uuid !in warnedTotems) {
-                playBeepSound(0.5f)
-                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
-                warnedTotems.add(entity.uuid)
-            }
+    private fun Totem.tryWarn(timeToWarn: Duration) {
+        if (timeToWarn <= 0.seconds || timeRemaining > timeToWarn) return
+
+        // warnedTotems requires a UUID — look up the ArmorStand to get it.
+        val entity = getEntitiesNearby<ArmorStand>(100.0)
+            .firstOrNull { it.getLorenzVec() == location } ?: return
+        if (entity.uuid !in warnedTotems) {
+            playBeepSound(0.5f)
+            TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
+            warnedTotems.add(entity.uuid)
         }
-
-        totem
     }
 
     private fun isOverlayEnabled() = SkyBlockUtils.inSkyBlock && config.showOverlay.get()
@@ -220,4 +221,6 @@ private class Totem(
     val timeRemaining: Duration,
     val ownerName: String,
     val distance: Double = location.distanceToPlayer(),
-)
+) {
+    fun isOwn() = ownerName == PlayerUtils.getName()
+}
