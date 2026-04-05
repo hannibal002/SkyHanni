@@ -111,6 +111,14 @@ object MinionFeatures {
         "^§aCollect All$",
     )
 
+    /**
+     * REGEX-TEST: You applied the eyedrops on the minion and ran out!
+     */
+    val eyedropsRanOutPattern by patternGroup.pattern(
+        "eyedrops.ranout",
+        "You applied the eyedrops on the minion and ran out!",
+    )
+
     var lastMinion: LorenzVec? = null
     private var lastStorage: LorenzVec? = null
     var minionInventoryOpen = false

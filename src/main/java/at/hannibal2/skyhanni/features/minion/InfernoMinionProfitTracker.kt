@@ -4,16 +4,21 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionDropsJson
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.minion.MinionFeatures.MINION_FUEL_SLOT
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -27,8 +32,10 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -36,9 +43,14 @@ object InfernoMinionProfitTracker {
 
     private val config get() = SkyHanniMod.feature.misc.minions.infernoProfitTracker
 
+    private val eyedropsItem = "CAPSAICIN_EYEDROPS_NO_CHARGES".toInternalName()
+
     private val infernoMinionInventory = InventoryDetector { name ->
         InfernoMinionFeatures.infernoMinionTitlePattern.matches(name)
     }
+
+    private var fuelDropMap = mapOf<NeuInternalName, Set<NeuInternalName>>()
+    private var minionDropMap = mapOf<String, Set<NeuInternalName>>()
 
     private var isInfernoMinion = false
     private var lastFuelItem: NeuInternalName? = null
@@ -115,6 +127,13 @@ object InfernoMinionProfitTracker {
     }
 
     @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<MinionDropsJson>("MinionDrops")
+        fuelDropMap = data.fuelDrops.associate { it.id to it.drops.toSet() }
+        minionDropMap = data.minions.associate { it.id to it.drops.toSet() }
+    }
+
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         val firstOpen = !isInfernoMinion
         isInfernoMinion = InfernoMinionFeatures.infernoMinionTitlePattern.matches(event.inventoryName)
@@ -135,10 +154,13 @@ object InfernoMinionProfitTracker {
         lastFuelItem = newFuel
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onItemAddInInventory(event: ItemAddEvent) {
-        if (!isInfernoMinion) return
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onItemAdd(event: ItemAddEvent) {
         if (!config.enabled) return
+        if (lastCollectionTime.passedSince() > 1.minutes) return
+        val isKnownDrop = minionDropMap.values.any { event.internalName in it } ||
+            fuelDropMap.values.any { event.internalName in it }
+        if (!isKnownDrop) return
         tracker.addItem(event.internalName, event.amount, command = false)
     }
 
@@ -149,6 +171,14 @@ object InfernoMinionProfitTracker {
         lastCollectionTime = SimpleTimeMark.now()
         lastFuelItem = null
         isInfernoMinion = false
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (!config.enabled) return
+        if (MinionFeatures.eyedropsRanOutPattern.matches(event.cleanMessage)) {
+            tracker.modify { it.totalFuelCost += eyedropsItem.getPrice() }
+        }
     }
 
     private fun getFuelFromInventory(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
