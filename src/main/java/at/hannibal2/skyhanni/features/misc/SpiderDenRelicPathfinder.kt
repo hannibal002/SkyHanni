@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -41,7 +41,7 @@ object SpiderDenRelicPathfinder {
 
     private var data: Data? = null
 
-    private val relicPathFindConfig = CoroutineConfig("spider relic pathfind")
+    private val relicPathFindConfig = CoroutineSettings("spider relic pathfind")
     private val patternGroup = RepoPattern.group("misc.spider-relic")
 
     /**
