@@ -54,7 +54,12 @@ class RareMobSharingConfig {
     var globalChat: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Mob Toggles", desc = "Choose which rare mobs trigger waypoint sharing.")
+    @ConfigOption(name = "Share Mob Toggles", desc = "Choose which rare mobs you share waypoints for.")
     @Accordion
-    val mobToggles: RareMobToggleConfig = RareMobToggleConfig()
+    val shareMobToggles: RareMobToggleConfig = RareMobToggleConfig()
+
+    @Expose
+    @ConfigOption(name = "Receive Mob Toggles", desc = "Choose which rare mobs you receive waypoints for.")
+    @Accordion
+    val receiveMobToggles: RareMobToggleConfig = RareMobToggleConfig()
 }

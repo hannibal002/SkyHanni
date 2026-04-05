@@ -94,7 +94,17 @@ object RareMobWaypointShare {
         val mobName: String,
     )
 
-    private fun isMobEnabled(name: String): Boolean = with(config.mobToggles) {
+    private fun isMobShareEnabled(name: String): Boolean = with(config.shareMobToggles) {
+        when {
+            name.contains("Minos Inquisitor") -> minosInquisitor
+            name.contains("Sphinx") -> sphinx
+            name.contains("Manticore") -> manticore
+            name.contains("King Minos") -> kingMinos
+            else -> true
+        }
+    }
+
+    private fun isMobReceiveEnabled(name: String): Boolean = with(config.receiveMobToggles) {
         when {
             name.contains("Minos Inquisitor") -> minosInquisitor
             name.contains("Sphinx") -> sphinx
@@ -239,7 +249,7 @@ object RareMobWaypointShare {
         }
         val location = rareMob.getLorenzVec().toChatFormat()
         val mobName = rareMob.name.string.orEmpty()
-        if (!isMobEnabled(mobName)) return
+        if (!isMobShareEnabled(mobName)) return
         lastShareTime = SimpleTimeMark.now()
         val name = if (mobName.isEmpty()) "" else "| $mobName"
         HypixelCommands.partyChat("$location $name")
@@ -259,7 +269,7 @@ object RareMobWaypointShare {
             if (rawMobName !in mob.mobAliases) continue
             mobName = mob.cleanName
         }
-        if (!isMobEnabled(mobName)) return false
+        if (!isMobReceiveEnabled(mobName)) return false
 
         val optionalAn = StringUtils.optionalAn(mobName)
 
