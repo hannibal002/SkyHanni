@@ -1,19 +1,23 @@
-package at.hannibal2.skyhanni.detektrules.formatting
+package formatting
 
 import com.google.auto.service.AutoService
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.RuleSet
-import io.gitlab.arturbosch.detekt.api.RuleSetProvider
+import dev.detekt.api.RuleName
+import dev.detekt.api.RuleSet
+import dev.detekt.api.RuleSetId
+import dev.detekt.api.RuleSetProvider
 
 @AutoService(RuleSetProvider::class)
 class FormattingRuleSetProvider : RuleSetProvider {
-    override val ruleSetId: String = "FormattingRules"
+    override val ruleSetId: RuleSetId = RuleSetId("FormattingRules")
 
-    override fun instance(config: Config): RuleSet {
-        return RuleSet(ruleSetId, listOf(
-            CustomAnnotationSpacing(config),
-            CustomCommentSpacing(config),
-            StorageVarOrVal(config),
-        ))
+    override fun instance(): RuleSet {
+        return RuleSet(
+            ruleSetId,
+            mapOf(
+                RuleName("CustomAnnotationSpacing") to ::CustomAnnotationSpacing,
+                RuleName("CustomCommentSpacing") to ::CustomCommentSpacing,
+                RuleName("StorageVarOrVal") to ::StorageVarOrVal,
+            ),
+        )
     }
 }

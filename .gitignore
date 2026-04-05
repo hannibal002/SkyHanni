@@ -9,7 +9,7 @@ run/
 build/
 bin/
 
-# gradle
+# Gradle
 build
 gradle.properties
 .gradle

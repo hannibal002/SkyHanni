@@ -30,6 +30,7 @@ data class SkyHanniGuiItemRenderState(
     val adjustedScale: Float = 1f,
     private val passedStableId: Int? = null,
     private val frameNumber: Int? = null,
+    val alpha: Float = 1f,
 ) : PictureInPictureRenderState {
     companion object {
         private var counter = 0
@@ -99,9 +100,6 @@ data class SkyHanniGuiItemRenderState(
 
         val f = pixelSize.toFloat()
         ps.scale(f, -f, f)
-
-        val rotationPadding = if (rotationVector != Vec3.ZERO) 1.0f / 1.42f else 1.0f
-        ps.scale(rotationPadding, rotationPadding, rotationPadding)
 
         val rotated = ps.mulPose(rotationVector)
         ps.translate(0.0f, 0.03f, 0.125f)

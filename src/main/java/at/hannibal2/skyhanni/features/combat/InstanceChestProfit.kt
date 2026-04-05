@@ -140,13 +140,11 @@ object InstanceChestProfit {
     )
 
     /**
-     * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
-     * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
+     * REGEX-TEST: §eRequires a Dungeon Chest Key
      */
-    private val bookColorFixerold by patternGroup.pattern(
-        // Remove after 7.6.0 is pushed
-        "bookcolorfix",
-        "Enchanted Book \\((?<item>.+)(?:§.)+\\)",
+    private val requiresDungeonChestKeyPattern by patternGroup.pattern(
+        "requiresadungeonchestkey",
+        "§eRequires a Dungeon Chest Key",
     )
 
     private val config get() = SkyHanniMod.feature.combat.instanceChestProfit
@@ -161,7 +159,7 @@ object InstanceChestProfit {
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
         if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
@@ -201,8 +199,8 @@ object InstanceChestProfit {
         }
     }
 
-    @HandleEvent
-    fun onKey(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onGuiKeyPress() {
         if (!config.keybind.isKeyHeld()) return
         val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
         stackUnderCursor()?.getInternalNameOrNull()?.let {
@@ -258,6 +256,9 @@ object InstanceChestProfit {
                     itemPrice = getPrice(internalName)
                     essencePattern.matchMatcher(loreLine) {
                         itemPrice = getEssence(group("name"), group("count").toInt())
+                    }
+                    if (requiresDungeonChestKeyPattern.matches(loreLine) || loreLine.isEmpty()) {
+                        itemPrice = -1.0
                     }
                     if (dungeonChestKey.matches(loreLine)) {
                         cost += getPrice(internalName).times(-1)
@@ -406,7 +407,7 @@ object InstanceChestProfit {
         add(Renderable.emptyText())
         add(Renderable.text("$color§lProfit $color${total.formatCoin()}"))
 
-        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
+        if (!IslandType.CATACOMBS.isInIsland() && !IslandType.KUUDRA_ARENA.isInIsland()) return@buildList
 
         add(Renderable.emptyText())
         add(Renderable.text("§d§lAll Chest Profits"))
@@ -431,7 +432,7 @@ object InstanceChestProfit {
             } ?: 0.0
 
     @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
                 chestDisplay?.let {

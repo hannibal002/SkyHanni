@@ -1,14 +1,12 @@
-package at.hannibal2.skyhanni.detektrules
+import com.intellij.psi.PsiElement
+import dev.detekt.api.Config
+import dev.detekt.api.Entity
+import dev.detekt.api.Finding
+import dev.detekt.api.Rule
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Rule
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
-
-abstract class SkyHanniRule(config: Config) : Rule(config) {
+abstract class SkyHanniRule(config: Config, description: String) : Rule(config, description) {
 
     protected fun PsiElement.reportIssue(message: String) {
-        report(CodeSmell(issue, Entity.from(this), message))
+        report(Finding(Entity.from(this), message))
     }
 }

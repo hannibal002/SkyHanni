@@ -17,11 +17,11 @@ jobs:
         runs-on: ubuntu-latest
         name: "Generate regexes"
         steps:
-            -   uses: actions/checkout@v3
-            -   name: Set up JDK 21
-                uses: actions/setup-java@v3
+            -   uses: actions/checkout@v6
+            -   name: Set up JDK 25
+                uses: actions/setup-java@v5
                 with:
-                    java-version: 21
+                    java-version: 25
                     distribution: temurin
                     cache: gradle
             -   name: Setup gradle
@@ -34,7 +34,7 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: generateRepoPatterns --stacktrace
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v7
                 name: Upload generated repo regexes
                 with:
                     name: Repo Regexes
@@ -46,11 +46,12 @@ jobs:
         # 511310721 is the Repository ID for SkyHanni
         if: ${{ 'push' == github.event_name && 'beta' == github.ref_name && '511310721' == github.repository_id }}
         steps:
-            -   uses: actions/checkout@v3
+            -   uses: actions/checkout@v6
                 with:
                     repository: ${{ env.data_repo }}
                     branch: main
-            -   uses: actions/download-artifact@v4
+                    persist-credentials: false
+            -   uses: actions/download-artifact@v8
                 name: Upload generated repo regexes
                 with:
                     name: Repo Regexes
@@ -70,6 +71,5 @@ jobs:
                     git commit -m "Update regexes based on https://github.com/hannibal002/Skyhanni/commit/$GITHUB_SHA"
             -   name: Publish new repository
                 run: |
-                    git config --unset-all http.https://github.com/.extraheader
                     git remote add restream https://user:${{secrets.REPO_PAT}}@github.com/${{env.data_repo}}
                     git push restream HEAD:main

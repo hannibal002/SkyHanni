@@ -14,7 +14,7 @@ object GuiChatHook {
     fun replaceEntireComponent(title: String, chatStyle: Style) {
         // Initialise new component
         val newComponent = title.asComponent()
-        newComponent.setStyle(chatStyle)
+        newComponent.style = chatStyle
 
         replacementComponent = newComponent
     }

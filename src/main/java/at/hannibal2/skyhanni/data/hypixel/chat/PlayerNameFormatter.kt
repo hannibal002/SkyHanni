@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.compat.changeColor
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
@@ -210,20 +212,15 @@ object PlayerNameFormatter {
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
 
-        val all = "".asComponent()
-        var first = true
-        for (text in config.partsOrder.mapNotNull { map[it] }) {
-            if (first) {
-                first = false
-            } else {
-                if (!all.unformattedTextCompat().endsWith(" ")) {
-                    all.append(" ")
-                }
-            }
-            all.append(text)
+        val components = config.partsOrder.mapNotNull { map[it] }
+        components.find { it.unformattedTextCompat().endsWith(" ") }?.let {
+            ErrorManager.logErrorStateWithData(
+                "player name formatting error",
+                "part of player name format ends with space",
+                "invalid part" to "'$it'",
+            )
         }
-
-        return all
+        return components.merge()
     }
 
     private fun formatLevel(rawColor: String?, rawLevel: ComponentSpan?): Component? {
@@ -260,27 +257,30 @@ object PlayerNameFormatter {
         levelColor: String?,
         removeColor: String,
         rankColor: String,
-    ): ComponentSpan = when {
-        MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
-            (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
-                .setStyle(name.sampleStyleAtStart()).intoSpan()
+    ): ComponentSpan {
+        val style = name.sampleStyleAtStart() ?: error("style is null")
+        return when {
+            MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
+                (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
+                    .setStyle(style).intoSpan()
 
-        levelColor != null && config.useLevelColorForName ->
-            (levelColor + removeColor).asComponent()
-                .setStyle(name.sampleStyleAtStart())
-                .intoSpan()
+            levelColor != null && config.useLevelColorForName ->
+                (levelColor + removeColor).asComponent()
+                    .setStyle(style)
+                    .intoSpan()
 
-        config.playerRankHider ->
-            removeColor.asComponent()
-                .setStyle(name.sampleStyleAtStart())
-                .style { withColor(ChatFormatting.AQUA) }
-                .intoSpan()
+            config.playerRankHider ->
+                removeColor.asComponent()
+                    .setStyle(style)
+                    .style { withColor(ChatFormatting.AQUA) }
+                    .intoSpan()
 
-        else ->
-            if (rankColor.isEmpty()) name
-            else (rankColor + removeColor).asComponent()
-                .setStyle(name.sampleStyleAtStart())
-                .intoSpan()
+            else ->
+                if (rankColor.isEmpty()) name
+                else (rankColor + removeColor).asComponent()
+                    .setStyle(style)
+                    .intoSpan()
+        }
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable

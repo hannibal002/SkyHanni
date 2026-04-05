@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
@@ -35,15 +35,13 @@ object ScoreboardElementPowder : ScoreboardElement() {
                 PowderDisplay.BOTH -> {
                     add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, "$current/$total", color)}")
                 }
-
-                null -> {}
             }
         }
     }
 
     override val configLine = "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234\n §7- §fGlacite: §b86,574"
 
-    override fun showIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
+    override fun showIsland() = IslandTypeTag.ADVANCED_MINING.isInIsland()
 }
 
 // click: open /hotm

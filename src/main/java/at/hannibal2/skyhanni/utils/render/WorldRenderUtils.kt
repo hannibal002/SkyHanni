@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -147,10 +146,9 @@ object WorldRenderUtils {
          * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
         seeThroughBlocks: Boolean = false,
     ) {
-        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, seeThroughBlocks)
+        drawFilledBoundingBox(aabb, c.toColor(), alphaMultiplier, renderRelativeToCamera, seeThroughBlocks)
     }
 
     // TODO make deprecated
@@ -163,7 +161,6 @@ object WorldRenderUtils {
          * If set to `false`, will be relativized to [WorldRenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
         seeThroughBlocks: Boolean = false,
     ) {
         val effectiveAABB = if (!renderRelativeToCamera) {
@@ -628,7 +625,7 @@ object WorldRenderUtils {
          */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
+        smallestViewDistance: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
@@ -648,7 +645,7 @@ object WorldRenderUtils {
         val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
         // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+        distToPlayer = distToPlayer.coerceAtLeast(smallestViewDistance)
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {
@@ -680,7 +677,7 @@ object WorldRenderUtils {
          */
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
-        smallestDistanceVew: Double = 5.0,
+        smallestViewDistance: Double = 5.0,
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
@@ -700,7 +697,7 @@ object WorldRenderUtils {
         val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
         // TODO this is optional maybe?
-        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+        distToPlayer = distToPlayer.coerceAtLeast(smallestViewDistance)
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {
@@ -816,13 +813,18 @@ object WorldRenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
-        drawLineToEye(location, color.toColor(), lineWidth, depth)
+    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+        drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
-    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    @Deprecated("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+        drawLineToCrosshair(location, color, lineWidth, depth)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(
-            exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2),
+            exactPlayerCrosshairLocation(),
             location,
             color,
             lineWidth,
@@ -952,8 +954,6 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos(ignored: Float) = getViewerPos()
-
     fun getViewerPos() =
         Minecraft.getInstance().gameRenderer.mainCamera?.let { exactLocation(it) } ?: LorenzVec()
 
@@ -980,9 +980,11 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.eyeHeight.toDouble()
-        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player).add(y = eyeHeight)
     }
+
+    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
+        exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
         if (entity.deceased) return entity.boundingBox
@@ -997,10 +999,8 @@ object WorldRenderUtils {
         ) ?: aabb
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
-        val add = if (player.isShiftKeyDown) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
-        return exactLocation(player) + add
-    }
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec =
+        exactLocation(player).up(player.getEyeHeight(player.pose))
 
     private fun addChainedFilledBoxVertices(
         matrices: PoseStack,

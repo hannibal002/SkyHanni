@@ -162,9 +162,9 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
 
     protected open fun getDisplay() = getSharedTracker()?.let {
         val data = it.get(getDisplayMode())
-        val searchables = drawDisplay(data)
-        if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-        else buildFinalDisplay(Renderable.vertical(searchables.toRenderable()))
+        val displayLines = drawDisplay(data)
+        if (config.trackerSearchEnabled.get()) buildFinalDisplay(displayLines.buildSearchBox(textInput))
+        else buildFinalDisplay(Renderable.vertical(displayLines.toRenderable()))
     }.orEmpty()
 
     protected open fun buildFinalDisplay(searchBox: Renderable) = buildList {
@@ -196,7 +196,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    private fun getDisplayModeTracker(dispMode: DisplayMode? = displayMode) = dispMode?.let { getSharedTracker()?.get(it) }
+    private fun getDisplayModeTracker(mode: DisplayMode? = displayMode) = mode?.let { getSharedTracker()?.get(it) }
 
     fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
 

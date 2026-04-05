@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules.imports
+package imports
 
 import org.jetbrains.kotlin.psi.KtImportDirective
 

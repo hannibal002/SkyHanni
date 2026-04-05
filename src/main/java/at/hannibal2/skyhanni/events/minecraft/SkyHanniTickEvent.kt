@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 @PrimaryFunction("onTick")
@@ -10,7 +11,7 @@ class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
 
     /**
      * Use of this method is discouraged, use [SecondPassedEvent] instead.
-     * Only use if very needed.
+     * Only use if absolutely necessary.
      */
     fun repeatSeconds(i: Int, offset: Int = 0) = isMod(i * 20, offset)
 }

@@ -17,13 +17,15 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import kotlin.time.Duration.Companion.milliseconds
@@ -32,18 +34,19 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TimiteHelper {
 
+    private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
     private val TIME_GUN = "TIME_GUN".toInternalName()
+
+    // TODO reform to data class, use Resettable
     private var holdingClick = SimpleTimeMark.farPast()
     private var lastClick = SimpleTimeMark.farPast()
-    private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
     private var currentPos: LorenzVec? = null
     private var currentBlockState: BlockState? = null
     private var doubleTimeShooting = false
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockHit(event: BlockClickEvent) {
-        if (!isEnabled()) return
-        if (!config.evolutionTimer) return
+        if (!isEnabled() || !config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (event.position != currentPos || currentBlockState != event.getBlockState) {
@@ -72,8 +75,7 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.evolutionTimer) return
+        if (!isEnabled() || !config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
         if (lastClick + 400.milliseconds < SimpleTimeMark.now()) {
             holdingClick = SimpleTimeMark.farPast()
@@ -87,7 +89,10 @@ object TimiteHelper {
         val timeLeft = holdingClick + time.milliseconds
         if (!timeLeft.isInPast()) {
             val formattedTime = timeLeft.timeUntil().format(showMilliSeconds = true)
-            config.timerPosition.renderString("§b$formattedTime", 0, 0, "Timite Helper")
+            config.timerPosition.renderRenderable(
+                Renderable.text("§b$formattedTime"),
+                posLabel = "Timite Helper",
+            )
         }
     }
 
@@ -95,8 +100,7 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-        if (!config.expiryTimer) return
+        if (!isEnabled() || !config.expiryTimer) return
 
         val map = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
@@ -110,21 +114,15 @@ object TimiteHelper {
             if (locations[loc] == null) locations[loc] = SimpleTimeMark.now()
         }
 
-        val iterator = locations.entries.iterator()
-        while (iterator.hasNext()) {
-            val state = iterator.next().key.getBlockStateAt()
-            if (state.block == Blocks.AIR) {
-                iterator.remove()
-            } else if (state.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) {
-                iterator.remove()
-            }
+        locations.entries.removeIf { (location, _) ->
+            val state = location.getBlockStateAt()
+            state.block == Blocks.AIR || state.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (!config.expiryTimer) return
+        if (!isEnabled() || !config.expiryTimer) return
 
         for (location in locations.entries) {
             val timeLeft = location.value + 31.seconds
@@ -135,9 +133,7 @@ object TimiteHelper {
     }
 
     @HandleEvent
-    fun onWorldChange() {
-        locations.clear()
-    }
+    fun onWorldChange() = locations.clear()
 
     private fun isEnabled() = RiftApi.inMountainTop() && config.enabled
 }

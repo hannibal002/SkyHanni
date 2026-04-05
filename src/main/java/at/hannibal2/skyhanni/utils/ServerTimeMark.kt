@@ -12,7 +12,7 @@ import kotlin.time.Duration
  * the server's tps instead of real time, and therefore are affected by server lag.
  */
 @JvmInline
-value class ServerTimeMark private constructor(val ticks: Long) : Comparable<ServerTimeMark> {
+value class ServerTimeMark internal constructor(val ticks: Long) : Comparable<ServerTimeMark> {
 
     operator fun minus(other: ServerTimeMark): Duration =
         (ticks - other.ticks).ticks

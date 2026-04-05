@@ -242,7 +242,7 @@ object MinionCraftHelper {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!SkyBlockUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 

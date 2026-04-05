@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import java.awt.Color
 
 @SkyHanniModule
@@ -34,7 +34,7 @@ object PigFeatures {
         if (!lineToPigEnabled) return
 
         val pigEntityLocation = WorldRenderUtils.exactLocation(pigEntity, partialTicks)
-        drawLineToEye(
+        drawLineToCrosshair(
             pigEntityLocation.up(0.54),
             Color.PINK.toChromaColor(),
             3,

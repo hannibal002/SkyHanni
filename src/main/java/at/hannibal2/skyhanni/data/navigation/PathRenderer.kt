@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.GraphUtils.playerPosition
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils.STANDING_EYE_HEIGHT
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
@@ -25,7 +26,7 @@ import java.awt.Color
  * node structure around the 5 blocks in front of you
  *
  * if the closest node and the path to it is not visible, move further down the line of currently moves paths to
- *  find the spot where to start the curve from. and if that also doesnt work, find a new edge on the actual graph to start the path on.
+ *  find the spot where to start the curve from. and if that also doesn't work, find a new edge on the actual graph to start the path on.
  *
  *  do not jump forward if the path is higher than the user location
  *
@@ -45,8 +46,6 @@ private const val TANGENT_LOOKAHEAD = 1.5
 
 private const val NEAR_LINE_WIDTH = 6
 private const val FAR_LINE_WIDTH = 4
-
-private const val STANDING_EYE_HEIGHT = 1.62
 
 // distance in blocks above/below a water surface crossing where depth testing is disabled
 private const val PEEK_DISTANCE = 4.0

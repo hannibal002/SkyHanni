@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMax
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percentToNextMilestone
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
@@ -85,7 +86,7 @@ private fun getCropMilestoneDisplay(): String {
 private fun getPetDisplay(): String = CurrentPetApi.currentPet?.getUserFriendlyName()
     ?: "No pet equipped"
 
-enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
+enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() -> String?) {
 
     NONE({ null }),
 
@@ -95,7 +96,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val island = SkyBlockUtils.currentIsland
 
             if (location == "Your Island") location = "Private Island"
-            lastKnownDisplayStrings[LOCATION] = when (island) {
+            lastKnownDisplayStrings[this] = when (island) {
                 IslandType.PRIVATE_ISLAND_GUEST -> "Visiting an Island"
 
                 // Some islands give no_area in graphArea, so they must be dealt with separately
@@ -118,10 +119,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 }
 
                 else -> location.takeIf { it != "None" && it != "invalid" && it != AreaNode.NO_AREA }
-                    ?: lastKnownDisplayStrings[LOCATION].orEmpty()
+                    ?: lastKnownDisplayStrings[this].orEmpty()
             }
             // Only display None if we don't have a last known area
-            lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
+            lastKnownDisplayStrings[this].takeIf { it?.isNotEmpty() == true } ?: "None"
         },
     ),
 
@@ -155,9 +156,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
             }
             if (ActionBarStatsData.MANA.value != "") {
-                lastKnownDisplayStrings[STATS] = statString
+                lastKnownDisplayStrings[this] = statString
             }
-            lastKnownDisplayStrings[STATS].orEmpty()
+            lastKnownDisplayStrings[this].orEmpty()
         },
     ),
 
@@ -196,7 +197,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 append(HypixelData.profileName.firstLetterUppercase())
             }
 
-            lastKnownDisplayStrings[PROFILE] = profile
+            lastKnownDisplayStrings[this] = profile
             profile
         },
     ),
@@ -234,7 +235,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             }
             if (autoReturn == "") { // if we didn't find any useful information, display the fallback
                 val fallbackID = DiscordRPCManager.config.auto.get().ordinal
-                autoReturn = if (fallbackID == AUTO.ordinal) {
+                autoReturn = if (fallbackID == this.ordinal) {
                     NONE.getDisplayString()
                 } else {
                     DiscordStatus.entries[fallbackID].getDisplayString()
@@ -282,9 +283,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                         break
                     }
                 }
-                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant] ?: StackingEnchantData()
+                val levels = stackingData.levels
                 val level = enchantments.getIntOrDefault(stackingEnchant)
-                val amount = extraAttributes.getIntOrDefault(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
+                val amount = extraAttributes.getIntOrDefault(stackingData.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

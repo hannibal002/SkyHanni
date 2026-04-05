@@ -363,7 +363,7 @@ object SkillApi {
         val currentXP = matcher.group("current").formatLong()
         val maxXP = matcher.group("needed").formatLong()
 
-        // when at overflow, we dont need to subtract one level in the logic below
+        // when at overflow, we don't need to subtract one level in the logic below
         val minus = if (maxXP == 0L) 0 else 1
         val level = getLevelExact(maxXP) - minus
 

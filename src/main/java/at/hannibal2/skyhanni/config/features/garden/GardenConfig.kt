@@ -54,6 +54,15 @@ class GardenConfig {
     val keyBind: KeyBindConfig = KeyBindConfig()
 
     @Expose
+    @ConfigOption(
+        name = "Prevent Breaking with Rod",
+        desc = "Stops you from breaking blocks while holding a fishing rod.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var noRodBreak: Boolean = true
+
+    @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     val optimalSpeeds: OptimalSpeedConfig = OptimalSpeedConfig()
 
