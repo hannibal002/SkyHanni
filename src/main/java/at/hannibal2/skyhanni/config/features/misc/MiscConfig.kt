@@ -331,7 +331,7 @@ class MiscConfig {
     @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
-    // doesnt work properly
+    // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
         desc = "Remove ghost entities caused by a Hypixel bug.\n" +

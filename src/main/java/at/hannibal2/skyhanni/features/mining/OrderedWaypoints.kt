@@ -178,9 +178,9 @@ object OrderedWaypoints {
             literal("skipto") {
                 description = "Skips to the waypoint with the inputted number."
                 arg("number", BrigadierArguments.integer()) { number ->
-                    callback { skipto(getArg(number)) }
+                    callback { skipTo(getArg(number)) }
                 }
-                simpleCallback { skipto(1) }
+                simpleCallback { skipTo(1) }
             }
             literal("unskip") {
                 description = "Goes back by the number inputted many waypoints."
@@ -248,8 +248,8 @@ object OrderedWaypoints {
         if (config.autoUnload) unload()
     }
 
-    private fun shouldRenderName(waypointIndice: Int) =
-        config.showName && (config.setupMode || config.showAll || waypointIndice in 0..(1 + config.nextCount.toInt()))
+    private fun shouldRenderName(waypointIndex: Int) =
+        config.showName && (config.setupMode || config.showAll || waypointIndex in 0..(1 + config.nextCount.toInt()))
 
     private fun getRouteNames() = ProfileStorageData.orderedWaypointsRoutes?.routes?.keys.orEmpty()
 
@@ -306,7 +306,7 @@ object OrderedWaypoints {
         ChatUtils.chat("Skipped $amount ${StringUtils.pluralize(amount, "waypoint")}.")
     }
 
-    private fun skipto(number: Int) {
+    private fun skipTo(number: Int) {
         if (orderedWaypointsList.isEmpty()) {
             return ChatUtils.chat("There are no waypoints to skip to.")
         }

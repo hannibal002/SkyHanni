@@ -8,6 +8,8 @@ GrammarRules:
 CompatRules:
     MinecraftCompat:
         active: true
+    VanillaItemStackImport:
+        active: true
 
 FormattingRules:
     CustomCommentSpacing:
@@ -65,9 +67,9 @@ style:
     LoopWithTooManyJumpStatements:
         active: true
         maxJumpCount: 3
-    UnnecessaryAbstractClass: # gets horrendously messed up with Event classes
+    UnusedPrivateClass: # seldom intentional
         active: false
-    UnusedPrivateMember: # gets tripped up by API methods
+    UnusedPrivateFunction: # gets tripped up by API methods
         active: false
     UnusedPrivateProperty: # loops that don't use their iterator
         active: true
@@ -80,7 +82,7 @@ style:
         active: true
         maxDestructuringEntries: 5
 
-formatting:
+ktlint:
     MaximumLineLength: # ktlint - handled by detekt
         active: false
     MultiLineIfElse:
@@ -117,30 +119,47 @@ formatting:
         active: false
     CommentWrapping:
         active: false
+    # Todo maybe re-evaluate in the future
+    BinaryExpressionWrapping:
+        active: false
+    BlankLineBetweenWhenConditions:
+        active: false
+    ClassSignature:
+        active: false
+    FunctionExpressionBody:
+        active: false
+    FunctionLiteral:
+        active: false
+    FunctionSignature:
+        active: false
+    MixedConditionOperators:
+        active: false
+    TrailingCommaOnCallSite:
+        active: false
 
 complexity:
-    CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
+    CyclomaticComplexMethod: # default allowedComplexity of 14, caught almost every complex method
         active: true
-        threshold: 25
+        allowedComplexity: 25
     LongParameterList: # too aggressive, classes can need a lot of params
         active: false
     NestedBlockDepth: # too aggressive
         active: false
-    TooManyFunctions: # ktlint - also way too aggressive by default (11 on all file types)
+    TooManyFunctions: # too aggressive by default (11 on all file types)
         active: true
-        thresholdInFiles: 15
-        thresholdInClasses: 20
-        thresholdInInterfaces: 20
-        thresholdInObjects: 20
-        thresholdInEnums: 11
+        allowedFunctionsPerFile: 15
+        allowedFunctionsPerClass: 20
+        allowedFunctionsPerInterface: 20
+        allowedFunctionsPerObject: 20
+        allowedFunctionsPerEnum: 11
         ignoreAnnotated:
             - 'SkyHanniModule'
-    ComplexCondition: # aggressive by default, at a complexity of 4
+    ComplexCondition: # aggressive by default, at a complexity of 3
         active: true
-        threshold: 6
+        allowedConditions: 6
     LongMethod: # default max length of 60, caught way too much
         active: true
-        threshold: 100
+        allowedLines: 100
 
 exceptions:
     SwallowedException: # there are valid reasons to do this
@@ -169,4 +188,3 @@ potential-bugs:
         active: true
     UnreachableCode:
         active: false
-

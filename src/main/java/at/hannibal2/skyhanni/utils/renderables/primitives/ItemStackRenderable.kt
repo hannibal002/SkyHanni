@@ -37,12 +37,15 @@ open class ItemStackRenderable internal constructor(
     }
 
     fun withTip(advancedTooltipCompat: Boolean = false) = Renderable.hoverTips(
-        stack,
+        this@ItemStackRenderable,
         stack.getTooltipCompat(advancedTooltipCompat),
         stack = stack,
     )
 
     companion object {
+        fun Renderable.Companion.item(stack: ItemStack, config: ItemRenderableConfig) =
+            ItemStackRenderable(config) { stack }
+
         fun Renderable.Companion.item(stackGetter: () -> ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
             ItemStackRenderable(ItemRenderableConfig().apply(config), stackGetter)
 
@@ -57,7 +60,7 @@ open class ItemStackRenderable internal constructor(
     }
 }
 
-open class ItemRenderableConfig {
+open class ItemRenderableConfig(selfOp: ItemRenderableConfig.() -> Unit = {}) {
     open var scale: Double by PropertyVar(NeuItems.ITEM_FONT_SIZE)
     open var xSpacing: Int by PropertyVar(2)
     open var ySpacing: Int by PropertyVar(1)
@@ -65,4 +68,8 @@ open class ItemRenderableConfig {
     open var horizontalAlign: HorizontalAlignment by PropertyVar(HorizontalAlignment.LEFT)
     open var verticalAlign: VerticalAlignment by PropertyVar { Property.of(VerticalAlignment.CENTER) }
     open var alpha: Float by PropertyVar(1f)
+
+    init {
+        selfOp()
+    }
 }

@@ -348,7 +348,7 @@ object HideNotClickableItems {
 
     private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
         if (!InventoryUtils.isInNormalChest()) return false
-        if (!IslandType.PRIVATE_ISLAND.isCurrent()) return false
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return false
         if (!stack.isSoulbound()) return false
 
         hideReason = "This item cannot be stored into a chest!"

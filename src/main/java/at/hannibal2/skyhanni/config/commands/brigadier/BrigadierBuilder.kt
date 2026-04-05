@@ -1,25 +1,30 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.isGreedy
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
 import at.hannibal2.skyhanni.utils.StringUtils.splitLastWhitespace
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
-typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<Any?>>
-typealias ArgumentCommandBuilder<T> = BrigadierBuilder<RequiredArgumentBuilder<Any?, T>>
+typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<FabricClientCommandSource>>
+typealias ArgumentCommandBuilder<T> = BrigadierBuilder<RequiredArgumentBuilder<FabricClientCommandSource, T>>
 
-class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBuilder<LiteralArgumentBuilder<Any?>>(
-    LiteralArgumentBuilder.literal<Any?>(name),
-) {
+class BaseBrigadierBuilder(
+    override val name: String,
+) : CommandData,
+    BrigadierBuilder<LiteralArgumentBuilder<FabricClientCommandSource>>(
+        LiteralArgumentBuilder.literal(name),
+    ) {
     var description: String = ""
     override var aliases: List<String> = emptyList()
     override var category: CommandCategory = CommandCategory.MAIN
@@ -27,11 +32,11 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
     override val descriptor: String
         get() = description
 
-    lateinit var node: CommandNode<Any?>
+    lateinit var node: CommandNode<FabricClientCommandSource>
 }
 
-open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
-    val builder: ArgumentBuilder<Any?, B>,
+open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
+    val builder: ArgumentBuilder<FabricClientCommandSource, B>,
     private val hasGreedyArg: Boolean = false,
 ) {
     private fun checkGreedy() =
@@ -62,9 +67,12 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     }
 
     /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
-    fun coroutineSimpleCallback(block: suspend ArgContext.() -> Unit) {
+    fun coroutineSimpleCallback(
+        config: CoroutineSettings = CoroutineSettings("$this command callback"),
+        block: suspend ArgContext.() -> Unit,
+    ) {
         this.builder.executes {
-            SkyHanniMod.launchIOCoroutine("brigadier builder coroutineSimpleCallback") {
+            config.launch {
                 block(ArgContext(it))
             }
             1
@@ -117,7 +125,9 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
                 }
                 continue
             }
-            val builder = BrigadierBuilder(LiteralArgumentBuilder.literal(name))
+            // IntelliJ is wrong, if the type argument is not specified the build fails
+            @Suppress("RemoveExplicitTypeArguments")
+            val builder = BrigadierBuilder(LiteralArgumentBuilder.literal<FabricClientCommandSource>(name))
             builder.action()
             this.builder.then(builder.builder)
         }
@@ -153,7 +163,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     inline fun <reified T> arg(
         name: String,
         argument: ArgumentType<T>,
-        suggestions: SuggestionProvider<Any?>? = null,
+        suggestions: SuggestionProvider<FabricClientCommandSource>? = null,
         crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
     ) {
         if (!name.hasWhitespace()) {
@@ -175,7 +185,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     fun <T> internalArg(
         name: String,
         argument: ArgumentType<T>,
-        suggestions: SuggestionProvider<Any?>? = null,
+        suggestions: SuggestionProvider<FabricClientCommandSource>? = null,
         action: ArgumentCommandBuilder<T>.() -> Unit,
     ) {
         checkGreedy()
@@ -188,7 +198,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         }
         val isGreedy = argument.isGreedy()
         val builder = BrigadierBuilder(
-            RequiredArgumentBuilder.argument<Any?, T>(name, argument).apply {
+            RequiredArgumentBuilder.argument<FabricClientCommandSource, T>(name, argument).apply {
                 if (suggestions != null) suggests(suggestions)
             },
             isGreedy,
@@ -256,7 +266,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     inline fun <reified T> argCallback(
         name: String,
         argument: ArgumentType<T>,
-        suggestions: SuggestionProvider<Any?>? = null,
+        suggestions: SuggestionProvider<FabricClientCommandSource>? = null,
         crossinline callback: ArgContext.(T) -> Unit,
     ) = arg(name, argument, suggestions) { callback { callback(getArg(it)) } }
 

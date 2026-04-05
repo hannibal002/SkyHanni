@@ -78,7 +78,7 @@ object MinionFeatures {
     private var lastMinionOpened = 0L
 
     private var lastInventoryClosed = 0L
-    private var coinsPerDay = ""
+    private var display: Renderable? = null
 
     private val patternGroup = RepoPattern.group("minion")
 
@@ -240,7 +240,7 @@ object MinionFeatures {
     }
 
     private fun removeBuggedMinions(isCommand: Boolean = false) {
-        if (!IslandType.PRIVATE_ISLAND.isCurrent()) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
         val removedEntities = mutableListOf<LorenzVec>()
@@ -275,11 +275,11 @@ object MinionFeatures {
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
-        coinsPerDay = ""
+        display = null
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
-        if (IslandType.PRIVATE_ISLAND.isCurrent()) {
+        if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
             if (location !in minions) {
@@ -288,12 +288,14 @@ object MinionFeatures {
         }
     }
 
+    // Todo this calculation should not happen invariably when null.
+    //  Use a "dirty" flag or something similar, and handle state management.
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTick() {
-        if (coinsPerDay != "") return
+        if (display != null) return
 
         if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
-            coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
+            display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }
 
@@ -331,6 +333,7 @@ object MinionFeatures {
         return "§7Coins/day with ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}§7: §6$format coins"
     }
 
+    // TODO reshape to data class, use Resettable
     @HandleEvent
     fun onWorldChange() {
         lastClickedEntity = null
@@ -441,13 +444,14 @@ object MinionFeatures {
         }
     }
 
-    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isCurrent() || IslandType.HUB.isCurrent()
+    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.HUB.isInIsland()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
-        config.hopperProfitPos.renderRenderable(Renderable.text(coinsPerDay), posLabel = "Minion Coins Per Day")
+        val display = display ?: return
+        config.hopperProfitPos.renderRenderable(display, posLabel = "Minion Coins Per Day")
     }
 
     @HandleEvent

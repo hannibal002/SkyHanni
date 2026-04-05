@@ -67,7 +67,7 @@ object RoundedShapeDrawer {
                 }
             }
 
-            // Need to backup current projection matrix and set current to an orthographic
+            // Need to back up current projection matrix and set current to an orthographic
             // projection matrix, since orthographic gui elements in 1.21.7 are now deferred
             // so we just set the correct matrix here are restore the perspective one afterwards
             val window = Minecraft.getInstance().window

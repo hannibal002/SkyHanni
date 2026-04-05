@@ -1,10 +1,11 @@
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
+import dev.detekt.gradle.Detekt
+import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
+import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -21,7 +22,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
     `maven-publish`
-    id("io.gitlab.arturbosch.detekt")
+    id("dev.detekt")
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
@@ -30,7 +31,7 @@ val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
     // We specifically request ADOPTIUM because if we do not restrict the vendor DCEVM is a
-    // possible candidate. Some DCEVMs are however incompatible with some things gradle is doing,
+    // possible candidate. Some DCEVMs are however incompatible with some things Gradle is doing,
     // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
     // IntelliJ run configuration.
     toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
@@ -97,11 +98,7 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.runClient {
-    this.javaLauncher.set(
-        javaToolchains.launcherFor {
-            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-        },
-    )
+    this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
@@ -169,7 +166,7 @@ dependencies {
 
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
-    detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.detektrules.ktlint)
 
     if (target != ProjectTarget.MODERN_12110) shadowImpl(libs.httpclient)
 }
@@ -202,8 +199,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.2"
         }
     }
 }
@@ -268,7 +264,12 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
-        freeCompilerArgs.addAll("-Xbackend-threads=0")
+        optIn.addAll(
+            "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+        )
+        freeCompilerArgs.addAll(
+            "-Xbackend-threads=0",
+        )
     }
 }
 
@@ -364,6 +365,7 @@ afterEvaluate {
     )
 }
 
+
 tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == ProjectTarget.MODERN_12110
     val skipDetekt = project.findProperty("skipDetekt") == "true"
@@ -375,14 +377,8 @@ tasks.withType<Detekt>().configureEach {
     reports {
         html.required.set(true)
         html.outputLocation.set(file("$detektDir/$outputFileName.html"))
-        xml.required.set(true)
-        xml.outputLocation.set(file("$detektDir/$outputFileName.xml"))
         sarif.required.set(true)
         sarif.outputLocation.set(file("$detektDir/$outputFileName.sarif"))
-        md.required.set(true)
-        md.outputLocation.set(file("$detektDir/$outputFileName.md"))
-        txt.required.set(true)
-        txt.outputLocation.set(file("$detektDir/$outputFileName.txt"))
     }
 }
 
@@ -403,6 +399,11 @@ tasks.withType<RemapSourcesJarTask>().configureEach {
 
 tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
     enabled = false
+}
+
+tasks.withType<ValidateAccessWidenerTask>().configureEach {
+    // This must be explicitly declared because of configuration cache shenanigans
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {
