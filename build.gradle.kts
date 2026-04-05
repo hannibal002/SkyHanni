@@ -1,12 +1,16 @@
+import at.skyhanni.sharedvariables.MappingStyle
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.api.tasks.JavaExec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
@@ -17,7 +21,8 @@ plugins {
     idea
     java
     alias(libs.plugins.shadow)
-    id("net.fabricmc.fabric-loom-remap")
+    id("net.fabricmc.fabric-loom-remap") apply false
+    id("net.fabricmc.fabric-loom") apply false
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -26,6 +31,26 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
+val isDeobf = target.mappingStyle == MappingStyle.NONE
+
+if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
+else apply(plugin = "net.fabricmc.fabric-loom-remap")
+
+// Manual accessors for the conditionally-applied loom plugin.
+// These replace the typed accessors that Kotlin DSL would normally generate for
+// plugins applied in the plugins block. Since both loom plugins are declared with
+// apply false, no accessors are auto-generated, so we define them explicitly.
+val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
+fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
+fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
+fun DependencyHandler.include(dep: Any): Dependency? = add("include", dep)
+fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dep)
+fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
+    add("modImplementation", dep).also { (it as? ExternalModuleDependency)?.configure() }
+fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dep)
+fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
+    add("modCompileOnly", dep).also { (it as? ExternalModuleDependency)?.configure() }
+fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dep)
 
 // Toolchains:
 java {
@@ -41,9 +66,10 @@ runDirectory.mkdirs()
 
 // Minecraft configuration:
 @OptIn(StonecutterExperimentalAPI::class)
-loom {
+loom.apply {
+    val classTweakerName = if (isDeobf) "skyhannideobf.classtweaker" else "skyhanni.classtweaker"
     val classTweakerFile = sc.process(
-        rootProject.file("src/main/resources/skyhanni.classtweaker"),
+        rootProject.file("src/main/resources/$classTweakerName"),
         "build/skyhanni.classtweaker",
     )
     if (classTweakerFile.exists()) {
@@ -76,8 +102,10 @@ val shadowImpl: Configuration by configurations.creating {
 }
 
 val shadowModImpl: Configuration by configurations.creating {
-    configurations.modImplementation.get().extendsFrom(this)
+    if (!isDeobf) configurations.getByName("modImplementation").extendsFrom(this)
 }
+
+val shadowOnly: Configuration by configurations.creating
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
@@ -97,7 +125,7 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
 
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
-tasks.runClient {
+tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
@@ -111,12 +139,14 @@ dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
     @Suppress("UnstableApiUsage")
-    if (target.mappingDependency == "official") {
-        mappings(loom.layered {
-            officialMojangMappings()
-        })
-    } else {
-        mappings(target.mappingDependency)
+    if (!isDeobf) {
+        if (target.mappingDependency == "official") {
+            mappings(loom.layered {
+                officialMojangMappings()
+            })
+        } else {
+            mappings(target.mappingDependency)
+        }
     }
 
     compileOnly(libs.jbAnnotations)
@@ -125,19 +155,36 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    target.fabricLoaderVersion?.let { modImplementation(it) }
-    target.fabricApiVersion?.let { modImplementation(it) }
-    modImplementation(libs.fabricLanguageKotlin)
-    target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
+    target.fabricLoaderVersion?.let {
+        if (isDeobf) implementation(it) else modImplementation(it)
+    }
+    target.fabricApiVersion?.let {
+        if (isDeobf) implementation(it) else modImplementation(it)
+    }
+    if (isDeobf) implementation(libs.fabricLanguageKotlin)
+    else modImplementation(libs.fabricLanguageKotlin)
 
-    modRuntimeOnly(libs.devauth)
+    target.modMenuVersion?.let {
+        if (isDeobf) implementation("maven.modrinth:modmenu:$it")
+        else modImplementation("maven.modrinth:modmenu:$it")
+    }
+
+    if (isDeobf) runtimeOnly(libs.devauth)
+    else modRuntimeOnly(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
+    if (isDeobf) {
+        shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+            exclude("org.jetbrains.kotlin")
+            exclude("org.jetbrains.kotlinx")
+        }
+    } else {
+        shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+            exclude("org.jetbrains.kotlin")
+            exclude("org.jetbrains.kotlinx")
+        }
+        include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     }
-    include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
 
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
@@ -147,13 +194,16 @@ dependencies {
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.mockk)
 
-    modImplementation(libs.hypixelmodapi)
-    include(libs.hypixelmodapi.fabric)
-
-
-    modCompileOnly(libs.roughlyenoughitems) {
-        exclude(group = "net.fabricmc.fabric-api")
+    if (isDeobf) {
+        shadowImpl(libs.hypixelmodapi)
+        shadowOnly(libs.hypixelmodapi.fabric)
+    } else {
+        modImplementation(libs.hypixelmodapi)
+        include(libs.hypixelmodapi.fabric)
     }
+
+    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
 
     // getting clock offset
     includeImplementation(libs.commons.net)
@@ -169,8 +219,12 @@ dependencies {
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
-    include(dep)
-    modImplementation(dep)
+    if (isDeobf) {
+        add("shadowImpl", dep)
+    } else {
+        include(dep)
+        modImplementation(dep)
+    }
 }
 
 afterEvaluate {
@@ -182,7 +236,9 @@ afterEvaluate {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
         arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
-        arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
+        if (!isDeobf) {
+            arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
+        }
     }
 }
 
@@ -206,9 +262,10 @@ tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val minecraftVersion = if (isDeobf) target.minecraftVersion.versionName else target.minecraftVersion.fabricModJsonVersion
     val props = buildMap {
         put("version", version)
-        put("minecraft", target.minecraftVersion.fabricModJsonVersion)
+        put("minecraft", minecraftVersion)
         put("fapi", fapiVersion)
     }
 
@@ -217,11 +274,21 @@ tasks.processResources {
     filesMatching("fabric.mod.json") {
         expand(props)
     }
+
+    if (isDeobf) {
+        // The named-namespace classtweaker is correct for remapped builds,
+        // but 26.1 runs official mappings with no remapping step, so we have to bundle the
+        // official-namespace variant instead.
+        exclude("skyhanni.classtweaker")
+        from(rootProject.file("src/main/resources/skyhannideobf.classtweaker")) {
+            rename { "skyhanni.classtweaker" }
+        }
+    }
 }
 
 @Suppress("UnstableApiUsage")
 if (target == ProjectTarget.MODERN_12111) {
-    fabricApi {
+    configure<FabricApiExtension> {
         configureTests {
             modId = "skyhanni"
             enableGameTests = false // Server game tests
@@ -231,9 +298,9 @@ if (target == ProjectTarget.MODERN_12111) {
     }
     tasks.register("generateRepoPatterns", ClientProductionRunTask::class.java).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-        dependsOn(tasks.configureLaunch)
+        dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
-        mods.from(project.configurations.modImplementation.get())
+        mods.from(project.configurations.getByName("modImplementation"))
 
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
@@ -260,13 +327,13 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
-        optIn.addAll(
-            "kotlin.concurrent.atomics.ExperimentalAtomicApi",
-        )
-        freeCompilerArgs.addAll(
-            "-Xbackend-threads=0",
-        )
+        val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
+                           else target.minecraftVersion.formattedJavaLanguageVersion
+        jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
+        if (!isDeobf) {
+            optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
+        }
+        freeCompilerArgs.addAll("-Xbackend-threads=0")
     }
 }
 
@@ -280,17 +347,29 @@ tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
 }
 
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    archiveClassifier.set("")
-    dependsOn(tasks.shadowJar)
-    inputFile.set(tasks.shadowJar.get().archiveFile)
-    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+if (!isDeobf) {
+    val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+        archiveClassifier.set("")
+        dependsOn(tasks.shadowJar)
+        inputFile.set(tasks.shadowJar.get().archiveFile)
+        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+    }
+    tasks.assemble.get().dependsOn(remapJar)
 }
 
 tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
-    archiveClassifier.set("all-dev")
-    configurations = listOf(shadowImpl, shadowModImpl)
+    if (isDeobf) {
+        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+        archiveClassifier.set("")
+    } else {
+        destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+        archiveClassifier.set("all-dev")
+    }
+    configurations = buildList {
+        add(shadowImpl)
+        if (!isDeobf) add(shadowModImpl)
+        if (isDeobf) add(shadowOnly)
+    }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
@@ -301,7 +380,10 @@ tasks.jar {
     archiveClassifier.set("nodeps")
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
-tasks.assemble.get().dependsOn(tasks.remapJar)
+
+if (isDeobf) {
+    tasks.assemble.get().dependsOn(tasks.shadowJar)
+}
 
 if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {
@@ -326,7 +408,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 publishing.publications {
     create<MavenPublication>("maven") {
-        artifact(tasks.remapJar)
+        if (!isDeobf) artifact(tasks.named("remapJar"))
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
@@ -366,14 +448,15 @@ afterEvaluate {
     )
 }
 
-
 tasks.withType<Detekt>().configureEach {
     source = source.matching {
         exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
     }
     val isTargetVersion = target == ProjectTarget.MODERN_12111
+    val isCi = System.getenv("CI") == "true"
     val skipDetekt = project.findProperty("skipDetekt") == "true"
-    onlyIf { isTargetVersion && !skipDetekt }
+    val deobf = isDeobf
+    onlyIf { isTargetVersion && (!deobf || isCi) && !skipDetekt }
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
@@ -406,8 +489,8 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    // This must be explicitly declared because of configuration cache shenanigans
-    dependsOn("stonecutterPrepare")
+    if (isDeobf) enabled = false
+    else dependsOn("stonecutterPrepare")
 }
 
 repositories {

@@ -25,9 +25,9 @@ enum class ProjectTarget(
         MinecraftVersion.MC26100,
         "official",
         MappingStyle.NONE,
-        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.144.3+26.1",
-        modMenuVersion = "18.0.0-alpha.6",
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.6",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.145.1+26.1",
+        modMenuVersion = "18.0.0-alpha.8",
         modrinthInfo = null,
     ),
     ;

@@ -44,14 +44,7 @@ rootProject.buildFileName = "root.gradle.kts"
 
 stonecutter {
     create(rootProject) {
-        fun setup(version: String) {
-            if (stonecutter.eval(version, ">1.21.11")) {
-                version(version).buildscript = "build.deobf.gradle.kts"
-            } else {
-                version(version).buildscript = "build.gradle.kts"
-            }
-        }
-        setup("1.21.11")
-        setup("26.1")
+        version("1.21.11").buildscript = "build.gradle.kts"
+        version("26.1").buildscript = "build.gradle.kts"
     }
 }
