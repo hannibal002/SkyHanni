@@ -139,13 +139,13 @@ object SpiderDenRelicPathfinder {
         data = null
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     fun onIslandGraphReload(event: IslandGraphReloadEvent) {
         if (config.spiderRelicPathfinder) reload()
         else data = null
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (!config.spiderRelicPathfinder) return
         if (event.isMod(5) && calculating) {
@@ -154,7 +154,7 @@ object SpiderDenRelicPathfinder {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.spiderRelicPathfinder) return
         data?.let {
@@ -164,7 +164,7 @@ object SpiderDenRelicPathfinder {
         reload()
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.SPIDER_DEN)
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
         if (!config.spiderRelicPathfinder) return
         if (foundPattern.matches(event.chatComponent) || duplicatePattern.matches(event.chatComponent)) {
