@@ -55,8 +55,9 @@ object InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
+        val fuelItemName = event.container.getSlot(MINION_FUEL_SLOT).item.hoverName
         val containsFuel =
-            NeuInternalName.fromItemNameOrNull(event.container.getSlot(MINION_FUEL_SLOT).item.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(fuelItemName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.index == MINION_FUEL_SLOT || event.slot?.index == MINION_PICKUP_SLOT) {

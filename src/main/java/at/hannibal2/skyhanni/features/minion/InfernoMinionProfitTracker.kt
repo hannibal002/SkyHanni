@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -32,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -70,7 +70,7 @@ object InfernoMinionProfitTracker {
         override fun getDescription(timesGained: Long): List<String> {
             val totalItems = items.values.sumOf { it.timesGained }
             val shareOfDrops = if (totalItems > 0) timesGained.toDouble() / totalItems else 0.0
-            val formattedShare = "%.1f%%".format(shareOfDrops * 100)
+            val formattedShare = (shareOfDrops * 100).oneDecimal()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Share of drops: §c$formattedShare",
@@ -154,7 +154,7 @@ object InfernoMinionProfitTracker {
         lastFuelItem = newFuel
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onItemAdd(event: ItemAddEvent) {
         if (!config.enabled) return
         if (lastCollectionTime.passedSince() > 1.minutes) return
