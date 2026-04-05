@@ -2,53 +2,93 @@ package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FusionKeybinds {
 
-    val config get() = SkyHanniMod.feature.hunting.fusionKeybinds
+    private val config get() = SkyHanniMod.feature.hunting.fusionKeybinds
+
+    private val patternGroup = RepoPattern.group("hunting.fusion.keybinds")
+
+    // <editor-fold desc="Patterns">
+    private val fusionBoxInventoryPattern by patternGroup.pattern(
+        "inventory.fusion-box",
+        "Fusion Box",
+    )
+
+    private val confirmFusionInventoryPattern by patternGroup.pattern(
+        "inventory.confirm-fusion",
+        "Confirm Fusion",
+    )
+    // </editor-fold>
+
+    private val fusionBoxInventory = InventoryDetector { name ->
+        fusionBoxInventoryPattern.matches(name)
+    }
+    private val confirmFusionInventory = InventoryDetector { name ->
+        confirmFusionInventoryPattern.matches(name)
+    }
 
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-    private var hasDuplicateKeybinds = false
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onKeybind(event: GuiKeyPressEvent) {
-        if (hasDuplicateKeybinds) return
-        when (InventoryUtils.openInventoryName()) {
-            "Fusion Box" -> {
-                if (!config.repeatFusionKeybind.isKeyHeld() || config.confirmFusionKeybind.isKeyHeld()) return
+    // No island check because Kysha Abiphone contact exists
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiKeyPress() {
+        val repeatFusionKeybind = config.repeatFusionKeybind.get()
+        val confirmFusionKeybind = config.confirmFusionKeybind.get()
+
+        when {
+            fusionBoxInventory.isInside() && repeatFusionKeybind.isKeyHeld() -> {
+                if (confirmFusionKeybind.isKeyHeld()) return
                 InventoryUtils.clickSlot(47, mouseButton = 2, mode = ClickType.MIDDLE)
             }
 
-            "Confirm Fusion" -> {
-                if (!config.confirmFusionKeybind.isKeyHeld() || config.repeatFusionKeybind.isKeyHeld()) return
+            confirmFusionInventory.isInside() && confirmFusionKeybind.isKeyHeld() -> {
+                if (repeatFusionKeybind.isKeyHeld()) return
                 InventoryUtils.clickSlot(33, mouseButton = 2, mode = ClickType.MIDDLE)
             }
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onSecondPassed(event: SecondPassedEvent) {
-        hasDuplicateKeybinds = config.repeatFusionKeybind != GLFW.GLFW_KEY_UNKNOWN &&
-            config.confirmFusionKeybind != GLFW.GLFW_KEY_UNKNOWN &&
-            config.repeatFusionKeybind == config.confirmFusionKeybind
+    fun warnDuplicateKeybinds() {
+        if (lastDuplicateKeybindsWarnTime.passedSince() < 1.seconds) return
 
-        if (!hasDuplicateKeybinds || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
+        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
         ChatUtils.chatAndOpenConfig(
-            "Repeat Fusion and Confirm Fusion keybinds cannot be the same!",
+            "§bRepeat Fusion Keybind §eand §bConfirm Fusion Keybind §ecannot be the same!",
             config::repeatFusionKeybind,
         )
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
+    }
+
+    @HandleEvent
+    fun onConfigLoad() {
+        val repeatFusionKeybind = config.repeatFusionKeybind.get()
+        val confirmFusionKeybind = config.confirmFusionKeybind.get()
+
+        config.repeatFusionKeybind.afterChange {
+            if (this != GLFW.GLFW_KEY_UNKNOWN && this == confirmFusionKeybind) {
+                config.repeatFusionKeybind.set(GLFW.GLFW_KEY_UNKNOWN)
+                warnDuplicateKeybinds()
+            }
+        }
+
+        config.confirmFusionKeybind.afterChange {
+            if (this != GLFW.GLFW_KEY_UNKNOWN && this == repeatFusionKeybind) {
+                config.confirmFusionKeybind.set(GLFW.GLFW_KEY_UNKNOWN)
+                warnDuplicateKeybinds()
+            }
+        }
     }
 }
