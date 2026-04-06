@@ -162,7 +162,7 @@ class GitRepo(
             true
         }.getOrElse { e ->
             logger.error("Failed to clone $location from $source\n$e")
-            root.deleteRecursively()
+            deleteRecursively("")
             root.mkdirs()
             false
         }
