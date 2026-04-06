@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -45,10 +44,7 @@ object InfernoMinionProfitTracker {
 
     private val eyedropsItem = "CAPSAICIN_EYEDROPS_NO_CHARGES".toInternalName()
 
-    private val infernoMinionInventory = InventoryDetector { name ->
-        InfernoMinionFeatures.infernoMinionTitlePattern.matches(name)
-    }
-
+    private val infernoMinionInventory = InventoryDetector(InfernoMinionFeatures.infernoMinionTitlePattern)
     private var fuelDropMap = mapOf<NeuInternalName, Set<NeuInternalName>>()
     private var minionDropMap = mapOf<String, Set<NeuInternalName>>()
 
@@ -86,7 +82,8 @@ object InfernoMinionProfitTracker {
         RenderDisplayHelper(
             inventory = infernoMinionInventory,
             outsideInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && (infernoMinionInventory.isInside() || isRecentCollection()) },
+            onlyOnIsland = IslandType.PRIVATE_ISLAND,
+            condition = { config.enabled && (infernoMinionInventory.isInside() || isRecentCollection()) },
             onRender = { tracker.renderDisplay(config.position) },
         )
     }
@@ -129,18 +126,15 @@ object InfernoMinionProfitTracker {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MinionDropsJson>("MinionDrops")
-        fuelDropMap = data.fuelDrops.associate { it.id to it.drops.toSet() }
-        minionDropMap = data.minions.associate { it.id to it.drops.toSet() }
+        fuelDropMap = data.fuelDrops
+        minionDropMap = data.minions
     }
 
     @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
-        val firstOpen = !isInfernoMinion
         isInfernoMinion = InfernoMinionFeatures.infernoMinionTitlePattern.matches(event.inventoryName)
         if (!isInfernoMinion) return
-        if (firstOpen) {
-            lastFuelItem = getFuelFromInventory(event.inventoryItems)
-        }
+        lastFuelItem = getFuelFromInventory(event.inventoryItems)
     }
 
     @HandleEvent
