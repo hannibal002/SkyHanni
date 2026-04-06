@@ -29,6 +29,13 @@ open class AnimatedRotationLocalStorage(
         vec.applyAxisValue(axis, staticRotation)
     }
 
+    // Drag interaction state. Stored here so it persists across renderable rebuilds.
+    var isDragging = false
+    var dragStartX = 0
+    var dragStartY = 0
+    var dragStartRotX = 0.0
+    var dragStartRotY = 0.0
+
     constructor(rotationSpeed: Double) : this(
         AnimatedRotationDefinition(
             Axis.X to AxisRotationDefinition(rotationSpeed),

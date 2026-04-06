@@ -169,7 +169,7 @@ object PunchcardHighlight {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPunch(event: EntityClickEvent) {
-        val entity = event.clickedEntity
+        val entity = event.entity
         if (entity !is AbstractClientPlayer) return
         if (entity.isNpc()) return
         val name = entity.name.string

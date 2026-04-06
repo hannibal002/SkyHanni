@@ -19,8 +19,8 @@ object KuudraProfileViewerBlocker {
         if (!config.disableProfileViewerInKuudra) return
 
         if (event.clickType != ClickType.RIGHT_CLICK) return
-        if (event.clickedEntity !is Player) return
-        if (event.clickedEntity.isNpc()) return
+        if (event.entity !is Player) return
+        if (event.entity.isNpc()) return
 
         event.cancel()
     }

@@ -26,7 +26,7 @@ internal interface RotatingBehavior : AnimatedRotationStorage {
     }
 
     private fun generateNextRotation(deltaTime: Double): SnappedVec3 {
-        if (!rotationDefinition.isEnabled()) return SnappedVec3.ZERO
+        if (!rotationDefinition.isEnabled()) return currentRotation
         return Axis.entries.filter { rotationDefinition.isAxisEnabled(it) }.fold(currentRotation) { vec, axis ->
             val offset = rotationDefinition.getRotationOffset(axis, deltaTime)
             vec.applyAxisOffset(axis, offset)

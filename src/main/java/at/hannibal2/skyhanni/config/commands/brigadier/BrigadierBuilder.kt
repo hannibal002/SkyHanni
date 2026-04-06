@@ -231,6 +231,13 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
         block: ArgContext.() -> Unit,
     ) = literal(*names) { callback(block) }
 
+    /** Alternative to [literalCallback] when a block needs to be executed in a coroutine. */
+    fun coroutineLiteralCallback(
+        vararg names: String,
+        config: CoroutineSettings = CoroutineSettings("$this command callback"),
+        block: suspend ArgContext.() -> Unit,
+    ) = literal(*names) { coroutineSimpleCallback(config, block) }
+
     /**
      * This function allows for the usage of a callback within an argument without having to
      * create a block for each one.

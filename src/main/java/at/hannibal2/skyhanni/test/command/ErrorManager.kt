@@ -99,6 +99,7 @@ object ErrorManager {
     private val skipErrorEntry = emptyMap<String, List<String>>()
 
     private val copyErrorCoroutine = CoroutineSettings("error manager copy error")
+    private val reloadRepoCoroutine = CoroutineSettings("error manager reload repo")
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -348,14 +349,14 @@ object ErrorManager {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val repoData = event.getConstant<ErrorManagerJson>("ErrorManager")
+    fun onRepoReload(event: RepositoryReloadEvent) = reloadRepoCoroutine.launch {
+        val repoData = event.getConstantAsync<ErrorManagerJson>("ErrorManager")
         breakAfter = repoData.breakAfter
         replacements = repoData.replacements
         entireReplacements = repoData.entireReplacements
         ignored = repoData.ignored
 
-        val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
+        val data = event.getConstantAsync<ChangedChatErrorsJson>("ChangedChatErrors")
         val version = SkyHanniMod.modVersion
 
         repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
