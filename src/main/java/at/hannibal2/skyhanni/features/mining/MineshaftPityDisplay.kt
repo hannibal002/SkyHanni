@@ -208,7 +208,7 @@ object MineshaftPityDisplay {
 
     @HandleEvent
     fun onPityWidget(event: WidgetUpdateEvent) {
-        if (!isDisplayEnabled()) return
+        if (!MiningApi.inGlacialTunnels() && !MiningApi.inDwarvenBaseCamp()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {
