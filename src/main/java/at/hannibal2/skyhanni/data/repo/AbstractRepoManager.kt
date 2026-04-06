@@ -82,7 +82,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
     private val gitRepo: GitRepo by lazy {
-        GitRepo(config.location, SkyHanniMod.feature.dev.debug.logRepoErrors)
+        GitRepo(config.location) { SkyHanniMod.feature.dev.debug.logRepoErrors }
     }
     private val repoMutex = Mutex()
     private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
