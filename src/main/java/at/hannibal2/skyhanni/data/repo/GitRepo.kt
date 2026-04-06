@@ -73,22 +73,12 @@ class GitRepo(
         return RepoCommit(sha = apiResponse.sha, time = apiResponse.commit.committer.date)
     }
 
-    fun RepoFileSystem.loadFromJGit(): RepoCommit? {
+    fun RepoFileSystem.loadFromJGit(): Boolean {
         val gitFile = File(root, ".git")
-        val success = when {
-            gitFile.exists() && tryPullRepo() != null -> true
-            root.listFiles()?.isNotEmpty() == true -> tryGitConvertLocalRepo()
-            else -> tryCloneRepo()
-        }
-        return if (success) readHeadCommit(root) else null
+        return if (gitFile.exists() && tryPullRepo() != null) true
+        else if (root.listFiles()?.isNotEmpty() == true) tryGitConvertLocalRepo()
+        else tryCloneRepo()
     }
-
-    private fun readHeadCommit(root: File): RepoCommit? = runCatching {
-        Git.open(root).use { git ->
-            val sha = git.repository.resolve(Constants.HEAD)?.name ?: return@runCatching null
-            RepoCommit(sha = sha, time = null)
-        }
-    }.getOrElse { null }
 
     private fun RepoFileSystem.tryGitConvertLocalRepo(): Boolean = runCatching {
         Git.init().setDirectory(root).call().use { git ->

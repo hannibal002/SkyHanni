@@ -435,11 +435,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     ): FetchUnpackResult {
         progress.update("try loading repo from jgit")
         with(gitRepo) {
-            val headCommit = repoFileSystem.loadFromJGit()
-            if (headCommit != null) {
+            if (repoFileSystem.loadFromJGit()) {
                 progress.update("loaded from jgit")
                 isUsingBackup = false
-                commitStorage.writeToFile(headCommit)
                 return FetchUnpackResult.SUCCESS
             } else {
                 progress.update("failed to load repo from jgit")
