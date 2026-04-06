@@ -126,9 +126,11 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         val kotlinClass = (type.rawType.kotlin as KClass<T>).takeIf {
             it.findAnnotation<KSerializable>() != null && it.isData
         } ?: return null
+
         val primaryConstructor = kotlinClass.primaryConstructor?.apply {
             isAccessible = true
         } ?: return null
+
         val params = primaryConstructor.parameters.filter { it.findAnnotation<ExtraData>() == null }
         val extraDataParam = buildExtraDataParam(kotlinClass, primaryConstructor.parameters)
         val parameterInfos = buildParameterInfos(kotlinClass, gson, type, params)
