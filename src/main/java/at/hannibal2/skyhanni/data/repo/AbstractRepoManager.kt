@@ -85,7 +85,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         GitRepo(config.location, SkyHanniMod.feature.dev.debug.logRepoErrors)
     }
     private val repoMutex = Mutex()
-    val repoLocked get() = repoMutex.isLocked
     private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
@@ -438,6 +437,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         with(gitRepo) {
             if (repoFileSystem.loadFromJGit()) {
                 progress.update("loaded from jgit")
+                isUsingBackup = false
                 return FetchUnpackResult.SUCCESS
             } else {
                 progress.update("failed to load repo from jgit")
@@ -500,8 +500,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
-            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory, logger, repoIOCoroutineConfig)
-            else DiskRepoFileSystem(repoDirectory, logger)
+            if (config.unzipToMemory) MemoryRepoFileSystem(root, logger, repoIOCoroutineConfig)
+            else DiskRepoFileSystem(root, logger)
         }.apply { deleteRecursively("") }
 
         progress.update("mkdirs")

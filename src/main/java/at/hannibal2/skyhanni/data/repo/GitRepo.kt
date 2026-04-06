@@ -24,11 +24,11 @@ import java.io.File
 /**
  * Represents the location of a Git repository.
  * @param config the [AbstractRepoLocationConfig] containing the information for this repository.
- * @param shouldError If true, will throw an error if the latest commit SHA cannot be fetched, or if the download fails.
+ * @param shouldErrorProvider if it resolves true, will throw an error if the latest commit SHA cannot be fetched, or if the download fails.
  */
-data class GitRepo(
+class GitRepo(
     val config: AbstractRepoLocationConfig,
-    private val shouldError: Boolean = false,
+    private val shouldErrorProvider: () -> Boolean = { false },
 ) {
     private val user get() = config.user
     private val repo get() = config.repoName
@@ -36,6 +36,7 @@ data class GitRepo(
 
     val location get() = "$user/$repo/$branch"
 
+    private val shouldError get() = shouldErrorProvider()
     private val commitApiUrl: String get() = "https://api.github.com/repos/$user/$repo/commits/$branch"
     private val shallowRefSpec get() = "+refs/heads/$branch:refs/remotes/origin/$branch"
     private val sshConfigurer = TransportConfigCallback { transport ->

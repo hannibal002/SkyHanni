@@ -25,6 +25,7 @@ sealed interface RepoFileSystem {
     /**
      * Deletes everything under [path].
      * If [path] is empty, deletes all entries.
+     * Should NOT delete logs.
      */
     fun deleteRecursively(path: String)
 
