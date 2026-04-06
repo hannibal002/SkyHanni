@@ -68,7 +68,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<FabricClientCommandSource, B>>(
 
     /** Alternative to [simpleCallback] when a block needs to be executed in a coroutine. */
     fun coroutineSimpleCallback(
-        config: CoroutineSettings = CoroutineSettings("$this command callback"),
+        config: CoroutineSettings,
         block: suspend ArgContext.() -> Unit,
     ) {
         this.builder.executes {
