@@ -11,6 +11,7 @@ import kotlin.math.sin
 import kotlin.time.Duration
 
 enum class OrbitDirection(private val displayName: String, val dirFactor: Int) {
+    NONE("None", 0),
     CLOCKWISE("Clockwise", 1),
     COUNTER_CLOCKWISE("Counter-Clockwise", -1),
     ;
