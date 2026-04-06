@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.SeaCreatureJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.features.event.winter.ReindrakeWarpHelper
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -55,10 +56,9 @@ object SeaCreatureManager {
             doubleHook = true
             return
         }
-
-        if (thunderBottleChargedPattern.matches(event.message) ||
-            PetStorageApi.isAutopetMessage(event.message)
-        ) return
+        if (isInterceptingColorCodeMessage(event.message)) return
+        if (isInterceptingCleanMessage(event.cleanMessage)) return
+        // I have no idea if this is the bug or if it's Hypixel, but we, might... Be able to fix this.
 
         getSeaCreatureFromMessage(event.message)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
@@ -79,9 +79,8 @@ object SeaCreatureManager {
             return
         }
 
-        if (thunderBottleChargedPattern.matches(event.message) ||
-            PetStorageApi.isAutopetMessage(event.message)
-        ) return
+        if (isInterceptingColorCodeMessage(event.message)) return
+        if (isInterceptingCleanMessage(event.cleanMessage)) return
 
         getSeaCreatureFromMessage(event.message)?.let {
             val original = event.chatComponent.copy()
@@ -103,6 +102,12 @@ object SeaCreatureManager {
 
         doubleHook = false
     }
+
+    private fun isInterceptingColorCodeMessage(message: String): Boolean = (PetStorageApi.isAutopetMessage(message) ||
+            thunderBottleChargedPattern.matches(message)
+        )
+        // TODO Unify when both are Color Code-less (I do not wanna touch that Pet Storage Autopet Regex, I will horrifically break something)
+    private fun isInterceptingCleanMessage(message: String): Boolean = (ReindrakeWarpHelper.spawnPattern.matches(message))
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
