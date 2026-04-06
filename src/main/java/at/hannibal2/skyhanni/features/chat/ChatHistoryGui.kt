@@ -27,8 +27,9 @@ import net.minecraft.util.FormattedCharSequence
 
 object ChatHistoryGui {
 
-    private const val LIST_WIDTH = 500
+    private const val LIST_WIDTH = 600
     private const val LIST_HEIGHT = 300
+    private const val SCROLLBAR_WIDTH = 7
     private val copyCoroutine = CoroutineSettings("chat history copy to clipboard")
 
     private fun ChatManager.MessageFilteringResult.getReason(): String? =
@@ -41,13 +42,14 @@ object ChatHistoryGui {
         val history = screen.history
         val reasonMaxLength = history.maxOfOrNull { reasonLength(it) } ?: 0
         val xOffset = ChatManager.ActionKind.maxLength + reasonMaxLength + 10
-        val wrapWidth = LIST_WIDTH - xOffset - 10
+        val wrapWidth = LIST_WIDTH - xOffset - SCROLLBAR_WIDTH
 
         val rows = history.map { msg -> buildRow(msg, wrapWidth, xOffset) }
 
         return Renderable.scrollList(
             rows,
             height = LIST_HEIGHT,
+            velocity = 12.0,
             scrollValue = screen.scrollValue,
             bypassChecks = true,
             showScrollbar = true,

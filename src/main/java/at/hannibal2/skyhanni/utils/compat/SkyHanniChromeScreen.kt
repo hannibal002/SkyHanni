@@ -71,6 +71,7 @@ abstract class SkyHanniChromeScreen : SkyHanniBaseScreen() {
             lastHeight = height
             rebuildDisplay()
         }
+        onChromeDrawScreen(mouseX, mouseY, partialTicks)
         val panel = display ?: return
         val startX = (width - panel.width) / 2
         val startY = (height - panel.height) / 2
@@ -96,4 +97,10 @@ abstract class SkyHanniChromeScreen : SkyHanniBaseScreen() {
 
     /** Called after the screen initializes. Override instead of [onInitGui]. */
     open fun onChromeInit() {}
+
+    /**
+     * Called each draw frame after resize checks. Override to poll async state and call
+     * [rebuildDisplay] when content needs to change (e.g., data finished loading).
+     */
+    open fun onChromeDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {}
 }

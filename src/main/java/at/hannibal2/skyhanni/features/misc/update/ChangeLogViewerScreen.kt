@@ -27,6 +27,15 @@ class ChangeLogViewerScreen : SkyHanniChromeScreen() {
     private val changelogScroll = ScrollValue()
 
     private lateinit var scrollList: Renderable
+    private var cacheWasReady = false
+
+    override fun onChromeDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        val ready = ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)
+        if (ready && !cacheWasReady) {
+            cacheWasReady = true
+            rebuildDisplay()
+        }
+    }
 
     private val buttonPanel = Renderable.horizontal(
         Renderable.darkRectButton(
