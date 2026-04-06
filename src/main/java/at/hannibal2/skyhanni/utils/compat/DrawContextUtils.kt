@@ -137,4 +137,12 @@ object DrawContextUtils {
     fun loadIdentity() {
         drawContext.pose().identity()
     }
+
+    /**
+     * Advances to the next render stratum, guaranteeing that all elements submitted
+     * after this call render on top of all elements submitted before it, regardless
+     * of spatial overlap. This is the mechanism Minecraft uses to ensure tooltips
+     * always render above all other GUI elements.
+     */
+    fun nextStratum() = drawContext.nextStratum()
 }

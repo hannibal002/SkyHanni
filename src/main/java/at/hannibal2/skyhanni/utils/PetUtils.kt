@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -197,7 +198,7 @@ object PetUtils {
             ErrorManager.logErrorWithData(
                 IndexOutOfBoundsException("offset:$rarityOffset, level:$level, size:${levelTree.size}"),
                 "§cFailed to load pet levels from NEU repo. " +
-                    "§cYou can try to fix this by running `§e/${ItemUtils.resetCommand}`§c.",
+                    "§cYou can try to fix this by running `§e/${EnoughUpdatesRepoManager.updateCommand}`§c.",
             )
             return null
         }

@@ -71,6 +71,16 @@ data class PetData(
             xpProgress / xpDifference * 100
         }
     }
+    val petInfo: SkyBlockItemModifierUtils.PetInfo? get() = properPetName?.let {
+        SkyBlockItemModifierUtils.PetInfo(
+            type = it,
+            tier = rarity,
+            exp = exp ?: 20.0,
+            properSkinItem = skinInternalName,
+            heldItem = heldItemInternalName,
+            uniqueId = uuid,
+        )
+    }
 
     val currentLevelXp get() = PetUtils.levelToXp(level, fauxInternalName) ?: 0.0
     val nextLevelXp get() = PetUtils.levelToXp(level + 1, fauxInternalName) ?: 0.0

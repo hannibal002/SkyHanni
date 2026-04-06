@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.replaceAll
+
 // Todo, possibly add other recipe types that are not item `recipes`/`recipe` entries,
 //  e.g., essence upgrades.
 enum class NeuRecipeType(
@@ -14,6 +17,10 @@ enum class NeuRecipeType(
     KAT_UPGRADE("katgrade", false, castClazz = NeuKatUpgradeRecipeJson::class.java),
     CRAFTING("crafting", castClazz = NeuCraftingRecipeJson::class.java),
     ;
+
+    val displayName by lazy {
+        this.name.lowercase().replaceAll("_", " ").firstLetterUppercase()
+    }
 
     companion object {
         fun fromNeuIdOrNull(neuId: String): NeuRecipeType? = entries.firstOrNull { it.neuRepoId == neuId }

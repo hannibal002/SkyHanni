@@ -262,7 +262,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.disableScissor()
     }
 
-    private fun drawFloatingRect(
+    internal fun drawFloatingRect(
         x: Int,
         y: Int,
         width: Int,
@@ -270,15 +270,15 @@ object GuiRenderUtils {
         light: Int = -0xcfcfca,
         dark: Int = -0xefefea,
         shadow: Boolean = true,
+        thickness: Int = 1,
     ) {
         val alpha = -0x1000000
-
         val main = alpha or 0x202026
-        drawRect(x, y, x + 1, y + height, light) // Left
-        drawRect(x + 1, y, x + width, y + 1, light) // Top1
-        drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
-        drawRect(x + 1, y + height - 1, x + width - 1, y + height, dark) // Bottom
-        drawRect(x + 1, y + 1, x + width - 1, y + height - 1, main) // Middle
+        drawRect(x, y, x + thickness, y + height, light) // Left
+        drawRect(x + thickness, y, x + width, y + thickness, light) //Top1
+        drawRect(x + width - thickness, y + thickness, x + width, y + height, dark) // Right
+        drawRect(x + thickness, y + height - thickness, x + width - thickness, y + height, dark) // Bottom
+        drawRect(x + thickness, y + thickness, x + width - thickness, y + height - thickness, main) // Middle
         if (shadow) {
             drawRect(x + width, y + 2, x + width + 2, y + height + 2, 0x70000000) // Right shadow
             drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow

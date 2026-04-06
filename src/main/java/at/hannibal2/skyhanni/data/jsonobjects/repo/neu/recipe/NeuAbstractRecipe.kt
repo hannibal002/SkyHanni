@@ -1,22 +1,22 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
+import at.hannibal2.skyhanni.utils.BasePrimitiveRecipe
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
+import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 
-abstract class NeuAbstractRecipe {
-    abstract val type: NeuRecipeType
+interface NeuAbstractRecipe {
+    val type: NeuRecipeType
+    val primitiveIngredients: Collection<PrimitiveIngredient>
 
-    abstract fun getPrimitiveInputs(itemJson: NeuItemJson): List<PrimitiveIngredient>
-
-    open fun getPrimitiveOutputs(itemJson: NeuItemJson): List<PrimitiveIngredient> = listOf(
-        getPrimitiveOutput(itemJson)
+    fun getPrimitiveRecipe(itemJson: NeuItemJson): PrimitiveRecipe = getBasePrimitiveRecipe(itemJson)
+    fun getBasePrimitiveRecipe(itemJson: NeuItemJson): BasePrimitiveRecipe = BasePrimitiveRecipe(
+        primitiveIngredients,
+        getPrimitiveOutputsFromJson(itemJson),
+        this.type,
     )
 
-    protected open val outputOverride: NeuOverrideProvider? = null
-
-    private fun getPrimitiveOutput(itemJson: NeuItemJson): PrimitiveIngredient {
-        val craftAmount = outputOverride?.overrideCount ?: 1
-        val outputInternalName = outputOverride?.overrideItem ?: itemJson.internalName
-        return PrimitiveIngredient(outputInternalName, craftAmount)
-    }
+    fun getPrimitiveOutputs(itemJson: NeuItemJson): Collection<PrimitiveIngredient> = getPrimitiveOutputsFromJson(itemJson)
+    fun getPrimitiveOutputsFromJson(itemJson: NeuItemJson, countOverride: Int? = null): Set<PrimitiveIngredient> =
+        setOf(PrimitiveIngredient(itemJson.internalName, countOverride ?: 1))
 }

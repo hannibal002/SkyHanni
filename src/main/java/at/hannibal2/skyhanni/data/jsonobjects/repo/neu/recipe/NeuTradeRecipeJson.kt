@@ -11,13 +11,12 @@ data class NeuTradeRecipeJson(
     @Expose private val min: Int? = null,
     @Expose private val max: Int? = null,
     @Expose val result: NeuRecipeComponent,
-) : NeuAbstractRecipe() {
+) : NeuAbstractRecipe {
     private val costCount = when {
         min != null && max != null -> (min + max) / 2
         else -> cost.count
     }
-    override fun getPrimitiveInputs(itemJson: NeuItemJson) = listOf(
-        cost.toPrimitiveIngredient(costCount)
-    )
-    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(result)
+    override val primitiveIngredients by lazy { listOf(cost.toPrimitiveIngredient(costCount)) }
+    private val primitiveOutput by lazy { listOf(result.toPrimitiveIngredient()) }
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) = primitiveOutput
 }

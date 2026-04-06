@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.utils.KSerializable
-import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -31,13 +30,12 @@ data class NeuCraftingRecipeJson(
      * How many items this recipe produces.
      */
     @Expose @SerializedName("count") val outputCount: Int = 1,
-) : NeuAbstractRecipe() {
-    private val primitiveIngredients: List<PrimitiveIngredient> by lazy {
-        listOfNotNull(a1, a2, a3, b1, b2, b3, c1, c2, c3).mapNotNull {
-            it.toPrimitiveIngredientOrNull()
+) : NeuAbstractRecipe {
+    override val primitiveIngredients by lazy {
+        listOfNotNull(a1, a2, a3, b1, b2, b3, c1, c2, c3).map {
+            it.toPrimitiveIngredientOrEmpty()
         }
     }
-
-    override fun getPrimitiveInputs(itemJson: NeuItemJson) = primitiveIngredients
-    override val outputOverride: NeuOverrideProvider = NeuOverrideProvider(overrideCount = outputCount)
+    override fun getPrimitiveOutputs(itemJson: NeuItemJson) =
+        super.getPrimitiveOutputsFromJson(itemJson, outputCount)
 }

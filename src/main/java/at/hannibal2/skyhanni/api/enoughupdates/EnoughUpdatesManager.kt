@@ -60,6 +60,7 @@ object EnoughUpdatesManager {
     private val itemStackCache = mutableMapOf<NeuInternalName, ItemStack>()
     private val displayNameCache = mutableMapOf<NeuInternalName, String>()
     private val recipesMap = HashMap<NeuInternalName, MutableSet<PrimitiveRecipe>>()
+    private val ingredientToOutputs = HashMap<NeuInternalName, MutableSet<NeuInternalName>>()
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: NeuPetNumsJson? = null
@@ -83,6 +84,7 @@ object EnoughUpdatesManager {
         internalNameSet.clear()
         titleWordMap.clear()
         recipesMap.clear()
+        ingredientToOutputs.clear()
 
         val tempItemMap = TreeMap<NeuInternalName, NeuItemJson>()
         loadItemMap(progress, tempItemMap)
@@ -93,34 +95,32 @@ object EnoughUpdatesManager {
         internalNameSet.addAll(itemMap.keys)
     }
 
-    fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesFor(internalName: NeuInternalName) = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesUsing(internalName: NeuInternalName) = ingredientToOutputs.getOrDefault(internalName, emptySet())
+        .flatMapTo(mutableSetOf()) { getRecipesFor(it) }
+        .filterTo(mutableSetOf()) { recipe -> recipe.ingredients.any { it.internalName == internalName } }
 
     private suspend fun loadItemMap(progress: ChatProgressUpdates, tempItemMap: TreeMap<NeuInternalName, NeuItemJson>) = coroutineScope {
-        progress.update("loadItemMap")
         val fileSystem = EnoughUpdatesRepoManager.repoFileSystem
         val list = fileSystem.list("items")
         progress.innerProgressStart(list.size)
+
         val parsedItems = list.mapNotNullAsync { name ->
             try {
                 val internalName = name.removeSuffix(".json")
                 val itemJson = fileSystem.readJson("items/$name").asJsonObject
-                val tryParsedItem = parseItem(itemJson)
+                val item = parseItem(itemJson) ?: return@mapNotNullAsync null
                 progress.innerProgressStep()
-                val parsedItem = tryParsedItem ?: return@mapNotNullAsync null
-                internalName.toInternalName() to parsedItem
+                Triple(internalName.toInternalName(), item, item.collectRecipes())
             } catch (e: Exception) {
-                progress.update("Failed to parse item: $name")
                 ErrorManager.logErrorWithData(e, "Failed to parse item: $name")
                 null
             }
         }
-        parsedItems.forEach { (internalName, item) ->
+
+        parsedItems.forEach { (internalName, item, recipes) ->
             tempItemMap[internalName] = item
-            // Crafting type recipe
-            item.recipe?.loadAndRegister(item)
-            // Other types of recipes
-            item.recipes.forEach { recipe -> recipe.loadAndRegister(item) }
-            // Title word map
+            recipes.forEach { it.register() }
             item.displayName?.let { displayName ->
                 for ((index, str) in displayName.split(" ").withIndex()) {
                     val cleanedStr = str.cleanString()
@@ -132,27 +132,33 @@ object EnoughUpdatesManager {
         }
     }
 
-    private fun NeuAbstractRecipe.loadAndRegister(itemJson: NeuItemJson) {
-        val ingredients = this.getPrimitiveInputs(itemJson).toSet()
-        val outputs = this.getPrimitiveOutputs(itemJson).toSet()
-        val recipe = PrimitiveRecipe(
-            ingredients,
-            outputs,
-            recipeType = this.type,
-            shouldUseForCraftCost = this.type.useForCraftCost,
-        )
-        for (internalName in recipe.outputs) {
-            val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
-            recipeSet.add(recipe)
+    private fun NeuItemJson.collectRecipes(): List<Pair<NeuAbstractRecipe, NeuItemJson>> = buildList {
+        recipe?.let { add(it to this@collectRecipes) }
+        recipes.forEach { add(it to this@collectRecipes) }
+    }
+
+    private fun Pair<NeuAbstractRecipe, NeuItemJson>.register() {
+        val (neuRecipe, itemJson) = this
+        val recipe = runCatching { neuRecipe.getPrimitiveRecipe(itemJson) }.getOrElse { e ->
+            ErrorManager.logErrorWithData(e, "Failed to parse recipe for ${itemJson.internalName}", "type" to neuRecipe.type)
+            return
+        }
+        recipe.outputs.forEach { output ->
+            recipesMap.getOrPut(output.internalName) {
+                mutableSetOf()
+            }.add(recipe)
+        }
+        recipe.ingredients.forEach { ingredient ->
+            ingredientToOutputs.getOrPut(ingredient.internalName) {
+                mutableSetOf()
+            }.addAll(recipe.outputs.map { it.internalName })
         }
     }
 
     private fun parseItem(json: JsonObject): NeuItemJson? = runCatching {
         val itemJson: NeuItemJson = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(json) ?: return@runCatching null
-        itemJson.itemId.getVanillaItem()?.let { mcItem ->
-            itemJson.itemId = mcItem.getIdentifierString()
-        }
-        return itemJson
+        itemJson.itemId.getVanillaItem()?.let { itemJson.itemId = it.getIdentifierString() }
+        itemJson
     }.getOrThrow()
 
     fun getItemById(id: String): NeuItemJson? = getItemById(id.toInternalName())
@@ -220,7 +226,7 @@ object EnoughUpdatesManager {
     }
 
     private fun ItemStack?.getPetLoreReplacements(): Map<String, String> {
-        val petInfo = this?.getPetInfo() ?: return emptyMap()
+        val petInfo = this?.getPetInfo(useDefaultForRepo = true) ?: return emptyMap()
         val properInternalName = petInfo.type
         // We let PetData do the heavy lifting of parsing the pet info
         val petData = PetData(petInfo)

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 
@@ -15,17 +14,13 @@ class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double =
     )
 
     companion object {
-        fun coinIngredient(count: Double = 1.0) = PrimitiveIngredient(SKYBLOCK_COIN, count)
-
-        fun Set<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> =
+        fun Collection<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> =
             map { it.toPrimitiveItemStack() }
+
+        val EMPTY by lazy { PrimitiveIngredient(NeuInternalName.NONE, 0.0) }
     }
 
-    fun isCoin() = internalName == SKYBLOCK_COIN
-
     override fun toString() = "$internalName x$count"
-
-    fun toPair() = Pair(internalName, count)
 
     // TODO should maybe throw an error when trying to use with internalName == SKYBLOCK_COIN
     fun toPrimitiveItemStack() = PrimitiveItemStack(internalName, count.toInt())

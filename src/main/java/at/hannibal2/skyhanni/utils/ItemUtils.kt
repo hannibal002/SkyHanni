@@ -849,31 +849,29 @@ object ItemUtils {
         }
     }
 
-    fun addMissingRepoItem(name: String, message: String) {
-        if (!missingRepoItems.add(name)) return
+    fun addMissingRepoItem(name: String, message: String) =
+        // Fake item used by NEU repo crafting recipes
+        if (name.contains("SKYBLOCK_COIN")) Unit
+        else if (!missingRepoItems.add(name)) Unit
         // If we're currently loading the repo (async in a coroutine), we don't want to show the warning
-        if (EnoughUpdatesManager.inLoadingState()) {
-            return ChatUtils.debug(
-                "Ignoring missing repo item warning, repo is currently loading or fetching",
-                replaceSameMessage = true,
-            )
+        else if (EnoughUpdatesManager.inLoadingState()) ChatUtils.debug(
+            "Ignoring missing repo item warning, repo is currently loading or fetching",
+            replaceSameMessage = true,
+        ) else {
+            ChatUtils.debug(message)
+            val lastWarningExpired = lastRepoWarning.passedSince() >= 3.minutes
+            if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment || lastWarningExpired) Unit
+            else {
+                lastRepoWarning = SimpleTimeMark.now()
+                showRepoWarning(name)
+            }
         }
-
-        ChatUtils.debug(message)
-        if (!SkyBlockUtils.debug && !PlatformUtils.isDevEnvironment) return
-
-        if (lastRepoWarning.passedSince() < 3.minutes) return
-        lastRepoWarning = SimpleTimeMark.now()
-        showRepoWarning(name)
-    }
-
-    val resetCommand = EnoughUpdatesRepoManager.updateCommand
 
     private fun showRepoWarning(item: String) {
         val text = listOf(
             "§c§lMissing repo data for item: $item",
             "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
-            "§cYou can try §l/$resetCommand§r§c and restart your game to see if that fixes the issue.",
+            "§cYou can try §l/$${EnoughUpdatesRepoManager.updateCommand}§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
