@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.other
 
+import at.hannibal2.skyhanni.utils.json.SkyHanniAdaptable
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -55,18 +56,10 @@ fun SkullOwnerInfo.toGameProfile(): GameProfile {
     return GameProfile(UUID.fromString(this.uuid), "hannibal2", PropertyMap(builder.build()))
 }
 
-data class NbtBoolean(val boolean: Boolean) {
-    fun asString(): String {
-        return if (boolean) "1b" else "0b"
-    }
+data class NbtBoolean(val boolean: Boolean) : SkyHanniAdaptable<NbtBoolean> {
+    override fun toJsonString() = if (boolean) "1b" else "0b"
 
-    companion object {
-        fun fromString(value: String): NbtBoolean {
-            return if (value == "1b") {
-                NbtBoolean(true)
-            } else {
-                NbtBoolean(false)
-            }
-        }
+    companion object : SkyHanniAdaptable.Factory<NbtBoolean> {
+        override fun fromJsonString(json: String) = NbtBoolean(json == "1b")
     }
 }

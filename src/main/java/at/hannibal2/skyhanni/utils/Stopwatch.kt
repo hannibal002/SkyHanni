@@ -1,12 +1,22 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.json.SkyHanniAdaptable
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class Stopwatch(
     private var duration: Duration = 0.seconds,
     private var paused: Boolean = true
-) {
+) : SkyHanniAdaptable<Stopwatch> {
+    override fun toJsonString(): String = getDuration().inWholeMilliseconds.toString()
+
+    companion object : SkyHanniAdaptable.Factory<Stopwatch> {
+        override fun fromJsonString(json: String): Stopwatch = json.toLongOrNull()?.milliseconds?.let {
+            Stopwatch(it)
+        } ?: error("Could not parse Stopwatch duration from '$json'")
+    }
+
     private var startTime = if (paused) SimpleTimeMark.farPast() else SimpleTimeMark.now()
 
     fun start(lapIfStarted: Boolean = false) {

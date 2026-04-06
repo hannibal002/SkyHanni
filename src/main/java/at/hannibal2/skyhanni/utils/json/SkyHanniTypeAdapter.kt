@@ -20,10 +20,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -34,7 +32,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
@@ -42,6 +39,7 @@ import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.reflect.full.companionObjectInstance
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -49,38 +47,54 @@ import kotlin.time.Duration.Companion.milliseconds
 private typealias J_UUID = UUID
 
 /**
+ * Implement on types used as [SkyHanniTypeAdapter] entries via the `(Class<out SkyHanniAdaptable<*>>)` constructor.
+ * The companion object must implement [Factory] to provide the deserialization half.
+ */
+interface SkyHanniAdaptable<T : Any> {
+    fun toJsonString(): String
+
+    interface Factory<T : Any> {
+        fun fromJsonString(json: String): T
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun adaptableAdapter(clazz: Class<out SkyHanniAdaptable<*>>): TypeAdapter<*> {
+    val factory = clazz.kotlin.companionObjectInstance as? SkyHanniAdaptable.Factory<Any>
+        ?: error("${clazz.simpleName} companion must implement SkyHanniAdaptable.Factory")
+    return object : TypeAdapter<Any>() {
+        override fun write(writer: JsonWriter, value: Any) {
+            writer.value((value as SkyHanniAdaptable<*>).toJsonString())
+        }
+
+        override fun read(reader: JsonReader): Any = factory.fromJsonString(reader.nextString())
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun enumAdapter(clazz: Class<out Enum<*>>, default: Enum<*>? = null): TypeAdapter<*> {
+    val constants = clazz.enumConstants as Array<Enum<*>>
+    return SimpleStringTypeAdapter<Any>(
+        { (this as Enum<*>).name },
+        { constants.firstOrNull { it.name == this } ?: default ?: error("Unknown ${clazz.simpleName} value: '$this'") },
+    )
+}
+
+/**
  * All entries are automatically registered in [BaseGsonBuilder.gson] via [GsonBuilder.registerSkyHanniAdapters]
  */
-enum class SkyHanniTypeAdapters(
+enum class SkyHanniTypeAdapter(
     val clazz: Class<*>,
     val adapter: TypeAdapter<*>,
 ) {
     UUID(
         J_UUID::class.java,
-        SimpleStringTypeAdapter({ this.toString() }, { StringUtils.parseUUID(this) }),
+        SimpleStringTypeAdapter(J_UUID::toString, StringUtils::parseUUID),
     ),
-    NBT_BOOLEAN(
-        NbtBoolean::class.java,
-        SimpleStringTypeAdapter({ this.asString() }, { NbtBoolean.fromString(this) }),
-    ),
-    VEC(
-        LorenzVec::class.java,
-        SimpleStringTypeAdapter(LorenzVec::asStoredString, LorenzVec::decodeFromString),
-    ),
-    TROPHY_RARITY(
-        TrophyRarity::class.java,
-        SimpleStringTypeAdapter(
-            { name },
-            { TrophyRarity.getByName(this) ?: error("Could not parse TrophyRarity from '$this'") },
-        ),
-    ),
-    NEU_RECIPE_COMPONENT(
-        NeuRecipeComponent::class.java,
-        SimpleStringTypeAdapter(
-            { this.toJsonString() },
-            { NeuRecipeComponent.fromJsonStringOrNull(this) ?: NeuRecipeComponent.EMPTY },
-        ),
-    ),
+    NBT_BOOLEAN(NbtBoolean::class.java),
+    VEC(LorenzVec::class.java),
+    TROPHY_RARITY(TrophyRarity::class.java),
+    NEU_RECIPE_COMPONENT(NeuRecipeComponent::class.java),
     NEU_ABSTRACT_RECIPE(
         NeuAbstractRecipe::class.java,
         object : TypeAdapter<NeuAbstractRecipe>() {
@@ -98,10 +112,7 @@ enum class SkyHanniTypeAdapters(
     ),
     NEU_RECIPE_TYPE(
         NeuRecipeType::class.java,
-        SimpleStringTypeAdapter(
-            { neuRepoId.orEmpty() },
-            { NeuRecipeType.fromNeuId(this) },
-        ),
+        SimpleStringTypeAdapter(NeuRecipeType::repoIdOrEmpty, NeuRecipeType::fromNeuId),
     ),
     NEU_RARITY_SPECIFIC_PET_NUMS(
         NEURaritySpecificPetNums::class.java,
@@ -125,89 +136,26 @@ enum class SkyHanniTypeAdapters(
         ItemStack::class.java,
         SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData),
     ),
-    INTERNAL_NAME(
-        NeuInternalName::class.java,
-        object : TypeAdapter<NeuInternalName>() {
-            override fun write(writer: JsonWriter, value: NeuInternalName?) {
-                if (value == null) writer.nullValue() else writer.value(value.asString())
-            }
-
-            override fun read(reader: JsonReader): NeuInternalName? {
-                if (reader.peek() == JsonToken.NULL) {
-                    reader.nextNull()
-                    return null
-                }
-                return reader.nextString().toInternalName()
-            }
-        },
-    ),
-    RARITY(
-        LorenzRarity::class.java,
-        SimpleStringTypeAdapter.forEnum<LorenzRarity>(),
-    ),
-    ISLAND_TYPE(
-        IslandType::class.java,
-        SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN),
-    ),
-    CROP_TYPE(
-        CropType::class.java,
-        SimpleStringTypeAdapter.forEnum<CropType>(CropType.WHEAT),
-    ),
-    PEST_TYPE(
-        PestType::class.java,
-        SimpleStringTypeAdapter.forEnum<PestType>(PestType.UNKNOWN),
-    ),
-    MOD_VERSION(
-        ModVersion::class.java,
-        SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString),
-    ),
+    INTERNAL_NAME(NeuInternalName::class.java),
+    RARITY(LorenzRarity::class.java),
+    ISLAND_TYPE(IslandType::class.java, IslandType.UNKNOWN),
+    CROP_TYPE(CropType::class.java, CropType.WHEAT),
+    PEST_TYPE(PestType::class.java, PestType.UNKNOWN),
+    MOD_VERSION(ModVersion::class.java),
     ELITE_LEADERBOARD_TYPE(
         EliteLeaderboardType::class.java,
         EliteLeaderboardTypeAdapter(),
     ),
-    TRACKER_DISPLAY_MODE(
-        SkyHanniTracker.DefaultDisplayMode::class.java,
-        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
-    ),
-    TIME_MARK(
-        SimpleTimeMark::class.java,
-        object : TypeAdapter<SimpleTimeMark>() {
-            override fun write(out: JsonWriter, value: SimpleTimeMark) {
-                out.value(value.toMillis())
-            }
-
-            override fun read(reader: JsonReader) = reader.nextLong().asTimeMark()
-        },
-    ),
+    TRACKER_DISPLAY_MODE(SkyHanniTracker.DefaultDisplayMode::class.java),
+    TIME_MARK(SimpleTimeMark::class.java),
     DURATION(
         Duration::class.java,
-        object : TypeAdapter<Duration>() {
-            override fun write(out: JsonWriter, value: Duration) {
-                out.value(value.inWholeMilliseconds)
-            }
-
-            override fun read(reader: JsonReader) = reader.nextLong().milliseconds
-        },
+        SimpleLongTypeAdapter(Duration::inWholeMilliseconds) { milliseconds }
     ),
-    STOPWATCH(
-        Stopwatch::class.java,
-        SimpleStringTypeAdapter(
-            { this.getDuration().inWholeMilliseconds.toString() },
-            {
-                this.toLongOrNull()?.milliseconds?.let { Stopwatch(it) }
-                    ?: error("Could not parse Stopwatch duration from '$this'")
-            },
-        ),
-    ),
+    STOPWATCH(Stopwatch::class.java),
     LOCALE_DATE(
         LocalDate::class.java,
-        object : TypeAdapter<LocalDate>() {
-            override fun write(out: JsonWriter, value: LocalDate) {
-                out.value(value.toString())
-            }
-
-            override fun read(reader: JsonReader): LocalDate = LocalDate.parse(reader.nextString())
-        },
+        SimpleStringTypeAdapter(LocalDate::toString, LocalDate::parse),
     ),
     SESSION_UPTIME(SessionUptime::class.java, SessionUptimeTypeAdapter()),
     COMPONENT(
@@ -259,12 +207,19 @@ enum class SkyHanniTypeAdapters(
             }
         },
     ),
-    GRAPH(Graph::class.java, Graph.typeAdapter),
+    GRAPH(Graph::class.java),
+    ;
+
+    /** Shorthand constructor for plain enum adapters. Disambiguated from the primary by [Enum] vs [TypeAdapter] second arg. */
+    constructor(enumClass: Class<out Enum<*>>, default: Enum<*>? = null) : this(enumClass, enumAdapter(enumClass, default))
+
+    /** Shorthand constructor for [SkyHanniAdaptable] types. Companion must implement [SkyHanniAdaptable.Factory]. */
+    constructor(adaptableClass: Class<out SkyHanniAdaptable<*>>) : this(adaptableClass, adaptableAdapter(adaptableClass))
 }
 
 @Suppress("UNCHECKED_CAST")
 fun GsonBuilder.registerSkyHanniAdapters(): GsonBuilder = apply {
-    SkyHanniTypeAdapters.entries.forEach {
+    SkyHanniTypeAdapter.entries.forEach {
         val adapter = (it.adapter as TypeAdapter<Any>).nullSafe()
         registerTypeAdapter(it.clazz, adapter)
     }

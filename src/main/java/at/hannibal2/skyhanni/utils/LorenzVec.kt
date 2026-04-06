@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.json.SkyHanniAdaptable
 import com.google.gson.annotations.Expose
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Rotations
@@ -27,7 +28,7 @@ data class LorenzVec(
     val x: Double,
     val y: Double,
     val z: Double,
-) {
+) : SkyHanniAdaptable<LorenzVec> {
     val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).inflate(0.0001, 0.0001, 0.0001).calculateEdges() }
 
     constructor() : this(0.0, 0.0, 0.0)
@@ -129,6 +130,7 @@ data class LorenzVec(
     fun toCleanString(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
     fun asStoredString(): String = "$x:$y:$z"
+    override fun toJsonString(): String = asStoredString()
 
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(lengthSquared())
@@ -252,7 +254,7 @@ data class LorenzVec(
         return result
     }
 
-    companion object {
+    companion object : SkyHanniAdaptable.Factory<LorenzVec> {
 
         val directions = setOf(
             LorenzVec(1, 0, 0),
@@ -278,6 +280,7 @@ data class LorenzVec(
             val (x, y, z) = string.split(":").map { it.toDouble() }
             return LorenzVec(x, y, z)
         }
+        override fun fromJsonString(json: String): LorenzVec = decodeFromString(json)
 
         fun List<Double>.toLorenzVec(): LorenzVec {
             if (size != 3) error("Can not transform a list of size $size to LorenzVec")

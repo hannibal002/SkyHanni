@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
+import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.util.UUID
 
@@ -142,85 +142,35 @@ enum class FarmingWeight(val displayName: String, val apiName: String) {
 }
 
 class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
+
     override fun write(out: JsonWriter, value: EliteLeaderboardType) {
-        out.beginObject()
-        when (value) {
-            is Weight -> {
-                out.name("type").value("weight")
-                out.name("weight").value(value.weight.name)
-                out.name("mode").value(value.mode.name)
-            }
-
-            is Crop -> {
-                out.name("type").value("crop")
-                out.name("crop").value(value.crop.name)
-                out.name("mode").value(value.mode.name)
-            }
-
-            is Pest -> {
-                out.name("type").value("pest")
-                out.name("pest")
-                if (value.pest == null) {
-                    out.nullValue()
-                } else {
-                    out.value(value.pest.name)
-                }
-                out.name("mode").value(value.mode.name)
-            }
+        val typeStr = when (value) {
+            is Weight -> "weight"
+            is Crop -> "crop"
+            is Pest -> "pest"
         }
+        val enumVal = (value as EliteLeaderboardType.WithEnum<*>).enumValue
+        out.beginObject()
+        out.name("type").value(typeStr)
+        out.name(typeStr)
+        if (enumVal == null) out.nullValue() else out.value(enumVal.name)
+        out.name("mode").value(value.mode.name)
         out.endObject()
     }
 
     override fun read(reader: JsonReader): EliteLeaderboardType {
-        var type: String? = null
-        var mode: EliteLeaderboardMode? = null
-        var weight: FarmingWeight? = null
-        var crop: CropType? = null
-        var pest: PestType? = null
+        val obj = JsonParser.parseReader(reader).asJsonObject
+        val type = obj.get("type")?.asString
+            ?: throw JsonParseException("Missing 'type' field")
+        fun req(field: String) = obj.get(field)?.asString
+            ?: throw JsonParseException("Missing '$field' for type '$type'")
 
-        reader.beginObject()
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "type" -> type = reader.nextString()
-                "mode" -> mode = EliteLeaderboardMode.valueOf(reader.nextString())
-                "weight" -> weight = FarmingWeight.valueOf(reader.nextString())
-                "crop" -> crop = CropType.valueOf(reader.nextString())
-                "pest" -> {
-                    if (reader.peek() == JsonToken.NULL) {
-                        reader.nextNull()
-                        pest = null
-                    } else {
-                        pest = PestType.valueOf(reader.nextString())
-                    }
-                }
-
-                else -> reader.skipValue()
-            }
-        }
-        reader.endObject()
-
+        val modeStr = req("mode")
+        val mode = EliteLeaderboardMode.valueOf(modeStr)
         return when (type) {
-            "weight" -> {
-                if (weight == null || mode == null) {
-                    throw JsonParseException("Missing required fields for Weight")
-                }
-                Weight(weight, mode)
-            }
-
-            "crop" -> {
-                if (crop == null || mode == null) {
-                    throw JsonParseException("Missing required fields for Crop")
-                }
-                Crop(crop, mode)
-            }
-
-            "pest" -> {
-                if (mode == null) {
-                    throw JsonParseException("Missing required fields for Pest")
-                }
-                Pest(pest, mode)
-            }
-
+            "weight" -> Weight(FarmingWeight.valueOf(req("weight")), mode)
+            "crop" -> Crop(CropType.valueOf(req("crop")), mode)
+            "pest" -> Pest(obj.get("pest")?.takeIf { !it.isJsonNull }?.asString?.let { PestType.valueOf(it) }, mode)
             else -> throw JsonParseException("Unknown type: $type")
         }
     }

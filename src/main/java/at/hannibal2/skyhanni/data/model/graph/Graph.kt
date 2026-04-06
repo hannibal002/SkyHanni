@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.json.SkyHanniAdaptable
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -22,7 +23,7 @@ import kotlin.collections.iterator
 @Suppress("TooManyFunctions")
 value class Graph(
     @Expose private val nodes: List<GraphNode>,
-) : List<GraphNode> by nodes {
+) : List<GraphNode> by nodes, SkyHanniAdaptable<Graph> {
 
     constructor() : this(emptyList())
 
@@ -58,19 +59,22 @@ value class Graph(
     ): GraphNode = filterByActive(condition).minBy { it.position.distanceSq(location) }
     fun toPositionsList() = map { it.position }
     fun toJson(): String = gson.toJson(this)
+    override fun toJsonString(): String = toJson()
 
     @Deprecated("See parent deprecation")
     @Suppress("UNCHECKED_CAST", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     override fun <T> toArray(generator: IntFunction<Array<T>>): Array<T> =
         (nodes as Collection<GraphNode>).toArray(generator)
 
-    companion object {
-        /** Exposed so [at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters] can register it without
+    companion object : SkyHanniAdaptable.Factory<Graph> {
+        /** Exposed so [at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapter] can register it without
          *  pulling in the full base GsonBuilder. */
         val typeAdapter: TypeAdapter<Graph> = object : TypeAdapter<Graph>() {
             override fun write(out: JsonWriter, value: Graph) = serializeGraph(out, value)
             override fun read(reader: JsonReader) = deserializeGraph(reader)
         }
+
+        override fun fromJsonString(json: String): Graph = gson.fromJson<Graph>(json)
 
         // Minimal Gson for graph files — deliberately does not use the base builder
         // (no @Expose filtering, no config adapters).
