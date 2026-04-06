@@ -45,3 +45,18 @@ data class EliteAuctionItem(
     val lowest3DaySet: EliteLowestSet = EliteLowestSet(lowest3Day, lowest3DayVolume)
     val lowest7DaySet: EliteLowestSet = EliteLowestSet(lowest7Day, lowest7DayVolume)
 }
+
+@KSerializable
+data class EliteVariedAuctionItem(
+    @Expose private val splitSkyblockId: NeuInternalName,
+    @Expose private val lowest: Long,
+    @Expose private val lowestVolume: Int,
+    @Expose private val lowest3Day: Long,
+    @Expose private val lowest3DayVolume: Int,
+    @Expose private val lowest7Day: Long,
+    @Expose private val lowest7DayVolume: Int,
+) {
+    val lowestSet: EliteLowestSet = EliteLowestSet(lowest, lowestVolume)
+    val lowest3DaySet: EliteLowestSet = EliteLowestSet(lowest3Day, lowest3DayVolume)
+    val lowest7DaySet: EliteLowestSet = EliteLowestSet(lowest7Day, lowest7DayVolume)
+}

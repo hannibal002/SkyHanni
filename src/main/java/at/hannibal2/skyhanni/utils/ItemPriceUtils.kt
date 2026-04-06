@@ -194,6 +194,8 @@ object ItemPriceUtils {
         return color + shortFormat()
     }
 
+    private fun Map<NeuInternalName, List<EliteAuctionItem>>.splitByVariedBy
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebugprice") {
