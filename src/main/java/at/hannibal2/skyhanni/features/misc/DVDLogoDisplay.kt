@@ -31,6 +31,7 @@ object DVDLogoDisplay {
         userLuckAmount = 1f,
         secret = false,
         tiers = listOf(1, 5, 10),
+        hidden = true,
     )
 
     private fun handleCornerHit() = with(AchievementManager) {
