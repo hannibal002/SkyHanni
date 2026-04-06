@@ -149,7 +149,7 @@ object MineshaftPityDisplay {
             val counterUntilPity = MAX_COUNTER - pityCounter
             val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.spreadBlocksBroken }
 
-            if (counterUntilPity < 100 && counterUntilPity != 0) {
+            if (counterUntilPity < 100 && everFoundPityWidget) {
                 AchievementManager.completeAchievement(SHAFT_ACHIEVEMENT)
             }
 
