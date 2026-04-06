@@ -18,8 +18,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -191,22 +192,22 @@ object FossilSolverDisplay {
         // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
         if (inExcavatorMenu) return config.position.renderRenderable(labelRenderable, posLabel = "Fossil Excavator Solver")
 
-        val displayList = mutableListOf<String>()
+        val displayList = mutableListOf<Renderable>()
         when {
-            isNotPossible -> displayList.add(NOT_POSSIBLE_STRING)
-            isCompleted -> displayList.add(SOLVED_STRING)
-            else -> displayList.add("${FOSSILS_REMAINING_STRING}§a$possibleFossilsRemaining")
+            isNotPossible -> displayList.addString(NOT_POSSIBLE_STRING)
+            isCompleted -> displayList.addString(SOLVED_STRING)
+            else -> displayList.addString("${FOSSILS_REMAINING_STRING}§a$possibleFossilsRemaining")
         }
-        displayList.add("${CHARGES_REMAINING_STRING}§a$chargesRemaining")
+        displayList.addString("${CHARGES_REMAINING_STRING}§a$chargesRemaining")
 
         if (possibleFossilTypes.isNotEmpty()) {
-            displayList.add("§ePossible Fossil types:")
+            displayList.addString("§ePossible Fossil types:")
             for (fossil in possibleFossilTypes) {
-                displayList.add("§7- ${fossil.displayName}")
+                displayList.addString("§7- ${fossil.displayName}")
             }
         }
 
-        config.position.renderStrings(displayList, posLabel = "Fossil Excavator Solver")
+        config.position.renderRenderables(displayList, posLabel = "Fossil Excavator Solver")
     }
 
     @HandleEvent

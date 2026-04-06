@@ -8,13 +8,15 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object CustomTextBox {
 
     private val config get() = SkyHanniMod.feature.gui.customTextBox
-    private var display = listOf<String>()
+    private var display = listOf<Renderable>()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -23,21 +25,21 @@ object CustomTextBox {
         }
     }
 
-    private fun String.format() = replace("&", "§").split("\\n").toList()
+    private fun String.format(): List<Renderable> = replace("&", "§").split("\\n").map { Renderable.text(it) }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.CUSTOM_TEXT_BOX])
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGui || !config.enabled) return
 
 
-        config.position.renderStrings(display, posLabel = "Custom Text Box")
+        config.position.renderRenderables(display, posLabel = "Custom Text Box")
     }
 
     @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.CUSTOM_TEXT_BOX])
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.onlyInGui || !config.enabled) return
 
-        config.position.renderStrings(display, posLabel = "Custom Text Box")
+        config.position.renderRenderables(display, posLabel = "Custom Text Box")
     }
 
     @HandleEvent

@@ -17,12 +17,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -103,7 +105,7 @@ object SuperpairDataDisplay {
 
     private val emptySuperpairItem = SuperpairItem(-1, "", -1)
 
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
     private var uncoveredItems = mapOf<Int, SuperpairItem>()
     private val currentFoundData = mutableMapOf<FoundType, MutableList<FoundData>>()
 
@@ -118,11 +120,11 @@ object SuperpairDataDisplay {
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.superpairs.display || !ExperimentationTableApi.inTable) return
 
-        display = display.takeIfNotEmpty()
+        val display = display.takeIfNotEmpty()
             ?: drawDisplay().takeIfNotEmpty()
             ?: return
 
-        config.superpairs.displayPosition.renderStrings(
+        config.superpairs.displayPosition.renderRenderables(
             display,
             posLabel = "Superpair Experimentation Data",
         )
@@ -276,11 +278,11 @@ object SuperpairDataDisplay {
         val currentExperimentType = ExperimentationTableApi.currentExperimentType
         val isValid = currentExperimentType == null || currentExperimentType !in disallowedTypes
         if (!isValid) return@buildList
-        add("§6Superpair Experimentation Data")
+        addString("§6Superpair Experimentation Data")
         if (currentExperimentType == null) return@buildList
 
         val currentTier = ExperimentationTableApi.currentExperimentTier ?: return@buildList
-        add("")
+        addString("")
 
         val normals = currentFoundData.entries.firstOrNull { it.key == FoundType.NORMAL }?.value.orEmpty()
         val pairs = currentFoundData.entries.firstOrNull { it.key == FoundType.PAIR }?.value.orEmpty()
@@ -299,22 +301,22 @@ object SuperpairDataDisplay {
         addDataStrings(notCollected, "§4Not Collected")
     }
 
-    private fun MutableList<String>.addDataStrings(dataList: List<String>, header: String) {
+    private fun MutableList<Renderable>.addDataStrings(dataList: List<String>, header: String) {
         if (dataList.isEmpty()) return
-        this.add("")
-        this.add(header)
+        this.addString("")
+        this.addString(header)
         val lastIndex = dataList.lastIndex
         for ((index, entry) in dataList.withIndex()) {
             val prefix = determinePrefix(index, lastIndex)
-            this.add(" $prefix $entry")
+            this.addString(" $prefix $entry")
         }
     }
 
-    private fun MutableList<String>.addFoundData(
+    private fun MutableList<Renderable>.addFoundData(
         sourceList: List<FoundData>,
         header: String,
         color: LorenzColor,
-        displayAccessor: (FoundData) -> String = { it.first?.reward.orEmpty() }
+        displayAccessor: (FoundData) -> String = { it.first?.reward.orEmpty() },
     ) = addDataStrings(sourceList.map { "${color.getChatColor()}${displayAccessor.invoke(it)}" }, header)
 
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =

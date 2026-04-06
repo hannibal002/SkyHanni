@@ -17,14 +17,17 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -36,7 +39,7 @@ object FarmingLaneFeatures {
     private var currentPosition: Double? = null
     private var currentDistance = 0.0
 
-    private var display = listOf<String>()
+    private var display = listOf<Renderable>()
     private var titleContext: TitleContext? = null
     private var timeRemaining: Duration? = null
     private var lastSpeed = 0.0
@@ -73,19 +76,17 @@ object FarmingLaneFeatures {
             showWarning()
         }
 
-        if (config.distanceDisplay) {
-            display = buildList {
-                add("§7Distance until switch: §e${currentDistance.roundTo(1)}")
+        if (config.distanceDisplay) display = buildList {
+            addString("§7Distance until switch: §e${currentDistance.roundTo(1)}")
 
-                val normal = movementState == MovementState.NORMAL
-                val color = if (normal) "§b" else "§8"
-                val timeRemaining = timeRemaining ?: return@buildList
-                val format = timeRemaining.format(showMilliSeconds = timeRemaining < 20.seconds)
-                val suffix = if (!normal) {
-                    " §7(${movementState.label}§7)"
-                } else ""
-                add("§7Time remaining: $color$format$suffix")
-            }
+            val normal = movementState == MovementState.NORMAL
+            val color = if (normal) "§b" else "§8"
+            val timeRemaining = timeRemaining ?: return@buildList
+            val format = timeRemaining.format(showMilliSeconds = timeRemaining < 20.seconds)
+            val suffix = if (!normal) {
+                " §7(${movementState.label}§7)"
+            } else ""
+            addString("§7Time remaining: $color$format$suffix")
         }
     }
 
@@ -215,7 +216,8 @@ object FarmingLaneFeatures {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.distanceDisplay) return
 
-        config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")
+        val display = display.takeIfNotEmpty() ?: return
+        config.distanceDisplayPosition.renderRenderables(display, posLabel = "Lane Display")
     }
 
     @JvmStatic

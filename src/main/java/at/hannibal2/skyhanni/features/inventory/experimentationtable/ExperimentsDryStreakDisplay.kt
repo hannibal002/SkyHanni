@@ -11,14 +11,16 @@ import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.ChatFormatting
 
 @SkyHanniModule
@@ -26,18 +28,15 @@ object ExperimentsDryStreakDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.dryStreak
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation?.dryStreak
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
     private var ignoreNextFinish = false
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled() || !ExperimentationTableApi.inTable) return
 
-        display = display.takeIfNotEmpty() ?: drawDisplay()
-        config.position.renderStrings(
-            display,
-            posLabel = "Experimentation Table Dry Streak",
-        )
+        val display = display.takeIfNotEmpty() ?: drawDisplay().takeIfNotEmpty() ?: return
+        config.position.renderRenderables(display, posLabel = "Experimentation Table Dry Streak")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -86,19 +85,19 @@ object ExperimentsDryStreakDisplay {
         if (!isEnabled()) return@buildList
         val storage = storage ?: return@buildList
 
-        add("§cDry-Streak since last §5ULTRA-RARE")
+        addString("§cDry-Streak since last §5ULTRA-RARE")
 
         val attemptsSince = storage.attemptsSince
         val xpSince = storage.xpSince.shortFormat()
         val attemptFormat = "Attempt".pluralize(attemptsSince)
 
         if (config.attemptsSince && config.xpSince) {
-            add("§e ├ $attemptsSince $attemptFormat")
-            add("§e └ $xpSince XP")
+            addString("§e ├ $attemptsSince $attemptFormat")
+            addString("§e └ $xpSince XP")
         } else if (config.attemptsSince) {
-            add("§e └ $attemptsSince $attemptFormat")
+            addString("§e └ $attemptsSince $attemptFormat")
         } else {
-            add("§e └ $xpSince XP")
+            addString("§e └ $xpSince XP")
         }
     }
 

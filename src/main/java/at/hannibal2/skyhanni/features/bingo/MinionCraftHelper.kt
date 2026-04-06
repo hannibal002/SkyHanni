@@ -20,11 +20,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -44,7 +47,7 @@ object MinionCraftHelper {
         "(?<name>.*) Minion (?<number>.*)",
     )
 
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
     private val tierOneMinions = mutableListOf<NeuInternalName>()
@@ -87,8 +90,8 @@ object MinionCraftHelper {
     private fun drawDisplay(
         minions: MutableMap<String, NeuInternalName>,
         otherItems: MutableMap<NeuInternalName, Int>,
-    ): MutableList<String> {
-        val newDisplay = mutableListOf<String>()
+    ): MutableList<Renderable> {
+        val newDisplay = mutableListOf<Renderable>()
         for ((minionName, minionId) in minions) {
             minionNamePattern.matchMatcher(minionName) {
                 val cleanName = group("name").removeColor()
@@ -193,11 +196,11 @@ object MinionCraftHelper {
         minionTier: Int,
         minionId: NeuInternalName,
         otherItems: MutableMap<NeuInternalName, Int>,
-        newDisplay: MutableList<String>,
+        newDisplay: MutableList<Renderable>,
     ) {
         val nextTier = minionTier + 1
         val minionName = "§9$name Minion $nextTier"
-        newDisplay.add(minionName)
+        newDisplay.addString(minionName)
         val nextMinionId = minionId.addOneToId()
         for (recipe in NeuItems.getRecipes(nextMinionId)) {
             if (!recipe.isCraftingRecipe()) continue
@@ -219,7 +222,7 @@ object MinionCraftHelper {
                 val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
                     val color = if (isTool) "§7" else "§a"
-                    newDisplay.add("  $itemName§8: ${color}DONE")
+                    newDisplay.addString("  $itemName§8: ${color}DONE")
                     otherItems[itemId] = have - needAmount
                 } else {
                     if (!config.minionCraftHelperProgressFirst && !isTool && minionId.endsWith("_0")) {
@@ -229,11 +232,11 @@ object MinionCraftHelper {
                     val format = percentage.formatPercentage()
                     val haveFormat = have.addSeparators()
                     val needFormat = needAmount.addSeparators()
-                    newDisplay.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
+                    newDisplay.addString("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
                     allDone = false
                 }
             }
-            newDisplay.add(" ")
+            newDisplay.addString(" ")
             if (allDone) {
                 addMinion(name, nextTier, nextMinionId, otherItems, newDisplay)
                 notify(minionName)
@@ -246,7 +249,8 @@ object MinionCraftHelper {
         if (!SkyBlockUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
-        config.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
+        val display = display.takeIfNotEmpty() ?: return
+        config.minionCraftHelperPos.renderRenderables(display, posLabel = "Minion Craft Helper")
     }
 
     private fun notify(minionName: String) {

@@ -19,12 +19,15 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlass
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.awt.Color
 import kotlin.time.Duration
@@ -35,7 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 object SunGeckoHelper {
     private val config: SunGeckoConfig get() = SkyHanniMod.feature.rift.area.mountaintop.sunGecko
 
-    private val display = mutableListOf<String>()
+    private val display = mutableListOf<Renderable>()
     private val modifiers: MutableSet<Modifiers> = mutableSetOf()
     private val patternGroup = RepoPattern.group("rift.area.mountaintop.sun-gecko")
 
@@ -112,8 +115,8 @@ object SunGeckoHelper {
         }
 
         val health = "$healthColor$displayHealthLeft§f/§a$displayTotalHealth§c❤"
-        display.add("§eSun Gecko $health")
-        display.add("$actionBarFormatted §e§lCombo: x$combo")
+        display.addString("§eSun Gecko $health")
+        display.addString("$actionBarFormatted §e§lCombo: x$combo")
 
         // this is just a total guess, but it looks right enough
         // I think its inconsistent because of how often the action bar updates
@@ -128,18 +131,18 @@ object SunGeckoHelper {
         if (timeLeft.timeUntil().inWholeMilliseconds > expiryTime.inWholeMilliseconds - 800.milliseconds.inWholeMilliseconds ||
             timeLeft.isInPast()
         ) {
-            display.add("§aCombo Timer: ${expiryTime.format()}/${expiryTime.format()}")
+            display.addString("§aCombo Timer: ${expiryTime.format()}/${expiryTime.format()}")
         } else {
-            display.add("§aCombo Timer: ${timeLeft.timeUntil().format(showMilliSeconds = true)}/${expiryTime.format()}")
+            display.addString("§aCombo Timer: ${timeLeft.timeUntil().format(showMilliSeconds = true)}/${expiryTime.format()}")
         }
 
         if (config.showModifiers) {
-            display.add("§6Modifiers:")
+            display.addString("§6Modifiers:")
             if (modifiers.isEmpty()) {
-                display.add("§eNone")
+                display.addString("§eNone")
             }
             for (modifier in modifiers) {
-                display.add("§e${modifier.formattedName}")
+                display.addString("§e${modifier.formattedName}")
             }
         }
     }
@@ -195,7 +198,8 @@ object SunGeckoHelper {
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
-        config.position.renderStrings(display, 0, "Sun Gecko Helper")
+        val display = display.takeIfNotEmpty() ?: return
+        config.position.renderRenderables(display, 0, "Sun Gecko Helper")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

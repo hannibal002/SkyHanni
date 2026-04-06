@@ -15,15 +15,17 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.util.Collections
-import kotlin.collections.buildList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -60,9 +62,9 @@ object KingTalismanHelper {
         "Grandan",
     )
 
-    private var allKingsDisplay = emptyList<String>()
-    private var farDisplay = ""
-    private var display = emptyList<String>()
+    private var allKingsDisplay = emptyList<Renderable>()
+    private var farDisplay: Renderable? = null
+    private var display = emptyList<Renderable>()
 
     private fun isNearby() = IslandType.DWARVEN_MINES.isInIsland() &&
         SkyBlockUtils.graphArea == "Royal Palace" &&
@@ -73,7 +75,7 @@ object KingTalismanHelper {
         if (!isEnabled()) return
 
         update()
-        display = if (isNearby()) allKingsDisplay else Collections.singletonList(farDisplay)
+        display = if (isNearby()) allKingsDisplay else listOfNotNull(farDisplay)
     }
 
 
@@ -100,13 +102,13 @@ object KingTalismanHelper {
     private fun update() {
         val kingsTalkedTo = storage?.kingsTalkedTo ?: return
         if (kingsTalkedTo.size == kingCircles.size) {
-            allKingsDisplay = Collections.singletonList("§eAll Kings found.")
-            farDisplay = ""
+            allKingsDisplay = listOf(Renderable.text("§eAll Kings found."))
+            farDisplay = null
             return
         }
 
         allKingsDisplay = buildList {
-            var farDisplay_: String? = null
+            var localFarDisplay: String? = null
 
             val currentKing = getCurrentKing()
             for ((king, timeUntil) in getKingTimes()) {
@@ -126,14 +128,14 @@ object KingTalismanHelper {
 
                 val currentString = if (current) "§6King " else ""
                 if (missing && current) {
-                    farDisplay_ = "§cNext missing king: §7$king §eNow $missingTimeFormat"
+                    localFarDisplay = "§cNext missing king: §7$king §eNow $missingTimeFormat"
                 }
 
                 val timeString = if (missing) " §cMissing $missingTimeFormat" else ""
 
-                add("§7$currentString$king$missingString$timeString")
+                addString("§7$currentString$king$missingString$timeString")
             }
-            farDisplay = farDisplay_ ?: nextMissingText()
+            farDisplay = Renderable.text(localFarDisplay ?: nextMissingText())
         }
     }
 
@@ -169,7 +171,8 @@ object KingTalismanHelper {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderStrings(display, posLabel = "King Talisman Helper")
+        val display = display.takeIfNotEmpty() ?: return
+        config.position.renderRenderables(display, posLabel = "King Talisman Helper")
     }
 
     @HandleEvent

@@ -8,9 +8,10 @@ import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,15 +44,13 @@ object GardenYawAndPitch {
 
         val yawText = yaw.roundTo(config.yawPrecision).toBigDecimal().toPlainString()
         val pitchText = pitch.roundTo(config.pitchPrecision).toBigDecimal().toPlainString()
-        val displayList = listOf(
-            "§aYaw: §f$yawText",
-            "§aPitch: §f$pitchText",
-        )
-        if (GardenApi.inGarden()) {
-            config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
-        } else {
-            config.posOutside.renderStrings(displayList, posLabel = "Yaw and Pitch")
+        val displayList = buildList {
+            addString("§aYaw: §f$yawText")
+            addString("§aPitch: §f$pitchText")
         }
+
+        val position = if (GardenApi.inGarden()) config.pos else config.posOutside
+        position.renderRenderables(displayList, posLabel = "Yaw and Pitch")
     }
 
     @HandleEvent

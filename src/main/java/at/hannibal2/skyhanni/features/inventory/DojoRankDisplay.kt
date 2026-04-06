@@ -13,10 +13,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 
@@ -24,7 +27,7 @@ import net.minecraft.world.item.ItemStack
 object DojoRankDisplay {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
     private val patternGroup = RepoPattern.group("inventory.dojo.rankdisplay")
     private val testNamePattern by patternGroup.pattern(
         "name",
@@ -39,13 +42,15 @@ object DojoRankDisplay {
     @HandleEvent
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
+
+        val display = display.takeIfNotEmpty() ?: return
+        config.dojoRankDisplayPosition.renderRenderables(display, posLabel = "Dojo Rank Display")
     }
 
     private fun drawDisplay(items: Collection<ItemStack>) = buildList {
         if (belts.isEmpty()) {
             // TODO make clickable
-            add("§cUnable to get Belts data, please run /shupdaterepo")
+            addString("§cUnable to get Belts data, please run /shupdaterepo")
             return@buildList
         }
 
@@ -60,7 +65,7 @@ object DojoRankDisplay {
                     val score = group("score").toInt()
                     val color = if (score in 0..99) "§c" else "§a"
                     totalScore += score
-                    add("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
+                    addString("$testColor$testName§f: $rank §7($color${score.addSeparators()}§7)")
                 }
             }
         }
@@ -72,10 +77,10 @@ object DojoRankDisplay {
         val nextBelt = beltPoints.getOrNull(currentIndex + 1) ?: beltPoints.first()
         val pointsNeededForNextBelt = 0.coerceAtLeast(nextBelt.second.minus(totalScore))
 
-        add("§7Total Score: §6${totalScore.addSeparators()} §7(§8${currentBelt.first}§7)")
+        addString("§7Total Score: §6${totalScore.addSeparators()} §7(§8${currentBelt.first}§7)")
 
         if (pointsNeededForNextBelt != 0)
-            add("§7Points needed for ${nextBelt.first}§f: §6${pointsNeededForNextBelt.addSeparators()}")
+            addString("§7Points needed for ${nextBelt.first}§f: §6${pointsNeededForNextBelt.addSeparators()}")
     }
 
     @HandleEvent

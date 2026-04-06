@@ -13,11 +13,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration
@@ -39,7 +41,7 @@ object RiftTimer {
         "(?<time>\\d+) ф",
     )
 
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
     private var maxTime = 0.seconds
     private var currentTime = 0.seconds
     private var latestTime = 0.seconds
@@ -95,10 +97,10 @@ object RiftTimer {
         val firstLine = "§eRift Timer: $color$currentFormat$maxTimeFormat$percentageFormat"
 
         display = buildList {
-            add(firstLine)
+            addString(firstLine)
             changes.keys.removeIf { System.currentTimeMillis() > it + 4_000 }
             for (entry in changes.values) {
-                add(entry)
+                addString(entry)
             }
         }
     }
@@ -127,10 +129,10 @@ object RiftTimer {
 
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (RiftApi.inMirrorVerse) return
+        if (!isEnabled() || RiftApi.inMirrorVerse) return
 
-        config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
+        val display = display.takeIfNotEmpty() ?: return
+        config.timerPosition.renderRenderables(display, posLabel = "Rift Timer")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

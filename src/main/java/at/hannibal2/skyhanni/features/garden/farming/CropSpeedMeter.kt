@@ -14,17 +14,20 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
 object CropSpeedMeter {
 
-    private var display = emptyList<String>()
+    private var display = emptyList<Renderable>()
     private var currentCrop: CropType? = null
     private var currentBlocks = 0
     private var snapshot = emptyList<String>()
 
-    var enabled = false
+    private var enabled = false
     private var startCrops = mapOf<CropType, Long>()
 
     @HandleEvent
@@ -53,29 +56,24 @@ object CropSpeedMeter {
         display = renderDisplay()
     }
 
-    private fun renderDisplay(): MutableList<String> {
-        val list = mutableListOf<String>()
-        list.add("§7Crop Speed Meter")
+    private fun renderDisplay(): List<Renderable> = buildList {
+        addString("§7Crop Speed Meter")
         if (startCrops.isEmpty()) {
-            list.add("§cOpen §e/cropmilestones §cto start!")
-            return list
+            return@buildList addString("§cOpen §e/cropmilestones §cto start!")
         }
 
         if (currentCrop == null) {
-            list.add("§cStart breaking blocks!")
-            return list
+            return@buildList addString("§cStart breaking blocks!")
         }
         currentCrop?.let {
-            list.add(" §7Current ${it.cropName} counter: §e${currentBlocks.addSeparators()}")
+            addString(" §7Current ${it.cropName} counter: §e${currentBlocks.addSeparators()}")
         }
 
         if (snapshot.isNotEmpty()) {
-            list += snapshot
+            snapshot.forEach { addString(it) }
         } else {
-            list.add("§cOpen §e/cropmilestones §cagain to calculate!")
+            addString("§cOpen §e/cropmilestones §cagain to calculate!")
         }
-
-        return list
     }
 
     @HandleEvent
@@ -89,28 +87,29 @@ object CropSpeedMeter {
             startCrops = counters
             currentCrop = null
             snapshot = emptyList()
-        } else {
-            currentCrop?.let {
-                val crops = (it.getMilestoneCounter() ?: 0) - (startCrops[it] ?: 0L)
-                val blocks = currentBlocks
-                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
+            return
+        }
 
-                val list = mutableListOf<String>()
-                list.add("")
-                list.add("§6Calculation results")
-                list.add(" §7Crops collected: " + crops.addSeparators())
-                list.add(" §7Blocks broken: " + blocks.addSeparators())
-                list.add(" §7Crops per Block: " + cropsPerBlocks.addSeparators())
+        currentCrop?.let {
+            val crops = (it.getMilestoneCounter() ?: 0) - (startCrops[it] ?: 0L)
+            val blocks = currentBlocks
+            val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
 
-                val baseDrops = it.baseDrops
-                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).roundTo(3)
+            val list = mutableListOf<String>()
+            list.add("")
+            list.add("§6Calculation results")
+            list.add(" §7Crops collected: " + crops.addSeparators())
+            list.add(" §7Blocks broken: " + blocks.addSeparators())
+            list.add(" §7Crops per Block: " + cropsPerBlocks.addSeparators())
 
-                list.add(" §7Calculated farming Fortune: §e" + farmingFortune.addSeparators())
-                list.add("§cOpen /cropmilestones again to recalculate!")
+            val baseDrops = it.baseDrops
+            val farmingFortune = (cropsPerBlocks * 100 / baseDrops).roundTo(3)
 
-                snapshot = list
-                updateDisplay()
-            }
+            list.add(" §7Calculated farming Fortune: §e" + farmingFortune.addSeparators())
+            list.add("§cOpen /cropmilestones again to recalculate!")
+
+            snapshot = list
+            updateDisplay()
         }
     }
 
@@ -122,7 +121,8 @@ object CropSpeedMeter {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        GardenApi.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
+        val display = display.takeIfNotEmpty() ?: return
+        GardenApi.config.cropSpeedMeterPos.renderRenderables(display, posLabel = "Crop Speed Meter")
     }
 
     fun isEnabled() = enabled && GardenApi.inGarden()
