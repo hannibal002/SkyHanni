@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.searchableList
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.SkyHanniMod
 
 @SkyHanniModule
 object RepoPatternGui {
@@ -22,7 +22,7 @@ object RepoPatternGui {
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
                 val patterns = RepoPatternManager.allPatterns.sortedBy { it.key }
-                Minecraft.getInstance().setScreen(RepoPatternScreen(patterns))
+                SkyHanniMod.screenToOpen = RepoPatternScreen(patterns)
             }
         }
     }

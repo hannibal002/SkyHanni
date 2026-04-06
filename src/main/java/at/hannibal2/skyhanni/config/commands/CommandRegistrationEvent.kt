@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
+@PrimaryFunction("onCommandRegistration")
 class CommandRegistrationEvent(
     val dispatcher: CommandDispatcher<FabricClientCommandSource>,
 ) : SkyHanniEvent() {

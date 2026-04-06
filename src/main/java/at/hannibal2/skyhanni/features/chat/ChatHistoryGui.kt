@@ -49,10 +49,10 @@ object ChatHistoryGui {
             rows,
             height = LIST_HEIGHT,
             scrollValue = screen.scrollValue,
+            bypassChecks = true,
             showScrollbar = true,
             scrollbarTrackColor = SkyHanniScreenTheme.COLOR_SCROLLBAR_TRACK,
             scrollbarThumbColor = SkyHanniScreenTheme.COLOR_SCROLLBAR_THUMB,
-            button = 0,
         )
     }
 
@@ -71,7 +71,7 @@ object ChatHistoryGui {
         val messageLines = wrapComponent(msg.message, wrapWidth)
         val modifiedLines = msg.modified?.let { wrapComponent(it, wrapWidth) }.orEmpty()
 
-        val rowContent = buildRowContent(msg, messageLines, modifiedLines, xOffset)
+        val rowContent = buildRowContent(msg, messageLines, modifiedLines, xOffset, wrapWidth)
 
         val withHover = Renderable.hoverable(
             Renderable.drawInsideRoundedRect(rowContent, SkyHanniScreenTheme.COLOR_ROW_HOVER, padding = 2, radius = 3),
@@ -86,8 +86,10 @@ object ChatHistoryGui {
             object : Renderable by withHover {
                 override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                     withHover.render(mouseOffsetX, mouseOffsetY)
-                    val tip = if (KeyboardManager.isShiftKeyDown()) extraTooltip ?: tooltip else tooltip
-                    tip?.let { RenderableTooltips.setTooltipForRender(it) }
+                    if (isHovered(mouseOffsetX, mouseOffsetY)) {
+                        val tip = if (KeyboardManager.isShiftKeyDown()) extraTooltip ?: tooltip else tooltip
+                        tip?.let { RenderableTooltips.setTooltipForRender(it) }
+                    }
                 }
             }
         } else withHover
@@ -116,13 +118,15 @@ object ChatHistoryGui {
      * @param msg The message filtering result to render.
      * @param messageLines The wrapped lines of the main message.
      * @param modifiedLines The wrapped lines of the modified message, if any.
-     * @param xOffset The horizontal offset at which message text begins.
+     * @param xOffset The combined pixel width of the action and reason label columns.
+     * @param wrapWidth The pixel width available for rendering message text.
      */
     private fun buildRowContent(
         msg: ChatManager.MessageFilteringResult,
         messageLines: List<FormattedCharSequence>,
         modifiedLines: List<FormattedCharSequence>,
         xOffset: Int,
+        wrapWidth: Int,
     ): Renderable {
         val actionLabel = Renderable.fixedSizeLine(
             Renderable.text(msg.actionKind.renderedString),
@@ -133,13 +137,13 @@ object ChatHistoryGui {
             width = xOffset - ChatManager.ActionKind.maxLength,
         )
         val msgBlock = if (msg.modified == null) {
-            formattedLines(messageLines)
+            formattedLines(messageLines, wrapWidth)
         } else {
             Renderable.vertical(
                 listOf(
-                    formattedLines(messageLines),
+                    formattedLines(messageLines, wrapWidth),
                     Renderable.text("§e§lNEW TEXT"),
-                    formattedLines(modifiedLines),
+                    formattedLines(modifiedLines, wrapWidth),
                 ),
                 spacing = 1,
             )
@@ -150,11 +154,11 @@ object ChatHistoryGui {
         )
     }
 
-    private fun formattedLines(lines: List<FormattedCharSequence>): Renderable =
-        Renderable.vertical(lines.map { line -> formattedCharRenderable(line) }, spacing = 1)
+    private fun formattedLines(lines: List<FormattedCharSequence>, wrapWidth: Int): Renderable =
+        Renderable.vertical(lines.map { line -> formattedCharRenderable(line, wrapWidth) }, spacing = 1)
 
-    private fun formattedCharRenderable(line: FormattedCharSequence): Renderable = object : Renderable {
-        override val width = LIST_WIDTH
+    private fun formattedCharRenderable(line: FormattedCharSequence, wrapWidth: Int): Renderable = object : Renderable {
+        override val width = wrapWidth
         override val height = 10
         override val horizontalAlign = HorizontalAlignment.LEFT
         override val verticalAlign = VerticalAlignment.TOP
