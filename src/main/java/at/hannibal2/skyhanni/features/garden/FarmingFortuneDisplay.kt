@@ -207,13 +207,23 @@ object FarmingFortuneDisplay {
     }
 
     private fun pestBuffExpireWarning() {
-        if (config.bonusFortuneChat)
-            ChatUtils.clickToActionOrDisable(
-                "§cPest fortune buff has expired!",
-                config::bonusFortuneChat,
-                "teleport to barn",
-                action = { HypixelCommands.teleportToPlot("barn") },
-            )
+        if (config.bonusFortuneChat) {
+            if (config.callPhilip) {
+                ChatUtils.clickToActionOrDisable(
+                    "§cPest fortune buff has expired!",
+                    config::bonusFortuneChat,
+                    "call Philip",
+                    action = { HypixelCommands.call("Philip") },
+                )
+            } else {
+                ChatUtils.clickToActionOrDisable(
+                    "§cPest fortune buff has expired!",
+                    config::bonusFortuneChat,
+                    "teleport to barn",
+                    action = { HypixelCommands.teleportToPlot("barn") },
+                )
+            }
+        }
         if (config.bonusFortuneTitle) {
             TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
             playUserSound()
