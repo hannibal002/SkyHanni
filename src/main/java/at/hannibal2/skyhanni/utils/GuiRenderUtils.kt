@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
@@ -39,6 +38,7 @@ object GuiRenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
 
+    @Suppress("SameParameterValue")
     private fun drawStringCentered(str: String, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
@@ -47,6 +47,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
+    @Suppress("SameParameterValue")
     private fun drawStringCentered(str: Component, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
@@ -406,9 +407,8 @@ object GuiRenderUtils {
          *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
         val guiItemRenderState = GuiItemRenderState(
-            //? if < 26.1 {
+            //? if < 26.1
             this.item.name.toString(),
-            //?}
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
             0,

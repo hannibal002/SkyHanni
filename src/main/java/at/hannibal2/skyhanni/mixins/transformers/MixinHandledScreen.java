@@ -18,10 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import kotlin.Unit;
-//? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
-//? } else
-//import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.inventory.Slot;
@@ -94,10 +91,11 @@ public abstract class MixinHandledScreen {
 
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post()) {
+        AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
+        if (new GuiKeyPressEvent(screen).post()) {
             cir.setReturnValue(false);
         }
-        if (new GuiMouseInputEvent((AbstractContainerScreen<?>) (Object) this).post()) {
+        if (new GuiMouseInputEvent(screen).post()) {
             cir.setReturnValue(false);
         }
     }

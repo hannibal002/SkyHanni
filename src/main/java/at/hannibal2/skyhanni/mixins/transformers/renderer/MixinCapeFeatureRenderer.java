@@ -20,10 +20,8 @@ public class MixinCapeFeatureRenderer {
         if (skinTextures.cape() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return original;
-            //? if < 26.1 {
+            //~ if > 1.21.11 'itemEntityTranslucentCull' -> 'entityTranslucentCullItemTarget'
             return RenderTypes.itemEntityTranslucentCull(skinTextures.cape().texturePath());
-            //? } else
-            //return RenderTypes.entityTranslucentCullItemTarget(skinTextures.cape().texturePath());
         }
         return original;
     }

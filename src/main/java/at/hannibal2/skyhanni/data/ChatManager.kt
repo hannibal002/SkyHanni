@@ -272,10 +272,8 @@ object ChatManager {
                         history.actionReason = reason.uppercase()
                     }
                 }
-                //? if < 26.1 {
+                //~ if > 1.21.11 'GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
                 this[it] = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
-                //? } else
-                //this[it] = GuiMessage(counter, newComponent, id, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
             }
         }
     }

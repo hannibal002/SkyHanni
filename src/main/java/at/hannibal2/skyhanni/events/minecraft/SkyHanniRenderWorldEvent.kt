@@ -4,10 +4,8 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
-//? if < 26.1 {
+//~ if > 1.21.11 '.Camera' -> '.renderer.state.level.CameraRenderState'
 import net.minecraft.client.Camera
-//? } else
-//import net.minecraft.client.renderer.state.level.CameraRenderState
 
 @PrimaryFunction("onRenderWorld")
 class SkyHanniRenderWorldEvent(

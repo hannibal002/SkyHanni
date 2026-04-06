@@ -38,13 +38,10 @@ public class MixinReplacementLevelRenderer {
     @Unique
     PoseStack contextMatrixStack;
 
-    //? if < 26.1 {
     @Unique
+    //~ if > 1.21.11 'Camera' -> 'CameraRenderState'
+    //~ if > 1.21.11 'currentCamera' -> 'currentCameraState'
     Camera currentCamera;
-    //? } else {
-    /*@Unique
-    CameraRenderState currentCameraState;
-    *///?}
 
     @Unique
     DeltaTracker currentTickCounter;
@@ -53,19 +50,21 @@ public class MixinReplacementLevelRenderer {
     @Shadow
     private RenderBuffers renderBuffers;
 
-    //? if < 26.1 {
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))
+    //~ if > 1.21.11 'allocator' -> 'resourceAllocator'
+    //~ if > 1.21.11 'tickCounter' -> 'deltaTracker'
+    //~ if > 1.21.11 'renderBlockOutline' -> 'renderOutline'
+    //~ if > 1.21.11 'Camera camera' -> 'CameraRenderState cameraState'
+    //~ if > 1.21.11 'Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix' -> 'Matrix4fc modelViewMatrix'
+    //~ if > 1.21.11 'fogBuffer' -> 'terrainFog'
+    //~ if > 1.21.11 'boolean renderSky' -> 'boolean shouldRenderSky'
+    //~ if > 1.21.11 'CallbackInfo ci' -> 'ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci'
     private void beginRender(GraphicsResourceAllocator allocator, DeltaTracker tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci) {
+        //~ if > 1.21.11 'currentCamera = camera' -> 'currentCameraState = cameraState'
         currentCamera = camera;
+        //~ if > 1.21.11 'tickCounter' -> 'deltaTracker'
         currentTickCounter = tickCounter;
     }
-    //? } else {
-    /*@Inject(method = "renderLevel", at = @At(value = "HEAD"))
-    private void beginRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci) {
-        currentCameraState = cameraState;
-        currentTickCounter = deltaTracker;
-    }
-    *///?}
 
     @WrapOperation(
         //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'

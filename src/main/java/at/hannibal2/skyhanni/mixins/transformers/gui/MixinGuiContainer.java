@@ -2,18 +2,12 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
-//? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
-//? } else
-//import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-//? if < 26.1 {
 import net.minecraft.world.inventory.ClickType;
-//? } else
-//import net.minecraft.world.inventory.ClickType;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;

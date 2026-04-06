@@ -103,10 +103,8 @@ object ClientEvents {
         if (cancel) {
             // the message doesn't get logged if we cancel it, so we do that ourselves
             val inGameHud = Minecraft.getInstance().gui
-            //? if < 26.1 {
+            //~ if > 1.21.11 'GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
             val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageTag.system())
-            //?} else
-            //val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
             inGameHud.chat.logChatMessage(chatHudLine)
         }
 

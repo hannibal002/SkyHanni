@@ -9,9 +9,8 @@ import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
 private typealias VFEType = VertexFormatElement.Type
-//? if < 26.1 {
+//? if < 26.1
 private typealias VFEUsage = VertexFormatElement.Usage
-//? }
 
 object SkyHanniVertexFormats {
 
@@ -23,11 +22,8 @@ object SkyHanniVertexFormats {
     internal enum class VertexElement(
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
-        //? if < 26.1 {
+        //~ if > 1.21.11 'usage: VFEUsage = VFEUsage.GENERIC' -> 'normalized: Boolean = false'
         private val usage: VFEUsage = VFEUsage.GENERIC,
-        //? } else {
-        /*private val normalized: Boolean = false,
-        *///? }
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
@@ -66,10 +62,8 @@ object SkyHanniVertexFormats {
         desiredId: Int,
         index: Int = 0,
         type: VFEType = VFEType.FLOAT,
-        //? if < 26.1 {
+        //~ if > 1.21.11 'usage: VFEUsage = VFEUsage.GENERIC' -> 'normalized: Boolean = false'
         usage: VFEUsage = VFEUsage.GENERIC,
-        //? } else
-        //normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
         // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,

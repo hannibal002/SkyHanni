@@ -32,23 +32,15 @@ public class MixinWorldRenderer {
         return true;
     }
 
-    @Inject(
-        //? if < 26.1 {
-        method = "method_62214",
-        //? } else
-        //method = "lambda$addMainPass$0",
-        at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
+    //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
+    @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
-    @Inject(
-        //? if < 26.1 {
-        method = "method_62214",
-        //? } else
-        //method = "lambda$addMainPass$0",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
+    //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
+    @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();

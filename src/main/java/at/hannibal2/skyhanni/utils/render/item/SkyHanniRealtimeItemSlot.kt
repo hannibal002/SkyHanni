@@ -43,10 +43,8 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
 
         val size = slotSize.toFloat()
-        //? if < 26.1 {
+        //~ if > 1.21.11 'size, size' -> 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)'
         val bufferSlice = projectionBuffer.getBuffer(size, size)
-        //? } else
-        //val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView

@@ -25,10 +25,8 @@ import java.awt.Color
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-//? if < 26.1 {
+//~ if > 1.21.11 'client.gui.render.state.GuiRenderState' -> 'client.renderer.state.gui.GuiRenderState'
 private typealias GuiRenderState = net.minecraft.client.gui.render.state.GuiRenderState
-//? } else
-//private typealias GuiRenderState = net.minecraft.client.renderer.state.gui.GuiRenderState
 
 @Suppress("TooManyFunctions")
 object ShaderRenderUtils {

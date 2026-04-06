@@ -16,10 +16,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.client.Minecraft
-//? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics
-//? } else
-//import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen

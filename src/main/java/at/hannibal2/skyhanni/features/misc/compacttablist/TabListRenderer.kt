@@ -19,10 +19,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-//? if < 26.1 {
+//~ if > 1.21.11 'PlayerFaceRenderer' -> 'PlayerFaceExtractor'
 import net.minecraft.client.gui.components.PlayerFaceRenderer
-//?} else
-//import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule

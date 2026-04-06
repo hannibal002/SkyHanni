@@ -6,10 +6,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.render.state.GuiRenderState
-//? if < 26.1 {
+//~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//? } else
-//import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.world.phys.Vec3
@@ -37,10 +35,9 @@ internal object SkyHanniItemRenderCoordinator {
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
-        //? if < 26.1 {
+        //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
+        //~ if > 1.21.11 '"SkyHanni items", -1000.0f, 1000.0f, true' -> '"SkyHanni items"'
         CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
-        //? } else
-        //ProjectionMatrixBuffer("SkyHanni items")
     }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber

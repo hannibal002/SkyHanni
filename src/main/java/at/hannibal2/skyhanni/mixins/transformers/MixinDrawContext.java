@@ -4,10 +4,7 @@ import at.hannibal2.skyhanni.events.ChatHoverEvent;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import at.hannibal2.skyhanni.mixins.hooks.RenderItemHookKt;
 import net.minecraft.client.gui.Font;
-//? if < 26.1 {
 import net.minecraft.client.gui.GuiGraphics;
-//? } else
-//import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.LivingEntity;

@@ -22,10 +22,8 @@ typealias SafeItemStack = ItemStack
  * Returns [ItemStack.EMPTY] if components are not yet loaded.
  */
 fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
-    //? if < 26.1 {
+    //~ if > 1.21.11 'ItemStack(item, count)' -> 'DeferredItemStack(item, { ItemStack(item, count) }, count)'
     return ItemStack(item, count)
-    //? } else
-    //return DeferredItemStack(item, { ItemStack(item, count) }, count)
 }
 
 /**
@@ -33,13 +31,9 @@ fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
  * Returns [ItemStack.EMPTY] if components are not yet loaded.
  */
 fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit): SafeItemStack {
-    //? if < 26.1 {
+    //~ if > 1.21.11 'ItemStack(item, count).also(extraOps)' -> 'DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)'
     return ItemStack(item, count).also(extraOps)
-    //? } else
-    //return DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)
 }
 
-//? if < 26.1 {
+//~ if > 1.21.11 '= item' -> '= item!!.value()'
 val SafeItemStack.itemType: Item get() = item
-//? } else
-//val SafeItemStack.itemType: Item get() = item!!.value()

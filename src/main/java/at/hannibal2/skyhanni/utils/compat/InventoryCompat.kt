@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 // TODO 26.1 REI compat needed
-//? if < 26.1 {
+//? if < 26.1
 import at.hannibal2.skyhanni.compat.ReiCompat
-//?}
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.Minecraft
@@ -27,9 +26,8 @@ fun stackUnderCursor(): SafeItemStack? {
     var stack = screen.hoveredSlot?.item
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
-    //? if < 26.1 {
+    //? if < 26.1
     stack = ReiCompat.getHoveredStackFromRei()
-    //?}
     return stack
 }
 

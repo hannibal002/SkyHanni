@@ -46,6 +46,8 @@ at.hannibal2.skyhanni.mixins.transformers.neu.MixinFairySouls.java
 at.hannibal2.skyhanni.mixins.transformers.neu.MixinNEUOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.neu.MixinStorageOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.renderer.MixinContributorRendererEntityLiving.java
+at.hannibal2.skyhanni.mixins.transformers.MixinFluidRenderHandlerRegistry.java
+at.hannibal2.skyhanni.mixins.transformers.renderer.MixinBlockRendererDispatcher.java
 
 # these files do not work yet but should be made to work in the future
 at.hannibal2.skyhanni.utils.HolographicEntities.kt
