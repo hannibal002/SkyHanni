@@ -33,7 +33,7 @@ object HoppityAchievements {
             "Bring home all of Hoppity's Rabbits".asComponent(),
             200f,
             false,
-            listOf(80, 90, 100),
+            listOf(80, 90, 99),
         )
         val chocolateAchievement = Achievement(
             "Waste of chooclate".asComponent(),

@@ -4,30 +4,32 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
-object ChimeraAchievement {
-    private const val CHIMERA_ACHIEVEMENT = "chim v"
+object ItemValueAchievement {
+
+    private const val ITEM_VALUE_ACHIEVEMENT = "Hefty Items"
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Pet Symbiosis".asComponent(),
-            "Make your weapon gain all the stats of your pet".asComponent(),
-            25f,
+            "Hefty Item".asComponent(),
+            "Swing an item worth more than 500mil".asComponent(),
+            50f,
         )
-        event.register(achievement, CHIMERA_ACHIEVEMENT)
+        event.register(achievement, ITEM_VALUE_ACHIEVEMENT)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
-        if (AchievementManager.isCompleted(CHIMERA_ACHIEVEMENT)) return
-        val enchantments = event.itemInHand?.getHypixelEnchantments() ?: return
-        if (enchantments["ultimate_chimera"] == 5) {
-            AchievementManager.completeAchievement(CHIMERA_ACHIEVEMENT)
+        if (AchievementManager.isCompleted(ITEM_VALUE_ACHIEVEMENT)) return
+        val stack = event.itemInHand ?: return
+        val value = EstimatedItemValueCalculator.getTotalPrice(stack, ignoreBasePrice = true) ?: return
+        if (value > 500_000_000) {
+            AchievementManager.completeAchievement(ITEM_VALUE_ACHIEVEMENT)
         }
     }
 }
