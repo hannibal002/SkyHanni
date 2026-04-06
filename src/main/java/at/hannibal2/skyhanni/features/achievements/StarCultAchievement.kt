@@ -19,7 +19,7 @@ object StarCultAchievement {
     private val starCultPattern by AchievementManager.group.pattern(
         "starcult",
         "\\[NPC] Dalir: You’ve now attended (?<amount>\\d+) meetings of the Cult of the Fallen Star!" +
-                " As a reward, here's some Starfall!"
+            " As a reward, here's some Starfall!"
     )
 
     private const val STAR_CULT_ACHIEVEMENT = "Weekly Cult"
