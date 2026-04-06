@@ -138,9 +138,6 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
-    fun getLogger(name: String): Logger {
-        return LogManager.getLogger("SkyHanni.$name")
-    }
 
     val modules: MutableList<Any> = ArrayList()
 
