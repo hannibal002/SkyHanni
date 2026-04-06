@@ -58,7 +58,9 @@ object SeaCreatureManager {
         }
         if (isInterceptingColorCodeMessage(event.message)) return
         if (isInterceptingCleanMessage(event.cleanMessage)) return
-        // I have no idea if this is the bug or if it's Hypixel, but we, might... Be able to fix this.
+        /*
+        These
+         */
 
         getSeaCreatureFromMessage(event.message)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
@@ -103,13 +105,30 @@ object SeaCreatureManager {
         doubleHook = false
     }
 
-    private fun isInterceptingColorCodeMessage(message: String): Boolean = (PetStorageApi.isAutopetMessage(message) ||
-        thunderBottleChargedPattern.matches(message)
-        )
+    private fun isInterceptingColorCodeMessage(message: String): Boolean {
+        var shouldIgnore = false
+        if (PetStorageApi.isAutopetMessage(message)) shouldIgnore = true
+        /**
+         * Icy, Sponge and Prismarine Sinkers can cause an autopet message between the double Hook & Catch Message.
+         */
+        if (thunderBottleChargedPattern.matches(message)) shouldIgnore = true
+        /**
+         * Thunder Sea Creature gives an immediate amount of charge This also lands between Double Hook & Catch Message.
+         */
+        return shouldIgnore
+    }
+
 
     // TODO Unify when both Clean. (I do not wanna touch that Pet Storage Autopet Regex, I will horrifically break something)
-    private fun isInterceptingCleanMessage(message: String): Boolean =
-        (ReindrakeWarpHelper.spawnPattern.matches(message) || message.isEmpty())
+    private fun isInterceptingCleanMessage(message: String): Boolean {
+        var shouldIgnore = false
+        if (ReindrakeWarpHelper.spawnPattern.matches(message)) shouldIgnore = true
+        if (message.isEmpty()) shouldIgnore = true
+        /**
+         * Reindrakes Send an empty line, the global message & another empty line between double hook & Catch message.
+         */
+        return shouldIgnore
+    }
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
