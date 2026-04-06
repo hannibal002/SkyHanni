@@ -12,8 +12,9 @@ data class Achievement(
     private val name: Component? = null,
     private val description: Component = Component.empty(),
     var userLuckAmount: Float = 0f,
-    var secret: Boolean = false,
+    var secret: Boolean = false, // Secret achievements hide the name
     var tiers: List<Int> = listOf(),
+    var hidden: Boolean = false, // Hidden achievements are hidden until found
     @Expose
     var data: AchievementUserData = AchievementUserData(),
 ) {
