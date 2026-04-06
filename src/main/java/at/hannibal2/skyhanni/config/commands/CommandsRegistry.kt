@@ -42,11 +42,10 @@ object CommandsRegistry {
         addBuilder(builders)
     }
 
-    fun <T : CommandBuilderBase> T.addToRegister(
+    fun CommandBuilder.addToRegister(
         dispatcher: CommandDispatcher<FabricClientCommandSource>,
         builders: MutableList<CommandData>,
     ) {
-        if (this !is CommandBuilder) return // complex commands are not supported in 1.21+ right now
         val builder = BaseBrigadierBuilder(name).apply {
             this.description = this@addToRegister.descriptor
             this.aliases = this@addToRegister.aliases

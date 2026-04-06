@@ -63,7 +63,7 @@ class ChangeLogViewerScreen : SkyHanniChromeScreen() {
         ChangelogViewer.openTime = SimpleTimeMark.now()
 
         val cacheContainsKey = ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)
-        if (ChangelogViewer.shouldMakeNewList && cacheContainsKey) {
+        if (cacheContainsKey && (ChangelogViewer.shouldMakeNewList || !::scrollList.isInitialized)) {
             ChangelogViewer.shouldMakeNewList = false
             scrollList = makeScrollList(buildChangelogMap(), 400, 300)
         }

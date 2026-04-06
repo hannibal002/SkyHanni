@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.config.commands.CommandsRegistry.addToRegister
 import at.hannibal2.skyhanni.config.commands.CommandsRegistry.hasUniqueName
 import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
 import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
@@ -30,14 +28,5 @@ class CommandRegistrationEvent(
         require(descriptor.isNotEmpty() || category in CommandCategory.developmentCategories) {
             "The command '$name' has no required description"
         }
-    }
-
-    fun <O : CommandContextAwareObject> registerComplex(
-        name: String,
-        block: ComplexCommandBuilder<O, CommandArgument<O>>.() -> Unit,
-    ) {
-        val command = ComplexCommandBuilder<O, CommandArgument<O>>(name).apply(block)
-        command.hasUniqueName(builders)
-        command.addToRegister(dispatcher, builders)
     }
 }
