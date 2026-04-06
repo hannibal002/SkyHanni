@@ -210,12 +210,12 @@ object VampireSlayerFeatures {
     fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (event.clickedEntity !is RemotePlayer) return
-        if (!event.clickedEntity.isNpc()) return
+        if (event.entity !is RemotePlayer) return
+        if (!event.entity.isNpc()) return
         val coopList = configCoopBoss.coopMembers.split(",").toList()
         val regexA = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex()
         val regexB = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-        for (armorStand in event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by")) {
+        for (armorStand in event.entity.getAllNameTagsInRadiusWith("Spawned by")) {
             val containCoop = coopList.isNotEmpty() &&
                 coopList.any {
                     var contain = false
@@ -226,8 +226,8 @@ object VampireSlayerFeatures {
                     contain
                 }
             if (armorStand.name.formattedTextCompatLessResets().contains(username) || containCoop) return
-            if (!taggedEntityList.contains(event.clickedEntity.id)) {
-                taggedEntityList.add(event.clickedEntity.id)
+            if (!taggedEntityList.contains(event.entity.id)) {
+                taggedEntityList.add(event.entity.id)
             }
         }
     }

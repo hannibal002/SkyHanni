@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
+import at.hannibal2.skyhanni.events.entity.EntityTransparencyFeatureActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +26,7 @@ object ActiveBossTransparency {
     private var lastHitCarrierBoss = false
 
     @HandleEvent
-    fun onEntityTransparencyActive(event: EntityTransparencyActiveEvent) {
+    fun onEntityTransparencyActive(event: EntityTransparencyFeatureActiveEvent) {
         event.setActive(isActive())
     }
 
@@ -41,7 +41,7 @@ object ActiveBossTransparency {
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
         if (event.action != ServerboundInteractPacket.ActionType.ATTACK) return
-        val mob = event.clickedEntity.mob ?: return
+        val mob = event.entity.mob ?: return
 
         lastClickedMob = mob
         lastHitCarrierBoss = CarryTracker.isCustomer(mob.ownerNameOrEmpty)
