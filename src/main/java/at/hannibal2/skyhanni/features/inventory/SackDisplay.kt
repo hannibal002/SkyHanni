@@ -42,7 +42,7 @@ object SackDisplay {
 
     private var display = emptyList<Renderable>()
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
-    private val patternGroup = RepoPattern.group("misc.sack")
+    private val patternGroup = RepoPattern.group("inventory.sack.display")
     private val storedPattern by patternGroup.pattern("stored.start", "Stored: ")
 
     private val MAGMA_FISH = "MAGMA_FISH".toInternalName()
@@ -62,11 +62,13 @@ object SackDisplay {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!SackApi.inventory.isInside()) return
         if (!config.highlightFull) return
+        // TODO calculate slots on inventory update, use here instead of iterating in render event
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.item.getLoreComponent()
             storedPattern.matchAllComponents(lore) { component ->
                 if (component.siblings.elementAtOrNull(1)?.style?.color?.name == "green") {
                     slot.highlight(LorenzColor.RED)
+                    return@matchAllComponents
                 }
             }
         }
