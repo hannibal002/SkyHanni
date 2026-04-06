@@ -1,126 +1,169 @@
 package at.hannibal2.skyhanni.features.chat
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniScreenTheme
 import at.hannibal2.skyhanni.utils.compat.convertToJsonString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.empty
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ComponentRenderUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 
-class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyHanniBaseScreen() {
+object ChatHistoryGui {
 
-    private var scroll = -1.0
-    private val w = 500
-    private var wasMouseButtonDown = false
-    private val h = 300
-    private val reasonMaxLength = history.maxOf { reasonLength(it) }
+    private const val LIST_WIDTH = 500
+    private const val LIST_HEIGHT = 300
+    private val copyCoroutine = CoroutineSettings("chat history copy to clipboard")
 
     private fun ChatManager.MessageFilteringResult.getReason(): String? =
         actionReason ?: modifiedReason
 
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
-        result.getReason()?.let { fontRenderer().width(it) } ?: 0
+        result.getReason()?.let { Minecraft.getInstance().font.width(it) } ?: 0
 
-    private val historySize =
-        history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
+    fun buildContent(screen: ChatHistoryScreen): Renderable {
+        val history = screen.history
+        val reasonMaxLength = history.maxOfOrNull { reasonLength(it) } ?: 0
+        val xOffset = ChatManager.ActionKind.maxLength + reasonMaxLength + 10
+        val wrapWidth = LIST_WIDTH - xOffset - 10
 
-    // TODO use Renderables instead
-    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(mouseX, mouseY, partialTicks)
-        var queuedTooltip: List<String>? = null
-        val l = (width / 2.0 - w / 2.0).toInt()
-        val t = (height / 2.0 - h / 2.0).toInt()
+        val rows = history.map { msg -> buildRow(msg, wrapWidth, xOffset) }
 
-        DrawContextUtils.translatedPushPopResult(x = l.toDouble(), y = t.toDouble()) {
-            GuiRenderUtils.drawFloatingRectDark(0, 0, w, h)
-            DrawContextUtils.translate(-l + 0.0, -t + 0.0)
-            GuiRenderUtils.enableScissor(l + 5, t + 5, w + l - 5, h + t - 5)
-            DrawContextUtils.translate(l + 0.0, t + 0.0)
-            DrawContextUtils.translate(5.0, 5.0 - scroll)
-            val offsetMouseX = mouseX - l
-            val isMouseButtonDown = offsetMouseX in 0..w && mouseY in t..(t + h) && MouseCompat.isButtonDown(0)
-            var offsetMouseY = mouseY - (t - scroll).toInt() - 5
-
-            for (msg in history) {
-                val messageLines = splitLine(msg.message)
-                val modifiedLines = msg.modified?.let { splitLine(it) }.orEmpty()
-                val size = messageLines.size + modifiedLines.size
-
-                val isHovered = offsetMouseX in 0..w && offsetMouseY in 0..<(size * 10) && mouseY >= t + 5
-
-                if (isHovered) {
-                    GuiRenderUtils.drawRect(0, -2, w, size * 10, 0x20FFFFFF)
-                }
-
-                GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
-                msg.getReason()?.let {
-                    GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1)
-                }
-                drawMultipleTextLines(messageLines, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
-                msg.modified?.let {
-                    GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)
-                    drawMultipleTextLines(modifiedLines, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
-                }
-
-                if (isHovered && msg.hoverInfo.isNotEmpty()) queuedTooltip = msg.hoverInfo
-                if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty()) queuedTooltip = msg.hoverExtraInfo
-                if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
-                    if (KeyboardManager.isShiftKeyDown()) {
-                        OSUtils.copyToClipboard(msg.message.convertToJsonString())
-                        ChatUtils.chat("Copied structured chat line to clipboard", false)
-                    } else {
-                        val message = msg.message.formattedTextCompat().stripHypixelMessage()
-                        OSUtils.copyToClipboard(message)
-                        ChatUtils.chat("Copied chat line to clipboard")
-                    }
-                }
-                offsetMouseY -= size * 10
-            }
-            GuiRenderUtils.disableScissor()
-            wasMouseButtonDown = isMouseButtonDown
-        }
-        queuedTooltip?.let { tooltip ->
-            RenderableTooltips.setTooltipForRender(tooltip.map(StringRenderable::from))
-        }
-    }
-
-    private fun splitLine(comp: Component): List<FormattedCharSequence> {
-        return ComponentRenderUtils.wrapComponents(
-            comp, w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10), Minecraft.getInstance().font
+        return Renderable.scrollList(
+            rows,
+            height = LIST_HEIGHT,
+            scrollValue = screen.scrollValue,
+            showScrollbar = true,
+            scrollbarTrackColor = SkyHanniScreenTheme.COLOR_SCROLLBAR_TRACK,
+            scrollbarThumbColor = SkyHanniScreenTheme.COLOR_SCROLLBAR_THUMB,
+            button = 0,
         )
     }
 
-    override fun onInitGui() {
-        if (this.scroll < 0) {
-            setScroll(1000000000.0)
+    /**
+     * Builds a single row Renderable for a message filtering result.
+     *
+     * @param msg The message filtering result to render.
+     * @param wrapWidth The available pixel width for wrapping message text.
+     * @param xOffset The horizontal offset at which message text begins.
+     */
+    private fun buildRow(
+        msg: ChatManager.MessageFilteringResult,
+        wrapWidth: Int,
+        xOffset: Int,
+    ): Renderable {
+        val messageLines = wrapComponent(msg.message, wrapWidth)
+        val modifiedLines = msg.modified?.let { wrapComponent(it, wrapWidth) }.orEmpty()
+
+        val rowContent = buildRowContent(msg, messageLines, modifiedLines, xOffset)
+
+        val withHover = Renderable.hoverable(
+            Renderable.drawInsideRoundedRect(rowContent, SkyHanniScreenTheme.COLOR_ROW_HOVER, padding = 2, radius = 3),
+            rowContent,
+            bypassChecks = true,
+        )
+
+        val tooltip = msg.hoverInfo.takeIf { it.isNotEmpty() }?.map(StringRenderable::from)
+        val extraTooltip = msg.hoverExtraInfo.takeIf { it.isNotEmpty() }?.map(StringRenderable::from)
+
+        val withTooltip = if (tooltip != null || extraTooltip != null) {
+            object : Renderable by withHover {
+                override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+                    withHover.render(mouseOffsetX, mouseOffsetY)
+                    val tip = if (KeyboardManager.isShiftKeyDown()) extraTooltip ?: tooltip else tooltip
+                    tip?.let { RenderableTooltips.setTooltipForRender(it) }
+                }
+            }
+        } else withHover
+
+        return Renderable.clickable(
+            withTooltip,
+            onLeftClick = {
+                copyCoroutine.launch {
+                    val (target, copyType) = if (KeyboardManager.isShiftKeyDown()) {
+                        msg.message.convertToJsonString() to "structured"
+                    } else {
+                        msg.message.formattedTextCompat().stripHypixelMessage() to ""
+                    }
+                    val copied = ClipboardUtils.copyToClipboardAsync(target).await() ?: false
+                    if (!copied) ChatUtils.chat("Failed to copy $copyType to clipboard")
+                    else ChatUtils.chat("Copied $copyType chat line to clipboard")
+                }
+            },
+            bypassChecks = true,
+        )
+    }
+
+    /**
+     * Builds the content Renderable for a single row without hover/click wrappers.
+     *
+     * @param msg The message filtering result to render.
+     * @param messageLines The wrapped lines of the main message.
+     * @param modifiedLines The wrapped lines of the modified message, if any.
+     * @param xOffset The horizontal offset at which message text begins.
+     */
+    private fun buildRowContent(
+        msg: ChatManager.MessageFilteringResult,
+        messageLines: List<FormattedCharSequence>,
+        modifiedLines: List<FormattedCharSequence>,
+        xOffset: Int,
+    ): Renderable {
+        val actionLabel = Renderable.fixedSizeLine(
+            Renderable.text(msg.actionKind.renderedString),
+            width = ChatManager.ActionKind.maxLength,
+        )
+        val reasonLabel = Renderable.fixedSizeLine(
+            msg.getReason()?.let { Renderable.text(it) } ?: Renderable.empty(),
+            width = xOffset - ChatManager.ActionKind.maxLength,
+        )
+        val msgBlock = if (msg.modified == null) {
+            formattedLines(messageLines)
+        } else {
+            Renderable.vertical(
+                listOf(
+                    formattedLines(messageLines),
+                    Renderable.text("§e§lNEW TEXT"),
+                    formattedLines(modifiedLines),
+                ),
+                spacing = 1,
+            )
+        }
+        return Renderable.horizontal(
+            listOf(actionLabel, reasonLabel, msgBlock),
+            spacing = 0,
+        )
+    }
+
+    private fun formattedLines(lines: List<FormattedCharSequence>): Renderable =
+        Renderable.vertical(lines.map { line -> formattedCharRenderable(line) }, spacing = 1)
+
+    private fun formattedCharRenderable(line: FormattedCharSequence): Renderable = object : Renderable {
+        override val width = LIST_WIDTH
+        override val height = 10
+        override val horizontalAlign = HorizontalAlignment.LEFT
+        override val verticalAlign = VerticalAlignment.TOP
+
+        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+            GuiRenderUtils.drawString(line, 0, 0, -1)
         }
     }
 
-    private fun setScroll(newScroll: Double) {
-        this.scroll = newScroll.coerceAtMost(historySize - h + 10.0).coerceAtLeast(0.0)
-    }
-
-    private fun drawMultipleTextLines(lines: List<FormattedCharSequence>, xPos: Int) {
-        for (line in lines) {
-            GuiRenderUtils.drawString(line, xPos, 0, -1)
-            DrawContextUtils.translate(0f, 10f)
-        }
-    }
-
-    private fun fontRenderer() = Minecraft.getInstance().font
-
-    override fun onHandleMouseInput() {
-        setScroll(scroll - MouseCompat.getScrollDelta())
-    }
+    private fun wrapComponent(comp: Component, width: Int): List<FormattedCharSequence> =
+        ComponentRenderUtils.wrapComponents(comp, width, Minecraft.getInstance().font)
 }

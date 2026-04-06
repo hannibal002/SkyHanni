@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
+import at.hannibal2.skyhanni.features.chat.ChatHistoryScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -316,10 +316,10 @@ object ChatManager {
                     ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
                     return@argCallback
                 }
-                SkyHanniMod.screenToOpen = ChatHistoryGui(history)
+                SkyHanniMod.screenToOpen = ChatHistoryScreen(history)
             }
             simpleCallback {
-                SkyHanniMod.screenToOpen = ChatHistoryGui(getRecentMessageHistory())
+                SkyHanniMod.screenToOpen = ChatHistoryScreen(getRecentMessageHistory())
             }
         }
     }

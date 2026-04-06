@@ -1,14 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -16,7 +11,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -40,14 +34,10 @@ import java.nio.charset.StandardCharsets
 /**
  * Constructs the full Renderable display for [VisualWordScreen].
  *
- * Stateless — all mutable state lives in [VisualWordScreen].
+ * Stateless. All mutable state lives in [VisualWordScreen].
  */
-@SkyHanniModule
 object VisualWordGui {
 
-    private val COLOR_BG = ChromaColour.fromStaticRGB(18, 18, 28, 235)
-    private val COLOR_OUTLINE_TOP = ChromaColour.fromStaticRGB(100, 100, 160, 255)
-    private val COLOR_OUTLINE_BOT = ChromaColour.fromStaticRGB(55, 55, 100, 255)
     private val COLOR_ROW_NORMAL = ChromaColour.fromStaticRGB(30, 30, 50, 180)
     private val COLOR_ROW_HOVER = ChromaColour.fromStaticRGB(55, 55, 85, 220)
     private val COLOR_BTN_ADD = ChromaColour.fromStaticRGB(35, 90, 35, 215)
@@ -88,39 +78,12 @@ object VisualWordGui {
 
     fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
 
-    fun onCommand() {
-        if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
-            ChatUtils.userError("You need to join Hypixel to use this feature!")
-            return
-        }
-        SkyHanniMod.screenToOpen = VisualWordScreen()
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shwords") {
-            description = "Opens the config list for modifying visual words"
-            callback { onCommand() }
-        }
-    }
-
     /**
      * Constructs the full display [Renderable] for the current state of [screen].
-     * Stateless — all mutable state lives in [VisualWordScreen].
+     * Stateless. All mutable state lives in [VisualWordScreen].
      */
-    fun buildDisplay(screen: VisualWordScreen): Renderable {
-        val body = if (screen.currentlyEditing) buildEditView(screen) else buildListView(screen)
-        return Renderable.drawInsideFloatingRectWithBorder(
-            body,
-            backgroundColor = COLOR_BG,
-            lightColor = COLOR_OUTLINE_TOP,
-            darkColor = COLOR_OUTLINE_BOT,
-            padding = 14,
-            radius = 12,
-            smoothness = 2,
-            borderThickness = 2,
-        )
-    }
+    fun buildDisplay(screen: VisualWordScreen): Renderable =
+        if (screen.currentlyEditing) buildEditView(screen) else buildListView(screen)
 
     private fun buildListView(screen: VisualWordScreen): Renderable {
         val header = Renderable.text("§bVisual Word Replacements", scale = 1.2, horizontalAlign = HA.CENTER)
@@ -131,7 +94,7 @@ object VisualWordGui {
         )
 
         val listArea = if (screen.modifiedWords.isEmpty()) {
-            Renderable.text("§7No entries yet — click §aAdd New§7 to start.", horizontalAlign = HA.CENTER)
+            Renderable.text("§7No entries yet. Click §aAdd New§7 to start.", horizontalAlign = HA.CENTER)
         } else {
             Renderable.scrollList(
                 screen.modifiedWords.mapIndexed { index, word -> buildWordRow(screen, index, word) },
@@ -285,7 +248,6 @@ object VisualWordGui {
                 if (isActive) {
                     GuiRenderUtils.drawFloatingRectLight(0, 0, width, height, false)
                     textInput.makeActive()
-                    textInput.handle()
                 } else {
                     GuiRenderUtils.drawFloatingRectDark(0, 0, width, height, false)
                 }
