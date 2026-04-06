@@ -108,11 +108,11 @@ object SeaCreatureManager {
     private fun isInterceptingColorCodeMessage(message: String): Boolean {
         var shouldIgnore = false
         if (PetStorageApi.isAutopetMessage(message)) shouldIgnore = true
-        /**
+        /*
          * Icy, Sponge and Prismarine Sinkers can cause an autopet message between the double Hook & Catch Message.
          */
         if (thunderBottleChargedPattern.matches(message)) shouldIgnore = true
-        /**
+        /*
          * Thunder Sea Creature gives an immediate amount of charge This also lands between Double Hook & Catch Message.
          */
         return shouldIgnore
@@ -124,7 +124,7 @@ object SeaCreatureManager {
         var shouldIgnore = false
         if (ReindrakeWarpHelper.spawnPattern.matches(message)) shouldIgnore = true
         if (message.isEmpty()) shouldIgnore = true
-        /**
+        /*
          * Reindrakes Send an empty line, the global message & another empty line between double hook & Catch message.
          */
         return shouldIgnore
