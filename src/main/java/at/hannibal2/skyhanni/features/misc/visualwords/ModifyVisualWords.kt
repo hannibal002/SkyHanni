@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni.features.misc.visualwords
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils.requiredStyleChangeString
@@ -27,6 +32,23 @@ object ModifyVisualWords {
     /** Replacements added automatically by the mod for features, april fools, etc. */
     private val modModifiedWords = mutableListOf<VisualWordText>()
     private var finalWordsList = emptyList<VisualWordText>()
+
+    fun openScreen() {
+        @Suppress("DEPRECATION")
+        if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
+            ChatUtils.userError("You need to join Hypixel to use this feature!")
+            return
+        }
+        SkyHanniMod.screenToOpen = VisualWordScreen()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shwords") {
+            description = "Opens the config list for modifying visual words"
+            callback { openScreen() }
+        }
+    }
 
     fun update() {
         finalWordsList = modModifiedWords + userModifiedWords
