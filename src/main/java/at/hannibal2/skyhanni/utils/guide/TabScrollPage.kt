@@ -5,14 +5,15 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.container.table.ScrollTable.Companion.scrollTable
 
-abstract class GuideScrollPage(
+@Suppress("AbstractClassCanBeConcreteClass")
+abstract class TabScrollPage(
     val sizeX: Int,
     val sizeY: Int,
     paddingX: Int = 0,
     paddingY: Int = 0,
     val marginY: Int = 5,
     val velocity: Double = 3.0,
-) : GuideRenderablePage(paddingX, paddingY) {
+) : TabRenderablePage(paddingX, paddingY) {
 
     private val scroll = ScrollValue()
 

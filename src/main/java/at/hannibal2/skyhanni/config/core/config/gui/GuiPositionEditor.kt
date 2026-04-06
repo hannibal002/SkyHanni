@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniCanvasScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -46,7 +46,7 @@ class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
     private val oldScreen: SkyHanniGuiContainer? = null,
-) : SkyHanniBaseScreen() {
+) : SkyHanniCanvasScreen() {
 
     private val config get() = SkyHanniMod.feature.gui
     private var grabbedX = 0
@@ -61,11 +61,11 @@ class GuiPositionEditor(
         OtherInventoryData.close()
     }
 
-    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
         if (oldScreen != null) {
-            oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
-            oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, mouseX, mouseY)
+            oldScreen.render(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
         }
 
         val hoveredPos = renderRectangles()
