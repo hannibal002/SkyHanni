@@ -18,5 +18,5 @@ object ScoreboardEventDamage : ScoreboardEvent() {
         ScoreboardPattern.bossDamagePattern,
     )
 
-    override fun showIsland() = IslandType.THE_END.isCurrent()
+    override fun showIsland() = IslandType.THE_END.isInIsland()
 }

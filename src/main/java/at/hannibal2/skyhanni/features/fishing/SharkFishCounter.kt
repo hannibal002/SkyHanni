@@ -8,36 +8,58 @@ import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
+import java.util.EnumMap
 
 @SkyHanniModule
 object SharkFishCounter {
 
-    private var counter = mutableListOf(0, 0, 0, 0)
-    private var display = ""
+    private enum class SharkType(
+        val displayName: String,
+        val color: LorenzColor,
+    ) {
+        NURSE("Nurse", LorenzColor.GREEN),
+        BLUE("Blue", LorenzColor.BLUE),
+        TIGER("Tiger", LorenzColor.DARK_PURPLE),
+        GREAT_WHITE("Great White", LorenzColor.GOLD),
+    }
+
+    private val counterMap = object : EnumMap<SharkType, Int>(SharkType::class.java) {
+        override fun clear() {
+            SharkType.entries.forEach { this[it] = 0 }
+        }
+        init {
+            this.clear()
+        }
+    }
+    private val totalCount get() = counterMap.values.sum()
+
+    private var display: Renderable? = null
     private var hasWaterRodInHand = false
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
-        val name = event.seaCreature.name
-        if (!name.contains("Shark")) return
-        counter[sharkIndex(name)] += if (event.doubleHook) 2 else 1
-        display = "§7Sharks caught: §e${
-            counter.sum().addSeparators()
-        } §7(§a${counter[0]} §9${counter[1]} §5${counter[2]} §6${counter[3]}§7)"
-    }
+        val eventName = event.seaCreature.name.takeIf { it.contains("Shark") } ?: return
+        val shark = SharkType.entries.find { shark ->
+            eventName.contains(shark.displayName)
+        } ?: return
 
-    private fun sharkIndex(name: String): Int = when {
-        name.contains("Blue") -> 1
-        name.contains("Tiger") -> 2
-        name.contains("Great") -> 3
-        else -> 0
+        counterMap.addOrPut(shark, if (event.doubleHook) 2 else 1)
+        val countString = counterMap.entries.joinToString(" ") { (shark, count) ->
+            shark.color.getChatColor() + count
+        }
+        val separatedCount = totalCount.addSeparators()
+
+        display = Renderable.text("§7Sharks caught: §e$separatedCount §7($countString§7)")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -52,29 +74,23 @@ object SharkFishCounter {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message != "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") return
-        val count = counter.sum()
-        if (count == 0) return
+        val count = totalCount.takeIf { it != 0 } ?: return
 
-        val n = counter[0] // Nurse
-        val b = counter[1] // Blue
-        val t = counter[2] // Tiger
-        val g = counter[3] // Great White
+        val (nurse, blue, tiger, great) = counterMap.entries.map { it.value }
         val total = count.addSeparators()
         val funnyComment = funnyComment(count)
-        ChatUtils.chat(
-            componentBuilder {
-                append("You caught $total ")
-                appendWithColor("(", ChatFormatting.WHITE)
-                appendWithColor("$n ", ChatFormatting.GREEN)
-                appendWithColor("$b ", ChatFormatting.GOLD)
-                appendWithColor("$t ", ChatFormatting.DARK_PURPLE)
-                appendWithColor("$g", ChatFormatting.GOLD)
-                appendWithColor(") ", ChatFormatting.WHITE)
-                append("sharks during this fishing festival. $funnyComment")
-            }
-        )
-        counter = mutableListOf(0, 0, 0, 0)
-        display = ""
+        ChatUtils.chat {
+            append("You caught $total ")
+            appendWithColor("(", ChatFormatting.WHITE)
+            appendWithColor("$nurse ", ChatFormatting.GREEN)
+            appendWithColor("$blue ", ChatFormatting.GOLD)
+            appendWithColor("$tiger ", ChatFormatting.DARK_PURPLE)
+            appendWithColor("$great", ChatFormatting.GOLD)
+            appendWithColor(") ", ChatFormatting.WHITE)
+            append("sharks during this fishing festival. $funnyComment")
+        }
+        counterMap.clear()
+        display = null
     }
 
     private fun funnyComment(count: Int): String = when {
@@ -94,6 +110,7 @@ object SharkFishCounter {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 
-        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderString(display, posLabel = "Shark Fish Counter")
+        val display = display ?: return
+        SkyHanniMod.feature.fishing.sharkFishCounterPos.renderRenderable(display, posLabel = "Shark Fish Counter")
     }
 }

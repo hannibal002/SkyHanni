@@ -49,7 +49,6 @@ at.hannibal2.skyhanni.mixins.transformers.renderer.MixinContributorRendererEntit
 
 # these files do not work yet but should be made to work in the future
 
-at.hannibal2.skyhanni.test.ComponentSpanTest.kt
 at.hannibal2.skyhanni.test.RepoPatternTest.kt
 at.hannibal2.skyhanni.test.ItemModifierTest.kt
 at.hannibal2.skyhanni.test.garden.VisitorListenerTest.kt

@@ -171,7 +171,7 @@
     <ID>PropertyName:LegionBobbinOverlay.kt:LegionBobbinOverlay$private var LEGION_DISTANCE = 30.0</ID>
     <ID>PropertyName:LegionBobbinOverlay.kt:LegionBobbinOverlay$private var LEGION_LIMIT = 20</ID>
     <ID>PropertyName:LegionBobbinOverlay.kt:LegionBobbinOverlay$private var LEGION_MULT = 0.07</ID>
-    <ID>PropertyName:LorenzLogger.kt:LorenzLogger.Companion$private var PREFIX_PATH: String</ID>
+    <ID>PropertyName:SkyHanniLogger.kt:LorenzLogger.Companion$private var PREFIX_PATH: String</ID>
     <ID>PropertyName:PestTrapApi.kt:PestTrapApi$var MAX_TRAPS = 3 private set</ID>
     <ID>PropertyName:QuiverApi.kt:QuiverApi$private var FLINT_ARROW_TYPE: ArrowType? = null</ID>
     <ID>PropertyName:QuiverApi.kt:QuiverApi$var NONE_ARROW_TYPE: ArrowType? = null</ID>
