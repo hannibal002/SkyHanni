@@ -107,7 +107,7 @@ object SeaCreatureManager {
             thunderBottleChargedPattern.matches(message)
         )
         // TODO Unify when both are Color Code-less (I do not wanna touch that Pet Storage Autopet Regex, I will horrifically break something)
-    private fun isInterceptingCleanMessage(message: String): Boolean = (ReindrakeWarpHelper.spawnPattern.matches(message))
+    private fun isInterceptingCleanMessage(message: String): Boolean = (ReindrakeWarpHelper.spawnPattern.matches(message) || message.isEmpty())
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
