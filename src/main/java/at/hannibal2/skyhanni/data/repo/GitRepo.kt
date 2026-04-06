@@ -159,6 +159,12 @@ class GitRepo(
         if (success) true else null
     } ?: false
 
+    fun getLocalHeadSha(repoDir: File): String? = runCatching {
+        Git.open(repoDir).use { git ->
+            git.repository.resolve(Constants.HEAD)?.name
+        }
+    }.getOrElse { null }
+
     suspend fun downloadCommitZipToFile(destinationZip: File, shaOverride: String? = null): Boolean {
         val shaToUse = shaOverride ?: getLatestCommit(!shouldError)?.sha ?: run {
             if (shouldError) ErrorManager.skyHanniError("Cannot get full archive URL without a valid SHA")

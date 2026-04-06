@@ -344,7 +344,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("displayRepoStatus for $commonName")
         if (joinEvent) return onJoinStatusError(progress)
 
-        val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
+        val currentDownloadedCommit = gitRepo.getLocalHeadSha(repoDirectory)
+            ?: commitStorage.readFromFile()?.sha ?: "unknown"
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
             logger.chat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
