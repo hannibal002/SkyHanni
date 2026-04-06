@@ -333,7 +333,10 @@ tasks.withType<KotlinCompile> {
         if (!isDeobf) {
             optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
         }
-        freeCompilerArgs.addAll("-Xbackend-threads=0")
+        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+        // leaving corrupt .class files that break subsequent incremental builds.
+        // see: https://youtrack.jetbrains.com/issue/KT-85498/
+        freeCompilerArgs.addAll("-Xbackend-threads=1")
     }
 }
 
