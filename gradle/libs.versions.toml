@@ -12,6 +12,7 @@ gson = "2.13.1"
 guava = "33.2.1-jre"
 changelog-builder = "1.1.3"
 methanol = "1.8.3"
+jgit = "7.6.0.202603022253-r"
 
 shadow = "9.3.1"
 loom = "1.15-SNAPSHOT"
@@ -42,6 +43,7 @@ kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "
 changelog-builder = { module = "com.github.SkyHanniStudios:SkyHanniChangelogBuilder", version.ref = "changelog-builder" }
 methanol = { module = "com.github.mizosoft.methanol:methanol", version.ref = "methanol" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 
 devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }

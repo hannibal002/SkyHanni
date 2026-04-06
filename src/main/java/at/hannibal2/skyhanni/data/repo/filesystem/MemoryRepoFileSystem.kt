@@ -56,22 +56,28 @@ class MemoryRepoFileSystem(
      * [transitionAfterReload] to wait for the flush and switch to [DiskRepoFileSystem].
      */
     override suspend fun loadFromZip(progress: ChatProgressUpdates, zipFile: File): Boolean {
-        progress.update("repo file system loadFromZip")
+        progress.update("repo memory file system loadFromZip")
         val success = super.loadFromZip(progress, zipFile)
-        check(flushResult == null) { "loadFromZip called twice on the same MemoryRepoFileSystem instance" }
+        check(flushResult == null) {
+            "loadFromZip called twice on the same MemoryRepoFileSystem instance"
+        }
+        flushResult = flushToDisk(progress.category, root)
+        progress.update("loadFromZip end")
+        return success
+    }
 
-        // Snapshot the category reference now — storage may be cleared before the flush job reads it.
-        val progressCategory = progress.category
+    // Launched into the module-level scope so it outlives this call site and can be
+    // awaited later in transitionAfterReload.
+    // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
+    // through runWithErrorHandling which would otherwise swallow exceptions silently.
+    private fun flushToDisk(
+        category: ChatProgressUpdates.ChatProgressCategory,
+        root: File,
+    ): CompletableDeferred<Unit> {
         val deferred = CompletableDeferred<Unit>()
-        flushResult = deferred
-
-        // Launched into the module-level scope so it outlives this call site and can be
-        // awaited later in transitionAfterReload.
-        // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
-        // through runWithErrorHandling which would otherwise swallow exceptions silently.
         coroutineSettings.withIOContext().launchUnScoped {
             try {
-                saveToDisk(progressCategory, root)
+                saveToDisk(category, root)
                 deferred.complete(Unit)
             } catch (e: CancellationException) {
                 deferred.completeExceptionally(e)
@@ -81,9 +87,7 @@ class MemoryRepoFileSystem(
                 deferred.completeExceptionally(e)
             }
         }
-
-        progress.update("loadFromZip end")
-        return success
+        return deferred
     }
 
     override fun dispose() = storage.clear()
@@ -92,8 +96,8 @@ class MemoryRepoFileSystem(
      * Waits for the background disk flush to complete, then disposes in-memory storage and
      * returns a [DiskRepoFileSystem] backed by [root].
      *
-     * If the flush failed, the error is logged and the transition still proceeds — callers
-     * should treat unsuccessful repo constants as the signal that something went wrong on disk.
+     * If the flush failed, the error is logged and the transition still proceeds.
+     * Callers should treat unsuccessful repo constants as the signal that something went wrong on disk.
      */
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
         val deferred = flushResult
@@ -104,7 +108,7 @@ class MemoryRepoFileSystem(
             runCatching { it.await() }.onFailure { e ->
                 // Disk state may be incomplete. We still transition so that memory is freed,
                 // but callers will observe failures via unsuccessfulConstants.
-                progress.update("disk flush failed — repo on disk may be incomplete: ${e.message}")
+                progress.update("disk flush failed! repo on disk may be incomplete: ${e.message}")
             }
         }
 
