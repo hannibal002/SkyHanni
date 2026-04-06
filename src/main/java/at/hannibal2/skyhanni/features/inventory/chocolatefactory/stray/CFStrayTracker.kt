@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -36,7 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -45,9 +47,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object CFStrayTracker {
-
-    private val config get() = CFApi.config
+object CFStrayTracker : SkyHanniTracker<CFStrayTracker.Data>("Stray Tracker") {
+    private val cfConfig get() = CFApi.config
+    override val config get() = cfConfig.strayTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.chocolateFactory.strayTracker }
+    override val renderConfig = RenderDisplayConfig(
+        inventoryDetector = CFApi.mainInventory,
+        condition = { config.enabled && isEnabled() },
+    )
     private val claimedStraysSlots = mutableListOf<Int>()
 
     // <editor-fold desc="Patterns">
@@ -140,34 +147,25 @@ object CFStrayTracker {
     )
     // </editor-fold>
 
-    private val tracker = SkyHanniTracker(
-        "Stray Tracker",
-        ::Data,
-        { it.chocolateFactory.strayTracker },
-        trackerConfig = { config.strayTrackerConfig }
-    ) {
-        drawDisplay(it)
-    }
-
     data class Data(
         @Expose var straysCaught: MutableMap<LorenzRarity, Int> = mutableMapOf(),
         @Expose var straysExtraChocMs: MutableMap<LorenzRarity, Long> = mutableMapOf(),
         @Expose var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf(),
-    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
+    ) : TrackerData<SessionUptime.Normal>()
 
     private fun incrementRarity(rarity: LorenzRarity, chocAmount: Long = 0) {
-        tracker.modify { it.straysCaught.addOrPut(rarity, 1) }
+        modify { it.straysCaught.addOrPut(rarity, 1) }
         val extraTime = CFApi.timeUntilNeed(chocAmount + 1)
-        tracker.modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
+        modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
         if (!HoppityApi.isHoppityEvent()) return
         HoppityEventSummary.addStrayCaught(rarity, chocAmount)
     }
 
     private fun incrementGoldenType(typeCaught: String, amount: Int = 1) {
-        tracker.modify { it.goldenTypesCaught.addOrPut(typeCaught, amount) }
+        modify { it.goldenTypesCaught.addOrPut(typeCaught, amount) }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         val extraChocMs = data.straysExtraChocMs.values.sum().milliseconds
         val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
 
@@ -299,25 +297,18 @@ object CFStrayTracker {
         incrementGoldenType("sidedish")
     }
 
-    init {
-        tracker.initRenderer(
-            { config.strayRabbitTrackerPosition },
-            CFApi.mainInventory,
-        ) { config.strayRabbitTracker && isEnabled() }
-    }
-
     @HandleEvent(InventoryFullyOpenedEvent::class)
     fun onInventoryFullyOpened() {
         if (!isEnabled()) return
         // Force a refresh for party mode
-        if (CFApi.inChocolateFactory && config.partyMode.get()) tracker.update()
-        tracker.firstUpdate()
+        if (CFApi.inChocolateFactory && cfConfig.partyMode.get()) update()
+        firstUpdate()
     }
 
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
         if (!isEnabled()) return
-        tracker.update() // Make sure we don't stay in party mode
+        update() // Make sure we don't stay in party mode
     }
 
     private fun <T> migrateJsonStringKeyToRarityKey(jElement: JsonElement, enumClass: Class<T>): JsonElement {
@@ -344,11 +335,15 @@ object CFStrayTracker {
         event.transform(58, "chocolateFactory.strayTracker.straysExtraChocMs") { element ->
             migrateJsonStringKeyToRarityKey(element, LorenzRarity::class.java)
         }
+        val base = "inventory.chocolateFactory"
+        event.move(130, "$base.strayRabbitTracker", "$base.strayTracker.enabled")
+        event.move(130, "$base.strayTrackerConfig", "$base.strayTracker.perTrackerConfig")
+        event.move(130, "$base.strayRabbitTrackerPosition", "$base.strayTracker.position")
     }
 
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
-        config.partyMode.onToggle(tracker::update)
+        cfConfig.partyMode.onToggle(::update)
     }
 
     @HandleEvent
@@ -356,7 +351,7 @@ object CFStrayTracker {
         event.registerBrigadier("shresetstrayrabbittracker") {
             description = "Resets the Stray Rabbit Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

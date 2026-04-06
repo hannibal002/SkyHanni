@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -24,47 +25,56 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object CrystalNucleusTracker {
-    private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
+object CrystalNucleusTracker : SkyHanniItemTracker<CrystalNucleusTracker.Data>("Crystal Nucleus Tracker") {
+    override val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.crystalNucleusTracker }
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { isEnabled() },
+        onlyOnIsland = IslandType.CRYSTAL_HOLLOWS,
+    )
     private val patternGroup = RepoPattern.group("mining.crystalnucleus.tracker")
 
     /**
-     * REGEX-TEST: §b[MVP§r§2+§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-     * REGEX-TEST: §6[MVP§r§2++§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-     * REGEX-TEST: oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
-     * REGEX-TEST: §c[§fYOUTUBE§c] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * REGEX-TEST: [MVP+] oBlazin has obtained [Lvl 1] Bal!
+     * REGEX-TEST: [MVP++] oBlazin has obtained [Lvl 1] Bal!
+     * REGEX-TEST: oBlazin has obtained [Lvl 1] Bal!
+     * REGEX-TEST: [YOUTUBE] oBlazin has obtained [Lvl 1] Bal!
      */
-    @Suppress("MaxLineLength")
     private val balObtainedPattern by patternGroup.pattern(
-        "bal.obtained",
-        "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!",
+        "bal.obtained.colorless",
+        "(?:\\[.*\\+*\\] )?(?<player>.*) has obtained \\[Lvl 1\\] Bal!",
     )
 
-    private val tracker = SkyHanniItemTracker(
-        "Crystal Nucleus Tracker",
-        ::Data,
-        { it.mining.crystalNucleusTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) { drawDisplay(it) }
+    /**
+     * REGEX-TEST: §6Bal
+     * REGEX-TEST: §5Bal
+     */
+    private val balRarityPattern by patternGroup.pattern(
+        "bal.rarity",
+        ".*§(?<raritycolor>[65])Bal.*"
+    )
 
     data class Data(
-        @Expose var runsCompleted: Long = 0L
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+        @Expose var runsCompleted: Long = 0L,
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / runsCompleted
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -81,16 +91,17 @@ object CrystalNucleusTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        balObtainedPattern.matchMatcher(event.message) {
+        balObtainedPattern.matchMatcher(event.chatComponent) {
             if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
-
-            val item = when (group("raritycolor")) {
-                "6" -> LEGENDARY_BAL_ITEM
-                "5" -> EPIC_BAL_ITEM
-                else -> return@matchMatcher
-            }
-            tracker.modify {
-                it.addItem(item, amount = 1, command = false)
+            balRarityPattern.matchMatcher(event.chatComponent.formattedTextCompat()) {
+                val item = when (group("raritycolor")) {
+                    "6" -> LEGENDARY_BAL_ITEM
+                    "5" -> EPIC_BAL_ITEM
+                    else -> return@matchMatcher
+                }
+                modify {
+                    it.addItem(item, amount = 1, command = false)
+                }
             }
         }
     }
@@ -99,7 +110,7 @@ object CrystalNucleusTracker {
     fun onShardGain(event: ShardGainEvent) {
         if (event.shardInternalName != BAL_SHARD_ITEM) return
 
-        tracker.modify {
+        modify {
             it.addItem(BAL_SHARD_ITEM, event.amount, command = false)
         }
     }
@@ -109,32 +120,32 @@ object CrystalNucleusTracker {
         event.registerBrigadier("shresetcrystalnucleustracker") {
             description = "Resets the Crystal Nucleus Tracker."
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 
     @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
-        tracker.modify {
+        modify {
             it.runsCompleted++
         }
         for ((internalName, amount) in event.loot) {
-            tracker.addItem(internalName, amount, false)
+            addItem(internalName, amount, false)
         }
     }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.professorUsage.onToggle(tracker::update)
+        config.professorUsage.onToggle(::update)
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lCrystal Nucleus Profit Tracker")
 
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
-            var profit = tracker.drawItems(data, { true }, this)
-            val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
+            var profit = drawItems(data, { true }, this)
+            val jungleKeyCost: Double = getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
@@ -148,7 +159,7 @@ object CrystalNucleusTracker {
             )
 
             val usesApparatus = CrystalNucleusApi.usesApparatus()
-            val partsCost = CrystalNucleusApi.getPrecursorRunPrice { tracker.getPricePer(it) }
+            val partsCost = CrystalNucleusApi.getPrecursorRunPrice { getPricePer(it) }
             val totalSapphireCost: Double = partsCost * runsCompleted
             val rawConfigString = config.professorUsage.get().toString()
             val usageString = if (usesApparatus) StringUtils.pluralize(
@@ -179,38 +190,27 @@ object CrystalNucleusTracker {
             )
 
             val duration = data.getTotalUptime()
-            addAll(tracker.addTotalProfit(profit, data.runsCompleted, "run", duration, "Runs"))
+            addAll(addTotalProfit(profit, data.runsCompleted, "run", duration, "Runs"))
         } else {
             addSearchString("§7Do a run to start tracking!")
         }
 
-        tracker.addPriceFromButton(this)
+        addPriceFromButton(this)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
-            tracker.addItem(event.internalName, event.amount, command = true)
+            addItem(event.internalName, event.amount, command = true)
         }
-    }
-
-    init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = ::isEnabled,
-            onRender = {
-                tracker.renderDisplay(config.position)
-            },
-        )
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 

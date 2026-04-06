@@ -23,29 +23,41 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object SlayerProfitTracker {
-
-    private val config get() = SlayerApi.config.itemProfitTracker
+object SlayerProfitTracker : SkyHanniItemTracker<SlayerProfitTracker.Data>("Slayer Profit Tracker") {
+    override val config get() = SlayerApi.config.itemProfitTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = {
+        it.slayerProfitData.getOrPut(category) { Data() }
+    }
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { shouldShowDisplay() },
+    )
+    override val name: String
+        get() = "$categoryName Profit Tracker"
 
     private var category = ""
     private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)
     private var baseSlayerType = ""
+
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
+    private fun getTracker(): SkyHanniItemTracker<Data>? =
+        if (category.isEmpty()) null else trackers.getOrPut(category) { this }
 
     /**
      * REGEX-TEST: Took 1.9k coins from your bank for auto-slayer...
@@ -58,7 +70,7 @@ object SlayerProfitTracker {
     data class Data(
         @Expose var slayerSpawnCost: Long = 0L,
         @Expose var slayerCompletedCount: Long = 0L,
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / slayerCompletedCount
             val perBoss = percentage.coerceAtMost(1.0).formatPercentage()
@@ -132,24 +144,6 @@ object SlayerProfitTracker {
         getTracker()?.update()
     }
 
-    private fun getTracker(): SkyHanniItemTracker<Data>? {
-        if (category == "") return null
-
-        return trackers.getOrPut(category) {
-            val getStorage: (ProfileSpecificStorage) -> Data = {
-                it.slayerProfitData.getOrPut(
-                    category,
-                ) { Data() }
-            }
-            SkyHanniItemTracker(
-                "$categoryName Profit Tracker",
-                ::Data,
-                getStorage,
-                trackerConfig = { config.perTrackerConfig }
-            ) { drawDisplay(it) }
-        }
-    }
-
     @HandleEvent
     fun onSlayerQuestComplete() {
         getTracker()?.modify {
@@ -181,7 +175,7 @@ object SlayerProfitTracker {
         return internalName in allowedList
     }
 
-    private fun drawDisplay(data: Data) = buildList {
+    override fun drawDisplayF(data: Data) = buildList {
         val tracker = getTracker() ?: return@buildList
         addSearchString("§e§l$categoryName Profit Tracker")
 
@@ -225,19 +219,22 @@ object SlayerProfitTracker {
         text to lore
     }
 
-    init {
-        // Can not use tracker.initRenderer(), since we have multiple tracker instances in use
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = ::shouldShowDisplay,
-            onRender = {
-                getTracker()?.renderDisplay(config.pos)
-            },
-        )
-    }
-
     private fun shouldShowDisplay(): Boolean = isEnabled() && SlayerApi.isInCorrectArea
+
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+
+    override fun resetCommand() = if (category == "") ChatUtils.userError(
+        "No current slayer data found! §eGo to a slayer area and start the specific slayer type you want to reset the data of.",
+    ) else super.resetCommand()
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetslayerprofits") {
+            description = "Resets the total slayer profit for the current slayer type"
+            category = CommandCategory.USERS_RESET
+            simpleCallback { resetCommand() }
+        }
+    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -259,28 +256,7 @@ object SlayerProfitTracker {
 
             old
         }
-    }
-
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
-
-    fun resetCommand() {
-        if (category == "") {
-            ChatUtils.userError(
-                "No current slayer data found! " +
-                    "§eGo to a slayer area and start the specific slayer type you want to reset the data of.",
-            )
-            return
-        }
-
-        getTracker()?.resetCommand()
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetslayerprofits") {
-            description = "Resets the total slayer profit for the current slayer type"
-            category = CommandCategory.USERS_RESET
-            simpleCallback(::resetCommand)
-        }
+        val base = "slayer.itemProfitTracker"
+        event.move(130, "$base.pos", "$base.position")
     }
 }

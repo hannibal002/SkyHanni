@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -48,8 +47,8 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -63,13 +62,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTracker.BucketData>(
     "Pest Profit Tracker",
-    ::BucketData,
-    { it.garden.pestProfitTracker },
-    { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.garden.pests.pestProfitTracker.perTrackerConfig },
-    customUptimeControl = true
 ) {
-    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.garden.pestProfitTracker }
+    override val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTracker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
@@ -108,32 +103,22 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         @Expose private var totalPestsKills: Long = 0L,
         @Expose var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java),
         @Expose var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java),
-    ) : BucketedItemTrackerData<PestType, SessionUptime.Garden>(PestType::class, SessionUptime.Garden::class) {
-        override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
-            val percentage = timesGained.toDouble() / getTotalPestCount()
-            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
-            return listOf(
-                "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate.",
-            )
-        }
+    ) : BucketedItemTrackerData<PestType, SessionUptime.Garden>() {
+        override fun getDescription(bucket: PestType?, timesGained: Long): List<String> =
+            super.getDropRate(pestKills, bucket, timesGained)
 
-        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
-            return if (internalName == BITS) {
-                getBitsPrice()
-            } else {
-                super.getCustomPricePer(internalName, tracker)
-            }
-        }
+        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*>): Double =
+            if (internalName == BITS) getBitsPrice()
+            else super.getCustomPricePer(internalName, tracker)
 
-        private fun getBitsPrice(): Double {
-            return if (SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL) 0.0 else config.coinsPerBit.get()
-                .toDouble()
-        }
+        private fun getBitsPrice(): Double =
+            if (SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL) 0.0
+            else config.coinsPerBit.get().toDouble()
 
-        override val selectedBucketItems
-            get() = if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
-                .toMutableMap()
+        override val selectedBucketItems get() = super.selectedBucketItems.let {
+            if (config.includeBits.get()) it
+            else it.filter { entry -> entry.key != BITS }.toMutableMap()
+        }
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
 
@@ -244,14 +229,14 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         lastPestKillTimes[type] = SimpleTimeMark.now()
     }
 
-    private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
+    override fun drawDisplayF(data: BucketData): List<Searchable> = buildList {
         addSearchString("§e§lPest Profit Tracker")
-        addBucketSelector(this, bucketData, "Pest Type")
+        addBucketSelector(this, data, "Pest Type")
 
-        var profit = drawItems(bucketData, { true }, this)
+        var profit = drawItems(data, { true }, this)
 
-        val selectedBucket = bucketData.selectedBucket
-        val pestCount = selectedBucket?.let { bucketData.pestKills[it] } ?: bucketData.getTotalPestCount()
+        val selectedBucket = data.selectedBucket
+        val pestCount = selectedBucket?.let { data.pestKills[it] } ?: data.getTotalPestCount()
         val pestCountFormat = "§7${selectedBucket?.pluralName ?: "Pests"} killed: §e${pestCount.addSeparators()}"
 
         add(
@@ -261,7 +246,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                     pestCountFormat,
                     buildList {
                         // Sort by A-Z in displaying real types
-                        bucketData.pestKills.toList().sortedBy {
+                        data.pestKills.toList().sortedBy {
                             it.first.displayName
                         }.forEach { (type, count) ->
                             add("§7${type.pluralName}: §e${count.addSeparators()}")
@@ -273,7 +258,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
         if (selectedBucket == null || selectedBucket.spray != null) {
             val applicableSprays = SprayType.getByPestTypeOrAll(selectedBucket)
-            val applicableSpraysUsed = bucketData.spraysUsed.filterKeys { it in applicableSprays }
+            val applicableSpraysUsed = data.spraysUsed.filterKeys { it in applicableSprays }
             val sumSpraysUsed = applicableSpraysUsed.values.sum()
 
             var sprayCosts = 0.0
@@ -300,14 +285,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             )
         }
 
-        val duration = bucketData.getTotalUptime()
-        addAll(addTotalProfit(profit, bucketData.getTotalPestCount(), "kill", duration, "Kills"))
+        val duration = data.getTotalUptime()
+        addAll(addTotalProfit(profit, data.getTotalPestCount(), "kill", duration, "Kills"))
 
         addPriceFromButton(this)
-    }
-
-    init {
-        initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

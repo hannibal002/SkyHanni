@@ -2,20 +2,22 @@ package at.hannibal2.skyhanni.config.features.event.yearofthepig
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ShinyOrbTrackerConfig {
+class ShinyOrbTrackerConfig : TopLevelTrackerConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a tracker for Shiny Orb rewards.")
     @FeatureToggle
     @ConfigEditorBoolean
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Only Holding Items", desc = "Only show the tracker while holding a Shiny Orb or Shiny Rod.")
@@ -23,14 +25,11 @@ class ShinyOrbTrackerConfig {
     var holdingItems: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<ItemTrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ShinyOrbTrackerConfig::class, field = "enabled")
-    val position: Position = Position(100, 100)
+    override val position: Position = Position(100, 100)
 }

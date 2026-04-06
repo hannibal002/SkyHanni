@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import com.google.gson.annotations.Expose
 import java.util.UUID
 
@@ -18,7 +18,7 @@ class Storage {
     var contestSendingAsked: Boolean = false
 
     @Expose
-    var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
+    var trackerDisplayModes: MutableMap<String, DisplayMode> = mutableMapOf()
 
     @Expose
     var foundDianaBurrowLocations: List<LorenzVec> = emptyList()

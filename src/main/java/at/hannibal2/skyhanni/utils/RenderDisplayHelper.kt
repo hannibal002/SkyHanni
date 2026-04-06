@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -14,20 +15,33 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
  * conditions and context, such as whether the player is in their inventory or
  * outside an inventory GUI, or in an inventory defined by InventoryDetector.
  *
- * @property inventory set a InventoryDetector the display should be rendered in.
+ * @property inventoryDetector set a InventoryDetector the display should be rendered in.
  * @property outsideInventory Specifies if the display should render when not inside any inventory.
  * @property inOwnInventory Specifies if the display should render when the player is in their own inventory.
  * @property condition Should the display be rendered at all? Insert the isEnabled() function here.
+ * @property onlyOnIsland Should the display only render on a certain Skyblock Island?
+ * @property onlyOnIslandTag Should the display only render when on an island with a certain tag?
  * @property onRender This is getting called when the render should happen.
  */
 class RenderDisplayHelper(
-    private val inventory: InventoryDetector = NO_INVENTORY,
+    private val inventoryDetector: InventoryDetector = NO_INVENTORY,
     private val outsideInventory: Boolean = false,
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
     private val onlyOnIsland: IslandType? = null,
+    private val onlyOnIslandTag: IslandTypeTag? = null,
     private val onRender: () -> Unit,
 ) {
+
+    constructor(config: RenderDisplayConfig, onRender: () -> Unit) : this(
+        inventoryDetector = config.inventoryDetector,
+        outsideInventory = config.outsideInventory,
+        inOwnInventory = config.inOwnInventory,
+        condition = config.condition,
+        onlyOnIsland = config.onlyOnIsland,
+        onlyOnIslandTag = config.onlyOnIslandTag,
+        onRender = onRender,
+    )
 
     init {
         // Registers the instance to the list of all display helpers.
@@ -35,7 +49,7 @@ class RenderDisplayHelper(
     }
 
     private fun renderIn(inOwnInventory: Boolean): Boolean {
-        return (this.inOwnInventory && inOwnInventory) || inventory.isInside()
+        return (this.inOwnInventory && inOwnInventory) || inventoryDetector.isInside()
     }
 
     @SkyHanniModule
@@ -77,13 +91,14 @@ class RenderDisplayHelper(
     }
 
     private fun checkCondition(): Boolean = try {
-        condition() && checkIslandCondition()
+        condition() && checkIslandCondition() && checkIslandTagCondition()
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(e, "Failed to check render display condition")
         false
     }
 
     private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isInIsland()
+    private fun checkIslandTagCondition(): Boolean = onlyOnIslandTag == null || onlyOnIslandTag.isInIsland()
 
     private fun render() {
         try {

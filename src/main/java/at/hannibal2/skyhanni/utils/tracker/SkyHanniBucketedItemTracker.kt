@@ -1,8 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,25 +7,18 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 
 @Suppress("SpreadOperator")
 abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E, *>>(
     name: String,
-    createNewSession: () -> BucketedData,
-    getStorage: (ProfileSpecificStorage) -> BucketedData,
-    drawDisplay: (BucketedData) -> List<Searchable>,
-    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
-    trackerConfig: () -> GenericIndividualTrackerConfig<ItemTrackerGenericConfig>,
-    customUptimeControl: Boolean = false
-) : SkyHanniItemTracker<BucketedData>(
-    name,
-    createNewSession,
-    getStorage,
-    extraDisplayModes,
-    customUptimeControl = customUptimeControl,
-    drawDisplay = drawDisplay,
-    trackerConfig = { trackerConfig() },
-) {
+) : SkyHanniItemTracker<BucketedData>(name) {
+
+    // TODO these overrides exist because BucketedItemTrackerData deliberately breaks the
+    //  ItemTrackerData contract for bucket-unaware methods (Liskov violation). The long-term
+    //  fix is to split ItemTrackerData so bucket-incompatible methods live on a separate
+    //  interface that BucketedItemTrackerData does not implement.
 
     final override fun addCoins(amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addCoins(bucket, coins, command) instead")
@@ -40,7 +30,7 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
     override fun ItemAddEvent.addItemFromEvent() {
         val command = source == ItemAddManager.Source.COMMAND
         lateinit var bucket: E
-        // TODO find out why those two booleans are necessary, fix the cause properly, and then remove the  two booleans
+        // TODO find out why those two booleans are necessary, fix the cause properly, and then remove the two booleans
         var done = false
         var errorMessage: String? = null
         modify { data ->
@@ -107,34 +97,26 @@ abstract class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedI
         data: BucketedData,
         filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
-        itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem>,
-        getCoinName: (ItemTrackerData.TrackedItem) -> String,
-        itemRemover: (NeuInternalName, String) -> Unit,
-        itemHider: (NeuInternalName, Boolean) -> Unit,
-        getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String>,
+        context: DrawItemsContext,
     ): Double = super.drawItems(
         data = data,
         filter = filter,
         lists = lists,
-        itemsAccessor = { data.selectedBucketItems },
-        getCoinName = { item ->
-            data.getCoinName(data.selectedBucket, item)
-        },
-        itemRemover = { internalName, cleanName ->
-            modify {
-                it.removeItem(data.selectedBucket, internalName)
-            }
-            ChatUtils.chat("Removed $cleanName §efrom $name.")
-        },
-        itemHider = { internalName, currentlyHidden ->
-            modify {
-                it.toggleItemHide(data.selectedBucket, internalName, currentlyHidden)
-            }
-        },
-        getLoreList = { internalName, item ->
-            val selectedBucket = data.selectedBucket
-            if (internalName == SKYBLOCK_COIN) data.getCoinDescription(selectedBucket, item)
-            else data.getDescription(selectedBucket, item.timesGained)
-        },
+        context = DrawItemsContext(
+            itemsAccessor = { data.selectedBucketItems },
+            getCoinName = { item -> data.getCoinName(data.selectedBucket, item) },
+            itemRemover = { internalName, cleanName ->
+                modify { it.removeItem(data.selectedBucket, internalName) }
+                ChatUtils.chat("Removed $cleanName §efrom $name.")
+            },
+            itemHider = { internalName, currentlyHidden ->
+                modify { it.toggleItemHide(data.selectedBucket, internalName, currentlyHidden) }
+            },
+            getLoreList = { internalName, item ->
+                val selectedBucket = data.selectedBucket
+                if (internalName == SKYBLOCK_COIN) data.getCoinDescription(selectedBucket, item)
+                else data.getDescription(selectedBucket, item.timesGained)
+            },
+        ),
     )
 }

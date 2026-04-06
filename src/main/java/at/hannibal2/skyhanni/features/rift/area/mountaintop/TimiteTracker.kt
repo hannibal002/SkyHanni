@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.rift.area.mountaintop
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
@@ -19,30 +20,35 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object TimiteTracker {
+object TimiteTracker : SkyHanniItemTracker<TimiteTracker.Data>("Timite Tracker") {
+    override val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite.tracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.rift.timiteTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() },
+    )
 
-    private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
     private val HIGHLITE = "HIGHLITE".toInternalName()
     private val TIMITE = "TIMITE".toInternalName()
 
-    class Data : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    class Data : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> = emptyList()
 
         override fun getCoinName(item: TrackedItem): String = "§5Motes"
 
         override fun getCoinDescription(item: TrackedItem): List<String> = emptyList()
 
-        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*>): Double {
             return internalName.getItemStack().motesNpcPrice() ?: 0.0
         }
 
@@ -51,9 +57,9 @@ object TimiteTracker {
         } ?: 0
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§9§lTimite Tracker")
-        val profit = tracker.drawItems(data, { true }, this)
+        val profit = drawItems(data, { true }, this)
 
         NeuItems.getRecipes(HIGHLITE).singleOrNull()?.let { highliteRecipe ->
             var craftableAmountByYoungite = 0
@@ -83,15 +89,6 @@ object TimiteTracker {
         addSearchString("§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes")
     }
 
-    private val tracker = SkyHanniItemTracker(
-        "Timite Tracker",
-        ::Data,
-        { it.rift.timiteTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) {
-        drawDisplay(it)
-    }
-
     private val validItems = listOf(
         TIMITE,
         "YOUNGITE".toInternalName(),
@@ -101,16 +98,8 @@ object TimiteTracker {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onItem(event: ItemAddEvent) {
         if (event.internalName in validItems) {
-            tracker.addItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+            addItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
         }
-    }
-
-    // TODO use RenderDisplayHelper
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRender(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        tracker.renderDisplay(config.trackerPosition)
     }
 
     @HandleEvent
@@ -118,14 +107,21 @@ object TimiteTracker {
         event.registerBrigadier("shresettimitetracker") {
             description = "Resets the Timite Tracker."
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 
-    private fun isEnabled() =
-        RiftApi.inMountainTop() &&
-            config.tracker &&
-            (!config.onlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "rift.area.mountaintop.timite"
+        event.move(130, "$base.tracker", "$base.tracker.enabled")
+        event.move(130, "$base.trackerPosition", "$base.tracker.position")
+        event.move(130, "$base.perTrackerConfig", "$base.tracker.perTrackerConfig")
+        event.move(130, "$base.onlyShowWhileHolding", "$base.tracker.onlyShowWhileHolding")
+    }
+
+    private fun isEnabled() = RiftApi.inMountainTop() && config.enabled &&
+        (!config.onlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
 
     private val timiteItems = listOf(
         "ANTI_SENTIENT_PICKAXE".toInternalName(),

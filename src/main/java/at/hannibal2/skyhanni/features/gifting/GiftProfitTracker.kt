@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -28,16 +30,20 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerUtils.addSkillXpInfo
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object GiftProfitTracker {
-    val config get() = SkyHanniMod.feature.event.gifting.giftProfitTracker
-    val patternGroup = RepoPattern.group("misc.gifting")
+object GiftProfitTracker : SkyHanniItemTracker<GiftProfitTracker.Data>("Gift Profit Tracker") {
+    override val config get() = SkyHanniMod.feature.event.gifting.giftProfitTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.giftProfitTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() && IsGiftingDetection.isCurrentlyGifting() },
+    )
+    private val patternGroup = RepoPattern.group("misc.gifting")
 
     // <editor-fold desc="Patterns">
     /**
@@ -127,21 +133,12 @@ object GiftProfitTracker {
     ).map { it.toPattern() }
     // </editor-fold>
 
-    private val tracker = SkyHanniItemTracker(
-        "Gift Tracker",
-        ::Data,
-        { it.giftProfitTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) {
-        drawDisplay(it)
-    }
-
     data class Data(
         @Expose var giftsUsed: MutableMap<GiftType, Long> = mutableMapOf(),
         @Expose var rarityRewardTypesGained: MutableMap<GiftRewardRarityType, Long> = mutableMapOf(),
         @Expose var northStarsGained: Long = 0,
         @Expose var skillXpGained: MutableMap<SkillType, Long> = mutableMapOf(),
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val totalRewards = rarityRewardTypesGained.sumAllValues().toLong().takeIf { it > 0 } ?: 1
             val percentage = timesGained.toDouble() / totalRewards
@@ -208,7 +205,7 @@ object GiftProfitTracker {
 
     private fun tryAddUsedGift(giftInput: String, amount: Long): String {
         val gift = GiftType.byUserInput(giftInput) ?: return ADD_GIFT_USAGE
-        tracker.modify {
+        modify {
             it.giftsUsed.addOrPut(gift, amount)
         }
         val pluralization = if (amount == 1L) "" else "s"
@@ -229,21 +226,15 @@ object GiftProfitTracker {
         event.registerBrigadier("shresetgifttracker") {
             description = "Reset the gift profit tracker."
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
-    }
-
-    init {
-        tracker.initRenderer(
-            { config.position },
-        ) { isEnabled() && IsGiftingDetection.isCurrentlyGifting() }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         northStarsPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
-            tracker.modify {
+            modify {
                 it.northStarsGained += amount
             }
             IsGiftingDetection.markLocation()
@@ -252,7 +243,7 @@ object GiftProfitTracker {
 
         giftRewardRarityPattern.matchMatcher(event.message) {
             val rewardRarity = GiftRewardRarityType.getByNameOrNull(group("rarity")) ?: return
-            tracker.modify {
+            modify {
                 it.rarityRewardTypesGained.addOrPut(rewardRarity, 1)
             }
             IsGiftingDetection.markLocation()
@@ -261,7 +252,7 @@ object GiftProfitTracker {
         xpGainedPattern.matchMatcher(event.message) {
             val skill = SkillType.getByNameOrNull(group("skill")) ?: return
             val amount = group("amount").formatLong()
-            tracker.modify {
+            modify {
                 it.skillXpGained.addOrPut(skill, amount)
             }
             return // Don't continue to other patterns
@@ -269,24 +260,23 @@ object GiftProfitTracker {
 
         coinsGainedPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
-            tracker.addCoins(amount, false)
-            return // Don't continue to other patterns
+            // Don't continue to other patterns
+            return addCoins(amount, false)
         }
 
         boostPotionPattern.matchMatcher(event.message) {
             val skill = SkillType.getByNameOrNull(group("skill")) ?: return
             val tier = group("tier").romanToDecimal()
             val item = getBoostPotion(skill, tier)
-            tracker.addItem(item, 1, false)
-            return // Don't continue to other patterns
+            // Don't continue to other patterns
+            return addItem(item, 1, false)
         }
 
         enchantmentBookPattern.matchMatcher(event.message) {
             val enchantment = group("enchantment")
             val tier = group("tier").romanToDecimal()
             val item = "${enchantment.uppercase()};$tier".toInternalName()
-            tracker.addItem(item, 1, false)
-            return // Don't continue to other patterns
+            return addItem(item, 1, false)
         }
 
         genericRewardPattern.matchMatcher(event.message) {
@@ -295,21 +285,21 @@ object GiftProfitTracker {
                 else -> ItemUtils.readItemAmount(group("item")) ?: return
             }
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.addItem(item, amount, false)
+                addItem(item, amount, false)
             }
         }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lGift Profit Tracker")
-        var profit = tracker.drawItems(data, { true }, this)
+        var profit = drawItems(data, { true }, this)
 
         val giftsUsed = data.giftsUsed
         val applicableGifts = giftsUsed.filter { it.value > 0 }
         var totalGiftCost = 0.0
         val giftCostStrings = applicableGifts.mapNotNull { (gift, count) ->
             val item = gift.toInternalName()
-            val totalPrice = tracker.getPricePer(item) * count
+            val totalPrice = getPricePer(item) * count
             if (totalPrice > 0) {
                 profit -= totalPrice
                 totalGiftCost += totalPrice
@@ -360,8 +350,8 @@ object GiftProfitTracker {
         }
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, totalRewards, "gift", duration, "Gifts"))
-        tracker.addPriceFromButton(this)
+        addAll(addTotalProfit(profit, totalRewards, "gift", duration, "Gifts"))
+        addPriceFromButton(this)
     }
 
     private fun holdingEnabled() = !config.holdingGift || GiftApi.isHoldingGift()

@@ -23,10 +23,12 @@ class RepoPatternRegexTestMissing(config: Config) : SkyHanniRule(config, "All re
     }
 
     private fun String.needsRegexTest(): Boolean {
-        return regexConstructs.containsMatchIn(this)
+        val stripped = this.replace(exactQuantifier, "")
+        return regexConstructs.containsMatchIn(stripped)
     }
 
     companion object {
         val regexConstructs = Regex("""(?<!\\)[.*+(){}\[|?]""")
+        val exactQuantifier = Regex("""\{\d+\}""")
     }
 }

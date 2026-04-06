@@ -1,18 +1,19 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyItemCommand.copyItemToClipboard
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import net.minecraft.world.item.ItemStack
 import java.io.InputStreamReader
@@ -20,16 +21,10 @@ import java.io.Reader
 
 @SkyHanniModule
 object TestExportTools {
-
     private val config get() = DevApi.config.debug
-
-    val gson = GsonBuilder()
-        .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
-        .create()
-
+    private val copyConfig = CoroutineSettings("copy item data")
+    internal val itemKey = Key<ItemStack>("Item")
     class Key<T> internal constructor(val name: String)
-
-    val Item = Key<ItemStack>("Item")
 
     @KSerializable
     data class TestValue(
@@ -37,27 +32,29 @@ object TestExportTools {
         val data: JsonElement,
     )
 
-    private fun <T> toJson(key: Key<T>, value: T): String {
-        return gson.toJson(TestValue(key.name, gson.toJsonTree(value)))
+    private fun <T> toJson(key: Key<T>, value: T): String = with(ConfigManager.gson) {
+        toJson(TestValue(key.name, toJsonTree(value)))
     }
 
-    inline fun <reified T> fromJson(key: Key<T>, reader: Reader): T {
-        val serializable = gson.fromJson<TestValue>(reader)
+    inline fun <reified T> fromJson(key: Key<T>, reader: Reader): T = with(ConfigManager.gson) {
+        val serializable = fromJson<TestValue>(reader)
         require(key.name == serializable.type)
-        return gson.fromJson(serializable.data)
+        return fromJson(serializable.data)
     }
 
     @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
-        if (config.copyItemData.isKeyHeld()) {
-            copyItemToClipboard(stack)
-            return
+        copyConfig.launch {
+            if (config.copyItemData.isKeyHeld()) copyItemToClipboard(stack)
+            else {
+                val itemJson = toJson(itemKey, stack)
+                val copied = ClipboardUtils.copyToClipboardAsync(itemJson).await() ?: false
+                if (!copied) ChatUtils.chat("Failed to copy item to clipboard!")
+                else ChatUtils.chat("Compressed item info copied into the clipboard!")
+            }
         }
-        val json = toJson(Item, stack)
-        OSUtils.copyToClipboard(json)
-        ChatUtils.chat("Compressed item info copied into the clipboard!")
     }
 
     inline fun <reified T> getTestData(category: Key<T>, name: String): T {

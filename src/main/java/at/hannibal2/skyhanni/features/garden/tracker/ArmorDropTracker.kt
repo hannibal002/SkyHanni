@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -26,16 +28,19 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ArmorDropTracker {
-
-    private val config get() = GardenApi.config.armorDropTracker
-
+object ArmorDropTracker : SkyHanniTracker<ArmorDropTracker.Data>("Armor Drop Tracker") {
+    override val config get() = GardenApi.config.armorDropTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.garden.armorDropTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
+    override val customUptimeControl = true
     private val patternGroup = RepoPattern.group("garden.armordrops")
 
     /**
@@ -52,20 +57,10 @@ object ArmorDropTracker {
         GardenApi.inGarden() && checkArmor()
     }
 
-    val tracker = SkyHanniTracker(
-        "Armor Drop Tracker",
-        ::Data,
-        { it.garden.armorDropTracker },
-        trackerConfig = { config.perTrackerConfig },
-        customUptimeControl = true
-    ) {
-        drawDisplay(it)
-    }
-
     data class Data(
         @Expose
         var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
-    ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
+    ) : TrackerData<SessionUptime.Garden>()
 
 
     init {
@@ -97,21 +92,17 @@ object ArmorDropTracker {
     }
 
     private fun addDrop(drop: ArmorDropType) {
-        tracker.modify {
+        modify {
             it.drops.addOrPut(drop, 1)
         }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§7Armor Drop Tracker:")
         for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
             addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -126,7 +117,7 @@ object ArmorDropTracker {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.GARDEN) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 
@@ -189,7 +180,7 @@ object ArmorDropTracker {
         event.registerBrigadier("shresetarmordroptracker") {
             description = "Resets the Armor Drop Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

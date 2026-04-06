@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
@@ -21,7 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -29,16 +30,35 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object DianaProfitTracker {
+object DianaProfitTracker : SkyHanniItemTracker<DianaProfitTracker.Data>("Diana Profit Tracker") {
+    override val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.diana.profitTracker }
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = {
+            config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand())
+        },
+        onRender = {
+            if (DianaApi.hasSpadeInHand()) firstUpdate()
+        }
+    )
 
-    private val config get() = SkyHanniMod.feature.event.diana.dianaProfitTracker
+    override val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = mapOf(
+        DisplayMode.MAYOR to {
+            it.diana.profitTrackerPerElection.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
+    )
+
     private var allowedDrops = listOf<NeuInternalName>()
 
     private val patternGroup = RepoPattern.group("diana.chat")
@@ -51,24 +71,9 @@ object DianaProfitTracker {
         "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!",
     )
 
-    private val tracker = SkyHanniItemTracker(
-        "Diana Profit Tracker",
-        ::Data,
-        { it.diana.profitTracker },
-        extraDisplayModes = mapOf(
-            SkyHanniTracker.DisplayMode.MAYOR to {
-                it.diana.profitTrackerPerElection.getOrPut(
-                    SkyBlockTime.now().getElectionYear(), ::Data,
-                )
-            },
-        ),
-        drawDisplay = { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
-    )
-
     data class Data(
         @Expose var burrowsDug: Long = 0,
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
             val perBurrow = percentage.coerceAtMost(1.0).formatPercentage()
@@ -90,10 +95,10 @@ object DianaProfitTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lDiana Profit Tracker")
 
-        val profit = tracker.drawItems(data, { true }, this)
+        val profit = drawItems(data, { true }, this)
 
         val treasureCoins = data.burrowsDug
         add(
@@ -104,9 +109,9 @@ object DianaProfitTracker {
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows", false))
+        addAll(addTotalProfit(profit, data.burrowsDug, "burrow", duration, "Burrows", false))
 
-        tracker.addPriceFromButton(this)
+        addPriceFromButton(this)
     }
 
     @HandleEvent
@@ -124,7 +129,7 @@ object DianaProfitTracker {
             return
         }
 
-        tracker.addItem(internalName, amount, command)
+        addItem(internalName, amount, command)
     }
 
     @HandleEvent
@@ -132,7 +137,7 @@ object DianaProfitTracker {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-            tracker.modify {
+            modify {
                 it.burrowsDug++
             }
             tryHide(event)
@@ -159,18 +164,6 @@ object DianaProfitTracker {
         }
     }
 
-    init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
-            onRender = {
-                if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
-                tracker.renderDisplay(config.position)
-            },
-        )
-    }
-
     private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     @HandleEvent
@@ -183,7 +176,7 @@ object DianaProfitTracker {
         event.registerBrigadier("shresetdianaprofittracker") {
             description = "Resets the Diana Profit Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

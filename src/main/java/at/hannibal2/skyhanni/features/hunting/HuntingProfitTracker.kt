@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -17,37 +18,36 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object HuntingProfitTracker {
-
-    val config get() = SkyHanniMod.feature.hunting.huntingProfitTracker
+object HuntingProfitTracker : SkyHanniItemTracker<HuntingProfitTracker.Data>("Hunting Profit Tracker") {
+    override val config get() = SkyHanniMod.feature.hunting.huntingProfitTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.hunting.huntingProfitTracker }
+    override val renderConfig = RenderDisplayConfig(
+        outsideInventory = true,
+        inOwnInventory = true,
+        condition = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) },
+    )
 
     private var lastHuntTime = SimpleTimeMark.farPast()
-    private val tracker = SkyHanniItemTracker(
-        "Hunting Profit Tracker",
-        { Data() },
-        { it.hunting.huntingProfitTracker },
-        trackerConfig = { SkyHanniMod.feature.hunting.huntingProfitTracker.perTrackerConfig }
-    ) { drawDisplay(it) }
 
     data class Data(
         @Expose var totalMobsCaught: Long = 0,
         @Expose var totalShardsGained: Long = 0
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
 
         override fun getDescription(item: TrackedItem): List<String> {
             val timesCaught = item.timesCaught
@@ -62,9 +62,7 @@ object HuntingProfitTracker {
         }
 
         override fun getDescription(timesGained: Long) = listOf<String>()
-
         override fun getCoinName(item: TrackedItem) = ""
-
         override fun getCoinDescription(item: TrackedItem) = listOf<String>()
     }
 
@@ -72,10 +70,10 @@ object HuntingProfitTracker {
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lHunting Profit Tracker")
 
-        val profit = tracker.drawItems(data, { true }, this)
+        val profit = drawItems(data, { true }, this)
 
         val caughtCount = data.totalMobsCaught
         add(
@@ -94,13 +92,12 @@ object HuntingProfitTracker {
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.totalMobsCaught, "shard", duration, "Shards"))
-
-        tracker.addPriceFromButton(this)
+        addAll(addTotalProfit(profit, data.totalMobsCaught, "shard", duration, "Shards"))
+        addPriceFromButton(this)
     }
 
     private fun addShard(amount: Int) {
-        tracker.modify {
+        modify {
             it.totalMobsCaught++
             it.totalShardsGained += amount
         }
@@ -110,22 +107,11 @@ object HuntingProfitTracker {
     private val isRecentPickup: Boolean
         get() = config.showWhenPickup && lastHuntTime.passedSince() < 10.seconds
 
-    init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) },
-            onRender = {
-                tracker.renderDisplay(config.position)
-            },
-        )
-    }
-
     @HandleEvent
     fun onShardGainEvent(event: ShardGainEvent) {
         if (event.amount <= 0) return
         addShard(event.amount)
-        tracker.addItem(event.shardInternalName, event.amount, command = false)
+        addItem(event.shardInternalName, event.amount, command = false)
     }
 
     @HandleEvent
@@ -173,7 +159,7 @@ object HuntingProfitTracker {
         event.registerBrigadier("shresethuntingtracker") {
             description = "Resets the Hunting Profit Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

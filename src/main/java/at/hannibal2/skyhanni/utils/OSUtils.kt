@@ -65,8 +65,10 @@ object OSUtils {
     )
     fun copyToClipboard(text: String) = ClipboardUtils.copyToClipboard(text)
 
+    @Deprecated("Use ClipboardUtils instead")
     suspend fun copyToClipboardAsync(text: String): Boolean? = ClipboardUtils.copyToClipboardAsync(text).await()
 
+    @Deprecated("Use ClipboardUtils instead")
     fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
     private fun File.isExpired(

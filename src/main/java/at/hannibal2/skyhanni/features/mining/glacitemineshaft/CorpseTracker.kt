@@ -4,60 +4,47 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
     "Corpse Tracker",
-    ::BucketData,
-    { it.mining.mineshaft.corpseProfitTracker },
-    { drawDisplay(it) },
-    trackerConfig = { SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker.perTrackerConfig }
 ) {
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> BucketData = { it.mining.mineshaft.corpseProfitTracker }
+    override val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
+    override val renderConfig = RenderDisplayConfig(
+        condition = { isEnabled() },
+    )
 
     data class BucketData(
         @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
-    ) : BucketedItemTrackerData<CorpseType, SessionUptime.Normal>(CorpseType::class, SessionUptime.Normal::class) {
-        override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
-            val divisor = 1.coerceAtLeast(
-                selectedBucket?.let {
-                    corpsesLooted[it]?.toInt()
-                } ?: corpsesLooted.sumAllValues().toInt(),
-            )
-            val percentage = timesGained.toDouble() / divisor
-            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
-            return listOf(
-                "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate.",
-            )
-        }
+    ) : BucketedItemTrackerData<CorpseType, SessionUptime.Normal>() {
+        override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> =
+            super.getDropRate(corpsesLooted, bucket, timesGained)
 
         override fun getCoinName(bucket: CorpseType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
@@ -87,17 +74,17 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
         }
     }
 
-    private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
+    override fun drawDisplayF(data: BucketData): List<Searchable> = buildList {
         addSearchString("§b§lMineshaft Corpse Profit Tracker")
-        addBucketSelector(this, bucketData, "Corpse Type")
+        addBucketSelector(this, data, "Corpse Type")
 
-        if (bucketData.getCorpseCount() == 0L) return@buildList
+        if (data.getCorpseCount() == 0L) return@buildList
 
-        var profit = drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let {
+        var profit = drawItems(data, { true }, this)
+        val applicableKeys: List<CorpseType> = data.selectedBucket?.let {
             listOf(it)
         } ?: enumValues<CorpseType>().toList()
-            .filter { bucketData.corpsesLooted[it] != null }
+            .filter { data.corpsesLooted[it] != null }
         var totalKeyCost = 0.0
         var totalKeyCount = 0
         val keyCostStrings = buildList {
@@ -105,7 +92,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
                 keyData.key?.let { key ->
                     val keyName = key.repoItemName
                     val price = getPricePer(key)
-                    val count = bucketData.corpsesLooted[keyData] ?: 0
+                    val count = data.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
                     if (totalPrice > 0) {
                         profit -= totalPrice
@@ -129,14 +116,10 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             )
         }
 
-        val duration = bucketData.getTotalUptime()
-        addAll(addTotalProfit(profit, bucketData.getCorpseCount(), "corpse", duration, "Corpses"))
+        val duration = data.getTotalUptime()
+        addAll(addTotalProfit(profit, data.getCorpseCount(), "corpse", duration, "Corpses"))
 
         addPriceFromButton(this)
-    }
-
-    init {
-        initRenderer({ config.position }) { isEnabled() }
     }
 
     @HandleEvent

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -16,36 +17,33 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 @SkyHanniModule
-object ExcavatorProfitTracker {
-
-    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.profitTracker
-
-    private val tracker = SkyHanniItemTracker(
-        "Fossil Excavation Profit Tracker",
-        ::Data,
-        { it.mining.fossilExcavatorProfitTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) { drawDisplay(it) }
+object ExcavatorProfitTracker : SkyHanniItemTracker<ExcavatorProfitTracker.Data>("Fossil Excavation Profit Tracker") {
+    override val config get() = SkyHanniMod.feature.mining.fossilExcavator.profitTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.mining.fossilExcavatorProfitTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     data class Data(
         @Expose var timesExcavated: Long = 0L,
         @Expose var glacitePowderGained: Long = 0L,
         @Expose var fossilDustGained: Long = 0L,
-    ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
+    ) : ItemTrackerData<SessionUptime.Normal>() {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / timesExcavated
             val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
@@ -60,9 +58,9 @@ object ExcavatorProfitTracker {
 
     private val scrapItem get() = FossilExcavatorApi.scrapItem
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFossil Excavation Profit Tracker")
-        var profit = tracker.drawItems(data, { true }, this)
+        var profit = drawItems(data, { true }, this)
 
         val timesExcavated = data.timesExcavated
         add(
@@ -81,9 +79,8 @@ object ExcavatorProfitTracker {
         }
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.timesExcavated, "excavation", duration, "Excavations"))
-
-        tracker.addPriceFromButton(this)
+        addAll(addTotalProfit(profit, data.timesExcavated, "excavation", duration, "Excavations"))
+        addPriceFromButton(this)
     }
 
     private fun MutableList<Searchable>.addFossilDust(
@@ -91,7 +88,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (fossilDustGained <= 0) return profit
-        val pricePer = tracker.getPricePer(scrapItem) / 500
+        val pricePer = getPricePer(scrapItem) / 500
         val fossilDustPrice = pricePer * fossilDustGained
         add(
             Renderable.hoverTips(
@@ -127,7 +124,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (timesExcavated <= 0) return profit
-        val scrapPrice = timesExcavated * tracker.getPricePer(scrapItem)
+        val scrapPrice = timesExcavated * getPricePer(scrapItem)
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
             Renderable.hoverTips(
@@ -154,7 +151,7 @@ object ExcavatorProfitTracker {
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
-        tracker.addItem(internalName, amount, command)
+        addItem(internalName, amount, command)
     }
 
     @HandleEvent
@@ -163,7 +160,7 @@ object ExcavatorProfitTracker {
         for ((name, amount) in event.loot) {
             addItem(name, amount)
         }
-        tracker.modify {
+        modify {
             it.timesExcavated++
         }
     }
@@ -171,7 +168,7 @@ object ExcavatorProfitTracker {
     private fun addItem(name: String, amount: Int) {
         if (name == "§bGlacite Powder") {
             if (config.trackGlacitePowder) {
-                tracker.modify {
+                modify {
                     it.glacitePowderGained += amount
                 }
             }
@@ -179,7 +176,7 @@ object ExcavatorProfitTracker {
         }
         if (name == "§fFossil Dust") {
             if (config.showFossilDust) {
-                tracker.modify {
+                modify {
                     it.fossilDustGained += amount
                 }
             }
@@ -195,10 +192,6 @@ object ExcavatorProfitTracker {
         tryAddItem(internalName, amount, command = false)
     }
 
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
-    }
-
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
@@ -210,7 +203,7 @@ object ExcavatorProfitTracker {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 
@@ -221,7 +214,7 @@ object ExcavatorProfitTracker {
         event.registerBrigadier("shresetexcavatortracker") {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

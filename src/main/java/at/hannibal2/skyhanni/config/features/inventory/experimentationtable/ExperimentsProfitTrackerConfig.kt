@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,12 +13,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ExperimentsProfitTrackerConfig {
+class ExperimentsProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Tracker for drops/XP you get from experiments.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    override var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Hide Messages", desc = "Change the messages to be hidden after completing Add-on/Main experiments.")
@@ -39,14 +41,11 @@ class ExperimentsProfitTrackerConfig {
     var bottleWarnings: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<ItemTrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(20, 20)
+    override val position: Position = Position(20, 20)
 }

@@ -296,7 +296,7 @@ object MoongladeBeacon {
         RenderDisplayHelper(
             outsideInventory = false,
             inOwnInventory = false,
-            inventory = colorMinigameInventory,
+            inventoryDetector = colorMinigameInventory,
             condition = { config.enabled },
             onlyOnIsland = IslandType.GALATEA,
             onRender = {

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -24,17 +26,24 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearc
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.tracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 
 @SkyHanniModule
-object VerminTracker {
+object VerminTracker : SkyHanniTracker<VerminTracker.Data>("Vermin Tracker") {
 
+    override val config get() = RiftApi.config.area.westVillage.verminTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.rift.verminTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §eYou vacuumed a §r§aSilverfish§r§e!
      */
@@ -67,24 +76,14 @@ object VerminTracker {
         "binline-nocolor",
         "Vermin Bin: (?<count>\\d+) (?<vermin>\\w+)",
     )
+    // </editor-fold>
 
     private var hasVacuum = false
     private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
 
-    private val config get() = RiftApi.config.area.westVillage.verminTracker
-
-    private val tracker = SkyHanniTracker(
-        "Vermin Tracker",
-        ::Data,
-        { it.rift.verminTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) {
-        drawDisplay(it)
-    }
-
     data class Data(
         @Expose var count: MutableMap<VerminType, Int> = mutableMapOf()
-    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
+    ) : TrackerData<SessionUptime.Normal>()
 
     enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
         FLY(1, "§aFlies", flyPattern),
@@ -98,15 +97,16 @@ object VerminTracker {
     }
 
     private fun checkVacuum() {
-        hasVacuum = InventoryUtils.getItemsInOwnInventory()
-            .any { it.getInternalName() == TURBOMAX_VACUUM }
+        hasVacuum = InventoryUtils.getItemsInOwnInventory().any {
+            it.getInternalName() == TURBOMAX_VACUUM
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
-                tracker.modify { it.count.addOrPut(verminType, 1) }
+                modify { it.count.addOrPut(verminType, 1) }
 
                 if (config.hideChat) {
                     event.blockedReason = "vermin_vacuumed"
@@ -156,23 +156,19 @@ object VerminTracker {
     }
 
     private fun addVermin(vermin: VerminType, count: Int = 1) {
-        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { it.count.addOrPut(vermin, count) }
+        modify(DisplayMode.TOTAL) { it.count.addOrPut(vermin, count) }
     }
 
     private fun setVermin(vermin: VerminType, count: Int) {
-        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { it.count[vermin] = count }
+        modify(DisplayMode.TOTAL) { it.count[vermin] = count }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         addSearchString("§7Vermin Tracker:")
         for ((vermin, amount) in data.count.entries.sortedBy { it.key.order }) {
             val verminName = vermin.vermin
             addSearchString(" §7- §e${amount.addSeparators()} $verminName", verminName)
         }
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -186,7 +182,7 @@ object VerminTracker {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.THE_RIFT) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 
@@ -195,7 +191,7 @@ object VerminTracker {
         event.registerBrigadier("shresetvermintracker") {
             description = "Resets the Vermin Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

@@ -6,6 +6,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.NoReset
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningEventsApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -17,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -24,7 +28,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
@@ -32,14 +36,21 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object PowderTracker {
-
-    private val config get() = SkyHanniMod.feature.mining.powderTracker
+object PowderTracker : SkyHanniTracker<PowderTracker.Data>("Powder Tracker") {
+    override val config get() = SkyHanniMod.feature.mining.powderTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.powderTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
+
+    /**
+     * WRAPPED-REGEX-TEST: "  §r§6§lCHEST LOCKPICKED "
+     */
     private val pickedPattern by patternGroup.pattern(
         "picked",
-        "  §r§6§lCHEST LOCKPICKED ",
+        " {2}§r§6§lCHEST LOCKPICKED ",
     )
 
     /**
@@ -52,12 +63,12 @@ object PowderTracker {
 
     private var lastChestPicked = SimpleTimeMark.farPast()
     private var isGrinding = false
-    private val gemstoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
-    private val mithrilInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
-    private val diamondEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
-    private val goldEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
-    private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
-    private val hardStoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
+    private val gemstoneInfo = ResourceInfo()
+    private val mithrilInfo = ResourceInfo()
+    private val diamondEssenceInfo = ResourceInfo()
+    private val goldEssenceInfo = ResourceInfo()
+    private val chestInfo = ResourceInfo()
+    private val hardStoneInfo = ResourceInfo()
     private val gemstones = listOf(
         "Ruby" to "§c",
         "Sapphire" to "§b",
@@ -85,30 +96,17 @@ object PowderTracker {
             isGrinding = false
         }
         val event = MiningEventsApi.getActiveEvent(MiningEventsApi.MiningEventType.DOUBLE_POWDER)
-
         if (event != null) {
-            tracker.update()
+            update()
         }
     }
-
-    private val tracker =
-        SkyHanniTracker(
-            "Powder Tracker",
-            ::Data,
-            { it.powderTracker },
-            trackerConfig = { config.perTrackerConfig }
-        ) { formatDisplay(drawDisplay(it)) }
 
     data class Data(
         @Expose var totalChestPicked: Long = 0,
         @Expose var totalHardStoneCompacted: Long = 0,
         // TODO remove this field and transform this into a ItemProfitTracker
         @Expose var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf(),
-    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
-    }
+    ) : TrackerData<SessionUptime.Normal>()
 
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
@@ -123,7 +121,7 @@ object PowderTracker {
         val msg = event.message
 
         pickedPattern.matchMatcher(msg) {
-            tracker.modify {
+            modify {
                 it.totalChestPicked += 1
             }
             isGrinding = true
@@ -131,7 +129,7 @@ object PowderTracker {
         }
 
         compactedPattern.matchMatcher(msg) {
-            tracker.modify {
+            modify {
                 it.totalHardStoneCompacted += 1
             }
         }
@@ -139,20 +137,20 @@ object PowderTracker {
         for (reward in PowderChestReward.entries) {
             if (reward == PowderChestReward.GEMSTONE_POWDER) continue
             reward.chatPattern.matchMatcher(msg) {
-                tracker.modify {
+                modify {
                     val count = it.rewards[reward] ?: 0
                     val amount = groupOrNull("amount")?.formatLong() ?: 1
                     it.rewards[reward] = count + amount
                 }
             }
         }
-        tracker.update()
+        update()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onPowderGain(event: PowderEvent.Gain) {
         if (lastChestPicked.passedSince() > 5.seconds) return
-        tracker.modify {
+        modify {
             val reward = when (event.powder) {
                 HotmApi.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
                 else -> return@modify
@@ -164,32 +162,20 @@ object PowderTracker {
     @HandleEvent
     fun onConfigLoad() {
         config.textFormat.afterChange {
-            tracker.update()
+            update()
         }
     }
 
     @HandleEvent
     fun onWorldChange() {
         if (!isEnabled()) return
-        gemstoneInfo.perHour = 0.0
-        gemstoneInfo.stoppedChecks = 0
-        gemstoneInfo.perMin.clear()
-        mithrilInfo.perHour = 0.0
-        mithrilInfo.stoppedChecks = 0
-        mithrilInfo.perMin.clear()
-        diamondEssenceInfo.perHour = 0.0
-        diamondEssenceInfo.stoppedChecks = 0
-        diamondEssenceInfo.perMin.clear()
-        goldEssenceInfo.perHour = 0.0
-        goldEssenceInfo.stoppedChecks = 0
-        goldEssenceInfo.perMin.clear()
-        chestInfo.perHour = 0.0
-        chestInfo.stoppedChecks = 0
-        chestInfo.perMin.clear()
-        hardStoneInfo.perHour = 0.0
-        hardStoneInfo.stoppedChecks = 0
-        hardStoneInfo.perMin.clear()
-        tracker.update()
+        gemstoneInfo.reset()
+        mithrilInfo.reset()
+        diamondEssenceInfo.reset()
+        goldEssenceInfo.reset()
+        chestInfo.reset()
+        hardStoneInfo.reset()
+        update()
     }
 
     @HandleEvent
@@ -223,7 +209,7 @@ object PowderTracker {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
-            tracker.firstUpdate()
+            firstUpdate()
         }
     }
 
@@ -238,7 +224,8 @@ object PowderTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    // Todo remove usage of formatDisplay
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         calculate(data, gemstoneInfo, PowderChestReward.GEMSTONE_POWDER)
         calculate(data, diamondEssenceInfo, PowderChestReward.DIAMOND_ESSENCE)
         calculate(data, goldEssenceInfo, PowderChestReward.GOLD_ESSENCE)
@@ -326,7 +313,7 @@ object PowderTracker {
             val name = reward.displayName
             addSearchString("§b$count $name", name)
         }
-    }
+    }.let { formatDisplay(it) }
 
     private fun MutableList<Searchable>.addPerHour(
         map: Map<PowderChestReward, Long>,
@@ -396,12 +383,13 @@ object PowderTracker {
     data class Gem(val flawless: Long, val fine: Long, val flawed: Long, val rough: Long)
 
     private data class ResourceInfo(
-        var estimated: Long,
-        var lastEstimated: Long,
-        var stoppedChecks: Int,
-        var perHour: Double,
-        val perMin: MutableList<Long>,
-    )
+        var stoppedChecks: Int = 0,
+        var perHour: Double = 0.0,
+        val perMin: MutableList<Long> = mutableListOf(),
+    ) : Resettable {
+        @NoReset var estimated: Long = 0L
+        @NoReset var lastEstimated: Long = 0L
+    }
 
     private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 
@@ -410,7 +398,7 @@ object PowderTracker {
         event.registerBrigadier("shresetpowdertracker") {
             description = "Resets the Powder Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

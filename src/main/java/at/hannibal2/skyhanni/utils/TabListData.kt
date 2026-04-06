@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.mixins.hooks.tabListGuarded
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.fabricmc.api.EnvType
@@ -25,6 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TabListData {
     private val playerOrdering = Ordering.from(TabPlayerComparator())
+    private val copyDataConfig = CoroutineSettings("copy tab data")
 
     @Environment(EnvType.CLIENT)
     internal class TabPlayerComparator : Comparator<PlayerInfo> {
@@ -114,12 +116,12 @@ object TabListData {
         event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            coroutineSimpleCallback { copyCommand() }
+            coroutineSimpleCallback(copyDataConfig) { copyCommand() }
         }
         event.registerBrigadier("shcopytablist") {
             description = "Copies the tab list body to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            coroutineSimpleCallback { copyCommand(asComponents = false) }
+            coroutineSimpleCallback(copyDataConfig) { copyCommand(asComponents = false) }
         }
     }
 }

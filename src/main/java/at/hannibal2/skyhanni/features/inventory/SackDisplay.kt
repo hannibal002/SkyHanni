@@ -48,7 +48,7 @@ object SackDisplay {
 
     init {
         RenderDisplayHelper(
-            inventory = SackApi.inventory,
+            inventoryDetector = SackApi.inventory,
             condition = ::isEnabled,
         ) {
             config.position.renderRenderables(

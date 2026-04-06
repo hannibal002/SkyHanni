@@ -27,9 +27,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.tracker.DefaultDisplayMode
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.TypeAdapter
@@ -166,8 +166,8 @@ enum class SkyHanniTypeAdapters(
         EliteLeaderboardTypeAdapter(),
     ),
     TRACKER_DISPLAY_MODE(
-        SkyHanniTracker.DefaultDisplayMode::class.java,
-        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+        DefaultDisplayMode::class.java,
+        SimpleStringTypeAdapter.forEnum<DefaultDisplayMode>()
     ),
     TIME_MARK(
         SimpleTimeMark::class.java,

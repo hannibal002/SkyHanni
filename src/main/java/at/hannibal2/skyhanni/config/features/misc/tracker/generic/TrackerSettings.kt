@@ -1,8 +1,8 @@
-package at.hannibal2.skyhanni.config.features.misc.tracker
+package at.hannibal2.skyhanni.config.features.misc.tracker.generic
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemPriceSource
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DefaultDisplayMode
+import at.hannibal2.skyhanni.utils.tracker.DefaultDisplayMode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -11,7 +11,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-open class TrackerGenericConfig {
+/**
+ * Base settings shared by all trackers.
+ *
+ * Subclasses add settings specific to their tracker type (item tracking, garden uptime, etc.)
+ * and should override [syncSettings] to also pull those extra fields from the universal config.
+ *
+ * @see ItemTrackerSettings
+ * @see GardenTrackerSettings
+ */
+open class TrackerSettings {
+
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
@@ -25,7 +35,7 @@ open class TrackerGenericConfig {
     @Expose
     @ConfigOption(
         name = "Only Show Session Uptime",
-        desc = "Only show uptime and profit per hour when the tracker is on session mode."
+        desc = "Only show uptime and profit per hour when the tracker is on session mode.",
     )
     @ConfigEditorBoolean
     val onlyShowSession: Property<Boolean> = Property.of(true)
@@ -34,7 +44,7 @@ open class TrackerGenericConfig {
     @ConfigOption(
         name = "AFK timeout",
         desc = "Pause the tracker if it is not modified for this amount of seconds." +
-            "\nDoes not apply to garden trackers."
+            "\nDoes not apply to garden trackers.",
     )
     @ConfigEditorSlider(minValue = 15f, maxValue = 900f, minStep = 15f)
     var afkTimeout: Int = 60
@@ -48,12 +58,12 @@ open class TrackerGenericConfig {
     @Expose
     @ConfigOption(
         name = "Change Price Source",
-        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
+        desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.",
     )
     @ConfigEditorDropdown
     var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
 
-    private fun syncGenericSettings() {
+    private fun syncBaseSettings() {
         val config = SkyHanniMod.feature.misc
         onlyShowSession.set(config.tracker.onlyShowSession.get())
         afkTimeout = config.tracker.afkTimeout
@@ -64,6 +74,6 @@ open class TrackerGenericConfig {
     }
 
     open fun syncSettings() {
-        syncGenericSettings()
+        syncBaseSettings()
     }
 }

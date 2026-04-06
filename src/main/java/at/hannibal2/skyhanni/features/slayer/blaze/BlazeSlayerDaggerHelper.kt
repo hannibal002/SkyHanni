@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BlazeSlayerDaggerHelper {
 
-    private val config get() = SlayerApi.config.blazes.hellion
+    private val config get() = SlayerApi.config.blaze.hellion
 
     /**
      * REGEX-TEST: §cStrike using the §r§f§lSPIRIT §r§cattunement on your dagger!

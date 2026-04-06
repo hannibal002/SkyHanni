@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc.tracker
+package at.hannibal2.skyhanni.config.features.misc.tracker.generic
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.annotations.Expose
@@ -6,7 +6,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+/**
+ * Retention and session settings for timed trackers.
+ *
+ * Controls how many historical entries are kept per display mode (day, week, month, etc.)
+ * before the oldest are pruned. A value of 0 disables pruning for that mode.
+ *
+ * Lives in [at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig] for per-tracker overrides, and also in
+ * [at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig] as the source of truth when syncing.
+ */
 class TimedTrackerConfig {
+
     @Expose
     @ConfigOption(name = "New Session on Game Start", desc = "Create new session display mode when opening the game.")
     @ConfigEditorBoolean
@@ -15,7 +25,7 @@ class TimedTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Sessions to Keep",
-        desc = "If there are more than these many year entries, delete the oldest. Set to 0 to never delete."
+        desc = "If there are more than these many session entries, delete the oldest. Set to 0 to never delete.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var session: Int = 5
@@ -23,7 +33,7 @@ class TimedTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Days to Keep",
-        desc = "If there are more than these many day entries, delete the oldest. Set to 0 to never delete."
+        desc = "If there are more than these many day entries, delete the oldest. Set to 0 to never delete.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var days: Int = 8
@@ -31,7 +41,7 @@ class TimedTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Weeks to Keep",
-        desc = "If there are more than these many week entries, delete the oldest. Set to 0 to never delete."
+        desc = "If there are more than these many week entries, delete the oldest. Set to 0 to never delete.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var weeks: Int = 5
@@ -39,7 +49,7 @@ class TimedTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Months to Keep",
-        desc = "If there are more than these many month entries, delete the oldest. Set to 0 to never delete."
+        desc = "If there are more than these many month entries, delete the oldest. Set to 0 to never delete.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var months: Int = 13
@@ -47,7 +57,7 @@ class TimedTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Years to Keep",
-        desc = "If there are more than these many year entries, delete the oldest. Set to 0 to never delete."
+        desc = "If there are more than these many year entries, delete the oldest. Set to 0 to never delete.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var years: Int = 0
@@ -55,7 +65,7 @@ class TimedTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Other",
-        desc = "Amount to keep of other modes not listed above."
+        desc = "Amount to keep of other modes not listed above.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var others: Int = 10

@@ -42,7 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EndermanSlayerFeatures {
 
-    private val config get() = SlayerApi.config.endermen
+    private val config get() = SlayerApi.config.enderman
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EnderMan>()
     private val flyingBeacons = mutableSetOf<ArmorStand>()

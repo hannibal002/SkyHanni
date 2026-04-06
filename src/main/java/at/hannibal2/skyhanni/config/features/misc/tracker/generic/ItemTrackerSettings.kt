@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc.tracker
+package at.hannibal2.skyhanni.config.features.misc.tracker.generic
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
@@ -11,12 +11,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-open class ItemTrackerGenericConfig : TrackerGenericConfig() {
+/**
+ * Extends [TrackerSettings] with item-tracker-specific options.
+ *
+ * Used for all trackers that display a collected-items list. Garden item trackers should
+ * use [GardenItemTrackerSettings] instead, which also adds the uptime redirect button.
+ */
+open class ItemTrackerSettings : TrackerSettings() {
+
     @Expose
-    @ConfigOption(
-        name = "Item Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Item Tracker Settings", desc = "")
     @Accordion
     val itemTracker: ItemTrackerConfig = ItemTrackerConfig()
 
@@ -26,6 +30,7 @@ open class ItemTrackerGenericConfig : TrackerGenericConfig() {
     }
 
     class ItemTrackerConfig {
+
         @Expose
         @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")
         @ConfigEditorBoolean
@@ -68,10 +73,11 @@ open class ItemTrackerGenericConfig : TrackerGenericConfig() {
         val warnings: TrackerItemWarningsConfig = TrackerItemWarningsConfig()
 
         class TrackerItemWarningsConfig {
+
             @Expose
             @ConfigOption(
                 name = "Price in Chat",
-                desc = "Show an extra chat message when you pick up an expensive item. (This contains name, amount and price)"
+                desc = "Show an extra chat message when you pick up an expensive item. (This contains name, amount and price)",
             )
             @ConfigEditorBoolean
             @FeatureToggle
@@ -109,8 +115,8 @@ open class ItemTrackerGenericConfig : TrackerGenericConfig() {
             mutableListOf(
                 TextPart.AMOUNT,
                 TextPart.NAME,
-                TextPart.TOTAL_PRICE
-            )
+                TextPart.TOTAL_PRICE,
+            ),
         )
 
         fun syncSettings() {

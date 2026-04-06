@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ExcludedSeaCreatureAreasJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -26,33 +28,28 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object SeaCreatureTracker {
+object SeaCreatureTracker : SkyHanniTracker<SeaCreatureTracker.Data>("Sea Creature Tracker") {
     private var needMigration = true
 
-    private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
-
-    private val tracker = SkyHanniTracker(
-        "Sea Creature Tracker",
-        ::Data,
-        { it.fishing.seaCreatureTracker },
-        trackerConfig = { config.perTrackerConfig }
-    ) {
-        drawDisplay(it)
-    }
+    override val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.fishing.seaCreatureTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { shouldShowDisplay() },
+    )
 
     data class Data(
         @Expose var amount: MutableMap<String, Int> = mutableMapOf(),
-    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
+    ) : TrackerData<SessionUptime.Normal>()
 
     @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!isEnabled()) return
 
-        tracker.modify {
+        modify {
             val amount = if (event.doubleHook && config.countDouble) 2 else 1
             it.amount.addOrPut(event.seaCreature.name, amount)
         }
@@ -79,7 +76,7 @@ object SeaCreatureTracker {
         needMigration = true
     }
 
-    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+    override fun drawDisplayF(data: Data): List<Searchable> = buildList {
         tryToMigrate(data.amount)
 
         addSearchString("§7Sea Creature Tracker:")
@@ -139,14 +136,14 @@ object SeaCreatureTracker {
             currentCategory = NAME_ALL
         }
 
-        if (tracker.isInventoryOpen()) {
+        if (isInventoryOpen()) {
             addButton(
                 label = "Category",
                 current = currentCategory,
                 getName = { it.allLettersFirstUppercase() + " §7(" + amounts[it] + ")" },
                 onChange = {
                     currentCategory = it
-                    tracker.update()
+                    update()
                 },
                 universe = list,
             )
@@ -173,17 +170,13 @@ object SeaCreatureTracker {
     @HandleEvent
     fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showPercentage) {
-            tracker.update()
+            update()
         }
     }
 
     @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
-        tracker.firstUpdate()
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+        firstUpdate()
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -216,7 +209,7 @@ object SeaCreatureTracker {
         event.registerBrigadier("shresetseacreaturetracker") {
             description = "Resets the Sea Creature Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 

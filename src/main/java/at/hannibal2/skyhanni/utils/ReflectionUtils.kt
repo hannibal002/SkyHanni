@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findSuperClassTypeParameters
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -158,7 +159,7 @@ object ReflectionUtils {
         MethodType.methodType(Nothing::class.javaPrimitiveType),
     )
 
-    inline fun <reified Stop : Any, reified T> Any.findGenericSuperclassTypeArgument(index: Int = 0): Class<T> {
+    inline fun <reified Stop : Any, T> Any.findGenericSuperclassTypeArgument(index: Int = 0): Class<T> {
         var type = javaClass.genericSuperclass
         while (type !is ParameterizedType || (type.rawType as Class<*>) != Stop::class.java) {
             type = (type as? Class<*>)?.genericSuperclass

@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.GardenItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,12 +13,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class CropFeverTrackerConfig {
+class CropFeverTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track your crop fever drops.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Only Show With Enchant", desc = "Only show when holding a farming with the crop fever enchant.")
@@ -63,14 +65,11 @@ class CropFeverTrackerConfig {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: GardenIndividualItemTrackerConfig = GardenIndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<GardenItemTrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = CropFeverTrackerConfig::class, field = "enabled")
-    val position: Position = Position(80, 20)
+    override val position: Position = Position(80, 20)
 }

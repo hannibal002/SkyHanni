@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -275,27 +275,23 @@ object IslandGraphs {
         }
     }
 
-    private fun reloadFromJson(islandName: String) {
+    private fun reloadFromJson(islandName: String) = runCatching {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        CoroutineSettings("load island graph data for $islandName").launchCoroutine {
-            try {
-                val graph = SkyHanniRepoManager.getRepoDataAsync<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
-                IslandAreaFeatures.display = null
-                DelayedRun.runNextTick {
-                    setNewGraph(graph)
-                }
-            } catch (e: Error) {
-                currentIslandGraph = null
-                if (SkyBlockUtils.debug) {
-                    ErrorManager.logErrorWithData(
-                        e,
-                        "failed to load graph data for island $islandName",
-                        "island name" to islandName,
-                    )
-                }
+        CoroutineSettings("load island graph data for $islandName").launch {
+            val graph = SkyHanniRepoManager.getRepoDataAsync<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+            IslandAreaFeatures.display = null
+            DelayedRun.runNextTick {
+                setNewGraph(graph)
             }
         }
+    }.getOrElse {
+        currentIslandGraph = null
+        if (SkyBlockUtils.debug) ErrorManager.logErrorWithData(
+            it,
+            "failed to load graph data for island $islandName",
+            "island name" to islandName,
+        )
     }
 
     fun setNewGraph(graph: Graph) {

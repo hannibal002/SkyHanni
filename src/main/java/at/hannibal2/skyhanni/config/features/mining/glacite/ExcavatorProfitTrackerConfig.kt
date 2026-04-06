@@ -2,19 +2,21 @@ package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ExcavatorProfitTrackerConfig {
+class ExcavatorProfitTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Count all drops you gain while excavating in the Fossil Research Center.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -30,14 +32,11 @@ class ExcavatorProfitTrackerConfig {
     var showFossilDust: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<ItemTrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(-380, 150)
+    override val position: Position = Position(-380, 150)
 }

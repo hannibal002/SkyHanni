@@ -33,16 +33,14 @@ class SlayerConfig {
     @Accordion
     val spider: SpiderConfig = SpiderConfig()
 
-    // TODO rename to "enderman"
     @Expose
     @Category(name = "Enderman", desc = "Enderman Slayer Feature")
     @Accordion
-    val endermen: EndermanConfig = EndermanConfig()
+    val enderman: EndermanConfig = EndermanConfig()
 
-    // TODO rename to "blaze"
     @Expose
     @Category(name = "Blaze", desc = "Blaze Slayer Features")
-    val blazes: BlazeConfig = BlazeConfig()
+    val blaze: BlazeConfig = BlazeConfig()
 
     @Expose
     @Category(name = "Vampire", desc = "Vampire Slayer Features")
@@ -209,6 +207,14 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
+
+            // Renames beforehand
+            event.move(130, "slayer.endermen", "slayer.enderman")
+            event.move(130, "slayer.blazes", "slayer.blaze")
+            val oldBase = "slayer.itemProfitTracker"
+            event.move(130, "$oldBase.voidgloomInNest", "slayer.enderman.showInNest")
+            event.move(130, "$oldBase.voidgloomInNoArea", "slayer.enderman.showInNoArea")
+            event.move(130, "$oldBase.revenantInGraveyard", "slayer.zombie.showInGraveyard")
         }
     }
 }

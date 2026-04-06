@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig
-import at.hannibal2.skyhanni.config.features.misc.tracker.ItemTrackerGenericConfig.ItemTrackerConfig.TextPart
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.GenericIndividualTrackerConfig
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.SkyHanniMod.launch
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings.ItemTrackerConfig.TextPart
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
@@ -41,45 +43,33 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.tracker.data.BucketedItemTrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.ItemTrackerData
 import net.minecraft.ChatFormatting
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-open class
-SkyHanniItemTracker<Data : ItemTrackerData<*>>(
-    name: String,
-    createNewSession: () -> Data,
-    getStorage: (ProfileSpecificStorage) -> Data,
-    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
-    trackerConfig: () -> GenericIndividualTrackerConfig<ItemTrackerGenericConfig>,
-    customUptimeControl: Boolean = false,
-    drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data, GenericIndividualTrackerConfig<ItemTrackerGenericConfig>>(
-    name,
-    createNewSession,
-    getStorage,
-    extraDisplayModes,
-    customUptimeControl = customUptimeControl,
-    drawDisplay = drawDisplay,
-    trackerConfig = { trackerConfig() }
-) {
-    companion object {
-        private val universalTracker get() = SkyHanniMod.feature.misc.tracker
+abstract class SkyHanniItemTracker<Data : ItemTrackerData<*>>(name: String) : SkyHanniTracker<Data>(name) {
+
+    abstract override val config: TopLevelTrackerConfig
+
+    // Chains through the base useUniversalConfig check, then casts. The cast is safe because
+    // this class constrains config to TopLevelTrackerConfig<ItemTrackerSettings>, so both the
+    // per-tracker config and universalTracker (which extends ItemTrackerSettings) satisfy it.
+    override val trackerConfig: ItemTrackerSettings get() = super.trackerConfig as ItemTrackerSettings
+
+    override fun shouldRender(): Boolean {
+        if (trackerConfig.itemTracker.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return false
+        if (!InventoryUtils.inAnyInventory() && trackerConfig.itemTracker.hideOutsideInventory) return false
+        return true
     }
 
-    private val config: ItemTrackerGenericConfig get() =
-        if (trackerSpecificConfig.useUniversalConfig) universalTracker else trackerSpecificConfig.trackerConfig
+    private val scrollValue = ScrollValue()
 
-    private val itemTrackerConfig: ItemTrackerGenericConfig.ItemTrackerConfig get() = config.itemTracker
-
-    private var scrollValue = ScrollValue()
-
-    open fun addCoins(amount: Int, command: Boolean) {
-        modify {
-            it.addItem(SKYBLOCK_COIN, amount, command)
-        }
+    open fun addCoins(amount: Int, command: Boolean) = modify {
+        it.addItem(SKYBLOCK_COIN, amount, command)
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
@@ -95,12 +85,9 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         handlePossibleRareDrop(internalName, amount, message)
     }
 
-    open fun ItemAddEvent.addItemFromEvent() {
-        val command = source == ItemAddManager.Source.COMMAND
-        modify { data ->
-            data.addItem(internalName, amount, command)
-            logCompletedAddEvent()
-        }
+    open fun ItemAddEvent.addItemFromEvent() = modify { data ->
+        data.addItem(internalName, amount, command = (source == ItemAddManager.Source.COMMAND))
+        logCompletedAddEvent()
     }
 
     fun logCommandAdd(internalName: NeuInternalName, amount: Int) {
@@ -114,6 +101,24 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         logCommandAdd(internalName, amount)
     }
 
+    fun handlePossibleRareDrop(
+        internalName: NeuInternalName,
+        amount: Int,
+        message: Boolean = true,
+    ) = with(trackerConfig.itemTracker) {
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
+        if (warnings.chat && price >= warnings.minimumChat && message) {
+            componentBuilder {
+                appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
+                appendWithColor(": ", ChatFormatting.GRAY)
+                append("§r$itemName")
+            }.let(ChatUtils::chat)
+        }
+        if (warnings.title && price >= warnings.minimumTitle) {
+            TitleManager.sendTitle("§a+ $itemName", weight = price)
+        }
+    }
+
     private fun NeuInternalName.getCleanName(
         items: Map<NeuInternalName, ItemTrackerData.TrackedItem>,
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
@@ -122,36 +127,23 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemNameCompact
     }
 
+    /**
+     * Renders the item list for this tracker and returns the total profit value.
+     *
+     * [context] provides overridable accessors and action callbacks. Use [DrawItemsContext.default]
+     * for standard trackers; bucketed trackers supply their own instance to route reads and
+     * mutations through the selected bucket.
+     */
     open fun drawItems(
         data: Data,
         filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
-        /**
-         * Extensions to allow for BucketedTrackers to re-use this code block.
-         * The default values are for any 'normal' item tracker, but can in theory
-         * be overridden by any tracker that needs to.
-         */
-        itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem> = { data.items },
-        getCoinName: (ItemTrackerData.TrackedItem) -> String = { item -> data.getCoinName(item) },
-        itemRemover: (NeuInternalName, String) -> Unit = { item, cleanName ->
-            modify {
-                it.items.remove(item)
-            }
-            ChatUtils.chat("Removed $cleanName §efrom $name.")
-        },
-        itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
-            modify {
-                it.toggleItemHide(item, currentlyHidden)
-            }
-        },
-        getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
-            if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
-            else data.getDescription(item)
-        },
+        context: DrawItemsContext = DrawItemsContext.default(data, this),
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
-        val dataItems = itemsAccessor.invoke()
+        val dataItems = context.itemsAccessor.invoke()
+        val itemTrackerConfig = trackerConfig.itemTracker
         for ((internalName, itemProfit) in dataItems) {
             if (!filter(internalName)) continue
 
@@ -169,14 +161,13 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         }
 
         val table = mutableMapOf<List<Renderable>, String>()
-
         for ((internalName, price) in items.sortedDesc()) {
             val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
-            val cleanName = internalName.getCleanName(dataItems, getCoinName)
+            val cleanName = internalName.getCleanName(dataItems, context.getCoinName)
 
             val hidden = itemProfit.hidden
             val priceFormat = price.formatCoin(gray = hidden)
@@ -186,7 +177,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             val displayName = if (hidden) "§8§m$formattedName" else cleanName
 
-            val loreText = getLoreList.invoke(internalName, itemProfit)
+            val loreText = context.getLoreList.invoke(internalName, itemProfit)
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
 
             // TODO add row abstraction to api, with common click+hover behaviour
@@ -194,8 +185,8 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
                 string,
                 tips = lore,
                 onLeftClick = {
-                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
-                    else itemHider.invoke(internalName, hidden)
+                    if (KeyboardManager.isModifierKeyDown()) context.itemRemover.invoke(internalName, cleanName)
+                    else context.itemHider.invoke(internalName, hidden)
                     // TODO remove unnecessary update call, as both invokes above call the modify fun. in modify there is also a update call
                     update()
                 },
@@ -231,7 +222,6 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             lists.add(it.toSearchable())
         }
 
-
         return profit
     }
 
@@ -263,6 +253,17 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
         }
     }
 
+    private val copyOnClickConfig by lazy { CoroutineSettings("$name copy on click") }
+
+    private fun copyOnClick(line: String, fullTipsLine: String, type: String) = copyOnClickConfig.launch {
+        val copied = ClipboardUtils.copyToClipboardAsync(
+            if (KeyboardManager.isShiftKeyDown()) fullTipsLine
+            else line,
+        ).await() ?: false
+        if (copied) ChatUtils.chat("§eCopied $name $type to clipboard!")
+        else ChatUtils.chat("§cFailed to copy $name $type to clipboard!")
+    }
+
     fun addTotalProfit(
         profit: Double,
         totalAmount: Long,
@@ -292,15 +293,14 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             }
         }
 
-
         val tips: List<String> = buildList {
             addAll(profitTips)
             addAll(
                 listOf(
                     "",
                     "§eClick to copy line!",
-                    "§eShift Click to include stats in this tooltip!"
-                )
+                    "§eShift Click to include stats in this tooltip!",
+                ),
             )
         }
 
@@ -315,7 +315,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
                 val tipStats = profitTips.take(2)
                 val fullTipsLine = line + "\n " + tipStats.joinToString(" \n") { it.removeColor() }
                 copyOnClick(line, fullTipsLine, "profit")
-            }
+            },
         )
         val profitPerHourRenderable =
             if (shouldShowProfitPerHour()) profitPerHourRenderable(profit, duration) else Renderable.empty()
@@ -323,7 +323,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
     }
 
     private fun shouldShowProfitPerHour() =
-        config.itemTracker.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && config.onlyShowSession.get())
+        trackerConfig.itemTracker.profitPerHour.get() && !(getDisplayMode() == DisplayMode.TOTAL && trackerConfig.onlyShowSession.get())
 
     private fun profitPerHourRenderable(profit: Double, duration: Duration): Renderable {
         if (duration == 0.seconds) return Renderable.empty()
@@ -337,7 +337,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
             "§7Uptime: §b${duration.format()}",
             "",
             "§eClick to copy line!",
-            "§eShift Click to include stats in this tooltip!"
+            "§eShift Click to include stats in this tooltip!",
         )
         return Renderable.clickable(
             text,
@@ -347,52 +347,21 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
                 val tipStats = tips[0]
                 val fullTipsLine = "$line\n${tipStats.removeColor()}"
                 copyOnClick(line, fullTipsLine, "profit per hour")
-            }
+            },
         )
     }
 
-    private fun copyOnClick(line: String, fullTipsLine: String, type: String) {
-        if (KeyboardManager.isShiftKeyDown()) ClipboardUtils.copyToClipboard(fullTipsLine)
-        else ClipboardUtils.copyToClipboard(line)
-        ChatUtils.chat("§eCopied $name $type to clipboard!")
-    }
-
-    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
-        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (itemTrackerConfig.warnings.chat && price >= itemTrackerConfig.warnings.minimumChat && message) {
-            ChatUtils.chat(
-                componentBuilder {
-                    appendWithColor("+Tracker Drop", ChatFormatting.GREEN)
-                    appendWithColor(": ", ChatFormatting.GRAY)
-                    append("§r$itemName")
-                }
-            )
-        }
-        if (itemTrackerConfig.warnings.title && price >= itemTrackerConfig.warnings.minimumTitle) {
-            TitleManager.sendTitle("§a+ $itemName", weight = price)
-        }
-    }
-
     fun addPriceFromButton(lists: MutableList<Searchable>) {
-        if (isInventoryOpen()) {
-            lists.addButton<ItemPriceSource>(
-                label = "Price Source",
-                current = config.priceSource,
-                getName = { it.sellName },
-                onChange = {
-                    config.priceSource = it
-                    update()
-                },
-                universe = ItemPriceSource.entries,
-            )
-        }
-    }
-
-    override fun hideInEstimatedItemValue(): Boolean {
-        return config.itemTracker.hideInEstimatedItemValue
-    }
-
-    override fun hideOutsideInventory(): Boolean {
-        return config.itemTracker.hideOutsideInventory
+        if (!isInventoryOpen()) return
+        lists.addButton(
+            label = "Price Source",
+            current = trackerConfig.priceSource,
+            getName = { it.sellName },
+            onChange = {
+                trackerConfig.priceSource = it
+                update()
+            },
+            universe = ItemPriceSource.entries,
+        )
     }
 }

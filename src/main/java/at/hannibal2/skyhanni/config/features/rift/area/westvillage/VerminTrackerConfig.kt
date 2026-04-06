@@ -2,19 +2,21 @@ package at.hannibal2.skyhanni.config.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class VerminTrackerConfig {
+class VerminTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Show Counter", desc = "Count all §aSilverfish§7, §aSpiders, §7and §aFlies §7vacuumed.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show Outside West Village", desc = "Show the Vermin Tracker in other areas of The Rift.")
@@ -35,15 +37,12 @@ class VerminTrackerConfig {
     var hideChat: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<TrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = VerminTrackerConfig::class, field = "enabled")
-    val position: Position = Position(16, -232)
+    override val position: Position = Position(16, -232)
 }
 

@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.mining.nucleus
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,16 +14,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class CrystalNucleusTrackerConfig {
+class CrystalNucleusTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable the Crystal Nucleus Tracker overlay.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    override var enabled: Boolean = false
 
     @Expose
     @ConfigLink(owner = CrystalNucleusTrackerConfig::class, field = "enabled")
-    val position: Position = Position(20, 20)
+    override val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Outside of Nucleus", desc = "Show the tracker anywhere in the Crystal Hollows.")
@@ -55,10 +57,7 @@ class CrystalNucleusTrackerConfig {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<ItemTrackerSettings> = PerTrackerConfig()
 }

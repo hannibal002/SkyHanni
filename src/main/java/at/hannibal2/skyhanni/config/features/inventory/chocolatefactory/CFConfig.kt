@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -81,6 +80,11 @@ class CFConfig {
     @ConfigOption(name = "Hoppity Collection Stats", desc = "")
     @Accordion
     val hoppityCollectionStats: HoppityCollectionStatsConfig = HoppityCollectionStatsConfig()
+
+    @Expose
+    @ConfigOption(name = "Stray Tracker", desc = "")
+    @Accordion
+    val strayTracker: CFStrayTrackerConfig = CFStrayTrackerConfig()
 
     @Expose
     @ConfigOption(
@@ -235,24 +239,6 @@ class CFConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hotChocolateMixinRequirement: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var strayRabbitTracker: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Stray Tracker Settings",
-        desc = ""
-    )
-    @Accordion
-    val strayTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
-
-    @Expose
-    @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
-    val strayRabbitTrackerPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")

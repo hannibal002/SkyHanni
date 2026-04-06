@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualItemTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.ItemTrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,17 +13,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ForagingTrackerConfig {
-
+class ForagingTrackerConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Track drops from foraging.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    override var enabled: Boolean = true
 
     @Expose
     @ConfigLink(owner = ForagingTrackerConfig::class, field = "enabled")
-    val position: Position = Position(-300, 300)
+    override val position: Position = Position(-300, 300)
 
     @Expose
     @ConfigOption(name = "Compact Gifts", desc = "Compact the chat messages when you receive a tree gift.")
@@ -78,10 +79,7 @@ class ForagingTrackerConfig {
     var showWholeTrees: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<ItemTrackerSettings> = PerTrackerConfig()
 }

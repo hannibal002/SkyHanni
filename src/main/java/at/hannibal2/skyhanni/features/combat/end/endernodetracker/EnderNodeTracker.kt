@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayConfig
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
@@ -31,13 +33,17 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import at.hannibal2.skyhanni.utils.tracker.data.TrackerData
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
-object EnderNodeTracker {
+object EnderNodeTracker : SkyHanniTracker<EnderNodeTracker.Data>("Ender Node Tracker") {
 
-    private val config get() = SkyHanniMod.feature.combat.endIsland.enderNodeTracker
+    override val config get() = SkyHanniMod.feature.combat.endIsland.enderNodeTracker
+    override val storageAccessor: (ProfileSpecificStorage) -> Data = { it.enderNodeTracker }
+    override val renderConfig = RenderDisplayConfig(
+        condition = { config.enabled && isEnabled() },
+    )
 
     private var miteGelInInventory = 0
 
@@ -63,19 +69,11 @@ object EnderNodeTracker {
     // TODO add abstract logic with other pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
-    private val tracker = SkyHanniTracker(
-        "Ender Node Tracker",
-        ::Data,
-        { it.enderNodeTracker },
-        drawDisplay = { drawDisplay(it) },
-        trackerConfig = { config.perTrackerConfig }
-    )
-
     data class Data(
         @Expose var totalNodesMined: Long = 0,
         @Expose var totalEndermiteNests: Long = 0,
         @Expose var lootCount: MutableMap<EnderNode, Int> = mutableMapOf(),
-    ) : TrackerData<SessionUptime.Normal>(SessionUptime.Normal::class)
+    ) : TrackerData<SessionUptime.Normal>()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
@@ -104,25 +102,21 @@ object EnderNodeTracker {
 
         when (item) {
             null -> return
-            "§cEndermite Nest" -> {
-                tracker.modify { storage ->
-                    storage.totalEndermiteNests++
-                }
+            "§cEndermite Nest" -> modify {
+                it.totalEndermiteNests++
             }
         }
 
         // increment the count of the specific item found
         EnderNode.entries.find { it.displayName == item }?.let {
-            tracker.modify { storage ->
+            modify { storage ->
                 storage.lootCount.addOrPut(it, amount)
             }
         }
     }
 
-    private fun addOneNodeMined() {
-        tracker.modify { storage ->
-            storage.totalNodesMined++
-        }
+    private fun addOneNodeMined() = modify {
+        it.totalNodesMined++
     }
 
     @HandleEvent
@@ -142,8 +136,8 @@ object EnderNodeTracker {
             it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0
         } ?: return
 
-        tracker.modify { storage ->
-            storage.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
+        modify {
+            it.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
         }
     }
 
@@ -157,24 +151,18 @@ object EnderNodeTracker {
         }.sumOf { it.count }
 
         val change = newMiteGelInInventory - miteGelInInventory
-        if (change > 0) {
-            tracker.modify { storage ->
-                storage.lootCount.addOrPut(EnderNode.MITE_GEL, change)
-            }
+        if (change > 0) modify {
+            it.lootCount.addOrPut(EnderNode.MITE_GEL, change)
         }
         miteGelInInventory = newMiteGelInInventory
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { config.enabled && isEnabled() }
     }
 
     @HandleEvent
     fun onConfigLoad() {
         config.textFormat.afterChange {
-            tracker.update()
+            update()
         }
-        tracker.update()
+        update()
     }
 
     @HandleEvent
@@ -188,7 +176,7 @@ object EnderNodeTracker {
 
         val newProfit = mutableMapOf<EnderNode, Double>()
         for ((item, amount) in storage.lootCount) {
-            val altPrice = (if (!SkyBlockUtils.noTradeMode) tracker.getPricePer(item.internalName) else 0.0)
+            val altPrice = if (!SkyBlockUtils.noTradeMode) getPricePer(item.internalName) else 0.0
             val price = when (item.isEnderArmor()) {
                 true -> 10_000.0
                 false -> altPrice.coerceAtLeast(
@@ -261,7 +249,7 @@ object EnderNodeTracker {
         add(configItem to invoker)
     }
 
-    private fun drawDisplay(data: Data) = buildList {
+    override fun drawDisplayF(data: Data) = buildList {
         for (enabledOption in config.textFormat.get()) {
             val transformer = transformMap[enabledOption] ?: continue
             val nodeItem = enabledOption.toEnderNodeOrNull()
@@ -274,7 +262,7 @@ object EnderNodeTracker {
         event.registerBrigadier("shresetendernodetracker") {
             description = "Resets the Ender Node Tracker"
             category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
+            simpleCallback { resetCommand() }
         }
     }
 }

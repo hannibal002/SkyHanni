@@ -16,7 +16,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 @SkyHanniModule
 object FirePillarDisplay {
 
-    private val config get() = SlayerApi.config.blazes
+    private val config get() = SlayerApi.config.blaze
 
     /**
      * REGEX-TEST: §6§l2s §c§l8 hits

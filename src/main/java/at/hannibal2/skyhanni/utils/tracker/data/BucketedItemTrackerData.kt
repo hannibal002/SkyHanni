@@ -1,16 +1,38 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.ReflectionUtils.findGenericSuperclassTypeArgument
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
-import kotlin.reflect.KClass
 
-abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KClass<E>, session: KClass<T>) : ItemTrackerData<T>(session) {
+abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime> : ItemTrackerData<T>() {
+
+    // TODO these final overrides that throw exist because this class deliberately breaks the
+    //  ItemTrackerData contract for bucket-unaware operations (Liskov violation). The long-term
+    //  fix is to split ItemTrackerData so these methods live on a separate interface that
+    //  BucketedItemTrackerData simply does not implement.
 
     final override fun getDescription(timesGained: Long): List<String> =
         throw UnsupportedOperationException("Use getDescription(bucket, timesGained) instead")
 
     abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
+
+    internal fun getDropRate(dataMap: Map<E, Number>, bucket: E?, timesGained: Long): List<String> {
+        val divisor = 1.coerceAtLeast(
+            bucket?.let {
+                dataMap[it]?.toInt()
+            } ?: dataMap.values.sumOf { it.toInt() },
+        )
+        val percentage = timesGained.toDouble() / divisor
+        val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
+        return listOf(
+            "§7Dropped §e${timesGained.addSeparators()} §7times.",
+            "§7Your drop rate: §c$dropRate.",
+        )
+    }
 
     final override fun getCoinName(item: TrackedItem): String =
         throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
@@ -62,13 +84,17 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
         }
     }
 
-    abstract fun E.isBucketSelectable(): Boolean
-
+    open fun E.isBucketSelectable(): Boolean = this in buckets
     abstract fun bucketName(): String
 
-    private val buckets: Array<E> = clazz.java.enumConstants
+    private val buckets by lazy {
+        val enumClass = findGenericSuperclassTypeArgument<BucketedItemTrackerData<*, *>, Enum<E>>(index = 0)
+        @Suppress("UNCHECKED_CAST")
+        enumClass.enumConstants as? Array<E> ?: error("Enum enum contains not an instance of ${enumClass.name}")
+    }
     val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 
+    // The null key represents the "all buckets" scroll state when no bucket is selected.
     private val scrollValues: Map<E?, ScrollValue> = buckets.associateWith { ScrollValue() } + (null to ScrollValue())
     val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: ScrollValue()
 

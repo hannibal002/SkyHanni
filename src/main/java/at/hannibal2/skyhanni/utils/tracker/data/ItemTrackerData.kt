@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import kotlin.reflect.KClass
 
-abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerData<T>(clazz) {
+abstract class ItemTrackerData<T : SessionUptime> : TrackerData<T>() {
 
-    // default implementation, delegates to below
     open fun getDescription(item: TrackedItem) = getDescription(item.timesGained)
 
     abstract fun getDescription(timesGained: Long): List<String>
@@ -17,7 +17,7 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
     // TODO add amount in the string
     abstract fun getCoinDescription(item: TrackedItem): List<String>
 
-    open fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>) = tracker.getPricePer(internalName)
+    open fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*>) = tracker.getPricePer(internalName)
 
     override fun reset() {
         super.reset()
@@ -44,10 +44,10 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
         command: Boolean,
         removalRunner: (NeuInternalName) -> Unit? = { removeItem(internalName) },
     ) = apply {
-        if (!command) { timesGained++ }
+        if (!command) timesGained++
         totalAmount += amount
         lastTimeUpdated = SimpleTimeMark.now()
-        if (command && totalAmount <= 0) { removalRunner(internalName) }
+        if (command && totalAmount <= 0) removalRunner(internalName)
     }
 
     @Expose
@@ -57,6 +57,6 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
         @Expose var timesGained: Long = 0,
         @Expose var totalAmount: Long = 0,
         @Expose var hidden: Boolean = false,
-        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast()
+        var lastTimeUpdated: SimpleTimeMark = SimpleTimeMark.farPast(),
     )
 }

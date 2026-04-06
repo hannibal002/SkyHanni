@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.combat.end
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.TopLevelTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.tracker.generic.TrackerSettings
+import at.hannibal2.skyhanni.config.features.misc.tracker.individual.PerTrackerConfig
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -12,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class EnderNodeConfig {
+class EnderNodeConfig : TopLevelTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -21,7 +23,7 @@ class EnderNodeConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    override var enabled: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -96,14 +98,11 @@ class EnderNodeConfig {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Tracker Settings",
-        desc = ""
-    )
+    @ConfigOption(name = "Tracker Settings", desc = "")
     @Accordion
-    val perTrackerConfig: IndividualTrackerConfig = IndividualTrackerConfig()
+    override val perTrackerConfig: PerTrackerConfig<TrackerSettings> = PerTrackerConfig()
 
     @Expose
     @ConfigLink(owner = EnderNodeConfig::class, field = "enabled")
-    val position: Position = Position(10, 80)
+    override val position: Position = Position(10, 80)
 }

@@ -1,21 +1,33 @@
-package at.hannibal2.skyhanni.utils.tracker
+package at.hannibal2.skyhanni.utils.tracker.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.utils.Stopwatch
+import at.hannibal2.skyhanni.utils.tracker.GardenSession
+import at.hannibal2.skyhanni.utils.tracker.NormalSession
+import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import com.google.gson.annotations.Expose
-import kotlin.reflect.KClass
 import com.google.gson.annotations.SerializedName
+import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-abstract class TrackerData<T : SessionUptime>(
-    private val uptimeClass: KClass<T>,
-) : Resettable {
-    @Expose
-    private var migrated = false
+abstract class TrackerData<T : SessionUptime> : Resettable {
 
-    @Expose
+    // Resolve the SessionUptime subtype from the generic parameter at runtime.
+    // Type erasure means we cannot use T::class directly; the concrete subclass carries the
+    // type argument in its superclass signature, which ParameterizedType exposes via reflection.
+    @Suppress("UNCHECKED_CAST")
+    private val uptimeClass: KClass<T> by lazy {
+        val genericSuper = this.javaClass.genericSuperclass as ParameterizedType
+        val jClass = genericSuper.actualTypeArguments[0] as Class<T>
+        jClass.kotlin
+    }
+
+    // Gson may deserialize null keys or null values from saves written by older builds that
+    // had bugs or incomplete migration. Storing with nullable types absorbs those entries;
+    // the non-nullable cast below is safe after migrateData() removes all nulls.
     @SerializedName("sessionUptime")
     private val sessionUptimeInternal: MutableMap<SessionUptime?, Stopwatch?> = mutableMapOf()
 
@@ -23,11 +35,8 @@ abstract class TrackerData<T : SessionUptime>(
     private val sessionUptime: MutableMap<SessionUptime, Stopwatch>
         get() = sessionUptimeInternal as MutableMap<SessionUptime, Stopwatch>
 
-
-    override fun reset() {
-        super.reset()
-        sessionUptime.values.forEach { it.reset() }
-    }
+    @Expose
+    private var migrated = false
 
     private var activeSession: SessionUptime? = null
 
@@ -35,20 +44,19 @@ abstract class TrackerData<T : SessionUptime>(
         addSessionUptime()
     }
 
-    private fun addSessionUptime() {
-        when (uptimeClass) {
-            SessionUptime.Normal::class -> {
-                NormalSession.entries.forEach { session ->
-                    sessionUptime[SessionUptime.Normal(session)] = Stopwatch()
-                }
-            }
-
-            SessionUptime.Garden::class -> {
-                GardenSession.entries.forEach { session ->
-                    sessionUptime[SessionUptime.Garden(session)] = Stopwatch()
-                }
-            }
+    private fun addSessionUptime() = when (uptimeClass) {
+        SessionUptime.Normal::class -> NormalSession.entries.forEach { session ->
+            sessionUptime[SessionUptime.Normal(session)] = Stopwatch()
         }
+        SessionUptime.Garden::class -> GardenSession.entries.forEach { session ->
+            sessionUptime[SessionUptime.Garden(session)] = Stopwatch()
+        }
+        else -> {}
+    }
+
+    override fun reset() {
+        super.reset()
+        sessionUptime.values.forEach { it.reset() }
     }
 
     fun getSessionMap() = sessionUptime.toMap()
@@ -85,20 +93,21 @@ abstract class TrackerData<T : SessionUptime>(
 
     private fun migrateData() {
         migrated = true
-        // Old config versions may still hold null keys or values
+        // Remove null keys and values that may have been written by older builds.
         sessionUptimeInternal.entries.removeAll { it.key == null || it.value == null }
 
         when (uptimeClass) {
-            SessionUptime.Normal::class -> {
-                filterAndRemove(uptimeClass, SessionUptime.Normal(NormalSession.NORMAL))
-            }
-
-            SessionUptime.Garden::class -> {
-                filterAndRemove(uptimeClass, SessionUptime.Garden(GardenSession.UNKNOWN))
-            }
+            SessionUptime.Normal::class -> filterAndRemove(uptimeClass, SessionUptime.Normal(NormalSession.NORMAL))
+            SessionUptime.Garden::class -> filterAndRemove(uptimeClass, SessionUptime.Garden(GardenSession.UNKNOWN))
         }
     }
 
+    /**
+     * Merges any entries whose key is not an instance of [entryType] into [migratedSessionType].
+     *
+     * Preserves accumulated durations from saves written by older builds that stored session
+     * types differently, rather than silently discarding them.
+     */
     private fun filterAndRemove(entryType: KClass<out SessionUptime>, migratedSessionType: SessionUptime) {
         val entries = sessionUptime.entries.filter { entry ->
             !entryType.isInstance(entry.key)
@@ -111,4 +120,3 @@ abstract class TrackerData<T : SessionUptime>(
         }
     }
 }
-
