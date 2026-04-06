@@ -24,6 +24,7 @@ object ChimeraAchievement {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
+        if (AchievementManager.isCompleted(CHIMERA_ACHIEVEMENT)) return
         val enchantments = event.itemInHand?.getHypixelEnchantments() ?: return
         if (enchantments["ultimate_chimera"] == 5) {
             AchievementManager.completeAchievement(CHIMERA_ACHIEVEMENT)

@@ -63,6 +63,10 @@ object AchievementManager {
         return config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
     }
 
+    fun isCompleted(id: String): Boolean {
+        return config[id]?.data?.achieved ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
+    }
+
     fun setAchievement(id: String, achievement: Achievement) {
         if (HypixelData.hypixelAlpha) return
         config[id] = achievement
