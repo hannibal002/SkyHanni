@@ -73,25 +73,12 @@ object ToolLevelDisplay {
     }
 
     private fun getDisplay(): List<String>? = buildList {
+        add("§6Tool Levels")
         val heldItem = InventoryUtils.getItemInHand() ?: return null
         val toolExp = heldItem.getToolExp() ?: return null
         var toolLevel = heldItem.getToolLevel() ?: return null
         val toolLevels = toolLevels ?: return null
-
-        val type = when (heldItem.getItemCategoryOrNull()) {
-            ItemCategory.HOE -> "Hoe"
-            ItemCategory.AXE -> "Axe"
-            else -> "Tool"
-        }
-        val title = "§6$type Levels"
-
-        add(title)
-
-        val next = if (toolLevel <= toolLevels.size) {
-            toolLevels[toolLevel - 1]
-        } else {
-            toolOverflow
-        }
+        val next = if (toolLevel <= toolLevels.size) toolLevels[toolLevel - 1] else toolOverflow
 
         if (toolLevel > toolLevels.size && config.overflow) {
             val uuid = heldItem.getItemUuid()
