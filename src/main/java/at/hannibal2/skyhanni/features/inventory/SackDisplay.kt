@@ -66,6 +66,8 @@ object SackDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.item.getLoreComponent()
             storedPattern.matchAllComponents(lore) { component ->
+                // The amount (which is the component after "stored: ") is green when full.
+                // Because numbers in sacks are compacted, we cannot match the numbers directly.
                 if (component.siblings.elementAtOrNull(1)?.style?.color?.name == "green") {
                     slot.highlight(LorenzColor.RED)
                     return@matchAllComponents
