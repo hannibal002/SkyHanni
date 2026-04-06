@@ -137,7 +137,7 @@ object WardrobeApi {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inventoryPattern.matches(event.inventoryName).let {
             inWardrobe = it
-            if (CustomWardrobe.config.enabled) inCustomWardrobe = it
+            if (CustomWardrobe.config.enabled.get()) inCustomWardrobe = it
         }
     }
 

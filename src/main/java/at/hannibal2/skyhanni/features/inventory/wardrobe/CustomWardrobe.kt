@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.getTooltip
@@ -76,7 +75,7 @@ object CustomWardrobe {
     var renderableDimensions: Pair<Int, Int> = 0 to 0
         private set
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
         val renderable = displayRenderable ?: run {
@@ -104,7 +103,7 @@ object CustomWardrobe {
         position.moveTo(left, top)
         renderableTopCorner = left to top
 
-        if (waitingForInventoryUpdate && config.loadingText) {
+        if (waitingForInventoryUpdate && config.loadingText.get()) {
             val loadingRenderable = Renderable.text(
                 "§cLoading...",
                 scale = activeScale / 100.0,
@@ -125,7 +124,7 @@ object CustomWardrobe {
     }
 
     // Edit button in normal wardrobe while in edit mode
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
@@ -137,7 +136,7 @@ object CustomWardrobe {
             .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
         DelayedRun.runDelayed(300.milliseconds) {
@@ -199,12 +198,12 @@ object CustomWardrobe {
 
         if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cYour wardrobe is empty :("
 
-        if (config.hideLockedSlots) {
+        if (config.hideLockedSlots.get()) {
             wardrobeSlots = wardrobeSlots.filter { !it.locked }
             if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cAll your slots are locked? Somehow"
         }
 
-        if (config.hideEmptySlots) {
+        if (config.hideEmptySlots.get()) {
             wardrobeSlots = wardrobeSlots.filter { !it.isEmpty() }
             if (wardrobeSlots.isEmpty()) wardrobeWarning = "§cAll slots are empty :("
         }
@@ -241,7 +240,7 @@ object CustomWardrobe {
                         tips = toolTip,
                         stack = stack,
                         condition = {
-                            !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                            !config.showTooltipOnlyKeybind.get() || config.tooltipKeybind.isKeyHeld()
                         },
                         onHover = {
                             if (EstimatedItemValue.config.enabled) EstimatedItemValue.updateItem(stack)
@@ -517,7 +516,7 @@ object CustomWardrobe {
                     },
                 ),
             )
-            if (config.estimatedValue && shouldRender) {
+            if (config.estimatedValue.get() && shouldRender) {
                 add(
                     Renderable.hoverTips(
                         centerString("§2$", scale = textScale),
@@ -656,7 +655,7 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
+    private fun isEnabled() = config.enabled.get() && WardrobeApi.inWardrobe()
 
     private fun centerString(
         text: String,

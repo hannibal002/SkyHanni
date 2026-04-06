@@ -6,6 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
 class CustomWardrobeConfig {
@@ -13,7 +14,7 @@ class CustomWardrobeConfig {
     @ConfigOption(name = "Enable", desc = "Enable the Custom Wardrobe GUI.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = true
+    val enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Follow mouse", desc = "Whether the \"players\" follow the movement of the mouse.")
@@ -21,14 +22,19 @@ class CustomWardrobeConfig {
     var eyesFollowMouse: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Animate Skins", desc = "When a skin is animated, plays the animation in the gui.")
+    @ConfigEditorBoolean
+    val animatedSkins: Property<Boolean> = Property.of(true)
+
+    @Expose
     @ConfigOption(name = "Hide Empty Slots", desc = "Hide wardrobe slots with no armor.")
     @ConfigEditorBoolean
-    var hideEmptySlots: Boolean = false
+    val hideEmptySlots: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Locked Slots", desc = "Hide locked wardrobe slots.")
     @ConfigEditorBoolean
-    var hideLockedSlots: Boolean = false
+    val hideLockedSlots: Property<Boolean> = Property.of(false)
 
     @Expose
     var onlyFavorites: Boolean = false
@@ -36,7 +42,7 @@ class CustomWardrobeConfig {
     @Expose
     @ConfigOption(name = "Estimated Value", desc = "Show a §2$ §7sign you can hover to see the wardrobe slot value.")
     @ConfigEditorBoolean
-    var estimatedValue: Boolean = true
+    val estimatedValue: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -44,7 +50,7 @@ class CustomWardrobeConfig {
         desc = "Show a \"§cLoading...§7\" text when the wardrobe page hasn't fully loaded in yet."
     )
     @ConfigEditorBoolean
-    var loadingText: Boolean = true
+    val loadingText: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -52,7 +58,7 @@ class CustomWardrobeConfig {
         desc = "Only show the lore of the item hovered when holding a keybind."
     )
     @ConfigEditorBoolean
-    var showTooltipOnlyKeybind: Boolean = false
+    val showTooltipOnlyKeybind: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Tooltip Keybind", desc = "Press this key to show the item tooltip.")
@@ -62,19 +68,17 @@ class CustomWardrobeConfig {
     @Expose
     @ConfigOption(name = "Show REI Items", desc = "Enables showing the REI item list from Firmament while in the custom wardrobe.")
     @ConfigEditorBoolean
-    var showReiItems: Boolean = true
+    val showReiItems: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Colors", desc = "Change the color settings.")
     @Accordion
-    @Suppress("StorageVarOrVal")
-    var color: ColorConfig = ColorConfig()
+    val color: ColorConfig = ColorConfig()
 
     @Expose
     @ConfigOption(name = "Spacing", desc = "")
     @Accordion
-    @Suppress("StorageVarOrVal")
-    var spacing: SpacingConfig = SpacingConfig()
+    val spacing: SpacingConfig = SpacingConfig()
 
     @Expose
     @ConfigOption(name = "Keybinds", desc = "")
