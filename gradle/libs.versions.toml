@@ -22,7 +22,7 @@ detekt = "2.0.0-alpha.2"
 
 devauth = "1.2.1"
 junit = "5.11.0"
-mockk = "1.12.5"
+mockk = "1.13.12"
 commons-net = "3.11.1"
 keval = "1.1.1"
 httpclient = "4.5.14"
@@ -49,6 +49,7 @@ devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth"
 junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-agent = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
 commons-net = { module = "commons-net:commons-net", version.ref = "commons-net" }
 keval = { module = "com.notkamui.libs:keval", version.ref = "keval" }
 httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
