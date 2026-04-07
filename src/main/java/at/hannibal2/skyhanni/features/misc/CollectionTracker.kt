@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -20,12 +20,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -56,14 +59,12 @@ object CollectionTracker {
         event.registerBrigadier("shtrackcollection") {
             description = "Tracks your collection gain over time"
             category = CommandCategory.USERS_ACTIVE
-            arg(
-                "args", BrigadierArguments.greedyString(),
-            ) { args ->
+            arg("args", BrigadierArguments.greedyString()) { args ->
                 callback { command(getArg(args).split(" ").toTypedArray()) }
             }
             simpleCallback {
                 if (internalName == null) {
-                    ChatUtils.userError("/shtrackcollection <item name> [goal amount]")
+                    ChatUtils.userError("Usage: /shtrackcollection <item name> [goal amount]")
                 } else {
                     ChatUtils.chat("Stopped collection tracker.")
                     resetData()
@@ -78,7 +79,7 @@ object CollectionTracker {
         val nameArgs = if (lastArg.isFormatNumber()) {
             val goal = lastArg.formatLong()
             if (goal <= 0) {
-                ChatUtils.chat("Invalid Amount for Goal.")
+                ChatUtils.chat("Invalid amount for goal.")
                 return
             }
             goalAmount = goal
@@ -108,7 +109,7 @@ object CollectionTracker {
             ChatUtils.userError("Item '$rawName' does not exist!")
             return
         }
-        setNewCollection(foundInternalName, stack.hoverName.string.removeColor())
+        setNewCollection(foundInternalName, stack.cleanName())
     }
 
     // TODO repo
@@ -148,7 +149,21 @@ object CollectionTracker {
 
         lastAmountInInventory = countCurrentlyInInventory()
         updateDisplay()
-        ChatUtils.chat("Started tracking $itemName §ecollection.")
+        ChatUtils.chat(
+            componentBuilder {
+                append("Started tracking $itemName collection.\n")
+                append("Run ")
+                appendWithColor("/shtrackcollection", ChatFormatting.AQUA) {
+                    command = "/shtrackcollection"
+                }
+                append(" without arguments to stop.\n")
+                appendWithColor(
+                    "Warning: This feature is not actively maintained and is likely to be " +
+                        "inaccurate.",
+                    ChatFormatting.GOLD,
+                )
+            }
+        )
     }
 
     private fun resetData() {
@@ -189,20 +204,17 @@ object CollectionTracker {
 
     private fun countCurrentlyInInventory(): Int = InventoryUtils.countItemsInLowerInventory {
         val name = it.getInternalName()
-        if (internalName == CACTUS && name == CACTUS_GREEN) {
-            return@countItemsInLowerInventory true
-        }
-        if (internalName == TIMITE && (name == YOUNGITE || name == OBSOLITE)) {
-            return@countItemsInLowerInventory true
-        }
-        name == internalName
+        name == internalName ||
+            (internalName == CACTUS && name == CACTUS_GREEN) ||
+            (internalName == TIMITE && name.equalsOneOf(YOUNGITE, OBSOLITE))
     }
 
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
-        return CollectionApi.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
-            .map { it.hoverName.string.removeColor().replace(" ", "_") }
+        return CollectionApi.collectionValue.keys
+            .mapNotNull { it.getItemStackOrNull() }
+            .map { it.cleanName().replace(" ", "_") }
     }
 
     @HandleEvent
@@ -244,9 +256,11 @@ object CollectionTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         display?.let {
-            SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(it, posLabel = "Collection Tracker")
+            SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(
+                it, posLabel = "Collection Tracker",
+            )
         }
     }
 }
