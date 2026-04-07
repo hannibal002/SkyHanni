@@ -200,7 +200,7 @@ object CustomWardrobe : SkyHanniContainerOverlayScreen(
             if (stack != null) {
                 renderable = Renderable.hoverTips(
                     renderable,
-                    tipsProvider = { getToolTip(stack, slot) ?: emptyList() },
+                    tipsProvider = { getToolTip(stack, slot).orEmpty() },
                     stack = stack,
                     condition = {
                         !config.showTooltipOnlyKeybind.get() || config.tooltipKeybind.isKeyHeld()
