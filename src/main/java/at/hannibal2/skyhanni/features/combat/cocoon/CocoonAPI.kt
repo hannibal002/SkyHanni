@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

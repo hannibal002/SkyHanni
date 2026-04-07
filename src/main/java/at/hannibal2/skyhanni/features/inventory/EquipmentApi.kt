@@ -46,7 +46,7 @@ object EquipmentApi {
 
     fun getAll(): List<ItemStack> = equipment?.filterNotNull() ?: emptyList()
 
-    private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?)  {
+    private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) {
         equipment?.set(slot.ordinal, itemStack)
         SkyblockEquipmentChangeEvent(slot, itemStack).post()
     }
