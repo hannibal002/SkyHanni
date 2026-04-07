@@ -52,13 +52,13 @@ class ExtendedChatColor(
                 }
             }
             event.registerBrigadier("shtestcomponentbuilder") {
-                description = "Sends an example componentBuilder output in chat"
+                description = "Sends an example component builder output in chat"
                 category = CommandCategory.DEVELOPER_TEST
                 simpleCallback {
                     ChatUtils.chat(
                         buildComponent {
                             withColor(1146986)
-                            append("Hello this is the componentBuilder ")
+                            append("Hello this is the component builder ")
                             append("example") {
                                 underlined = true
                                 hover = Component.literal("ඞ")
