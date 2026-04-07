@@ -5,6 +5,7 @@ import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.task.RemapSourcesJarTask
+import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -163,6 +164,9 @@ dependencies {
     // Calculator
     includeImplementation(libs.keval)
 
+    // Repo mgmt
+    includeImplementation(libs.jgit)
+
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
@@ -198,8 +202,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.2"
         }
     }
 }
@@ -264,7 +267,15 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
-        freeCompilerArgs.addAll("-Xbackend-threads=0")
+        optIn.addAll(
+            "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+        )
+        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+        // leaving corrupt .class files that break subsequent incremental builds.
+        // see: https://youtrack.jetbrains.com/issue/KT-85498/
+        freeCompilerArgs.addAll(
+            "-Xbackend-threads=1",
+        )
     }
 }
 
@@ -394,6 +405,11 @@ tasks.withType<RemapSourcesJarTask>().configureEach {
 
 tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
     enabled = false
+}
+
+tasks.withType<ValidateAccessWidenerTask>().configureEach {
+    // This must be explicitly declared because of configuration cache shenanigans
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {

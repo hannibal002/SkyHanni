@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.animal.golem.IronGolem
@@ -88,10 +87,10 @@ object HideFarEntities {
             // other party members
             list += allEntities.filter { it is RemotePlayer && !it.isNpc() }
         }
-        if (IslandType.WINTER.isCurrent()) {
+        if (IslandType.WINTER.isInIsland()) {
             list += allEntities.filter { it is MagmaCube }
         }
-        if (IslandType.DWARVEN_MINES.isCurrent()) {
+        if (IslandType.DWARVEN_MINES.isInIsland()) {
             // powder ghast & golem defender (from goblin raid event)
             list += allEntities.filter { it is Ghast || it is IronGolem }
         }

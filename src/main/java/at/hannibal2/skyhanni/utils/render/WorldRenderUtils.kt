@@ -817,6 +817,11 @@ object WorldRenderUtils {
         drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
+    @Deprecated("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
+        drawLineToCrosshair(location, color, lineWidth, depth)
+    }
+
     fun SkyHanniRenderWorldEvent.drawLineToCrosshair(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(
             exactPlayerCrosshairLocation(),

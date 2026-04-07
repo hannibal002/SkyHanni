@@ -237,7 +237,7 @@ object TunnelsMaps {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS")
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -538,6 +538,6 @@ object TunnelsMaps {
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isCurrent() && config.enable &&
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable &&
             (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
 }

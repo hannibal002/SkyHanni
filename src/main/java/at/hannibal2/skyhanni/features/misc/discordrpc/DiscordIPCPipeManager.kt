@@ -43,6 +43,7 @@ object DiscordIPCPipeManager {
             env("XDG_RUNTIME_DIR"),
             env("TMPDIR"),
             env("TMP"),
+            env("TEMP"),
             uid?.let { "/run/user/$it" },
             "/tmp",
         ).distinct()

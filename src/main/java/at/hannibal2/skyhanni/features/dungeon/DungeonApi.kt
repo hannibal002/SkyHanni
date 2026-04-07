@@ -142,7 +142,7 @@ object DungeonApi {
         }
     }
 
-    fun inDungeon(): Boolean = IslandType.CATACOMBS.isCurrent()
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
 
     fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
 
@@ -457,7 +457,7 @@ object DungeonApi {
             val dungeonClassName = group("className")
             val dungeonClassLevel = group("classLevel")
 
-            playerTeamClasses.find { it.username == username }?.let { player ->
+            playerTeamClasses.find { teamClass -> teamClass.username == username }?.let { player ->
                 player.playerDead = playerDead
                 if (player.dungeonClass == null && !playerDead) {
                     player.dungeonClass = DungeonClass.getByClassName(dungeonClassName)

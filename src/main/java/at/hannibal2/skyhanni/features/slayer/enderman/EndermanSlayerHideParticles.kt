@@ -31,7 +31,7 @@ object EndermanSlayerHideParticles {
         }
     }
 
-    fun isEnabled() = IslandType.THE_END.isCurrent() && SlayerApi.config.endermen.hideParticles
+    fun isEnabled() = IslandType.THE_END.isInIsland() && SlayerApi.config.endermen.hideParticles
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
