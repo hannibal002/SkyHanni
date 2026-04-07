@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AnimatedSkinUtils
@@ -102,6 +103,13 @@ object WardrobeApi {
         "FERMENTO_ULTIMATE",
     )
 
+    private var armorFrameCache: MutableMap<String, List<ItemStackAnimatedFrame>> = mutableMapOf()
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        armorFrameCache.clear()
+    }
+
     fun getArmorAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
         val skinInternalName = stack.getHelmetSkin()?.asString() ?: return null
         if (skinInternalName in skinsNoAnimation) return null
@@ -110,18 +118,22 @@ object WardrobeApi {
         // Pick the single texture that matches the item's stored variant index.
         if (animJson.ticks <= 0 && animJson.textures.size > 1) {
             val variantIndex = stack.getExtraAttributes()?.let { AnimatedSkinUtils.getVariantIndexOrNull(it) } ?: 0
-            val texture = animJson.textures.getOrElse(variantIndex) { animJson.textures.first() }
-            return listOf(ItemStackAnimatedFrame(texture.buildTextureItemStack(), 0))
+            val cacheKey = "$skinInternalName:$variantIndex"
+            return armorFrameCache.getOrPut(cacheKey) {
+                val texture = animJson.textures.getOrElse(variantIndex) { animJson.textures.first() }
+                listOf(ItemStackAnimatedFrame(texture.buildTextureItemStack(), 0))
+            }
         }
-        return animJson.textures.map { ItemStackAnimatedFrame(it.buildTextureItemStack(), animJson.ticks) }
+        return armorFrameCache.getOrPut(skinInternalName) {
+            animJson.textures.map { ItemStackAnimatedFrame(it.buildTextureItemStack(), animJson.ticks) }
+        }
     }
 
     fun getArmorDyeAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
         val dyeInternalName = stack.getArmorDye() ?: return null
         val dyeColors = AnimatedSkinUtils.animatedDyes[dyeInternalName] ?: return null
         if (dyeColors.size <= 1) return null
-        return dyeColors.map { hexColor ->
-            val colorInt = hexColor.trimStart('#').toLong(16).toInt()
+        return dyeColors.map { colorInt ->
             val dyedStack = stack.copy()
             dyedStack.set(DataComponents.DYED_COLOR, DyedItemColor(colorInt))
             ItemStackAnimatedFrame(dyedStack, 1)

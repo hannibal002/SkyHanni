@@ -23,8 +23,8 @@ object AnimatedSkinUtils {
 
     private val repoReloadCoroutine = CoroutineSettings("animated skin utils repo reload")
 
-    /** Animated dye entries for armor */
-    var animatedDyes: Map<NeuInternalName, List<String>> = mapOf()
+    /** Animated dye entries for armor, with hex strings pre-parsed into color integers. */
+    var animatedDyes: Map<NeuInternalName, List<Int>> = mapOf()
         private set
 
     /** Animated skin entries for armor (keys do not start with `PET_SKIN`). */
@@ -54,7 +54,7 @@ object AnimatedSkinUtils {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = repoReloadCoroutine.launch {
         val dyeData = event.getConstantAsync<NeuAnimatedDyeJson>("dyes")
-        animatedDyes = dyeData.animated
+        animatedDyes = dyeData.animated.mapValues { (_, colors) -> colors.map { it.trimStart('#').toLong(16).toInt() } }
 
         val skinData = event.getConstantAsync<NeuAnimatedSkullsJson>("animatedskulls")
         armorSkins = skinData.skins.filterKeys { !it.startsWith("PET_SKIN") }
