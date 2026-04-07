@@ -8,7 +8,6 @@ import com.mojang.authlib.properties.Property
 import java.util.UUID
 import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
-import net.minecraft.world.item.ItemStack
 
 data class NeuNbtInfoJson(
     @Expose @SerializedName("HideFlags") val hideFlags: Int?,
