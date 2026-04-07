@@ -55,7 +55,7 @@ object CocoonAPI {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEquipmentChangeEvent(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        if (IslandType.THE_RIFT.isCurrent()) return
+        if (IslandType.THE_RIFT.isInIsland()) return
         val entity = event.entity
         if (!entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val position = entity.getLorenzVec()
@@ -77,7 +77,7 @@ object CocoonAPI {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
-        if (IslandType.THE_RIFT.isCurrent()) return
+        if (IslandType.THE_RIFT.isInIsland()) return
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         val cocoonMob = cocoon.mob
         val timeSince = cocoon.spawnTime.passedSince()

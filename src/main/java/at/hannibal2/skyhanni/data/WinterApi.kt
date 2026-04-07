@@ -11,7 +11,7 @@ object WinterApi {
 
     private var inArea = false
 
-    fun inWorkshop() = IslandType.WINTER.isCurrent()
+    fun inWorkshop() = IslandType.WINTER.isInIsland()
 
     fun inGlacialCave() = inWorkshop() && inArea
 

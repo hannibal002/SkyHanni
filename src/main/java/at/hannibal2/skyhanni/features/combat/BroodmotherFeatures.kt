@@ -185,7 +185,7 @@ object BroodmotherFeatures {
         }
     }
 
-    private fun inSpidersDen() = IslandType.SPIDER_DEN.isCurrent()
+    private fun inSpidersDen() = IslandType.SPIDER_DEN.isInIsland()
     private fun isCountdownEnabled() = inSpidersDen() && config.countdown
     private fun isAliveMessageEnabled() = config.alertOnSpawn || config.stages.contains(StageEntry.ALIVE)
 }

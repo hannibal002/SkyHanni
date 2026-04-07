@@ -44,5 +44,5 @@ object VolcanoExplosivityDisplay {
         config.positionVolcano.renderRenderable(Renderable.text(display), posLabel = "Volcano Explosivity")
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.volcanoExplosivity
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.volcanoExplosivity
 }

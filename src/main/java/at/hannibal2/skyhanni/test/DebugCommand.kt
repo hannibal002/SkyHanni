@@ -207,7 +207,7 @@ object DebugCommand {
 
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
-        val tps = TpsCounter.tps ?: 0.0
+        val tps = TpsCounter.rawTps ?: 0.0
         val pingEnabled = DevApi.mainToggles.pingApi
 
         val list = buildList {

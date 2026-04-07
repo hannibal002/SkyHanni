@@ -242,7 +242,7 @@ object ApiInternalUtils {
             val raw = if (tryForceGzip) GZIPInputStream(this.content) else this.content
             val text = raw.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
             if (text.isBlank()) null
-            else ConfigManager.Companion.gson.fromJson<T>(text)
+            else ConfigManager.gson.fromJson<T>(text)
         }.getOrNull()
     }
     // </editor-fold>

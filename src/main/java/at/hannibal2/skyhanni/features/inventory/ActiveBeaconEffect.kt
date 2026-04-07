@@ -64,5 +64,5 @@ object ActiveBeaconEffect {
         event.container.getSlot(slot).highlight(LorenzColor.GREEN)
     }
 
-    fun isEnabled() = IslandType.PRIVATE_ISLAND.isCurrent() && config.highlightActiveBeaconEffect
+    fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.highlightActiveBeaconEffect
 }

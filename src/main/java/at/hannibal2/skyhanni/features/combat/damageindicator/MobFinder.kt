@@ -344,8 +344,8 @@ class MobFinder {
     // TODO testing and use sidebar data
     @Suppress("UnusedParameter")
     private fun tryAddEntityDragon(mob: Mob) = when {
-        IslandType.THE_END.isCurrent() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
-        IslandType.WINTER.isCurrent() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
+        IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
+        IslandType.WINTER.isInIsland() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
 
         else -> null
     }
@@ -415,7 +415,7 @@ class MobFinder {
         if (mob.name == "Conjoined Brood") {
             return EntityResult(bossType = BossType.SLAYER_SPIDER_5_2)
         }
-        if (IslandType.SPIDER_DEN.isCurrent()) {
+        if (IslandType.SPIDER_DEN.isInIsland()) {
             if (mob.name == "Broodmother") {
                 return EntityResult(bossType = BossType.BROODMOTHER)
             }
