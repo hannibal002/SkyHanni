@@ -1,18 +1,22 @@
-package at.hannibal2.skyhanni.detektrules.imports
+package imports
 
 import com.google.auto.service.AutoService
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.RuleSet
-import io.gitlab.arturbosch.detekt.api.RuleSetProvider
+import dev.detekt.api.RuleName
+import dev.detekt.api.RuleSet
+import dev.detekt.api.RuleSetId
+import dev.detekt.api.RuleSetProvider
 
 @AutoService(RuleSetProvider::class)
 class ImportRuleSetProvider : RuleSetProvider {
-    override val ruleSetId: String = "ImportRules"
+    override val ruleSetId: RuleSetId = RuleSetId("ImportRules")
 
-    override fun instance(config: Config): RuleSet {
-        return RuleSet(ruleSetId, listOf(
-            CustomImportOrdering(config),
-            PreprocessingImportOrdering(config),
-        ))
+    override fun instance(): RuleSet {
+        return RuleSet(
+            ruleSetId,
+            mapOf(
+                RuleName("CustomImportOrdering") to ::CustomImportOrdering,
+                RuleName("PreprocessingImportOrdering") to ::PreprocessingImportOrdering,
+            ),
+        )
     }
 }

@@ -110,16 +110,13 @@ object CustomWardrobe {
                 .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f)
-
-        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-
-        if (EstimatedItemValue.config.enabled) {
-            DrawContextUtils.translate(0f, 0f)
-            EstimatedItemValue.tryRendering()
+        DrawContextUtils.translatedPushPopResult(0f, 0f) {
+            position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+            if (EstimatedItemValue.config.enabled) {
+                DrawContextUtils.translate(0f, 0f)
+                EstimatedItemValue.tryRendering()
+            }
         }
-        DrawContextUtils.popMatrix()
         event.cancel()
     }
 
@@ -282,7 +279,7 @@ object CustomWardrobe {
 
         for (equipment in net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
-            if (armorOrdinal < 0 || armorOrdinal > 3) continue
+            if (armorOrdinal !in 0..3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
             if (stack == null) stack = ItemStack.EMPTY
             fakePlayer.equipment.set(equipment, stack)

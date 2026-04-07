@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import com.google.gson.JsonPrimitive
@@ -123,7 +123,7 @@ object PestParticleWaypoint {
         event.drawWaypointFilled(waypoint, color.toColor(), beacon = true)
         event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
         if (config.drawLine) {
-            event.drawLineToEye(
+            event.drawLineToCrosshair(
                 waypoint.add(0.5, 0.5, 0.5),
                 color,
                 3,

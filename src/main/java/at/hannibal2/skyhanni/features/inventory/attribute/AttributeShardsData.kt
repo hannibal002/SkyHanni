@@ -330,14 +330,12 @@ object AttributeShardsData {
                 val source = shouldPostGainEvent.second
                 val newSource = if (source == null) {
                     val type = groupOrNull("charmType")
-                    if (type == "CHARM") {
-                        ShardSource.CHARM
-                    } else if (type == "NAGA") {
-                        ShardSource.NAGA
-                    } else if (type == "SALT") {
-                        ShardSource.SALT
-                    } else {
-                        ShardSource.UNKNOWN
+                    when (type) {
+                        "CHARM" -> ShardSource.CHARM
+                        "NAGA" -> ShardSource.NAGA
+                        "SALT" -> ShardSource.SALT
+
+                        else -> ShardSource.UNKNOWN
                     }
                 } else {
                     source
@@ -576,7 +574,7 @@ object AttributeShardsData {
         ChatUtils.clickableChat(
             "Reset hunting box shards data. Open the hunting box or click here to update the saved data.",
             { HypixelCommands.huntingBox() },
-            "§eClick here to open the hunting box!"
+            "§eClick here to open the hunting box!",
         )
     }
 

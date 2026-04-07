@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobCategory
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.entity.LivingEntity
@@ -87,7 +87,7 @@ object DungeonMobManager {
         if (fel.line) {
             val color = getFelColor()
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {
-                event.drawLineToEye(
+                event.drawLineToCrosshair(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
                     color,
                     3,

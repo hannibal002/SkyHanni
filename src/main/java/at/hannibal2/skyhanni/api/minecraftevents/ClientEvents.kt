@@ -21,17 +21,14 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
-import net.minecraft.server.packs.resources.PreparableReloadListener
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executor
 
 @SkyHanniModule
 object ClientEvents {
@@ -41,58 +38,38 @@ object ClientEvents {
     init {
 
         // Tick event
-        ClientTickEvents.START_WORLD_TICK.register(
-            ClientTickEvents.StartWorldTick {
-                if (!MinecraftCompat.localPlayerExists) return@StartWorldTick
-                if (!MinecraftCompat.localWorldExists) return@StartWorldTick
+        ClientTickEvents.END_CLIENT_TICK.register {
+            if (!MinecraftCompat.localPlayerExists) return@register
+            if (!MinecraftCompat.localWorldExists) return@register
 
-                DelayedRun.checkRuns()
-                totalTicks++
-                SkyHanniTickEvent(totalTicks).post()
-            },
-        )
+            SkyHanniTickEvent(++totalTicks).post()
+
+            DelayedRun.checkRuns()
+        }
 
         // Disconnect event
-        ClientPlayConnectionEvents.DISCONNECT.register(
-            ClientPlayConnectionEvents.Disconnect { _, _ ->
-                ClientDisconnectEvent.post()
-            },
-        )
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
+            ClientDisconnectEvent.post()
+        }
 
         // Connect event
-        ClientPlayConnectionEvents.JOIN.register(
-            ClientPlayConnectionEvents.Join { _, _, _ ->
-                ClientConnectEvent.post()
-            },
-        )
+        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+            ClientConnectEvent.post()
+        }
 
         // World change event
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(
-            ClientWorldEvents.AfterClientWorldChange { client, world ->
-                WorldChangeEvent().post()
-            },
-        )
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { _, _ ->
+            WorldChangeEvent.post()
+        }
 
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
-            object : IdentifiableResourceReloadListener {
-
-                override fun getFabricId(): Identifier =
-                    Identifier.fromNamespaceAndPath("skyhanni", "resources")
-
-                @Suppress("ForbiddenVoid")
-                override fun reload(
-                    store: PreparableReloadListener.SharedState,
-                    prepareExecutor: Executor,
-                    reloadSynchronizer: PreparableReloadListener.PreparationBarrier,
-                    applyExecutor: Executor,
-                ): CompletableFuture<Void> {
-                    return CompletableFuture.runAsync(
-                        { ResourcePackReloadEvent(store.resourceManager()).post() },
-                        applyExecutor,
-                    ).thenCompose(reloadSynchronizer::wait)
-                }
-            },
-        )
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(
+            Identifier.fromNamespaceAndPath("skyhanni", "resources"),
+        ) { currentReload, _, preparationBarrier, reloadExecutor ->
+            CompletableFuture.runAsync(
+                { ResourcePackReloadEvent(currentReload.resourceManager()).post() },
+                reloadExecutor,
+            ).thenCompose(preparationBarrier::wait)
+        }
 
         ClientReceiveMessageEvents.ALLOW_GAME.register(::onAllow)
         ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)

@@ -58,7 +58,7 @@ object FireFreezeFeatures {
         }
 
         fun hasFinished(): Boolean = frozen || startTime.passedSince() > 0.5.seconds
-        // 0.5s passed since is for times where the fire freeze misses and hypixel plays no noise.
+        // 0.5s passed since is for times when the fire freeze misses and hypixel plays no noise.
 
         fun freezeMobs() {
             if (frozen) return

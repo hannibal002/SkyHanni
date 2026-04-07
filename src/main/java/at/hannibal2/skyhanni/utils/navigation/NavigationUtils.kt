@@ -138,7 +138,7 @@ object NavigationUtils {
         fun dfs(node: GraphNode, cluster: MutableList<GraphNode>) {
             visited.add(node)
             cluster.add(node)
-            for (neighbor in node.neighbours) {
+            for (neighbor in node.neighbors) {
                 // Ensure neighbor.key equals one of the target nodes.
                 if (targetNodes.contains(neighbor.key) && !visited.contains(neighbor.key)) {
                     dfs(neighbor.key, cluster)

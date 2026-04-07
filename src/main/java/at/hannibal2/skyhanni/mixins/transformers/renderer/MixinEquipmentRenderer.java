@@ -22,12 +22,9 @@ public class MixinEquipmentRenderer {
              Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
              if (entityAlpha == null) return original;
 
-             //? if < 1.21.11 {
+             //~ if > 1.21.10 'RenderType' -> 'RenderTypes'
              return RenderType.armorTranslucent(identifier);
-             //?} else
-             //return RenderTypes.armorTranslucent(identifier);
          }
          return original;
      }
-
 }

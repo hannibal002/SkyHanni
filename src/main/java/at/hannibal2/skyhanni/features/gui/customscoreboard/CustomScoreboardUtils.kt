@@ -68,7 +68,6 @@ object CustomScoreboardUtils {
     internal fun formatNumber(number: Number): String = when (displayConfig.numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> number.shortFormat()
         DisplayConfig.NumberFormat.LONG -> number.addSeparators()
-        else -> "0"
     }
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
@@ -99,7 +98,7 @@ object CustomScoreboardUtils {
 
     internal fun getHeat() = MiningApi.heatDisplay
 
-    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSBLines(), "northStars") ?: "0"
+    internal fun getNorthStars() = getGroup(ScoreboardPattern.northStarsPattern, getSBLines(), "northStars") ?: "0"
 
     internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSBLines(), "symbol").orEmpty()
 

@@ -18,19 +18,18 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import net.minecraft.world.entity.Entity
@@ -49,7 +48,7 @@ object EndermanSlayerFeatures {
     private val flyingBeacons = mutableSetOf<ArmorStand>()
     private val nukekubiSkulls = mutableSetOf<ArmorStand>()
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
-    private val logger = LorenzLogger("slayer/enderman")
+    private val logger = SkyHanniLogger("slayer/enderman")
 
     private val NUKEKUBI_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_NUKEKUBI") }
 
@@ -131,7 +130,7 @@ object EndermanSlayerFeatures {
                 val skullLocation = event.exactLocation(skull)
                 // TODO remove visibility check once the skull stops moving
                 if (!skull.canBeSeen(viewDistance = 20)) continue
-                event.drawLineToEye(
+                event.drawLineToCrosshair(
                     skullLocation.up(),
                     LorenzColor.GOLD.toChromaColor(),
                     3,
@@ -151,7 +150,7 @@ object EndermanSlayerFeatures {
 
             if (beaconConfig.showLine) {
                 val beaconLocation = event.exactLocation(beacon)
-                event.drawLineToEye(
+                event.drawLineToCrosshair(
                     beaconLocation.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor,
                     beaconConfig.lineWidth,
@@ -165,7 +164,7 @@ object EndermanSlayerFeatures {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {
-                event.drawLineToEye(
+                event.drawLineToCrosshair(
                     location.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor,
                     beaconConfig.lineWidth,

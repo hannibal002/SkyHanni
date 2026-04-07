@@ -9,7 +9,7 @@ data class DijkstraTree(
      */
     val distances: Map<GraphNode, Double>,
     /**
-     * A map of nodes to the neighbouring node that is the quickest path towards the origin (the neighbouring node
+     * A map of nodes to the neighboring node that is the quickest path towards the origin (the neighboring node
      * that has the lowest value in [distances]).
      */
     val towardsOrigin: Map<GraphNode, GraphNode>,

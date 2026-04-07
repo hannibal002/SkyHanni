@@ -62,7 +62,7 @@ object DungeonCreationCooldown {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!cooldown.isInFuture()) return
         val display = Renderable.text("§eDungeon Creation Cooldown: §b${cooldown.timeUntil().format()}")

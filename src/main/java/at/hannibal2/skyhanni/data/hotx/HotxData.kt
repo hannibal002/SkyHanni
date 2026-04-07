@@ -22,7 +22,7 @@ interface HotxData<Reward> {
     val guiName: String
 
     /**
-     * Userfacing name of the Perk
+     * User-facing name of the Perk
      *
      * `name.allLettersFirstUppercase()`
      */
