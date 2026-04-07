@@ -57,8 +57,7 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    // idk what this is for
-    private const val insideTest = false
+    private val insideTest = runCatching { Class.forName("org.junit.jupiter.api.Test") }.isSuccess
 
     var inTestDuplicateUsage = true
 

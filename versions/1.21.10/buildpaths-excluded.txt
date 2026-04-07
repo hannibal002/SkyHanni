@@ -1,4 +1,0 @@
-# these files do not work yet but should be made to work in the future
-# ItemModifierTest requires a running MC item registry to deserialize ItemStack via NeuItems
-
-at.hannibal2.skyhanni.test.ItemModifierTest.kt

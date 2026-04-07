@@ -149,6 +149,7 @@ dependencies {
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
 
     modImplementation(libs.hypixelmodapi)
     include(libs.hypixelmodapi.fabric)
