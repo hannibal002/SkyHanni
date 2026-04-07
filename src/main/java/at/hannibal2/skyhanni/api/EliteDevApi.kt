@@ -174,7 +174,7 @@ object EliteDevApi {
         // Try to find by name first if localProfile is provided
         val selectedProfileEntry = if (localProfile.isNotBlank()) {
             weightData.profiles.firstOrNull {
-                it.profileName.lowercase() == profile.lowercase()
+                it.profileName.equals(profile, ignoreCase = true)
             }
         } else {
             null

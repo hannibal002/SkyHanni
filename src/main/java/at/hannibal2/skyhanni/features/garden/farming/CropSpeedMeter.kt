@@ -119,7 +119,7 @@ object CropSpeedMeter {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         GardenApi.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")

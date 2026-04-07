@@ -47,5 +47,5 @@ object OdgerWaypoint {
         event.move(2, "fishing.odgerLocation", "fishing.trophyFishing.odgerLocation")
     }
 
-    fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.odgerLocation
+    fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.odgerLocation
 }

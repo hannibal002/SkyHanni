@@ -78,7 +78,7 @@ object UnknownLinesHandler {
             }
         }
 
-        // Remove agathes contest
+        // Remove Agatha contest
         for (i in 1..2) {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(

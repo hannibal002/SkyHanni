@@ -23,7 +23,7 @@ object GardenCropTimeCommand {
 
     private fun onCommand(args: Array<String>) {
         if (!config.display) {
-            ChatUtils.userError("shcroptime requires 'Show money per Hour' feature to be enabled to work!")
+            ChatUtils.userError("Command /shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 

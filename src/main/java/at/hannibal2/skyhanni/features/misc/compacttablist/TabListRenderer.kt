@@ -45,7 +45,7 @@ object TabListRenderer {
     private var isTabToggled = false
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
         if (Minecraft.getInstance().screen != null) return
 

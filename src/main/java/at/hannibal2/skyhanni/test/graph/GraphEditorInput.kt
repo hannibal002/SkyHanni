@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
@@ -205,7 +205,7 @@ object GraphEditorInput {
 
         val json = OSUtils.readFromClipboard() ?: return true
 
-        CoroutineConfig("load graph json").launchCoroutine {
+        CoroutineSettings("load graph json").launchCoroutine {
             try {
                 val graph = Graph.fromJson(json)
                 val newState = GraphEditorIO.createStateFrom(graph)

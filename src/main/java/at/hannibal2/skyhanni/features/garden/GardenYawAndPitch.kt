@@ -23,7 +23,7 @@ object GardenYawAndPitch {
     private var lastPitch = 0f
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!SkyBlockUtils.onHypixel) return
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return

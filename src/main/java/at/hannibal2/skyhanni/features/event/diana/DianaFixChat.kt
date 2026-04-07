@@ -22,9 +22,7 @@ object DianaFixChat {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private var hasSetParticleQuality = false
-    private var hasSetToggleMusic = false
     private var lastParticleQualityPrompt = SimpleTimeMark.farPast()
-    private var lastToggleMusicPrompt = SimpleTimeMark.farPast()
     private var errorCounter = 0
     private var successfulCounter = 0
 
@@ -57,51 +55,31 @@ object DianaFixChat {
         errorCounter++
         if (errorCounter == 1) {
             if (successfulCounter < 5) {
-                ChatUtils.chat(
-                    "Could not find Diana Guess using sound and particles, " +
-                        "please try again. (Was this a funny sound easter egg?)",
-                )
+                ChatUtils.chat("Could not find Diana guess using particles, please try again.")
             }
             return
         }
 
-        println("error")
         if (!hasSetParticleQuality) {
             if (lastParticleQualityPrompt.passedSince() > 30.seconds) {
                 lastParticleQualityPrompt = SimpleTimeMark.now()
                 ChatUtils.clickableChat(
-                    "§cError detecting Diana Guess! §eClick here to set the particle quality to high!",
+                    "§cError detecting Diana Guess! §eClick here to set the particle quality to extreme!",
                     onClick = {
                         hasSetParticleQuality = true
-                        HypixelCommands.particleQuality("high")
+                        HypixelCommands.particleQuality("extreme")
                         errorCounter = 0
                         ChatUtils.chat("Now try again!")
                     },
                 )
             }
         } else {
-            if (!hasSetToggleMusic) {
-                if (lastToggleMusicPrompt.passedSince() > 30.seconds) {
-                    lastToggleMusicPrompt = SimpleTimeMark.now()
-                    ChatUtils.clickableChat(
-                        "§cError detecting Diana Guess! Changing the Particle Quality has not worked :( " +
-                            "§eClick here to disable hypixel music!",
-                        onClick = {
-                            hasSetToggleMusic = true
-                            HypixelCommands.toggleMusic()
-                            errorCounter = 0
-                            ChatUtils.chat("Now try again, please!")
-                        },
-                    )
-                }
-            } else {
-                ErrorManager.logErrorStateWithData(
-                    "Could not find diana guess point",
-                    "diana guess point failed to load after /pq and /togglemusic",
-                    "errorCounter" to errorCounter,
-                    "successfulCounter" to successfulCounter,
-                )
-            }
+            ErrorManager.logErrorStateWithData(
+                "Could not find Diana guess point",
+                "Diana guess point failed to load after /pq",
+                "errorCounter" to errorCounter,
+                "successfulCounter" to successfulCounter,
+            )
         }
     }
 
@@ -122,14 +100,11 @@ object DianaFixChat {
     fun onBurrowGuess(event: BurrowGuessEvent) {
         foundGuess = true
 
-        if (hasSetToggleMusic) {
-            ChatUtils.chat("Toggling the hypixel music has worked, good job!")
-        } else if (hasSetParticleQuality) {
-            ChatUtils.chat("Changing the particle quality has worked, good job!")
+        if (hasSetParticleQuality) {
+            ChatUtils.chat("Changing the particle quality worked, good job!")
         }
 
         hasSetParticleQuality = false
-        hasSetToggleMusic = false
         errorCounter = 0
 
         // This ensures we only count successes after new spade clicks, not the repeated moved guess locations

@@ -140,7 +140,7 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: North Stars: §d1,539
      */
-    val northstarsPattern by mainSB.pattern(
+    val northStarsPattern by mainSB.pattern(
         "northstars",
         "North Stars: §d(?<northstars>[\\w,]+).*",
     )
@@ -590,6 +590,7 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Flight Duration: §a202:46:12
+     * REGEX-TEST: Flight Duration: §a2:09:29
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
@@ -796,7 +797,7 @@ object ScoreboardPattern {
         "dimension",
         "\\s*(?:§f)?Rift Dimension",
     )
-    val riftHotdogTitlePattern by riftSB.pattern(
+    val riftHotDogTitlePattern by riftSB.pattern(
         "hotdogtitle",
         "§6Hot Dog Contest",
     )
@@ -804,7 +805,7 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST: Eaten: §c2/50
      */
-    val riftHotdogEatenPattern by riftSB.pattern(
+    val riftHotDogEatenPattern by riftSB.pattern(
         "hotdogeaten",
         "Eaten: §.\\d+/\\d+",
     )

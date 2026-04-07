@@ -41,7 +41,7 @@ object FishyTreatProfit {
     private var display = emptyList<Renderable>()
     private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
-    // I don't know why this fetches price source based on tracker config,
+    // idk why this fetches price source based on tracker config,
     // but it already did before I changed how tracker config worked
     val priceSource get() = SkyHanniMod.feature.misc.tracker.priceSource
 

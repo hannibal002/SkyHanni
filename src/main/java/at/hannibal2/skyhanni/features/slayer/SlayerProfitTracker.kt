@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
@@ -49,11 +48,11 @@ object SlayerProfitTracker {
     private val trackers = mutableMapOf<String, SkyHanniItemTracker<Data>>()
 
     /**
-     * REGEX-TEST: §7Took 1.9k coins from your bank for auto-slayer...
+     * REGEX-TEST: Took 1.9k coins from your bank for auto-slayer...
      */
     private val autoSlayerBankPattern by RepoPattern.pattern(
-        "slayer.autoslayer.bank.chat",
-        "§7Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\.",
+        "slayer.autoslayer.bank.chat.colorless",
+        "Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\.",
     )
 
     data class Data(
@@ -120,7 +119,7 @@ object SlayerProfitTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        autoSlayerBankPattern.matchMatcher(event.message) {
+        autoSlayerBankPattern.matchMatcher(event.cleanMessage) {
             addSlayerCosts(-group("coins").formatDouble())
         }
     }
@@ -152,7 +151,7 @@ object SlayerProfitTracker {
     }
 
     @HandleEvent
-    fun onQuestComplete(event: SlayerQuestCompleteEvent) {
+    fun onSlayerQuestComplete() {
         getTracker()?.modify {
             it.slayerCompletedCount++
         }
@@ -219,7 +218,7 @@ object SlayerProfitTracker {
         val mobKillCoinsFormat = item.totalAmount.shortFormat()
         val text = " §6Mob kill coins§7: §6$mobKillCoinsFormat"
         val lore = listOf(
-            "§7Killing mobs gives you coins (more with scavenger)",
+            "§7Killing mobs gives you coins (more with Scavenger)",
             "§7You got §e$mobKillCoinsFormat §7coins in total this way",
         )
 
@@ -238,12 +237,7 @@ object SlayerProfitTracker {
         )
     }
 
-    private fun shouldShowDisplay(): Boolean {
-        if (!isEnabled()) return false
-        if (!SlayerApi.isInCorrectArea) return false
-
-        return true
-    }
+    private fun shouldShowDisplay(): Boolean = isEnabled() && SlayerApi.isInCorrectArea
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -286,7 +280,7 @@ object SlayerProfitTracker {
         event.registerBrigadier("shresetslayerprofits") {
             description = "Resets the total slayer profit for the current slayer type"
             category = CommandCategory.USERS_RESET
-            simpleCallback { resetCommand() }
+            simpleCallback(::resetCommand)
         }
     }
 }

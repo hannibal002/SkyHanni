@@ -6,13 +6,12 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -25,6 +24,9 @@ import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
+
+private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
+private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
 
 open class Enchant : Comparable<Enchant> {
 
@@ -66,7 +68,8 @@ open class Enchant : Comparable<Enchant> {
 
         if (colorProperty.get() is LorenzColor &&
             colorProperty.get() == LorenzColor.CHROMA && // If enchant color is chroma
-            !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) { // and chroma is disabled
+            !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)
+        ) { // and chroma is disabled
             return Style.EMPTY.withColor(ChatFormatting.GOLD).withBold(true) // return bold gold color
         }
 
@@ -88,51 +91,51 @@ open class Enchant : Comparable<Enchant> {
      * Method to check for certain or unique exceptions that need to be handled explicitly.
      *
      * *(There isn't much of a convention to adding exceptions, except try to include relevant exceptions under
-     * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant. i.e.
-     * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
+     * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant, e.g.
+     * Efficiency exceptions should be within the `"efficiency"` conditional.)*
      *
      * @param level The level of the enchant currently being parsed
      * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
     private fun checkExceptions(level: Int, itemStack: ItemStack?): Style? {
-        val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()
-        val itemName = internalName?.repoItemName?.removeColor()
+        val itemCategory = itemStack?.getItemCategoryOrNull()
 
-        if (this.nbtName == "efficiency") {
-            // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
-            // color the enchant as max
-            if (itemName == "Stonk" ||
-                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")
-            ) {
-                var style = if (advanced.useAdvancedPerfectColor.get()) {
-                    Style.EMPTY.withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
-                } else {
-                    if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
-                        Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
-                    else
-                        Style.EMPTY.withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
-                }
-
-                if (config.boldPerfectEnchant.get()) style = style.withBold(true)
-
-                return style
+        return when (nbtName) {
+            "efficiency" -> {
+                // If the item is a Stonk, or a non-mining tool with Efficiency 5
+                // (whilst not being a Promising Shovel), color the enchant as max
+                if (internalName == STONK_PICKAXE ||
+                    (level == 5 &&
+                        itemCategory !in ItemCategory.miningTools &&
+                        internalName != PROMISING_SHOVEL)
+                ) {
+                    with(Style.EMPTY) {
+                        if (advanced.useAdvancedPerfectColor.get()) {
+                            withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
+                        } else {
+                            if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
+                                withColor(TextColor(0xFFFFFF, "chroma"))
+                            else
+                                withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
+                        }
+                    }.let { if (config.boldPerfectEnchant.get()) it.withBold(true) else it }
+                } else null
             }
+            else -> null
         }
-
-        return null
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"
 
     override fun compareTo(other: Enchant): Int {
-        if (this.isUltimate() == other.isUltimate()) {
-            if (this.isStacking() == other.isStacking()) {
-                return this.loreName.compareTo(other.loreName)
+        if (isUltimate() == other.isUltimate()) {
+            if (isStacking() == other.isStacking()) {
+                return loreName.compareTo(other.loreName)
             }
-            return if (this.isStacking()) -1 else 1
+            return if (isStacking()) -1 else 1
         }
-        return if (this.isUltimate()) -1 else 1
+        return if (isUltimate()) -1 else 1
     }
 
     class Normal : Enchant()

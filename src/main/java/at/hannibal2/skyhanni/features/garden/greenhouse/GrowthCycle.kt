@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -85,9 +84,8 @@ object GrowthCycle {
 
     private fun updateDisplay() {
         val nextCycle = storage?.nextCycle ?: return
-        if (nextCycle.isFarPast() || nextCycle.passedSince() > 60.minutes) {
+        if (nextCycle.passedSince() > 60.minutes) {
             display = null
-            hasNotified = false
             return
         }
         display = drawDisplay(nextCycle)
@@ -105,8 +103,8 @@ object GrowthCycle {
         return Renderable.text("§6Next Greenhouse Growth Stage: $formatted")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderOverlay() {
         if (!config.showDisplay) return
 
         display?.let {

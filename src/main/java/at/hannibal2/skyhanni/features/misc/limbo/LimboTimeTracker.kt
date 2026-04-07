@@ -7,27 +7,34 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.ChatFormatting
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -36,6 +43,7 @@ object LimboTimeTracker {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val config get() = SkyHanniMod.feature.misc
 
+    // TODO reshape to data class, use Resettable
     private var limboJoinTime = SimpleTimeMark.farPast()
     var inLimbo = false
     private var inFakeLimbo = false
@@ -50,6 +58,7 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
+        // TODO repo pattern
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
@@ -81,13 +90,13 @@ object LimboTimeTracker {
                     append("! You've surpassed your previous record of ")
                     appendWithColor("$oldPB", ChatFormatting.YELLOW)
                     append("!")
-                }
+                },
             )
             ChatUtils.chat(
                 componentBuilder {
                     append("Keep it up!")
                     withColor(ChatFormatting.WHITE)
-                }
+                },
             )
         }
         val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString
@@ -113,24 +122,40 @@ object LimboTimeTracker {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!inLimbo) return
-        if (SkyBlockUtils.inSkyBlock) {
-            leaveLimbo()
-            return
-        }
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.showTimeInLimbo || !inLimbo) return
+        @Suppress("InSkyBlockEarlyReturn")
+        if (SkyBlockUtils.inSkyBlock) return leaveLimbo()
         val duration = limboJoinTime.passedSince().format()
-        config.showTimeInLimboPosition.renderString("§eIn Limbo since §b$duration", posLabel = "Limbo Time Tracker")
+        val display = Renderable.text("§eIn Limbo since §b$duration")
+        config.showTimeInLimboPosition.renderRenderable(display, posLabel = "Limbo Time Tracker")
+    }
+
+    private const val LIMBO_ACHIEVEMENT = "Limbo Time"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Forgot to turn off the PC".asComponent(),
+            componentBuilder {
+                append("Spend 6 hours in limbo at once! ")
+                append("What a waste of electricity :(") {
+                    withColor(ChatFormatting.DARK_GRAY)
+                }
+            },
+            6f,
+        )
+        event.register(achievement, LIMBO_ACHIEVEMENT)
     }
 
     private fun leaveLimbo() {
         inLimbo = false
-        if (!isEnabled()) return
+        if (!config.showTimeInLimbo) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
         val currentPB = (storage?.personalBest ?: 0).seconds
         val oldLuck = storage?.userLuck ?: 0f
+        if (passedSince > 6.hours || currentPB > 6.hours) AchievementManager.completeAchievement(LIMBO_ACHIEVEMENT)
         if (passedSince > currentPB) {
             oldPB = currentPB
             storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
@@ -201,12 +226,9 @@ object LimboTimeTracker {
         }
     }
 
-    fun isEnabled() = config.showTimeInLimbo
-
-    private fun tryTruncateFloat(input: Float): String {
-        val string = input.toString()
-        return if (string.endsWith(".0")) return string.dropLast(2)
-        else string
+    private fun tryTruncateFloat(input: Float): String = input.toString().let {
+        if (it.endsWith(".0")) it.dropLast(2)
+        else it
     }
 
     @HandleEvent

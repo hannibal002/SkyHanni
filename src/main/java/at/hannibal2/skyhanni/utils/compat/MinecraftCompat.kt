@@ -22,9 +22,6 @@ object MinecraftCompat {
 
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
-    //? if < 1.21.11 {
+    //~ if > 1.21.10 'isF3Visible' -> 'isOverlayVisible'
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isF3Visible
-    //? } else {
-    /*val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
-    *///?}
 }
