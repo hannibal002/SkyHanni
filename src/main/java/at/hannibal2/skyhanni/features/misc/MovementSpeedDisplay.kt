@@ -4,38 +4,33 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import kotlin.concurrent.fixedRateTimer
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object MovementSpeedDisplay {
 
     private val config get() = SkyHanniMod.feature.misc
-
-    private var display = ""
+    private var display: Renderable? = null
 
     /**
      * This speed value represents the movement speed in blocks per second.
      * This has nothing to do with the speed stat.
      */
-    var speed = 0.0
+    var bpsMoveSpeed = 0.0
 
-    init {
-        // TODO use LorenzTickEvent
-        fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
-            checkSpeed()
-        }
-    }
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!event.isMod(5)) return
 
-    private fun checkSpeed() {
-        if (!SkyBlockUtils.onHypixel) return
-
-        speed = with(MinecraftCompat.localPlayer) {
+        bpsMoveSpeed = with(MinecraftCompat.localPlayer) {
             val oldPos = LorenzVec(xOld, yOld, zOld)
             val newPos = LorenzVec(position().x, position().y, position().z)
 
@@ -43,19 +38,18 @@ object MovementSpeedDisplay {
             oldPos.distance(newPos) * 20
         }
 
-        if (isEnabled()) {
-            display = "Movement Speed: ${speed.roundTo(2)}"
-        }
+        if (!isEnabled()) return
+        display = Renderable.text("Movement Speed: ${bpsMoveSpeed.roundTo(2)}")
     }
 
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
+        val display = display ?: return
+        config.playerMovementSpeedPos.renderRenderable(display, posLabel = "Movement Speed")
     }
 
-    fun isEnabled() = SkyBlockUtils.onHypixel &&
-        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()) &&
-        config.playerMovementSpeed
+    fun sbEnabled() = SkyBlockUtils.inSkyBlock || OutsideSBFeature.MOVEMENT_SPEED.isSelected()
+    fun isEnabled() = SkyBlockUtils.onHypixel && sbEnabled() && config.playerMovementSpeed
 }

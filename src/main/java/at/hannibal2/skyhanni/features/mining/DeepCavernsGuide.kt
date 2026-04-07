@@ -168,7 +168,7 @@ object DeepCavernsGuide {
         parkourHelper?.render(event)
     }
 
-    private fun isEnabled() = IslandType.DEEP_CAVERNS.isCurrent() && config.enabled
+    private fun isEnabled() = IslandType.DEEP_CAVERNS.isInIsland() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
