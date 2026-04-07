@@ -59,3 +59,29 @@ class FrameTickRateProvider private constructor(
 
     fun getTransitionTicks(frame: AnimatedFrame): Int = provider(frame)
 }
+
+/**
+ * Per-equipment-slot animation state.
+ *
+ * Extends [AnimatedFrameLocalStorage] so it already IS the storage. No extra
+ * wrapping needed. Mirrors the advancement logic of [FramedBehavior.tryMoveNextFrame]
+ * but owns its own [ticksInFrame] counter because each slot advances independently.
+ */
+class EquipmentSlotAnimationState(
+    frames: List<ItemStackAnimatedFrame>,
+    tickRateProvider: FrameTickRateProvider = FrameTickRateProvider.of(1.0),
+) : AnimatedFrameLocalStorage<ItemStackAnimatedFrame>(frames, tickRateProvider) {
+
+    private var ticksInFrame: Double = 0.0
+    fun advance(deltaSeconds: Double) {
+        val transitionTicks = tickRateProvider.getTransitionTicks(frames[currentFrameIndex]).takeIf { it > 0 } ?: return
+
+        ticksInFrame += deltaSeconds * 20.0
+        if (ticksInFrame <= transitionTicks) return
+
+        currentFrameIndex = (currentFrameIndex + 1) % frames.size
+        ticksInFrame = 0.0
+    }
+
+    val currentStack: ItemStack get() = frames[currentFrameIndex].stack
+}

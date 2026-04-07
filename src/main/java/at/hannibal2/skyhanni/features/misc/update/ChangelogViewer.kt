@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.api.ApiUtils
@@ -133,76 +133,69 @@ object ChangelogViewer {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerComplex<CommandContext>("shchangelog") {
+        event.registerBrigadier("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
-            // context = { CommandContext() }
 
-            specifiers = listOf(
-                CommandArgument(
-                    documentation = "<version> - Shows the changelog of the versions until this, " +
-                        "or only that version if no since is specified.",
-                    prefix = "until",
-                    defaultPosition = 1,
-                    handler = { argument, context ->
-                        context.until = context.getModVersion(argument)
-                        1
-                    },
-                ),
-                CommandArgument(
-                    documentation = "<version> - Shows the changelog of the versions since this. (Exclusive)",
-                    prefix = "since",
-                    defaultPosition = 0,
-                    handler = { argument, context ->
-                        context.since = context.getModVersion(argument)
-                        1
-                    },
-                ),
-                CommandArgument(
-                    documentation = "<version> - Shows the changelog of this specific versions",
-                    prefix = "show",
-                    defaultPosition = -1,
-                    handler = { argument, context ->
-                        context.since = context.getModVersion(argument)
-                        context.until = context.since
-                        1
-                    },
-                ),
-            )
+            simpleCallback { runChangelog(null, null) }
+
+            literal("show") {
+                argCallback("version", BrigadierArguments.string()) { versionStr ->
+                    val v = parseVersion(versionStr) ?: return@argCallback
+                    showChangelog(v, v)
+                }
+            }
+
+            literal("since") {
+                argCallback("version", BrigadierArguments.string()) { versionStr ->
+                    val since = parseVersion(versionStr) ?: return@argCallback
+                    runChangelog(since, null)
+                }
+            }
+
+            literal("until") {
+                argCallback("version", BrigadierArguments.string()) { versionStr ->
+                    val until = parseVersion(versionStr) ?: return@argCallback
+                    runChangelog(null, until)
+                }
+            }
+
+            arg("sinceVersion", BrigadierArguments.string()) { sinceArg ->
+                argCallback("untilVersion", BrigadierArguments.string()) { untilStr ->
+                    val since = parseVersion(getArg(sinceArg)) ?: return@argCallback
+                    val until = parseVersion(untilStr) ?: return@argCallback
+                    if (until < since) {
+                        ChatUtils.userError("until '$until' must be greater than since '$since'")
+                        return@argCallback
+                    }
+                    showChangelog(since, until)
+                }
+                callback {
+                    val since = parseVersion(getArg(sinceArg)) ?: return@callback
+                    runChangelog(since, null)
+                }
+            }
         }
     }
 
-    private fun CommandContext.getModVersion(argument: Iterable<String>): ModVersion? {
-        val input = argument.first()
+    private fun runChangelog(since: ModVersion?, until: ModVersion?) {
+        val resolvedSince = since ?: ModVersion.fromString(SkyHanniMod.VERSION)
+        val resolvedUntil = until ?: ModVersion.fromString(UpdateManager.getNextVersion() ?: SkyHanniMod.VERSION)
+        if (resolvedUntil < resolvedSince) {
+            ChatUtils.userError("until '$resolvedUntil' is less than since '$resolvedSince'")
+            return
+        }
+        showChangelog(resolvedSince, resolvedUntil)
+    }
+
+    private fun parseVersion(input: String): ModVersion? {
         val version = ModVersion.fromString(input)
         return if (!version.isValid()) {
-            errorMessage =
-                "'$input' is not a valid mod version. Version Syntax is: 'Major.Beta.Patch' " +
-                "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
+            ChatUtils.userError(
+                "'$input' is not a valid mod version. Version syntax: 'Major.Minor.Patch', " +
+                    "anything not written is assumed 0. E.g. 1.1 = 1.1.0",
+            )
             null
-        } else {
-            version
-        }
-    }
-
-    private class CommandContext : CommandContextAwareObject {
-
-        override var errorMessage: String? = null
-
-        var until: ModVersion? = null
-        var since: ModVersion? = null
-
-        override fun post() {
-            val since = since ?: ModVersion.fromString(SkyHanniMod.VERSION)
-            val until =
-                until ?: UpdateManager.getNextVersion()?.let { ModVersion.fromString(it) } ?: ModVersion.fromString(SkyHanniMod.VERSION)
-
-            if (until < since) {
-                errorMessage = "until:'$until' is less than since:'$since', where it is expected to be greater"
-                return
-            }
-            showChangelog(since, until)
-        }
-
+        } else version
     }
 }

@@ -4,13 +4,20 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AnimatedSkinUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.DyedItemColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -19,6 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStained
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.world.item.ItemStack
@@ -56,7 +64,6 @@ object WardrobeApi {
     const val MAX_PAGES = 3
 
     var slots = listOf<WardrobeSlot>()
-    var inCustomWardrobe = false
 
     internal fun emptyArmor(): List<ItemStack?> = listOf(null, null, null, null)
 
@@ -67,7 +74,7 @@ object WardrobeApi {
         }
 
     var currentPage: Int? = null
-    private var inWardrobe = false
+    val wardrobeDetector = InventoryDetector(inventoryPattern)
 
     init {
         val list = mutableListOf<WardrobeSlot>()
@@ -86,12 +93,59 @@ object WardrobeApi {
         slots = list
     }
 
+    private fun String.buildTextureItemStack(): ItemStack {
+        val (uuid, texture) = this.split(":")
+        return ItemUtils.createSkull("Animated Armor", uuid, texture)
+    }
+
+    // TODO at some point fix this idk
+    private val skinsNoAnimation = setOf(
+        "FERMENTO_ULTIMATE",
+    )
+
+    private val armorFrameCache: MutableMap<String, List<ItemStackAnimatedFrame>> = mutableMapOf()
+
+    @HandleEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        armorFrameCache.clear()
+    }
+
+    fun getArmorAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
+        val skinInternalName = stack.getHelmetSkin()?.asString() ?: return null
+        if (skinInternalName in skinsNoAnimation) return null
+        val animJson = AnimatedSkinUtils.armorSkins[skinInternalName] ?: return null
+        // Variant skins have multiple textures but no animation tick rate.
+        // Pick the single texture that matches the item's stored variant index.
+        if (animJson.ticks <= 0 && animJson.textures.size > 1) {
+            val variantIndex = stack.getExtraAttributes()?.let { AnimatedSkinUtils.getVariantIndexOrNull(it) } ?: 0
+            val cacheKey = "$skinInternalName:$variantIndex"
+            return armorFrameCache.getOrPut(cacheKey) {
+                val texture = animJson.textures.getOrElse(variantIndex) { animJson.textures.first() }
+                listOf(ItemStackAnimatedFrame(texture.buildTextureItemStack(), 0))
+            }
+        }
+        return armorFrameCache.getOrPut(skinInternalName) {
+            animJson.textures.map { ItemStackAnimatedFrame(it.buildTextureItemStack(), animJson.ticks) }
+        }
+    }
+
+    fun getArmorDyeAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
+        val dyeInternalName = stack.getArmorDye() ?: return null
+        val dyeColors = AnimatedSkinUtils.animatedDyes[dyeInternalName] ?: return null
+        if (dyeColors.size <= 1) return null
+        return dyeColors.map { colorInt ->
+            val dyedStack = stack.copy()
+            dyedStack.set(DataComponents.DYED_COLOR, DyedItemColor(colorInt))
+            ItemStackAnimatedFrame(dyedStack, 1)
+        }
+    }
+
     private fun getWardrobeItem(itemStack: ItemStack?) =
         if (itemStack == null || itemStack.isStainedGlassPane()) null else itemStack
 
     private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inWardrobe() = InventoryUtils.inInventory() && inWardrobe
+    fun inWardrobe() = wardrobeDetector.isInside()
 
     fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
@@ -106,18 +160,9 @@ object WardrobeApi {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
-    @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        inventoryPattern.matches(event.inventoryName).let {
-            inWardrobe = it
-            if (CustomWardrobe.config.enabled) inCustomWardrobe = it
-        }
-    }
-
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         inventoryPattern.matchMatcher(event.inventoryName) {
-            inWardrobe = true
             currentPage = group("currentPage").formatInt()
         } ?: return
 
@@ -167,17 +212,15 @@ object WardrobeApi {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inWardrobe) return
         DelayedRun.runDelayed(250.milliseconds) {
-            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inWardrobe = false
+            if (!wardrobeDetector.isInside()) {
                 currentPage = null
             }
         }
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
             if (slots.isEmpty()) {
@@ -190,11 +233,9 @@ object WardrobeApi {
                     append("Slot ${slot.id}")
                     if (slot.favorite) append(" - Favorite: true")
                 }
-                if (slot.locked) {
-                    add("$slotInfo is locked")
-                } else if (slot.isEmpty()) {
-                    add("$slotInfo is empty")
-                } else {
+                if (slot.locked) add("$slotInfo is locked")
+                else if (slot.isEmpty()) add("$slotInfo is empty")
+                else {
                     add(slotInfo)
                     setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
                         slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->

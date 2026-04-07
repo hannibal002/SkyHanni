@@ -44,7 +44,7 @@ object EstimatedWardrobePrice {
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() &&
-        (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
+        !CustomWardrobe.isOverlayVisible
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

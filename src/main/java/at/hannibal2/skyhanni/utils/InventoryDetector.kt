@@ -28,7 +28,7 @@ class InventoryDetector(
     ) : this(
         onOpenInventory,
         onCloseInventory,
-        checkInventoryName = { name -> pattern.matches(name) }
+        checkInventoryName = { name -> pattern.matches(name) },
     )
 
     init {
@@ -55,7 +55,7 @@ class InventoryDetector(
         }
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
-        fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             detectors.forEach { it.updateInventoryState(event) }
         }
     }

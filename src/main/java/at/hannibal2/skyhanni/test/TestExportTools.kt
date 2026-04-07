@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.json.registerSkyHanniAdapters
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import net.minecraft.world.item.ItemStack
@@ -22,9 +23,10 @@ import java.io.Reader
 object TestExportTools {
 
     private val config get() = DevApi.config.debug
-
-    val gson = GsonBuilder()
+    @PublishedApi
+    internal val gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
+        .registerSkyHanniAdapters()
         .create()
 
     class Key<T> internal constructor(val name: String)
@@ -41,14 +43,15 @@ object TestExportTools {
         return gson.toJson(TestValue(key.name, gson.toJsonTree(value)))
     }
 
-    inline fun <reified T> fromJson(key: Key<T>, reader: Reader): T {
+    @PublishedApi
+    internal inline fun <reified T> fromJson(key: Key<T>, reader: Reader): T {
         val serializable = gson.fromJson<TestValue>(reader)
         require(key.name == serializable.type)
         return gson.fromJson(serializable.data)
     }
 
     @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         if (config.copyItemData.isKeyHeld()) {

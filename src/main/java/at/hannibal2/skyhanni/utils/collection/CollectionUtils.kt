@@ -336,7 +336,7 @@ object CollectionUtils {
 
     fun <T, C : Collection<T>> C.takeIfNotEmpty(): C? = takeIf { it.isNotEmpty() }
 
-    fun <K, V> Map<K, V>.takeIfNotEmpty(): Map<K, V>? = takeIf { it.isNotEmpty() }
+    fun <K, V, M : Map<K, V>> M.takeIfNotEmpty(): M? = takeIf { it.isNotEmpty() }
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 

@@ -8,27 +8,33 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 
-abstract class GuideTablePage(
+@Suppress("AbstractClassCanBeConcreteClass")
+abstract class TabTablePage(
     val sizeX: Int,
     val sizeY: Int,
     paddingX: Int = 0,
     paddingY: Int = 0,
     val footerSpacing: Int = 2,
-) : GuideRenderablePage(paddingX, paddingY) {
+) : TabRenderablePage(paddingX, paddingY) {
 
     fun update(
         content: List<List<Renderable>>,
         footer: List<Renderable> = emptyList(),
     ) {
-        val ySpace = (content + listOf(footer)).tableStretchYPadding(sizeY - paddingY * 2)
-        renderable = Renderable.vertical(
-            Renderable.table(
-                content,
-                xSpacing = content.tableStretchXPadding(sizeX - paddingX * 2),
-                ySpacing = ySpace,
-            ),
-            Renderable.horizontal(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER),
-            spacing = ySpace,
+        val ySpace = content.tableStretchYPadding(sizeY - paddingY * 2)
+        val table = Renderable.table(
+            content,
+            xSpacing = content.tableStretchXPadding(sizeX - paddingX * 2),
+            ySpacing = ySpace,
         )
+        renderable = if (footer.isEmpty()) {
+            table
+        } else {
+            Renderable.vertical(
+                table,
+                Renderable.horizontal(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER),
+                spacing = ySpace,
+            )
+        }
     }
 }

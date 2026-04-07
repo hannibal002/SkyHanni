@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.mixins.hooks.VisualWordsHook
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import at.hannibal2.skyhanni.utils.compat.SkyHanniChromeScreen
 import org.lwjgl.glfw.GLFW
 
 /**
@@ -17,42 +15,24 @@ import org.lwjgl.glfw.GLFW
  * All mutable UI state lives here.
  * All Renderable construction is delegated to [VisualWordGui].
  */
-class VisualWordScreen : SkyHanniBaseScreen() {
+class VisualWordScreen : SkyHanniChromeScreen() {
+
+    override val screenTitle = "Visual Word Replacements"
 
     val phraseInput = TextInput()
     val replacementInput = TextInput()
     val listScrollValue = ScrollValue()
 
-    private var display: Renderable? = null
     var currentlyEditing = false
     var currentIndex = -1
     var activeInput: TextInput? = null
     var modifiedWords: MutableList<VisualWord> = ModifyVisualWords.userModifiedWords
         .map { it.toVisualWord() }.toMutableList()
 
-    /**
-     * Rebuilds the Renderable tree. Call on structural changes such as mode switches,
-     * add/delete/reorder, and flag toggles. Do not call while the user is actively typing.
-     */
-    fun rebuildDisplay() {
-        display = VisualWordGui.buildDisplay(this)
-    }
+    override fun buildContent(): Renderable = VisualWordGui.buildDisplay(this)
 
-    override fun onInitGui() = rebuildDisplay()
-    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(mouseX, mouseY, partialTicks)
-        val renderable = display ?: return
-        val startX = (width - renderable.width) / 2
-        val startY = (height - renderable.height) / 2
-
-        VisualWordsHook.withoutWordChanges {
-            DrawContextUtils.pushPop {
-                DrawContextUtils.translate(startX.toFloat(), startY.toFloat())
-                Renderable.withMousePosition(mouseX - startX, mouseY - startY) {
-                    renderable.render(0, 0)
-                }
-            }
-        }
+    override fun guiClosed() {
+        if (currentlyEditing) exitEditMode()
     }
 
     override fun onKeyTyped(typedChar: Char?, keyCode: Int?) = keyCode?.let {

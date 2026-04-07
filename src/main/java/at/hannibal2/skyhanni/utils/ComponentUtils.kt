@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.DisplayInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuDisplayInfo
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
-import at.hannibal2.skyhanni.data.jsonobjects.other.PropertiesInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.SkullOwnerInfo
-import at.hannibal2.skyhanni.data.jsonobjects.other.TextureInfo
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuProfileInfo
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuProfileProperties
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuProfileTexture
 import at.hannibal2.skyhanni.data.jsonobjects.other.toGameProfile
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
@@ -30,7 +29,7 @@ import kotlin.jvm.optionals.getOrNull
 object ComponentUtils {
     fun convertToComponents(stack: ItemStack, nbtInfo: NeuNbtInfoJson?) {
         nbtInfo ?: return
-        nbtInfo.extraAttributes?.let { extraJson ->
+        nbtInfo.customData?.let { extraJson ->
             val extraAttributes = JsonOps.INSTANCE
                 .convertTo(NbtOps.INSTANCE, extraJson)
                 .asCompound()
@@ -40,7 +39,7 @@ object ComponentUtils {
         if (nbtInfo.enchantments?.isNotEmpty() == true) {
             stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
         }
-        if (nbtInfo.unbreakable?.boolean == true) {
+        if ((nbtInfo.unbreakable ?: 0) > 0) {
             stack.set(DataComponents.UNBREAKABLE, Unit.INSTANCE)
         }
         nbtInfo.itemModel?.let { stack.set(DataComponents.ITEM_MODEL, Identifier.parse(it)) }
@@ -52,58 +51,49 @@ object ComponentUtils {
             if (display.name != null) {
                 stack.setCustomItemName(display.name)
             } else {
-                ErrorManager.skyHanniError("stack display name is null", "extra attributes" to nbtInfo.extraAttributes)
+                ErrorManager.skyHanniError("stack display name is null", "custom data" to nbtInfo.customData)
             }
             if (display.lore != null) {
                 stack.setLoreString(display.lore)
             }
         }
-        if (nbtInfo.skullOwner != null) {
-            val skullOwner = nbtInfo.skullOwner
-            stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(skullOwner.toGameProfile()))
+        if (nbtInfo.profile != null) {
+            stack.set(DataComponents.PROFILE, ResolvableProfile.createResolved(nbtInfo.profile.toGameProfile()))
         }
-
     }
 
     fun convertToNeuNbtInfoJson(stack: ItemStack): JsonObject {
-        val isUnbreakable = NbtBoolean(stack.has(DataComponents.UNBREAKABLE))
         val profile = stack.get(DataComponents.PROFILE)
         val profileProperties = profile?.partialProfile()?.properties?.get("textures")?.firstOrNull()
         val uuid = profile?.partialProfile()?.id ?: "53924f1a-87e6-4709-8e53-f1c7d13dc239"
-        val value = profileProperties?.value
-        val signature = profileProperties?.signature
-        val propertiesInfo = PropertiesInfo(listOf(TextureInfo(value = value, signature = signature)))
-        val skullOwner = SkullOwnerInfo(
-            uuid = uuid.toString(),
-            properties = propertiesInfo,
-            hypixelPopulated = NbtBoolean(true),
+        val profileInfo = NeuProfileInfo(
+            id = uuid.toString(),
             name = profile?.name()?.getOrNull(),
+            properties = NeuProfileProperties(
+                listOf(NeuProfileTexture(value = profileProperties?.value, signature = profileProperties?.signature)),
+            ),
         )
         val lore = stack.getLore()
         val color = stack.get(DataComponents.DYED_COLOR)?.rgb
-        val displayInfo = DisplayInfo(name = stack.hoverName.formattedTextCompat(), lore = lore, color = color)
+        val displayInfo = NeuDisplayInfo(name = stack.hoverName.formattedTextCompat(), lore = lore, color = color)
         val customData = stack.get(DataComponents.CUSTOM_DATA)
         val itemModel = stack.getItemModel()?.getIdentifierString()
-        val extraAttributes: JsonObject? = if (customData != null) {
+        val customDataJson: JsonObject? = if (customData != null) {
             NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, customData.copyTag()).asJsonObject
         } else {
             null
         }
         val enchants = if (stack.has(DataComponents.ENCHANTMENT_GLINT_OVERRIDE)) listOf(JsonObject()) else null
+        val unbreakable = if (stack.has(DataComponents.UNBREAKABLE)) 1 else null
 
         val nbt = NeuNbtInfoJson(
             hideFlags = 254,
-            unbreakable = isUnbreakable,
-            skullOwner = skullOwner,
+            unbreakable = unbreakable,
+            profile = profileInfo,
             display = displayInfo,
-            extraAttributes = extraAttributes,
-            explosion = null,
-            customPotionEffects = null,
+            customData = customDataJson,
             enchantments = enchants,
-            overrideMeta = NbtBoolean(true),
             itemModel = itemModel,
-            generation = null,
-            resolved = null,
         )
         return ConfigManager.gson.toJsonTree(nbt).asJsonObject
     }

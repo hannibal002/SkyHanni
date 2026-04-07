@@ -5,35 +5,38 @@ import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import java.awt.Color
-import org.joml.Matrix3x2f
-import kotlin.math.atan
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.LivingEntity
+import org.joml.Matrix3x2f
 import org.joml.Quaternionf
 import org.joml.Vector3f
+import java.awt.Color
+import kotlin.math.atan
 
-fun Renderable.Companion.fakePlayer(
-    player: FakePlayer,
-    followMouse: Boolean = false,
-    eyesX: Float = 0f,
-    eyesY: Float = 0f,
-    width: Int = 50,
-    height: Int = 100,
-    entityScale: Int = 30,
-    padding: Int = 5,
-    color: Color? = null,
-    colorCondition: () -> Boolean = { true },
-) = object : Renderable {
-    override val width = width + 2 * padding
-    override val height = height + 2 * padding
+open class FakePlayerRenderable(
+    protected val player: FakePlayer,
+    private val followMouse: Boolean,
+    private val eyesX: Float,
+    private val eyesY: Float,
+    private val entityScale: Int,
+    private val padding: Int,
+    private val color: Color?,
+    private val colorCondition: () -> Boolean,
+    rawWidth: Int,
+    rawHeight: Int,
+) : Renderable {
+
+    override val width = rawWidth + 2 * padding
+    override val height = rawHeight + 2 * padding
     override val horizontalAlign = HorizontalAlignment.LEFT
     override val verticalAlign = VerticalAlignment.TOP
 
-    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
+    override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = drawPlayer(mouseOffsetX, mouseOffsetY)
+
+    protected fun drawPlayer(mouseOffsetX: Int, mouseOffsetY: Int) {
         if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
-        val mouse = currentRenderPassMousePosition ?: return
+        val mouse = Renderable.currentRenderPassMousePosition ?: return
         DrawContextUtils.pushPop {
             val peeked = DrawContextUtils.drawContext.pose().get(Matrix3x2f())
             val translationX = peeked.m20().toInt()
@@ -58,7 +61,20 @@ fun Renderable.Companion.fakePlayer(
     }
 }
 
-private fun drawEntityWithoutScissor(
+fun Renderable.Companion.fakePlayer(
+    player: FakePlayer,
+    followMouse: Boolean = false,
+    eyesX: Float = 0f,
+    eyesY: Float = 0f,
+    width: Int = 50,
+    height: Int = 100,
+    entityScale: Int = 30,
+    padding: Int = 5,
+    color: Color? = null,
+    colorCondition: () -> Boolean = { true },
+) = FakePlayerRenderable(player, followMouse, eyesX, eyesY, entityScale, padding, color, colorCondition, width, height)
+
+internal fun drawEntityWithoutScissor(
     guiGraphics: GuiGraphics,
     x1: Int,
     y1: Int,
@@ -91,18 +107,7 @@ private fun drawEntityWithoutScissor(
     val w: Float = entity.scale
     val vector3f = Vector3f(0.0f, entity.bbHeight / 2.0f + scale * w, 0.0f)
     val x: Float = size.toFloat() / w
-    InventoryScreen.renderEntityInInventory(
-        guiGraphics,
-        x1,
-        y1,
-        x2,
-        y2,
-        x,
-        vector3f,
-        quaternionf,
-        quaternionf2,
-        entity
-    )
+    InventoryScreen.renderEntityInInventory(guiGraphics, x1, y1, x2, y2, x, vector3f, quaternionf, quaternionf2, entity)
     entity.yBodyRot = r
     entity.yRot = s
     entity.xRot = t
