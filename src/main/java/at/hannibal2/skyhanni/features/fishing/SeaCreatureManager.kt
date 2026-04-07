@@ -105,30 +105,22 @@ object SeaCreatureManager {
         doubleHook = false
     }
 
-    private fun isInterceptingColorCodeMessage(message: String): Boolean {
-        var shouldIgnore = false
-        if (PetStorageApi.isAutopetMessage(message)) shouldIgnore = true
-        /*
-         * Icy, Sponge and Prismarine Sinkers can cause an autopet message between the double Hook & Catch Message.
-         */
-        if (thunderBottleChargedPattern.matches(message)) shouldIgnore = true
-        /*
-         * Thunder Sea Creature gives an immediate amount of charge This also lands between Double Hook & Catch Message.
-         */
-        return shouldIgnore
-    }
+
+    /**
+     * Autopet can be triggered via Sinkers as rod parts (Sponge, Prismarine, Icy) to trigger collection gain which goes between Double Hook! and the Catch message.
+     * The Thunder sea Creature gives charge when hooked, which can cause thunder bottles to charge and send the full charge message between Double Hook! and Catch message.
+     */
+    private fun isInterceptingColorCodeMessage(message: String): Boolean =
+        (PetStorageApi.isAutopetMessage(message) || thunderBottleChargedPattern.matches(message))
 
 
     // TODO Unify when both Clean. (I do not wanna touch that Pet Storage Autopet Regex, I will horrifically break something)
-    private fun isInterceptingCleanMessage(message: String): Boolean {
-        var shouldIgnore = false
-        if (ReindrakeWarpHelper.spawnPattern.matches(message)) shouldIgnore = true
-        if (message.isEmpty()) shouldIgnore = true
-        /*
-         * Reindrakes Send an empty line, the global message & another empty line between double hook & Catch message.
-         */
-        return shouldIgnore
-    }
+
+    /**
+     * Reindrakes Send an empty line, the global message & another empty line Double Hook! and Catch message.
+     */
+    private fun isInterceptingCleanMessage(message: String): Boolean =
+        (ReindrakeWarpHelper.spawnPattern.matches(message) || message.isEmpty())
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
