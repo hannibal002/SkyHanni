@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 
 abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val container: AbstractContainerMenu) : SkyHanniEvent() {
 
@@ -70,7 +70,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     data class SlotClickEvent(
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
-        val item: ItemStack?,
+        val item: SafeItemStack?,
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,

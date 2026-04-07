@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object EssenceUtils {
@@ -137,13 +137,13 @@ object EssenceUtils {
     }
 
     fun extractPurchasedUpgrades(
-        inventoryItems: Map<Int, ItemStack>,
+        inventoryItems: Map<Int, SafeItemStack>,
         keyRange: IntRange,
     ) = extractPurchasedUpgrades(
         inventoryItems.filter { it.key in keyRange && it.value.item != null },
     )
 
-    private fun extractPurchasedUpgrades(inventoryItems: Map<Int, ItemStack>) = buildMap {
+    private fun extractPurchasedUpgrades(inventoryItems: Map<Int, SafeItemStack>) = buildMap {
         for (value in inventoryItems.values) {
             // Right now Carnival and Essence Upgrade patterns are 'in-sync'
             // This may change in the future, and this would then need its own pattern

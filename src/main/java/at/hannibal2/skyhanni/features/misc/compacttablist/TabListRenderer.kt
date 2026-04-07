@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+//~ if > 1.21.11 'PlayerFaceRenderer' -> 'PlayerFaceExtractor'
 import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.network.chat.Component
 
@@ -160,7 +161,9 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
+                        //~ if > 1.21.11 '.id()' -> '.texturePath()'
                         val texture = playerInfo.skin.body().id()
+                        //~ if > 1.21.11 'PlayerFaceRenderer.draw' -> 'PlayerFaceExtractor.extractRenderState'
                         PlayerFaceRenderer.draw(
                             DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )

@@ -7,6 +7,7 @@ import net.minecraft.world.phys.AABB
 @SkyHanniModule
 object FrustumUtils {
 
+    //~ if > 1.21.11 'levelRenderer.capturedFrustum' -> 'gameRenderer.getMainCamera().getCullFrustum()'
     private val frustum get() = Minecraft.getInstance().levelRenderer.capturedFrustum
 
     fun isVisible(box: AABB): Boolean = frustum?.isVisible(box) ?: true

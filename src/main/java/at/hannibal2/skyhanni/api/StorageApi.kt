@@ -21,12 +21,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.subMapOfStringsStartingWith
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.ChestBlock
 import java.util.NavigableMap
 import java.util.TreeMap
@@ -159,7 +159,7 @@ object StorageApi {
         }
     }
 
-    private fun handleRead(name: String, inventory: Collection<ItemStack?>) {
+    private fun handleRead(name: String, inventory: Collection<SafeItemStack?>) {
         val saneInventory = inventory.drop(9)
         val old = storage[name]
         val stored: SkyHanniInventoryContainer
@@ -175,7 +175,7 @@ object StorageApi {
         shouldSave = true
     }
 
-    private fun handlePrivateIslandRead(inventory: Collection<ItemStack?>) {
+    private fun handlePrivateIslandRead(inventory: Collection<SafeItemStack?>) {
         val primary = lastChestClicked ?: run {
             ErrorManager.logErrorStateWithData("Failed to save chest", "Failed to save chest on Private Island", "inventory" to inventory)
             return

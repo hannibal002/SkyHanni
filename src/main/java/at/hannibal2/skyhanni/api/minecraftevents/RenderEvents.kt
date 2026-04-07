@@ -2,18 +2,28 @@ package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.RenderData
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
+//~ if > 1.21.11 'SpecialGuiElementRegistry' -> 'PictureInPictureRendererRegistry'
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+//~ if > 1.21.11 '.v1.world.WorldRenderContext' -> '.v1.level.LevelRenderContext'
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
+//~if > 1.21.11 '.v1.world.WorldRenderEvents' -> '.v1.level.LevelRenderEvents'
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.resources.Identifier
+//? if > 1.21.11
+//import at.hannibal2.skyhanni.utils.compat.getRenderState
 
 @SkyHanniModule
 object RenderEvents {
@@ -25,26 +35,36 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
+        //~ if > 1.21.11 'SpecialGuiElementRegistry' -> 'PictureInPictureRendererRegistry'
         SpecialGuiElementRegistry.register { ctx ->
-            SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
+            SkyHanniPipCoordinatorRenderer(
+                //~ if > 1.21.11 'vertexConsumers' -> 'bufferSource'
+                ctx.vertexConsumers()
+            )
         }
 
         // makes the lines render weird idk
-        /*WorldRenderEvents.END_MAIN.register { event ->
+        //~ if > 1.21.11 'WorldRenderEvents' -> 'LevelRenderEvents'
+        //~ if > 1.21.11 'WorldRenderContext' -> 'LevelRenderContext'
+        WorldRenderEvents.END_MAIN.register { event: WorldRenderContext ->
+            //~ if > 1.21.11 '.consumers() as? MultiBufferSource.BufferSource ?: return@register' -> '.bufferSource()'
             val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
+            //~ if > 1.21.11 '.matrices()' -> '.poseStack()'
             val stack = event.matrices()
             SkyHanniRenderWorldEvent(
                 stack,
+                //~ if > 1.21.11 'mainCamera' -> 'mainCamera.getRenderState()'
                 event.gameRenderer().mainCamera,
                 immediateVertexConsumers,
-                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
+                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks,
             ).post()
-        }*/
+        }
     }
 
     @HandleEvent
     fun onResourcePackReload() {
         SkyHanniItemRenderCoordinator.invalidateAtlas()
+        SkyHanniRoundedShapeRenderManager.invalidateAtlas()
     }
 
     private fun postGui(context: GuiGraphics, tick: DeltaTracker) {

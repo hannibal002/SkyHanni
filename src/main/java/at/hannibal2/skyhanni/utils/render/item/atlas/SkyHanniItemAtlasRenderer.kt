@@ -8,14 +8,17 @@ import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.gui.render.state.BlitRenderState
 import net.minecraft.client.gui.render.state.GuiRenderState
+//? if < 26.1 {
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+//? } else {
+/*import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import org.joml.Matrix4f
+*///?}
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+import com.mojang.blaze3d.textures.FilterMode
 import kotlin.math.roundToInt
-
-//? if > 1.21.10
-//import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -25,8 +28,14 @@ internal class SkyHanniItemAtlasRenderer(
     private val depthTexture: GpuTexture,
 ) {
 
-    fun render(projectionBuffer: CachedOrthoProjectionMatrixBuffer, block: () -> Unit) {
-        val bufferSlice = projectionBuffer.getBuffer(sizePixels.toFloat(), sizePixels.toFloat())
+    fun render(
+        //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
+        projectionBuffer: CachedOrthoProjectionMatrixBuffer,
+        block: () -> Unit,
+    ) {
+        val size = sizePixels.toFloat()
+        //~ if > 1.21.11 'size, size' -> '(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))'
+        val bufferSlice = projectionBuffer.getBuffer(size, size)
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
@@ -72,13 +81,11 @@ internal class SkyHanniItemAtlasRenderer(
         val slotF = pixelSize.toFloat()
         val u1 = u + slotF / size
         val v1 = v + (-slotF) / size
+        //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
         guiRenderState.submitBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
-                //? if < 1.21.11 {
-                TextureSetup.singleTexture(textureView),
-                //?} else
-                //TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
+                TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
                 shState.pose(),
                 shState.x0(), shState.y0(), shState.x1(), shState.y1(),
                 u, u1, v, v1,

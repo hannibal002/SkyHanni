@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//~ if > 1.21.11 'state.CameraRenderState' -> 'state.level.CameraRenderState'
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 

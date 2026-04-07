@@ -22,18 +22,7 @@ import java.util.Random;
 @Mixin(SplashManager.class)
 public class MixinSplashTextResourceSupplier {
 
-    //? if < 1.21.11 {
     @Shadow
-    @Final
-    private List<String> splashes;
-
-    @Inject(method = "apply(Ljava/util/List;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
-    public void addSplash(List<String> list, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
-        this.splashes.add("SkyHanni!");
-    }
-    //?} else {
-
-    /*@Shadow
     private List<Component> splashes;
 
     @Shadow
@@ -46,5 +35,4 @@ public class MixinSplashTextResourceSupplier {
             cir.setReturnValue(new SplashRenderer(TextHelper.INSTANCE.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, "SkyHanni!")));
         }
     }
-    *///?}
 }

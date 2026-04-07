@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.compat.addLavas
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -169,20 +169,20 @@ object FishingApi {
         lastReelTime = SimpleTimeMark.now()
     }
 
-    fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
+    fun SafeItemStack.isFishingRod() = getInternalName().isFishingRod()
     fun NeuInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
     fun NeuInternalName.isLavaRod() = this in lavaRods
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
+    fun SafeItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
         val rodPartName = getExtraAttributes()?.getCompoundOrDefault(part.tagName)?.getStringOrDefault("part")
         if (rodPartName.isNullOrEmpty()) return null
         return rodPartName.toInternalName()
     }
 
-    fun ItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
+    fun SafeItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {

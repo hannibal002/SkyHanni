@@ -22,7 +22,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
 import net.minecraft.util.FormattedCharSequence
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import java.text.DecimalFormat
 import kotlin.math.min
@@ -39,17 +38,21 @@ object GuiRenderUtils {
 
     private val fr: Font get() = Minecraft.getInstance().font
 
+    @Suppress("SameParameterValue")
     private fun drawStringCentered(str: String, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
+    @Suppress("SameParameterValue")
     private fun drawStringCentered(str: Component, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
@@ -72,26 +75,32 @@ object GuiRenderUtils {
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
     fun drawString(str: Component, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: Component, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
     fun drawString(str: FormattedCharSequence, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: FormattedCharSequence, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
+        //~ if > 1.21.11 '.drawString' -> '.text'
         DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
@@ -102,6 +111,7 @@ object GuiRenderUtils {
     fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
+            //~ if > 1.21.11 '.drawString' -> '.text'
             DrawContextUtils.drawContext.drawString(fr, string, x, newY, color, shadow)
             newY += 9
         }
@@ -110,6 +120,7 @@ object GuiRenderUtils {
     fun drawTexts(strings: List<Component>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
+            //~ if > 1.21.11 '.drawString' -> '.text'
             DrawContextUtils.drawContext.drawString(fr, string, x, newY, color, shadow)
             newY += 9
         }
@@ -172,7 +183,7 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
     }
 
-    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
+    fun renderItemAndBackground(item: SafeItemStack, x: Int, y: Int, color: Int) {
         DrawContextUtils.drawItem(item, x, y)
         drawRect(x, y, x + 16, y + 16, color)
     }
@@ -326,7 +337,7 @@ object GuiRenderUtils {
     /**
      * Wrapper for rendering an item on screen, with the config pre-built.
      */
-    fun ItemStack.renderOnScreen(
+    fun SafeItemStack.renderOnScreen(
         x: Float,
         y: Float,
         config: ItemRenderableConfig,
@@ -347,7 +358,7 @@ object GuiRenderUtils {
      * rendered using the normal method (either is static, or 'small')
      */
     @Suppress("unused")
-    fun ItemStack.renderOnScreen(
+    fun SafeItemStack.renderOnScreen(
         x: Float,
         y: Float,
         scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -396,6 +407,7 @@ object GuiRenderUtils {
          *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
          */
         val guiItemRenderState = GuiItemRenderState(
+            //? if < 26.1
             this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
@@ -415,11 +427,14 @@ object GuiRenderUtils {
             frameNumber = frameNumber,
             alpha = alpha,
         )
+        //~ if > 1.21.11 'gameRenderer.' -> 'gameRenderer.gameRenderState.'
+        //~ if > 1.21.11 'submitPicturesInPictureState' -> 'addPicturesInPictureState'
         Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+
         return newRenderState.stableId
     }
 
-    private fun ItemStack.normalRenderOnScreen(
+    private fun SafeItemStack.normalRenderOnScreen(
         translateX: Float,
         translateY: Float,
         scale: Float

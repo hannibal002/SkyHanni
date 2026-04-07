@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object TradeValue {
@@ -73,8 +73,8 @@ object TradeValue {
         if (!inventory.isInside()) return
         if (!event.isMod(2)) return
 
-        val otherMap = mutableMapOf<Int, ItemStack>()
-        val yourMap = mutableMapOf<Int, ItemStack>()
+        val otherMap = mutableMapOf<Int, SafeItemStack>()
+        val yourMap = mutableMapOf<Int, SafeItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.containerSlot in otherList) {
@@ -98,7 +98,7 @@ object TradeValue {
         }
     }
 
-    private fun calculatePrice(items: MutableMap<Int, ItemStack>): Pair<Double?, Double> {
+    private fun calculatePrice(items: MutableMap<Int, SafeItemStack>): Pair<Double?, Double> {
         var coin: Double? = null
         var total = 0.0
         for ((slot, stack) in items.toMap()) {

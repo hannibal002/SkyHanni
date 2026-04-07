@@ -17,10 +17,12 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 @Mixin(CustomHeadLayer.class)
 public class MixinHeadFeatureRenderer {
 
+    //~ if > 1.21.11 ';submitSkull(Lnet/minecraft/core/Direction;' -> ';submitSkull('
     @WrapWithCondition(
         method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(Lnet/minecraft/core/Direction;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V")
     )
+    //~ if > 1.21.11 'Direction direction, float f, float g' -> 'float animationPos'
     private boolean onRenderArmor(Direction direction, float f, float g, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int i, SkullModelBase skullModelBase, RenderType renderType, int j, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         return !HideArmorHookKt.shouldHideArmor();
     }
@@ -32,5 +34,4 @@ public class MixinHeadFeatureRenderer {
     private boolean onRenderItemstackOnHead(ItemStackRenderState instance, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int i, int j, int k) {
         return !HideArmorHookKt.shouldHideArmor();
     }
-
 }

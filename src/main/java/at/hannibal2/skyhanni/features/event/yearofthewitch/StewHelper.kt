@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
@@ -130,7 +130,7 @@ object StewHelper {
     }
 
     // TODO repo patterns for the two lastLine
-    private fun getStewStatus(stack: ItemStack): StewStatus? {
+    private fun getStewStatus(stack: SafeItemStack): StewStatus? {
         val lastLine = stack.getLoreComponent().lastOrNull()?.string ?: return null
         if (lastLine == "You've already eaten this stew!") return StewStatus.HAS_EATEN
         if (lastLine == "Click to give ingredients!") return StewStatus.HAS_ENOUGH

@@ -25,8 +25,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.LightTexture
-import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -38,10 +36,15 @@ import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+//? if > 1.21.11 {
+/*import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.rotation
+*///? }
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
+    //~ if > 1.21.11 'entity/' -> 'entity/beacon/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
@@ -187,10 +190,7 @@ object WorldRenderUtils {
         val buf = vertexConsumers.getBuffer(layer)
         matrices.pushPose()
 
-        //? < 1.21.11 {
-        ShapeRenderer.addChainedFilledBoxVertices(
-            //?} else
-            //addChainedFilledBoxVertices(
+        addChainedFilledBoxVertices(
             matrices,
             buf,
             effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
@@ -280,7 +280,7 @@ object WorldRenderUtils {
             vertexConsumers,
             if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
             backGroundColor,
-            LightTexture.FULL_BRIGHT,
+            15728880,
         )
     }
 
@@ -337,7 +337,7 @@ object WorldRenderUtils {
             vertexConsumers,
             if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
             backGroundColor,
-            LightTexture.FULL_BRIGHT,
+            15728880,
         )
     }
 
@@ -954,8 +954,7 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos() =
-        Minecraft.getInstance().gameRenderer.mainCamera?.let { exactLocation(it) } ?: LorenzVec()
+    fun getViewerPos() = Minecraft.getInstance().gameRenderer.mainCamera.let { exactLocation(it) }
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -977,13 +976,13 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+    internal fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.eyeHeight.toDouble()
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
+    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
         exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {

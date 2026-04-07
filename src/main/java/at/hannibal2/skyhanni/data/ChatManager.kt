@@ -25,6 +25,8 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.GuiMessageTag
+//? if > 1.21.11
+//import net.minecraft.client.GuiMessageSource
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
@@ -270,6 +272,7 @@ object ChatManager {
                         history.actionReason = reason.uppercase()
                     }
                 }
+                //~ if > 1.21.11 'GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
                 this[it] = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
             }
         }

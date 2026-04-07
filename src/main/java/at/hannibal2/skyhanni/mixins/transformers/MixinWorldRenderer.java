@@ -28,22 +28,21 @@ public class MixinWorldRenderer {
     @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
     public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-        if (glowColor == null) {
-            return original.call(instance);
-        }
+        if (glowColor == null) return original.call(instance);
         return true;
     }
 
+    //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
     @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
+    //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
     @Inject(method = "method_62214", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
     }
-
 }

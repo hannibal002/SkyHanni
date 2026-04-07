@@ -26,11 +26,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Matcher
 import kotlin.math.pow
 
@@ -414,7 +414,7 @@ enum class HotmData(
 
     override var slot: Slot? = null
 
-    override var item: ItemStack? = null
+    override var item: SafeItemStack? = null
 
     override val totalCostMaxLevel = calculateTotalCost(maxLevel)
 

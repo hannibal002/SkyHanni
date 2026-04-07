@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -49,7 +50,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
@@ -382,13 +382,13 @@ object MineshaftPityDisplay {
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
-        val displayItem: ItemStack,
+        private val displayItemProvider: () -> SafeItemStack,
     ) {
         MITHRIL(
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
+            { ColoredBlockCompat.LIGHT_BLUE.createWoolStack() },
         ),
 
         // can't rename enum because config explodes
@@ -396,40 +396,42 @@ object MineshaftPityDisplay {
             "Low Tier Gemstone",
             OreType.entries.filter { it.isLowTierGemstone() },
             8,
-            ColoredBlockCompat.RED.createGlassStack(),
+            { ColoredBlockCompat.RED.createGlassStack() },
         ),
         HIGH_TIER_GEMSTONE(
             "High Tier Gemstone",
             OreType.entries.filter { it.isHighTierGemstone() },
             10,
-            ColoredBlockCompat.BLUE.createGlassStack(),
+            { ColoredBlockCompat.BLUE.createGlassStack() },
         ),
         GLACITE(
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            ItemStack(Blocks.PACKED_ICE),
+            { SafeItemStack(Blocks.PACKED_ICE) },
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            ItemStack(Blocks.CLAY),
+            { SafeItemStack(Blocks.CLAY) },
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            ItemStack(Blocks.RED_SANDSTONE),
+            { SafeItemStack(Blocks.RED_SANDSTONE) },
         ),
 
         TITANIUM(
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            BlockCompat.createSmoothDiorite(),
+            { BlockCompat.createSmoothDiorite() },
         ),
         ;
+
+        val displayItem: SafeItemStack by lazy { displayItemProvider() }
 
         companion object {
 

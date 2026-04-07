@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockRenderDispatcher.class)
 public class MixinBlockRendererDispatcher {
-
     @Inject(method = "getBlockModel", at = @At("HEAD"), cancellable = true)
     public void getModel(BlockState state, CallbackInfoReturnable<BlockStateModel> cir) {
         BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockRenderDispatcher) (Object) this, state, cir);

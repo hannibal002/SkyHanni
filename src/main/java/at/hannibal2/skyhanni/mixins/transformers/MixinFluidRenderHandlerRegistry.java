@@ -18,8 +18,7 @@ import java.util.Map;
 @Mixin(value = FluidRenderHandlerRegistryImpl.class, remap = false)
 public class MixinFluidRenderHandlerRegistry {
 
-    @Shadow
-    @Final
+    @Shadow @Final
     private Map<Fluid, FluidRenderHandler> handlers;
 
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
@@ -29,5 +28,4 @@ public class MixinFluidRenderHandlerRegistry {
             else if (fluid == Fluids.FLOWING_LAVA) cir.setReturnValue(handlers.get(Fluids.FLOWING_WATER));
         }
     }
-
 }

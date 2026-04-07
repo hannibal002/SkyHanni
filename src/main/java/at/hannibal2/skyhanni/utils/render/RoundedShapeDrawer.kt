@@ -19,16 +19,18 @@ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleU
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 import com.mojang.blaze3d.buffers.GpuBufferSlice
+//~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.joml.Vector3f
-//? > 1.21.10
-//import com.mojang.blaze3d.textures.FilterMode
+import com.mojang.blaze3d.textures.FilterMode
 
 object RoundedShapeDrawer {
 
+    //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
+    //~ if > 1.21.11 '"SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true' -> '"SkyHanni Rounded Shapes"'
     val projectionMatrix = CachedOrthoProjectionMatrixBuffer("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
@@ -72,22 +74,18 @@ object RoundedShapeDrawer {
             // so we just set the correct matrix here are restore the perspective one afterwards
             val window = Minecraft.getInstance().window
             RenderSystem.backupProjectionMatrix()
+            val w = window.width.toFloat() / window.guiScale.toFloat()
+            val h = window.height.toFloat() / window.guiScale.toFloat()
             RenderSystem.setProjectionMatrix(
-                projectionMatrix.getBuffer(
-                    window.width.toFloat() / window.guiScale.toFloat(),
-                    window.height.toFloat() / window.guiScale.toFloat(),
-                ),
+                //~ if > 1.21.11 'w, h' -> 'Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)'
+                projectionMatrix.getBuffer(w, h),
                 ProjectionType.ORTHOGRAPHIC,
             )
             val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
                 Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
                 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
                 Vector3f(),
-                //? if < 1.21.11 {
-                RenderSystem.getTextureMatrix(),
-                RenderSystem.getShaderLineWidth(),
-                //?} else
-                //Matrix4f(),
+                Matrix4f(),
             )
             roundedBufferSlice =
                 roundedUniform.writeWith(scaleFactor, radius, smoothness, halfSize, centerPos, modelViewMatrix)
@@ -114,8 +112,6 @@ object RoundedShapeDrawer {
     fun drawRoundedTexturedRect(left: Int, top: Int, right: Int, bottom: Int, texture: Identifier) {
         val glTex = Minecraft.getInstance().textureManager.getTexture(texture).textureView
         RenderSystem.assertOnRenderThread()
-        //? if < 1.21.11
-        RenderSystem.setShaderTexture(0, glTex)
         RoundedTextureShader.performVQuadAndUniforms(
             SkyHanniRenderPipeline.ROUNDED_TEXTURED_RECT(),
             x1 = left, y1 = top, x2 = right, y2 = bottom,
@@ -126,12 +122,8 @@ object RoundedShapeDrawer {
                 { setUv(1f, 0f) },
             ),
         ) {
-            //? if < 1.21.11 {
-            bindSampler("textureSampler", glTex)
-            //?} else {
-            /*val sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)
+            val sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)
             bindTexture("textureSampler", glTex, sampler)
-            *///?}
         }
     }
 

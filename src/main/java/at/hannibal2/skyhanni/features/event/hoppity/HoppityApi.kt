@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -53,7 +54,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
@@ -186,7 +186,7 @@ object HoppityApi {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    fun filterMayBeStray(items: Map<Int, ItemStack>) = items.filter { (slotIndex, stack) ->
+    fun filterMayBeStray(items: Map<Int, SafeItemStack>) = items.filter { (slotIndex, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slotIndex != 13 && slotIndex in 0..26 &&
             // Stack must not be null, and must be a skull.
@@ -195,7 +195,7 @@ object HoppityApi {
             stack.hoverName.string.isNotEmpty() && stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
     }
 
-    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
+    private fun Map<Int, SafeItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
         !processedStraySlots.contains(it.key) && // Don't process the same slot twice.
             it.value.getLore().isNotEmpty() // All processable strays have lore.
     }

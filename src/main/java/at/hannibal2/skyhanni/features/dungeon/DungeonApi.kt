@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -36,7 +37,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -308,7 +308,7 @@ object DungeonApi {
 
     private fun readOneMaxCollection(
         bossCollections: MutableMap<DungeonFloor, Int>,
-        inventoryItems: Map<Int, ItemStack>,
+        inventoryItems: Map<Int, SafeItemStack>,
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
@@ -331,7 +331,7 @@ object DungeonApi {
 
     private fun readAllCollections(
         bossCollections: MutableMap<DungeonFloor, Int>,
-        inventoryItems: Map<Int, ItemStack>,
+        inventoryItems: Map<Int, SafeItemStack>,
     ) {
         nextItem@ for (stack in inventoryItems.values) {
             var name = ""

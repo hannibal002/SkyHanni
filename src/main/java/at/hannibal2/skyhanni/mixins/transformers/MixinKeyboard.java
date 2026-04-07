@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+// TODO 26.1 rei compat needed
+//? if < 26.1
 import at.hannibal2.skyhanni.compat.ReiCompat;
 import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
@@ -26,6 +28,8 @@ public class MixinKeyboard {
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
         // don't send key events if Rei search bar is selected
+        // TODO 26.1 rei compat needed
+        //? if < 26.1
         if (ReiCompat.searchHasFocus()) return;
 
         /*

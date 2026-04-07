@@ -30,12 +30,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 
@@ -44,7 +44,7 @@ object EstimatedItemValue {
 
     val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<Renderable>()
-    private val cache = mutableMapOf<ItemStack, List<Renderable>>()
+    private val cache = mutableMapOf<SafeItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
@@ -162,7 +162,7 @@ object EstimatedItemValue {
         updateItem(event.stack)
     }
 
-    fun updateItem(item: ItemStack) {
+    fun updateItem(item: SafeItemStack) {
         cache[item]?.let {
             display = it
             lastToolTipTime = System.currentTimeMillis()
@@ -200,7 +200,7 @@ object EstimatedItemValue {
         lastToolTipTime = System.currentTimeMillis()
     }
 
-    private fun ItemStack.shouldIgnoreDraw(): Boolean {
+    private fun SafeItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
             val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
             return (
@@ -222,7 +222,7 @@ object EstimatedItemValue {
         } ?: return true
     }
 
-    private fun draw(stack: ItemStack): List<Renderable> {
+    private fun draw(stack: SafeItemStack): List<Renderable> {
         if (stack.shouldIgnoreDraw()) return listOf()
 
         val list = mutableListOf<String>()

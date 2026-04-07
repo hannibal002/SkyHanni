@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.projectile.FishingHook
-import net.minecraft.world.item.ItemStack
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 
@@ -228,7 +228,7 @@ object HoppityEggLocator {
         SkyBlockUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
             HoppityApi.isHoppityEvent()
 
-    private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
+    private val SafeItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
     private val locatorInHotbar by RecalculatingValue(1.seconds) {
         SkyBlockUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }

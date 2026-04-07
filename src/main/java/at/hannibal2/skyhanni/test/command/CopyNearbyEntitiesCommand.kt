@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -47,7 +48,6 @@ import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Shulker
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
@@ -266,7 +266,7 @@ object CopyNearbyEntitiesCommand {
         add("-  Variant: $variant")
     }
 
-    private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
+    private fun MutableList<String>.printItemStackData(stack: SafeItemStack?) {
         if (stack != null) {
             val skullTexture = stack.getSkullTexture()?.trim()?.replace("\n", "")
             if (skullTexture != null) {

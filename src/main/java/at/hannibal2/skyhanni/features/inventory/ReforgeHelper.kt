@@ -25,11 +25,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
@@ -38,7 +40,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
@@ -83,7 +84,7 @@ object ReforgeHelper {
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
-    private var itemToReforge: ItemStack? = null
+    private var itemToReforge: SafeItemStack? = null
     private var inventoryContainer: AbstractContainerMenu? = null
 
     private var currentReforge: ReforgeApi.Reforge? = null
@@ -128,7 +129,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            if (event.slot.item?.getLoreComponent()?.last()?.string != "Click to reforge!") return
+            if (event.slot.item.orNull()?.getLoreComponent()?.last()?.string != "Click to reforge!") return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -427,8 +428,8 @@ object ReforgeHelper {
         if (slot != null) {
             slot.highlight(color)
         } else {
-            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON].takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
-            inventory[HEX_REFORGE_NEXT_UP_BUTTON].takeIf { it.item?.item == Items.PLAYER_HEAD }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON].takeIf { it.item.orNull()?.item == Items.PLAYER_HEAD }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON].takeIf { it.item.orNull()?.item == Items.PLAYER_HEAD }?.highlight(color)
         }
     }
 

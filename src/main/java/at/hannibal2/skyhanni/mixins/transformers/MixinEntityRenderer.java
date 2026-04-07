@@ -11,7 +11,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+//? if < 26.1 {
 import net.minecraft.client.renderer.state.CameraRenderState;
+//? } else {
+/*import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
+*///? }
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
 
+    //~ if > 1.21.11 'submitNameTag' -> 'submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V'
     @Inject(method = "submitNameTag", at = @At("HEAD"), cancellable = true)
     public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
@@ -32,6 +41,7 @@ public class MixinEntityRenderer {
         }
     }
 
+    //~ if > 1.21.11 'submitNameTag' -> 'submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V'
     @Inject(method = "submitNameTag", at = @At("TAIL"))
     public void onRenderLabelTail(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
@@ -64,4 +74,18 @@ public class MixinEntityRenderer {
         state.skyhanni$setEntity(entity);
     }
 
+    // See modifyRenderLabelIfPresentArgs in MixinPlayerEntityRenderer.
+    //? if > 1.21.11 {
+    /*@ModifyArg(
+        method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;I)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V", ordinal = 0),
+        index = 3
+    )
+    private Component modifyRenderLabelIfPresentArgs(Component text) {
+        if (SkyBlockUtils.INSTANCE.getInSkyBlock()) {
+            return EntityData.getHealthDisplay(text);
+        }
+        return text;
+    }
+    *///? }
 }

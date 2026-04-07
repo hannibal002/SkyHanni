@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.LorenzVec
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.level.block.state.BlockState
 
 /**
@@ -15,5 +15,5 @@ class CropClickEvent(
     val crop: CropType,
     val blockState: BlockState,
     val clickType: ClickType,
-    val itemInHand: ItemStack?,
+    val itemInHand: SafeItemStack?,
 ) : SkyHanniEvent()

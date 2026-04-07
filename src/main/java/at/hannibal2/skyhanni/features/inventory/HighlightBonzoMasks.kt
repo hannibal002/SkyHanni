@@ -6,13 +6,14 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.awt.Color
 import kotlin.time.Duration
@@ -46,7 +47,7 @@ object HighlightBonzoMasks {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.depletedBonzosMasks) return
         for (slot in event.container.slots) {
-            val internalName = slot.item?.getInternalName() ?: continue
+            val internalName = slot.item.orNull()?.getInternalNameOrNull() ?: continue
             val maskType = MaskType.getByInternalName(internalName) ?: continue
             val readyAt = maskTimers[maskType] ?: continue
 

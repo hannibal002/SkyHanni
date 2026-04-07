@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
@@ -55,7 +56,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -66,7 +66,7 @@ object GardenApi {
     private val RARE_MOOSHROOM_COW_PET_ITEM = "MOOSHROOM_COW;2".toInternalName()
 
     var toolInHand: String? = null
-    var itemInHand: ItemStack? = null
+    var itemInHand: SafeItemStack? = null
     var cropInHand: CropType? = null
     var lastBrokenCropType: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
@@ -86,7 +86,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
+    private val cropIconCache = TimeLimitedCache<String, SafeItemStack>(10.minutes)
     val barnArea = AABB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     private var extraFarmingTools: Set<NeuInternalName> = setOf()
@@ -162,7 +162,7 @@ object GardenApi {
         }
     }
 
-    private fun getToolInHand(toolItem: ItemStack?, crop: CropType?): String? {
+    private fun getToolInHand(toolItem: SafeItemStack?, crop: CropType?): String? {
         if (crop != null) return crop.cropName
 
         val internalName = toolItem?.getInternalName() ?: return null
@@ -184,7 +184,7 @@ object GardenApi {
     fun isHoldingCropFever(): Boolean =
         InventoryUtils.getItemInHand()?.getHypixelEnchantments()?.containsKeys("ultimate_crop_fever") == true
 
-    fun ItemStack.getCropType(): CropType? {
+    fun SafeItemStack.getCropType(): CropType? {
         val internalName = getInternalName()
         if (internalName.startsWith("THEORETICAL_HOE_SUNFLOWER")) {
             return CropType.getTimeFlower()
@@ -192,10 +192,10 @@ object GardenApi {
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long? =
+    fun readCounter(itemStack: SafeItemStack): Long? =
         itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
 
-    fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
+    fun CropType.getItemStackCopy(iconId: String): SafeItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
         AnitaMedalProfit.inInventory ||

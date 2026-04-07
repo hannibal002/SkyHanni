@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 
 @SkyHanniModule
 object CFInventory {
@@ -34,7 +35,7 @@ object CFInventory {
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.item == null) continue
+            if (slot.item.orNull() == null) continue
             val slotIndex = slot.index
 
             if (slotIndex == CFApi.bestPossibleSlot) {
@@ -50,7 +51,7 @@ object CFInventory {
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.item == null) continue
+            if (slot.item.orNull() == null) continue
             val slotIndex = slot.index
 
             val currentUpdates = CFApi.factoryUpgrades
@@ -67,7 +68,7 @@ object CFInventory {
                 slot.highlight(LorenzColor.RED)
             }
             if (slotIndex == CFApi.milestoneIndex) {
-                unclaimedRewardsPattern.firstMatcher(slot.item?.getLore().orEmpty()) {
+                unclaimedRewardsPattern.firstMatcher(slot.item.orNull()?.getLore().orEmpty()) {
                     slot.highlight(LorenzColor.RED)
                 }
             }

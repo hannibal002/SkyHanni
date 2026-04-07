@@ -57,14 +57,26 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
 
-    @WrapOperation(method = "addElementToMesh", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;"))
+    @WrapOperation(
+        method = "addElementToMesh",
+        //~ if > 1.21.11 'gui/render/state/' -> 'gui/'
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+    )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    // Here and below is to construct our own render pipeline for atlas-ed item rendering.
+    //~ if > 1.21.11 'Shadow' -> 'Unique'
     @Shadow
+    //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
     private int frameNumber;
+
+    //? if > 1.21.11 {
+    /*@Inject(method = "render", at = @At("HEAD"))
+    private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
+        skyhanni$frameNumber++;
+    }
+    *///? }
 
     @Shadow
     @Final
@@ -96,6 +108,7 @@ public class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
+            //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
             frameNumber
         );
     }
@@ -113,6 +126,7 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
+            //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
             frameNumber
         );
     }

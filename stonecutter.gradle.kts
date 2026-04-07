@@ -71,9 +71,10 @@ allprojects {
 
         // moulconfig and a few detekt rules
         exclusiveContent {
-            forRepository {
-                maven("https://maven.notenoughupdates.org/releases")
-            }
+            forRepositories(
+                repositories.mavenLocal(),
+                repositories.maven("https://maven.notenoughupdates.org/releases"),
+            )
             filter {
                 includeGroup("org.notenoughupdates")
                 includeGroup("org.notenoughupdates.moulconfig")
@@ -122,7 +123,7 @@ allprojects {
     }
 }
 
-stonecutter active "1.21.10"
+stonecutter active "1.21.11"
 
 stonecutter handlers {
     inherit("accesswidener", "classtweaker")
@@ -134,8 +135,35 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed >= "1.21.11") {
-            replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
+        string(current.parsed >= "26.1") {
+            replace("ClientWorldEvents", "ClientLevelEvents")
+            replace("START_WORLD_TICK", "START_LEVEL_TICK")
+            replace("StartWorldTick", "StartLevelTick")
+            replace("END_WORLD_TICK", "END_LEVEL_TICK")
+            replace("EndWorldTick", "EndLevelTick")
+            replace("AFTER_CLIENT_WORLD_CHANGE", "AFTER_CLIENT_LEVEL_CHANGE")
+            replace("AfterClientWorldChange", "AfterClientLevelChange")
+            replace("ClickType", "ContainerInput")
+            replace("GuiGraphics", "GuiGraphicsExtractor")
+            replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
+            replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
+
+            listOf(
+                "GlyphRenderState",
+                "GuiElementRenderState",
+                "GuiRenderState",
+                "GuiItemRenderState",
+                "BlitRenderState",
+                "pip.PictureInPictureRenderState"
+            ).forEach {
+                replace(
+                    "import net.minecraft.client.gui.render.state.$it",
+                    "import net.minecraft.client.renderer.state.gui.$it"
+                )
+            }
+
+            replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
+            replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
         }
     }
 

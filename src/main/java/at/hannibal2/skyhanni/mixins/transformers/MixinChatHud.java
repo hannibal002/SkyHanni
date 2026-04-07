@@ -38,7 +38,7 @@ public abstract class MixinChatHud {
     }
 
     @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;set(Ljava/lang/Object;)V"), require = 0)
-    private <E> void clearChatTail(ListIterator instance, E e) {
+    private <E> void clearChatTail(ListIterator<E> instance, E e) {
         instance.remove();
     }
 
@@ -49,27 +49,17 @@ public abstract class MixinChatHud {
         }
     }
 
-    @WrapMethod(
-            //? if < 1.21.11 {
-            method = "render"
-            //?} else
-            //method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V"
-    )
-
-            //? if < 1.21.11 {
-    private void wrapRender(GuiGraphics context, int currentTick, int mouseX, int mouseY, boolean focused, Operation<Void> original) {
-        //?} else
-        //private void wrapRender(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int i, int j, boolean bl, Operation<Void> original) {
+    //~ if > 1.21.11 'ChatGraphicsAccess;IIZ' -> 'ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V'
+    @WrapMethod(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V")
+    //~ if > 1.21.11 'int i, int j, boolean bl, Operation<Void> original' -> 'int screenHeight, int ticks, ChatComponent.DisplayMode displayMode, Operation<Void> original'
+    private void wrapRender(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int i, int j, boolean bl, Operation<Void> original) {
         ChromaFontManagerKt.setRenderingChat(true);
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
-        //? if < 1.21.11 {
-        original.call(context, currentTick, mouseX, mouseY, focused);
-        //?} else
-        //original.call(chatGraphicsAccess, i, j, bl);
+        //~ if > 1.21.11 'i, j, bl' -> 'screenHeight, ticks, displayMode'
+        original.call(chatGraphicsAccess, i, j, bl);
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
-
 }

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import net.minecraft.world.item.ItemStack
 
 enum class ItemCategory {
     SWORD,
@@ -74,7 +73,7 @@ enum class ItemCategory {
 
     companion object {
 
-        fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
+        fun Collection<ItemCategory>.containsItem(stack: SafeItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
