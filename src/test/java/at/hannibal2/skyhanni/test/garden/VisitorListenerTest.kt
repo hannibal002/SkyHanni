@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.garden
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import net.minecraft.network.chat.Component
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
@@ -86,6 +87,6 @@ class VisitorListenerTest {
     }
 
     private fun fakeTabWidget(lines: List<String>): WidgetUpdateEvent {
-        return WidgetUpdateEvent(TabWidget.VISITORS, lines)
+        return WidgetUpdateEvent(TabWidget.VISITORS, lines.map { Component.literal(it) })
     }
 }
