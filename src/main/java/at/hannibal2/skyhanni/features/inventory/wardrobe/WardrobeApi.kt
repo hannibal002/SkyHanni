@@ -12,8 +12,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.DyedItemColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -111,6 +114,18 @@ object WardrobeApi {
             return listOf(ItemStackAnimatedFrame(texture.buildTextureItemStack(), 0))
         }
         return animJson.textures.map { ItemStackAnimatedFrame(it.buildTextureItemStack(), animJson.ticks) }
+    }
+
+    fun getArmorDyeAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
+        val dyeInternalName = stack.getArmorDye() ?: return null
+        val dyeColors = AnimatedSkinUtils.animatedDyes[dyeInternalName] ?: return null
+        if (dyeColors.size <= 1) return null
+        return dyeColors.map { hexColor ->
+            val colorInt = hexColor.trimStart('#').toLong(16).toInt()
+            val dyedStack = stack.copy()
+            dyedStack.set(DataComponents.DYED_COLOR, DyedItemColor(colorInt))
+            ItemStackAnimatedFrame(dyedStack, 1)
+        }
     }
 
     private fun getWardrobeItem(itemStack: ItemStack?) =

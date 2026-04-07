@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAnimatedDyeJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
@@ -11,7 +12,7 @@ import com.google.gson.JsonObject
 import net.minecraft.nbt.CompoundTag
 
 /**
- * Central store for data loaded from the NEU `animatedskulls` repository entry.
+ * Central store for data loaded from the NEU `animatedskulls` repository entry (as well as `dyes`)
  *
  * Provides the shared skin-variant-index lookup used by both armor and pet skin rendering,
  * and exposes the pre-split skin maps consumed by [at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi]
@@ -22,7 +23,11 @@ object AnimatedSkinUtils {
 
     private val repoReloadCoroutine = CoroutineSettings("animated skin utils repo reload")
 
-    /** Animated skin entries for non-pet armor (keys do not start with `PET_SKIN`). */
+    /** Animated dye entries for armor */
+    var animatedDyes: Map<NeuInternalName, List<String>> = mapOf()
+        private set
+
+    /** Animated skin entries for armor (keys do not start with `PET_SKIN`). */
     var armorSkins: Map<String, AnimatedSkinJson> = mapOf()
         private set
 
@@ -48,6 +53,9 @@ object AnimatedSkinUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val dyeData = event.getConstantAsync<NeuAnimatedDyeJson>("dyes")
+        animatedDyes = dyeData.animated
+
         val skinData = event.getConstantAsync<NeuAnimatedSkullsJson>("animatedskulls")
         armorSkins = skinData.skins.filterKeys { !it.startsWith("PET_SKIN") }
         petSkins = skinData.skins.filter { it.key.startsWith("PET_SKIN") }

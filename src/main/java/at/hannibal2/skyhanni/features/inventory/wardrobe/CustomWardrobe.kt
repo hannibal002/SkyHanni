@@ -244,7 +244,9 @@ object CustomWardrobe : SkyHanniContainerOverlayScreen(
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal !in 0..3) continue
             val raw = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants() ?: ItemStack.EMPTY
-            val frames = if (config.animatedSkins.get()) WardrobeApi.getArmorAnimatedFrames(raw) else null
+            val frames = if (config.animatedSkins.get()) {
+                WardrobeApi.getArmorAnimatedFrames(raw) ?: WardrobeApi.getArmorDyeAnimatedFrames(raw)
+            } else null
             fakePlayer.equipment.set(equipment, frames?.firstOrNull()?.stack ?: raw)
             if (frames != null && frames.size > 1) {
                 animatedSlots[equipment] = EquipmentSlotAnimationState(frames)
