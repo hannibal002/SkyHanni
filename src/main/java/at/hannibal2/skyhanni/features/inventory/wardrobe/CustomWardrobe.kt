@@ -2,15 +2,11 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_PAGES
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -30,9 +26,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.SkyHanniContainerOverlayScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
+import at.hannibal2.skyhanni.utils.compat.SkyHanniOverlayTheme
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedFakePlayerRenderable.Companion.animatedFakePlayer
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.EquipmentSlotAnimationState
@@ -47,87 +46,49 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
-import kotlin.math.min
-import kotlin.time.Duration.Companion.milliseconds
+
+class CustomWardrobeTheme(config: CustomWardrobeConfig) : SkyHanniOverlayTheme(
+    backgroundColor = config.color.backgroundColor.toColor(),
+    topBorderColor = config.color.topBorderColor.toColor(),
+    bottomBorderColor = config.color.bottomBorderColor.toColor(),
+    outlineThickness = config.spacing.outlineThickness.get(),
+    outlineBlur = config.spacing.outlineBlur.get(),
+    backgroundPadding = config.spacing.backgroundPadding.get(),
+    borderRadius = 8,
+) {
+    val equippedColor: Color = config.color.equippedColor.toColor()
+    val favoriteColor: Color = config.color.favoriteColor.toColor()
+    val samePageColor: Color = config.color.samePageColor.toColor()
+    val otherPageColor: Color = config.color.otherPageColor.toColor()
+    val buttonTopBorder: Int = config.color.topBorderColor.toColor().rgb
+    val buttonBottomBorder: Int = config.color.bottomBorderColor.toColor().rgb
+}
 
 @SkyHanniModule
-object CustomWardrobe {
+object CustomWardrobe : SkyHanniContainerOverlayScreen(
+    checkInventoryName = WardrobeApi.wardrobeDetector.checkInventoryName,
+) {
 
     val config: CustomWardrobeConfig get() = SkyHanniMod.feature.inventory.customWardrobe
 
-    private var displayRenderable: Renderable? = null
+    private val inventoryButtonPosition: Position = Position().ignoreScale()
     private var inventoryButton: Renderable? = null
     var editMode = false
     private var waitingForInventoryUpdate = false
 
-    private val position: Position = Position().ignoreScale()
-    private val loadingPosition: Position = Position().ignoreScale()
-    private val inventoryButtonPosition: Position = Position().ignoreScale()
-
-    private var activeScale: Int = 100
-    private var currentMaxSize: Pair<Int, Int>? = null
-    private var lastScreenSize: Pair<Int, Int>? = null
-
     private const val GUI_NAME = "Custom Wardrobe"
 
-    var renderableTopCorner: Pair<Int, Int> = 0 to 0
-        private set
-    var renderableDimensions: Pair<Int, Int> = 0 to 0
-        private set
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRender(event: GuiContainerEvent.PreDraw) {
-        if (!isEnabled() || editMode) return
-        val renderable = displayRenderable ?: run {
-            update()
-            displayRenderable ?: return
-        }
-
-        val gui = event.gui
-        val screenSize = gui.width to gui.height
-
-        if (screenSize != lastScreenSize) {
-            lastScreenSize = screenSize
-            val shouldUpdate = updateScreenSize(screenSize)
-            if (shouldUpdate) {
-                update()
-                return
-            }
-        }
-
-        val (width, height) = renderable.width to renderable.height
-        renderableDimensions = width to height
-
-        val left = (gui.width - width) / 2
-        val top = (gui.height - height) / 2
-        position.moveTo(left, top)
-        renderableTopCorner = left to top
-
-        if (waitingForInventoryUpdate && config.loadingText.get()) {
-            val loadingRenderable = Renderable.text(
-                "§cLoading...",
-                scale = activeScale / 100.0,
-            )
-            loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
-                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
-        }
-
-        DrawContextUtils.translatedPushPopResult(0f, 0f) {
-            position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-
-            if (EstimatedItemValue.config.enabled) {
-                DrawContextUtils.translate(0f, 0f)
-                EstimatedItemValue.tryRendering()
-            }
-        }
-        event.cancel()
-    }
+    override val theme: CustomWardrobeTheme get() = CustomWardrobeTheme(config)
+    override val isPassthrough: Boolean get() = editMode
+    override val shouldActivate: Boolean get() = config.enabled.get()
+    override val configuredScale: Int get() = config.spacing.globalScale.get()
+    override fun allowMouseClick(): Boolean = CustomWardrobeKeybinds.allowMouseClick()
+    override fun allowKeyboardClick(): Boolean = CustomWardrobeKeybinds.allowKeyboardClick()
 
     // Edit button in normal wardrobe while in edit mode
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!editMode) return
+        if (!WardrobeApi.inWardrobe() || !config.enabled.get() || !editMode) return
         val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
         val posX = gui.leftPos + (1.05 * gui.imageWidth).toInt()
@@ -139,11 +100,38 @@ object CustomWardrobe {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
-        DelayedRun.runDelayed(300.milliseconds) {
-            if (!WardrobeApi.inWardrobe()) {
-                reset()
+    }
+
+    override fun onOverlayClose() {
+        reset()
+    }
+
+    override fun onOverlayDrawScreen(mouseX: Int, mouseY: Int) {
+        if (!waitingForInventoryUpdate || !config.loadingText.get()) return
+        val renderable = displayRenderable ?: return
+        val (left, top) = renderableTopCorner
+        val loadingText = Renderable.text("§cLoading...", scale = activeScale / 100.0)
+        val loadingLeft = left + (renderable.width - loadingText.width) / 2
+        val loadingTop = top - loadingText.height
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(loadingLeft.toFloat(), loadingTop.toFloat())
+            Renderable.withMousePosition(mouseX - loadingLeft, mouseY - loadingTop) {
+                loadingText.render(0, 0)
             }
         }
+    }
+
+    override fun onAfterRender() {
+        if (EstimatedItemValue.config.enabled) {
+            DrawContextUtils.translate(0f, 0f)
+            EstimatedItemValue.tryRendering()
+        }
+    }
+
+    override fun onBrandingClick() {
+        config::enabled.jumpToEditor()
+        reset()
+        WardrobeApi.currentPage = null
     }
 
     @HandleEvent
@@ -156,40 +144,18 @@ object CustomWardrobe {
                 buttonSlotsVerticalSpacing, buttonHorizontalSpacing, buttonVerticalSpacing,
                 buttonWidth, buttonHeight, backgroundPadding,
             ) {
-                currentMaxSize = null
-                lastScreenSize = null
+                invalidateScale()
+                rebuildDisplay()
             }
         }
     }
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || editMode) return
+        if (!WardrobeApi.inWardrobe() || !config.enabled.get() || editMode) return
         DelayedRun.runNextTick {
-            update()
+            rebuildDisplay()
         }
-    }
-
-    private fun update() {
-        displayRenderable = createRenderables()
-    }
-
-    private fun updateScreenSize(gui: Pair<Int, Int>): Boolean {
-        val renderable = currentMaxSize ?: run {
-            activeScale = config.spacing.globalScale.get()
-            update()
-            return true
-        }
-        val previousActiveScale = activeScale
-        val unscaledRenderableWidth = renderable.first / activeScale
-        val unscaledRenderableHeight = renderable.second / activeScale
-        val autoScaleWidth = 0.95 * gui.first / unscaledRenderableWidth
-        val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
-        val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
-
-        activeScale = config.spacing.globalScale.get().coerceAtMost(maxScale)
-
-        return activeScale != previousActiveScale
     }
 
     private fun createWarning(list: List<WardrobeSlot>): Pair<String?, List<WardrobeSlot>> {
@@ -215,7 +181,6 @@ object CustomWardrobe {
         return wardrobeWarning to wardrobeSlots
     }
 
-    // TODO don't initialize all 18 slots at once, load them lazily when first time hovering over the item.
     private fun createArmorTooltipRenderable(
         slot: WardrobeSlot,
         containerHeight: Int,
@@ -233,20 +198,17 @@ object CustomWardrobe {
             val stack = slot.armor.getOrNull(armorIndex)?.copy()
             var renderable = Renderable.placeholder(containerWidth, hoverableSizes[armorIndex])
             if (stack != null) {
-                val toolTip = getToolTip(stack, slot)
-                if (toolTip != null) {
-                    renderable = Renderable.hoverTips(
-                        renderable,
-                        tips = toolTip,
-                        stack = stack,
-                        condition = {
-                            !config.showTooltipOnlyKeybind.get() || config.tooltipKeybind.isKeyHeld()
-                        },
-                        onHover = {
-                            if (EstimatedItemValue.config.enabled) EstimatedItemValue.updateItem(stack)
-                        },
-                    )
-                }
+                renderable = Renderable.hoverTips(
+                    renderable,
+                    tipsProvider = { getToolTip(stack, slot) ?: emptyList() },
+                    stack = stack,
+                    condition = {
+                        !config.showTooltipOnlyKeybind.get() || config.tooltipKeybind.isKeyHeld()
+                    },
+                    onHover = {
+                        if (EstimatedItemValue.config.enabled) EstimatedItemValue.updateItem(stack)
+                    },
+                )
             }
             loreList.add(renderable)
         }
@@ -255,10 +217,7 @@ object CustomWardrobe {
 
     private fun getToolTip(stack: ItemStack, slot: WardrobeSlot): List<Component>? {
         try {
-            // Get tooltip from minecraft and other mods
-            val toolTips = stack.getTooltip(Minecraft.getInstance().options.advancedItemTooltips)
-
-            return toolTips
+            return stack.getTooltip(Minecraft.getInstance().options.advancedItemTooltips)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e,
@@ -285,12 +244,10 @@ object CustomWardrobe {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal !in 0..3) continue
             val raw = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants() ?: ItemStack.EMPTY
-            val frames = WardrobeApi.getArmorAnimatedFrames(raw)
+            val frames = if (config.animatedSkins.get()) WardrobeApi.getArmorAnimatedFrames(raw) else null
+            fakePlayer.equipment.set(equipment, frames?.firstOrNull()?.stack ?: raw)
             if (frames != null && frames.size > 1) {
-                fakePlayer.equipment.set(equipment, frames.first().stack)
                 animatedSlots[equipment] = EquipmentSlotAnimationState(frames)
-            } else {
-                fakePlayer.equipment.set(equipment, raw)
             }
         }
 
@@ -311,30 +268,22 @@ object CustomWardrobe {
         )
     }
 
-    private fun createRenderables(): Renderable {
+    override fun buildContent(): Renderable {
         val (wardrobeWarning, list) = createWarning(WardrobeApi.slots)
 
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
-        val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1
         val containerWidth = (config.spacing.slotWidth.get() * (activeScale / 100.0)).toInt()
         val containerHeight = (config.spacing.slotHeight.get() * (activeScale / 100.0)).toInt()
         val playerWidth = (containerWidth * (config.spacing.playerScale.get() / 100.0))
         val horizontalSpacing = (config.spacing.horizontalSpacing.get() * (activeScale / 100.0)).toInt()
         val verticalSpacing = (config.spacing.verticalSpacing.get() * (activeScale / 100.0)).toInt()
-        val backgroundPadding = (config.spacing.backgroundPadding.get() * (activeScale / 100.0)).toInt()
         val buttonVerticalSpacing = (config.spacing.buttonVerticalSpacing.get() * (activeScale / 100.0)).toInt()
 
         var maxRenderableWidth = maxPlayersPerRow * containerWidth + (maxPlayersPerRow - 1) * horizontalSpacing
-        var maxRenderableHeight = maxPlayersRows * containerHeight + (maxPlayersRows - 1) * verticalSpacing
 
         val button = addButtons()
 
         if (button.width > maxRenderableWidth) maxRenderableWidth = button.width
-        maxRenderableHeight += button.height + buttonVerticalSpacing
-
-        maxRenderableWidth += 2 * backgroundPadding
-        maxRenderableHeight += 2 * backgroundPadding
-        currentMaxSize = maxRenderableWidth to maxRenderableHeight
 
         wardrobeWarning?.let { text ->
             val warningRenderable = Renderable.wrappedText(
@@ -343,13 +292,12 @@ object CustomWardrobe {
                 3.0 * (activeScale / 100.0),
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
-            val withButtons = Renderable.vertical(
+            return Renderable.vertical(
                 warningRenderable,
                 button,
                 spacing = buttonVerticalSpacing,
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
-            return addGuiBackground(withButtons, backgroundPadding)
         }
 
         val chunkedList = list.chunked(maxPlayersPerRow)
@@ -372,7 +320,7 @@ object CustomWardrobe {
 
                 val playerRenderable = createFakePlayerRenderable(slot, playerWidth, containerHeight, containerWidth)
 
-                Renderable.doubleLayered(playerBackground, playerRenderable, false)
+                Renderable.doubleLayered(playerBackground, playerRenderable, blockBottomHover = false, forceBottomRenderFirst = true)
             }
             Renderable.horizontal(slotsRenderables, horizontalSpacing)
         }
@@ -383,42 +331,15 @@ object CustomWardrobe {
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val withButtons = Renderable.vertical(
+        return Renderable.vertical(
             listOf(allSlotsRenderable, button),
             buttonVerticalSpacing,
             horizontalAlign = HorizontalAlignment.CENTER,
         )
-
-        return addGuiBackground(withButtons, backgroundPadding)
     }
 
-    private fun addGuiBackground(renderable: Renderable, borderPadding: Int) =
-        Renderable.drawInsideRoundedRect(
-            Renderable.doubleLayered(
-                renderable,
-                Renderable.clickable(
-                    Renderable.text(
-                        "§7SkyHanni",
-                        horizontalAlign = HorizontalAlignment.RIGHT,
-                        verticalAlign = VerticalAlignment.BOTTOM,
-                        scale = 1.0 * (activeScale / 100.0),
-                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unHovered = it) },
-                    onLeftClick = {
-                        config::enabled.jumpToEditor()
-                        reset()
-                        WardrobeApi.currentPage = null
-                    },
-                ),
-                blockBottomHover = false,
-            ),
-            config.color.backgroundColor.toColor(),
-            padding = borderPadding,
-        )
-
     private fun reset() {
-        WardrobeApi.inCustomWardrobe = false
         editMode = false
-        displayRenderable = null
         inventoryButton = null
     }
 
@@ -452,7 +373,7 @@ object CustomWardrobe {
             hoveredColor = if (config.onlyFavorites) greenColor else redColor,
             onClick = {
                 config.onlyFavorites = !config.onlyFavorites
-                update()
+                rebuildDisplay()
             },
         )
 
@@ -474,15 +395,13 @@ object CustomWardrobe {
             horizontalAlign = HorizontalAlignment.CENTER,
         )
 
-        val total = Renderable.vertical(
+        return Renderable.vertical(
             row,
             editButton,
             spacing = verticalSpacing.toInt(),
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER,
         )
-
-        return total
     }
 
     private fun addReEnableButton(): Renderable {
@@ -492,9 +411,8 @@ object CustomWardrobe {
             hoveredColor = color,
             unhoveredColor = color.darker(0.8),
             onClick = {
-                WardrobeApi.inCustomWardrobe = false
                 editMode = false
-                update()
+                rebuildDisplay()
             },
         )
     }
@@ -512,7 +430,7 @@ object CustomWardrobe {
                     ),
                     onLeftClick = {
                         wardrobeSlot.favorite = !wardrobeSlot.favorite
-                        update()
+                        rebuildDisplay()
                     },
                 ),
             )
@@ -539,7 +457,8 @@ object CustomWardrobe {
         val buttonHeight = (config.spacing.buttonHeight.get() * (activeScale / 100.0)).toInt()
         val textScale = (activeScale / 100.0)
 
-        val renderable = Renderable.hoverable(
+        val t = theme
+        return Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
                 Renderable.doubleLayered(
                     Renderable.clickable(
@@ -551,8 +470,8 @@ object CustomWardrobe {
                 ),
                 hoveredColor,
                 padding = 0,
-                topOutlineColor = config.color.topBorderColor.toColor().rgb,
-                bottomOutlineColor = config.color.bottomBorderColor.toColor().rgb,
+                topOutlineColor = t.buttonTopBorder,
+                bottomOutlineColor = t.buttonBottomBorder,
                 borderOutlineThickness = 2,
                 horizontalAlign = HorizontalAlignment.CENTER,
             ),
@@ -566,8 +485,6 @@ object CustomWardrobe {
                 horizontalAlign = HorizontalAlignment.CENTER,
             ),
         )
-
-        return renderable
     }
 
     private fun createHoverableRenderable(
@@ -615,7 +532,9 @@ object CustomWardrobe {
         )
 
     private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {
-        val (top, bottom) = config.color.topBorderColor.toColor() to config.color.bottomBorderColor.toColor()
+        val t = theme
+        val top = t.topBorderColor
+        val bottom = t.bottomBorderColor
         return when {
             isEmpty() || locked -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
             !isInCurrentPage() -> top.darker(0.5) to bottom.darker(0.5)
@@ -642,20 +561,21 @@ object CustomWardrobe {
                 InventoryUtils.clickSlot(nextPageSlot)
             }
         }
-        update()
+        rebuildDisplay()
     }
 
-    private fun WardrobeSlot.getSlotColor(): Color = with(config.color) {
-        when {
-            isCurrentSlot() -> equippedColor
-            favorite && !config.onlyFavorites -> favoriteColor
-            else -> null
-        }?.toColor()?.transformIf({ !isInCurrentPage() }) { darker() }
-            ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toColor()
-                .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
+    private fun WardrobeSlot.getSlotColor(): Color {
+        val t = theme
+        return with(t) {
+            when {
+                isCurrentSlot() -> equippedColor
+                favorite && !config.onlyFavorites -> favoriteColor
+                else -> null
+            }?.transformIf({ !isInCurrentPage() }) { darker() }
+                ?: (if (isInCurrentPage()) samePageColor else otherPageColor)
+                    .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
+        }
     }
-
-    private fun isEnabled() = config.enabled.get() && WardrobeApi.inWardrobe()
 
     private fun centerString(
         text: String,
@@ -664,5 +584,5 @@ object CustomWardrobe {
     ) = Renderable.text(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 
     @JvmStatic
-    fun shouldHideNormalTooltip(): Boolean = WardrobeApi.inCustomWardrobe && !editMode
+    fun shouldHideNormalTooltip(): Boolean = isOverlayVisible
 }

@@ -45,12 +45,16 @@ open class FakePlayerRenderable(
             val adjustedPadding = (padding * averageScale).toInt()
             val adjustedWidth = (width * averageScale).toInt()
             val adjustedHeight = (height * averageScale).toInt()
+            // Expand scissor bounds to prevent head clipping during rotation.
+            // Based on the rendered entity size rather than slot dimensions, since the
+            // head can extend well beyond the slot when rotating at large entity scales.
+            val headRoom = (entityScale * averageScale * 0.75).toInt()
             drawEntityWithoutScissor(
                 DrawContextUtils.drawContext,
-                adjustedPadding + translationX,
-                adjustedPadding + translationY,
-                adjustedPadding + adjustedWidth + translationX,
-                adjustedPadding + adjustedHeight + translationY,
+                adjustedPadding + translationX - headRoom,
+                adjustedPadding + translationY - headRoom,
+                adjustedPadding + adjustedWidth + translationX + headRoom,
+                adjustedPadding + adjustedHeight + translationY + headRoom,
                 (entityScale * averageScale).toInt(),
                 0.0625f * averageScale,
                 if (followMouse) (mouse.first - mouseOffsetX.toFloat()) * averageScale + translationX else eyesX,

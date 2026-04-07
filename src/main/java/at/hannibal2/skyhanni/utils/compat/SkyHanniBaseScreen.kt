@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
+import kotlin.math.min
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
@@ -13,6 +14,32 @@ import net.minecraft.client.input.KeyEvent
 abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     val mc: Minecraft = Minecraft.getInstance()
+
+    protected var activeScale: Int = 100
+        private set
+    private var lastKnownScreenSize: Pair<Int, Int> = 0 to 0
+
+    /**
+     * Computes and updates [activeScale] so that content of the given unscaled dimensions
+     * fits within 95% of the current screen in both axes. Returns true if the scale changed
+     * and a display rebuild is needed.
+     *
+     * @param configuredScale The user-configured maximum scale (e.g. from a config slider).
+     * @param unscaledWidth Width of the content rendered at scale 100.
+     * @param unscaledHeight Height of the content rendered at scale 100.
+     */
+    protected fun updateScaleForContent(configuredScale: Int, unscaledWidth: Int, unscaledHeight: Int): Boolean {
+        val screenSize = width to height
+        val maxFitScale = min(
+            0.95 * width / unscaledWidth,
+            0.95 * height / unscaledHeight,
+        ).toInt()
+        val newScale = configuredScale.coerceAtMost(maxFitScale)
+        val changed = newScale != activeScale || screenSize != lastKnownScreenSize
+        activeScale = newScale
+        lastKnownScreenSize = screenSize
+        return changed
+    }
 
     override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)

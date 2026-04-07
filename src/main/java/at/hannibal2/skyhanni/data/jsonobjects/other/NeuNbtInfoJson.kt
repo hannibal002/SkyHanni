@@ -8,13 +8,14 @@ import com.mojang.authlib.properties.Property
 import java.util.UUID
 import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
+import net.minecraft.world.item.ItemStack
 
 data class NeuNbtInfoJson(
     @Expose @SerializedName("HideFlags") val hideFlags: Int?,
     @Expose @SerializedName("Unbreakable") val unbreakable: NbtBoolean?,
     @Expose @SerializedName("SkullOwner") val skullOwner: SkullOwnerInfo?,
     @Expose @SerializedName("display") val display: DisplayInfo?,
-    @Expose @SerializedName("ExtraAttributes") val extraAttributes: JsonObject?,
+    @Expose @SerializedName(value = "custom_data", alternate = ["ExtraAttributes"]) val extraAttributes: JsonObject?,
     @Expose @SerializedName("Explosion") val explosion: JsonObject?,
     @Expose @SerializedName("CustomPotionEffects") val customPotionEffects: List<JsonObject>?,
     @Expose @SerializedName("ench") val enchantments: List<JsonObject>?,
@@ -63,6 +64,7 @@ data class NbtBoolean(val boolean: Boolean) {
     companion object {
         fun fromString(value: String): NbtBoolean {
             return if (value == "1b") {
+                ItemStack
                 NbtBoolean(true)
             } else {
                 NbtBoolean(false)

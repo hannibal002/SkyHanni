@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.AnimatedSkinUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.item.ItemStack
@@ -39,10 +41,18 @@ object CopyItemCommand {
         resultList.add("")
         val attributes = itemStack.extraAttributes.getReadableNBTDump()
         if (attributes.isEmpty()) {
-            resultList.add("no tag compound")
+            resultList.add("no extra_attributes")
         } else {
-            resultList.add("getTagCompound")
+            resultList.add("extra_attributes:")
             resultList.addAll(attributes)
+        }
+
+        val helmetSkin = itemStack.getHelmetSkin()
+        if (helmetSkin != null) {
+            resultList.add("")
+            resultList.add("armor skin: '${helmetSkin.asString()}'")
+            val variantIndex = AnimatedSkinUtils.getVariantIndexOrNull(itemStack.extraAttributes)
+            if (variantIndex != null) resultList.add("armor skin variant index: $variantIndex")
         }
 
         val string = resultList.joinToString("\n")

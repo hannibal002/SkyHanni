@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
+import at.hannibal2.skyhanni.utils.AnimatedSkinUtils
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import com.google.gson.JsonObject
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -39,11 +38,8 @@ object PetUtils {
     private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
     private var basePetLeveling: List<Int> = listOf()
     private var customPetLeveling: Map<String, NeuPetData> = mapOf()
-    private var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
     private var displayNameMap: Map<String, String> = mapOf()
-    private var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
     private var petInternalNames: Set<NeuInternalName> = setOf()
-    private var petSkinNbtNames: Set<String> = setOf()
     private var petItemResolution: Map<String, NeuInternalName> = mapOf()
 
     // Late load from SH repo
@@ -54,40 +50,36 @@ object PetUtils {
     private fun getSeasonalVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = SkyblockSeason.currentSeason?.name ?: "SPRING"
         val variantFauxInternalName = "${skinInternalName.asString()}_$variantId"
-        return animatedPetSkins[variantFauxInternalName]
+        return AnimatedSkinUtils.petSkins[variantFauxInternalName]
     }
 
     private fun getDayNightVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val variantId = if (SkyBlockTime.isDay()) "DAY" else "NIGHT"
         val variantFauxInternalName = "${skinInternalName.asString()}_$variantId"
-        return animatedPetSkins[variantFauxInternalName]
+        return AnimatedSkinUtils.petSkins[variantFauxInternalName]
     }
 
     private fun getCiFactionVariantOrNull(skinInternalName: NeuInternalName): AnimatedSkinJson? {
         val playerFaction = CrimsonIsleReputationApi.factionType ?: FactionType.BARBARIAN
         val variantFauxInternalName = "${skinInternalName.asString()}_${playerFaction.name}"
-        return animatedPetSkins[variantFauxInternalName]
+        return AnimatedSkinUtils.petSkins[variantFauxInternalName]
     }
 
     fun getAnimatedJsonOrNull(
         skinInternalName: NeuInternalName,
         skinVariantIndex: Int? = null,
     ): AnimatedSkinJson? {
-        val baseSkin = animatedPetSkins[skinInternalName.asString()]
+        val baseSkin = AnimatedSkinUtils.petSkins[skinInternalName.asString()]
         return when {
             skinInternalName in seasonalVariants -> getSeasonalVariantOrNull(skinInternalName) ?: baseSkin
             skinInternalName in dayNightVariants -> getDayNightVariantOrNull(skinInternalName) ?: baseSkin
             skinInternalName in ciFactionVariants -> getCiFactionVariantOrNull(skinInternalName) ?: baseSkin
             skinVariantIndex == null || skinVariantIndex == -1 -> baseSkin
             else -> {
-                val variantIdentifier = petSkinVariants[skinInternalName]?.get(skinVariantIndex)
-                variantIdentifier?.let { animatedPetSkins[it] }
+                val variantIdentifier = AnimatedSkinUtils.petSkinVariants[skinInternalName]?.get(skinVariantIndex)
+                variantIdentifier?.let { AnimatedSkinUtils.petSkins[it] }
             }
         }
-    }
-
-    fun getVariantIndexOrNull(extraData: JsonObject): Int? = petSkinNbtNames.firstNotNullOfOrNull {
-        extraData.get(it)?.asInt
     }
 
     fun resolvePetItemOrNull(itemName: String): NeuInternalName? {
@@ -288,11 +280,6 @@ object PetUtils {
         customPetLeveling = petData.customPetLeveling
         petItemResolution = petData.petItemResolution
         displayNameMap = petData.displayNameMap
-
-        val skinData = event.getConstantAsync<NeuAnimatedSkullsJson>("animatedskulls")
-        animatedPetSkins = skinData.skins.filter { it.key.startsWith("PET_SKIN") }
-        petSkinVariants = skinData.petSkinVariants
-        petSkinNbtNames = skinData.petSkinNbtNames
 
         val rawPetInternalNames = mutableSetOf<NeuInternalName>()
         val rawPetSkins = mutableMapOf<String, MutableList<NeuItemJson>>()

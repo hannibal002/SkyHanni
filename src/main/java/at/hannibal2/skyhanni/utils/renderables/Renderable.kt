@@ -266,6 +266,45 @@ interface Renderable {
             snapsToTopIfToLong: Boolean = true,
             condition: () -> Boolean = { true },
             onHover: () -> Unit = {},
+        ): Renderable = hoverTips(
+            content = content,
+            tipsProvider = { tips },
+            highlightsOnHoverSlots = highlightsOnHoverSlots,
+            stack = stack,
+            color = color,
+            spacedTitle = spacedTitle,
+            bypassChecks = bypassChecks,
+            snapsToTopIfToLong = snapsToTopIfToLong,
+            condition = condition,
+            onHover = onHover,
+        )
+
+        /**
+         * Like [hoverTips] but evaluates the tooltip list lazily on first hover, avoiding
+         * the cost of building all tooltips up front when many instances exist simultaneously.
+         *
+         * @param content The renderable to display (accepts anything [fromAny] accepts).
+         * @param tipsProvider Called once on first hover to produce the tooltip lines.
+         * @param highlightsOnHoverSlots Inventory slot indices to highlight while hovered.
+         * @param stack Optional item stack to render alongside the tooltip.
+         * @param color Optional border color for the tooltip.
+         * @param spacedTitle Whether to add extra space after the first tooltip line.
+         * @param bypassChecks Skip the normal link-allow checks.
+         * @param snapsToTopIfToLong Snap the tooltip to the top of the screen if it overflows.
+         * @param condition Extra guard evaluated each frame; tooltip only shows when true.
+         * @param onHover Called each frame while the element is hovered.
+         */
+        fun hoverTips(
+            content: Any,
+            tipsProvider: () -> List<Any>,
+            highlightsOnHoverSlots: List<Int> = listOf(),
+            stack: ItemStack? = null,
+            color: LorenzColor? = null,
+            spacedTitle: Boolean = false,
+            bypassChecks: Boolean = false,
+            snapsToTopIfToLong: Boolean = true,
+            condition: () -> Boolean = { true },
+            onHover: () -> Unit = {},
         ): Renderable {
 
             val render = fromAny(content) ?: text("Error")
@@ -275,7 +314,7 @@ interface Renderable {
                 override val horizontalAlign = render.horizontalAlign
                 override val verticalAlign = render.verticalAlign
 
-                val tipsRender = tips.mapNotNull { fromAny(it) }
+                val tipsRender by lazy { tipsProvider().mapNotNull { fromAny(it) } }
 
                 override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                     render.render(mouseOffsetX, mouseOffsetY)

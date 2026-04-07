@@ -30,7 +30,7 @@ object CustomWardrobeKeybinds {
     var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onGui(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (handlePress()) event.cancel()
     }
 
@@ -43,7 +43,7 @@ object CustomWardrobeKeybinds {
         if (!isEnabled()) return false
         val slots = WardrobeApi.slots.filter { it.isInCurrentPage() }
             .filterNot { config.onlyFavorites && !it.favorite }
-            .filterNot { config.hideEmptySlots && it.armor.all { piece -> piece == null } }
+            .filterNot { config.hideEmptySlots.get() && it.armor.all { piece -> piece == null } }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue
@@ -62,5 +62,5 @@ object CustomWardrobeKeybinds {
     fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
 
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && WardrobeApi.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
+        SkyBlockUtils.inSkyBlock && CustomWardrobe.isOverlayVisible && config.keybinds.slotKeybindsToggle && config.enabled.get()
 }

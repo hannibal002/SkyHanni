@@ -8,6 +8,7 @@ data class NeuAnimatedSkullsJson(
     @Expose val skins: Map<String, AnimatedSkinJson>,
     @Expose @SerializedName("pet_skin_variant") val petSkinVariants: Map<NeuInternalName, List<String>>,
     @Expose @SerializedName("pet_skin_nbt_name") val petSkinNbtNames: Set<String>,
+    @Expose @SerializedName("armor_skin_nbt_name") val armorSkinNbtNames: Set<String> = setOf("favorite_crop"),
 )
 
 data class AnimatedSkinJson(
