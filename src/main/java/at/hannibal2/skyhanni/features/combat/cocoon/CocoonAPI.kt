@@ -47,6 +47,7 @@ object CocoonAPI {
         var hasBeenSeen: Boolean,
         val cocoonEntity: ArmorStand,
     )
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityMove(event: EntityMoveEvent<ArmorStand>) {
         val movedCocoons = existingCocoons.filter { it.cocoonID == event.entity.id }
@@ -81,7 +82,7 @@ object CocoonAPI {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         existingCocoons.clear()
     }
 
