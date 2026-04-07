@@ -193,6 +193,7 @@ dependencies {
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
 
     if (isDeobf) {
         shadowImpl(libs.hypixelmodapi)
@@ -238,9 +239,10 @@ afterEvaluate {
     ksp {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
-        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
         if (!isDeobf) {
             arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
+        } else {
+            arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
         }
     }
 }
@@ -250,6 +252,13 @@ tasks.withType(Test::class) {
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     workingDir(file(runDirectory))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+        "-XX:+EnableDynamicAgentLoading",
+        // Tests start NPE-ing without this on Java 25
+        "-Dnet.bytebuddy.experimental=true",
+    )
 }
 
 kotlin {
@@ -325,8 +334,10 @@ fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
         }
     }
 }
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
+if (isDeobf) {
+    excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+    excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
+}
 
 tasks.withType<KotlinCompile> {
     compilerOptions {

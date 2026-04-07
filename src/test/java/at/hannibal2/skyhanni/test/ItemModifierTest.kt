@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(BootstrapExtension::class)
 class ItemModifierTest {
 
     @Test

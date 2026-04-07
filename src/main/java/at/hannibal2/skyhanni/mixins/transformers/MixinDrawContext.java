@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiGraphics.class)
-// TODO rename this to `MixinGuiGraphicsExtractor` when we drop 1.21.11
+// TODO rename this to `MixinGuiGraphics` when we drop 1.21.11
 public class MixinDrawContext {
 
     //~ if > 1.21.11 'renderItem(' -> 'item('
