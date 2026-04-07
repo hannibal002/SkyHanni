@@ -103,7 +103,7 @@ object WardrobeApi {
         "FERMENTO_ULTIMATE",
     )
 
-    private var armorFrameCache: MutableMap<String, List<ItemStackAnimatedFrame>> = mutableMapOf()
+    private val armorFrameCache: MutableMap<String, List<ItemStackAnimatedFrame>> = mutableMapOf()
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
