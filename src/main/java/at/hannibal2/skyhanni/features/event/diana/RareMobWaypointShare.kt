@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.event.diana.RareMobToggleConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -73,7 +74,7 @@ object RareMobWaypointShare {
      */
     private val rareMobFoundChatPattern by patternGroup.pattern(
         "dug",
-        ".* §r§eYou dug out a §.§.(?:Minos Inquisitor|Sphinx|King Minos|Manticore)§.§.!",
+        ".* §r§eYou dug out a §.§.(?:${RareDianaMob.entries.joinToString("|") { it.mobName }})§.§.!",
     )
 
     private var rareMob = -1
@@ -94,24 +95,21 @@ object RareMobWaypointShare {
         val mobName: String,
     )
 
-    private fun isMobShareEnabled(name: String): Boolean = with(config.shareMobToggles) {
-        when {
-            name.contains("Minos Inquisitor") -> minosInquisitor
-            name.contains("Sphinx") -> sphinx
-            name.contains("Manticore") -> manticore
-            name.contains("King Minos") -> kingMinos
-            else -> true
-        }
+    private fun RareMobToggleConfig.isEnabled(mob: RareDianaMob): Boolean = when (mob) {
+        RareDianaMob.SPHINX -> sphinx
+        RareDianaMob.MINOS_INQUISITOR -> minosInquisitor
+        RareDianaMob.MANTICORE -> manticore
+        RareDianaMob.KING_MINOS -> kingMinos
     }
 
-    private fun isMobReceiveEnabled(name: String): Boolean = with(config.receiveMobToggles) {
-        when {
-            name.contains("Minos Inquisitor") -> minosInquisitor
-            name.contains("Sphinx") -> sphinx
-            name.contains("Manticore") -> manticore
-            name.contains("King Minos") -> kingMinos
-            else -> true
-        }
+    private fun isMobShareEnabled(name: String): Boolean {
+        val mob = RareDianaMob.fromName(name) ?: return true
+        return config.shareMobToggles.isEnabled(mob)
+    }
+
+    private fun isMobReceiveEnabled(name: String): Boolean {
+        val mob = RareDianaMob.fromName(name) ?: return true
+        return config.receiveMobToggles.isEnabled(mob)
     }
 
     @HandleEvent

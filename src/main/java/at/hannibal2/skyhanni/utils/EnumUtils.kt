@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-object EnumUtils {
+object  EnumUtils {
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
