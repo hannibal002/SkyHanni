@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.findStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.buildComponent
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,7 +14,7 @@ import java.util.regex.Pattern
 class ComponentSpanTest {
     @Test
     fun testComponent() {
-        val component = componentBuilder {
+        val component = buildComponent {
             append("12345")
             append("12345") {
                 withColor(ChatFormatting.RED)
@@ -32,7 +32,7 @@ class ComponentSpanTest {
 
     @Test
     fun testRemovePrefix() {
-        val component = componentBuilder {
+        val component = buildComponent {
             append("12345")
             append("12345")
             append("12345§r")
@@ -46,7 +46,7 @@ class ComponentSpanTest {
 
     @Test
     fun testRegex() {
-        val component = componentBuilder {
+        val component = buildComponent {
             append("12345")
             append("abcdef") {
                 withColor(ChatFormatting.RED)
