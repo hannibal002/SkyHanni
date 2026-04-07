@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.HeldItemChangeEvent;
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,23 +25,30 @@ public abstract class MixinInventory {
     public abstract int getSelectedSlot();
 
     @WrapMethod(method = "setItem")
-    public void setItem(int slot, ItemStack stack, Operation<Void> original) {
-        original.call(slot, stack);
-        if (slot == getSelectedSlot() && stack != skyhanni$lastHeldStack) {
+    public void setItem(int slot, ItemStack newStack, Operation<Void> original) {
+        ItemStack oldStack = getItem(slot);
+
+        original.call(slot, newStack);
+
+        if (slot == getSelectedSlot() && newStack != skyhanni$lastHeldStack) {
             skyhanni$lastHeldSlot = slot;
-            skyhanni$lastHeldStack = stack;
-            new HeldItemChangeEvent(stack, slot).post();
+            skyhanni$lastHeldStack = newStack;
+            new ItemInHandChangeEvent(slot, oldStack, slot, newStack).post();
         }
     }
 
     @WrapMethod(method = "setSelectedSlot")
-    public void setSelectedSlot(int slot, Operation<Void> original) {
-        original.call(slot);
-        if (slot != skyhanni$lastHeldSlot) {
-            ItemStack stack = getItem(slot);
-            skyhanni$lastHeldSlot = slot;
-            skyhanni$lastHeldStack = stack;
-            new HeldItemChangeEvent(getItem(slot), slot).post();
+    public void setSelectedSlot(int newSlot, Operation<Void> original) {
+        int oldSlot = getSelectedSlot();
+        ItemStack oldStack = getItem(oldSlot);
+
+        original.call(newSlot);
+
+        if (newSlot != skyhanni$lastHeldSlot) {
+            ItemStack newStack = getItem(newSlot);
+            skyhanni$lastHeldSlot = newSlot;
+            skyhanni$lastHeldStack = newStack;
+            new ItemInHandChangeEvent(oldSlot, oldStack, newSlot, newStack).post();
         }
     }
 }

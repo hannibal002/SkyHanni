@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -92,7 +91,7 @@ object GardenApi {
     private var extraFarmingTools: Set<NeuInternalName> = setOf()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange() {
         checkItemInHand()
     }
 
