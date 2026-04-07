@@ -169,6 +169,7 @@ class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Tool Levels Display", desc = "")
+    @SearchTag("Hoe, Axe, Dicer")
     @Accordion
     val toolLevelDisplay: ToolLevelsDisplayConfig = ToolLevelsDisplayConfig()
 
