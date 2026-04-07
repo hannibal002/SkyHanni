@@ -79,7 +79,7 @@ object RepoPatternManager {
      * Crash if in a development environment.
      */
     private fun crash(reason: String) {
-        if (PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
+        if (insideTest || PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
     }
 
     /**

@@ -188,7 +188,6 @@ afterEvaluate {
     ksp {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
-        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
         arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
     }
 }
@@ -198,6 +197,10 @@ tasks.withType(Test::class) {
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     workingDir(file(runDirectory))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+    )
 }
 
 kotlin {
@@ -262,8 +265,6 @@ fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
         }
     }
 }
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
