@@ -64,7 +64,6 @@ data class NbtBoolean(val boolean: Boolean) {
     companion object {
         fun fromString(value: String): NbtBoolean {
             return if (value == "1b") {
-                ItemStack
                 NbtBoolean(true)
             } else {
                 NbtBoolean(false)
