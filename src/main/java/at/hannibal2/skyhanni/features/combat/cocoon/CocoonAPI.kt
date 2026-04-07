@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,9 +47,17 @@ object CocoonAPI {
         var hasBeenSeen: Boolean,
         val cocoonEntity: ArmorStand,
     )
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityMove(event: EntityMoveEvent<ArmorStand>) {
+        val movedCocoons = existingCocoons.filter { it.cocoonID == event.entity.id }
+        if (movedCocoons.isEmpty()) return
+        movedCocoons.forEach { cocoon ->
+            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
+        }
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    fun onLocalPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         existingCocoons.forEach { cocoon ->
             if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
         }
@@ -86,11 +96,13 @@ object CocoonAPI {
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
-        val deadMobs = skyblockMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
-        val mob = deadMobs.minByOrNull {
+        val deadMobs = skyblockMobs.filter { mob -> !mob.isAlive && mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
+        val filteredMobs = deadMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
+        // Jawbus spawns Jawbus Followers, and they are often killed before being detected as Skyblock Mobs.
+        // this, should prevent a downstream feature from sending fake "My Lord Jawbus Was Cocooned" Messages.
+        val mob = filteredMobs.minByOrNull {
             it.baseEntity.getLorenzVec().distance(cocoonVector)
         } ?: return null
-        if (mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) > 4.0) return null
         return mob
     }
 
