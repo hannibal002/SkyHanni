@@ -53,7 +53,3 @@ at.hannibal2.skyhanni.test.RepoPatternTest.kt
 at.hannibal2.skyhanni.test.ItemModifierTest.kt
 at.hannibal2.skyhanni.test.garden.VisitorListenerTest.kt
 at.hannibal2.skyhanni.test.ResettableTest.kt
-
-at.hannibal2.skyhanni.mixins.transformers.ExtendedColorPatch.java
-at.hannibal2.skyhanni.mixins.transformers.MixinEntityFireball.java
-at.hannibal2.skyhanni.mixins.transformers.MixinGuiPlayerTabOverlay.java
