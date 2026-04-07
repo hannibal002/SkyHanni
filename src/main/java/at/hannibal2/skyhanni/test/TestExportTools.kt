@@ -25,7 +25,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
@@ -64,7 +63,7 @@ object TestExportTools {
             val extraAttribs = oldTag.getCompound("ExtraAttributes").getOrNull() ?: CompoundTag()
 
             val item = BuiltInRegistries.ITEM.getValue(Identifier.parse(rawId))
-            val stack = ItemStack(item, count)
+            val stack = SafeItemStack(item, count)
 
             if (!extraAttribs.isEmpty) {
                 stack.set(DataComponents.CUSTOM_DATA, CustomData.of(extraAttribs))
