@@ -48,7 +48,7 @@ class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "Call Philip Instead",
-        desc = "Use Philip's Abiphone contact to call him instead of teleporting to the barn plot when the pest fortune buff expires."
+        desc = "Use Philip's contact to call him when the fortune buff expires."
     )
     @ConfigEditorBoolean
     var callPhilip: Boolean = false
