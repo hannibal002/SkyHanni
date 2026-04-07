@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
@@ -49,11 +49,11 @@ object HypixelLocationApi {
     var isGuest: Boolean = false
         private set
 
-    // TODO reenable the setting once the hypixel mod api works fine
+    // TODO re-enable the setting once the hypixel mod api works fine
 //     val config get() = SkyHanniMod.feature.dev.hypixelModApi
     val config get() = false
 
-    private val logger = LorenzLogger("debug/hypixel_api")
+    private val logger = SkyHanniLogger("debug/hypixel_api")
 
     private var sentIslandEvent = false
     private var internalIsland = IslandType.NONE

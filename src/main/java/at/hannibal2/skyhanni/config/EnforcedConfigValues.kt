@@ -70,7 +70,7 @@ object EnforcedConfigValues {
 
     private fun enforceOntoConfig(config: Any) {
         for (enforcedValue in enforcedConfigValuesData.flatMap { it.enforcedValues }) {
-            val shimmy = Shimmy.makeShimmy(config, enforcedValue.path.split(".")) ?: try {
+            val shimmy = Shimmy(config, enforcedValue.path.split(".")) ?: try {
                 ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
             } catch (_: Exception) {
                 continue

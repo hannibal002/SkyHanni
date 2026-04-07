@@ -761,10 +761,10 @@ object EstimatedItemValueCalculator {
                 items.addOrPut(ingredient.internalName, amount)
             }
 
-            val splitSlot = key.split("_") // eg. SAPPHIRE_1
+            val splitSlot = key.split("_") // e.g. SAPPHIRE_1
             val colorCode = SkyBlockItemModifierUtils.GemstoneSlotType.getColorCode(splitSlot[0])
 
-            // eg. SAPPHIRE_1 -> Sapphire Slot 2
+            // e.g. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
                 // If the slot index is 0, we don't need to specify
                 if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""

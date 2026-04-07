@@ -36,7 +36,7 @@ object TestWrappedString : RenderableTestSuite.TestRenderable("wrapped_string") 
             testString.map {
                 table(
                     listOf(
-                        listOf(text("Orignal:"), text(it.key)),
+                        listOf(text("Original:"), text(it.key)),
                         listOf(
                             empty(),
                             fixedSizeLine(text("Limited Width", horizontalAlign = HorizontalAlignment.CENTER), it.value).renderBounds(),

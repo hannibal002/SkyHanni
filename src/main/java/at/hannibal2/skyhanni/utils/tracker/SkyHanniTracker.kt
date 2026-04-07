@@ -196,7 +196,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    private fun getDisplayModeTracker(dispMode: DisplayMode? = displayMode) = dispMode?.let { getSharedTracker()?.get(it) }
+    private fun getDisplayModeTracker(mode: DisplayMode? = displayMode) = mode?.let { getSharedTracker()?.get(it) }
 
     fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
 

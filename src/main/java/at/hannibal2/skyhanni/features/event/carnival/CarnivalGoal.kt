@@ -210,7 +210,7 @@ enum class CarnivalGoal(
         fun isEnabled() = SkyBlockUtils.inSkyBlock && config.showGoals && CarnivalAPI.inCarnivalArea
 
         private enum class GoalType(val item: Item, display: String) {
-            FRUIT_DIGGING(Item.byBlock(Blocks.SAND), "§6Fruit Digging"),
+            FRUIT_DIGGING(Blocks.SAND.asItem(), "§6Fruit Digging"),
             CATCH_A_FISH(Items.COD, "§3Catch a Fish"),
             ZOMBIE_SHOOTOUT(Items.ARROW, "§cZombie Shootout");
 

@@ -1,66 +1,40 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateField
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Field
 
-// Copied from NEU
-class Shimmy private constructor(
-    val source: Any,
-    val field: Field,
-) {
-    companion object {
-        private fun shimmy(source: Any?, fieldName: String): Any? {
-            if (source == null) return null
-            return try {
-                val declaredField = source.javaClass.getDeclaredField(fieldName).makeAccessible()
-                declaredField.get(source)
-            } catch (e: NoSuchFieldException) {
-                null
-            }
-        }
+// Copied (+ adapted to Kotlin) from NEU
+class Shimmy private constructor(val source: Any, val reflectField: Field) {
+    val clazz: Class<*> = reflectField.type
+    var value: Any?
+        get() = reflectField.get(source)
+        set(v) = reflectField.set(source, v)
 
-        fun makeShimmy(source: Any?, path: List<String>): Shimmy? {
-            if (path.isEmpty())
-                return null
-            var source = source
-            for (part in path.dropLast(1)) {
-                source = shimmy(source, part)
-            }
-            if (source == null) return null
-            val lastName = path.last()
-            return try {
-                val field = source.javaClass.getDeclaredField(lastName).makeAccessible()
-                val shimmy = Shimmy(source, field)
-
-                if (shimmy.clazz == Property::class.java) {
-                    source = shimmy(source, lastName) ?: return shimmy
-                    makeShimmy(source, listOf("value")) ?: shimmy
-                } else {
-                    shimmy
-                }
-            } catch (e: NoSuchFieldException) {
-                null
-            }
-        }
-    }
-
-    val clazz: Class<*> = field.type
-    fun get(): Any? {
-        return field.get(source)
-    }
-
-    fun set(value: Any?) {
-        field.set(source, value)
-    }
-
-    fun getJson(): JsonElement {
-        return ConfigManager.gson.toJsonTree(get())
-    }
-
+    fun getJson(): JsonElement = ConfigManager.gson.toJsonTree(value)
     fun setJson(element: JsonElement) {
-        set(ConfigManager.gson.fromJson(element, clazz))
+        value = ConfigManager.gson.fromJson(element, clazz)
+    }
+
+    companion object {
+        private fun traverse(source: Any?, fieldName: String): Any? =
+            runCatching { source?.getPrivateFieldValue(fieldName) }.getOrNull()
+
+        operator fun invoke(source: Any?, path: List<String>): Shimmy? {
+            if (path.isEmpty()) return null
+            val parent = path.dropLast(1).fold(source) { obj, part -> traverse(obj, part) } ?: return null
+            return try {
+                val field = parent.getPrivateField(path.last())
+                val shimmy = Shimmy(parent, field)
+                if (shimmy.clazz != Property::class.java) return shimmy
+                val propertySource = traverse(parent, path.last()) ?: return shimmy
+                invoke(propertySource, listOf("value")) ?: shimmy
+            } catch (e: NoSuchFieldException) {
+                null
+            }
+        }
     }
 }

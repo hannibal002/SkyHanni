@@ -1,47 +1,42 @@
-package at.hannibal2.skyhanni.detektrules.potentialbugs
+package potentialbugs
 
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import io.gitlab.arturbosch.detekt.api.internal.RequiresTypeResolution
-import io.gitlab.arturbosch.detekt.rules.fqNameOrNull
+import SkyHanniRule
+import dev.detekt.api.Config
+import dev.detekt.api.RequiresAnalysisApi
+import org.jetbrains.kotlin.analysis.api.KaSession
+import org.jetbrains.kotlin.analysis.api.analyze
+import org.jetbrains.kotlin.analysis.api.types.KaClassType
+import org.jetbrains.kotlin.analysis.api.types.KaType
+import org.jetbrains.kotlin.analysis.api.types.KaTypeArgumentWithVariance
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.KtTypeReference
-import org.jetbrains.kotlin.resolve.typeBinding.createTypeBinding
-import org.jetbrains.kotlin.resolve.typeBinding.createTypeBindingForReturnType
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.typeUtil.immediateSupertypes
 
-@RequiresTypeResolution
-class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : SkyHanniRule(config) {
-    override val issue: Issue
-        get() = Issue(
-            "ImmutableTypesWithExpectedInteriorMutabilityInConfig",
-            Severity.Defect,
-            "Disallow using types which may disallow MoulConfig from mutating them, due to the lack of interior mutability",
-            Debt.FIVE_MINS,
-        )
-
+class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : RequiresAnalysisApi, SkyHanniRule(
+    config,
+    "Disallow using types which may disallow MoulConfig from mutating them, due to the lack of interior mutability",
+) {
     companion object {
         val configPackage = FqName("at.hannibal2.skyhanni.config")
-        val configOption = FqName("io.github.notenoughupdates.moulconfig.annotations.ConfigOption")
-        val propertyType = FqName("io.github.notenoughupdates.moulconfig.observer.Property")
-        val immutableCollectionTypes = setOf(
-            FqName("kotlin.collections.Collection"),
-            FqName("kotlin.collections.Map"),
-            FqName("java.util.Collection"),
-            FqName("java.util.Map"),
+
+        private val propertyClassId = ClassId(
+            FqName("io.github.notenoughupdates.moulconfig.observer"),
+            FqName("Property"),
+            false,
         )
-        val mutableCollectionTypes = setOf(
-            FqName("kotlin.collections.MutableCollection"),
-            FqName("kotlin.collections.MutableMap"),
-            FqName("java.util.EnumMap"),
-            FqName("java.util.EnumSet"),
+        private val immutableCollectionClassIds = setOf(
+            ClassId(FqName("kotlin.collections"), FqName("Collection"), false),
+            ClassId(FqName("kotlin.collections"), FqName("Map"), false),
+            ClassId(FqName("java.util"), FqName("Collection"), false),
+            ClassId(FqName("java.util"), FqName("Map"), false),
+        )
+        private val mutableCollectionClassIds = setOf(
+            ClassId(FqName("kotlin.collections"), FqName("MutableCollection"), false),
+            ClassId(FqName("kotlin.collections"), FqName("MutableMap"), false),
+            ClassId(FqName("java.util"), FqName("EnumMap"), false),
+            ClassId(FqName("java.util"), FqName("EnumSet"), false),
         )
     }
 
@@ -50,37 +45,43 @@ class ImmutableTypesWithExpectedInteriorMutabilityInConfig(config: Config) : Sky
         super.visit(root)
     }
 
-    fun KtTypeReference.fqName() = type()?.fqNameOrNull()
-    fun KtTypeReference.type() = createTypeBinding(bindingContext)?.type
-
-    fun KtAnnotated.hasAnnotation(fqName: FqName): Boolean {
-        return annotationEntries.any { it.typeReference?.fqName() == fqName }
-    }
-
-    fun resolvePropertyTypes(kotlinType: KotlinType, typeResult: MutableSet<KotlinType> = mutableSetOf()): Set<FqName> {
-        typeResult.add(kotlinType)
-        if (kotlinType.fqNameOrNull() == propertyType) {
-            resolvePropertyTypes(kotlinType.arguments.single().type, typeResult)
-        }
-        for (supertype in kotlinType.immediateSupertypes()) {
-            resolvePropertyTypes(supertype, typeResult)
-        }
-        return typeResult.mapNotNullTo(mutableSetOf()) { it.fqNameOrNull() }
+    private fun KtAnnotated.hasConfigOptionAnnotation(): Boolean {
+        return annotationEntries.any { it.shortName?.asString() == "ConfigOption" }
     }
 
     override fun visitProperty(property: KtProperty) {
         super.visitProperty(property)
-        if (!property.hasAnnotation(configOption)) return
-        val fieldType = property.createTypeBindingForReturnType(bindingContext)?.type
-        if (fieldType == null) {
-            property.reportIssue("Could not resolve type reference for property")
-            return
+        if (!property.hasConfigOptionAnnotation()) return
+
+        analyze(property) {
+            val allClassIds = resolveAllClassIds(property.returnType)
+
+            val immutableParentTypes = allClassIds.intersect(immutableCollectionClassIds)
+            if (immutableParentTypes.isEmpty()) return@analyze
+
+            val mutableParentTypes = allClassIds.intersect(mutableCollectionClassIds)
+            if (mutableParentTypes.isNotEmpty()) return@analyze
+
+            property.reportIssue("A @ConfigOption field must use types with interior mutability: $immutableParentTypes")
         }
-        val allTypes = resolvePropertyTypes(fieldType)
-        val immutableParentTypes = allTypes.intersect(immutableCollectionTypes)
-        if (!immutableParentTypes.any()) return
-        val mutableParentTypes = allTypes.intersect(mutableCollectionTypes)
-        if (mutableParentTypes.any()) return
-        property.reportIssue("A @ConfigOption field must use types with interior mutability: $immutableParentTypes")
+    }
+
+    private fun KaSession.resolveAllClassIds(type: KaType, visited: MutableSet<KaType> = mutableSetOf()): Set<ClassId> {
+        if (!visited.add(type)) return emptySet()
+        val classType = type as? KaClassType ?: return emptySet()
+        val result = mutableSetOf(classType.classId)
+
+        // Unwrap MoulConfig's Property<T> wrapper to check the inner type
+        if (classType.classId == propertyClassId) {
+            val innerType = (classType.typeArguments.firstOrNull() as? KaTypeArgumentWithVariance)?.type
+            if (innerType != null) {
+                result.addAll(resolveAllClassIds(innerType, visited))
+            }
+        }
+
+        for (supertype in type.directSupertypes) {
+            result.addAll(resolveAllClassIds(supertype, visited))
+        }
+        return result
     }
 }
