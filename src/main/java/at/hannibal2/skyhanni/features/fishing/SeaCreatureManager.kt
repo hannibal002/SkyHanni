@@ -58,9 +58,6 @@ object SeaCreatureManager {
         }
         if (isInterceptingColorCodeMessage(event.message)) return
         if (isInterceptingCleanMessage(event.cleanMessage)) return
-        /*
-        These
-         */
 
         getSeaCreatureFromMessage(event.message)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
