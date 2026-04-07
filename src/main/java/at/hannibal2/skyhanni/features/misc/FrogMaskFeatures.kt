@@ -60,7 +60,7 @@ object FrogMaskFeatures {
     private val frogMaskRenderable = Renderable.item(FROG_MASK)
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         display?.let {

@@ -140,16 +140,6 @@ object InstanceChestProfit {
     )
 
     /**
-     * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
-     * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
-     */
-    private val bookColorFixerOld by patternGroup.pattern(
-        // Remove after 7.6.0 is pushed
-        "bookcolorfix",
-        "Enchanted Book \\((?<item>.+)(?:§.)+\\)",
-    )
-
-    /**
      * REGEX-TEST: §eRequires a Dungeon Chest Key
      */
     private val requiresDungeonChestKeyPattern by patternGroup.pattern(
@@ -169,7 +159,7 @@ object InstanceChestProfit {
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
         if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
@@ -209,8 +199,8 @@ object InstanceChestProfit {
         }
     }
 
-    @HandleEvent
-    fun onKey(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onGuiKeyPress() {
         if (!config.keybind.isKeyHeld()) return
         val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
         stackUnderCursor()?.getInternalNameOrNull()?.let {
@@ -442,7 +432,7 @@ object InstanceChestProfit {
             } ?: 0.0
 
     @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
                 chestDisplay?.let {

@@ -18,7 +18,7 @@ object CFKeybinds {
     private var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onKeyPress(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.enabled) return
         if (!CFApi.inChocolateFactory) return
 

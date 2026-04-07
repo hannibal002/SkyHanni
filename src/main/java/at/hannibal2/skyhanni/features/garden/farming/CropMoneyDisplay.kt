@@ -79,7 +79,7 @@ object CropMoneyDisplay {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         if (!GardenApi.hideExtraGuis()) {
@@ -105,7 +105,7 @@ object CropMoneyDisplay {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crop Money - Extra")
         event.addIrrelevant(extraMoneyPerHour.toString())
         event.title("Crop Money - Crop")
