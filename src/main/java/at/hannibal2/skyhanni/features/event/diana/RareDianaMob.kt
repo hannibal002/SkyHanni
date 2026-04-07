@@ -6,10 +6,8 @@ enum class RareDianaMob(val mobName: String) {
     MANTICORE("Manticore"),
     KING_MINOS("King Minos"),
     ;
-
     companion object {
         fun fromName(name: String): RareDianaMob? =
             entries.firstOrNull { name.contains(it.mobName) }
     }
 }
-
