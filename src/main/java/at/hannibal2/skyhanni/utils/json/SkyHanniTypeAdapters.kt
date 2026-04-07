@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardTypeAdapter
-import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NEURaritySpecificPetNums
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetNums
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuAbstractRecipe
@@ -58,10 +57,6 @@ enum class SkyHanniTypeAdapters(
     UUID(
         J_UUID::class.java,
         SimpleStringTypeAdapter({ this.toString() }, { StringUtils.parseUUID(this) }),
-    ),
-    NBT_BOOLEAN(
-        NbtBoolean::class.java,
-        SimpleStringTypeAdapter({ this.asString() }, { NbtBoolean.fromString(this) }),
     ),
     VEC(
         LorenzVec::class.java,

@@ -94,8 +94,14 @@ object WardrobeApi {
         return ItemUtils.createSkull("Animated Armor", uuid, texture)
     }
 
+    // TODO at some point fix this idk
+    private val skinsNoAnimation = setOf(
+        "FERMENTO_ULTIMATE",
+    )
+
     fun getArmorAnimatedFrames(stack: ItemStack): List<ItemStackAnimatedFrame>? {
         val skinInternalName = stack.getHelmetSkin()?.asString() ?: return null
+        if (skinInternalName in skinsNoAnimation) return null
         val animJson = AnimatedSkinUtils.armorSkins[skinInternalName] ?: return null
         // Variant skins have multiple textures but no animation tick rate.
         // Pick the single texture that matches the item's stored variant index.

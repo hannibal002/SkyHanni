@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -191,10 +192,13 @@ abstract class SkyHanniContainerOverlayScreen(
         @HandleEvent
         fun onInventoryClose(event: InventoryCloseEvent) {
             val overlay = activeOverlay ?: return
-            activeOverlay = null
             lastScreenSize = null
             DelayedRun.runDelayed(300.milliseconds) {
-                if (activeOverlay === overlay) return@runDelayed
+                // A different overlay took over in the meantime — leave it alone.
+                if (activeOverlay !== overlay) return@runDelayed
+                // The matching inventory is still open (e.g. page navigation) — don't close.
+                if (overlay.checkInventoryName(InventoryUtils.openInventoryName())) return@runDelayed
+                activeOverlay = null
                 overlay.onOverlayClose()
                 overlay.displayRenderable = null
                 overlay.maxRenderedSize = null
@@ -204,6 +208,14 @@ abstract class SkyHanniContainerOverlayScreen(
         @HandleEvent(onlyOnSkyblock = true)
         fun onPreDraw(event: GuiContainerEvent.PreDraw) {
             val overlay = activeOverlay ?: return
+
+            // If a pending navigation landed on a different container, clear the overlay
+            // so it does not render on top of an unrelated screen.
+            if (!overlay.checkInventoryName(InventoryUtils.openInventoryName())) {
+                activeOverlay = null
+                return
+            }
+
             val gui = event.gui
 
             if (overlay.isPassthrough) {
