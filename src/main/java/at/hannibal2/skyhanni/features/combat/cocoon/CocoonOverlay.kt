@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.existingCocoons
 import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.expectedLifetime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CocoonUtils.playerCanCocoon
+import at.hannibal2.skyhanni.utils.CocoonUtils.canCocoon
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -24,7 +24,7 @@ object CocoonOverlay {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         for (cocoon in existingCocoons) {
             if (!cocoon.hasBeenSeen) if (cocoon.coordinates.distanceToPlayer() > 32) continue
-            if (!playerCanCocoon() && config.onlyShowWhenPlayerIsAbleToCocoon) return
+            if (!canCocoon && config.onlyShowWhenPlayerIsAbleToCocoon) return
             if (config.showCocoonContainedMobName) event.drawDynamicText(
                 cocoon.coordinates,
                 cocoon.mob.name,
