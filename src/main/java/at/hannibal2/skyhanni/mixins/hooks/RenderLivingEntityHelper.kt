@@ -10,13 +10,15 @@ import at.hannibal2.skyhanni.utils.compat.deceased
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
-import java.util.concurrent.ConcurrentHashMap
+import java.util.WeakHashMap
 
 @SkyHanniModule
 object RenderLivingEntityHelper {
 
-    private val entityColorMap = mutableMapOf<LivingEntity, Color>()
-    private val entityColorCondition = ConcurrentHashMap<LivingEntity, () -> Boolean>()
+    // WeakHashMap so that FakePlayer instances (and any other short-lived entities)
+    // are not kept alive just by being registered here
+    private val entityColorMap = WeakHashMap<LivingEntity, Color>()
+    private val entityColorCondition = WeakHashMap<LivingEntity, () -> Boolean>()
 
     @JvmStatic
     var areMobsHighlighted = false
