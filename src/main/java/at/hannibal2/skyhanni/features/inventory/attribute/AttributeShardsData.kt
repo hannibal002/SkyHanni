@@ -191,7 +191,7 @@ object AttributeShardsData {
      * REGEX-TEST: You caught x2 Voracious Spider Shards!
      */
     private val caughtShardsPattern by patternGroup.pattern(
-        "caught.shards",
+        "caught.shards.colorless",
         "You caught(?: [an]+)?(?: x(?<amount>\\d+))? (?<shardName>.+) Shards?!",
     )
 
@@ -234,7 +234,7 @@ object AttributeShardsData {
      * REGEX-TEST: You sent a Verdant Shard to your Hunting Box.
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
-        "sent.to.hunting.box",
+        "sent.to.hunting.box.colorless",
         "You sent (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? to your Hunting Box\\.",
     )
 

@@ -185,10 +185,10 @@ object ItemUtils {
     fun ItemStack.getLore(): List<String> =
         getLoreComponent().map { it.formattedTextCompatLessResets() }
 
-    @Deprecated(
-        "Use getCleanSingleLineLore unless you really need color codes",
-        ReplaceWith("this.getCleanSingleLineLore()"),
-    )
+    fun ItemStack.getCleanSingleLineLore(): String =
+        getCleanLore().filter { it.isNotEmpty() }.joinToString(" ")
+
+    @Deprecated("Use getLoreComponent or getCleanSingleLineLore unless you really need color codes")
     fun ItemStack.getSingleLineLore(): String =
         getLore().filter { it.isNotEmpty() }.joinToString(" ")
 

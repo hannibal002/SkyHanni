@@ -328,7 +328,7 @@ class ItemResolutionQuery {
         var displayName = ItemUtils.getDisplayName(compound) ?: return null
         displayName = displayName.removePrefix("§6§lSELL ").removePrefix("§a§lBUY ")
 
-        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && compound != null) {
+        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar) {
             return resolveEnchantmentByName(displayName)
         }
         if (itemType === Items.PLAYER_HEAD && displayName.contains("Essence")) {
@@ -377,7 +377,7 @@ class ItemResolutionQuery {
         return toBazaarPattern.anyMatches(stackInSlot.getCleanLore())
     }
 
-    private fun getExtraAttributes(): CompoundTag = compound?.extraAttributes ?: CompoundTag()
+    private fun getExtraAttributes(): CompoundTag = compound.extraAttributes
 
     private fun resolveFromSkyblock(): NeuInternalName? {
         val internalName = getExtraAttributes().getStringOrDefault("id")
