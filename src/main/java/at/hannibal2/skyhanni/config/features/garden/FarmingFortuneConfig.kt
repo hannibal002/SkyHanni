@@ -47,11 +47,11 @@ class FarmingFortuneConfig {
 
     @Expose
     @ConfigOption(
-        name = "Call Philip Instead",
-        desc = "Use Philip's contact to call him when the fortune buff expires."
+        name = "Call Phillip Instead",
+        desc = "Use Phillip's contact to call him when the fortune buff expires."
     )
     @ConfigEditorBoolean
-    var callPhilip: Boolean = false
+    var callPhillip: Boolean = false
 
     @Expose
     @ConfigOption(
