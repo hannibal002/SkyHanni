@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
+import net.minecraft.ChatFormatting
 
 data class SeaCreature(
     val name: String,
@@ -10,8 +14,16 @@ data class SeaCreature(
     val rarity: LorenzRarity,
 ) {
 
-    val displayName = chatColor + rare() + name
+    val displayName = chatColor + legacyRare() + name
 
-    private fun rare() = if (rare) "§l" else ""
+    val componentDisplayName = componentBuilder {
+        append(name).withStyle(componentColor(), rare())
+    }
+
+    private fun componentColor() = chatColor[1].toLorenzColor()?.toChatFormatting() ?: ChatFormatting.DARK_RED
+
+    private fun rare() = if (rare) ChatFormatting.BOLD else componentColor()
+
+    private fun legacyRare() = if (rare) "§l" else ""
 }
 
