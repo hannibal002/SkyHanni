@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -94,7 +93,12 @@ object SeaCreatureManager {
             }
 
             if (config.compactDoubleHook && doubleHook) {
-                edited = Component.literal("§e§lDOUBLE HOOK! ").append(edited)
+                edited = when (config.compactDoubleHookPosition) {
+                    CompactDoubleHookPosition.LEFT ->
+                        "§e§lDOUBLE HOOK! ".asComponent().append(edited)
+                    CompactDoubleHookPosition.RIGHT ->
+                        edited.append(" §e§lDOUBLE HOOK!".asComponent())
+                }
             }
 
             if (original == edited) return
@@ -142,5 +146,13 @@ object SeaCreatureManager {
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
+    }
+
+    enum class CompactDoubleHookPosition(private val displayName: String) {
+        LEFT("Left"),
+        RIGHT("Right"),
+        ;
+
+        override fun toString() = displayName
     }
 }
