@@ -208,12 +208,12 @@ object FarmingFortuneDisplay {
 
     private fun pestBuffExpireWarning() {
         if (config.bonusFortuneChat) {
-            if (config.callPhilip) {
+            if (config.callPhillip) {
                 ChatUtils.clickToActionOrDisable(
                     "§cPest fortune buff has expired!",
                     config::bonusFortuneChat,
-                    "call Philip",
-                    action = { HypixelCommands.call("Philip") },
+                    "call Phillip",
+                    action = { HypixelCommands.call("Phillip") },
                 )
             } else {
                 ChatUtils.clickToActionOrDisable(
