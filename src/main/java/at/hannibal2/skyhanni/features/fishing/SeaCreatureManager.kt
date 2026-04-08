@@ -102,7 +102,6 @@ object SeaCreatureManager {
         doubleHook = false
     }
 
-
     /**
      * Autopet can be triggered via Sinkers as rod parts (Sponge, Prismarine, Icy) to trigger collection gain which goes between Double Hook! and the Catch message.
      * The Thunder sea Creature gives charge when hooked, which can cause thunder bottles to charge and send the full charge message between Double Hook! and Catch message.
@@ -110,8 +109,7 @@ object SeaCreatureManager {
     private fun isInterceptingColorCodeMessage(message: String): Boolean =
         (PetStorageApi.isAutopetMessage(message) || thunderBottleChargedPattern.matches(message))
 
-
-    // TODO Unify when both Clean. (I do not wanna touch that Pet Storage Autopet Regex, I will horrifically break something)
+    // TODO Unify when both use CleanMessage.
 
     /**
      * Reindrakes Send an empty line, the global message & another empty line Double Hook! and Catch message.
