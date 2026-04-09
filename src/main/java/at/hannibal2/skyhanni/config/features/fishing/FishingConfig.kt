@@ -28,6 +28,11 @@ class FishingConfig {
     val barnTimer: BarnTimerConfig = BarnTimerConfig()
 
     @Expose
+    @ConfigOption(name = "Fishing Bobber Timer", desc = "")
+    @Accordion
+    val bobberTimer: FishingBobberTimerConfig = FishingBobberTimerConfig()
+
+    @Expose
     @ConfigOption(name = "Chum/Chumcap Bucket Hider", desc = "")
     @Accordion
     val chumBucketHider: ChumBucketHiderConfig = ChumBucketHiderConfig()
