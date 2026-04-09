@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.Direction
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,7 +31,7 @@ object PartyOnBoop {
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (!isEnabled()) return
-        if (event.isOutgoing) return
+        if (event.direction == Direction.INCOMING) return
         val message = event.messageComponent.intoComponent().formattedTextCompat().removeResets()
         if (!boopPattern.matches(message)) return
 
