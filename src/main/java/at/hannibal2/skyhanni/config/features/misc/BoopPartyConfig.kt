@@ -18,8 +18,8 @@ class BoopPartyConfig {
 
     @Expose
     @ConfigOption(
-        name = "Boop Party",
-        desc = "Send party invite to players that boop you while you are on a Bingo profile (Usable Independent to above toggle)."
+        name = "Bingo Boop Party",
+        desc = "Send party invite to players that /boop you while you are on a Bingo profile. (Usable independent to the above toggle.)"
     )
     @ConfigEditorBoolean
     @FeatureToggle
