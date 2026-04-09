@@ -47,7 +47,8 @@ object FastFairySoulsPathfinder {
     // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
     // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
-    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
+    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound
+        ?: mutableMapOf()
 
     private var data: Data? = null
 
@@ -309,7 +310,7 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Fairy Souls Pathfinder")
 
         if (!isEnabled()) return event.addIrrelevant("disabled")
