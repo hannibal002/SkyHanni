@@ -10,7 +10,7 @@ class BoopPartyConfig {
     @Expose
     @ConfigOption(
         name = "Boop Party",
-        desc = "Send party invite to players that /boop you."
+        desc = "Send a chat prompt to party invite players that /boop you. (Will activate on all profiles incl Bingo)"
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -18,8 +18,8 @@ class BoopPartyConfig {
 
     @Expose
     @ConfigOption(
-        name = "Bingo Boop Party",
-        desc = "Send party invite to players that /boop you while you are on a Bingo profile. (Usable independent to the above toggle.)"
+        name = "Only on Bingo",
+        desc = "Above setting but only active on Bingo."
     )
     @ConfigEditorBoolean
     @FeatureToggle
