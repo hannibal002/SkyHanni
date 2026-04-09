@@ -306,7 +306,8 @@ class ItemResolutionQuery {
     private fun resolveItemInCatacombsRngMeter(): NeuInternalName? {
         val lore = compound.getLoreComponent()
         val index = lore.indexOfFirstOrNull { it.string == "Selected Drop" } ?: return null
-        val displayName = lore[index + 1].formattedTextCompatLeadingWhiteLessResets()
+        val displayName = lore.getOrNull(index + 1)?.formattedTextCompatLeadingWhiteLessResets()
+            ?: return null
         return findInternalNameByDisplayName(displayName, false)
     }
 
