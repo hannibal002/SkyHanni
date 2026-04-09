@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.features.event.bingo
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -42,12 +45,11 @@ class BingoConfig {
     @ConfigLink(owner = BingoConfig::class, field = "minionCraftHelperEnabled")
     val minionCraftHelperPos: Position = Position(10, 10)
 
-    @Expose
-    @ConfigOption(
-        name = "Boop Party",
-        desc = "Send party invite to players that boop you while you are on a Bingo profile."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var boopParty: Boolean = false
+    @SkyHanniModule
+    companion object {
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(130, "event.bingo.boopParty", "misc.boopParty.boopPartyBingo")
+        }
+    }
 }

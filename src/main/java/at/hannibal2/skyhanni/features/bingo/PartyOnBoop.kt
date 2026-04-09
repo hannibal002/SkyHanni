@@ -14,24 +14,27 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object BingoBoopParty {
+object PartyOnBoop {
 
-    private val config get() = SkyHanniMod.feature.event.bingo.boopParty
+    private val config get() = SkyHanniMod.feature.misc.boopParty
     private val patternGroup = RepoPattern.group("bingo")
 
     /**
-     * REGEX-TEST: §dFrom §b[MVP§3+§b] Tryp0MC§7: §d§lBoop!
-     * REGEX-TEST: §dFrom §b[MVP§5+§b] martimavocado§7: §d§lBoop!
+     * REGEX-TEST: §d§lBoop!
      */
     private val boopPattern by patternGroup.pattern(
         "boop",
-        "§dFrom.*§d§lBoop!",
+        "§d§lBoop!",
     )
 
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (!isEnabled()) return
-        val message = event.messageComponent.textComponent.formattedTextCompat().removeResets()
+        val direction = event.direction ?: "From"
+        ChatUtils.debug(direction)
+        if (direction == "To") return
+        val message = event.messageComponent.intoComponent().formattedTextCompat().removeResets()
+        ChatUtils.debug("event.message = ${event.message} §r, message var. = $message")
         if (!boopPattern.matches(message)) return
 
         val username = event.author.cleanPlayerName(displayName = true)
@@ -43,5 +46,5 @@ object BingoBoopParty {
         )
     }
 
-    private fun isEnabled() = SkyBlockUtils.isBingoProfile && config
+    private fun isEnabled() = (SkyBlockUtils.isBingoProfile && config.boopPartyBingo) || config.boopParty
 }

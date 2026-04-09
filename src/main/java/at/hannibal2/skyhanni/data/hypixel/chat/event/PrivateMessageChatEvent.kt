@@ -8,16 +8,16 @@ object PrivateMessageChatEvent {
     class Allow(
         val direction: String?,
         author: ComponentSpan,
-        message: ComponentSpan,
+        privateMessageContents: ComponentSpan,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : AbstractSourcedChatEvent.Allow(author, message, chatComponent, blockedReason)
+    ) : AbstractSourcedChatEvent.Allow(author, privateMessageContents, chatComponent, blockedReason)
 
     class Modify(
         val direction: String?,
         author: ComponentSpan,
-        message: ComponentSpan,
+        privateMessageContents: ComponentSpan,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : AbstractSourcedChatEvent.Modify(author, message, chatComponent, blockedReason)
+    ) : AbstractSourcedChatEvent.Modify(author, privateMessageContents, chatComponent, blockedReason)
 }

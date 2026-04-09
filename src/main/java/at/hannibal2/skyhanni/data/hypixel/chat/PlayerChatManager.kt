@@ -80,7 +80,7 @@ object PlayerChatManager {
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
-        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)",
+        "^(?!From stash: )(?<direction>From|To) (?<rank>\\[[ዞ\\w+]+\\] )?(?<author>[^:]*): (?<message>.*)",
     )
 
     /**
