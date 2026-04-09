@@ -12,8 +12,6 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
@@ -69,7 +67,6 @@ object SpiderDenRelicPathfinder {
     ) {
         var disabled = total > 0 && found == total
         var debugState: String? = null
-        private val playerLocation get() = LocationUtils.playerLocation()
 
         fun foundNearby() {
             if (disabled) return
@@ -80,6 +77,7 @@ object SpiderDenRelicPathfinder {
         }
 
         private fun getNearestRelic(): LorenzVec? {
+            val playerLocation = LocationUtils.playerLocation()
             return allRelics.filter { it.distanceToPlayer() < 10 }.minByOrNull { it.distanceSq(playerLocation) }
         }
 
@@ -140,7 +138,7 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
+    fun onIslandGraphReload() {
         if (config.spiderRelicPathfinder) reload()
         else data = null
     }
@@ -155,7 +153,7 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!config.spiderRelicPathfinder) return
         data?.let {
             it.checkNextRelic()
@@ -192,7 +190,7 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Spider Den Relic Pathfinder")
         if (!config.spiderRelicPathfinder) {
             event.addIrrelevant("disabled")
@@ -217,7 +215,6 @@ object SpiderDenRelicPathfinder {
     private var calculatingStart = SimpleTimeMark.farPast()
 
     private fun reload() {
-
         val graph = IslandGraphs.currentIslandGraph ?: run {
             data = createEmptyData("island graph is empty")
             return
@@ -284,7 +281,7 @@ object SpiderDenRelicPathfinder {
     private fun isDisabledCommand(): Boolean {
         if (config.spiderRelicPathfinder) return false
         ChatUtils.clickableChat(
-            "§cSpider Relic Pathfinder disabled, or not in Spider's Den. Click to enable!",
+            "§cSpider Relic Pathfinder disabled. Click to enable!",
             onClick = { config.spiderRelicPathfinder = true },
         )
         return true
