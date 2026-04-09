@@ -24,7 +24,8 @@ object PrivateMessageChatEvent {
 
 enum class Direction(val text: String) {
     OUTGOING("To"),
-    INCOMING("From");
+    INCOMING("From"),
+    ;
 
     companion object {
         fun fromString(string: String) = entries.firstOrNull { it.text == string } ?: error("Invalid direction string: $string")
