@@ -48,7 +48,6 @@ class BingoConfig {
     @ConfigLink(owner = BingoConfig::class, field = "minionCraftHelperEnabled")
     val minionCraftHelperPos: Position = Position(10, 10)
 
-    @Expose
     @ConfigOption(name = "Bingo Boop Party", desc = "Bingo Boop Party has been moved to Misc. Click here to jump straight to it.")
     @ConfigEditorButton(buttonText = "Go")
     val chestOverlayRunnable = Runnable { SkyHanniMod.feature.misc.boopParty::boopPartyBingo.jumpToEditor() }
