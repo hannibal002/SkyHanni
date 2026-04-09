@@ -7,17 +7,19 @@ object PrivateMessageChatEvent {
 
     class Allow(
         val direction: String?,
+        val isOutgoing: Boolean,
         author: ComponentSpan,
-        privateMessageContents: ComponentSpan,
+        message: ComponentSpan,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : AbstractSourcedChatEvent.Allow(author, privateMessageContents, chatComponent, blockedReason)
+    ) : AbstractSourcedChatEvent.Allow(author, message, chatComponent, blockedReason)
 
     class Modify(
         val direction: String?,
+        val isOutgoing: Boolean,
         author: ComponentSpan,
-        privateMessageContents: ComponentSpan,
+        message: ComponentSpan,
         chatComponent: Component,
         blockedReason: String? = null,
-    ) : AbstractSourcedChatEvent.Modify(author, privateMessageContents, chatComponent, blockedReason)
+    ) : AbstractSourcedChatEvent.Modify(author, message, chatComponent, blockedReason)
 }

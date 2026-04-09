@@ -144,9 +144,10 @@ object PlayerChatManager {
         }
         privateMessagePattern.matchStyledMatcher(chatComponent) {
             val direction = groupOrThrow("direction").getText()
+            val isOutgoing = direction == "To"
             val author = groupOrThrow("author")
             val message = groupOrThrow("message")
-            PrivateMessageChatEvent.Allow(direction, author, message, event.chatComponent).postChat(event)
+            PrivateMessageChatEvent.Allow(direction, isOutgoing, author, message, event.chatComponent).postChat(event)
             return
         }
         itemShowPattern.matchStyledMatcher(chatComponent) {
@@ -197,9 +198,10 @@ object PlayerChatManager {
         }
         privateMessagePattern.matchStyledMatcher(chatComponent) {
             val direction = groupOrThrow("direction").getText()
+            val isOutgoing = direction == "To"
             val author = groupOrThrow("author")
             val message = groupOrThrow("message")
-            PrivateMessageChatEvent.Modify(direction, author, message, event.chatComponent).postChat(event)
+            PrivateMessageChatEvent.Modify(direction, isOutgoing, author, message, event.chatComponent).postChat(event)
             return
         }
         itemShowPattern.matchStyledMatcher(chatComponent) {

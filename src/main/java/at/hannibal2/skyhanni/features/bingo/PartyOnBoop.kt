@@ -30,11 +30,8 @@ object PartyOnBoop {
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (!isEnabled()) return
-        val direction = event.direction ?: "From"
-        ChatUtils.debug(direction)
-        if (direction == "To") return
+        if (event.isOutgoing) return
         val message = event.messageComponent.intoComponent().formattedTextCompat().removeResets()
-        ChatUtils.debug("event.message = ${event.message} §r, message var. = $message")
         if (!boopPattern.matches(message)) return
 
         val username = event.author.cleanPlayerName(displayName = true)
