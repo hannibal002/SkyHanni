@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -192,6 +193,10 @@ object SpiderDenRelicPathfinder {
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Spider Den Relic Pathfinder")
+        if (!IslandType.SPIDER_DEN.isInIsland()) {
+            event.addIrrelevant("not on spider island")
+            return
+        }
         if (!config.spiderRelicPathfinder) {
             event.addIrrelevant("disabled")
             return
@@ -287,8 +292,18 @@ object SpiderDenRelicPathfinder {
         return true
     }
 
+    private fun isWrongIslandCommand(): Boolean {
+        if (IslandType.SPIDER_DEN.isInIsland()) return false
+        ChatUtils.clickableChat(
+            "§cNot on Spider's Den. Click to warp!",
+            onClick = { HypixelCommands.warp("spider") },
+        )
+        return true
+    }
+
     private fun onResetCommand() {
         if (isDisabledCommand()) return
+        if (isWrongIslandCommand()) return
         foundRelicsStore().clear()
         data = null
         reload()
@@ -297,6 +312,7 @@ object SpiderDenRelicPathfinder {
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
+        if (isWrongIslandCommand()) return
         data?.allFound("manually marked all relics as found via command")
         reload()
         ChatUtils.chat("Marked all Relics as found in Spider's Den.")
@@ -304,6 +320,7 @@ object SpiderDenRelicPathfinder {
 
     private fun onReloadCommand() {
         if (isDisabledCommand()) return
+        if (isWrongIslandCommand()) return
         data = null
         reload()
         ChatUtils.chat("Reloaded Relic pathfinder.")
