@@ -8,16 +8,22 @@ import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
@@ -29,6 +35,8 @@ object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
     val expectedLifetime = 6.4.seconds
+    var canCocoon: Boolean = false
+        private set
 
     /*
      roughly where cocoon times landed for me across a few hundred cocoons
@@ -47,13 +55,31 @@ object CocoonAPI {
         val cocoonEntity: ArmorStand,
     )
 
+    private fun playerCanCocoon(): Boolean {
+        val belt = EquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
+        return (belt.getInternalName() == "THE_PRIMORDIAL".toInternalName() || belt.getReforgeModifier() == "blood_shot")
+    }
+
+    @HandleEvent
+    fun onSkyblockEquipmentDataUpdate(event: SkyblockEquipmentDataUpdateEvent) {
+        if (!event.isBelt) return
+        if (event.newItemStack == null) {
+            canCocoon = false
+            return
+        }
+        val belt = event.newItemStack
+        canCocoon = (belt.getInternalName() == "THE_PRIMORDIAL".toInternalName() || belt.getReforgeModifier() == "blood_shot")
+    }
+
+    @HandleEvent
+    fun onProfileJoin() {
+        canCocoon = playerCanCocoon()
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityMove(event: EntityMoveEvent<ArmorStand>) {
-        val movedCocoons = existingCocoons.filter { it.cocoonID == event.entity.id }
-        if (movedCocoons.isEmpty()) return
-        movedCocoons.forEach { cocoon ->
-            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
-        }
+        val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
+        if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -97,12 +123,12 @@ object CocoonAPI {
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
         val deadMobs = skyblockMobs.filter { mob -> !mob.isAlive && mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
-        val filteredMobs = deadMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
         // Jawbus spawns Jawbus Followers, and they are often killed before being detected as Skyblock Mobs.
         // this, should prevent a downstream feature from sending fake "My Lord Jawbus Was Cocooned" Messages.
+        val filteredMobs = deadMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
         val mob = filteredMobs.minByOrNull {
             it.baseEntity.getLorenzVec().distance(cocoonVector)
-        } ?: return null
+        }
         return mob
     }
 

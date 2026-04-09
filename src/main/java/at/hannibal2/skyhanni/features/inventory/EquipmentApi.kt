@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -48,7 +48,7 @@ object EquipmentApi {
 
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) {
         equipment?.set(slot.ordinal, itemStack)
-        SkyblockEquipmentDataEvent(slot, itemStack).post()
+        SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
     }
 
     private val repoGroup = RepoPattern.group("data.equipment")

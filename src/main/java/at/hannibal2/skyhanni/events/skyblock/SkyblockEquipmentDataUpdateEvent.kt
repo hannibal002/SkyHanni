@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  * @param newItemStack Item Stack (or Null when previously clicked is unknown) of the Equipment.
  *
  */
-@PrimaryFunction("onSkyblockEquipmentDataEvent")
-class SkyblockEquipmentDataEvent(val slot: EquipmentSlot, val newItemStack: ItemStack?) : SkyHanniEvent() {
+@PrimaryFunction("onSkyblockEquipmentDataUpdate")
+class SkyblockEquipmentDataUpdateEvent(val slot: EquipmentSlot, val newItemStack: ItemStack?) : SkyHanniEvent() {
 
     val isNecklace get() = slot == EquipmentSlot.NECKLACE
     val isCloak get() = slot == EquipmentSlot.CLOAK
