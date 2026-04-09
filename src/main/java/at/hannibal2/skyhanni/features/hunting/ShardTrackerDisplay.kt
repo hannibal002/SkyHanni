@@ -145,7 +145,7 @@ object ShardTrackerDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onKeyPress(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         if (!config.selectShardKeybind.isKeyHeld()) return
         if (!isInsideShardsMenu()) return

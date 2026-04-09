@@ -164,6 +164,9 @@ dependencies {
     // Calculator
     includeImplementation(libs.keval)
 
+    // Repo mgmt
+    includeImplementation(libs.jgit)
+
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
@@ -267,8 +270,11 @@ tasks.withType<KotlinCompile> {
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",
         )
+        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+        // leaving corrupt .class files that break subsequent incremental builds.
+        // see: https://youtrack.jetbrains.com/issue/KT-85498/
         freeCompilerArgs.addAll(
-            "-Xbackend-threads=0",
+            "-Xbackend-threads=1",
         )
     }
 }
