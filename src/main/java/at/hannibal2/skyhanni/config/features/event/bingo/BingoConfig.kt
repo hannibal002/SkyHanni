@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.config.features.event.bingo
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -44,6 +47,11 @@ class BingoConfig {
     @Expose
     @ConfigLink(owner = BingoConfig::class, field = "minionCraftHelperEnabled")
     val minionCraftHelperPos: Position = Position(10, 10)
+
+    @Expose
+    @ConfigOption(name = "Bingo Boop Party", desc = "Bingo Boop Party has been moved to Misc click here to jump straight to it")
+    @ConfigEditorButton(buttonText = "Go")
+    val chestOverlayRunnable = Runnable { SkyHanniMod.feature.misc.boopParty::boopPartyBingo.jumpToEditor() }
 
     @SkyHanniModule
     companion object {
