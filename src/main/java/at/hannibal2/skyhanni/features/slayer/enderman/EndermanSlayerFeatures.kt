@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.slayer.enderman
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -41,7 +40,6 @@ import kotlin.time.Duration.Companion.seconds
 // TODO replace all drawLineToEye with LineToMobHandler
 @SkyHanniModule
 object EndermanSlayerFeatures {
-
     private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EnderMan>()
@@ -52,7 +50,7 @@ object EndermanSlayerFeatures {
 
     private val NUKEKUBI_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_NUKEKUBI")
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    @HandleEvent(onlyOnIsland = THE_END)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
@@ -99,7 +97,7 @@ object EndermanSlayerFeatures {
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    @HandleEvent(onlyOnIsland = THE_END)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.deceased || !hasBeaconInHand(it) }
@@ -182,7 +180,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    @HandleEvent(onlyOnIsland = THE_END)
     fun onSecondPassed(event: SecondPassedEvent) {
         nukekubiSkulls.removeAll {
             if (it.deceased) {
@@ -207,12 +205,12 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    @HandleEvent(onlyOnIsland = THE_END)
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!showBeacon()) return
 
         val location = event.location
-        if (event.new == "beacon") {
+        if (event.new == Blocks.BEACON) {
             val armorStand = flyingBeacons.find { location.distance(it.getLorenzVec()) < 3 }
             if (armorStand != null) {
                 flyingBeacons.remove(armorStand)
@@ -229,7 +227,7 @@ object EndermanSlayerFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
         nukekubiSkulls.clear()
@@ -238,7 +236,7 @@ object EndermanSlayerFeatures {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             3,
             "slayer.endermanBeaconConfig.highlightBeacon",

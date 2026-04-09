@@ -2,9 +2,6 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
-import at.hannibal2.skyhanni.data.InteractClickType
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -12,7 +9,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -43,23 +40,24 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PowderChestTimer {
-
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
+
+    private const val MAX_CHEST_DISTANCE = 15
+    private const val NEAR_PLAYER_DISTANCE = 25
+
+    private val maxDuration = 60.seconds
 
     private var display: Renderable? = null
     private val minedBlocks = TimeLimitedSet<LorenzVec>(5.seconds)
     private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
-    private val maxDuration = 60.seconds
-    private const val MAX_CHEST_DISTANCE = 15
-    private const val NEAR_PLAYER_DISTANCE = 25
     private var lastSound = SimpleTimeMark.farPast()
 
     private val arePlayersNearby by RecalculatingValue(5.seconds) {
         EntityUtils.getPlayerEntities().any { it.distanceToPlayer() < NEAR_PLAYER_DISTANCE }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onPlaySound(event: PlaySoundEvent) {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
             if (config.muteChestDiscover) event.cancel()
@@ -71,59 +69,59 @@ object PowderChestTimer {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onGuiRenderOverlay() {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
     }
 
     @HandleEvent
-    fun onWorldChange() = chests.clear()
+    private fun onWorldChange() = chests.clear()
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onServerBlockChange(event: ServerBlockChangeEvent) {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         val location = event.location
         if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
 
         when {
-            event.oldState.`is`(Blocks.STONE) && event.newState.`is`(Blocks.AIR) -> {
+            event.old == Blocks.STONE && event.new == Blocks.AIR -> {
                 minedBlocks.add(location)
             }
 
-            !event.oldState.`is`(Blocks.CHEST) && event.newState.`is`(Blocks.CHEST) -> {
+            event.old != Blocks.CHEST && event.new == Blocks.CHEST -> {
                 val mined = minedBlocks.remove(location)
-                val possibleFalsePositive = arePlayersNearby || (!mined && event.oldState.`is`(Blocks.AIR))
+                val possibleFalsePositive = arePlayersNearby || (!mined && event.old == Blocks.AIR)
 
                 if (possibleFalsePositive && lastSound.passedSince() > 200.milliseconds) return
 
                 chests[location] = maxDuration.fromNow()
             }
 
-            event.oldState.`is`(Blocks.CHEST) && !event.newState.`is`(Blocks.CHEST) -> {
+            event.old == Blocks.CHEST && event.new != Blocks.CHEST -> {
                 chests.remove(location)
             }
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onBlockClick(event: BlockClickEvent) {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
         val location = event.position
-        if (!location.getBlockStateAt().`is`(Blocks.CHEST)) return
+        if (location.getBlockAt() != Blocks.CHEST) return
 
         if (HotmData.GREAT_EXPLORER.activeLevel < 20) return
 
         if (location.isOpened()) return
-        if (event.clickType == InteractClickType.RIGHT_CLICK) {
+        if (event.clickType == RIGHT_CLICK) {
             chests.remove(location)
             return
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onTick() {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onTick() {
         if (!isEnabled()) return
 
         // TODO why in god's name is this calculating onTick 🥺
@@ -147,8 +145,8 @@ object PowderChestTimer {
         return "$color${timeUntil.format(TimeUnit.SECOND)} §8(§e$count §b$name§8)"
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = CRYSTAL_HOLLOWS)
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val chests = chests.takeIf { it.isNotEmpty() }?.toMap() ?: return
 
@@ -184,8 +182,8 @@ object PowderChestTimer {
 
     private fun sortChests(chests: Map<LorenzVec, SimpleTimeMark>): List<Map.Entry<LorenzVec, SimpleTimeMark>> {
         val sortedChests = when (config.lineMode) {
-            PowderChestTimerConfig.LineMode.OLDEST -> chests.entries.sortedBy { it.value.timeUntil() }
-            PowderChestTimerConfig.LineMode.NEAREST -> chests.entries.sortedBy { it.key.distanceToPlayer() }
+            OLDEST -> chests.entries.sortedBy { it.value.timeUntil() }
+            NEAREST -> chests.entries.sortedBy { it.key.distanceToPlayer() }
             else -> return emptyList()
         }
 
@@ -211,14 +209,13 @@ object PowderChestTimer {
         }
     }
 
-    private fun Color.toChatColor(): String {
-        return when {
-            red in 0..127 && green in 127..255 -> "§a"
-            red in 127..212 && green in 42..127 -> "§6"
-            red in 212..230 && green in 25..42 -> "§c"
-            red in 230..255 && green in 0..25 -> "§4"
-            else -> "§f"
-        }
+    @Suppress("IntroduceWhenSubject")
+    private fun Color.toChatColor() = when {
+        red in 0..127 && green in 127..255 -> "§a"
+        red in 127..212 && green in 42..127 -> "§6"
+        red in 212..230 && green in 25..42 -> "§c"
+        red in 230..255 && green in 0..25 -> "§4"
+        else -> "§f"
     }
 
     private fun Duration.getColorBasedOnTime(): Color {
