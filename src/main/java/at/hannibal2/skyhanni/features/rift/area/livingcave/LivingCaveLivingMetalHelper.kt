@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.InteractClickType
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
@@ -16,35 +14,32 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LivingCaveLivingMetalHelper {
-
     private val config get() = RiftApi.config.area.livingCave.livingMetal
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var animationStartTime = SimpleTimeMark.farPast()
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onBlockClick(event: BlockClickEvent) {
+    @HandleEvent(onlyOnIsland = THE_RIFT)
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType == InteractClickType.LEFT_CLICK) {
-            val name = event.blockState.block.toString()
-            if (name.contains("lapis_ore")) {
-                lastClicked = event.position
-            }
+        if (event.clickType == LEFT_CLICK && event.blockState.block == Blocks.LAPIS_ORE) {
+            lastClicked = event.position
         }
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
         if (location.distanceToPlayer() >= 7) return
 
-        if (event.old == "lapis_ore") {
+        if (event.old == Blocks.LAPIS_ORE) {
             pair?.let {
                 if (it.second == location) {
                     pair = null
@@ -52,7 +47,7 @@ object LivingCaveLivingMetalHelper {
             }
         }
 
-        if (event.new != "lapis_ore") return
+        if (event.new != Blocks.LAPIS_ORE) return
 
         lastClicked?.let {
             val distance = location.distance(it)
@@ -64,7 +59,7 @@ object LivingCaveLivingMetalHelper {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val (a, b) = pair ?: return
         if (animationStartTime.passedSince() > 4.seconds) return
@@ -79,7 +74,7 @@ object LivingCaveLivingMetalHelper {
     }
 
     @HandleEvent
-    fun onParticle(event: ParticleEvent) {
+    private fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return
 
@@ -91,7 +86,7 @@ object LivingCaveLivingMetalHelper {
     }
 
     @HandleEvent
-    fun onTitleReceived(event: TitleReceivedEvent) {
+    private fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
         if (event.title.contains("Living Metal")) {
             pair = null
