@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractSourcedChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
+import at.hannibal2.skyhanni.data.hypixel.chat.event.Direction
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
@@ -143,11 +144,10 @@ object PlayerChatManager {
             return
         }
         privateMessagePattern.matchStyledMatcher(chatComponent) {
-            val direction = groupOrThrow("direction").getText()
-            val isOutgoing = direction == "To"
+            val direction = Direction.fromString(groupOrThrow("direction").getText())
             val author = groupOrThrow("author")
             val message = groupOrThrow("message")
-            PrivateMessageChatEvent.Allow(direction, isOutgoing, author, message, event.chatComponent).postChat(event)
+            PrivateMessageChatEvent.Allow(direction, author, message, event.chatComponent).postChat(event)
             return
         }
         itemShowPattern.matchStyledMatcher(chatComponent) {
@@ -197,11 +197,10 @@ object PlayerChatManager {
             return
         }
         privateMessagePattern.matchStyledMatcher(chatComponent) {
-            val direction = groupOrThrow("direction").getText()
-            val isOutgoing = direction == "To"
+            val direction = Direction.fromString(groupOrThrow("direction").getText())
             val author = groupOrThrow("author")
             val message = groupOrThrow("message")
-            PrivateMessageChatEvent.Modify(direction, isOutgoing, author, message, event.chatComponent).postChat(event)
+            PrivateMessageChatEvent.Modify(direction, author, message, event.chatComponent).postChat(event)
             return
         }
         itemShowPattern.matchStyledMatcher(chatComponent) {
