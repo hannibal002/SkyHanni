@@ -13,11 +13,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.SizeLimitedCache
 import at.hannibal2.skyhanni.utils.inPartialMilliseconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -31,15 +32,16 @@ object TpsCounter {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    private val msPerTickList = TimeAndSizeLimitedCache<Long, Double>(100, 5.seconds)
-    val tps: Double?
+    private val msPerTickList = SizeLimitedCache<Long, Double>(100)
+    val rawTps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
-            msPerTickList.isEmpty() -> 0.0
+            msPerTickList.isEmpty() || lastServerTick.passedSince() >= 1.seconds -> 0.0
             else -> (1000.0 / msPerTickList.values.average()).coerceIn(0.0..20.0).also {
                 if (!it.isFinite()) printError(it)
             }
         }
+    val tps get() = rawTps?.let { if (TimeUtils.isAprilFoolsDay) it / 2 else it }
 
     private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
 
@@ -59,11 +61,6 @@ object TpsCounter {
 
     @HandleEvent
     fun onSecondPassed() {
-        if (lastServerTick.passedSince() >= 1.seconds && !msPerTickList.isEmpty()) {
-            ChatUtils.debug("No server ticks detected for 1 second, clearing TPS data")
-            msPerTickList.clear()
-        }
-
         display = Renderable.text(getTpsString(compact = true))
 
         if (pendingTpsCommand) {
@@ -74,18 +71,19 @@ object TpsCounter {
 
     private fun getTpsString(compact: Boolean = false): String = buildString {
         append("§eTPS: ")
-        var currentTps = tps
+        val currentTps = tps
         when {
             LimboTimeTracker.inLimbo -> {
                 append("§4N/A §7(Limbo)")
             }
+
             currentTps == null -> {
                 val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
                 if (!compact) append("§fCalculating... ")
                 append("§7(${remaining}s)")
             }
+
             else -> {
-                if (TimeUtils.isAprilFoolsDay) currentTps /= 2
                 append("%s%.1f".format(getColor(currentTps), currentTps))
             }
         }
@@ -150,7 +148,7 @@ object TpsCounter {
             "TPS calculation got an error",
             "tps is $tps",
             "tps" to tps,
-            "msptList" to msPerTickList,
+            "msPerTickList" to msPerTickList,
             "timeSinceWorldSwitch" to timeSinceWorldSwitch,
         )
     }
@@ -159,7 +157,7 @@ object TpsCounter {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("TPS Counter")
         event.addIrrelevant {
-            add("TPS: %.1f".format(tps))
+            add("TPS: ${rawTps?.oneDecimal()}")
             add("Milliseconds Per Tick: ${msPerTickList.values.joinToString(", ") { "%.1f".format(it) }}")
             add("Time Since World Switch: $timeSinceWorldSwitch")
         }

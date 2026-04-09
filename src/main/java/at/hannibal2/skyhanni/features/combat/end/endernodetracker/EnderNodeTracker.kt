@@ -61,7 +61,7 @@ object EnderNodeTracker {
     )
 
     // TODO use repo patterns
-    // TODO add abstract logic with ohter pet drop chat messages
+    // TODO add abstract logic with other pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
     private val tracker = SkyHanniTracker(
@@ -201,7 +201,7 @@ object EnderNodeTracker {
         return newProfit
     }
 
-    private fun isEnabled() = IslandType.THE_END.isCurrent() && (!config.onlyPickaxe || hasItemInHand())
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && (!config.onlyPickaxe || hasItemInHand())
 
     private fun hasItemInHand() = MiningApi.isHoldingMiningTool()
 

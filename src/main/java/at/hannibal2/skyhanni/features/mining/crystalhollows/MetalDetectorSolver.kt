@@ -125,7 +125,7 @@ object MetalDetectorSolver {
                     return
                 }
                 if (loc.add(0, 1, 0).distanceToPlayer().roundTo(1) == distance) {
-                    if (predictedChestLocations.size == 0 && !playedPling) {
+                    if (predictedChestLocations.isEmpty() && !playedPling) {
                         SoundUtils.plingSound.playSound()
                         playedPling = true
                     }
@@ -144,7 +144,7 @@ object MetalDetectorSolver {
                 if (lastTreasureFound.passedSince() < 500.milliseconds) return
             }
 
-            if (predictedChestLocations.size == 0) {
+            if (predictedChestLocations.isEmpty()) {
                 ChatUtils.chat(
                     "No chests found. Try standing still with the metal detector in a different spot.",
                     replaceSameMessage = true,

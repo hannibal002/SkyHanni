@@ -36,7 +36,11 @@ object HighlightMiningCommissionMobs {
         "Star Sentry Puncher" to { it.name.string == "Crystal Sentry" },
         "Glacite Walker Slayer" to { it.name.string == "Ice Walker" },
         "Golden Goblin Slayer" to { it.name.string.contains("Golden Goblin") },
-        "Treasure Hoarder Puncher" to { it.name.string == "Treasuer Hunter" }, // typo is intentional
+        "Treasure Hoarder Puncher" to {
+            // typo is intentional, that's on hypixel's end
+            @Suppress("SpellCheckingInspection")
+            it.name.string == "Treasuer Hunter"
+        },
 
         // Crystal Hollows
         "Automaton Slayer" to { it is IronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) },
@@ -100,5 +104,5 @@ object HighlightMiningCommissionMobs {
         event.move(2, "misc.mining", "mining")
     }
 
-    fun isEnabled() = config.highlightCommissionMobs && (IslandType.DWARVEN_MINES.isCurrent() || IslandType.CRYSTAL_HOLLOWS.isCurrent())
+    fun isEnabled() = config.highlightCommissionMobs && (IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland())
 }

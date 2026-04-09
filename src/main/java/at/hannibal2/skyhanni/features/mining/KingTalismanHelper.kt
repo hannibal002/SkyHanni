@@ -64,7 +64,7 @@ object KingTalismanHelper {
     private var farDisplay = ""
     private var display = emptyList<String>()
 
-    private fun isNearby() = IslandType.DWARVEN_MINES.isCurrent() &&
+    private fun isNearby() = IslandType.DWARVEN_MINES.isInIsland() &&
         SkyBlockUtils.graphArea == "Royal Palace" &&
         kingLocation.distanceToPlayer() < 10
 
@@ -79,7 +79,7 @@ object KingTalismanHelper {
 
     fun isEnabled() = config.enabled &&
         SkyBlockUtils.inSkyBlock &&
-        (IslandType.DWARVEN_MINES.isCurrent() || config.outsideMines)
+        (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -166,7 +166,7 @@ object KingTalismanHelper {
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "King Talisman Helper")

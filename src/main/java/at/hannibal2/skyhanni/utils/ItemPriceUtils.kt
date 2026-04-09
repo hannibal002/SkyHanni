@@ -152,12 +152,12 @@ object ItemPriceUtils {
         lastLowestBinRefresh = SimpleTimeMark.now()
 
         SkyHanniMod.launchIOCoroutine("neu lowest bin item price fetch", timeout = 1.minutes) {
-            val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lbinStatic).assertSuccessWithData() ?: return@launchIOCoroutine
+            val (_, data) = ApiUtils.getTypedJsonResponse<JsonObject>(lowBinStatic).assertSuccessWithData() ?: return@launchIOCoroutine
             lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(data)
         }
     }
 
-    private val lbinStatic = ApiStaticGetPath(
+    private val lowBinStatic = ApiStaticGetPath(
         "https://moulberry.codes/lowestbin.json.gz",
         "NEU Lowest Bin",
         tryForceGzip = true
@@ -203,7 +203,7 @@ object ItemPriceUtils {
             simpleCallback {
                 SkyHanniMod.launchIOCoroutine("shfetchmoulblbins command", timeout = 1.minutes) {
                     val timeNow = SimpleTimeMark.now()
-                    val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(lbinStatic).assertSuccessWithData()
+                    val (_, fetchedLowestBins) = ApiUtils.getJsonResponse(lowBinStatic).assertSuccessWithData()
                         ?: ErrorManager.skyHanniError("Failed to fetch Moulberry's lowest bin data!")
                     lowestBins = ConfigManager.gson.fromJson<Map<NeuInternalName, Long>>(fetchedLowestBins)
                     val formatString = buildString {

@@ -11,7 +11,8 @@ class EasterEggConfig {
     @ConfigOption(
         name = "Egg Waypoints",
         desc = "Show all Easter Egg waypoints.\n" +
-            "Coordinates by §bL3Cache§7. (last updated: 2025)",
+            "§eCoordinates may not always be up to date!§7\n" +
+            "Last updated: 2026",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -20,8 +21,7 @@ class EasterEggConfig {
     @Expose
     @ConfigOption(
         name = "Entrance Waypoints",
-        desc = "Show helper waypoints to Baskets #18, #27, and #30.\n" +
-            "Coordinates by §bSorkoPiko§7 and §bErymanthus§7.",
+        desc = "Not needed for current years Easter Eggs",
     )
     @ConfigEditorBoolean
     var allEntranceWaypoints: Boolean = false

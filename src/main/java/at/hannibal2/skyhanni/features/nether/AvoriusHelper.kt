@@ -60,5 +60,5 @@ object AvoriusHelper {
         lastSentMessage = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = config.avoriusHelper && CrimsonIsleReputationApi.factionType == FactionType.MAGE
+    private fun isEnabled() = config.avoriusHelper && CrimsonIsleReputationApi.factionType == FactionType.MAGE
 }

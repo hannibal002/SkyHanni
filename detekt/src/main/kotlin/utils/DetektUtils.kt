@@ -1,10 +1,13 @@
-package at.hannibal2.skyhanni.detektrules.utils
+package utils
 
-import io.gitlab.arturbosch.detekt.rules.hasAnnotation
+import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
 object DetektUtils {
+
+    fun KtAnnotated.hasAnnotation(name: String): Boolean =
+        annotationEntries.any { it.shortName?.asString() == name }
 
     // Skip:
     //  - Local properties

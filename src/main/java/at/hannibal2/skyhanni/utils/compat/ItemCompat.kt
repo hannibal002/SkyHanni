@@ -27,7 +27,7 @@ fun Item.getIdentifierString(): String {
 }
 
 /*
- * On Modern it will return Items.AIR if it cant find it instead of null
+ * On modern, it will return Items.AIR if it can't find it instead of null
  */
 fun String.getVanillaItem(): Item? {
     val item = BuiltInRegistries.ITEM.getValue(Identifier.parse(this))

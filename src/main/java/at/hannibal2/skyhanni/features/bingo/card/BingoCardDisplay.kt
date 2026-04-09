@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
@@ -82,8 +81,8 @@ object BingoCardDisplay {
         if (hasHiddenPersonalGoals) dirty = true
     }
 
-    @HandleEvent
-    fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
+    @HandleEvent(BingoCardUpdateEvent::class)
+    fun onBingoCardUpdate() {
         if (!isEnabled()) return
         dirty = true
     }
@@ -110,7 +109,7 @@ object BingoCardDisplay {
 
     // todo use RenderDisplayHelper
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isEnabled()) return
 
         if (dirty) {

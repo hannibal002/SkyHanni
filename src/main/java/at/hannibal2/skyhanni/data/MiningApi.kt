@@ -86,13 +86,13 @@ object MiningApi {
         "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
     )
 
-    private val pickbobulusGroup = group.group("pickobulus")
+    private val pickobulusGroup = group.group("pickobulus")
 
     /**
      * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
      */
 
-    private val pickobulusUsePattern by pickbobulusGroup.pattern(
+    private val pickobulusUsePattern by pickobulusGroup.pattern(
         "use",
         "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
     )
@@ -100,7 +100,7 @@ object MiningApi {
     /**
      * REGEX-TEST: §7Your §r§aPickobulus §r§7destroyed §r§e140 §r§7blocks!
      */
-    private val pickobulusEndPattern by pickbobulusGroup.pattern(
+    private val pickobulusEndPattern by pickobulusGroup.pattern(
         "end",
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!",
     )
@@ -108,7 +108,7 @@ object MiningApi {
     /**
      * REGEX-TEST: §7Your §r§aPickobulus §r§7didn't destroy any blocks!
      */
-    private val pickobulusFailPattern by pickbobulusGroup.pattern(
+    private val pickobulusFailPattern by pickobulusGroup.pattern(
         "fail",
         "§7Your §r§aPickobulus §r§7didn't destroy any blocks!",
     )
@@ -144,7 +144,7 @@ object MiningApi {
     private var pickobulusWaitingForSound = false
     private var pickobulusWaitingForBlock = false
 
-    // oreblock data
+    // OreBlock data
     var inGlacite = false
         private set
     var inTunnels = false
@@ -196,23 +196,23 @@ object MiningApi {
 
     private var lastOreMinedTime = SimpleTimeMark.farPast()
 
-    fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isCurrent()
+    fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
 
-    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isCurrent() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
+    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isInIsland() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
 
-    fun inRegularDwarven() = IslandType.DWARVEN_MINES.isCurrent() && !inGlacialTunnels()
+    fun inRegularDwarven() = IslandType.DWARVEN_MINES.isInIsland() && !inGlacialTunnels()
 
-    fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
+    fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
 
     fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
 
-    fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
+    fun inMineshaft() = IslandType.MINESHAFT.isInIsland()
 
-    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
+    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (IslandTypeTags.IS_COLD.inAny()) {
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
@@ -226,7 +226,7 @@ object MiningApi {
             }
         }
 
-        if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
+        if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             var found = false
             heatPattern.firstMatcher(event.new) {
                 found = true
@@ -249,7 +249,7 @@ object MiningApi {
 
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         val now = SimpleTimeMark.now()
@@ -260,8 +260,8 @@ object MiningApi {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (IslandTypeTags.IS_COLD.inAny()) {
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
                 updateCold(0)
                 lastColdReset = SimpleTimeMark.now()
@@ -300,7 +300,7 @@ object MiningApi {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.soundName == "entity.generic.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
             lastPickobulusExplosion = SimpleTimeMark.now()
             pickobulusExplosionPos = event.location
@@ -344,7 +344,7 @@ object MiningApi {
 
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         val oldState = event.oldState
         val newState = event.newState
         val oldBlock = oldState.block
@@ -388,7 +388,7 @@ object MiningApi {
 
     @HandleEvent
     fun onTick() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 10 seconds to mine a single block, congrats
@@ -407,7 +407,7 @@ object MiningApi {
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
     fun onAreaChange() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
     }
 
@@ -433,7 +433,7 @@ object MiningApi {
         val extraBlocks = surroundingMinedBlocks.filter {
             // We can do this because all blocks that don't have an init sound also cannot be mined by
             // efficient miner when other blocks are mined.
-            // The more correct way of doing this would be making sure the oretype of the originally mined
+            // The more correct way of doing this would be making sure the OreType of the originally mined
             // block matches
             if (ignoreFilter) it.first.ore == originalBlock.ore else it.first.confirmed
         }.countBy { it.first.ore }
@@ -483,7 +483,7 @@ object MiningApi {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining API")
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) {
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) {
             event.addIrrelevant("not in a mining island")
             return
         }
@@ -537,9 +537,9 @@ object MiningApi {
         inMineshaft = inMineshaft()
         inDwarvenMines = inRegularDwarven()
         inCrystalHollows = inCrystalHollows()
-        inCrimsonIsle = IslandType.CRIMSON_ISLE.isCurrent()
-        inEnd = IslandType.THE_END.isCurrent()
-        inSpidersDen = IslandType.SPIDER_DEN.isCurrent()
+        inCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
+        inEnd = IslandType.THE_END.isInIsland()
+        inSpidersDen = IslandType.SPIDER_DEN.isInIsland()
 
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
     }

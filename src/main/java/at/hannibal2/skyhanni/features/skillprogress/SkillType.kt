@@ -20,7 +20,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     HUNTING("Hunting", Items.LEAD, 25),
     ;
 
-    constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, Item.byBlock(block), maxLevel)
+    constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, block.asItem(), maxLevel)
 
     val item: ItemStack by lazy { ItemUtils.createItemStack(icon, displayName) }
     val lowercaseName = displayName.lowercase()
@@ -32,6 +32,6 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
         fun getByName(name: String) = getByNameOrNull(name) ?: error("Unknown Skill Type: '$name'")
 
         fun getByNameOrNull(name: String) =
-            entries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
+            entries.firstOrNull { it.displayName.equals(name, ignoreCase = true) }
     }
 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.SlayerApi.ActiveQuestState
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -31,18 +32,21 @@ object SlayerQuestWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
-        if (event.state == SlayerApi.ActiveQuestState.GRINDING) {
-            needSlayerQuest = false
-        }
-        if (event.state == SlayerApi.ActiveQuestState.FAILED) {
-            needNewQuest("The old slayer quest has failed!")
-        }
-        if (event.state == SlayerApi.ActiveQuestState.SLAIN) {
-            DelayedRun.runDelayed(5.seconds) {
-                if (SlayerApi.state == SlayerApi.ActiveQuestState.SLAIN) {
-                    needNewQuest("You have no Auto-Slayer active!")
+        when (event.state) {
+            ActiveQuestState.GRINDING -> {
+                needSlayerQuest = false
+            }
+            ActiveQuestState.FAILED -> {
+                needNewQuest("The old slayer quest has failed!")
+            }
+            ActiveQuestState.SLAIN -> {
+                DelayedRun.runDelayed(5.seconds) {
+                    if (SlayerApi.state == ActiveQuestState.SLAIN) {
+                        needNewQuest("You have no Auto-Slayer active!")
+                    }
                 }
             }
+            else -> {}
         }
     }
 
