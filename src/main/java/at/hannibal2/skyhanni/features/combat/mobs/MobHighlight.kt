@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.Blocks
 object MobHighlight {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
-    private val arachneBossConfig get() =  config.arachneSettings.boss
+    private val arachneBossConfig get() = config.arachneSettings.boss
     private val arachneKeeperConfig get() = config.arachneSettings.keeper
     private var arachne: Mob? = null
 
@@ -98,6 +98,7 @@ object MobHighlight {
 
             entity.isZealotOrBruiser() ->
                 Triple(LorenzColor.DARK_AQUA, 127, config::zealotBruiserHighlighter)
+
             else -> return
         }
 

@@ -34,7 +34,7 @@ class ArachneConfig {
         @ConfigOption(
             name = "Arachne Spawn Timer",
             desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn. " +
-                "§eTimer may be 1 - 2 seconds off."
+                "§eTimer may be 1 - 2 seconds off.",
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -44,7 +44,7 @@ class ArachneConfig {
         @ConfigOption(
             name = "Arachne Kill Timer",
             desc = "Shows how long it took to kill Arachne after the fight ends. " +
-                "§cDoes not show if you were not in the Sanctuary when it spawned."
+                "§cDoes not show if you were not in the Sanctuary when it spawned.",
         )
         @ConfigEditorBoolean
         @FeatureToggle
@@ -86,7 +86,7 @@ class ArachneConfig {
             val newArachneKeeperPath = "$oldArachnePath.arachneSettings.keeper"
             event.move(130, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
             event.move(130, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
-            event.transform(130, oldArachnePath)  { element ->
+            event.transform(130, oldArachnePath) { element ->
                 val oldEnabled = element.asJsonObject.get("arachneBossHighlighter").asBoolean
                 if (!oldEnabled) {
                     element.asJsonObject.remove(".arachneSettings.boss.bossHighlight")

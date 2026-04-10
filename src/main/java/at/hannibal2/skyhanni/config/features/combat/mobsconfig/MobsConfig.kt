@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MobsConfig {
@@ -18,7 +17,7 @@ class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Area Boss Highlighter",
-        desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist, Millenia-Aged Blaze and Soul of the Alpha."
+        desc = "Highlight Golden Ghoul, Old Wolf, Voidling Extremist, Millenia-Aged Blaze and Soul of the Alpha.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -45,7 +44,7 @@ class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Special Zealots",
-        desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End."
+        desc = "Highlight Special Zealots (the ones that drop Summoning Eyes) in the End.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -67,7 +66,7 @@ class MobsConfig {
     @ConfigOption(
         name = "Area Boss Timer",
         desc = "Show a timer when Area Bosses respawn.\n" +
-            "§eMay take 20 - 30 seconds to calibrate correctly."
+            "§eMay take 20 - 30 seconds to calibrate correctly.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
