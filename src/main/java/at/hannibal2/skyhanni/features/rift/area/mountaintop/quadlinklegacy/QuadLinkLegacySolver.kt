@@ -52,7 +52,7 @@ object QuadLinkLegacySolver {
 
     /**
      * REGEX-TEST: Green player is Wizardman
-     * REGEX-TEST: Red player is Azzurala
+     * REGEX-TEST: Red player is Technoblade
      */
     private val playerColorPattern by patternGroup.pattern(
         "player-color",

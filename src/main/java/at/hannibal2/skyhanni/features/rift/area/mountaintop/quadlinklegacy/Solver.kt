@@ -8,7 +8,7 @@ import kotlin.math.min
 /**
  * This class can be reused to score multiple positions. It is *not* thread-safe.
  */
-class Solver {
+internal class Solver {
     private val statistics = Statistics()
     private val tt: TranspositionTable = TranspositionTable(statistics)
 
