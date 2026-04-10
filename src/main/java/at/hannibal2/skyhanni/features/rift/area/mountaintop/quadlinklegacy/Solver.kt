@@ -18,7 +18,7 @@ class Solver {
         boardSnapshot: String,
         pieceCount: Int,
         response: AtomicReference<QuadLinkLegacySolver.QLLResponse?>,
-        shouldStop: BooleanSupplier
+        shouldStop: BooleanSupplier,
     ) {
         val p: Position = Position.fromBoardSnapshot(boardSnapshot, pieceCount)
         if (p.numMoves <= 1 || p.onlyMiddlePlayed()) {
@@ -92,9 +92,10 @@ class Solver {
     /**
      * @param p a non-terminal position with no winning moves
      */
-    private fun negamax(p: Position, alpha: Int, beta: Int, shouldStop: BooleanSupplier): Int {
-        var alpha = alpha
-        var beta = beta
+    private fun negamax(p: Position, alphaP: Int, betaP: Int, shouldStop: BooleanSupplier): Int {
+
+        var alpha = alphaP
+        var beta = betaP
         if (shouldStop.asBoolean) {
             return STOP_SEARCH
         }

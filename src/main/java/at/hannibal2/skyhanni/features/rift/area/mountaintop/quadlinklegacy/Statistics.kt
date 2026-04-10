@@ -7,10 +7,6 @@ internal class Statistics {
     private var ttCacheEvictions: Long = 0
     private var ttSets: Long = 0
     private var ttGets: Long = 0
-    private var ttOptimalHits: Long = 0
-
-    private val ttSeenKeys: MutableSet<Long?>? =
-        if (Config.STATISTICS_CALCULATE_HIT_RATE_OPTIMAL) HashSet<Long?>() else null
 
     fun incrementExploredNodes() {
         if (Config.STATISTICS_ENABLED) {
@@ -46,21 +42,15 @@ internal class Statistics {
     val tTMisses: Long
         get() = if (Config.STATISTICS_ENABLED) ttMisses else 0
 
-    fun recordTTSet(key: Long) {
+    fun recordTTSet() {
         if (Config.STATISTICS_ENABLED) {
             ++ttSets
-            if (Config.STATISTICS_CALCULATE_HIT_RATE_OPTIMAL) {
-                ttSeenKeys!!.add(key)
-            }
         }
     }
 
-    fun recordTTGet(key: Long) {
+    fun recordTTGet() {
         if (Config.STATISTICS_ENABLED) {
             ++ttGets
-            if (Config.STATISTICS_CALCULATE_HIT_RATE_OPTIMAL && ttSeenKeys!!.contains(key)) {
-                ++ttOptimalHits
-            }
         }
     }
 
@@ -73,9 +63,6 @@ internal class Statistics {
     val tTGets: Long
         get() = if (Config.STATISTICS_ENABLED) ttGets else 0
 
-    val tTOptimalHits: Long
-        get() = if (Config.STATISTICS_ENABLED) ttOptimalHits else 0
-
     fun reset() {
         if (Config.STATISTICS_ENABLED) {
             exploredNodes = 0
@@ -84,10 +71,6 @@ internal class Statistics {
             ttCacheEvictions = 0
             ttSets = 0
             ttGets = 0
-            ttOptimalHits = 0
-            if (Config.STATISTICS_CALCULATE_HIT_RATE_OPTIMAL) {
-                ttSeenKeys!!.clear()
-            }
         }
     }
 }

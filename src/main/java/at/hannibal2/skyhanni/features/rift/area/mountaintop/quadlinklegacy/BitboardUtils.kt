@@ -66,10 +66,12 @@ internal object BitboardUtils {
     private fun winningSlots(bitboard: Long, offset: Int): Long {
         val adj = bitboard and (bitboard ushr offset)
 
-        return ((adj ushr offset) and (bitboard ushr (3 * offset)) // XXX_...
-                or ((adj ushr offset) and (bitboard shl offset) // .XX_X..
-                ) or ((adj shl (2 * offset)) and (bitboard ushr offset) // ..X_XX.
-                ) or ((adj shl (2 * offset)) and (bitboard shl (3 * offset)))) // ..._XXX
+        return (
+            (adj ushr offset) and (bitboard ushr (3 * offset)) // XXX_...
+                or ((adj ushr offset) and (bitboard shl offset)) // .XX_X..
+                or ((adj shl (2 * offset)) and (bitboard ushr offset)) // ..X_XX.
+                or ((adj shl (2 * offset)) and (bitboard shl (3 * offset))) // ..._XXX
+            )
     }
 
     fun hasTwoOrMore(bitboard: Long): Boolean {

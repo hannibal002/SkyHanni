@@ -56,7 +56,7 @@ object QuadLinkLegacySolver {
      */
     private val playerColorPattern by patternGroup.pattern(
         "player-color",
-        "(?<color>[A-Za-z]+) player is [A-Za-z0-9_]+\\.?",
+        "(?<color>[A-Za-z]+) player is .*\\.?",
     )
 
     private var solver: Solver? = null
@@ -95,12 +95,12 @@ object QuadLinkLegacySolver {
 
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        checkBoardForUpdates();
+        checkBoardForUpdates()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        checkBoardForUpdates();
+        checkBoardForUpdates()
     }
 
     private fun checkBoardForUpdates() {
@@ -109,7 +109,7 @@ object QuadLinkLegacySolver {
 
         if (!updateBoardState()) return
 
-        val solver = solver!!
+        val solver = solver ?: return // it's impossible for this to be null but detekt complains about !!
         val currentBoard = currentBoard ?: return
         solverCommand.set(QLLCommand(currentPieceCount.get(), currentBoard))
 

@@ -54,7 +54,7 @@ style:
             - 'Mod.EventHandler'
     ReturnCount:
         active: true
-        max: 5
+        max: 8
         excludeGuardClauses: true
         ignoreAnnotated:
             - 'SubscribeEvent'

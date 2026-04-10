@@ -53,10 +53,7 @@ internal class Position {
                     heights
                 )
             for (i in 0..<COLUMNS) {
-                if (canPlayMove(i) && (winningMoves and BitboardUtils.column(
-                        i
-                    )) != 0L
-                ) {
+                if (canPlayMove(i) && (winningMoves and BitboardUtils.column(i)) != 0L) {
                     return i
                 }
             }
@@ -66,10 +63,10 @@ internal class Position {
     val possibleMoves: Long
         get() = BitboardUtils.possibleMoves(heights)
 
+    /**
+     * May include sentinel slots or slots already played
+     */
     val opponentThreats: Long
-        /**
-         * May include sentinel slots or slots already played
-         */
         get() = BitboardUtils.winningSlots(mask() and board.inv())
 
     /**
@@ -79,10 +76,10 @@ internal class Position {
         return BitboardUtils.winningSlots(board or slot) and mask().inv() and BitboardUtils.PLAYABLE_SPACE
     }
 
+    /**
+     * @return The number of empty slots in the position
+     */
     val emptySlotsCount: Int
-        /**
-         * @return The number of empty slots in the position
-         */
         get() = TOTAL_SLOTS - this.numMoves
 
     /**
@@ -155,8 +152,11 @@ internal class Position {
 
                     if (cell == QuadLinkLegacySolver.EMPTY_PIECE) {
                         break
-                    } else if (cell == (if (pieceCount % 2 == 1) QuadLinkLegacySolver.PLAYER_PIECE else QuadLinkLegacySolver.WIZARD_PIECE)) {
-                        position.board = position.board or BitboardUtils.slot(col, row)
+                    } else {
+                        val piece: Char = if (pieceCount % 2 == 1) QuadLinkLegacySolver.PLAYER_PIECE else QuadLinkLegacySolver.WIZARD_PIECE
+                        if (cell == piece) {
+                            position.board = position.board or BitboardUtils.slot(col, row)
+                        }
                     }
                     ++position.numMoves
                     ++row

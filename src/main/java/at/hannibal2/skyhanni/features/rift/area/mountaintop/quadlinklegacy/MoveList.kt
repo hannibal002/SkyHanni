@@ -51,9 +51,11 @@ internal class MoveList {
         private const val MOVE_MASK = (1L shl MOVE_BITS) - 1
 
         private fun packMove(move: Long, priority: Int, order: Int): Long {
-            return ((priority.toLong() shl (MOVE_BITS + ORDER_BITS)) //
+            return (
+                (priority.toLong() shl (MOVE_BITS + ORDER_BITS)) //
                     or ((Position.COLUMNS - order).toLong() shl MOVE_BITS) //
-                    or move)
+                    or move
+                )
         }
     }
 }

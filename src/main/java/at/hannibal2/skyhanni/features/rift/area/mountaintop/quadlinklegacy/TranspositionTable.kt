@@ -6,7 +6,7 @@ internal class TranspositionTable(private val statistics: Statistics) {
     private val table = LongArray(NUM_BUCKETS)
 
     fun set(key: Long, value: Int, numMoves: Int) {
-        statistics.recordTTSet(key)
+        statistics.recordTTSet()
 
         val handle = 2 * hash(key)
 
@@ -40,7 +40,7 @@ internal class TranspositionTable(private val statistics: Statistics) {
     }
 
     fun getValueOrDefault(key: Long, defaultValue: Int): Int {
-        statistics.recordTTGet(key)
+        statistics.recordTTGet()
 
         val handle = 2 * hash(key)
 
