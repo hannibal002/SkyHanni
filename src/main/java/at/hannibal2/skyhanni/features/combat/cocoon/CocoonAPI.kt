@@ -79,13 +79,13 @@ object CocoonAPI {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityMove(event: EntityMoveEvent<ArmorStand>) {
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
-        if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
+        updateCocoonSeen(cocoon)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onLocalPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         existingCocoons.forEach { cocoon ->
-            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
+            updateCocoonSeen(cocoon)
         }
     }
 
@@ -98,7 +98,7 @@ object CocoonAPI {
         val id = entity.id
         if (isSameCocoonGroup(position, id)) return
         val mob = getCocoonMob(position) ?: return
-        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
+        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(32), entity)
         existingCocoons.add(cocoon)
         val debug = "${cocoon.mob.name}, CocoonID (${cocoon.cocoonID}) Entered List"
         ChatUtils.debug(debug)
@@ -122,14 +122,18 @@ object CocoonAPI {
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
-        val deadMobs = skyblockMobs.filter { mob -> !mob.isAlive && mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
+        val tooFarMobs = skyblockMobs.filter { mob ->  mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
         // Jawbus spawns Jawbus Followers, and they are often killed before being detected as Skyblock Mobs.
         // this, should prevent a downstream feature from sending fake "My Lord Jawbus Was Cocooned" Messages.
-        val filteredMobs = deadMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
+        val filteredMobs = tooFarMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
         val mob = filteredMobs.minByOrNull {
             it.baseEntity.getLorenzVec().distance(cocoonVector)
         }
         return mob
+    }
+
+    private fun updateCocoonSeen(cocoon: CocoonMob) {
+        if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
     }
 
     private fun isSameCocoonGroup(currentPos: LorenzVec, currentID: Int): Boolean {

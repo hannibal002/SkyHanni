@@ -48,7 +48,7 @@ object EquipmentApi {
 
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) {
         equipment?.set(slot.ordinal, itemStack)
-        SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
+        if (equipment != null) SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
     }
 
     private val repoGroup = RepoPattern.group("data.equipment")

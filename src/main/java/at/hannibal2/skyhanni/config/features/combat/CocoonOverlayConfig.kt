@@ -10,8 +10,7 @@ class CocoonOverlayConfig {
     @Expose
     @ConfigOption(name = "Require Cocooning", desc = "Toggles whether overlay should only work when you can personally cocoon.")
     @ConfigEditorBoolean
-    @FeatureToggle
-    var onlyShowWhenPlayerIsAbleToCocoon: Boolean = false
+    var requireCocoonPossible: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show Timer", desc = "Shows Time Left till Cocoon Hatches, Can be inaccurate.")
