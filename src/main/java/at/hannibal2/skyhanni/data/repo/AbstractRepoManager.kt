@@ -10,12 +10,11 @@ import at.hannibal2.skyhanni.data.repo.filesystem.DiskRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.MemoryRepoFileSystem
 import at.hannibal2.skyhanni.data.repo.filesystem.RepoFileSystem
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GitHubUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.json.getJson
 import at.hannibal2.skyhanni.utils.system.LazyVar
@@ -34,16 +33,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-    open fun getGson() = ConfigManager.gson
-
-    @Suppress("UNCHECKED_CAST")
-    private val eventClass: Class<E> by lazy {
-        (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
-    }
-
-    private val eventCtor by lazy {
-        eventClass.getConstructor(AbstractRepoManager::class.java)
-    }
 
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
@@ -56,7 +45,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * Gets used in command registration, and as a prefix for constants, etc.
      */
     abstract val commonShortNameCased: String
-    private val commonShortName by lazy { commonShortNameCased.lowercase() }
 
     /**
      * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.zip")
@@ -64,14 +52,22 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open val backupRepoResourcePath: String? = null
 
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug
     abstract val config: AbstractRepoConfig
     abstract val configDirectory: File
 
-    val logger by lazy { RepoLogger("[Repo - $commonName]") }
+    @PublishedApi
+    internal val logger by lazy { RepoLogger(this) }
     val repoDirectory by lazy {
         // ~/.minecraft/config/[...]/repo
         File(configDirectory, "repo")
+    }
+    @Suppress("UNCHECKED_CAST")
+    private val eventClass: Class<E> by lazy {
+        (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
+    }
+
+    private val eventCtor by lazy {
+        eventClass.getConstructor(AbstractRepoManager::class.java)
     }
     private val repoZipFile by lazy {
         // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].zip
@@ -82,28 +78,22 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         // ~/.minecraft/config/[...]/currentCommit.json
         RepoCommitStorage(File(configDirectory, "currentCommit.json"))
     }
+    private val commonShortName by lazy { commonShortNameCased.lowercase() }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()
-    private val githubRepoLocation: GitHubUtils.RepoLocation
-        get() = GitHubUtils.RepoLocation(config.location, debugConfig.logRepoErrors)
-    val repoMutex = Mutex()
-
-    abstract val updateCommand: String
-    abstract val statusCommand: String
-    abstract val reloadCommand: String
-
-    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineConfig(
-        name = "$commonName Repo $repoAction Coroutine",
-        timeout = 2.minutes,
-        withIOContext = true,
-    ).let {
-        if (repoMutex != null) it.withMutex(repoMutex) else it
+    private val gitRepo: GitRepo by lazy {
+        GitRepo(config.location) { SkyHanniMod.feature.dev.debug.logRepoErrors }
     }
-
+    private val repoMutex = Mutex()
     private val repoIOCoroutineConfig = repoCoroutineConfig("IO")
     private val repoInitCoroutineConfig = repoCoroutineConfig("Init", repoMutex)
     private val repoReloadCoroutineConfig = repoCoroutineConfig("Reload", repoMutex)
     private val repoUpdateCoroutineConfig = repoCoroutineConfig("Update", repoMutex)
+    private val commandConfig = CoroutineSettings("$commonName command")
+
+    abstract val updateCommand: String
+    abstract val statusCommand: String
+    abstract val reloadCommand: String
 
     var repoFileSystem: RepoFileSystem by LazyVar { DiskRepoFileSystem(repoDirectory, logger) }
         private set
@@ -120,8 +110,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     abstract val progressCategory: ChatProgressCategory
 
+    open fun reportExtraStatusInfo(): Unit = Unit
+    fun addSuccessfulConstant(constant: String) = successfulConstants.add(constant)
+    fun addUnsuccessfulConstant(constant: String, e: Throwable): Nothing {
+        unsuccessfulConstants.add(constant)
+        logger.throwErrorWithCause("Could not load constant '$constant'", e)
+    }
     fun getFailedConstants() = unsuccessfulConstants.toList()
-    fun getGitHubRepoPath(): String = githubRepoLocation.location
+    fun getGitHubRepoPath(): String = gitRepo.location
+
+    private fun repoCoroutineConfig(repoAction: String, repoMutex: Mutex? = null) = CoroutineSettings(
+        name = "$commonName Repo $repoAction Coroutine",
+        timeout = 2.minutes,
+        withIOContext = true,
+    ).withMutex(repoMutex)
 
     // Will be invoked by the implementation of this class
     internal fun registerCommands(event: CommandRegistrationEvent) {
@@ -137,7 +139,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         event.registerBrigadier(statusCommand) {
             description = "Shows the status of the $commonName repo"
             category = CommandCategory.USERS_BUG_FIX
-            coroutineSimpleCallback {
+            coroutineSimpleCallback(commandConfig) {
                 val progress = progressCategory.start("showing status via /$statusCommand")
                 displayRepoStatus(progress, joinEvent = false, command = true)
                 progress.end("done showing status")
@@ -157,9 +159,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    fun addSuccessfulConstant(fileName: String) = successfulConstants.add(fileName)
-    fun addUnsuccessfulConstant(fileName: String) = unsuccessfulConstants.add(fileName)
-
     @PublishedApi
     internal fun resolvePath(dir: String, name: String) = "$dir/$name.json"
 
@@ -174,19 +173,22 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             else -> repoDirectory.list()?.size?.let { "$it top-level entries in repo directory" }
                 ?: "repo directory exists but could not be listed"
         }
-        logger.logNonDestructiveError("Repo file not found: $path ($repoDiagnostic)")
+        logger.error("Repo file not found: $path ($repoDiagnostic)")
         return null
     }
 
     @PublishedApi
-    internal inline fun <reified T : Any> getRepoData(
+    @Suppress("InjectDispatcher")
+    internal suspend inline fun <reified T : Any> getRepoDataAsync(
         directory: String,
         fileName: String,
-        gson: Gson = getGson(),
+        gson: Gson = ConfigManager.gson,
     ): T = runCatching {
         val path = resolvePath(directory, fileName)
         val json = readJsonElement(path) ?: logger.throwError("Repo file '$fileName' not found.")
-        gson.fromJson<T>(json)
+        withContext(Dispatchers.Default) {
+            gson.fromJson<T>(json)
+        }
     }.getOrElse { e ->
         logger.throwErrorWithCause("Repo parsing error while trying to read constant '$fileName'", e)
     }
@@ -198,31 +200,32 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("Remove and re-download, forceReset=$forceReset")
         shouldManuallyReload = true
         if (!config.location.valid) {
-            logger.errorToChat("Invalid $commonName repo settings detected, resetting default settings.")
+            logger.chatError("Invalid $commonName repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
 
         repoUpdateCoroutineConfig.launch {
             if (!fetchAndUnpackRepo(progress, command = true, forceReset = forceReset).canContinue) {
                 logger.warn("Failed to fetch & unpack repo - aborting repository reload.")
+                dumpDiagnosticsToLog("operation" to "fetchAndUnpack", "forceReset" to forceReset)
                 return@launch
             }
             reloadRepository(progress, "$commonName repo updated successfully.")
             if (unsuccessfulConstants.isEmpty() && !isUsingBackup) return@launch
-            val informed = logger.logErrorStateWithData(
+            val informed = logger.errorStateWithData(
                 "Error updating reading $commonName repo",
                 "no success",
                 "usingBackupRepo" to isUsingBackup,
                 "unsuccessfulConstants" to unsuccessfulConstants,
             )
             if (informed) return@launch
-            logger.logToChat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
+            logger.chat("§cFailed to load the $commonShortNameCased repo! See above for more infos.")
         }
     }
 
     private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
         if (hasDefaultSettings()) {
-            if (manual) logger.logToChat("$commonShortNameCased repo settings are already on default!")
+            if (manual) logger.chat("$commonShortNameCased repo settings are already on default!")
             return
         }
 
@@ -256,7 +259,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             //  i.e. before any internal return path could call progress.end()
             // In all normal return paths above, progress is ended explicitly
             // We only need to guard here against the coroutine being torn down prematurely
-            if (cause != null) progress.end("init ended abnormally: ${cause.message}")
+            if (cause != null) {
+                progress.end("init ended abnormally: ${cause.message}")
+                dumpDiagnosticsToLog("exceptionType" to cause::class.simpleName, "exception" to cause.message)
+            }
         }
     }
 
@@ -300,12 +306,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         logger.debug("Successfully switched to backup repo")
         return FetchUnpackResult.SWITCHED_TO_BACKUP
     }.onFailure { e ->
-        logger.logNonDestructiveError("Failed to switch to backup repo: ${e.message}")
+        logger.error("Failed to switch to backup repo: ${e.message}")
+        dumpDiagnosticsToLog("operation" to "switchToBackupRepo", "exceptionType" to e::class.simpleName, "exception" to e.message)
         progress.update("reason: ${e.message ?: "no reason"}")
         progress.end("Failed to switch to backup repo")
     }.getOrDefault(FetchUnpackResult.FAILED)
-
-    open fun reportExtraStatusInfo(): Unit = Unit
 
     private suspend fun isRepeatErrorOrFixed(progress: ChatProgressUpdates): Boolean {
         progress.update("isRepeatErrorOrFixed")
@@ -317,18 +322,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         val comparison = getCommitComparison(silentError = false)
         val isOutdated = comparison?.let { !it.hashesMatch } ?: run {
-            logger.logNonDestructiveError("Failed to fetch latest commit for repo status check.")
+            logger.error("Failed to fetch latest commit for repo status check.")
             false
         }
         if (isOutdated) {
-            logger.logToChat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
+            logger.chat("Repo Issue caught, however the repo is outdated.\n§aTrying to update it now...")
             val result = fetchAndUnpackRepo(progress, command = false)
             if (result == FetchUnpackResult.SUCCESS) {
-                logger.logToChat("§a$commonName repo updated successfully!")
+                logger.chat("§a$commonName repo updated successfully!")
                 progress.update("repo update successfully!")
                 return true
             } else {
-                logger.logToChat("§cFailed to update the $commonName repo.")
+                logger.chat("§cFailed to update the $commonName repo.")
                 progress.update("Failed to update the $commonName repo.")
             }
         }
@@ -339,21 +344,23 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("displayRepoStatus for $commonName")
         if (joinEvent) return onJoinStatusError(progress)
 
-        val (currentDownloadedCommit, _) = commitStorage.readFromFile() ?: RepoCommit()
+        val currentDownloadedCommit = gitRepo.getLocalHeadSha(repoDirectory)
+            ?: commitStorage.readFromFile()?.sha ?: "unknown"
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            logger.logToChat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
+            logger.chat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
             return
         }
 
         if (!command && isRepeatErrorOrFixed(progress)) return
-        logger.errorToChat("$commonName repo has errors! Commit hash: §b$currentDownloadedCommit§r")
+        logger.chatError("$commonName repo has errors! Commit hash: §b$currentDownloadedCommit§r")
+        dumpDiagnosticsToLog()
 
-        if (successfulConstants.isNotEmpty()) logger.logToChat("Successful Constants §7(${successfulConstants.size}):")
-        for (constant in successfulConstants) logger.logToChat("   - §7$constant")
+        if (successfulConstants.isNotEmpty()) logger.chat("Successful Constants §7(${successfulConstants.size}):")
+        for (constant in successfulConstants) logger.chat("   - §7$constant")
 
-        logger.logToChat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
-        for (constant in unsuccessfulConstants) logger.logToChat("   - §7$constant", color = "§e")
+        logger.chat("Unsuccessful Constants §7(${unsuccessfulConstants.size}):", color = "§e")
+        for (constant in unsuccessfulConstants) logger.chat("   - §7$constant", color = "§e")
 
         progress.update("reportExtraStatusInfo")
         reportExtraStatusInfo()
@@ -376,6 +383,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             }
         }.map { it.asComponent() }
         TextHelper.multiline(text).send()
+        dumpDiagnosticsToLog()
     }
 
     private enum class FetchUnpackResult(val canContinue: Boolean = true) {
@@ -393,7 +401,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     private suspend fun getCommitComparison(silentError: Boolean): RepoComparison? {
         localRepoCommit = commitStorage.readFromFile() ?: RepoCommit()
-        val latestRepoCommit = githubRepoLocation.getLatestCommit(silentError) ?: return null
+        val latestRepoCommit = gitRepo.getLatestCommit(silentError) ?: return null
         return RepoComparison(commonName, localRepoCommit, latestRepoCommit)
     }
 
@@ -426,6 +434,18 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult {
+        progress.update("try loading repo from jgit")
+        with(gitRepo) {
+            if (repoFileSystem.loadFromJGit()) {
+                progress.update("loaded from jgit")
+                isUsingBackup = false
+                return FetchUnpackResult.SUCCESS
+            } else {
+                progress.update("failed to load repo from jgit")
+                dumpDiagnosticsToLog("operation" to "jgit load")
+            }
+        }
+
         progress.update("fetchAndUnpackRepo")
         val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
@@ -448,9 +468,10 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         prepCleanRepoFileSystem(progress)
 
         progress.update("downloadCommitZipToFile")
-        if (!githubRepoLocation.downloadCommitZipToFile(repoZipFile)) {
+        if (!gitRepo.downloadCommitZipToFile(repoZipFile)) {
             progress.update("Failed to download the repo zip file from GitHub.")
-            logger.logNonDestructiveError("Failed to download the repo zip file from GitHub.")
+            logger.error("Failed to download the repo zip file from GitHub.")
+            dumpDiagnosticsToLog("operation" to "download zip", "destination" to repoZipFile.name)
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else {
                 progress.update("FetchUnpackResult.FAILED")
@@ -460,27 +481,28 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         progress.update("loadFromZip")
         // Actually unpack the repo zip file into our local 'file system'
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
+        return if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
             progress.update("Failed to unpack the downloaded zip file.")
-            logger.logNonDestructiveError("Failed to unpack the downloaded zip file.")
-            return if (switchToBackupOnFail) switchToBackupRepo(progress)
+            logger.error("Failed to unpack the downloaded zip file.")
+            dumpDiagnosticsToLog("operation" to "unpack zip", "zipFile" to repoZipFile.name, "zipSize" to repoZipFile.length())
+            if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
+        } else {
+            progress.update("writeToFile: fetchAndUnpackRepo")
+            commitStorage.writeToFile(comparison.latest)
+            isUsingBackup = false
+            FetchUnpackResult.SUCCESS
         }
-
-        progress.update("writeToFile: fetchAndUnpackRepo")
-        commitStorage.writeToFile(comparison.latest)
-        isUsingBackup = false
-        return FetchUnpackResult.SUCCESS
     }
 
     private fun prepCleanRepoFileSystem(progress: ChatProgressUpdates) {
         progress.update("deleteRecursively")
-        repoDirectory.deleteRecursively()
+        repoDirectory.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
 
         progress.update("createAndClean")
         repoFileSystem = repoDirectory.let { root ->
-            if (config.unzipToMemory) MemoryRepoFileSystem(repoDirectory, logger, repoIOCoroutineConfig)
-            else DiskRepoFileSystem(repoDirectory, logger)
+            if (config.unzipToMemory) MemoryRepoFileSystem(root, logger, repoIOCoroutineConfig)
+            else DiskRepoFileSystem(root, logger)
         }.apply { deleteRecursively("") }
 
         progress.update("mkdirs")
@@ -513,7 +535,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         event.post { error ->
             if (loadingError) return@post
             progress.update("Error while posting repo reload event: ${error.message}")
-            logger.logErrorWithData(error, "Error while posting repo reload event")
+            logger.errorWithData(error, "Error while posting repo reload event")
             loadingError = true
         }
         progress.update("post done")
@@ -525,7 +547,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("transitionAfterReload done")
         if (answerMessage.isNotEmpty() && !loadingError) {
             progress.end("answerMessage: $answerMessage")
-            logger.logToChat("§a$answerMessage")
+            logger.chat("§a$answerMessage")
         } else if (loadingError) {
             progress.end("Error with the $commonShortName repo detected")
             ChatUtils.clickableChat(
@@ -537,6 +559,27 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             if (unsuccessfulConstants.isEmpty()) unsuccessfulConstants.add("All Constants")
         } else {
             progress.end("done reloading $commonShortName repo")
+        }
+    }
+
+    internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
+        val loc = config.location
+        val fileCount = repoDirectory.walkTopDown().count { it.isFile }
+        debug("Diagnostic dump for $commonName:")
+        debug("  config: autoUpdate=${config.repoAutoUpdate}, unzipToMemory=${config.unzipToMemory}")
+        debug("  location: ${loc.user}/${loc.repoName}@${loc.branch} (default=${loc.hasDefaultSettings()})")
+        debug("  localCommit: sha=${localRepoCommit.sha ?: "none"}, time=${localRepoCommit.time ?: "none"}")
+        debug("  usingBackup: $isUsingBackup")
+        debug("  repoDir: exists=${repoDirectory.exists()}, files=$fileCount, path=${repoDirectory.absolutePath}")
+        debug("  gitPresent: ${repoDirectory.resolve(".git").exists()}")
+        debug("  fileSystem: ${repoFileSystem::class.simpleName}")
+        debug("  successful: ${successfulConstants.size}, failed: ${unsuccessfulConstants.size}")
+        if (unsuccessfulConstants.isNotEmpty()) {
+            debug("  failedConstants: ${unsuccessfulConstants.joinToString()}")
+        }
+        if (extraData.isNotEmpty()) {
+            debug("  extra:")
+            for ((key, value) in extraData) debug("    $key: $value")
         }
     }
 }

@@ -30,12 +30,14 @@ class DungeonConfig {
     @Accordion
     val secretChime: SecretChimeConfig = SecretChimeConfig()
 
+    // Todo rename to "milestoneDisplay"
     @Expose
-    @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
+    @ConfigOption(name = "Milestone Display", desc = "Show the current milestone in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showMilestonesDisplay: Boolean = false
 
+    // Todo rename to "milestoneDisplayPos"
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "showMilestonesDisplay")
     val showMileStonesDisplayPos: Position = Position(10, 10)

@@ -85,5 +85,5 @@ object ArachneKillTimer {
         arachneSpawnedTime = SimpleTimeMark.farPast()
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isCurrent() && config.killTimer
+    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.killTimer
 }

@@ -37,8 +37,7 @@ sealed class InternalNameArgumentType(
         val input = if (isGreedy) reader.readGreedyString().escapeDoubleQuote()
         else reader.readOptionalDoubleQuotedString()
 
-        val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)
-        return when (result) {
+        return when (val result = BrigadierUtils.parseItem(input, isValidItem = ::isValidItem)) {
             is NeuInternalName -> result
             ParsingFail.DISALLOWED_ITEM -> throw disallowedValueException.createWithContext(reader, input)
             ParsingFail.UNKNOWN_ITEM -> throw unknownValueException.createWithContext(reader, input)
@@ -50,19 +49,18 @@ sealed class InternalNameArgumentType(
     protected open fun isValidItem(item: NeuInternalName): Boolean = true
 
     private open class ItemName(isGreedy: Boolean) : InternalNameArgumentType(isGreedy) {
-        override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
-            return BrigadierUtils.parseItemNameTabComplete(
+        override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> =
+            BrigadierUtils.parseItemNameTabComplete(
                 builder.remainingLowerCase,
                 builder,
                 showWhenEmpty = showWhenEmpty,
                 isGreedy = isGreedy,
                 isValidItem = ::isValidItem,
             )
-        }
     }
 
     private open class InternalName(isGreedy: Boolean) : InternalNameArgumentType(isGreedy) {
-        override fun <S : Any?> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+        override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
             return BrigadierUtils.parseInternalNameTabComplete(
                 builder.remaining,
                 builder,

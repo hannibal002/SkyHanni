@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -34,7 +34,7 @@ object CocoonAPI {
      Might require some sort of ping based tweaking?
      */
     val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
-    val logger: LorenzLogger = LorenzLogger("Combat/Cocoon")
+    val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
 
     data class CocoonMob(
         val mob: Mob,
@@ -55,7 +55,7 @@ object CocoonAPI {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEquipmentChangeEvent(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        if (IslandType.THE_RIFT.isCurrent()) return
+        if (IslandType.THE_RIFT.isInIsland()) return
         val entity = event.entity
         if (!entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val position = entity.getLorenzVec()
@@ -77,7 +77,7 @@ object CocoonAPI {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
-        if (IslandType.THE_RIFT.isCurrent()) return
+        if (IslandType.THE_RIFT.isInIsland()) return
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         val cocoonMob = cocoon.mob
         val timeSince = cocoon.spawnTime.passedSince()
