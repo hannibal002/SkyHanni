@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -14,7 +13,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.MiningProfitTrackerConfig.GemstoneType
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
@@ -54,15 +53,15 @@ val OreCategory.miningCategory: MiningCategory
     }
 
 
-enum class MiningCategory(val displayName: String, val jsonKey: String?) {
-    GEMSTONES("Gemstones", "Gemstones"),
-    DWARVEN_METALS("Dwarven Metals", "Dwarven Metals"),
-    BLOCKS("Blocks/Stones", "Blocks/Stones"),
-    ORES("Ores", "Ores"),
-    MINING_FIESTA("Mining Fiesta Drops", "Mining Fiesta Drops"),
-    MISC("Misc", "Misc");
+enum class MiningCategory(val jsonKey: String) {
+    GEMSTONES("Gemstones"),
+    DWARVEN_METALS("Dwarven Metals"),
+    BLOCKS("Blocks/Stones"),
+    ORES("Ores"),
+    MINING_FIESTA("Mining Fiesta Drops"),
+    MISC("Misc");
 
-    override fun toString(): String = displayName
+    override fun toString(): String = jsonKey
 
     companion object {
         fun fromJsonKey(jsonKey: String): MiningCategory = entries.find { it.jsonKey == jsonKey } ?: MISC
@@ -83,7 +82,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     val config get() = SkyHanniMod.feature.mining.miningTracker
 
     // Block Types; see [https://github.com/hannibal002/SkyHanni-REPO/blob/main/constants/Mining.json]
-    private var blockTypes: Map<String, List<NeuInternalName>>
+    private var blockTypes: Map<String, List<NeuInternalName>> = emptyMap()
 
     private val group = RepoPattern.group("data.miningtracker")
 
@@ -95,21 +94,18 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     /**
      * REGEX-TEST: internalName:ROUGH_RUBY_GEM
      */
-    private val gemstonePatternMeta = group.pattern(
+    private val gemstonePattern by group.pattern(
         "gemstoneidregex",
         "^internalName:(ROUGH|FLAWED|FINE|FLAWLESS)_(.+)_GEM$",
     )
-    private val gemstonePattern by gemstonePatternMeta
     private var lastClickedPos: LorenzVec? = null
-    private var lastClickedTime = SimpleTimeMark.farPast()
 
     // Should the tracker show? Tracker display conditions
     init {
-        blockTypes = emptyMap()
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTags.CUSTOM_MINING.inAny() && MiningApi.isHoldingMiningTool() },
+            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTag.MINING.isInIsland() && MiningApi.isHoldingMiningTool() },
             onRender = {
                 renderDisplay(config.position)
             },
@@ -117,15 +113,12 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     }
 
     data class BucketData(
-        @Expose var blocksMined: MutableMap<MiningCategory, Long>? = null,
+        @Expose var blocksMined: MutableMap<MiningCategory, Long> = EnumMap(MiningCategory::class.java),
     ) : BucketedItemTrackerData<MiningCategory, SessionUptime.Normal>(MiningCategory::class, SessionUptime.Normal::class) {
 
         val safeBlocksMined: MutableMap<MiningCategory, Long>
             get() {
-                if (blocksMined == null) {
-                    blocksMined = EnumMap(MiningCategory::class.java)
-                }
-                return blocksMined!!
+                return blocksMined
             }
 
         fun getTotalBlocksMined(): Long {
@@ -236,14 +229,13 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     // BlockType category control. All is for any minable quantity.
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!config.enabled || !IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!config.enabled || !IslandTypeTag.MINING.isInIsland() || !MiningApi.isHoldingMiningTool()) return
         update()
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         val ore = OreBlock.getByStateOrNull(event.getBlockState)
         if (ore != null) {
             lastClickedPos = event.position
-            lastClickedTime = SimpleTimeMark.now()
             blockUpdateControl = true
         }
     }
@@ -251,7 +243,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     //Adding to the number of blocks mined
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!config.enabled || !IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!config.enabled || !IslandTypeTag.MINING.isInIsland()) return
         firstUpdate()
         val oldState = event.oldState
         val newState = event.newState
@@ -288,26 +280,14 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!config.enabled) return
+        if (!config.enabled || !IslandTypeTag.MINING.isInIsland()) return
 
-        if (event.source == ItemAddManager.Source.COMMAND) {
-            tryAddItem(event.internalName, event.amount, command = true)
-            return
-        }
-
-        tryAddItem(event.internalName, event.amount, command = false)
-
-    }
-
-    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        val bucket = categoryOf(internalName)
+        val bucket = categoryOf(event.internalName)
         if (bucket == null) {
-            ChatUtils.debug("Ignored non-mining item pickup: $internalName'")
+            ChatUtils.debug("Ignored non-mining item pickup: $event.internalName'")
             return
         }
-
-        addItem(bucket, internalName, amount, command)
+        addItem(bucket, event.internalName, event.amount, command = (event.source == ItemAddManager.Source.COMMAND))
     }
 
     private fun categoryOf(internalName: NeuInternalName): MiningCategory? {
