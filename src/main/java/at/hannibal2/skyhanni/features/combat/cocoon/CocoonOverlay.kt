@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.cocoon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.COCOON_SIGHT_DISTANCE
 import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.canCocoon
 import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.existingCocoons
 import at.hannibal2.skyhanni.features.combat.cocoon.CocoonAPI.expectedLifetime
@@ -23,7 +24,7 @@ object CocoonOverlay {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!canCocoon && config.requireCocoonPossible) return
         for (cocoon in existingCocoons) {
-            if (!cocoon.hasBeenSeen && cocoon.coordinates.distanceToPlayer() > 32) continue
+            if (!cocoon.hasBeenSeen && cocoon.coordinates.distanceToPlayer() > COCOON_SIGHT_DISTANCE) continue
             if (config.showCocoonContainedMobName) event.drawDynamicText(
                 cocoon.coordinates,
                 cocoon.mob.name,

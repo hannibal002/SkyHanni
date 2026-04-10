@@ -38,6 +38,8 @@ object CocoonAPI {
     var canCocoon: Boolean = false
         private set
 
+    const val COCOON_SIGHT_DISTANCE = 32
+
     /*
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
@@ -98,7 +100,7 @@ object CocoonAPI {
         val id = entity.id
         if (isSameCocoonGroup(position, id)) return
         val mob = getCocoonMob(position) ?: return
-        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(32), entity)
+        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(COCOON_SIGHT_DISTANCE), entity)
         existingCocoons.add(cocoon)
         val debug = "${cocoon.mob.name}, CocoonID (${cocoon.cocoonID}) Entered List"
         ChatUtils.debug(debug)
@@ -133,7 +135,7 @@ object CocoonAPI {
     }
 
     private fun updateCocoonSeen(cocoon: CocoonMob) {
-        if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(32)
+        if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(COCOON_SIGHT_DISTANCE)
     }
 
     private fun isSameCocoonGroup(currentPos: LorenzVec, currentID: Int): Boolean {
