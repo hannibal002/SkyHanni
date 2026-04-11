@@ -93,8 +93,8 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
 // TODO refactor
+@SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
 
