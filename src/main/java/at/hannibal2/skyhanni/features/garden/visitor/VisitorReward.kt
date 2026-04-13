@@ -34,6 +34,7 @@ enum class VisitorReward(rawInternalName: String, val displayName: String) {
     CASHMERE_JACKET("CASHMERE_JACKET", "§9Cashmere Jacket"),
     SATIN_TROUSERS("SATIN_TROUSERS", "§9Satin Trousers"),
     OXFORD_SHOES("OXFORD_SHOES", "§9Oxford Shoes"),
+    CARNIVAL_TICKET("CARNIVAL_TICKET", "§aCarnival Ticket"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
