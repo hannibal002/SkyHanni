@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -158,7 +159,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
     ITEM(
         {
             val heldItem = InventoryUtils.getItemInHand()
-            val heldItemName = heldItem?.hoverName?.string?.removeColor()
+            val heldItemName = heldItem?.cleanName()
 
             if (heldItem == null || heldItemName == "Air") "No item in hand"
             else String.format(java.util.Locale.US, "Holding $heldItemName")
@@ -247,7 +248,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
         {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
-            val itemName = itemInHand?.hoverName?.string?.removeColor().orEmpty()
+            val itemName = itemInHand?.cleanName().orEmpty()
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
