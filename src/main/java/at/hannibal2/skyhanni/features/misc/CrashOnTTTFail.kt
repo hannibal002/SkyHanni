@@ -31,7 +31,7 @@ object CrashOnTTTFail {
                 Minecraft.getInstance().delayCrash(
                     CrashReport(
                         "SkyHanni Crash on TTT Fail",
-                        Throwable("Disable Crash on TTT Fail in SkyHanni if you want to stop crashing"),
+                        Throwable("Get gud or disable Crash on TTT Fail (if you are bad)"),
                     ),
                 )
             }
