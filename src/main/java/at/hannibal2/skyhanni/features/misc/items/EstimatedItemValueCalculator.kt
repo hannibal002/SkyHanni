@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
@@ -902,8 +902,10 @@ object EstimatedItemValueCalculator {
 
         val internalName = getInternalName()
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
-            // Do not error out on items if their data was changed.
-            if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
+            // Do not error out on items if their data was changed or it is a known item with legacy slots.
+            if (getLoreComponent().any { it.string.contains("This item has unused Gemstones!") }) return null
+            if (internalName in EstimatedItemValue.hasLegacyGemstoneSlots) return null
+
             ErrorManager.logErrorStateWithData(
                 "Could not find gemstone slot price for ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
