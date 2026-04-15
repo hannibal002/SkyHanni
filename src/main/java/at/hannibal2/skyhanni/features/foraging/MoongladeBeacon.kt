@@ -8,10 +8,8 @@ import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconColor.Companion.getColorOrNull
 import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconColor.Companion.getLoreColorOrNull
 import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconPitch.Companion.getBeaconPitchOrNull
@@ -19,8 +17,8 @@ import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconSpeed.Compa
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -121,7 +119,7 @@ object MoongladeBeacon {
 
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? =
-                beaconCurrentColorPattern.firstMatcher(this.item.getCleanLore()) {
+                beaconCurrentColorPattern.firstMatcher(this.item.getLoreComponent().map { it.string }) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
                 }
@@ -154,7 +152,7 @@ object MoongladeBeacon {
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
                 val stack = this.item ?: return null
-                return beaconCurrentSpeedPattern.firstMatcher(stack.getCleanLore()) {
+                return beaconCurrentSpeedPattern.firstMatcher(stack.getLoreComponent().map { it.string }) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
                 }
@@ -180,7 +178,7 @@ object MoongladeBeacon {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
                 val stack = this.item ?: return null
-                return beaconCurrentPitchPattern.firstMatcher(stack.getCleanLore()) {
+                return beaconCurrentPitchPattern.firstMatcher(stack.getLoreComponent().map { it.string }) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
             }

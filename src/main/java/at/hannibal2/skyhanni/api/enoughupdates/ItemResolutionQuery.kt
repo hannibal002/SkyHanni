@@ -40,7 +40,7 @@ import net.minecraft.world.item.Items
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
 
-    private var compound = DataComponentMap.EMPTY
+    private var compound: DataComponentMap? = null
 
     private var itemType: Item? = null
     private var knownInternalName: NeuInternalName? = null
@@ -296,10 +296,10 @@ class ItemResolutionQuery {
     }
 
     private fun resolveItemInCatacombsRngMeter(): NeuInternalName? {
-        val lore = compound?.getLore() ?: return null
+        val lore = compound.getLore()
         if (lore.size > 16) {
             val s = lore[15]
-            if (s.removeColor() == "Selected Drop") {
+            if (s == "§7Selected Drop") {
                 val displayName = lore[16]
                 return findInternalNameByDisplayName(displayName, false)
             }

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -73,7 +73,7 @@ object CoralFishHelper {
         val items = InventoryUtils.getItemsInOpenChest().map { it.item }
 
         val overviewItem = items[OVERVIEW_FISH_SLOT]
-        val overviewItemLore = overviewItem.getCleanLore()
+        val overviewItemLore = overviewItem.getLoreComponent().map { it.string }
 
         val (amountFound, totalAmount) = coralFishFoundPattern.firstMatcher(overviewItemLore) {
             group("found").toInt() to group("total").toInt()
