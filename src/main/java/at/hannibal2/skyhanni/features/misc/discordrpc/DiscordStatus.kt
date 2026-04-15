@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMax
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percentToNextMilestone
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -41,10 +41,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import kotlin.time.Duration.Companion.minutes
-
-var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
-    mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
-
 
 // There is no consistent way to get the full username of the owner of an island you are visiting (as far as I know)
 // so this will be removed until/unless they add it back
@@ -60,8 +56,6 @@ var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
 //     }
 //     return "Someone"
 // }
-
-var beenAfkFor = SimpleTimeMark.now()
 
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
@@ -282,12 +276,10 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
                         break
                     }
                 }
-                val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant]
-                val levels = stackingData?.levels ?: listOf(0)
+                val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant] ?: StackingEnchantData()
+                val levels = stackingData.levels
                 val level = enchantments.getIntOrDefault(stackingEnchant)
-                // Despite this `orEmpty()`, by this point, we know that statName is populated.
-                // Just here to make linting happy.
-                val amount = extraAttributes.getIntOrDefault(stackingData?.statName.orEmpty())
+                val amount = extraAttributes.getIntOrDefault(stackingData.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =
@@ -319,8 +311,8 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
 
     AFK(
         {
-            if (beenAfkFor.passedSince() > 5.minutes) {
-                val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            if (DiscordRPCManager.beenAfkFor.passedSince() > 5.minutes) {
+                val format = DiscordRPCManager.beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
                 "AFK for $format"
             } else AutoStatus.AFK.placeholderText
         },
@@ -328,6 +320,11 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
     ;
 
     fun getDisplayString(): String = displayMessageSupplier().orEmpty()
+
+    companion object {
+        // if the displayMessageSupplier is ever a placeholder, return from this instead
+        internal val lastKnownDisplayStrings: MutableMap<DiscordStatus, String> = mutableMapOf()
+    }
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {

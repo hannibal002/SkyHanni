@@ -25,7 +25,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import com.google.gson.JsonObject
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object PetUtils {
@@ -84,8 +86,13 @@ object PetUtils {
         extraData.get(it)?.asInt
     }
 
-    fun resolvePetItemOrNull(itemName: String) = petItemResolution[itemName] ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf {
-        !it.isPet && it.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET_ITEM
+    fun resolvePetItemOrNull(itemName: String): NeuInternalName? {
+        petItemResolutionCache[itemName]?.let { return it }
+        val result = petItemResolution[itemName] ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf {
+            !it.isPet && it.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET_ITEM
+        }
+        if (result != null) petItemResolutionCache[itemName] = result
+        return result
     }
 
     fun isKnownPetInternalName(internalName: NeuInternalName) = internalName in petInternalNames
@@ -249,6 +256,7 @@ object PetUtils {
         }
     }
 
+    private val petItemResolutionCache = TimeLimitedCache<String, NeuInternalName>(5.minutes)
     private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
     fun NeuInternalName.hasValidHigherTier() = nextTierCache.getOrPut(this) {
         if (!this.isPet) return@getOrPut false
@@ -295,6 +303,7 @@ object PetUtils {
         }
         petInternalNames = rawPetInternalNames
         petSkins = rawPetSkins
+        petItemResolutionCache.clear()
         nextTierCache.clear()
     }
 

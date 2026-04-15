@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpLocationData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -56,7 +55,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!config.burrowNearestWarp) return
         if (!DianaApi.isDoingDiana()) return
         val warp = currentWarp ?: return
@@ -123,7 +122,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Diana Burrow Nearest Warp")
 
         if (!DianaApi.isDoingDiana()) {
