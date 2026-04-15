@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.world.item.ItemStack
 
-// Todo: Merge this with SuperpairDataDisplay
+// TODO Merge this with SuperpairDataDisplay
 //  Store slots over there
 //  Have the rendered text of SuperpairDataDisplay highlight the slots the items are in
 @SkyHanniModule
@@ -30,7 +30,7 @@ object SuperPairsItemVisibility {
      * REGEX-TEST: Next button is instantly rewarded!
      */
     private val unknownSuperpairsClickPattern by ExperimentationTableApi.patternGroup.list(
-        "superpairs.unknown-click-nocolor",
+        "superpairs.unknown-click.colorless",
         "\\?",
         "Click (?:any|a second) button!",
         "Next button is instantly rewarded!",

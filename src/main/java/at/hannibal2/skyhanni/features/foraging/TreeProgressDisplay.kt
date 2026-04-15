@@ -28,7 +28,7 @@ object TreeProgressDisplay {
      * REGEX-TEST: MANGROVE TREE 5%
      */
     private val currentTreeProgressPattern by RepoPattern.pattern(
-        "foraging.tree.progress-nocolor",
+        "foraging.tree.progress.colorless",
         "(?<treeType>\\w+) TREE (?<percent>\\d+)%",
     )
 

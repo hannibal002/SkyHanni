@@ -46,7 +46,7 @@ object CoralFishHelper {
      * REGEX-TEST: Herring the Fish
      */
     private val coralFishNamePattern by patternGroup.pattern(
-        "name-nocolor",
+        "name.colorless",
         "\\w+ the Fish",
     )
 
