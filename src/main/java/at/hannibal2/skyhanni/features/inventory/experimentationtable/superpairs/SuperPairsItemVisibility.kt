@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.item.ItemStack
 
 // Todo: Merge this with SuperpairDataDisplay
@@ -58,7 +57,7 @@ object SuperPairsItemVisibility {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val slotNumber = event.slot?.index?.takeUnless(superpairsSlotMap.keys::contains) ?: return
         val clickedItem = event.item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+        if (unknownSuperpairsClickPattern.matches(clickedItem.cleanName())) {
             superpairsSlotsToRead.add(slotNumber)
         } else {
             superpairsSlotMap[slotNumber] = clickedItem
