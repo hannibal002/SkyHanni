@@ -40,7 +40,7 @@ import net.minecraft.world.item.Items
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
 
-    private var compound: DataComponentMap? = null
+    private var compound: DataComponentMap = DataComponentMap.EMPTY
 
     private var itemType: Item? = null
     private var knownInternalName: NeuInternalName? = null
@@ -326,7 +326,7 @@ class ItemResolutionQuery {
         val isOnBazaar: Boolean = isBazaar(inventorySlots.container)
         var displayName: String = ItemUtils.getDisplayName(compound) ?: return null
         displayName = displayName.removePrefix("§6§lSELL ").removePrefix("§a§lBUY ")
-        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && compound != null) {
+        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && !compound.isEmpty) {
             return resolveEnchantmentByName(displayName)
         }
         if (itemType === Items.PLAYER_HEAD && displayName.contains("Essence")) {
@@ -376,7 +376,7 @@ class ItemResolutionQuery {
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): CompoundTag = compound?.extraAttributes ?: CompoundTag()
+    private fun getExtraAttributes(): CompoundTag = compound.extraAttributes
 
     private fun resolveFromSkyblock(): NeuInternalName? {
         val internalName = getExtraAttributes().getStringOrDefault("id")
