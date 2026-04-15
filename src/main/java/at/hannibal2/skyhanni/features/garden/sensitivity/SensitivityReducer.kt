@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
@@ -53,6 +54,11 @@ object SensitivityReducer {
 
         updatePlayerStatus()
         autoToggleIfNeeded()
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        disable()
     }
 
     @HandleEvent
