@@ -187,10 +187,7 @@ object ItemUtils {
 
     fun ItemStack.getCleanLore(): List<String> = components.getCleanLore()
 
-    @Deprecated(
-        "Use getCleanLore or getLoreComponent unless you really need color codes",
-        ReplaceWith("this.getLoreComponent()"),
-    )
+    @Deprecated("Use getCleanLore or getLoreComponent unless you really need color codes")
     @Suppress("Deprecation")
     fun ItemStack.getLore(): List<String> = components.getLore()
 
