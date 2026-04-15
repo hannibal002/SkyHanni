@@ -85,7 +85,7 @@ object EquipmentApi {
             if (lastClickedEquipmentTime.passedSince() > 1.seconds) return@matchMatcher
             val chatItem = group("item").removeColor()
             val (item, slot) = lastClickedEquipment ?: return@matchMatcher
-            if (item.cleanName() != chatItem) return@matchMatcher
+            if (item.cleanName != chatItem) return@matchMatcher
             setEquipment(slot, item)
             lastClickedEquipment = null
         }

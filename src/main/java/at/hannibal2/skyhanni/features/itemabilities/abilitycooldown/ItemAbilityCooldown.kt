@@ -455,7 +455,7 @@ object ItemAbilityCooldown {
 
     // TODO add item caching
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
-        val itemName: String = stack.cleanName()
+        val itemName: String = stack.cleanName
         val internalName = stack.getInternalName()
         val scrolls = ItemAbility.getAllAbilityScrolls(stack)
 

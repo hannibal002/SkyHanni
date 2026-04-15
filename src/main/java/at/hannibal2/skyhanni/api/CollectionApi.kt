@@ -115,7 +115,7 @@ object CollectionApi {
 
         if (inventoryName.endsWith("s") && inventoryName != "Boss Collections") {
             for ((_, stack) in event.inventoryItems) {
-                val name = stack.cleanName()
+                val name = stack.cleanName
                 if ("Collections" in name) continue
 
                 val lore = stack.getLoreComponent()

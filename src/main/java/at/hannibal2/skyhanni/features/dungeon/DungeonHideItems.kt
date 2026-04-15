@@ -43,7 +43,7 @@ object DungeonHideItems {
     private val DAMAGE_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB") }
     private val HEALER_FAIRY_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY") }
 
-    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
+    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName == "Skeleton Skull"
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
@@ -51,11 +51,11 @@ object DungeonHideItems {
 
         if (entity is ItemEntity) {
             val stack = entity.item
-            if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
+            if (config.hideReviveStone && stack.cleanName == "Revive Stone") {
                 event.cancel()
             }
 
-            if (config.hideJournalEntry && stack.cleanName() == "Journal Entry") {
+            if (config.hideJournalEntry && stack.cleanName == "Journal Entry") {
                 event.cancel()
             }
         }
@@ -69,7 +69,7 @@ object DungeonHideItems {
                 event.cancel()
             }
 
-            if (head != null && head.cleanName() == "Superboom TNT") {
+            if (head != null && head.cleanName == "Superboom TNT") {
                 event.cancel()
                 hideParticles[entity] = SimpleTimeMark.now()
             }

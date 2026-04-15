@@ -27,7 +27,7 @@ object PlayerDeathMessages {
         if (!shouldHideFarDeaths()) return
 
         EntityUtils.getEntitiesNearby<RemotePlayer>(25.0).forEach { player ->
-            lastTimePlayerSeen[player.cleanName()] = SimpleTimeMark.now()
+            lastTimePlayerSeen[player.cleanName] = SimpleTimeMark.now()
         }
     }
 
