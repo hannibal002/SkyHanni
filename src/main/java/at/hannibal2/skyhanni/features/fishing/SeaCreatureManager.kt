@@ -59,7 +59,7 @@ object SeaCreatureManager {
         if (isInterceptingColorCodeMessage(event.message)) return
         if (isInterceptingCleanMessage(event.cleanMessage)) return
 
-        getSeaCreatureFromMessage(event.message)?.let {
+        getSeaCreatureFromMessage(event.cleanMessage)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
@@ -81,7 +81,7 @@ object SeaCreatureManager {
         if (isInterceptingColorCodeMessage(event.message)) return
         if (isInterceptingCleanMessage(event.cleanMessage)) return
 
-        getSeaCreatureFromMessage(event.message)?.let {
+        getSeaCreatureFromMessage(event.cleanMessage)?.let {
             val original = event.chatComponent.copy()
             var edited = original
 
