@@ -299,7 +299,7 @@ object MoongladeBeacon {
 
     private var currentServerTicks = 0
 
-    @HandleEvent(ServerTickEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onServerTick() {
         if (!colorMinigameInventory.isInside()) return
         currentServerTicks++
@@ -334,7 +334,7 @@ object MoongladeBeacon {
         )
     }
 
-    @HandleEvent(GuiContainerEvent.BackgroundDrawnEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onBackgroundDrawn() {
         if (!solverEnabled()) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
@@ -350,7 +350,7 @@ object MoongladeBeacon {
         enchantedTuning.tryLabelIfAble(event)
     }
 
-    @HandleEvent(InventoryUpdatedEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onInventoryUpdated() {
         if (!solverEnabled()) return
 

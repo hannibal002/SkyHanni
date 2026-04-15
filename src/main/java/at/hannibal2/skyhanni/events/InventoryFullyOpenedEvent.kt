@@ -49,4 +49,5 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
 @PrimaryFunction("onInventoryFullyOpened")
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
+@PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
