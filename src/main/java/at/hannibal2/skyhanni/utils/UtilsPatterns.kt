@@ -18,6 +18,7 @@ object UtilsPatterns {
      * REGEX-TEST: EPIC BOOTS
      * REGEX-TEST: COMMON
      * REGEX-TEST: COMMON COMBAT SHARD (ID C9)
+     * REGEX-TEST: EPIC WATER SHARD (ID E5)
      * REGEX-TEST: Rarity: LEGENDARY
      * REGEX-TEST: Rarity: RARE
      */
@@ -25,7 +26,7 @@ object UtilsPatterns {
         "item.lore.rarity.line.colorless",
         "^(?:Rarity: )?(?:. )?(?:SHINY )?(?<rarity>" +
             enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") } +
-            ") ?(?:DUNGEON )?(?<itemCategory>.*)(?: .)?(?: \\(ID \\w\\d+\\))?$",
+            ") ?(?:DUNGEON )?(?<itemCategory>[^()]*?)(?: .)?(?: \\(ID \\w\\d+\\))?$",
     )
 
     /**
