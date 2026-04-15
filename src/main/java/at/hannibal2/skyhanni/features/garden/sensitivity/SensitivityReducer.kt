@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import net.minecraft.client.player.LocalPlayer
 
 @SkyHanniModule
 object SensitivityReducer {
@@ -42,7 +44,7 @@ object SensitivityReducer {
     private val isManualActive get() = SensitivityState.MANUAL_REDUCED.isActive()
 
     @HandleEvent
-    fun onTick() {
+    fun onLocalPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!GardenApi.inGarden()) {
             if (isAutoActive) autoToggle()
             return
