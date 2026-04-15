@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -65,7 +66,6 @@ object AttributeShardOverlay {
         override fun toString(): String = displayName
     }
 
-    @Suppress("unused")
     enum class AttributeShardPriceSource(val displayName: String, val priceSource: ItemPriceSource) {
         INSTANT_BUY("BZ Instant Buy", ItemPriceSource.BAZAAR_INSTANT_BUY),
         SELL_ORDER("BZ Buy Order", ItemPriceSource.BAZAAR_INSTANT_SELL),
@@ -314,7 +314,7 @@ object AttributeShardOverlay {
         )
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(InventoryUpdatedEvent::class, onlyOnSkyblock = true)
     fun onInventoryUpdated() {
         if (!AttributeShardsData.attributeMenuInventory.isInside()) return
         if (!config.onlyCurrentInventory) return

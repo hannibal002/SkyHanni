@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault
 import at.hannibal2.skyhanni.utils.compat.getByteOrDefault
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault

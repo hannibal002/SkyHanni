@@ -164,33 +164,29 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    fun DataComponentMap.getLoreComponent(): List<Component> =
-        get(DataComponents.LORE)?.lines.orEmpty()
-
-    fun ItemStack.getLoreComponent(): List<Component> {
+    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
+    fun ItemStack.getLore(): List<String> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
         }
-        val lore = components.getLoreComponent()
+        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
     }
 
-    fun ItemStack.getCleanLore(): List<String> =
-        getLoreComponent().map { it.string.removeColor() }
+    fun ItemStack.getLoreComponent(): List<Component> {
+        val lore = this.get(DataComponents.LORE)?.lines
+        return lore ?: emptyList()
+    }
 
-    @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
-    fun ItemStack.getLore(): List<String> =
-        getLoreComponent().map { it.formattedTextCompatLessResets() }
+    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
-    fun ItemStack.getCleanSingleLineLore(): String =
-        getCleanLore().filter { it.isNotEmpty() }.joinToString(" ")
-
-    @Deprecated("Use getLoreComponent or getCleanSingleLineLore unless you really need color codes")
-    fun ItemStack.getSingleLineLore(): String =
-        getLore().filter { it.isNotEmpty() }.joinToString(" ")
+    fun DataComponentMap?.getLore(): List<String> {
+        this ?: return emptyList()
+        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
+    }
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
         this ?: return emptyList()

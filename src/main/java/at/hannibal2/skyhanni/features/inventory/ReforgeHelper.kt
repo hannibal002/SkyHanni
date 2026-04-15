@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
@@ -136,7 +136,8 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            if (!clickToReforgePattern.matches(event.slot.item?.getCleanLore()?.lastOrNull())) return
+            val lastLine = event.slot.item?.getLoreComponent()?.lastOrNull()?.string
+            if (!clickToReforgePattern.matches(lastLine)) return
             if (handleReforgeButtonClick(event)) return
         }
 

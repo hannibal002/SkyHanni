@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
@@ -33,7 +32,7 @@ data class CachedItemData(
 
     var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 
-    var lastLore: List<Component> = emptyList(),
+    var lastLore: List<String> = listOf(),
 
     var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 
@@ -47,8 +46,7 @@ data class CachedItemData(
 ) {
     companion object {
         private val cache = TimeLimitedCache<IdentityCharacteristics<ItemStack>, CachedItemData>(expireAfterWrite = 2.minutes)
-        val ItemStack.cachedData: CachedItemData
-            get() = cache.getOrPut(IdentityCharacteristics(this)) { CachedItemData() }
+        val ItemStack.cachedData: CachedItemData get() = cache.getOrPut(IdentityCharacteristics(this)) { CachedItemData() }
 
         fun forEachValue(action: (CachedItemData) -> Unit) {
             cache.map { action(it.value) }
