@@ -107,7 +107,7 @@ object IslandAreaFeatures {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isAreaListEnabled()) return
         if (!areaListConfig.showAlways) return
         val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
