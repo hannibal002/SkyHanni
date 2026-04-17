@@ -52,10 +52,9 @@ object SkyHanniEvents {
     val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
-    @Suppress("Deprecation")
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
-        when (method.parameterCount) {
+        return when (method.parameterCount) {
             0 -> {
                 val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
                 if (primaryFunctionEventType != null) {
@@ -63,17 +62,18 @@ object SkyHanniEvents {
                 }
                 if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
                 if (options.eventTypes.isEmpty()) return null
-                return options to options.eventTypes.map { it.java }
+                options to options.eventTypes.map { it.java }
             }
 
             1 -> {
                 val eventType = method.parameterTypes.first()
                 if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return null
                 @Suppress("UNCHECKED_CAST")
-                return options to listOf(eventType as Class<out SkyHanniEvent>)
+                options to listOf(eventType as Class<out SkyHanniEvent>)
             }
+
+            else -> null
         }
-        return null
     }
 
     private fun unregisterMethod(method: Method) {

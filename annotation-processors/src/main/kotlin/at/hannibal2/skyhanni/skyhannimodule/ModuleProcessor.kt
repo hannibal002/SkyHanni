@@ -28,7 +28,6 @@ class ModuleProcessor(
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
 
     private var skyHanniEvent: KSType? = null
-    private val warnings = mutableListOf<String>()
     private val stateFile: File? = cacheDir?.let { File(it, "ksp-module-state-$mcVersion.txt") }
 
     private data class FileState(val mtime: Long, val crc: Long)
@@ -69,7 +68,7 @@ class ModuleProcessor(
 
         val dirtyCount = symbols.count { it.containingFile?.filePath in dirtyFilePaths }
         val cachedCount = symbols.size - dirtyCount
-        logger.warn(
+        println(
             "Found ${symbols.size.withPlural("symbol")} with @SkyHanniModule for mc $mcVersion " +
                 "($dirtyCount revalidated, $cachedCount from cache)",
         )
@@ -79,11 +78,11 @@ class ModuleProcessor(
                 File(it, "generated/ksp/main/kotlin/at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt")
             }
             if (outputFile?.exists() != false) {
-                logger.warn("No @SkyHanniModule files changed, skipping LoadedModules regeneration")
+                println("No @SkyHanniModule files changed, skipping LoadedModules regeneration")
                 writeStateFile(newStates)
                 return emptyList()
             }
-            logger.warn("No @SkyHanniModule files changed but LoadedModules.kt is missing, regenerating")
+            println("No @SkyHanniModule files changed but LoadedModules.kt is missing, regenerating")
         }
 
         val validSymbols = symbols.mapNotNull {
@@ -153,11 +152,11 @@ class ModuleProcessor(
             return null
         }
         if (symbol !is KSClassDeclaration) {
-            logger.error("@SkyHanniModule is only valid on class declarations", symbol)
+            logger.error("@SkyHanniModule is only valid on class declarations: $symbol")
             return null
         }
         if (symbol.classKind != ClassKind.OBJECT) {
-            logger.error("@SkyHanniModule is only valid on kotlin objects", symbol)
+            logger.error("@SkyHanniModule is only valid on Kotlin objects: $symbol")
             return null
         }
 
@@ -175,7 +174,7 @@ class ModuleProcessor(
 
                     when (parameterCount) {
                         0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
-                            warnings.add(
+                            logger.error(
                                 "Function $name must have an event parameter, a primary function " +
                                     "name, or an explicit event specification because it is " +
                                     "annotated with @HandleEvent",
@@ -183,13 +182,13 @@ class ModuleProcessor(
                         }
 
                         1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
-                            warnings.add(
+                            logger.error(
                                 "Function $name must have an event assignable from $event " +
                                     "because it is annotated with @HandleEvent",
                             )
                         }
 
-                        else -> warnings.add(
+                        else -> logger.error(
                             "Function $name has too many parameters. It must have exactly one " +
                                 "event parameter, or be parameterless with a primary function " +
                                 "name or an explicit event specification because it is annotated " +
@@ -204,23 +203,17 @@ class ModuleProcessor(
     }
 
     private fun KSAnnotation.hasExplicitEventSpec(): Boolean {
-        val location = location as? FileLocation ?: return false
-        val file = File(location.filePath)
-        if (!file.exists()) return false
-
-        val lines = file.readLines()
-        val startIndex = (location.lineNumber - 1).coerceAtLeast(0)
-        val endIndex = minOf(lines.size, startIndex + 12)
-        val snippet = buildString {
-            for (index in startIndex until endIndex) {
-                append(lines[index])
-                append('\n')
-                if (lines[index].contains("fun ")) break
-            }
+        val annotationFilePath = (location as? FileLocation)?.filePath ?: return false
+        return arguments.any { argument ->
+            val value = argument.value
+            (argument.location as? FileLocation)?.filePath == annotationFilePath &&
+                when (value) {
+                    is KSType -> true
+                    is Iterable<*> -> value.all { it is KSType }
+                    is Array<*> -> value.all { it is KSType }
+                    else -> false
+                }
         }
-
-        val annotationText = snippet.substringAfter("@HandleEvent", "")
-        return annotationText.contains("::class")
     }
 
     private fun isDevOnly(klass: KSClassDeclaration): Boolean =
@@ -228,15 +221,6 @@ class ModuleProcessor(
             ?.arguments?.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
 
     private fun generateFile(symbols: List<KSClassDeclaration>) {
-        if (warnings.isNotEmpty()) {
-            warnings.forEach { logger.warn(it) }
-            error(
-                "${warnings.size.withPlural("error")} related to event annotations found, please " +
-                    "fix them before continuing. Click on the kspKotlin build log for more " +
-                    "information.",
-            )
-        }
-
         val sources = symbols.mapNotNull { it.containingFile }.toTypedArray()
         val file = codeGenerator.createNewFile(
             Dependencies(true, *sources),
@@ -248,11 +232,10 @@ class ModuleProcessor(
                 """
                 |package at.hannibal2.skyhanni.skyhannimodule
                 |
-                |@Suppress("LargeClass")
                 |object LoadedModules {
                 |    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment
                 |    val modules: List<Any> = buildList {
-            """.trimMargin(),
+                """.trimMargin(),
             )
             symbols.forEach { symbol ->
                 val prefix = if (isDevOnly(symbol)) "if (isDev) " else ""

@@ -17,17 +17,23 @@ class VersionConstantsProcessor(
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
         val file = codeGenerator.createNewFile(Dependencies(false), "at.hannibal2.skyhanni.utils", "VersionConstants")
         OutputStreamWriter(file).use {
-            it.write("package at.hannibal2.skyhanni.utils\n\n")
-            it.write("object VersionConstants {\n")
-            it.write("    const val MOD_VERSION = \"$modVersion\"\n")
-            it.write("    // Do not use this mc version as its reflective of the compile time version\n")
-            it.write("    // And might not be correct at run time\n")
-            it.write("    // We use it for the auto updater only\n")
-            it.write("    var MC_VERSION = \"$mcVersion\"\n")
-            it.write("        private set\n")
-            it.write("}\n")
+            it.appendLine(
+                """
+                |package at.hannibal2.skyhanni.utils
+                |
+                |object VersionConstants {
+                |    const val MOD_VERSION = "$modVersion"
+                |    /**
+                |     * Do not use this Minecraft version as it is reflective of the compile-time version
+                |     * and might not be correct at runtime. We use it for the auto-updater only.
+                |     */
+                |    internal var MC_VERSION = "$mcVersion"
+                |        private set
+                |}
+                """.trimMargin(),
+            )
         }
-        logger.warn("Generated VersionConstants file with mod version $modVersion and mc version $mcVersion")
+        println("Generated VersionConstants file with mod version $modVersion and Minecraft version $mcVersion")
         return emptyList()
     }
 }
