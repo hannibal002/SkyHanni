@@ -23,6 +23,7 @@ object HighlightSkeletonMasterChestplate {
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!auctionMenu.isInside()) return
+        if (!isEnabled()) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.item.getInternalName() != "SKELETON_MASTER_CHESTPLATE".toInternalName()) continue
             if (isGoodChestplate(slot.item) && config.highlightGoodChestplate) slot.highlight(config.goodColor)
@@ -32,4 +33,6 @@ object HighlightSkeletonMasterChestplate {
 
     private fun isGoodChestplate(item: ItemStack): Boolean =
         (item.getDungeonTier() == 10 && item.getStatBoostPercentage() == 50)
+
+    fun isEnabled(): Boolean = (config.highlightBadChestplate || config.highlightGoodChestplate)
 }

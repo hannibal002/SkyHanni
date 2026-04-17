@@ -154,7 +154,7 @@ object AuctionHousePriceComparison {
     }
 
     private fun shouldIgnoreItem(internalName: NeuInternalName): Boolean =
-        internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && HighlightSkeletonMasterChestplate.isEnabled
+        internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && HighlightSkeletonMasterChestplate.isEnabled()
 
     private fun lerp(delta: Double, start: Int, end: Int) = start + delta * (end - start)
 
