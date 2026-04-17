@@ -28,6 +28,6 @@ enum class Direction(val text: String) {
     ;
 
     companion object {
-        fun fromString(string: String) = entries.firstOrNull { it.text == string } ?: error("Invalid direction string: $string")
+        fun fromString(string: String): Direction = entries.firstOrNull { it.text == string } ?: error("Invalid direction string: $string")
     }
 }
