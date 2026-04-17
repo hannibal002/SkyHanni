@@ -17,17 +17,16 @@ import net.minecraft.world.item.ItemStack
 @SkyHanniModule
 object HighlightSkeletonMasterChestplate {
 
-    val isEnabled get() = SkyHanniMod.feature.inventory.auctions.highlightSkeletonMasterChestplate
-    private val isInAuctionMenu = InventoryDetector(checkInventoryName = { it.startsWith("Auctions") })
+    private val config get() = SkyHanniMod.feature.inventory.auctions.skeletonMaster
+    private val auctionMenu = InventoryDetector(checkInventoryName = { it.startsWith("Auctions") })
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isInAuctionMenu.isInside()) return
-        if (!isEnabled) return
+        if (!auctionMenu.isInside()) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.item.getInternalName() != "SKELETON_MASTER_CHESTPLATE".toInternalName()) continue
-            if (isGoodChestplate(slot.item)) slot.highlight(LorenzColor.GREEN)
-            else slot.highlight(LorenzColor.DARK_RED)
+            if (isGoodChestplate(slot.item) && config.highlightGoodChestplate) slot.highlight(config.goodColor)
+            else if (config.highlightBadChestplate) slot.highlight(config.badColor)
         }
     }
 
