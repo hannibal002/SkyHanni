@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -45,8 +46,8 @@ object CocoonAPI {
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
      */
-    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
-    val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
+    private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
 
     data class CocoonMob(
         val mob: Mob,
@@ -146,4 +147,6 @@ object CocoonAPI {
         return existingCocoons.any { it.coordinates.distanceSqIgnoreY(currentPos) < 0.5 || it.cocoonID == currentID }
     }
 
+    fun getVisible(): List<CocoonMob> =
+        existingCocoons.filter { it.hasBeenSeen || it.coordinates.distanceToPlayer() < COCOON_SIGHT_DISTANCE }
 }
