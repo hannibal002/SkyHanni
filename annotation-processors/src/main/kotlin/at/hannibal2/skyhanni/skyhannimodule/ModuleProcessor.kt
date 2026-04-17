@@ -210,7 +210,6 @@ class ModuleProcessor(
                 when (value) {
                     is KSType -> true
                     is Iterable<*> -> value.all { it is KSType }
-                    is Array<*> -> value.all { it is KSType }
                     else -> false
                 }
         }
@@ -245,9 +244,9 @@ class ModuleProcessor(
                 """
                 |    }
                 |}
-            """.trimMargin(),
+                """.trimMargin(),
             )
         }
-        logger.info("Generated LoadedModules file with ${symbols.size.withPlural("module")}")
+        println("Generated LoadedModules file with ${symbols.size.withPlural("module")}")
     }
 }
