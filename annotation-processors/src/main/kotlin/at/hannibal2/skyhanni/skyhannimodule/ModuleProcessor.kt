@@ -152,11 +152,11 @@ class ModuleProcessor(
             return null
         }
         if (symbol !is KSClassDeclaration) {
-            logger.error("@SkyHanniModule is only valid on class declarations: $symbol")
+            logger.error("@SkyHanniModule is only valid on class declarations", symbol)
             return null
         }
         if (symbol.classKind != ClassKind.OBJECT) {
-            logger.error("@SkyHanniModule is only valid on Kotlin objects: $symbol")
+            logger.error("@SkyHanniModule is only valid on Kotlin objects", symbol)
             return null
         }
 
