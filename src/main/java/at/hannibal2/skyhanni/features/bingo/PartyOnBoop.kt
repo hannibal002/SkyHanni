@@ -36,7 +36,6 @@ object PartyOnBoop {
         val message = event.messageComponent.intoComponent()
         if (!boopPattern.matches(message)) return
 
-
         ChatUtils.clickableChat(
             "Click to invite $username §eto the party!",
             onClick = {
