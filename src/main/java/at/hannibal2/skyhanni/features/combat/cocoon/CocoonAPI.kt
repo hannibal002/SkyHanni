@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -60,8 +60,11 @@ object CocoonAPI {
 
     private fun playerCanCocoon(): Boolean {
         val belt = EquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
-        return (belt.getInternalName() == "THE_PRIMORDIAL".toInternalName() || belt.getReforgeModifier() == "blood_shot")
+        return belt.canCocoon()
     }
+
+    private fun ItemStack.canCocoon() =
+        (this.getInternalName() == "THE_PRIMORDIAL".toInternalName() || this.getReforgeModifier() == "blood_shot")
 
     @HandleEvent
     fun onSkyblockEquipmentDataUpdate(event: SkyblockEquipmentDataUpdateEvent) {
@@ -71,7 +74,7 @@ object CocoonAPI {
             return
         }
         val belt = event.newItemStack
-        canCocoon = (belt.getInternalName() == "THE_PRIMORDIAL".toInternalName() || belt.getReforgeModifier() == "blood_shot")
+        canCocoon = belt.canCocoon()
     }
 
     @HandleEvent
@@ -94,7 +97,7 @@ object CocoonAPI {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityEquipmentChangeEvent(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        if (IslandType.THE_RIFT.isInIsland()) return
+        if (IslandType.THE_RIFT.isCurrent()) return
         val entity = event.entity
         if (!entity.wearingSkullTexture(COCOON_SKULL_TEXTURE)) return
         val position = entity.getLorenzVec()
@@ -116,7 +119,7 @@ object CocoonAPI {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<ArmorStand>) {
-        if (IslandType.THE_RIFT.isInIsland()) return
+        if (IslandType.THE_RIFT.isCurrent()) return
         val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
         val cocoonMob = cocoon.mob
         val timeSince = cocoon.spawnTime.passedSince()
@@ -125,10 +128,10 @@ object CocoonAPI {
     }
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
-        val tooFarMobs = skyblockMobs.filter { mob -> mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
+        val nearbyMobs = skyblockMobs.filter { mob -> mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
         // Jawbus spawns Jawbus Followers, and they are often killed before being detected as Skyblock Mobs.
         // this, should prevent a downstream feature from sending fake "My Lord Jawbus Was Cocooned" Messages.
-        val filteredMobs = tooFarMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
+        val filteredMobs = nearbyMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
         val mob = filteredMobs.minByOrNull {
             it.baseEntity.getLorenzVec().distance(cocoonVector)
         }
@@ -143,6 +146,4 @@ object CocoonAPI {
         return existingCocoons.any { it.coordinates.distanceSqIgnoreY(currentPos) < 0.5 || it.cocoonID == currentID }
     }
 
-    fun getVisible(): List<CocoonMob> =
-        existingCocoons.filter { it.hasBeenSeen || it.coordinates.distanceToPlayer() < COCOON_SIGHT_DISTANCE }
 }
