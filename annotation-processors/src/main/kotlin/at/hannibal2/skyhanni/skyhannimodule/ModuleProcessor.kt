@@ -9,7 +9,9 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.FileLocation
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
 import java.io.File
@@ -31,10 +33,23 @@ class ModuleProcessor(
 
     private data class FileState(val mtime: Long, val crc: Long)
 
-    override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
-        skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
+    private fun Int.withPlural(string: String) = "$this $string${if (this == 1) "" else "s"}"
 
-        val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
+    override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
+        skyHanniEvent = resolver.getClassDeclarationByName(
+            "at.hannibal2.skyhanni.api.event.SkyHanniEvent",
+        )?.asStarProjectedType()
+
+        val symbols = processBuildPaths(
+            resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList(),
+        )
+        val primaryFunctionNames = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
+            .filterIsInstance<KSClassDeclaration>()
+            .mapNotNull { symbol ->
+                val annotation = symbol.annotations.firstOrNull { it.shortName.asString() == "PrimaryFunction" }
+                annotation?.arguments?.firstOrNull()?.value as? String
+            }
+            .toSet()
 
         val cachedStates = readStateFile()
         val newStates = mutableMapOf<String, FileState>()
@@ -54,7 +69,10 @@ class ModuleProcessor(
 
         val dirtyCount = symbols.count { it.containingFile?.filePath in dirtyFilePaths }
         val cachedCount = symbols.size - dirtyCount
-        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion ($dirtyCount revalidated, $cachedCount from cache)")
+        logger.warn(
+            "Found ${symbols.size.withPlural("symbol")} with @SkyHanniModule for mc $mcVersion " +
+                "($dirtyCount revalidated, $cachedCount from cache)",
+        )
 
         if (dirtyFilePaths.isEmpty()) {
             val outputFile = stateFile?.parentFile?.let {
@@ -68,7 +86,9 @@ class ModuleProcessor(
             logger.warn("No @SkyHanniModule files changed but LoadedModules.kt is missing, regenerating")
         }
 
-        val validSymbols = symbols.mapNotNull { validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths) }
+        val validSymbols = symbols.mapNotNull {
+            validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths, primaryFunctionNames)
+        }
         if (validSymbols.isNotEmpty()) generateFile(validSymbols)
         writeStateFile(newStates)
         return emptyList()
@@ -97,7 +117,11 @@ class ModuleProcessor(
     private fun writeStateFile(states: Map<String, FileState>) {
         val file = stateFile ?: return
         file.parentFile?.mkdirs()
-        file.writeText(states.entries.joinToString("\n") { (path, state) -> "$path|${state.mtime}|${state.crc}" })
+        file.writeText(
+            states.entries.joinToString("\n") { (path, state) ->
+                "$path|${state.mtime}|${state.crc}"
+            },
+        )
     }
 
     private fun processBuildPaths(symbols: List<KSAnnotated>): List<KSAnnotated> {
@@ -119,7 +143,11 @@ class ModuleProcessor(
      * @param isDirty Whether the symbol's source file is new or modified since the last build.
      *                If false, expensive type resolution is skipped as the symbol was already validated.
      */
-    private fun validateSymbol(symbol: KSAnnotated, isDirty: Boolean): KSClassDeclaration? {
+    private fun validateSymbol(
+        symbol: KSAnnotated,
+        isDirty: Boolean,
+        primaryFunctionNames: Set<String>,
+    ): KSClassDeclaration? {
         if (!symbol.validate()) {
             logger.warn("Symbol is not valid: $symbol")
             return null
@@ -134,20 +162,65 @@ class ModuleProcessor(
         }
 
         if (isDirty) {
-            val className = symbol.qualifiedName?.asString() ?: "unknown"
             for (function in symbol.getDeclaredFunctions()) {
                 if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
                     val event = skyHanniEvent ?: return symbol
-                    val firstParam = function.parameters.firstOrNull()?.type?.resolve()
-                    val eventType = function.annotations.find { it.shortName.asString() == "HandleEvent" }
-                        ?.arguments?.find { it.name?.asString() == "eventType" }?.value
-                    if ((firstParam == null && eventType == null) || (firstParam != null && !event.isAssignableFrom(firstParam)))
-                        warnings.add("Function in $className must have an event assignable from $event because it is annotated with @HandleEvent")
+                    val handleEvent = function.annotations.find { it.shortName.asString() == "HandleEvent" }
+                    val eventParameterType = function.extensionReceiver?.resolve()
+                        ?: function.parameters.firstOrNull()?.type?.resolve()
+                    val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
+                    val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
+                    val hasExplicitEventSpec = handleEvent?.hasExplicitEventSpec() == true
+                    val name = (function.qualifiedName ?: function.simpleName).asString()
+
+                    when (parameterCount) {
+                        0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
+                            warnings.add(
+                                "Function $name must have an event parameter, a primary function " +
+                                    "name, or an explicit event specification because it is " +
+                                    "annotated with @HandleEvent",
+                            )
+                        }
+
+                        1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
+                            warnings.add(
+                                "Function $name must have an event assignable from $event " +
+                                    "because it is annotated with @HandleEvent",
+                            )
+                        }
+
+                        else -> warnings.add(
+                            "Function $name has too many parameters. It must have exactly one " +
+                                "event parameter, or be parameterless with a primary function " +
+                                "name or an explicit event specification because it is annotated " +
+                                "with @HandleEvent",
+                        )
+                    }
                 }
             }
         }
 
         return symbol
+    }
+
+    private fun KSAnnotation.hasExplicitEventSpec(): Boolean {
+        val location = location as? FileLocation ?: return false
+        val file = File(location.filePath)
+        if (!file.exists()) return false
+
+        val lines = file.readLines()
+        val startIndex = (location.lineNumber - 1).coerceAtLeast(0)
+        val endIndex = minOf(lines.size, startIndex + 12)
+        val snippet = buildString {
+            for (index in startIndex until endIndex) {
+                append(lines[index])
+                append('\n')
+                if (lines[index].contains("fun ")) break
+            }
+        }
+
+        val annotationText = snippet.substringAfter("@HandleEvent", "")
+        return annotationText.contains("::class")
     }
 
     private fun isDevOnly(klass: KSClassDeclaration): Boolean =
@@ -157,27 +230,41 @@ class ModuleProcessor(
     private fun generateFile(symbols: List<KSClassDeclaration>) {
         if (warnings.isNotEmpty()) {
             warnings.forEach { logger.warn(it) }
-            error("${warnings.size} errors related to event annotations found, please fix them before continuing. Click on the kspKotlin build log for more information.")
+            error(
+                "${warnings.size.withPlural("error")} related to event annotations found, please " +
+                    "fix them before continuing. Click on the kspKotlin build log for more " +
+                    "information.",
+            )
         }
 
         val sources = symbols.mapNotNull { it.containingFile }.toTypedArray()
-        val file = codeGenerator.createNewFile(Dependencies(true, *sources), "at.hannibal2.skyhanni.skyhannimodule", "LoadedModules")
+        val file = codeGenerator.createNewFile(
+            Dependencies(true, *sources),
+            "at.hannibal2.skyhanni.skyhannimodule",
+            "LoadedModules",
+        )
         OutputStreamWriter(file).use {
-            it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
-            it.write("@Suppress(\"LargeClass\")\n")
-            it.write("object LoadedModules {\n")
-            it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
-            it.write("    val modules: List<Any> = buildList {\n")
+            it.appendLine(
+                """
+                |package at.hannibal2.skyhanni.skyhannimodule
+                |
+                |@Suppress("LargeClass")
+                |object LoadedModules {
+                |    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment
+                |    val modules: List<Any> = buildList {
+            """.trimMargin(),
+            )
             symbols.forEach { symbol ->
-                if (isDevOnly(symbol)) {
-                    it.write("        if (isDev) add(${symbol.qualifiedName!!.asString()})\n")
-                } else {
-                    it.write("        add(${symbol.qualifiedName!!.asString()})\n")
-                }
+                val prefix = if (isDevOnly(symbol)) "if (isDev) " else ""
+                it.appendLine("        ${prefix}add(${symbol.qualifiedName!!.asString()})")
             }
-            it.write("    }\n")
-            it.write("}\n")
+            it.appendLine(
+                """
+                |    }
+                |}
+            """.trimMargin(),
+            )
         }
-        logger.warn("Generated LoadedModules file with ${symbols.size} modules")
+        logger.info("Generated LoadedModules file with ${symbols.size.withPlural("module")}")
     }
 }
