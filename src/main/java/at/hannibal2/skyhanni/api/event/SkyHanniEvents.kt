@@ -93,8 +93,8 @@ object SkyHanniEvents {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
-        disabledHandlers = data.disabledHandlers.orEmpty()
-        disabledHandlerInvokers = data.disabledInvokers.orEmpty()
+        disabledHandlers = data.disabledHandlers
+        disabledHandlerInvokers = data.disabledInvokers
     }
 
     val seconds = listOf(10, 60, 60 * 5)
