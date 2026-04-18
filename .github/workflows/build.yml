@@ -15,6 +15,7 @@ on:
 permissions: write-all
 jobs:
     build:
+        if: false # Temporarily disabled due to vulnerability
         runs-on: ubuntu-latest
         name: "Build and test"
         steps:
@@ -66,6 +67,7 @@ jobs:
                     if-no-files-found: warn
 
     preprocess:
+        if: false # Temporarily disabled due to vulnerability
         runs-on: ubuntu-latest
         name: "Build multi version"
         steps:
