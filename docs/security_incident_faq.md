@@ -1,5 +1,5 @@
 
-**SkyHanni got hacked on 2026-04-18 (UTC). An attacker found a way to upload malicious mod versions to our GitHub releases for a short period of time. Current data shows a very small number of affected users, though an exact total cannot be confirmed. No maintainer account was accessed, and Modrinth downloads were unaffected.** **You are potentially at risk if:**
+**SkyHanni got hacked on April 18, 2026 at 00:01 UTC. An attacker found a way to upload malicious mod versions to our GitHub releases for a short period of time. Current data shows a very small number of affected users, though an exact total cannot be confirmed. No maintainer account was accessed, and Modrinth downloads were unaffected.** **You are potentially at risk if:**
 * **You downloaded ANY version of SkyHanni 8.x.x from GitHub.**
 * **You manually downloaded from GitHub Releases during the affected window (see FAQ for times).**
 * **Your game pulled an update via the GitHub auto-updater during the affected window AND you have restarted your game since then.**
@@ -13,7 +13,7 @@
 
 # SkyHanni Security Incident FAQ
 
-On 2026-04-18 (UTC), an attacker uploaded malicious SkyHanni versions through stolen GitHub Actions tokens. This document covers what happened, who is affected, and what you should do.
+On April 18, 2026 at 00:01 UTC, an attacker uploaded malicious SkyHanni versions through stolen GitHub Actions tokens. This document covers what happened, who is affected, and what you should do.
 
 ## 1. What happened?
 
