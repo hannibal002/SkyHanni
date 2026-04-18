@@ -8,6 +8,7 @@ on:
 
 jobs:
     remove_very_soon:
+        if: false # Temporarily disabled due to vulnerability
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v6

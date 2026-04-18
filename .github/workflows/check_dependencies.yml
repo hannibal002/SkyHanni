@@ -10,6 +10,7 @@ permissions:
 
 jobs:
     check-dependencies:
+        if: false # Temporarily disabled due to vulnerability
         runs-on: ubuntu-latest
         steps:
             -   name: Check out the repository

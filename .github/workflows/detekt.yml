@@ -13,6 +13,7 @@ permissions:
 
 jobs:
     detekt:
+        if: false # Temporarily disabled due to vulnerability
         name: Run detekt
         runs-on: ubuntu-latest
         concurrency:
@@ -91,6 +92,7 @@ jobs:
                     path: detekt_output.txt
 
     detekt_comment:
+        if: false # Temporarily disabled due to vulnerability
         name: Comment detekt failures on PR
         runs-on: ubuntu-latest
         concurrency:

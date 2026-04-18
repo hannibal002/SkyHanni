@@ -6,7 +6,8 @@ on:
 
 jobs:
     assign-label:
-        if: github.event.pull_request.state == 'open'
+        #if: github.event.pull_request.state == 'open'
+        if: false # Temporarily disabled due to vulnerability
         runs-on: ubuntu-latest
         permissions:
             issues: write

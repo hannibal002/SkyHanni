@@ -11,6 +11,7 @@ on:
 
 jobs:
     conflicts:
+        if: false # Temporarily disabled due to vulnerability
         runs-on: ubuntu-latest
         permissions:
             contents: read
