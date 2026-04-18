@@ -1,5 +1,5 @@
 
-**SkyHanni got hacked on 2026-04-17. An attacker found a way to upload malicious mod versions to our GitHub releases for a short period of time. Current data shows a very small number of affected users, though an exact total cannot be confirmed. No maintainer account was accessed, and Modrinth downloads were unaffected.** **You are potentially at risk if:**
+**SkyHanni got hacked on 2026-04-18 (UTC). An attacker found a way to upload malicious mod versions to our GitHub releases for a short period of time. Current data shows a very small number of affected users, though an exact total cannot be confirmed. No maintainer account was accessed, and Modrinth downloads were unaffected.** **You are potentially at risk if:**
 * **You downloaded ANY version of SkyHanni 8.x.x from GitHub.**
 * **You manually downloaded from GitHub Releases during the affected window (see FAQ for times).**
 * **Your game pulled an update via the GitHub auto-updater during the affected window AND you have restarted your game since then.**
@@ -13,7 +13,7 @@
 
 # SkyHanni Security Incident FAQ
 
-On 2026-04-17, an attacker uploaded malicious SkyHanni versions through stolen GitHub Actions tokens. This document covers what happened, who is affected, and what you should do.
+On 2026-04-18 (UTC), an attacker uploaded malicious SkyHanni versions through stolen GitHub Actions tokens. This document covers what happened, who is affected, and what you should do.
 
 ## 1. What happened?
 
@@ -33,11 +33,11 @@ Compromised versions on GitHub Releases:
 
 | Version | Start Time (UTC)    | End Time (UTC)      | Duration |
 |---------|---------------------|---------------------|----------|
-| 7.0.0   | 2026-04-17 09:21:44 | 2026-04-17 10:04:30 | ~50 min  |
-| 7.16.1  | 2026-04-17 09:21:44 | 2026-04-17 10:04:30 | ~50 min  |
-| 8.0.0   | 2026-04-17 09:21:44 | 2026-04-17 09:31:31 | ~10 min  |
-| 8.0.1   | 2026-04-17 09:45:36 | 2026-04-17 09:46:36 | <1 min   |
-| 8.0.2   | 2026-04-17 09:47:13 | 2026-04-17 09:48:13 | <1 min   |
+| 7.0.0   | 2026-04-18 00:01:44 | 2026-04-18 00:44:30 | ~45 min  |
+| 7.16.1  | 2026-04-18 00:01:44 | 2026-04-18 00:44:30 | ~45 min  |
+| 8.0.0   | 2026-04-18 00:01:44 | 2026-04-18 00:11:31 | ~10 min  |
+| 8.0.1   | 2026-04-18 00:25:36 | 2026-04-18 00:26:36 | <1 min   |
+| 8.0.2   | 2026-04-18 00:27:13 | 2026-04-18 00:28:13 | <1 min   |
 
 
 If your mod was not downloaded or updated during these windows, you are not affected.
