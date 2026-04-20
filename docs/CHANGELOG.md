@@ -126,6 +126,7 @@
 + Added 21 more /shachievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5489)
 + Added `/shrpcrestart` to restart Discord Rich Presence. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5537)
 + Added Rosewater Flask search tag to options related to evolving items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5525)
++ Improved Sirih Helper to also work when clicking Sirih with an Abiphone while in Pig form. - Luna (https://github.com/hannibal002/SkyHanni/pull/5586)
 
 #### Garden
 
@@ -146,6 +147,7 @@
 + Fixed Greenhouse Growth Stage alert sometimes sending multiple times. - Luna (https://github.com/hannibal002/SkyHanni/pull/5438)
 + Fixed being able to set Sensitivity Reducer reduction factor to invalid values, causing glitched head movement. - Luna (https://github.com/hannibal002/SkyHanni/pull/5536)
 + Fixed Mute Fusion Machine not working if you're too far away. - Luna (https://github.com/hannibal002/SkyHanni/pull/5526)
++ Fixed the Composter Display showing when disabled. - Alex (https://github.com/hannibal002/SkyHanni/pull/5574)
 
 #### Combat
 
@@ -182,6 +184,7 @@
 + Fixed Active Effects and Cookie Buff in Compact Tab List having really long text when inactive. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
 + Fixed Active Effects in Compact Tab List being split into two lines when they shouldn't. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
 + Fixed unpredictable SHWords replacements on 1.21.11. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5342)
++ Fixed error with SkyBlock Profile Viewer for players that have no selected Crimson Isle faction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5593)
 
 #### Item Ability
 
@@ -199,6 +202,7 @@
 + Fixed Shiny Orb Tracker not working with revamped Year of the Pig event. - Luna (https://github.com/hannibal002/SkyHanni/pull/5421)
 + Updated Shiny Orb Tracker to work after Shiny Shard rename to Shiny Token. - Luna (https://github.com/hannibal002/SkyHanni/pull/5518)
 + Fixed errors about Alixer and Bingo NPC in chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/5508)
++ Fixed Easter Egg waypoint not working. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5590)
 
 #### Fishing
 
@@ -235,6 +239,9 @@
 + Fixed error reading items in ItemPickupLog. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5444)
 + Fixed Ultrasequencer Helper missing first round. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5498)
 + Fixed lags when dealing with pets. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5545)
++ Fixed error causing Reforge Helper to fail to prevent reforges in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/5530)
++ Fixed some enchantments being named Combinable in the Anvil instead of their actual name in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5582)
++ Fixed Wardrobe background rendering over entities. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5577)
 
 #### Misc
 
@@ -268,6 +275,10 @@
 + Fixed issues trying to download NEU repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5517)
 + Fixed Lobby Easter Egg Waypoints. - L3Cache (https://github.com/hannibal002/SkyHanni/pull/5542)
 + Fixed the mod sometimes saying Control (Ctrl) even when the Command (Cmd) key is expected on macOS. - Luna (https://github.com/hannibal002/SkyHanni/pull/5525)
++ Fixed Bazaar price update sometimes happening more often than it should and causing chat spam/game freezes. - Luna (https://github.com/hannibal002/SkyHanni/pull/5585)
++ Fixed Hide Far Deaths incorrectly hiding the player's own deaths. - Luna (https://github.com/hannibal002/SkyHanni/pull/5592)
++ Fixed Lumber Jack NPC coordinates in Foraging Tutorial Quest. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5590)
++ Fixed Reindrake LS Sphere being on by default. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5557)
 
 #### Commands
 
@@ -454,6 +465,8 @@
 + Replaced lots of feature `isEnabled()` functions with new `HandleEvent` params. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5419)
 + Reworked the `RepoLogger` to extend `SkyHanniLogger`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5517)
 + Updated Kotlin language version from 2.0 to 2.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/5460)
++ Changed sea creature catch detection to use the message without color codes. - Luna (https://github.com/hannibal002/SkyHanni/pull/5528)
+    + The version with color codes should still be added as `alternate_messages` to the repo to not break older mod versions until Hypixel drops 1.21.11 support.
 
 ### Removed Features
 
