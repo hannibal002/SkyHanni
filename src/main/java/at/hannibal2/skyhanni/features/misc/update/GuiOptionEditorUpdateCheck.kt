@@ -27,8 +27,6 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         button.text = when (UpdateManager.updateState) {
             UpdateManager.UpdateState.AVAILABLE -> "Download update"
-            UpdateManager.UpdateState.QUEUED -> "Downloading..."
-            UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
         button.width = button.getWidth(context)
@@ -40,18 +38,6 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         }
 
         val widthRemaining = adjustedWidth - max(button.width, changelog.width) - 10
-
-        if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
-            context.drawStringCenteredScaledMaxWidth(
-                "§aThe update will be installed after your next restart.".asStructuredText(),
-                fr,
-                widthRemaining / 2F,
-                40F,
-                true,
-                widthRemaining,
-                -1,
-            )
-        }
 
         context.scale(2F, 2F)
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
@@ -86,9 +72,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (isInside(getButtonPosition(width - 20), height = 10, button)) {
             when (UpdateManager.updateState) {
-                UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
-                UpdateManager.UpdateState.QUEUED -> {}
-                UpdateManager.UpdateState.DOWNLOADED -> {}
+                UpdateManager.UpdateState.AVAILABLE -> UpdateManager.openDownloadPage()
                 UpdateManager.UpdateState.NONE -> UpdateManager.checkUpdate()
             }
             return true

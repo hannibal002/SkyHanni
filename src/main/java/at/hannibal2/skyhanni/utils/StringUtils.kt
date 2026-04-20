@@ -591,4 +591,6 @@ object StringUtils {
     }
 
     fun String.addSkyHanniUtm(): String = "$this?utm_source=SkyHanni"
+
+    fun Map<String, Any>.toQueryString(): String = "?" + map { (k, v) -> "$k=$v" }.joinToString("&")
 }
