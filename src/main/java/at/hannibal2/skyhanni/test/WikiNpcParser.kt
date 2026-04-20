@@ -33,7 +33,7 @@ object WikiNpcParser {
         "Rift Dimension" to IslandType.THE_RIFT,
     )
 
-    fun parse(text: String): Map<IslandType, Map<String, LorenzVec>> {
+    fun parse(text: String): MutableMap<IslandType, MutableMap<String, LorenzVec>> {
         val result = mutableMapOf<IslandType, MutableMap<String, LorenzVec>>()
         var currentIsland: IslandType? = null
 

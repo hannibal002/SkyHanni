@@ -28,7 +28,7 @@ object WikiNpcComparator {
             legacyCallbackArgs {
                 CoroutineSettings("compare wiki npc data").launchCoroutine {
                     val result = mutableListOf<String>()
-                    val wikiNpcs = loadWiki(result) ?: return@launchCoroutine
+                    val wikiNpcs = customRules(loadWiki(result)) ?: return@launchCoroutine
                     val shNpcs = loadShNpcs(result) ?: return@launchCoroutine
                     compare(result, shNpcs, wikiNpcs)
                 }
@@ -36,7 +36,22 @@ object WikiNpcComparator {
         }
     }
 
-    private fun loadWiki(result: MutableList<String>): Map<IslandType, Map<String, LorenzVec>>? {
+    private fun customRules(raw: MutableMap<IslandType, MutableMap<String, LorenzVec>>?): MutableMap<IslandType, MutableMap<String, LorenzVec>>? {
+        if (raw == null) return null
+        for ((island, names) in raw) {
+            for ((name, location) in names.toMutableMap()) {
+                if (name.contains(" (Dwarven)")) {
+                    val updatedName = name.removeSuffix(" (Dwarven)")
+                    names[updatedName] = location
+                    names.remove(name)
+                }
+            }
+        }
+
+        return raw
+    }
+
+    private fun loadWiki(result: MutableList<String>): MutableMap<IslandType, MutableMap<String, LorenzVec>>? {
         val clipboard = OSUtils.readFromClipboard() ?: run {
             ChatUtils.userError("clipboard does not contain a string")
             return null
@@ -57,28 +72,38 @@ object WikiNpcComparator {
     }
 
     // TODO do this once on skyblock join, then store until repo reload.
-    private suspend fun loadShNpcs(result: MutableList<String>): MutableMap<IslandType, Map<String, LorenzVec>>? {
-        val shNpcs = mutableMapOf<IslandType, Map<String, LorenzVec>>()
+    private suspend fun loadShNpcs(result: MutableList<String>): MutableMap<IslandType, MutableMap<String, LorenzVec>>? {
+        val shNpcs = mutableMapOf<IslandType, MutableMap<String, LorenzVec>>()
+
+        val islands = mutableMapOf<String, IslandType>()
         for (islandType in IslandType.entries) {
             if (islandType in IslandTypeTag.NO_FIXED_NPC_LOCATIONS) continue
+            islands[islandType.name] = islandType
+        }
+        islands["GLACITE_TUNNELS"] = IslandType.DWARVEN_MINES
+
+        for ((name, type) in islands) {
             val graph = runCatching {
                 SkyHanniRepoManager.getRepoDataAsync<Graph>(
-                    "constants/island_graphs", islandType.name, gson = Graph.gson,
+                    "constants/island_graphs", name, gson = Graph.gson,
                 )
             }.getOrElse {
-                result.add("failed to load island graph for island $islandType")
+                result.add("failed to load island graph for island $name")
                 continue
             }
 
             val npcs = mutableMapOf<String, LorenzVec>()
             for (node in graph) {
                 if (node.hasTag(GraphNodeTag.NPC)) {
-                    val name = node.name ?: error("name is null for npc node at ${node.position} in island $islandType")
+                    val name = node.name ?: error("name is null for npc node at ${node.position} in island $name")
                     npcs[name] = node.position
                 }
             }
-            if (npcs.isNotEmpty()) shNpcs[islandType] = npcs
+            if (npcs.isNotEmpty()) {
+                shNpcs.getOrPut(type) { mutableMapOf() }.putAll(npcs)
+            }
         }
+
         val total = shNpcs.values.sumOf { it.size }
         result.add("found in total $total npcs in sh repo")
         if (total == 0) {
@@ -121,10 +146,18 @@ object WikiNpcComparator {
 
                     shPos != null && wikiPos != null -> {
                         val dist = shPos.distance(wikiPos)
+                        /**
+                         * this cant be a precise check.
+                         * the wiki uses the block location the npc stands on,
+                         * and skyhanni uses the location of where the user should stand when talking to the npc
+                         * so this is almost never 0 block distance, and often even 2 blocks distance.
+                         */
                         if (dist > 3.0) {
-                            mismatch.add("$name: ${dist.roundTo(1)} blocks away\n" +
-                                "      sh: ${shPos.toChatFormat()}\n" +
-                                "      wiki: ${wikiPos.toChatFormat()}")
+                            mismatch.add(
+                                "$name: ${dist.roundTo(1)} blocks away\n" +
+                                    "      sh: ${shPos.toChatFormat()}\n" +
+                                    "      wiki: ${wikiPos.toChatFormat()}",
+                            )
                         } else {
                             allFine++
                         }

@@ -37,7 +37,6 @@ object NavigationHelper {
         GraphNodeTag.GRIND_MOBS,
         GraphNodeTag.GRIND_ORES,
         GraphNodeTag.GRIND_CROPS,
-        GraphNodeTag.MINES_EMISSARY,
         GraphNodeTag.CRIMSON_MINIBOSS,
     )
 
