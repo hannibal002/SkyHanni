@@ -128,6 +128,7 @@ object RiftWiltedBerberisHelper {
             isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
 
+        // ToDo: when warping back into the lobby after only seeing a partial sequence and the first being broken, the sequence is stuck with invalid renders, could not recreate
         if (!config.respawnSequence) return
         for ((center, seq) in fieldSequences) {
             if (seq.sequence.isEmpty()) continue
@@ -315,9 +316,10 @@ object RiftWiltedBerberisHelper {
             }
         }
 
-        // Suppress particle rendering while sequence is active
+        // Suppress particles whenever the sequence renderer is active
+        // ToDo: for some reason not working on partial sequences even if condition true while debugging
         val sequenceIsGuiding = config.respawnSequence &&
-            fieldSequences.values.any { it.isValid && it.isRendering && it.currentTarget != null }
+            fieldSequences.values.any { it.isRendering && !it.isAway && it.currentTarget != null }
         if (sequenceIsGuiding) return
 
         for (berberis in list) {
@@ -357,6 +359,7 @@ object RiftWiltedBerberisHelper {
         }
     }
 
+    // ToDo: It might be possible to not instantly invalidate but instead check if there is a start point in the sequence which works and skip forward to that
     private fun validateSequence(seq: BerberisSequence) {
         for ((index, location) in seq.sequence.withIndex()) {
             val block = location.getBlockAt()
