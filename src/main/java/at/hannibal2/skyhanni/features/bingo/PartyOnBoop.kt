@@ -23,18 +23,20 @@ object PartyOnBoop {
      * REGEX-TEST: Boop!
      */
     private val boopPattern by patternGroup.pattern(
-        "boop",
+        "boop.colorless",
         "Boop!",
     )
 
     @HandleEvent
     fun onPrivateMessageChat(event: PrivateMessageChatEvent.Allow) {
         if (!isEnabled()) return
-        val username = event.author.cleanPlayerName(displayName = true)
-        if (username == PlayerUtils.getName()) return
         if (event.direction == Direction.OUTGOING) return
+
         val message = event.messageComponent.intoComponent()
         if (!boopPattern.matches(message)) return
+
+        val username = event.author.cleanPlayerName(displayName = true)
+        if (username == PlayerUtils.getName()) return
 
         ChatUtils.clickableChat(
             "Click to invite $username §eto the party!",
