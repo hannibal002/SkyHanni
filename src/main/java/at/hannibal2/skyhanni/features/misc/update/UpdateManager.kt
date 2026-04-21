@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -57,8 +58,8 @@ object UpdateManager {
         return potentialUpdate?.update?.versionNumber?.asString
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         SkyHanniMod.feature.about.updateStream.onToggle {
             reset()
         }
@@ -120,20 +121,18 @@ object UpdateManager {
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
-                    if (config.fullAutoUpdates || forceDownload) {
-                        ChatUtils.chat(
-                            componentBuilder {
-                                append("SkyHanni found a new update: ${it.update.versionName}, starting to download now.")
-                                withColor(ChatFormatting.GREEN)
-                            }
-                        )
-                        queueUpdate()
-                    } else if (config.checkForUpdates) {
-                        ChatUtils.chatAndOpenConfig(
-                            "§aSkyHanni found a new update: ${it.update.versionName}. " +
-                                "Check §b/sh download update §afor more info.",
-                            config::checkForUpdates,
-                        )
+//                     if (config.fullAutoUpdates || forceDownload) {
+//                         ChatUtils.chat(
+//                             componentBuilder {
+//                                 append("SkyHanni found a new update: ${it.update.versionName}, starting to download now.")
+//                                 withColor(ChatFormatting.GREEN)
+//                             }
+//                         )
+//                         queueUpdate()
+//                     } else
+                    if (config.checkForUpdates) {
+                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}.")
+                        suggestModrinth()
                         ChatUtils.clickableChat(
                             "§e§lCLICK HERE §r§eto view changes.",
                             onClick = {
@@ -146,7 +145,7 @@ object UpdateManager {
                         componentBuilder {
                             append("SkyHanni didn't find a new update.")
                             withColor(ChatFormatting.GREEN)
-                        }
+                        },
                     )
                 }
             },
@@ -155,23 +154,31 @@ object UpdateManager {
     }
 
     fun queueUpdate() {
-        if (updateState != UpdateState.AVAILABLE) {
-            logger.log("Trying to enqueue an update while another one is already downloaded or none is present")
-        }
-        updateState = UpdateState.QUEUED
-        activePromise = CompletableFuture.supplyAsync {
-            logger.log("Update download started")
-            potentialUpdate!!.prepareUpdate()
-        }.thenAcceptAsync(
-            {
-                logger.log("Update download completed, setting exit hook")
-                updateState = UpdateState.DOWNLOADED
-                potentialUpdate!!.executePreparedUpdate()
-                ChatUtils.chat("Download of update complete. ")
-                ChatUtils.chat("§aThe update will be installed after your next restart.")
-            },
-            Minecraft.getInstance(),
-        )
+        logger.log("auto updating is manually disabled for now.")
+        suggestModrinth()
+//         if (updateState != UpdateState.AVAILABLE) {
+//             logger.log("Trying to enqueue an update while another one is already downloaded or none is present")
+//         }
+//         updateState = UpdateState.QUEUED
+//         activePromise = CompletableFuture.supplyAsync {
+//             logger.log("Update download started")
+//             potentialUpdate!!.prepareUpdate()
+//         }.thenAcceptAsync(
+//             {
+//                 logger.log("Update download completed, setting exit hook")
+//                 updateState = UpdateState.DOWNLOADED
+//                 potentialUpdate!!.executePreparedUpdate()
+//                 ChatUtils.chat("Download of update complete. ")
+//                 ChatUtils.chat("§aThe update will be installed after your next restart.")
+//             },
+//             Minecraft.getInstance(),
+//         )
+    }
+
+    private fun suggestModrinth() {
+        ChatUtils.clickableChat("§eClick here to manually download the version from Modrinth.", onClick = {
+            OSUtils.openBrowser("https://modrinth.com/mod/skyhanni")
+        })
     }
 
     private val context = UpdateContext(
