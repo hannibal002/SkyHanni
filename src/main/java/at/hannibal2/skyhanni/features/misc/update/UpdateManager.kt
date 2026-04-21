@@ -338,7 +338,7 @@ object UpdateManager {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(130, "about.updateStream") { element ->
+        event.transform(131, "about.updateStream") { element ->
             when (element.asString) {
                 "NONE" -> JsonPrimitive(if (SkyHanniMod.isBetaVersion) "BETA" else "RELEASES")
                 else -> element
