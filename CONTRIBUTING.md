@@ -337,10 +337,11 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 ### Elite Farmers API
 
 SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for
-some farming features.
+some farming features and for LBIN price data.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience.
-All data sent is anonymized and opt-in.
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players 
+for convenience. Features that upload data to the Elite API are optional and opt-in. All requests to 
+the Elite API are subject to its [privacy policy](https://eliteskyblock.com/privacy).
 
 ### Mixin
 
