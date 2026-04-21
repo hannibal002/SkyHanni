@@ -96,6 +96,8 @@ object ChangelogViewer {
                             .assertSuccessWithData()
                             ?: error("Changelog Loading Failed")
 
+                        // We cannot use ConfigManager.gson here because it excludes fields without
+                        // @Expose annotations, and GithubRelease comes from libautoupdate
                         val page = Gson().fromJson<List<GithubRelease>>(jsonObject)
 
                         addAll(page)
