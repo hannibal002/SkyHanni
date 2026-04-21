@@ -10,7 +10,6 @@ import moe.nea.libautoupdate.UpdateData
 import java.util.concurrent.CompletableFuture
 import java.util.Locale
 
-
 class ModrinthUpdateSource(private val projectId: String, private val slug: String) : JsonUpdateSource() {
 
     override fun getGson(): Gson = ConfigManager.gson
