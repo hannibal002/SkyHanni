@@ -73,6 +73,7 @@ object PestSpawnTimer {
     private var longestCropBrokenTime: Duration = 0.seconds
     private var pestSpawned = false
     private var hasWarned = false
+    private var hasReminderShown = false
     private var maxPests = false
     private var ready = false
     private var shouldRender = false
@@ -107,6 +108,7 @@ object PestSpawnTimer {
 
             if (pestSpawned) {
                 hasWarned = false
+                hasReminderShown = false
                 pestSpawned = false
             }
         }
@@ -158,7 +160,9 @@ object PestSpawnTimer {
         if (shouldRepeatWarning) {
             countdownTitleContext?.stop()
             countdownTitleContext = null
-            countdownWarn(pestCooldownEndTime.timeUntil())
+            if (!pestCooldownEndTime.isInPast()) {
+                countdownWarn(pestCooldownEndTime.timeUntil())
+            }
         }
 
         if (hasWarned || !config.cooldownOverWarning) return
@@ -168,6 +172,7 @@ object PestSpawnTimer {
             cooldownExpired()
             return
         }
+        if (hasReminderShown) return
         if ((pestCooldownEndTime - (config.cooldownWarningTime.seconds + 1.seconds)).isInPast()) {
             cooldownReminder(pestCooldownEndTime)
         } else shouldRepeatWarning = false
@@ -265,6 +270,7 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
+        shouldRepeatWarning = false
         TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.notifyOrDisable(
             "§cPest spawn cooldown has expired!",
@@ -281,7 +287,7 @@ object PestSpawnTimer {
             option = config::cooldownOverWarning,
             messageId = cooldownOverMessageId,
         )
-        hasWarned = true
+        hasReminderShown = true
 
         if (config.repeatWarning) {
             countdownWarn(endTime.timeUntil())
