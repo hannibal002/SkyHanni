@@ -152,7 +152,7 @@ object UpdateManager {
                         updateState = UpdateState.AVAILABLE
                         ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
                         ChatUtils.clickableLinkChat(
-                            "§e§lCLICK HERE to manually download the update.",
+                            "§e§lCLICK HERE §r§eto open the download page.",
                             getDownloadPage(),
                         )
                         ChatUtils.clickableChat(
