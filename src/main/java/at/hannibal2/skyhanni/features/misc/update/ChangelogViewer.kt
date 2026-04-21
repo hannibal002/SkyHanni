@@ -122,7 +122,7 @@ object ChangelogViewer {
     private fun formatData(text: String): Map<String, List<String>> {
         var headline = 0
         return text // Bolding Markdown
-            .replace(trailingNewlinePattern, "") // Remove trailing empty Lines
+            .replace(trailingNewlinePattern, "") // Remove trailing empty lines
             .split(lineBreakPattern) // Split at newlines
             .map { it.trimEnd() } // Remove trailing empty stuff
             .groupBy {
