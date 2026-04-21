@@ -512,4 +512,9 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var achievementMessages: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts")
+    @ConfigEditorBoolean
+    var giftCleanDisplay: Boolean = false
 }
