@@ -15,10 +15,11 @@ class ModrinthUpdateSource(private val projectId: String, private val slug: Stri
     override fun getGson(): Gson = ConfigManager.gson
 
     fun getReleases(includeChangelog: Boolean = false): CompletableFuture<List<ModrinthRelease>?> =
+        // Modrinth API expects syntax like loaders=["fabric"]
         getJsonFromURL(
             "https://api.modrinth.com/v2/project/$projectId/version" + mapOf(
-                "loaders" to "fabric",
-                "game_versions" to PlatformUtils.MC_VERSION,
+                "loaders" to gson.toJson(listOf("fabric")),
+                "game_versions" to gson.toJson(listOf(PlatformUtils.MC_VERSION)),
                 "include_changelog" to includeChangelog,
             ).toQueryString(),
             object : TypeToken<List<ModrinthRelease>>() {}.type,
