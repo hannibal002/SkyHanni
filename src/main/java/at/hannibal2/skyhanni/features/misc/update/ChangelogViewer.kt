@@ -116,11 +116,14 @@ object ChangelogViewer {
     private fun formatChangelog(body: String): Map<String, List<String>> =
         formatData(formatString(getBasic(body)))
 
+    private val trailingNewlinePattern = "\\s*\r?\n$".toRegex()
+    private val lineBreakPattern = "\r?\n".toRegex()
+
     private fun formatData(text: String): Map<String, List<String>> {
         var headline = 0
         return text // Bolding Markdown
-            .replace("\\s*\r?\n$".toRegex(), "") // Remove trailing empty Lines
-            .split("\r?\n".toRegex()) // Split at newlines
+            .replace(trailingNewlinePattern, "") // Remove trailing empty Lines
+            .split(lineBreakPattern) // Split at newlines
             .map { it.trimEnd() } // Remove trailing empty stuff
             .groupBy {
                 if (it.startsWith("§l§9")) {
@@ -204,7 +207,7 @@ object ChangelogViewer {
         return if (!version.isValid()) {
             errorMessage =
                 "'$input' is not a valid mod version. Version Syntax is: 'Major.Beta.Patch' " +
-                "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
+                    "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
             null
         } else {
             version
