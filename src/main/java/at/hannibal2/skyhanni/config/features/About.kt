@@ -28,6 +28,7 @@ class About {
     @ConfigEditorBoolean
     var checkForUpdates: Boolean = true
 
+    // TODO change this somehow
     @ConfigOption(name = "Auto Updates", desc = "Automatically download new version on each startup")
     @Expose
     @FeatureToggle
