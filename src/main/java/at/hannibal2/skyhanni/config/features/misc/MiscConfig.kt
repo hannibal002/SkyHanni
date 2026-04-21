@@ -213,7 +213,7 @@ class MiscConfig {
     var crashOnDeath: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Creash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
+    @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
     @ConfigEditorBoolean
     var crashOnTTTFail: Boolean = false
 
