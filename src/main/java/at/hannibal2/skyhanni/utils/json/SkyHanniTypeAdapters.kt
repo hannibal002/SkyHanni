@@ -173,7 +173,7 @@ enum class SkyHanniTypeAdapters(
     ),
     TRACKER_DISPLAY_MODE(
         SkyHanniTracker.DefaultDisplayMode::class.java,
-        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>(),
     ),
     TIME_MARK(
         SimpleTimeMark::class.java,

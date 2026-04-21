@@ -7,8 +7,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import moe.nea.libautoupdate.JsonUpdateSource
 import moe.nea.libautoupdate.UpdateData
-import java.util.concurrent.CompletableFuture
 import java.util.Locale
+import java.util.concurrent.CompletableFuture
 
 class ModrinthUpdateSource(private val projectId: String, private val slug: String) : JsonUpdateSource() {
 
