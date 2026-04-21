@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 /**
  * This class handles the "am I in SkyBlock" and "what SkyBlock island am I on" checks.
- * For "Am i on hypixel" see [HypixelData].
+ * For "Am I on hypixel" see [HypixelData].
  */
 @SkyHanniModule
 object SkyBlockLocationData {

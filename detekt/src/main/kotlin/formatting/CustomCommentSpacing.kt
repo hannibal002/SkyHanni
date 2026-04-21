@@ -1,25 +1,14 @@
-package at.hannibal2.skyhanni.detektrules.formatting
+package formatting
 
-import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.CodeSmell
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
-import org.jetbrains.kotlin.com.intellij.psi.PsiComment
+import PreprocessingPattern.Companion.containsPreprocessingPattern
+import SkyHanniRule
+import com.intellij.psi.PsiComment
+import dev.detekt.api.Config
 
 /**
  * This rule enforces the default spacing rules for comments but ignores preprocessed comments.
  */
-class CustomCommentSpacing(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "CustomCommentSpacing",
-        Severity.Style,
-        "Enforces custom spacing rules for comments.",
-        Debt.FIVE_MINS
-    )
+class CustomCommentSpacing(config: Config) : SkyHanniRule(config, "Enforces custom spacing rules for comments.") {
 
     override fun visitComment(comment: PsiComment) {
         if (comment.text.containsPreprocessingPattern()) return

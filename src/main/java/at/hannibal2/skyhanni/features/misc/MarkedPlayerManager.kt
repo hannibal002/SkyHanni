@@ -91,6 +91,7 @@ object MarkedPlayerManager {
 
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
+    @Suppress("DEPRECATION")
     private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
         config.highlightInWorld.get()
 

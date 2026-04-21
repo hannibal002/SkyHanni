@@ -445,7 +445,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
@@ -459,6 +459,7 @@ object GardenNextJacobContest {
     }
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
+    @Suppress("DEPRECATION")
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically

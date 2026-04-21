@@ -94,7 +94,7 @@ open class TextInput {
                 if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) {
                     disable()
                 } else {
-                    ci.setReturnValue(false)
+                    ci.returnValue = false
                 }
                 return
             }

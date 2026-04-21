@@ -115,8 +115,8 @@ object SunGeckoHelper {
         display.add("§eSun Gecko $health")
         display.add("$actionBarFormatted §e§lCombo: x$combo")
 
-        // this is just a total guess but it looks right enough
-        // i think its inconsistent because of how often the action bar updates
+        // this is just a total guess, but it looks right enough
+        // I think its inconsistent because of how often the action bar updates
         var expiryTime = 4.seconds + 700.milliseconds
         if (InventoryUtils.isItemInInventory(COMBO_MANIA_TALISMAN)) {
             expiryTime += 500.milliseconds
@@ -240,10 +240,10 @@ object SunGeckoHelper {
 
             if (comboHitCount == 9 && totalHits == 8) {
 
-                // this is a hypixel bug
-                // it goes from 8/8 to 9/8 to 2/8
-                // the combo does not go up at 9/8
-                // so i guess the overlay is wrong but whatever
+                // This is a hypixel bug
+                // It goes from 8/8 to 9/8 to 2/8
+                // The combo does not go up at 9/8
+                // So, I guess the overlay is wrong but whatever
                 comboHitCount = 1
             }
             actionBarFormatted = "§a$comboHitCount/$totalHits"

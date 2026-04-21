@@ -244,7 +244,7 @@ object CollectionTracker {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         display?.let {
             SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(it, posLabel = "Collection Tracker")
         }

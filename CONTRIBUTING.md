@@ -41,7 +41,7 @@ downloaded. If not, you might need to link the Gradle project in the Gradle tab 
 </details>
 
 Make sure the Gradle JVM (found in the settings wheel in the Gradle tab, or by searching <kbd>Ctrl + Shift + A</kbd>
-for "Gradle JVM") is set to a Java 21 JDK.
+for "Gradle JVM") is set to a Java 25 JDK.
 
 <details>
 <summary>🖼️Show Gradle JVM image</summary>
@@ -50,7 +50,8 @@ for "Gradle JVM") is set to a Java 21 JDK.
 
 </details>
 
-Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java version for the project.
+Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
 
@@ -61,7 +62,7 @@ To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Proje
 
 </details>
 
-We want to set the project structure to use Java 21.
+We want to set the project structure to use Java 25.
 
 <details>
 <summary>🖼️ What you should set the project structure to be</summary>
@@ -90,7 +91,7 @@ configuration. If not, you can restart intellij and reload the gradle project ag
 
 </details>
 
-Select an appropriate Java 21 JDK (preferably [DCEVM](#hot-swap), but any Java 21 JDK will do).
+Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 25 JDK will do).
 
 <details>
 <summary>🖼️Show run configuration image</summary>
@@ -109,6 +110,7 @@ the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pu
 ### Creating a Pull Request
 
 If you are not very familiar with Git, you might want to check out some of these resources:
+
 - [GitHub docs](https://docs.github.com/en/get-started/learning-to-code/getting-started-with-git)
 - [Git tutorial video](https://www.youtube.com/watch?v=Ala6PHlYjmw)
 - [Learn Git Branching](https://learngitbranching.js.org)
@@ -206,7 +208,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with `@SkyHanniModule`
+    - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
+      `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
       the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
@@ -336,11 +339,12 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 
 ### Elite Farmers API
 
-SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for
-some farming features.
+SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for some farming
+features and for LBIN price data.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience.
-All data sent is anonymized and opt-in.
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience. Features that upload
+data to the Elite API are optional and opt-in. All requests to the Elite API are subject to
+its [privacy policy](https://eliteskyblock.com/privacy).
 
 ### Mixin
 

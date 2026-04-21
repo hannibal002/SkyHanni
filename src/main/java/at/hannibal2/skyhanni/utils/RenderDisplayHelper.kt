@@ -5,13 +5,14 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
 /**
  * RenderDisplayHelper determines when to render displays based on
  * conditions and context, such as whether the player is in their inventory or
- * outside of an inventory GUI, or in a inventory defined by InventoryDetector.
+ * outside an inventory GUI, or in an inventory defined by InventoryDetector.
  *
  * @property inventory set a InventoryDetector the display should be rendered in.
  * @property outsideInventory Specifies if the display should render when not inside any inventory.
@@ -53,13 +54,19 @@ class RenderDisplayHelper(
             val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.renderIn(isInOwnInventory)) {
-                    display.render()
+                    if (display.outsideInventory && isInOwnInventory) {
+                        InventoryGuiScaleCompat.withOriginalHudScale {
+                            display.render()
+                        }
+                    } else {
+                        display.render()
+                    }
                 }
             }
         }
 
         @HandleEvent
-        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
@@ -76,7 +83,7 @@ class RenderDisplayHelper(
         false
     }
 
-    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isCurrent()
+    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isInIsland()
 
     private fun render() {
         try {

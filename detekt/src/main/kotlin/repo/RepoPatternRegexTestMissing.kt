@@ -1,20 +1,11 @@
-package at.hannibal2.skyhanni.detektrules.repo
+package repo
 
-import at.hannibal2.skyhanni.detektrules.RepoPatternElement.Companion.asRepoPatternElement
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import RepoPatternElement.Companion.asRepoPatternElement
+import SkyHanniRule
+import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternRegexTestMissing(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "RepoPatternRegexTestMissing",
-        Severity.Style,
-        "All repo patterns must be accompanied by one or more regex test.",
-        Debt.FIVE_MINS,
-    )
+class RepoPatternRegexTestMissing(config: Config) : SkyHanniRule(config, "All repo patterns must be accompanied by one or more regex test.") {
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)

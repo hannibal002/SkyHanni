@@ -6,7 +6,7 @@ plugins {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 repositories {
@@ -27,5 +27,5 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    compilerOptions.jvmTarget.set(JvmTarget.fromTarget("21"))
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget("25"))
 }

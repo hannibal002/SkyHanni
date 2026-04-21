@@ -158,6 +158,11 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(name = "Boop Party", desc = "")
+    @Accordion
+    val boopParty: BoopPartyConfig = BoopPartyConfig()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
@@ -203,7 +208,7 @@ class MiscConfig {
     var brewingStandOverlay: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
+    @ConfigOption(name = "Crash on Death", desc = "Crashes your game every time you die in SkyBlock")
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
 
@@ -331,7 +336,7 @@ class MiscConfig {
     @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
-    // doesnt work properly
+    // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
         desc = "Remove ghost entities caused by a Hypixel bug.\n" +
@@ -393,10 +398,19 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fast Fairy Souls",
-        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ",
+        desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island.",
     )
     @ConfigEditorBoolean
     var fastFairySouls: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Spider Den Relic Pathfinder",
+        desc = "Uses a fast pathfinder route to get to all Relics in Spider's Den.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var spiderRelicPathfinder: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -489,4 +503,13 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     var rainbowActionBar: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Show Achievement Messages",
+        desc = "You can do §e/shachievements§7 to see them all!"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var achievementMessages: Boolean = true
 }
