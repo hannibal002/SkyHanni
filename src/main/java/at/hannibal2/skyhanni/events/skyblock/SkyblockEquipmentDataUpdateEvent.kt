@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.world.item.ItemStack
 
 /**
- * This Event Fires When the Equipment Inventory is fully opened or when the equipment is changed via Chat message.
+ * This event fires when the Equipment Inventory is fully opened or when the equipment is changed via Chat message.
+ * Fires for each slot independently.
  *
  * @param slot EquipmentSlot Enum Entry
  * @param newItemStack Item Stack (or Null when previously clicked is unknown) of the Equipment.

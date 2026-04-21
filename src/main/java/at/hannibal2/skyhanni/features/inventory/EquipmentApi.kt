@@ -47,8 +47,9 @@ object EquipmentApi {
     fun getAll(): List<ItemStack> = equipment?.filterNotNull() ?: emptyList()
 
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) {
-        equipment?.set(slot.ordinal, itemStack)
-        if (equipment != null) SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
+        val equipment = equipment ?: return
+        equipment[slot.ordinal] = itemStack
+        SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
     }
 
     private val repoGroup = RepoPattern.group("data.equipment")
@@ -96,7 +97,7 @@ object EquipmentApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Equipment")
         event.addIrrelevant {
             val storage = storage ?: run {
