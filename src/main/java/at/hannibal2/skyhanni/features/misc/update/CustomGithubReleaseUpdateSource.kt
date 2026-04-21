@@ -20,6 +20,8 @@ class CustomGithubReleaseUpdateSource(owner: String, repository: String) : Githu
             ?: throw IllegalStateException("No valid release found")
     }
 
+    public override fun getReleaseApiUrl(): String = super.getReleaseApiUrl()
+
     override fun findAsset(release: GithubRelease?): UpdateData? {
         release ?: return null
 

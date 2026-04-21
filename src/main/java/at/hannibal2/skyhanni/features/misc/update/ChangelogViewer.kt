@@ -28,8 +28,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChangelogViewer {
 
-    const val GITHUB_API_URL = "https://api.github.com/repos/hannibal002/SkyHanni/releases"
-
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -86,10 +84,11 @@ object ChangelogViewer {
             }
 
             SkyHanniUpdateSource.GITHUB -> {
+                val source = updateSource.source as CustomGithubReleaseUpdateSource
                 buildList {
                     var pageNumber = 1
                     while (true) {
-                        val pagedUrl = GITHUB_API_URL + mapOf(
+                        val pagedUrl = source.releaseApiUrl + mapOf(
                             "per_page" to 100,
                             "page" to pageNumber,
                         ).toQueryString()
