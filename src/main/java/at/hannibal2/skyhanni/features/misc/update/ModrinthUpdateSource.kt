@@ -16,7 +16,7 @@ class ModrinthUpdateSource(private val projectId: String, private val slug: Stri
 
     fun getReleases(includeChangelog: Boolean = false): CompletableFuture<List<ModrinthRelease>?> =
         getJsonFromURL(
-            String.format(Locale.ROOT, MODRINTH_API_URL, projectId) + mapOf(
+            "https://api.modrinth.com/v2/project/$projectId/version" + mapOf(
                 "loaders" to "fabric",
                 "game_versions" to PlatformUtils.MC_VERSION,
                 "include_changelog" to includeChangelog,
@@ -36,8 +36,4 @@ class ModrinthUpdateSource(private val projectId: String, private val slug: Stri
                     )
                 }
         }
-
-    companion object {
-        const val MODRINTH_API_URL = "https://api.modrinth.com/v2/project/%s/version"
-    }
 }
