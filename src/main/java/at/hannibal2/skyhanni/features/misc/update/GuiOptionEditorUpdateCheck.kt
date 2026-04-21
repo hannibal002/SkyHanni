@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -26,7 +27,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
-            UpdateManager.UpdateState.AVAILABLE -> "Download update"
+            UpdateManager.UpdateState.AVAILABLE -> "Manually download"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
         button.width = button.getWidth(context)
@@ -72,7 +73,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (isInside(getButtonPosition(width - 20), height = 10, button)) {
             when (UpdateManager.updateState) {
-                UpdateManager.UpdateState.AVAILABLE -> UpdateManager.openDownloadPage()
+                UpdateManager.UpdateState.AVAILABLE -> OSUtils.openBrowser(UpdateManager.getDownloadPage())
                 UpdateManager.UpdateState.NONE -> UpdateManager.checkUpdate()
             }
             return true

@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -151,13 +150,13 @@ object UpdateManager {
                     potentialUpdate = update
                     if (update.isUpdateAvailable) {
                         updateState = UpdateState.AVAILABLE
-                        ChatUtils.chatAndOpenConfig(
-                            "§aSkyHanni found a new update: ${update.update.versionName}. " +
-                                "Check §b/sh download update §afor more info.",
-                            config::currentVersion,
+                        ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
+                        ChatUtils.clickableLinkChat(
+                            "§e§lCLICK HERE to manually download the update.",
+                            getDownloadPage(),
                         )
                         ChatUtils.clickableChat(
-                            "§e§lCLICK HERE §r§eto view changes.",
+                            "§e§lCLICK HERE §r§eto view changes in-game.",
                             onClick = {
                                 ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.update.versionName)
                             },
@@ -175,14 +174,13 @@ object UpdateManager {
             )
     }
 
-    fun openDownloadPage() {
+    fun getDownloadPage(): String {
         val update = potentialUpdate ?: error("Attempted to open update download page with no known update")
-        val url = when (val data = update.update) {
+        return when (val data = update.update) {
             is ModrinthUpdateData -> data.htmlUrl
             is GithubReleaseUpdateData -> data.htmlUrl
             else -> error("Unsupported update data type: ${data.javaClass}")
         }
-        OSUtils.openBrowser(url)
     }
 
     private fun buildContext(updateSource: SkyHanniUpdateSource) = UpdateContext(
