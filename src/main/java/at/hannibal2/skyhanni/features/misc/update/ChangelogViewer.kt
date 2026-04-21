@@ -28,6 +28,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChangelogViewer {
 
+    private val gson = Gson()
+
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -98,7 +100,7 @@ object ChangelogViewer {
 
                         // We cannot use ConfigManager.gson here because it excludes fields without
                         // @Expose annotations, and GithubRelease comes from libautoupdate
-                        val page = Gson().fromJson<List<GithubRelease>>(jsonObject)
+                        val page = gson.fromJson<List<GithubRelease>>(jsonObject)
 
                         addAll(page)
 

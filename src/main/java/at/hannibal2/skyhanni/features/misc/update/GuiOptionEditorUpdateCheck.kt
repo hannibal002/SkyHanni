@@ -73,8 +73,11 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (isInside(getButtonPosition(width - 20), height = 10, button)) {
             when (UpdateManager.updateState) {
-                UpdateManager.UpdateState.AVAILABLE -> OSUtils.openBrowser(UpdateManager.getDownloadPage())
-                UpdateManager.UpdateState.NONE -> UpdateManager.checkUpdate()
+                UpdateManager.UpdateState.AVAILABLE ->
+                    UpdateManager.getDownloadPage()?.let(OSUtils::openBrowser)
+
+                UpdateManager.UpdateState.NONE ->
+                    UpdateManager.checkUpdate()
             }
             return true
         }

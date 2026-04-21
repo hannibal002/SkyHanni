@@ -104,6 +104,7 @@ object UpdateManager {
         updateState = UpdateState.NONE
         _activePromise = null
         potentialUpdate = null
+        hasCheckedForUpdate = false
         logger.log("Reset update state")
     }
 
@@ -151,10 +152,12 @@ object UpdateManager {
                     if (update.isUpdateAvailable) {
                         updateState = UpdateState.AVAILABLE
                         ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
-                        ChatUtils.clickableLinkChat(
-                            "§e§lCLICK HERE §r§eto open the download page.",
-                            getDownloadPage(),
-                        )
+                        getDownloadPage(update)?.let { url ->
+                            ChatUtils.clickableLinkChat(
+                                "§e§lCLICK HERE §r§eto open the download page.",
+                                url,
+                            )
+                        }
                         ChatUtils.clickableChat(
                             "§e§lCLICK HERE §r§eto view changes in-game.",
                             onClick = {
@@ -174,12 +177,25 @@ object UpdateManager {
             )
     }
 
-    fun getDownloadPage(): String {
-        val update = potentialUpdate ?: error("Attempted to open update download page with no known update")
+    fun getDownloadPage(update: PotentialUpdate? = potentialUpdate): String? {
+        if (update == null) {
+            ErrorManager.logErrorWithData(
+                IllegalStateException("Attempted to call getDownloadPage with no potentialUpdate"),
+                "Error while getting update download information",
+            )
+            return null
+        }
         return when (val data = update.update) {
             is ModrinthUpdateData -> data.htmlUrl
             is GithubReleaseUpdateData -> data.htmlUrl
-            else -> error("Unsupported update data type: ${data.javaClass}")
+            else -> {
+                ErrorManager.logErrorWithData(
+                    IllegalStateException("Unsupported update data type"),
+                    "Error while getting update download information",
+                    "updateData" to data,
+                )
+                null
+            }
         }
     }
 
