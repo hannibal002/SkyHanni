@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MineshaftDetectionConfig {
@@ -48,4 +50,17 @@ class MineshaftDetectionConfig {
         MineshaftDetection.MineshaftType.FAIR_1,
         MineshaftDetection.MineshaftType.JASP_1,
     )
+
+    @Expose
+    @ConfigOption(
+        name = "Cave-in Timer",
+        desc = "Shows a HUD timer counting down until the mineshaft entrance caves in."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var mineshaftCollapseTimer: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = MineshaftDetectionConfig::class, field = "mineshaftCollapseTimer")
+    var collapseTimerPosition: Position = Position(10, 10)
 }
