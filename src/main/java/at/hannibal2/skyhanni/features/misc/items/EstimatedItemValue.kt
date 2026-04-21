@@ -72,7 +72,7 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
-        hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots
+        hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots ?: emptyList()
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
