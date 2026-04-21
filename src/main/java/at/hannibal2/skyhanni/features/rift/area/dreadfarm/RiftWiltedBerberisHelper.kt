@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.WiltedBerberisLocationsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -46,17 +48,8 @@ object RiftWiltedBerberisHelper {
     private var hasFarmingToolInHand = false
 
     // Maps each field's center position to the number of Wilted Berberis in that field.
-    private val FIELD_CENTERS = mapOf(
-        LorenzVec(-29, 71, -179) to 12,
-        LorenzVec(-65, 72, -184) to 15,
-        LorenzVec(-79, 72, -162) to 19,
-        LorenzVec(-69, 71, -134) to 21,
-        LorenzVec(-33, 70, -140) to 36,
-        LorenzVec(-49, 69, -123) to 8,
-    )
-
-    private val fieldSequences: Map<LorenzVec, BerberisSequence> =
-        FIELD_CENTERS.keys.associateWith { BerberisSequence(it) }
+    private var fieldCenters = mapOf<LorenzVec, Int>()
+    private var fieldSequences = mapOf<LorenzVec, BerberisSequence>()
 
     data class WiltedBerberis(var currentParticles: LorenzVec) {
         var previous: LorenzVec? = null
@@ -66,7 +59,7 @@ object RiftWiltedBerberisHelper {
     }
 
     private class BerberisSequence(fieldCenter: LorenzVec) {
-        val expectedCount: Int = FIELD_CENTERS.getValue(fieldCenter)
+        val expectedCount: Int = fieldCenters.getValue(fieldCenter)
         val sequence = mutableListOf<LorenzVec>()
         var isValid = false
         var isRendering = false
@@ -115,6 +108,13 @@ object RiftWiltedBerberisHelper {
             currentTarget?.roundToBlock() == location.roundToBlock()
     }
 
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        fieldCenters = event.getConstant<WiltedBerberisLocationsJson>("rift/WiltedBerberisLocations")
+            .fieldCenters.associate { it.position to it.count }
+        fieldSequences = fieldCenters.keys.associateWith { BerberisSequence(it) }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
@@ -149,7 +149,7 @@ object RiftWiltedBerberisHelper {
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
     private fun nearestFieldCenter(location: LorenzVec, maxDistance: Double = 50.0): LorenzVec? =
-        FIELD_CENTERS.keys
+        fieldCenters.keys
             .filter { it.distanceIgnoreY(location) < maxDistance }
             .minByOrNull { it.distanceIgnoreY(location) }
 
@@ -364,8 +364,15 @@ object RiftWiltedBerberisHelper {
         for ((index, location) in seq.sequence.withIndex()) {
             val block = location.getBlockAt()
             val expectDeadBush = index >= seq.currentIndex
-            if (expectDeadBush && block != Blocks.DEAD_BUSH) { seq.invalidate(); return }
-            if (!expectDeadBush && block == Blocks.DEAD_BUSH) { seq.invalidate(); return }
+
+            if (expectDeadBush && block != Blocks.DEAD_BUSH) {
+                seq.invalidate()
+                return
+            }
+            if (!expectDeadBush && block == Blocks.DEAD_BUSH) {
+                seq.invalidate()
+                return
+            }
         }
     }
 
