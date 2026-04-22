@@ -8,16 +8,13 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -26,14 +23,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.ChatFormatting
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MineshaftDetection {
@@ -56,18 +50,10 @@ object MineshaftDetection {
 
     private var found = false
 
-    private var collapseTimerStart = SimpleTimeMark.farPast()
-
-    private val COLLAPSE_DURATION = 60.seconds
-    private val COLLAPSE_WARNING_THRESHOLD = 10.seconds
-    private val COLLAPSE_CAUTION_THRESHOLD = 30.seconds
-
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
         found = false
 
-
-        collapseTimerStart = SimpleTimeMark.farPast()
     }
 
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnIsland = IslandType.MINESHAFT)
@@ -101,8 +87,6 @@ object MineshaftDetection {
         }
         if (config.mineshaftDetection) ChatUtils.chat("You entered a ${type.displayName} mineshaft!".asComponent())
 
-        collapseTimerStart = SimpleTimeMark.now()
-
         if (type in config.mineshaftsToTrack) {
             TitleManager.sendTitle(type.displayName)
             ChatUtils.chat(
@@ -135,35 +119,6 @@ object MineshaftDetection {
             HypixelCommands.partyChat(partyChatBuilder.toString().removeColor())
         }
     }
-
-    private var display: Renderable? = null
-
-    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!config.mineshaftCollapseTimer || collapseTimerStart.isFarPast()) {
-            display = null
-            return
-        }
-        val timeLeft = COLLAPSE_DURATION - collapseTimerStart.passedSince()
-        if (timeLeft.isNegative()) {
-            display = null
-            return
-        }
-
-        val color = when {
-            timeLeft <= COLLAPSE_WARNING_THRESHOLD -> LorenzColor.RED.getChatColor()
-            timeLeft <= COLLAPSE_CAUTION_THRESHOLD -> LorenzColor.YELLOW.getChatColor()
-            else -> LorenzColor.GREEN.getChatColor()
-        }
-        display = "§fEntrance caves in: $color${timeLeft.format()}".let(Renderable::text)
-    }
-
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.MINESHAFT)
-    fun onRenderOverlay() {
-        val display = display ?: return
-        config.collapseTimerPosition.renderRenderable(display, posLabel = "Mineshaft Cave-in Timer")
-    }
-
 
     private fun handleShaftData(type: MineshaftType) {
         setSinceMineshaftType(type, 0)
