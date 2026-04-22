@@ -9,14 +9,18 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object MineshaftCaveInTimer {
@@ -74,18 +78,19 @@ object MineshaftCaveInTimer {
 
         val timeLeft = CAVE_IN_DURATION - caveInTimerStart.passedSince()
 
-        val warningThreshold = config.warningThreshold.seconds
-        val cautionThreshold = config.cautionThreshold.seconds
-
+        val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
         val caveInColor = when {
-            timeLeft <= warningThreshold -> LorenzColor.RED.getChatColor()
-            timeLeft <= cautionThreshold -> LorenzColor.YELLOW.getChatColor()
-            else -> LorenzColor.GREEN.getChatColor()
+            percentage <= 0.5 -> blendRGB(LorenzColor.GREEN, LorenzColor.YELLOW, percentage * 2)
+            else -> blendRGB(LorenzColor.YELLOW, LorenzColor.RED, (percentage - 0.5) * 2)
         }
+
         val caveInText = if (timeLeft.isNegative()) "Caved in!" else timeLeft.format()
 
         display = buildList {
-            add("§fEntrance caves in: $caveInColor$caveInText".let(Renderable::text))
+            add(componentBuilder {
+                appendWithColor("Entrance caves in: ", ChatFormatting.WHITE)
+                appendWithColor(caveInText, caveInColor.rgb)
+            }.let(Renderable::text))
 
             if (config.showTimeInMineshaft) {
                 val timeInMineshaft = caveInTimerStart.passedSince()
