@@ -84,20 +84,13 @@ object CopyChat {
     fun screenToChatX(d: Double): Double {
         val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return 0.0
-        //? if < 1.21.11 {
-        return chatGui.screenToChatX(d)
-        //?} else
-        //return d / chatGui.scale - 4.0
+        return d / chatGui.scale - 4.0
     }
 
     fun screenToChatY(d: Double): Double {
         val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return 0.0
-        //? if < 1.21.11 {
-        return chatGui.screenToChatY(d)
-        //?} else {
-        /*val e = mc.window.guiScaledHeight - d - 40.0
+        val e = mc.window.guiScaledHeight - d - 40.0
         return e / (chatGui.scale * chatGui.lineHeight)
-        *///?}
     }
 }

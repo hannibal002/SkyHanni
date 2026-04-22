@@ -1,5 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
-//? > 1.21.9 < 26.1 {
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugEntryLocalDifficulty;
@@ -25,4 +25,3 @@ public class MixinDebugEntryLocalDifficulty {
     }
 
 }
-//?}

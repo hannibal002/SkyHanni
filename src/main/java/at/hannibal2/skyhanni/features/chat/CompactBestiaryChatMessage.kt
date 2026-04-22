@@ -37,7 +37,7 @@ object CompactBestiaryChatMessage {
             }
 
             for (sibling in event.chatComponent.siblings) {
-                sibling.style?.clickEvent?.let {
+                sibling.style.clickEvent?.let {
                     command = it.value()
                 }
             }

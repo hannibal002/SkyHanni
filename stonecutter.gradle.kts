@@ -118,11 +118,10 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
-        maven("https://maven.gegy.dev/releases/") // mojbackward
     }
 }
 
-stonecutter active "1.21.10"
+stonecutter active "1.21.11"
 
 stonecutter handlers {
     inherit("accesswidener", "classtweaker")

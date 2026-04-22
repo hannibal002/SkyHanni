@@ -212,7 +212,7 @@ object EntityUtils {
             if (Minecraft.getInstance().isSameThread) it else it.toMutableList()
         }.asSequence().filterNotNull()
 
-        return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
+        return blockEntityTickers.mapNotNull { invoker -> world.getBlockEntity(invoker.pos) }
     }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
