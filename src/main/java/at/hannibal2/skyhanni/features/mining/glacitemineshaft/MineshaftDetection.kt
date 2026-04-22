@@ -53,7 +53,6 @@ object MineshaftDetection {
     @HandleEvent(WorldChangeEvent::class)
     fun onWorldChange() {
         found = false
-
     }
 
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnIsland = IslandType.MINESHAFT)
