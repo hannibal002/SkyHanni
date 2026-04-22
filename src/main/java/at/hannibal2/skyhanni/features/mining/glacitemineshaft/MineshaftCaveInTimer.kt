@@ -47,8 +47,8 @@ object MineshaftCaveInTimer {
         display = emptyList()
     }
 
-    @HandleEvent
-    fun onMineshaftDetect(event: GlaciteMineshaftDetectEvent) {
+    @HandleEvent(GlaciteMineshaftDetectEvent::class)
+    fun onMineshaftDetect() {
         caveInTimerStart = SimpleTimeMark.now()
         firstColdTime = SimpleTimeMark.farPast()
         lastColdValue = null
@@ -98,10 +98,11 @@ object MineshaftCaveInTimer {
         val caveInText = if (timeLeft.isNegative()) "Caved in!" else timeLeft.format()
 
         display = buildList {
-            add(componentBuilder {
+            val componentBuilder = componentBuilder {
                 appendWithColor("Entrance caves in: ", ChatFormatting.WHITE)
                 appendWithColor(caveInText, caveInColor.rgb)
-            }.let(Renderable::text))
+            }
+            add(Renderable.text(componentBuilder))
 
             if (config.showTimeInMineshaft) {
                 val timeInMineshaft = caveInTimerStart.passedSince()
@@ -117,7 +118,7 @@ object MineshaftCaveInTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.MINESHAFT)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Mineshaft Cave-in Timer")
     }
