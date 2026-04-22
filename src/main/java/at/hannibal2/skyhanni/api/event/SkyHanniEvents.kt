@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @SkyHanniModule
 object SkyHanniEvents {
-
     private val listeners: MutableMap<Class<out SkyHanniEvent>, EventListeners> = mutableMapOf()
     private val handlers: MutableMap<Class<out SkyHanniEvent>, EventHandler<out SkyHanniEvent>> = mutableMapOf()
     private var disabledHandlers = emptySet<String>()
@@ -46,11 +45,9 @@ object SkyHanniEvents {
     fun isDisabledInvoker(invoker: String): Boolean = invoker in disabledHandlerInvokers
 
     private fun registerMethod(method: Method, instance: Any) {
-        val (options, eventTypes) = getEventData(method) ?: return
-        eventTypes.forEach { eventType ->
-            listeners.getOrPut(eventType) { EventListeners(eventType) }
-                .addListener(method, instance, options)
-        }
+        val (options, eventType) = getEventData(method) ?: return
+        listeners.getOrPut(eventType) { EventListeners(eventType) }
+            .addListener(method, instance, options)
     }
 
     @JvmStatic
@@ -62,28 +59,24 @@ object SkyHanniEvents {
     private fun handleZeroParameterMethod(
         method: Method,
         options: HandleEvent,
-    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+    ): Pair<HandleEvent, Class<out SkyHanniEvent>>? {
         val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
-        if (primaryFunctionEventType != null) return options to listOf(primaryFunctionEventType)
+        if (primaryFunctionEventType != null) return options to primaryFunctionEventType
 
-        if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+        if (options.eventType != SkyHanniEvent::class) return options to options.eventType.java
 
-        if (options.eventTypes.isEmpty()) {
-            ErrorManager.crashInDevEnv(
-                "Function ${method.fullyQualifiedName} must have an event parameter, a primary " +
-                    "function name, or an explicit event specification because it is annotated " +
-                    "with @HandleEvent",
-            )
-            return null
-        }
-
-        return options to options.eventTypes.map { it.java }
+        ErrorManager.crashInDevEnv(
+            "Function ${method.fullyQualifiedName} must have an event parameter, a primary " +
+                "function name, or an explicit event specification because it is annotated " +
+                "with @HandleEvent",
+        )
+        return null
     }
 
     private fun handleSingleParameterMethod(
         method: Method,
         options: HandleEvent,
-    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+    ): Pair<HandleEvent, Class<out SkyHanniEvent>>? {
         val eventType = method.parameterTypes.first()
 
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
@@ -95,10 +88,10 @@ object SkyHanniEvents {
         }
 
         @Suppress("UNCHECKED_CAST")
-        return options to listOf(eventType as Class<out SkyHanniEvent>)
+        return options to (eventType as Class<out SkyHanniEvent>)
     }
 
-    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+    private fun getEventData(method: Method): Pair<HandleEvent, Class<out SkyHanniEvent>>? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
         if (!method.declaringClass.isAnnotationPresent(SkyHanniModule::class.java)) {
             ErrorManager.crashInDevEnv(
@@ -123,11 +116,9 @@ object SkyHanniEvents {
     }
 
     private fun unregisterMethod(method: Method) {
-        val (_, eventTypes) = getEventData(method) ?: return
-        eventTypes.forEach { event ->
-            unregisterHandler(event)
-            listeners.values.forEach { it.removeListener(method) }
-        }
+        val (_, eventType) = getEventData(method) ?: return
+        unregisterHandler(eventType)
+        listeners.values.forEach { it.removeListener(method) }
     }
 
     private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
@@ -178,7 +169,6 @@ object SkyHanniEvents {
         markEventCacheDirty(DirtyReason.REPO_RELOAD)
     }
 
-
     private fun Set<DisabledEventVersionedJson>.activeNames(
         version: ModVersion,
         mcVersion: String,
@@ -198,7 +188,6 @@ object SkyHanniEvents {
 
             for (second in seconds) {
                 if (event.repeatSeconds(second)) {
-
                     for (handler in list) {
                         val log = handler.invokeLog
                         val current = log.invokeCount
@@ -221,7 +210,6 @@ object SkyHanniEvents {
     class EventInvokeData(var oldValue: Long, var diff: Long)
 
     class EventInvokeLog {
-
         var invokeCount: Long = 0L
 
         var overTimeLog = mutableMapOf<Int, EventInvokeData>()

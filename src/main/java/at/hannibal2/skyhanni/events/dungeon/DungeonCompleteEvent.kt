@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events.dungeon
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 /**
  * Fired when a dungeon run is completed.
@@ -10,4 +11,5 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
  *
  * [floor] holds the current dungeon floor identifier (e.g., "F7", "M7", "E").
  */
+@PrimaryFunction("onDungeonComplete")
 class DungeonCompleteEvent(val floor: String) : SkyHanniEvent()

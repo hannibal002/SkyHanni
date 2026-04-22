@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDi
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
@@ -61,7 +59,6 @@ private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
 
 @SkyHanniModule
 object HoppityLiveDisplay {
-
     /**
      * REGEX-TEST: Hoppity's Collection
      * REGEX-TEST: (1/2) Hoppity's Collection
@@ -101,8 +98,7 @@ object HoppityLiveDisplay {
     private var displayCardRenderables: List<Renderable> = emptyList()
     private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent(onlyOnSkyblock = true, eventTypes = [InventoryCloseEvent::class, InventoryFullyOpenedEvent::class])
-    fun reCheckInventoryState() {
+    private fun reCheckInventoryState() {
         if (isInInventory() != lastKnownInInvState) {
             lastKnownInInvState = !lastKnownInInvState
             lastKnownStatHash = 0
@@ -110,14 +106,20 @@ object HoppityLiveDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed() {
+    private fun onInventoryClose() = reCheckInventoryState()
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryFullyOpened() = reCheckInventoryState()
+
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onSecondPassed() {
         reCheckInventoryState()
         if (!currentTimerActive) return
         lastKnownStatHash = 0
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         eventConfig.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
@@ -127,7 +129,7 @@ object HoppityLiveDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onKeyPress(event: KeyPressEvent) {
+    private fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!config.enabled) return
         if (config.toggleKeybind == GLFW.GLFW_KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
@@ -142,7 +144,7 @@ object HoppityLiveDisplay {
     private var inventoryOpen = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderTop() {
+    private fun onGuiRenderTop() {
         if (!liveDisplayEnabled()) return
 
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return

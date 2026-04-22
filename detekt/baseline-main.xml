@@ -1110,14 +1110,6 @@
     <ID>PrivateEventListener:ExperimentationSuperpairApi.kt:ExperimentationSuperpairApi$@HandleEvent fun onTableTaskStarted</ID>
     <ID>PrivateEventListener:ExperimentationSuperpairApi.kt:ExperimentationSuperpairApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:ExperimentationSuperpairApi.kt:ExperimentationSuperpairApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onSlotClick</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent( onlyOnIsland = IslandType.PRIVATE_ISLAND, eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class], ) fun refreshBottlesInInventory</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onChat</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onClick</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryClose</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onSlotClick</ID>
-    <ID>PrivateEventListener:ExperimentationTableApi.kt:ExperimentationTableApi$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:ExperimentationXPOverlay.kt:ExperimentationXPOverlay$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:ExperimentationXPOverlay.kt:ExperimentationXPOverlay$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onRenderItemOverlayPost</ID>
     <ID>PrivateEventListener:ExperimentsAddonsHelper.kt:ExperimentsAddonsHelper$@HandleEvent fun onConfigFix</ID>
@@ -1737,11 +1729,6 @@
     <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onProfileJoin</ID>
     <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onRabbitFound</ID>
     <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderTop</ID>
-    <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onKeyPress</ID>
-    <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true, eventTypes = [InventoryCloseEvent::class, InventoryFullyOpenedEvent::class]) fun reCheckInventoryState</ID>
     <ID>PrivateEventListener:HoppityMuteEggSounds.kt:HoppityMuteEggSounds$@HandleEvent fun onPlaySound</ID>
     <ID>PrivateEventListener:HoppityNpc.kt:HoppityNpc$@HandleEvent fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:HoppityNpc.kt:HoppityNpc$@HandleEvent fun onInventoryClose</ID>
@@ -2514,10 +2501,6 @@
     <ID>PrivateEventListener:QuiverDisplay.kt:QuiverDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:QuiverDisplay.kt:QuiverDisplay$@HandleEvent fun onProfileJoin</ID>
     <ID>PrivateEventListener:QuiverDisplay.kt:QuiverDisplay$@HandleEvent fun onQuiverUpdate</ID>
-    <ID>PrivateEventListener:QuiverWarning.kt:QuiverWarning$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:QuiverWarning.kt:QuiverWarning$@HandleEvent fun onQuiverUpdate</ID>
-    <ID>PrivateEventListener:QuiverWarning.kt:QuiverWarning$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:QuiverWarning.kt:QuiverWarning$@HandleEvent(eventTypes = [DungeonCompleteEvent::class, KuudraCompleteEvent::class]) fun onInstanceComplete</ID>
     <ID>PrivateEventListener:RareCropTracker.kt:RareCropTracker$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:RareCropTracker.kt:RareCropTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:RareCropTracker.kt:RareCropTracker$@HandleEvent fun onConfigFix</ID>

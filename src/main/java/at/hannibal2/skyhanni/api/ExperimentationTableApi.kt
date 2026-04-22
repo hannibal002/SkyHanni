@@ -12,15 +12,14 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -55,7 +54,6 @@ typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
 
 @SkyHanniModule
 object ExperimentationTableApi {
-
     private const val ADDONS_OVER_DATA_SLOT = 11
     private const val SUPERPAIRS_OVER_DATA_SLOT = 13
 
@@ -338,14 +336,14 @@ object ExperimentationTableApi {
     private fun ExperimentationMessages.isSelected() = config.experimentsProfitTracker.hideMessages.contains(this)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
         miscRepoRewards = experiments.miscRewards
         ultraRareMiscItems = experiments.ultraRareRewards.orEmpty()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         if (currentExpOverHash != 0) {
             lastExpOverHash = currentExpOverHash
             currentExpOverHash = 0
@@ -364,19 +362,24 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(
-        onlyOnIsland = IslandType.PRIVATE_ISLAND,
-        eventTypes = [WorldChangeEvent::class, ItemAddInInventoryEvent::class],
-    )
-    fun refreshBottlesInInventory() {
+    private fun refreshBottlesInInventory() {
         currentBottlesInInventory = getBottlesInOwnInventory().takeIf {
             it != currentBottlesInInventory
         } ?: return
         ChatUtils.debug("Updated bottles in inventory: $currentBottlesInInventory")
     }
 
+    @HandleEvent
+    private fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.PRIVATE_ISLAND) return
+        refreshBottlesInInventory()
+    }
+
+    @HandleEvent
+    private fun onItemAddInInventory() = refreshBottlesInInventory()
+
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (claimMessagePattern.matches(event.message) && ExperimentationMessages.DONE.isSelected()) {
             event.blockedReason = "CLAIM_MESSAGE"
             return
@@ -432,7 +435,7 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onClick(event: WorldClickEvent) {
+    private fun onClick(event: WorldClickEvent) {
         if (!inDistanceToTable(15.0)) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
@@ -446,7 +449,7 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
         event.tryUpdateCurrentActivity()
         event.tryFireRareBookUncovered()
@@ -455,7 +458,7 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTable || event.item == null || event.slot == null) return
         event.tryResetQueuedEvent()
     }
@@ -466,7 +469,7 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!inTable) return
         updateTablePosition()
         event.tryProcessExperimentOver()
