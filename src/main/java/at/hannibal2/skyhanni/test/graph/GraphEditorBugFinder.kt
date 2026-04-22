@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
+import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
@@ -34,6 +36,8 @@ object GraphEditorBugFinder {
         checkConflictingTags(graph, errorsInWorld)
         checkConflictingAreas(graph, errorsInWorld)
         checkMissingData(graph, errorsInWorld)
+        checkDeprecatedTags(graph, errorsInWorld)
+        checkInvalidNames(graph, errorsInWorld)
 
         this.errorsInWorld = errorsInWorld
         errorsInWorld.keys.minByOrNull {
@@ -41,15 +45,46 @@ object GraphEditorBugFinder {
         }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
     }
 
+    private fun checkDeprecatedTags(
+        graph: Graph,
+        errorsInWorld: MutableMap<GraphNode, String>,
+    ) {
+        for (node in graph) {
+            @Suppress("DEPRECATION")
+            if (node.hasTag(GraphNodeTag.TELEPORT)) {
+                errorsInWorld[node] = "deprecated teleport node"
+            }
+        }
+    }
+
+    private fun checkInvalidNames(
+        graph: Graph,
+        errorsInWorld: MutableMap<GraphNode, String>,
+    ) {
+        for (node in graph) {
+            val name = node.name ?: continue
+            if (node.hasTag(GraphNodeTag.WARP)) {
+                if (!name.startsWith("/")) {
+                    errorsInWorld[node] = "invalid warp name"
+                }
+            }
+            if (node.hasTag(GraphNodeTag.JUMP_PAD)) {
+                if (IslandType.entries.none { it.displayName == name }) {
+                    errorsInWorld[node] = "jump pad name is no known island name"
+                }
+            }
+        }
+    }
+
     private fun checkMissingData(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {
         for (node in graph) {
             val nameNull = node.name.isNullOrBlank()
             val tagsEmpty = node.tags.isEmpty()
             if (nameNull > tagsEmpty) {
-                errorsInWorld[node] = "§cMissing name despite having tags"
+                errorsInWorld[node] = "Missing name despite having tags"
             }
             if (tagsEmpty > nameNull) {
-                errorsInWorld[node] = "§cMissing tags despite having name"
+                errorsInWorld[node] = "Missing tags despite having name"
             }
         }
     }
@@ -70,7 +105,7 @@ object GraphEditorBugFinder {
                 val neighboringAreaNode = nearestArea[neighbor]?.name ?: continue
                 if (neighboringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    errorsInWorld[node] = "§cConflicting areas $areaNode and $neighboringAreaNode"
+                    errorsInWorld[node] = "Conflicting areas $areaNode and $neighboringAreaNode"
                 }
             }
         }
@@ -81,7 +116,7 @@ object GraphEditorBugFinder {
             if (!node.tags.any { it in NavigationHelper.allowedTags }) continue
             val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
             if (remainingTags.size != 1) {
-                errorsInWorld[node] = "§cConflicting tags: $remainingTags"
+                errorsInWorld[node] = "Conflicting tags: $remainingTags"
             }
         }
     }

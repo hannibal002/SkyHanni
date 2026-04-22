@@ -15,13 +15,29 @@ enum class GraphNodeTag(
     DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev.", onlySkyblock = null), // E.g. Spawn points, todos, etc
 
     // Everywhere
-    NPC("npc", LorenzColor.YELLOW, "NPC", "A NPC to talk to.", onlySkyblock = null), // also take from neu repo
+    NPC("npc", LorenzColor.YELLOW, "NPC", "An NPC to talk to.", onlySkyblock = null),
     AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area.", onlySkyblock = null),
     SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house.", onlySkyblock = null),
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map.", onlySkyblock = null),
 
-    //     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
-    TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport.", onlySkyblock = null),
+    // TODO delete once no graph data contains this anymore
+    @Deprecated("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
+    TELEPORT(
+        "teleport",
+        LorenzColor.BLUE,
+        "Teleport",
+        "A teleportation spot. Deprecated, split into warp, jump pad, and teleport pad.",
+        onlySkyblock = null,
+    ),
+
+    // teleports from any island to this location on this island
+    WARP("warp", LorenzColor.BLUE, "Warp", "A warp command target.", onlySkyblock = null),
+
+    // stand there, jumps to another island, name is the other island (display name, not enum name)
+    JUMP_PAD("jump_pad", LorenzColor.BLUE, "Jump Pad", "A jump pad or portal to another island.", onlySkyblock = null),
+
+    // teleports around on the same island
+    TELEPORT_PAD("teleport_pad", LorenzColor.BLUE, "Teleport Pad", "A teleport pad inside the same island.", onlySkyblock = null),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Spots related to the Romeo and Juliette/Ring of Love quest line."),
@@ -33,11 +49,6 @@ enum class GraphNodeTag(
     GRIND_CROPS("grind_crops", LorenzColor.DARK_GREEN, "Crop Area", "An area where crops grow that can be farmed."),
     // hoppity
 
-    // Hub
-    HUB_12_STARTER(
-        "starter_npc", LorenzColor.WHITE, "Starter NPC", "One of the 12 starter NPC's you need to talk to.",
-        onlyIsland = IslandType.HUB,
-    ),
     // diana
 
     // Farming Islands: Pelts
@@ -67,7 +78,7 @@ enum class GraphNodeTag(
         "SPIDER_RELIC",
         LorenzColor.DARK_PURPLE,
         "Spider's Relic",
-        "An relic in the Spider's Den.",
+        "A relic in the Spider's Den.",
         onlyIsland = IslandType.SPIDER_DEN,
     ),
 
@@ -80,7 +91,7 @@ enum class GraphNodeTag(
         "crimson_miniboss",
         LorenzColor.RED,
         "Crimson Miniboss",
-        "A Miniboss in the Crimson Isle.",
+        "A miniboss in the Crimson Isle.",
         onlyIsland = IslandType.CRIMSON_ISLE,
     ),
 
@@ -100,7 +111,7 @@ enum class GraphNodeTag(
         "fishing_hotspot",
         LorenzColor.AQUA,
         "Fishing Hotspot",
-        "A possible hotspot where you can fish",
+        "A possible hotspot where you can fish.",
         onlyIslands = setOf(IslandType.BACKWATER_BAYOU, IslandType.HUB, IslandType.CRIMSON_ISLE),
     ),
 
