@@ -10,8 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-//? if > 1.21.10
-//import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 @Mixin(CapeLayer.class)
 public class MixinCapeFeatureRenderer {
@@ -21,10 +20,7 @@ public class MixinCapeFeatureRenderer {
         if (skinTextures.cape() != null && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return original;
-            //? if < 1.21.11 {
-            return RenderType.itemEntityTranslucentCull(skinTextures.cape().texturePath());
-            //?} else
-            //return RenderTypes.itemEntityTranslucentCull(skinTextures.cape().texturePath());
+            return RenderTypes.itemEntityTranslucentCull(skinTextures.cape().texturePath());
         }
         return original;
     }

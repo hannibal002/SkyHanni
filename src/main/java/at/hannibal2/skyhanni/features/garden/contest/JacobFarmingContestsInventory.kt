@@ -96,7 +96,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.item?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return
+        val itemName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
