@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -45,8 +45,8 @@ object MineshaftCaveInTimer {
         display = emptyList()
     }
 
-    @HandleEvent
-    fun onMineshaftDetect(event: GlaciteMineshaftDetectEvent) {
+    @HandleEvent(GlaciteMineshaftDetectEvent::class)
+    fun onMineshaftDetect() {
         caveInTimerStart = SimpleTimeMark.now()
         firstColdTime = SimpleTimeMark.farPast()
         lastColdValue = null
@@ -80,17 +80,18 @@ object MineshaftCaveInTimer {
 
         val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
         val caveInColor = when {
-            percentage <= 0.5 -> blendRGB(LorenzColor.GREEN, LorenzColor.YELLOW, percentage * 2)
-            else -> blendRGB(LorenzColor.YELLOW, LorenzColor.RED, (percentage - 0.5) * 2)
+            percentage <= 0.5 -> ColorUtils.blendRGB(LorenzColor.GREEN, LorenzColor.YELLOW, percentage * 2)
+            else -> ColorUtils.blendRGB(LorenzColor.YELLOW, LorenzColor.RED, (percentage - 0.5) * 2)
         }
 
         val caveInText = if (timeLeft.isNegative()) "Caved in!" else timeLeft.format()
 
         display = buildList {
-            add(componentBuilder {
+            val componentBuilder = componentBuilder {
                 appendWithColor("Entrance caves in: ", ChatFormatting.WHITE)
                 appendWithColor(caveInText, caveInColor.rgb)
-            }.let(Renderable::text))
+            }
+            add(Renderable.text(componentBuilder))
 
             if (config.showTimeInMineshaft) {
                 val timeInMineshaft = caveInTimerStart.passedSince()
@@ -106,7 +107,7 @@ object MineshaftCaveInTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.MINESHAFT)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Mineshaft Cave-in Timer")
     }
