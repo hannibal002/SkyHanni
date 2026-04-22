@@ -127,11 +127,17 @@
 + Added `/shrpcrestart` to restart Discord Rich Presence. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5537)
 + Added Rosewater Flask search tag to options related to evolving items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5525)
 + Improved Sirih Helper to also work when clicking Sirih with an Abiphone while in Pig form. - Luna (https://github.com/hannibal002/SkyHanni/pull/5586)
++ Added Boop Party for non-Bingo Profiles. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5570)
++ Changed the in-game auto-updater to not auto-update anything, rather suggest to manually update from Modrinth. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5617)
 
 #### Garden
 
 + Changed Duplicate Location Markers to no longer show after all Hoppity Egg locations on the island are found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5395)
 + Renamed Farming Weight's EliteBot display name to Elite SkyBlock. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5409)
+
+#### Combat
+
++ Added toggle to only show Cocoon Overlay when the player can cocoon. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
 
 ### Fixes
 
@@ -148,6 +154,7 @@
 + Fixed being able to set Sensitivity Reducer reduction factor to invalid values, causing glitched head movement. - Luna (https://github.com/hannibal002/SkyHanni/pull/5536)
 + Fixed Mute Fusion Machine not working if you're too far away. - Luna (https://github.com/hannibal002/SkyHanni/pull/5526)
 + Fixed the Composter Display showing when disabled. - Alex (https://github.com/hannibal002/SkyHanni/pull/5574)
++ Fixed sending Pest Spawn Cooldown Expired warning wrongly at Garden join. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5432)
 
 #### Combat
 
@@ -170,6 +177,8 @@
 + Fixed occasional performance issues with Mob Detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5456)
 + Fixed Slayer Kill Time not counting the first phase for Tarantula Broodfather 5. - Luna (https://github.com/hannibal002/SkyHanni/pull/5466)
 + Fixed an issue where enabling Hide Particles would still show particles from other players' Totems of Corruption. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5543)
++ Fixed Cocoon Features triggering in incorrect conditions. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
++ Fixed Cocoon Overlay showing from very far away. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
 
 #### GUI
 
@@ -279,11 +288,19 @@
 + Fixed Hide Far Deaths incorrectly hiding the player's own deaths. - Luna (https://github.com/hannibal002/SkyHanni/pull/5592)
 + Fixed Lumber Jack NPC coordinates in Foraging Tutorial Quest. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5590)
 + Fixed Reindrake LS Sphere being on by default. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5557)
++ Fixed Bingo Boop Party Including Player Ranks in Party Invite. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5570)
++ Fixed Enter keybind firing incorrectly after closing chat or inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5413)
 
 #### Commands
 
 + Fixed colored item names in `/viewrecipe` autocomplete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5434)
 + Fixed issues with GFS auto-complete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5494)
+
+#### Mining
+
++ Fixed Could not find gemstone slot price error showing up when interacting with certain items that still have outdated gemstone slots. - Luna (https://github.com/hannibal002/SkyHanni/pull/5591)
+    + If you still see any such errors, please report it to us so that we can add the items to the exclusion list.
++ Fixed custom Mineshaft type names not displaying correctly. - Rain (https://github.com/hannibal002/SkyHanni/pull/5613)
 
 ### Technical Details
 
@@ -467,6 +484,9 @@
 + Updated Kotlin language version from 2.0 to 2.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/5460)
 + Changed sea creature catch detection to use the message without color codes. - Luna (https://github.com/hannibal002/SkyHanni/pull/5528)
     + The version with color codes should still be added as `alternate_messages` to the repo to not break older mod versions until Hypixel drops 1.21.11 support.
++ Added `SkyblockEquipmentDataUpdateEvent` for equipment updates. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
++ Switched from Moulberry LBIN API to Elite LBIN API. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5616)
+    + Also renamed `/shfetchmoulblbins` to `/shreloadlbins`.
 
 ### Removed Features
 
