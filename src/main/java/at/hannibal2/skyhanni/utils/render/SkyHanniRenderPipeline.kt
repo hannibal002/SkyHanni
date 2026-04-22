@@ -194,5 +194,5 @@ private object SkyHanniRenderPipelineUtils {
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
     val PosColorNormal: VertexFormat =
-        DefaultVertexFormat./*? if < 1.21.11 {*/ POSITION_COLOR_NORMAL /*?} else {*/ /*POSITION_COLOR_NORMAL_LINE_WIDTH *//*?}*/
+        DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH
 }

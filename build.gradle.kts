@@ -106,14 +106,8 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
-    @Suppress("UnstableApiUsage")
     if (target.mappingDependency == "official") {
-        mappings(loom.layered {
-            officialMojangMappings()
-            if (versionName == "1.21.10") {
-                mappings("dev.lambdaurora:yalmm-mojbackward:1.21.10+build.3")
-            }
-        })
+        mappings(loom.officialMojangMappings())
     } else {
         mappings(target.mappingDependency)
     }
@@ -167,7 +161,7 @@ dependencies {
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
 
-    if (target != ProjectTarget.MODERN_12110) shadowImpl(libs.httpclient)
+    shadowImpl(libs.httpclient)
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
@@ -226,7 +220,7 @@ tasks.processResources {
 }
 
 @Suppress("UnstableApiUsage")
-if (target == ProjectTarget.MODERN_12110) {
+if (target == ProjectTarget.MODERN_12111) {
     fabricApi {
         configureTests {
             modId = "skyhanni"
@@ -373,7 +367,7 @@ afterEvaluate {
 
 
 tasks.withType<Detekt>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    val isTargetVersion = target == ProjectTarget.MODERN_12111
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
 
@@ -389,7 +383,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    val isTargetVersion = target == ProjectTarget.MODERN_12111
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }

@@ -23,8 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//? > 1.21.10
-//import com.mojang.blaze3d.textures.GpuSampler;
+import com.mojang.blaze3d.textures.GpuSampler;
 
 // Adapted from 1.21.7 and 1.21.10 fabric api implementation
 // The fabric api event makes our lines render strange
@@ -50,21 +49,12 @@ public class MixinReplacementLevelRenderer {
         currentTickCounter = tickCounter;
     }
 
-    //? < 1.21.11 {
     @WrapOperation(method = "method_62214",
-            slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;)V", ordinal = 0)
-    )
-    private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, Operation<Void> original) {
-        original.call(instance, group);
-        //?} else {
-    /*@WrapOperation(method = "method_62214",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
     )
     private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
         original.call(instance, group, gpuSampler);
-        *///?}
         if (contextMatrixStack == null) return;
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(

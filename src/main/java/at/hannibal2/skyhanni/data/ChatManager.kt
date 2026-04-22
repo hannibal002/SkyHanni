@@ -303,17 +303,13 @@ object ChatManager {
             return@runOrNextTick
         }
         val maxWidth = floor(chatGui.width / chatGui.scale).toInt()
-        //? if < 1.21.11 {
-        chatGui.refreshTrimmedMessages()
-        throw UnsupportedOperationException("You are running an unsupported development build. Please update to 1.21.11 or above.")
-        //? } else
-        /*val lines = newMessage.splitLines(mc.font, maxWidth)
+        val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
             val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
             newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
             chatGui.trimmedMessages.add(targetIndex++, newLine)
-        }*/
+        }
     }
 
     /**
