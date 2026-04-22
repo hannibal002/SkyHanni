@@ -60,7 +60,7 @@ object GraphUtils {
                 val next = queue.pop()
                 universe.remove(next)
                 cluster.add(next)
-                queue.addAll(next.neighbours.keys)
+                queue.addAll(next.neighbors.keys)
                 queue.retainAll(universe)
             }
         }
@@ -100,13 +100,13 @@ object GraphUtils {
 
             visited.add(current)
 
-            current.neighbours.forEach { (neighbour, weight) ->
-                if (neighbour !in visited) {
+            current.neighbors.forEach { (neighbor, weight) ->
+                if (neighbor !in visited) {
                     val newDistance = distances.getValue(current) + weight
-                    if (newDistance < distances.getOrDefault(neighbour, Double.MAX_VALUE)) {
-                        distances[neighbour] = newDistance
-                        previous[neighbour] = current
-                        queue.add(neighbour)
+                    if (newDistance < distances.getOrDefault(neighbor, Double.MAX_VALUE)) {
+                        distances[neighbor] = newDistance
+                        previous[neighbor] = current
+                        queue.add(neighbor)
                     }
                 }
             }

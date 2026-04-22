@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMax
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percentToNextMilestone
+import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -41,10 +41,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import kotlin.time.Duration.Companion.minutes
-
-var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
-    mutableMapOf() // if the displayMessageSupplier is ever a placeholder, return from this instead
-
 
 // There is no consistent way to get the full username of the owner of an island you are visiting (as far as I know)
 // so this will be removed until/unless they add it back
@@ -60,8 +56,6 @@ var lastKnownDisplayStrings: MutableMap<DiscordStatus, String> =
 //     }
 //     return "Someone"
 // }
-
-var beenAfkFor = SimpleTimeMark.now()
 
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
@@ -85,7 +79,7 @@ private fun getCropMilestoneDisplay(): String {
 private fun getPetDisplay(): String = CurrentPetApi.currentPet?.getUserFriendlyName()
     ?: "No pet equipped"
 
-enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
+enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() -> String?) {
 
     NONE({ null }),
 
@@ -95,7 +89,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val island = SkyBlockUtils.currentIsland
 
             if (location == "Your Island") location = "Private Island"
-            lastKnownDisplayStrings[LOCATION] = when (island) {
+            lastKnownDisplayStrings[this] = when (island) {
                 IslandType.PRIVATE_ISLAND_GUEST -> "Visiting an Island"
 
                 // Some islands give no_area in graphArea, so they must be dealt with separately
@@ -118,10 +112,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 }
 
                 else -> location.takeIf { it != "None" && it != "invalid" && it != AreaNode.NO_AREA }
-                    ?: lastKnownDisplayStrings[LOCATION].orEmpty()
+                    ?: lastKnownDisplayStrings[this].orEmpty()
             }
             // Only display None if we don't have a last known area
-            lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
+            lastKnownDisplayStrings[this].takeIf { it?.isNotEmpty() == true } ?: "None"
         },
     ),
 
@@ -155,9 +149,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
             }
             if (ActionBarStatsData.MANA.value != "") {
-                lastKnownDisplayStrings[STATS] = statString
+                lastKnownDisplayStrings[this] = statString
             }
-            lastKnownDisplayStrings[STATS].orEmpty()
+            lastKnownDisplayStrings[this].orEmpty()
         },
     ),
 
@@ -196,7 +190,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 append(HypixelData.profileName.firstLetterUppercase())
             }
 
-            lastKnownDisplayStrings[PROFILE] = profile
+            lastKnownDisplayStrings[this] = profile
             profile
         },
     ),
@@ -234,7 +228,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             }
             if (autoReturn == "") { // if we didn't find any useful information, display the fallback
                 val fallbackID = DiscordRPCManager.config.auto.get().ordinal
-                autoReturn = if (fallbackID == AUTO.ordinal) {
+                autoReturn = if (fallbackID == this.ordinal) {
                     NONE.getDisplayString()
                 } else {
                     DiscordStatus.entries[fallbackID].getDisplayString()
@@ -282,9 +276,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                         break
                     }
                 }
-                val levels = EstimatedItemValue.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant] ?: StackingEnchantData()
+                val levels = stackingData.levels
                 val level = enchantments.getIntOrDefault(stackingEnchant)
-                val amount = extraAttributes.getIntOrDefault(EstimatedItemValue.stackingEnchants[stackingEnchant]?.statName)
+                val amount = extraAttributes.getIntOrDefault(stackingData.statName)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =
@@ -316,8 +311,8 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     AFK(
         {
-            if (beenAfkFor.passedSince() > 5.minutes) {
-                val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            if (DiscordRPCManager.beenAfkFor.passedSince() > 5.minutes) {
+                val format = DiscordRPCManager.beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
                 "AFK for $format"
             } else AutoStatus.AFK.placeholderText
         },
@@ -325,6 +320,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     ;
 
     fun getDisplayString(): String = displayMessageSupplier().orEmpty()
+
+    companion object {
+        // if the displayMessageSupplier is ever a placeholder, return from this instead
+        internal val lastKnownDisplayStrings: MutableMap<DiscordStatus, String> = mutableMapOf()
+    }
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {

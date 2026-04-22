@@ -88,5 +88,5 @@ object ArachneChatMessageHider {
         return hideArachneDeadMessage
     }
 
-    fun isEnabled() = IslandType.SPIDER_DEN.isCurrent() && config.hideArachneMessages
+    fun isEnabled() = IslandType.SPIDER_DEN.isInIsland() && config.hideArachneMessages
 }

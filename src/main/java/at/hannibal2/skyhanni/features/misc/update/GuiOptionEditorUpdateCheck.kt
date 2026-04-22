@@ -26,7 +26,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
-            UpdateManager.UpdateState.AVAILABLE -> "Download update"
+            UpdateManager.UpdateState.AVAILABLE -> "Manually download"
             UpdateManager.UpdateState.QUEUED -> "Downloading..."
             UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"

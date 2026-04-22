@@ -20,9 +20,9 @@ public class MixinClientEntityManager<T extends EntityAccess> {
 
     @Inject(method = "onRemove", at = @At("HEAD"))
     private void remove(Entity.RemovalReason reason, CallbackInfo ci) {
-        if (entity instanceof Entity entity) {
-            EntityData.despawnEntity(entity);
-            new EntityRemovedEvent(entity).post();
+        if (entity instanceof Entity typedEntity) {
+            EntityData.despawnEntity(typedEntity);
+            new EntityRemovedEvent<>(typedEntity).post();
         }
     }
 }

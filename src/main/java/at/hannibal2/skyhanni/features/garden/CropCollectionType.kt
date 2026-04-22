@@ -11,6 +11,6 @@ enum class CropCollectionType(val displayName: String) {
     ;
 
     companion object {
-        fun getByName(name: String) = CropCollectionType.entries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
+        fun getByName(name: String) = CropCollectionType.entries.firstOrNull { it.displayName.equals(name, ignoreCase = true) }
     }
 }

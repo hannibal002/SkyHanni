@@ -23,5 +23,5 @@ object ScoreboardEventKuudra : ScoreboardEvent() {
         ScoreboardPattern.submergesPattern,
     )
 
-    override fun showIsland() = IslandType.KUUDRA_ARENA.isCurrent()
+    override fun showIsland() = IslandType.KUUDRA_ARENA.isInIsland()
 }

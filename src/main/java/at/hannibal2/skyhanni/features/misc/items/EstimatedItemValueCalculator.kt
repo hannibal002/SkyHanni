@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getPetInternalNameWithLevel
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
@@ -631,15 +631,13 @@ object EstimatedItemValueCalculator {
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (names.isEmpty()) return 0.0
         list.add("§7Enchantments: " + totalPrice.formatCoin())
-        var i = 0
-        for (name in names) {
+        for ((i, name) in names.withIndex()) {
             if (i == enchantmentsCap) {
                 val missing = names.size - enchantmentsCap
                 list.add(" §7§o$missing more enchantments..")
                 break
             }
             list.add(name)
-            i++
         }
         return totalPrice
     }
@@ -698,13 +696,12 @@ object EstimatedItemValueCalculator {
             var level = rawLevel
             var multiplier = 1
 
-            when {
-                rawName in data.onlyTierOnePrices && rawLevel in 2..5 -> {
+            when (rawName) {
+                in data.onlyTierOnePrices if rawLevel in 2..5 -> {
                     multiplier = 2.intPow(rawLevel - 1)
                     level = 1
                 }
-
-                rawName in data.onlyTierFivePrices && rawLevel in 6..10 -> {
+                in data.onlyTierFivePrices if rawLevel in 6..10 -> {
                     multiplier = 2.intPow(rawLevel - 5)
                     if (multiplier > 1) level = 5
                 }
@@ -763,10 +760,10 @@ object EstimatedItemValueCalculator {
                 items.addOrPut(ingredient.internalName, amount)
             }
 
-            val splitSlot = key.split("_") // eg. SAPPHIRE_1
+            val splitSlot = key.split("_") // e.g. SAPPHIRE_1
             val colorCode = SkyBlockItemModifierUtils.GemstoneSlotType.getColorCode(splitSlot[0])
 
-            // eg. SAPPHIRE_1 -> Sapphire Slot 2
+            // e.g. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
                 // If the slot index is 0, we don't need to specify
                 if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
@@ -904,8 +901,10 @@ object EstimatedItemValueCalculator {
 
         val internalName = getInternalName()
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
-            // Do not error out on items if their data was changed.
-            if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
+            // Do not error out on items if their data was changed, or it is a known item with legacy slots.
+            if (getLoreComponent().any { it.string.contains("This item has unused Gemstones!") }) return null
+            if (internalName in EstimatedItemValue.hasLegacyGemstoneSlots) return null
+
             ErrorManager.logErrorStateWithData(
                 "Could not find gemstone slot price for ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
@@ -922,7 +921,7 @@ object EstimatedItemValueCalculator {
 
     private fun ItemStack.readBoosters(): List<NeuInternalName> {
         val list = NbtCompat.getStringTagList(extraAttributes, "boosters")
-        if (list.size == 0) return emptyList()
+        if (list.isEmpty) return emptyList()
         val boosters = mutableListOf<NeuInternalName>()
         for (i in 0..list.size) {
             var internalName = list.getStringOrDefault(i)

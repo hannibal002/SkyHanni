@@ -1,25 +1,15 @@
-package at.hannibal2.skyhanni.detektrules.imports
+package imports
 
-import at.hannibal2.skyhanni.detektrules.PreprocessingPattern
-import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
-import at.hannibal2.skyhanni.detektrules.SkyHanniRule
-import io.gitlab.arturbosch.detekt.api.Config
-import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Severity
+import PreprocessingPattern.Companion.containsPreprocessingPattern
+import SkyHanniRule
+import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
 
 /**
  * This rule enforces correct import ordering, while ignoring preprocessed comments and imports that are in a preprocessed block.
  */
-class CustomImportOrdering(config: Config) : SkyHanniRule(config) {
-    override val issue = Issue(
-        "CustomImportOrdering",
-        Severity.Style,
-        "Enforces correct import ordering, taking into account preprocessed imports.",
-        Debt.FIVE_MINS,
-    )
+class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
     private fun isImportsCorrectlyOrdered(imports: List<KtImportDirective>, rawText: List<String>): Boolean {
         if (rawText.any { it.isBlank() }) {

@@ -86,7 +86,7 @@ object RiftMotesOrb {
             if (ageInSeconds < 0.5) continue
 
             val particlesPerSecond = (orb.counter.toDouble() / ageInSeconds).roundTo(1)
-            if (particlesPerSecond < 60 || particlesPerSecond > 90) continue
+            if (particlesPerSecond !in 60.0..90.0) continue
             orb.isOrb = true
 
             if (System.currentTimeMillis() > orb.lastTime + 300) {

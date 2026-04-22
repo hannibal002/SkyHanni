@@ -146,7 +146,7 @@ object PunchcardHighlight {
 
     private fun colorPlayer(entity: LivingEntity) {
         val color = config.color.get().toColor()
-        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isCurrent() }
+        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isInIsland() }
     }
 
     private fun removePlayerColor(entity: LivingEntity) {
@@ -214,7 +214,7 @@ object PunchcardHighlight {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
 
         config.position.renderRenderable(display, "Punchcard Overlay")

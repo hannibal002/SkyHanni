@@ -53,6 +53,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added `/shcalc` command. - Luna (https://github.com/hannibal002/SkyHanni/pull/4821)
 + Added Rainbow Action Bar. - nopo (https://github.com/hannibal002/SkyHanni/pull/5104)
 + Added an option to show the item that was bid on in the winning bid message in the Dark Auction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5126)
++ Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
+  + Do /shachievements to see them all.
 
 #### Chat Filter
 
@@ -1499,6 +1501,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Matriarch Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1385)
     + Highlights the Heavy Pearls.
     + Draws a line to the Heavy Pearls.
++ Added Vanquisher Waypoint Sharing. - itsseth3 (https://github.com/hannibal002/SkyHanni/pull/5197)
+    + Sends appropriate Vanquisher spawned/shared/died message into party/all chat.
+    + Either shares instantly or upon key press.
+    + On-screen indicators: Renders title, waypoint, beacon, and tracers for party member spawns (or global if enabled).
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -1860,6 +1866,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Transparent Minecraft Farming feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/5178)
 + Added the ability to move and scale the Action Bar in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
 + Added the ability to move and scale the Held Item Tooltip in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
++ Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
 
 </details>
 <details open><summary>

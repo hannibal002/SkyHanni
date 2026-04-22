@@ -30,23 +30,22 @@ import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import java.lang.UnsupportedOperationException
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
+private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
+private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
+private const val CHAT_PREFIX = "[SkyHanni] "
+
 @SkyHanniModule
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
-    private val log = LorenzLogger("chat/mod_sent")
+    private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
-
-    private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
-    private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private const val CHAT_PREFIX = "[SkyHanni] "
 
     /**
      * Sends a debug message to the chat and the console.
@@ -103,6 +102,15 @@ object ChatUtils {
         }
         chat(message.asComponent(), prefix, color, replaceSameMessage, onlySendOnce, messageId)
     }
+
+    fun chat(
+        prefix: Boolean = true,
+        prefixColor: Int? = null,
+        replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
+        builder: MutableComponent.() -> Unit = { },
+    ) = chat(componentBuilder(builder), prefix, prefixColor, replaceSameMessage, onlySendOnce, messageId)
 
     fun chat(
         message: Component,
@@ -184,6 +192,7 @@ object ChatUtils {
         prefixColor: String? = null,
         oneTimeClick: Boolean = false,
         replaceSameMessage: Boolean = false,
+        messageId: Int? = null,
     ) {
         var color: Int? = null
         if (prefixColor != null) {
@@ -200,9 +209,12 @@ object ChatUtils {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
-
-        if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
-        else logAndSendMessage(text)
+        messageId?.let {
+            text.send(it)
+        } ?: run {
+            if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
+            else logAndSendMessage(text)
+        }
     }
 
     /**
@@ -359,14 +371,14 @@ object ChatUtils {
         }
     }
 
-    private var deleteNext: Pair<String, (String) -> Boolean>? = null
+    private var deleteNext: Pair<String, (Component) -> Boolean>? = null
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val (reason, predicate) = deleteNext ?: return
         this.deleteNext = null
 
-        if (predicate(event.message)) {
+        if (predicate(event.chatComponent)) {
             event.blockedReason = reason
         }
     }
@@ -379,7 +391,7 @@ object ChatUtils {
 
     fun deleteNextMessage(
         reason: String,
-        predicate: (String) -> Boolean,
+        predicate: (Component) -> Boolean,
     ) {
         deleteNext = reason to predicate
     }
@@ -441,6 +453,7 @@ object ChatUtils {
     ) {
         val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to $actionName or disable this feature]"
+        val modifier = KeyboardManager.getModifierKeyName()
         clickableChat(
             "$message$hint",
             onClick = {
@@ -450,7 +463,8 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n" +
+                "§eShift-Click or $modifier-Click to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
@@ -465,6 +479,7 @@ object ChatUtils {
         message: String,
         option: KProperty0<*>,
         oneTimeClick: Boolean = false,
+        messageId: Int? = null,
     ) {
         val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to disable this feature]"
@@ -474,6 +489,7 @@ object ChatUtils {
             hover = "§eClick to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
+            messageId = messageId,
         )
     }
 
@@ -488,7 +504,9 @@ object ChatUtils {
 
     var GuiMessage.fullComponent: Component
         get() = `skyhanni$getFullComponent`()
-        set(value) { `skyhanni$setFullComponent`(value) }
+        set(value) {
+            `skyhanni$setFullComponent`(value)
+        }
 
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks

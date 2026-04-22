@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 
+@PrimaryFunction("onPlaySound")
 class PlaySoundEvent(
     val soundName: String,
     override val location: LorenzVec,

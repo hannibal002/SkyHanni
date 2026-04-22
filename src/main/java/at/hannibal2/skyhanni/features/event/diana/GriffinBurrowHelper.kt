@@ -129,7 +129,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    // used because insta-breaking a block makes it invalid would be better to store valid blocks in repo
+    // used because instant-breaking a block makes it invalid would be better to store valid blocks in repo
     private val recentClickedBlocks = TimeLimitedSet<LorenzVec>(1.seconds)
 
     private var shouldFocusOnRareMob = false
@@ -579,7 +579,7 @@ object GriffinBurrowHelper {
     private fun isEnabled() = DianaApi.isDoingDiana()
 
     private fun setTestBurrow(arg: String) {
-        if (!IslandType.HUB.isCurrent()) {
+        if (!IslandType.HUB.isInIsland()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -37,11 +37,11 @@ object ChatManager {
 
     private val config get() = SkyHanniMod.feature.dev
 
-    private val loggerAll = LorenzLogger("chat/all")
-    private val loggerFiltered = LorenzLogger("chat/blocked")
-    private val loggerAllowed = LorenzLogger("chat/allowed")
-    private val loggerModified = LorenzLogger("chat/modified")
-    private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
+    private val loggerAll = SkyHanniLogger("chat/all")
+    private val loggerFiltered = SkyHanniLogger("chat/blocked")
+    private val loggerAllowed = SkyHanniLogger("chat/allowed")
+    private val loggerModified = SkyHanniLogger("chat/modified")
+    private val loggerFilteredTypes = mutableMapOf<String, SkyHanniLogger>()
 
     private val backingMessageHistory =
         object : LinkedHashMap<IdentityCharacteristics<Component>, MessageFilteringResult>() {
@@ -170,7 +170,7 @@ object ChatManager {
         if (blockReason != "") {
             loggerFiltered.log("[$blockReason] $message")
             loggerAll.log("[$blockReason] $message")
-            loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
+            loggerFilteredTypes.getOrPut(blockReason) { SkyHanniLogger("chat/filter_blocked/$blockReason") }
                 .log(message)
             messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null, null)
             return true
@@ -225,7 +225,7 @@ object ChatManager {
 
         loggerFiltered.log("[$blockReason] $message")
         loggerAll.log("[$blockReason] $message")
-        loggerFilteredTypes.getOrPut(blockReason) { LorenzLogger("chat/filter_blocked/$blockReason") }
+        loggerFilteredTypes.getOrPut(blockReason) { SkyHanniLogger("chat/filter_blocked/$blockReason") }
             .log(message)
         messageHistory[key] = MessageFilteringResult(original, ActionKind.BLOCKED, blockReason, null, null)
     }

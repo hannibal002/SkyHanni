@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import java.awt.Color
 
@@ -23,7 +23,7 @@ object GraphEditorBugFinder {
     private var errorsInWorld = emptyMap<GraphNode, String>()
 
     fun runTests() {
-        CoroutineConfig("graph editor bug finder").launchCoroutine {
+        CoroutineSettings("graph editor bug finder").launchCoroutine {
             asyncTest()
         }
     }
@@ -85,11 +85,11 @@ object GraphEditorBugFinder {
         }
         for (node in graph) {
             val areaNode = nearestArea[node]?.name ?: continue
-            for (neighbour in node.neighbours.keys) {
-                val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
-                if (neighbouringAreaNode == areaNode) continue
+            for (neighbor in node.neighbors.keys) {
+                val neighboringAreaNode = nearestArea[neighbor]?.name ?: continue
+                if (neighboringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    errorsInWorld[node] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
+                    errorsInWorld[node] = "§cConflicting areas $areaNode and $neighboringAreaNode"
                 }
             }
         }
