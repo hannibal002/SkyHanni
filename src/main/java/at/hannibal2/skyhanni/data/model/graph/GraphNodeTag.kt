@@ -31,13 +31,25 @@ enum class GraphNodeTag(
     ),
 
     // teleports from any island to this location on this island
-    WARP("warp", LorenzColor.BLUE, "Warp", "A warp command target.", onlySkyblock = null),
+    WARP("warp", LorenzColor.BLUE, "Teleport Destination", "A teleport command destination.", onlySkyblock = null),
 
     // stand there, jumps to another island, name is the other island (enum name, not display name)
-    JUMP_PAD("jump_pad", LorenzColor.BLUE, "Jump Pad", "A jump pad or portal to another island.", onlySkyblock = null),
+    JUMP_PAD(
+        "jump_pad",
+        LorenzColor.BLUE,
+        "Teleport To Other Island",
+        "A jump pad, portal, or similar mechanic that teleports to another island.",
+        onlySkyblock = null,
+    ),
 
     // teleports around on the same island
-    TELEPORT_PAD("teleport_pad", LorenzColor.BLUE, "Teleport Pad", "A teleport pad inside the same island.", onlySkyblock = null),
+    TELEPORT_PAD(
+        "teleport_pad",
+        LorenzColor.BLUE,
+        "Teleport To Same Island",
+        "A teleport pad that teleports within the same island.",
+        onlySkyblock = null,
+    ),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Spots related to the Romeo and Juliette/Ring of Love quest line."),
@@ -83,6 +95,7 @@ enum class GraphNodeTag(
     ),
 
     // Dwarven Mines
+    // always has to also have the npc tag added
     MINES_EMISSARY("mines_emissary", LorenzColor.GOLD, "Mines Emissary", "An Emissary to the king.", onlyIsland = IslandType.DWARVEN_MINES),
     // commission areas
 

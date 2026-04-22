@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend.getAreaTag
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -39,6 +40,7 @@ object GraphEditorBugFinder {
         checkMissingData(graph, errorsInWorld)
         checkDeprecatedTags(graph, errorsInWorld)
         checkInvalidNames(graph, errorsInWorld)
+        checkHasSpawn(graph, errorsInWorld)
 
         this.errorsInWorld = errorsInWorld
         errorsInWorld.keys.minByOrNull {
@@ -77,6 +79,15 @@ object GraphEditorBugFinder {
                     errorsInWorld[node] = "jump pad name is current island name"
                 }
             }
+        }
+    }
+
+    private fun checkHasSpawn(
+        graph: Graph,
+        errorsInWorld: MutableMap<GraphNode, String>,
+    ) {
+        if (graph.none { it.hasTag(GraphNodeTag.POI) && it.name == "Spawn" }) {
+            ChatUtils.chat("§cGraph editor without spawn point!")
         }
     }
 
@@ -121,6 +132,11 @@ object GraphEditorBugFinder {
             val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
             if (remainingTags.size != 1) {
                 errorsInWorld[node] = "Conflicting tags: $remainingTags"
+            }
+            if (node.hasTag(GraphNodeTag.MINES_EMISSARY)) {
+                if (!node.hasTag(GraphNodeTag.NPC)) {
+                    errorsInWorld[node] = "emissary without npc tag"
+                }
             }
         }
     }
