@@ -9,15 +9,17 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import net.minecraft.ChatFormatting
@@ -40,13 +42,13 @@ object MineshaftCaveInTimer {
     fun onWorldChange() {
         caveInTimerStart = SimpleTimeMark.farPast()
         firstColdTime = SimpleTimeMark.farPast()
-        lastColdValue = null
+        lastColdValue = 0
         totalColdGained = 0
         display = emptyList()
     }
 
-    @HandleEvent(GlaciteMineshaftDetectEvent::class)
-    fun onMineshaftDetect() {
+    @HandleEvent
+    fun onMineshaftDetect(event: GlaciteMineshaftDetectEvent) {
         caveInTimerStart = SimpleTimeMark.now()
         firstColdTime = SimpleTimeMark.farPast()
         lastColdValue = null
@@ -78,20 +80,28 @@ object MineshaftCaveInTimer {
 
         val timeLeft = CAVE_IN_DURATION - caveInTimerStart.passedSince()
 
+        val warningFraction = config.warningThreshold / CAVE_IN_DURATION.inPartialSeconds
+        val cautionFraction = config.cautionThreshold / CAVE_IN_DURATION.inPartialSeconds
+
+        fun blend(from: LorenzColor, to: LorenzColor, t: Double, speed: Double) =
+            blendRGB(from, to, t.pow(1.0 / speed))
+
         val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
         val caveInColor = when {
-            percentage <= 0.5 -> ColorUtils.blendRGB(LorenzColor.GREEN, LorenzColor.YELLOW, percentage * 2)
-            else -> ColorUtils.blendRGB(LorenzColor.YELLOW, LorenzColor.RED, (percentage - 0.5) * 2)
+            percentage < warningFraction ->
+                blend(LorenzColor.GREEN, LorenzColor.YELLOW, percentage / warningFraction, warningFraction)
+            percentage < cautionFraction ->
+                blend(LorenzColor.YELLOW, LorenzColor.RED, (percentage - warningFraction) / (cautionFraction - warningFraction), cautionFraction - warningFraction)
+            else -> LorenzColor.RED.toColor()
         }
 
         val caveInText = if (timeLeft.isNegative()) "Caved in!" else timeLeft.format()
 
         display = buildList {
-            val componentBuilder = componentBuilder {
+            add(componentBuilder {
                 appendWithColor("Entrance caves in: ", ChatFormatting.WHITE)
                 appendWithColor(caveInText, caveInColor.rgb)
-            }
-            add(Renderable.text(componentBuilder))
+            }.let(Renderable::text))
 
             if (config.showTimeInMineshaft) {
                 val timeInMineshaft = caveInTimerStart.passedSince()
@@ -107,7 +117,7 @@ object MineshaftCaveInTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.MINESHAFT)
-    fun onGuiRenderOverlay() {
+    fun onRenderOverlay() {
         if (display.isEmpty()) return
         config.position.renderRenderables(display, posLabel = "Mineshaft Cave-in Timer")
     }
@@ -115,8 +125,8 @@ object MineshaftCaveInTimer {
     private fun estimateMaxTimeLeft(): Duration? {
         val current = lastColdValue ?: return null
         if (firstColdTime.isFarPast()) return null
-        val elapsed = firstColdTime.passedSince().toDouble(kotlin.time.DurationUnit.SECONDS)
-        if (totalColdGained <= 0 || elapsed <= 0) return null // should support the alpha +5cold for each kill?
+        val elapsed = firstColdTime.passedSince().inPartialSeconds
+        if (totalColdGained <= 0 || elapsed <= 0) return null
         val ratePerSecond = totalColdGained / elapsed
         return ((100 - current) / ratePerSecond).seconds
     }
