@@ -43,6 +43,14 @@ class MineshaftTimerConfig {
     var showTimeInMineshaft: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Show Estimated Time Left",
+        desc = "Estimates how long you can stay before cold reaches 100, based on your current cold rate."
+    )
+    @ConfigEditorBoolean
+    var showEstimatedTimeLeft: Boolean = true
+
+    @Expose
     @ConfigLink(owner = MineshaftTimerConfig::class, field = "enabled")
     var position: Position = Position(10, 10)
 }
