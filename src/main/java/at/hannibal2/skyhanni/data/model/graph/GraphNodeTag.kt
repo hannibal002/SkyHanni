@@ -33,7 +33,7 @@ enum class GraphNodeTag(
     // teleports from any island to this location on this island
     WARP("warp", LorenzColor.BLUE, "Warp", "A warp command target.", onlySkyblock = null),
 
-    // stand there, jumps to another island, name is the other island (display name, not enum name)
+    // stand there, jumps to another island, name is the other island (enum name, not display name)
     JUMP_PAD("jump_pad", LorenzColor.BLUE, "Jump Pad", "A jump pad or portal to another island.", onlySkyblock = null),
 
     // teleports around on the same island

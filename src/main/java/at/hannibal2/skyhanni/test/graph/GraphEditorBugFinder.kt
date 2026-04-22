@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import java.awt.Color
@@ -69,8 +70,11 @@ object GraphEditorBugFinder {
                 }
             }
             if (node.hasTag(GraphNodeTag.JUMP_PAD)) {
-                if (IslandType.entries.none { it.displayName == name }) {
+                if (IslandType.entries.none { it.name == name }) {
                     errorsInWorld[node] = "jump pad name is no known island name"
+                }
+                if (name == SkyBlockUtils.currentIsland.name) {
+                    errorsInWorld[node] = "jump pad name is current island name"
                 }
             }
         }
