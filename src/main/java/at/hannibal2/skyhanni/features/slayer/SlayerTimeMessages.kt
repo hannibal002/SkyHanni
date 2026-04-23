@@ -76,8 +76,8 @@ object SlayerTimeMessages {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(130, "slayer.timeToKillMessage", "slayer.slayerTimeMessages.timeToKill")
-        event.move(130, "slayer.questCompleteMessage", "slayer.slayerTimeMessages.questComplete")
-        event.move(130, "slayer.compactTimeMessage", "slayer.slayerTimeMessages.compact")
+        event.move(132, "slayer.timeToKillMessage", "slayer.slayerTimeMessages.timeToKill")
+        event.move(132, "slayer.questCompleteMessage", "slayer.slayerTimeMessages.questComplete")
+        event.move(132, "slayer.compactTimeMessage", "slayer.slayerTimeMessages.compact")
     }
 }
