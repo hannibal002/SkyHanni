@@ -981,6 +981,19 @@ class ProfileSpecificStorage(
     }
 
     @Expose
+    var spider: SpiderStorage = SpiderStorage()
+
+    class SpiderStorage {
+        @Expose
+        var relics: SpiderRelicsStorage = SpiderRelicsStorage()
+
+        class SpiderRelicsStorage {
+            @Expose
+            var found: MutableSet<LorenzVec> = mutableSetOf()
+        }
+    }
+
+    @Expose
     var cakeCounterData: CakeCounterData = CakeCounterData()
 
     class CakeCounterData(

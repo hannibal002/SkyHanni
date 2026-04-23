@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class RareMobSharingConfig {
+
     @Expose
     @ConfigOption(name = "Enabled", desc = "Share your Rare Diana Mobs and receiving other Rare Diana Mobs via Party Chat.")
     @ConfigEditorBoolean
@@ -24,7 +25,7 @@ class RareMobSharingConfig {
     @Expose
     @ConfigOption(
         name = "Instant Share",
-        desc = "Share the waypoint as soon as you find a Rare Diana Mob. As an alternative, you can share it only via key press."
+        desc = "Share the waypoint as soon as you find a Rare Diana Mob. As an alternative, you can share it only via key press.",
     )
     @ConfigEditorBoolean
     var instantShare: Boolean = true
@@ -47,8 +48,18 @@ class RareMobSharingConfig {
     @Expose
     @ConfigOption(
         name = "Read Global Chat",
-        desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat."
+        desc = "Also read the global chat for detecting Rare Diana Mobs, not only party chat.",
     )
     @ConfigEditorBoolean
     var globalChat: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Share Mob Toggles", desc = "Choose which rare mobs you share waypoints for.")
+    @Accordion
+    val shareMobToggles: RareMobToggleConfig = RareMobToggleConfig()
+
+    @Expose
+    @ConfigOption(name = "Receive Mob Toggles", desc = "Choose which rare mobs you receive waypoints for.")
+    @Accordion
+    val receiveMobToggles: RareMobToggleConfig = RareMobToggleConfig()
 }
