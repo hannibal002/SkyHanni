@@ -30,7 +30,7 @@ object GardenBpsTracker {
         { it.garden.gardenBpsTracker },
         { drawDisplay(it) },
         customUptimeControl = true,
-        trackerConfig = { config.perTrackerConfig }
+        trackerConfig = { config.perTrackerConfig },
     )
 
     class TimedData : TimedTrackerData<Data>({ Data() })

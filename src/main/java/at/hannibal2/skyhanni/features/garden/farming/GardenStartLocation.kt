@@ -29,7 +29,7 @@ object GardenStartLocation {
         if (!config.enabled) {
             ChatUtils.chatAndOpenConfig(
                 "This feature is disabled. Enable it in the config: §e/sh crop start location",
-                GardenApi.config::cropStartLocation
+                GardenApi.config::cropStartLocation,
             )
             return
         }

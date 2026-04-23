@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.mojang.blaze3d.platform.InputConstants
@@ -46,7 +44,7 @@ object GardenCustomKeybinds {
                 continue
             }
             if (key.value == override) {
-                keyBinding.setDown(pressed)
+                keyBinding.isDown = pressed
                 handled = true
                 continue
             }
