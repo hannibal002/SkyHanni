@@ -158,6 +158,11 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(name = "Boop Party", desc = "")
+    @Accordion
+    val boopParty: BoopPartyConfig = BoopPartyConfig()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
@@ -397,6 +402,15 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     var fastFairySouls: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Spider Den Relic Pathfinder",
+        desc = "Uses a fast pathfinder route to get to all Relics in Spider's Den.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var spiderRelicPathfinder: Boolean = false
 
     @Expose
     @ConfigOption(

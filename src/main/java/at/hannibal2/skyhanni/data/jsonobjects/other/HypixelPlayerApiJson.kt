@@ -38,5 +38,5 @@ data class HypixelApiTrophyFish(
 data class HypixelApiFactionInfo(
     @Expose @SerializedName("barbarians_reputation") val barbarianReputation: Int,
     @Expose @SerializedName("mages_reputation") val mageReputation: Int,
-    @Expose @SerializedName("selected_faction") val currentFaction: String,
+    @Expose @SerializedName("selected_faction") val currentFaction: String?,
 )

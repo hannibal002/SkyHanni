@@ -47,6 +47,7 @@ object EstimatedItemValue {
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
+    var hasLegacyGemstoneSlots = emptyList<NeuInternalName>()
     var bookBundleAmount = mapOf<String, Int>()
     var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
@@ -71,6 +72,7 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
+        hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots ?: emptyList()
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
 
