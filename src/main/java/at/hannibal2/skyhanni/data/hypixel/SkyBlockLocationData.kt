@@ -191,7 +191,6 @@ object SkyBlockLocationData {
                     workaroundChangeTo(islandType)
                     if (islandType == IslandType.MINESHAFT) {
                         GlaciteMineshaftDetectEvent(MineshaftDetection.MineshaftType.TOPA_1).post()
-
                     }
                 }
             }
