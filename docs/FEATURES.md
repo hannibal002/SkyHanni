@@ -1501,6 +1501,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Matriarch Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1385)
     + Highlights the Heavy Pearls.
     + Draws a line to the Heavy Pearls.
++ Added Vanquisher Waypoint Sharing. - itsseth3 (https://github.com/hannibal002/SkyHanni/pull/5197)
+    + Sends appropriate Vanquisher spawned/shared/died message into party/all chat.
+    + Either shares instantly or upon key press.
+    + On-screen indicators: Renders title, waypoint, beacon, and tracers for party member spawns (or global if enabled).
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.

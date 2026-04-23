@@ -1,24 +1,26 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
+import java.io.File
 
-// todo this class is a mess, it should get cleaned up and standardized with ChatUtils and ErrorManager
-//  should be some genericized way to create loggers that can utilize either ChatUtils or ErrorManager or SkyHanniMod.logger
-//  depending on the use case
-class RepoLogger(private val loggingPrefix: String) {
-    fun debug(message: String) = SkyHanniMod.logger.debug("$loggingPrefix $message")
-    fun preDebug(message: String) = println("$loggingPrefix $message")
-    fun warn(message: String) = SkyHanniMod.logger.warn("$loggingPrefix $message")
-    fun logToChat(message: String, color: String = "§a") = ChatUtils.chat("$color$loggingPrefix $message", prefix = false)
-    fun errorToChat(error: String) = ChatUtils.userError("§c$loggingPrefix $error")
+class RepoLogger(manager: AbstractRepoManager<*>) : SkyHanniLogger(manager.commonName) {
 
-    fun logNonDestructiveError(error: String) = SkyHanniMod.logger.error("$loggingPrefix $error")
-    fun logError(error: String): Nothing = ErrorManager.skyHanniError("$loggingPrefix $error")
-    fun logErrorWithData(cause: Throwable, error: String): Boolean =
+    private val loggingPrefix = "[Repo - ${manager.commonName}]"
+    override val logsDir = File(manager.repoDirectory, "logs")
+
+    fun debug(message: String) = log("[DEBUG] $loggingPrefix $message")
+    fun warn(message: String) = log("[WARN] $loggingPrefix $message")
+    fun error(message: String) = log("[ERROR] $loggingPrefix $message")
+
+    fun chat(message: String, color: String = "§a") = ChatUtils.chat("$color$loggingPrefix $message", prefix = false)
+    fun chatError(error: String) = ChatUtils.userError("§c$loggingPrefix $error")
+
+    fun errorWithData(cause: Throwable, error: String): Boolean =
         ErrorManager.logErrorWithData(cause, "$loggingPrefix $error")
-    fun logErrorStateWithData(
+
+    fun errorStateWithData(
         userMessage: String,
         internalMessage: String,
         vararg extraData: Pair<String, Any?>,
