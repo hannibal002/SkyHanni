@@ -6,5 +6,5 @@ import moe.nea.libautoupdate.UpdateTarget
 
 object NoOpUpdateTarget : UpdateTarget {
 
-    override fun generateUpdateActions(update: PotentialUpdate?) = emptyList<UpdateAction>()
+    override fun generateUpdateActions(update: PotentialUpdate) = emptyList<UpdateAction>()
 }
