@@ -256,7 +256,7 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !config.respawnSequence) return
         if (event.old != "dead_bush" || event.new != "air") return
