@@ -21,7 +21,7 @@ data class MCVersion(val epoch: Int, val major: Int, val minor: Int) : Comparabl
 
     companion object {
 
-        val currentMcVersion = fromString(PlatformUtils.MC_VERSION)
+        val currentMcVersion by lazy { fromString(PlatformUtils.MC_VERSION) })
 
         fun fromString(version: String): MCVersion {
             val parts = version.split('.')
