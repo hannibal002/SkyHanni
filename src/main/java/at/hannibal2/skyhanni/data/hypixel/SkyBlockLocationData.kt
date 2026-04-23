@@ -167,33 +167,4 @@ object SkyBlockLocationData {
             event.addData(list)
         }
     }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shassumeisland") {
-            category = CommandCategory.DEVELOPER_TEST
-            description = "Used to override the island type for testing purposes."
-            arg("island", BrigadierArguments.string(), IslandType.entries.map { it.name.lowercase() }) { island ->
-                arg("type", BrigadierArguments.string(), MineshaftDetection.MineshaftType.entries.map { it.name.lowercase() }) { type ->
-                    callback {
-                        val islandType = IslandType.valueOf(getArg(island).uppercase())
-                        workaroundChangeTo(islandType)
-                        if (islandType == IslandType.MINESHAFT) {
-                            val mineshaftType = MineshaftDetection.MineshaftType.entries
-                                .firstOrNull { it.name == getArg(type).uppercase() }
-                                ?: MineshaftDetection.MineshaftType.TOPA_1
-                            GlaciteMineshaftDetectEvent(mineshaftType).post()
-                        }
-                    }
-                }
-                callback {
-                    val islandType = IslandType.valueOf(getArg(island).uppercase())
-                    workaroundChangeTo(islandType)
-                    if (islandType == IslandType.MINESHAFT) {
-                        GlaciteMineshaftDetectEvent(MineshaftDetection.MineshaftType.TOPA_1).post()
-                    }
-                }
-            }
-        }
-    }
 }

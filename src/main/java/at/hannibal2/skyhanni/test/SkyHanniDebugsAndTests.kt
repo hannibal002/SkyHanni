@@ -9,21 +9,26 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.LorenzVecArgumentType
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.SkyBlockLocationData.workaroundChangeTo
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -579,6 +584,31 @@ object SkyHanniDebugsAndTests {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
                 } else {
                     ChatUtils.chat("§eYou are not in SkyBlock.")
+                }
+            }
+        }
+        event.registerBrigadier("shassumeisland") {
+            category = CommandCategory.DEVELOPER_TEST
+            description = "Used to override the island type for testing purposes."
+            arg("island", BrigadierArguments.string(), IslandType.entries.map { it.name.lowercase() }) { island ->
+                arg("type", BrigadierArguments.string(), MineshaftDetection.MineshaftType.entries.map { it.name.lowercase() }) { type ->
+                    callback {
+                        val islandType = IslandType.valueOf(getArg(island).uppercase())
+                        workaroundChangeTo(islandType)
+                        if (islandType == IslandType.MINESHAFT) {
+                            val mineshaftType = MineshaftDetection.MineshaftType.entries
+                                .firstOrNull { it.name == getArg(type).uppercase() }
+                                ?: MineshaftDetection.MineshaftType.TOPA_1
+                            GlaciteMineshaftDetectEvent(mineshaftType).post()
+                        }
+                    }
+                }
+                callback {
+                    val islandType = IslandType.valueOf(getArg(island).uppercase())
+                    workaroundChangeTo(islandType)
+                    if (islandType == IslandType.MINESHAFT) {
+                        GlaciteMineshaftDetectEvent(MineshaftDetection.MineshaftType.TOPA_1).post()
+                    }
                 }
             }
         }
