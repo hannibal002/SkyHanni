@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -66,7 +67,7 @@ object InfernoMinionProfitTracker {
         override fun getDescription(timesGained: Long): List<String> {
             val totalItems = items.values.sumOf { it.timesGained }
             val shareOfDrops = if (totalItems > 0) timesGained.toDouble() / totalItems else 0.0
-            val formattedShare = (shareOfDrops * 100).oneDecimal()
+            val formattedShare = shareOfDrops.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Share of drops: §c$formattedShare",
