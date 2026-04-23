@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
+import at.hannibal2.skyhanni.features.misc.update.SkyHanniUpdateSource
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -151,7 +152,19 @@ class DebugConfig {
     var printMissingBazaarItems: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
+    @ConfigOption(
+        name = "Update Source",
+        desc = "Source to use to check for updates.\n" +
+            "§cDo not change this unless you know what you are doing!"
+    )
+    @ConfigEditorDropdown
+    val updateSource: Property<SkyHanniUpdateSource> = Property.of(SkyHanniUpdateSource.MODRINTH)
+
+    @Expose
+    @ConfigOption(
+        name = "Always Outdated",
+        desc = "When checking for updates, act like you are always outdated.",
+    )
     @ConfigEditorBoolean
     var alwaysOutdated: Boolean = false
 
