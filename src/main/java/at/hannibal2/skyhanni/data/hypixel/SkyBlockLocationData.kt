@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.data.hypixel
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -8,6 +11,8 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.IslandLeaveEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -54,12 +59,14 @@ object SkyBlockLocationData {
     private var confirmedIsland = IslandType.NONE
     private var previousIsland = IslandType.NONE
     private var scoreboardTitle: String? = null
+    private var islandOverride: IslandType? = null
 
     @HandleEvent
     fun onWorldChange() {
         scoreboardTitle = null
         scoreboardShowsSkyBlock = false
         tabListIsland = IslandType.NONE
+        islandOverride = null
         handleStateChange()
     }
 
@@ -68,6 +75,7 @@ object SkyBlockLocationData {
         scoreboardTitle = null
         scoreboardShowsSkyBlock = false
         tabListIsland = IslandType.NONE
+        islandOverride = null
         if (confirmedIsland != IslandType.NONE) {
             changeTo(IslandType.NONE)
         }
@@ -100,6 +108,7 @@ object SkyBlockLocationData {
 
     fun workaroundChangeTo(newIsland: IslandType) {
         ChatUtils.debug("workaroundChangeTo $newIsland")
+        islandOverride = newIsland
         if (confirmedIsland != IslandType.NONE) {
             changeTo(IslandType.NONE)
         }
@@ -108,6 +117,7 @@ object SkyBlockLocationData {
     }
 
     private fun handleStateChange() {
+        if (islandOverride != null) return
         val newIsland = if (inSkyBlock) tabListIsland else IslandType.NONE
         if (newIsland == confirmedIsland) return
 
@@ -155,6 +165,36 @@ object SkyBlockLocationData {
             event.addIrrelevant(list)
         } else {
             event.addData(list)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shassumeisland") {
+            category = CommandCategory.DEVELOPER_TEST
+            description = "Used to override the island type for testing purposes."
+            arg("island", BrigadierArguments.string(), IslandType.entries.map { it.name.lowercase() }) { island ->
+                arg("type", BrigadierArguments.string(), MineshaftDetection.MineshaftType.entries.map { it.name.lowercase() }) { type ->
+                    callback {
+                        val islandType = IslandType.valueOf(getArg(island).uppercase())
+                        workaroundChangeTo(islandType)
+                        if (islandType == IslandType.MINESHAFT) {
+                            val mineshaftType = MineshaftDetection.MineshaftType.entries
+                                .firstOrNull { it.name == getArg(type).uppercase() }
+                                ?: MineshaftDetection.MineshaftType.TOPA_1
+                            GlaciteMineshaftDetectEvent(mineshaftType).post()
+                        }
+                    }
+                }
+                callback {
+                    val islandType = IslandType.valueOf(getArg(island).uppercase())
+                    workaroundChangeTo(islandType)
+                    if (islandType == IslandType.MINESHAFT) {
+                        GlaciteMineshaftDetectEvent(MineshaftDetection.MineshaftType.TOPA_1).post()
+
+                    }
+                }
+            }
         }
     }
 }
