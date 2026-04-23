@@ -54,14 +54,12 @@ object SkyBlockLocationData {
     private var confirmedIsland = IslandType.NONE
     private var previousIsland = IslandType.NONE
     private var scoreboardTitle: String? = null
-    private var islandOverride: IslandType? = null
 
     @HandleEvent
     fun onWorldChange() {
         scoreboardTitle = null
         scoreboardShowsSkyBlock = false
         tabListIsland = IslandType.NONE
-        islandOverride = null
         handleStateChange()
     }
 
@@ -70,7 +68,6 @@ object SkyBlockLocationData {
         scoreboardTitle = null
         scoreboardShowsSkyBlock = false
         tabListIsland = IslandType.NONE
-        islandOverride = null
         if (confirmedIsland != IslandType.NONE) {
             changeTo(IslandType.NONE)
         }
@@ -103,7 +100,6 @@ object SkyBlockLocationData {
 
     fun workaroundChangeTo(newIsland: IslandType) {
         ChatUtils.debug("workaroundChangeTo $newIsland")
-        islandOverride = newIsland
         if (confirmedIsland != IslandType.NONE) {
             changeTo(IslandType.NONE)
         }
@@ -112,7 +108,6 @@ object SkyBlockLocationData {
     }
 
     private fun handleStateChange() {
-        if (islandOverride != null) return
         val newIsland = if (inSkyBlock) tabListIsland else IslandType.NONE
         if (newIsland == confirmedIsland) return
 
