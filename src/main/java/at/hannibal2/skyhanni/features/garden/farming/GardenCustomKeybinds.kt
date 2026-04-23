@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
-import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
