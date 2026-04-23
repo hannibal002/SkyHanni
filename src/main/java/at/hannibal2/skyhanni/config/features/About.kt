@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.config.features
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDeprecatedDisplay
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class About {
@@ -20,20 +19,9 @@ class About {
 
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
+    @SearchTag("check download update")
     @Transient
     var currentVersion: Unit? = null
-
-    @ConfigOption(name = "Check for Updates", desc = "Automatically check for updates on each startup")
-    @Expose
-    @ConfigEditorBoolean
-    var checkForUpdates: Boolean = true
-
-    // TODO change this somehow
-    @ConfigOption(name = "Auto Updates", desc = "Automatically download new version on each startup")
-    @Expose
-    @FeatureToggle
-    @ConfigEditorBoolean
-    var fullAutoUpdates: Boolean = false
 
     @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
     @Expose
@@ -46,7 +34,6 @@ class About {
     val licenses: Licenses = Licenses()
 
     enum class UpdateStream(private val label: String, val stream: String) {
-        NONE("None", "none"),
         BETA("Beta", "pre"),
         RELEASES("Full", "full");
 

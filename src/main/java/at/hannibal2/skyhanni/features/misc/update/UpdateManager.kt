@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -10,32 +12,35 @@ import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersion
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DiscontinuedMinecraftVersionsJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
+import moe.nea.libautoupdate.GithubReleaseUpdateData
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
-import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.Items
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.net.ssl.HttpsURLConnection
 import kotlin.time.Duration
 
@@ -43,6 +48,9 @@ import kotlin.time.Duration
 object UpdateManager {
 
     private val logger = SkyHanniLogger("update_manager")
+
+    private val repoReloadCoroutine = CoroutineSettings("update manager repo reload")
+
     private var _activePromise: CompletableFuture<*>? = null
     private var activePromise: CompletableFuture<*>?
         get() = _activePromise
@@ -58,11 +66,18 @@ object UpdateManager {
         return potentialUpdate?.update?.versionNumber?.asString
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
-        SkyHanniMod.feature.about.updateStream.onToggle {
+        config.updateStream.onToggle {
             reset()
         }
+        debugConfig.updateSource.whenChanged { _, new ->
+            logger.log("Update source changed to $new")
+            reset()
+            refreshContext(new)
+        }
+
+        refreshContext(debugConfig.updateSource.get())
     }
 
     private var hasCheckedForUpdate = false
@@ -70,10 +85,7 @@ object UpdateManager {
     @HandleEvent
     fun onTick() {
         if (hasCheckedForUpdate) return
-        hasCheckedForUpdate = true
-
-        if (config.checkForUpdates || config.fullAutoUpdates)
-            checkUpdate()
+        checkUpdate()
     }
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
@@ -86,106 +98,112 @@ object UpdateManager {
     }
 
     private val config get() = SkyHanniMod.feature.about
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
     fun reset() {
         updateState = UpdateState.NONE
         _activePromise = null
         potentialUpdate = null
+        hasCheckedForUpdate = false
         logger.log("Reset update state")
     }
 
-    fun checkUpdate(forceDownload: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
+    fun checkUpdate(force: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
+        val context = updateContext ?: return
+        hasCheckedForUpdate = true
+
         var updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
-            if (updateState == UpdateState.AVAILABLE && forceDownload) {
+            if (updateState == UpdateState.AVAILABLE && force) {
                 updateState = UpdateState.NONE
-                logger.log("Resetting update state to force download")
+                logger.log("Resetting update state to force check")
             } else {
                 logger.log("Trying to perform update check while another update is already in progress")
                 return
             }
         }
-        logger.log("Starting update check")
+
+        logger.log("Starting update check (source: ${context.source.javaClass.simpleName}")
+
         val currentStream = config.updateStream.get()
         if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
             config.updateStream.set(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
-        activePromise = context.checkUpdate(updateStream.stream).thenAcceptAsync(
-            {
-                logger.log("Update check completed")
-                if (updateState != UpdateState.NONE) {
-                    logger.log("This appears to be the second update check. Ignoring this one")
-                    return@thenAcceptAsync
-                }
-                potentialUpdate = it
-                if (it.isUpdateAvailable) {
-                    updateState = UpdateState.AVAILABLE
-//                     if (config.fullAutoUpdates || forceDownload) {
-//                         ChatUtils.chat(
-//                             componentBuilder {
-//                                 append("SkyHanni found a new update: ${it.update.versionName}, starting to download now.")
-//                                 withColor(ChatFormatting.GREEN)
-//                             }
-//                         )
-//                         queueUpdate()
-//                     } else
-                    if (config.checkForUpdates) {
-                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}.")
-                        suggestModrinth()
+
+        activePromise = context.checkUpdate(updateStream.stream)
+            .orTimeout(15, TimeUnit.SECONDS)
+            .whenCompleteAsync(
+                { update, throwable ->
+                    if (throwable != null) {
+                        if (throwable is TimeoutException) {
+                            ErrorManager.logErrorWithData(throwable, "Update check timed out")
+                        } else {
+                            ErrorManager.logErrorWithData(throwable, "Update check failed")
+                        }
+                        return@whenCompleteAsync
+                    }
+                    logger.log("Update check completed")
+                    if (updateState != UpdateState.NONE) {
+                        logger.log("This appears to be the second update check. Ignoring this one")
+                        return@whenCompleteAsync
+                    }
+                    potentialUpdate = update
+                    if (update.isUpdateAvailable) {
+                        updateState = UpdateState.AVAILABLE
+                        ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
+                        getDownloadPage(update)?.let { url ->
+                            ChatUtils.clickableLinkChat(
+                                "§e§lCLICK HERE §r§eto open the download page.",
+                                url,
+                            )
+                        }
                         ChatUtils.clickableChat(
-                            "§e§lCLICK HERE §r§eto view changes.",
+                            "§e§lCLICK HERE §r§eto view changes in-game.",
                             onClick = {
-                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, it.update.versionName)
+                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.update.versionName)
+                            },
+                        )
+                    } else if (force) {
+                        ChatUtils.chat(
+                            componentBuilder {
+                                append("SkyHanni didn't find a new update.")
+                                withColor(ChatFormatting.GREEN)
                             },
                         )
                     }
-                } else if (forceDownload) {
-                    ChatUtils.chat(
-                        componentBuilder {
-                            append("SkyHanni didn't find a new update.")
-                            withColor(ChatFormatting.GREEN)
-                        },
-                    )
-                }
-            },
-            Minecraft.getInstance(),
-        )
+                },
+                Minecraft.getInstance(),
+            )
     }
 
-    fun queueUpdate() {
-        logger.log("auto updating is manually disabled for now.")
-        suggestModrinth()
-//         if (updateState != UpdateState.AVAILABLE) {
-//             logger.log("Trying to enqueue an update while another one is already downloaded or none is present")
-//         }
-//         updateState = UpdateState.QUEUED
-//         activePromise = CompletableFuture.supplyAsync {
-//             logger.log("Update download started")
-//             potentialUpdate!!.prepareUpdate()
-//         }.thenAcceptAsync(
-//             {
-//                 logger.log("Update download completed, setting exit hook")
-//                 updateState = UpdateState.DOWNLOADED
-//                 potentialUpdate!!.executePreparedUpdate()
-//                 ChatUtils.chat("Download of update complete. ")
-//                 ChatUtils.chat("§aThe update will be installed after your next restart.")
-//             },
-//             Minecraft.getInstance(),
-//         )
+    fun getDownloadPage(update: PotentialUpdate? = potentialUpdate): String? {
+        if (update == null) {
+            ErrorManager.logErrorWithData(
+                IllegalStateException("Attempted to call getDownloadPage with no potentialUpdate"),
+                "Error while getting update download information",
+            )
+            return null
+        }
+        return when (val data = update.update) {
+            is ModrinthUpdateData -> data.htmlUrl
+            is GithubReleaseUpdateData -> data.htmlUrl
+            else -> {
+                ErrorManager.logErrorWithData(
+                    IllegalStateException("Unsupported update data type"),
+                    "Error while getting update download information",
+                    "updateData" to data,
+                )
+                null
+            }
+        }
     }
 
-    private fun suggestModrinth() {
-        ChatUtils.clickableChat("§eClick here to manually download the version from Modrinth.", onClick = {
-            OSUtils.openBrowser("https://modrinth.com/mod/skyhanni")
-        })
-    }
-
-    private val context = UpdateContext(
-        CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
-        UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
+    private fun buildContext(updateSource: SkyHanniUpdateSource) = UpdateContext(
+        updateSource.source,
+        NoOpUpdateTarget,
         object : CurrentVersion {
-            private val debug get() = SkyHanniMod.feature.dev.debug.alwaysOutdated
+            private val debug get() = debugConfig.alwaysOutdated
             override fun display(): String = if (debug) "Force Outdated" else SkyHanniMod.VERSION
 
             override fun isOlderThan(element: JsonElement?): Boolean {
@@ -198,9 +216,17 @@ object UpdateManager {
         SkyHanniMod.MODID,
     )
 
+    private fun refreshContext(updateSource: SkyHanniUpdateSource) {
+        val newContext = buildContext(updateSource)
+        newContext.cleanup()
+        updateContext = newContext
+    }
+
+    private var updateContext: UpdateContext? = null
+
     init {
-        context.cleanup()
         UpdateUtils.patchConnection {
+            it.setRequestProperty("User-Agent", SkyHanniMod.userAgent)
             if (it is HttpsURLConnection) {
                 ApiInternalUtils.patchHttpsRequest(it)
             }
@@ -209,8 +235,6 @@ object UpdateManager {
 
     enum class UpdateState {
         AVAILABLE,
-        QUEUED,
-        DOWNLOADED,
         NONE
     }
 
@@ -262,11 +286,10 @@ object UpdateManager {
     private var hasWarned = false
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstant<DiscontinuedMinecraftVersionsJson>("DiscontinuedMinecraftVersions")
-        constant.versions?.let {
-            discontinuedVersions = it
-        }
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        discontinuedVersions = event.getConstantAsync<DiscontinuedMinecraftVersionsJson>(
+            "DiscontinuedMinecraftVersions",
+        ).versions.orEmpty()
     }
 
     @HandleEvent(HypixelJoinEvent::class)
@@ -324,6 +347,16 @@ object UpdateManager {
                 ),
             )
             event.addItem(stack)
+        }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(131, "about.updateStream") { element ->
+            when (element.asString) {
+                "NONE" -> JsonPrimitive(if (SkyHanniMod.isBetaVersion) "BETA" else "RELEASES")
+                else -> element
+            }
         }
     }
 }
