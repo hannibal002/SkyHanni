@@ -120,6 +120,7 @@ object ChangelogViewer {
     private fun formatChangelog(body: String): Map<String, List<String>> =
         formatData(formatString(getBasic(body)))
 
+    // These patterns parse internal changelog formatting, not Hypixel game messages, and do not need remote update capability.
     private val trailingNewlinePattern = "\\s*\r?\n$".toRegex()
     private val lineBreakPattern = "\r?\n".toRegex()
 
