@@ -140,8 +140,8 @@ object InfernoMinionProfitTracker {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isInfernoMinion) return
         if (!config.enabled) return
+        if (!isInfernoMinion) return
         val newFuel = getFuelFromInventory(event.inventoryItems)
         if (newFuel != null && newFuel != lastFuelItem) {
             tracker.modify { it.totalFuelCost += newFuel.getPrice() }
@@ -168,7 +168,7 @@ object InfernoMinionProfitTracker {
         isInfernoMinion = false
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
         if (MinionFeatures.eyedropsRanOutPattern.matches(event.cleanMessage)) {
