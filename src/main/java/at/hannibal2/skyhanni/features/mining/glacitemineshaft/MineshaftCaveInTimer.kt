@@ -52,7 +52,7 @@ object MineshaftCaveInTimer {
     fun onMineshaftDetect() {
         caveInTimerStart = SimpleTimeMark.now()
         firstColdTime = SimpleTimeMark.farPast()
-        lastColdValue = null
+        lastColdValue = 0
         totalColdGained = 0
     }
 
