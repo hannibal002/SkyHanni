@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -171,7 +172,9 @@ object RiftWiltedBerberisHelper {
                 event.cancel()
             }
             if (event.type == ParticleTypes.HAPPY_VILLAGER) {
-                handleRespawnParticle(location)
+                DelayedRun.runOrNextTick {
+                    handleRespawnParticle(location)
+                }
             }
             return
         }
@@ -245,7 +248,7 @@ object RiftWiltedBerberisHelper {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled() || !config.respawnSequence) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        if (event.getBlockState.block != Blocks.DEAD_BUSH) return
+        if (event.blockState.block != Blocks.DEAD_BUSH) return
 
         for (seq in fieldSequences.values) {
             if (!seq.isRendering || seq.isAway) continue
