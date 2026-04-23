@@ -158,8 +158,8 @@ object InfernoMinionProfitTracker {
         tracker.addItem(event.internalName, event.amount, command = false)
     }
 
-    @HandleEvent
-    fun onMinionClose(event: MinionCloseEvent) {
+    @HandleEvent(MinionCloseEvent::class)
+    fun onMinionClose() {
         if (!isInfernoMinion) return
         if (!config.enabled) return
         lastCollectionTime = SimpleTimeMark.now()
